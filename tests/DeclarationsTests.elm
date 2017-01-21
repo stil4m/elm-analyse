@@ -20,7 +20,8 @@ all =
                 parseFullStringWithNullState "foo : Int" Parser.signature
                     |> Expect.equal
                         (Just
-                            { name = "foo"
+                            { operatorDefinition = False
+                            , name = "foo"
                             , typeReference = Types.Typed [] "Int" []
                             }
                         )
@@ -29,7 +30,8 @@ all =
                 parseFullStringWithNullState "foo:Int" Parser.signature
                     |> Expect.equal
                         (Just
-                            { name = "foo"
+                            { operatorDefinition = False
+                            , name = "foo"
                             , typeReference = Types.Typed [] "Int" []
                             }
                         )
@@ -42,7 +44,8 @@ all =
                 parseFullStringWithNullState "foo :\n Int" Parser.signature
                     |> Expect.equal
                         (Just
-                            { name = "foo"
+                            { operatorDefinition = False
+                            , name = "foo"
                             , typeReference = Types.Typed [] "Int" []
                             }
                         )
@@ -53,13 +56,30 @@ all =
         , test "function declaration" <|
             \() ->
                 parseFullStringWithNullState "foo = bar" Parser.functionDeclaration
-                    |> Expect.equal (Just { name = "foo", arguments = [], expression = (FunctionOrValue "bar") })
+                    |> Expect.equal (Just { operatorDefinition = False, name = "foo", arguments = [], expression = (FunctionOrValue "bar") })
+        , test "operator declarations" <|
+            \() ->
+                parseFullStringWithNullState "(&>) = flip Maybe.andThen" Parser.functionDeclaration
+                    |> Expect.equal
+                        (Just
+                            { operatorDefinition = True
+                            , name = "&>"
+                            , arguments = []
+                            , expression =
+                                (Application
+                                    [ FunctionOrValue "flip"
+                                    , QualifiedExpr (ModuleName [ "Maybe" ]) "andThen"
+                                    ]
+                                )
+                            }
+                        )
         , test "function declaration with args" <|
             \() ->
                 parseFullStringWithNullState "inc x = x + 1" Parser.functionDeclaration
                     |> Expect.equal
                         (Just
-                            { name = "inc"
+                            { operatorDefinition = False
+                            , name = "inc"
                             , arguments = [ VarPattern "x" ]
                             , expression =
                                 (Application
@@ -75,7 +95,8 @@ all =
                 parseFullStringWithNullState "bar : List ( Int , Maybe m )" Parser.signature
                     |> Expect.equal
                         (Just
-                            { name = "bar"
+                            { operatorDefinition = False
+                            , name = "bar"
                             , typeReference =
                                 Typed []
                                     "List"
@@ -93,7 +114,8 @@ all =
                 parseFullStringWithNullState "foo =\n let\n  b = 1\n in\n  b" Parser.functionDeclaration
                     |> Expect.equal
                         (Just
-                            { name = "foo"
+                            { operatorDefinition = False
+                            , name = "foo"
                             , arguments = []
                             , expression =
                                 (LetBlock
@@ -101,7 +123,8 @@ all =
                                         { documentation = Nothing
                                         , signature = Nothing
                                         , declaration =
-                                            { name = "b"
+                                            { operatorDefinition = False
+                                            , name = "b"
                                             , arguments = []
                                             , expression = Integer 1
                                             }
@@ -116,7 +139,8 @@ all =
                 parseFullStringWithNullState "main =\n  beginnerProgram { model = 0, view = view, update = update }" Parser.functionDeclaration
                     |> Expect.equal
                         (Just
-                            { name = "main"
+                            { operatorDefinition = False
+                            , name = "main"
                             , arguments = []
                             , expression =
                                 (Application
@@ -135,7 +159,8 @@ all =
                 parseFullStringWithNullState "update msg model =\n  case msg of\n    Increment ->\n      model + 1\n\n    Decrement ->\n      model - 1" Parser.functionDeclaration
                     |> Expect.equal
                         (Just
-                            { name = "update"
+                            { operatorDefinition = False
+                            , name = "update"
                             , arguments = [ VarPattern "msg", VarPattern "model" ]
                             , expression =
                                 (CaseBlock
@@ -156,7 +181,8 @@ all =
                     |> Expect.equal
                         (Just
                             (PortDeclaration
-                                { name = "parseResponse"
+                                { operatorDefinition = False
+                                , name = "parseResponse"
                                 , typeReference =
                                     (Types.Function
                                         (Tupled [ Typed [] "String" [], Typed [] "String" [] ])
@@ -180,6 +206,21 @@ all =
                                 ]
                             , declarations = []
                             }
+                        )
+        , test "port declaration" <|
+            \() ->
+                parseFullStringWithNullState "port scroll : (Move -> msg) -> Sub msg" declaration
+                    |> Expect.equal
+                        (Just <|
+                            PortDeclaration
+                                { operatorDefinition = False
+                                , name = "scroll"
+                                , typeReference =
+                                    (Types.Function
+                                        (Types.Function (Typed [] "Move" []) (GenericType "msg"))
+                                        (Typed [] "Sub" ([ Generic "msg" ]))
+                                    )
+                                }
                         )
         ]
 

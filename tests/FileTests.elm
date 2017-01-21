@@ -16,7 +16,8 @@ all =
                 parseFullStringState emptyState "main =\n  text \"Hello, World!\"" Parser.functionDeclaration
                     |> Expect.equal
                         (Just
-                            { name = "main"
+                            { operatorDefinition = False
+                            , name = "main"
                             , arguments = []
                             , expression =
                                 Application
@@ -33,7 +34,8 @@ all =
                             { documentation = Nothing
                             , signature = Nothing
                             , declaration =
-                                { name = "main"
+                                { operatorDefinition = False
+                                , name = "main"
                                 , arguments = []
                                 , expression =
                                     Application

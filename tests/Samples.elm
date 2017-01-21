@@ -20,6 +20,7 @@ allSamples =
     , sample15
     , sample16
     , sample17
+    , sample18
     ]
 
 
@@ -250,3 +251,12 @@ sample17 =
     """module Foo
 bar =
     '1'"""
+
+
+sample18 : String
+sample18 =
+    """port module Ports exposing (..)
+
+import Scroll exposing (Move)
+
+port scroll : (Move -> msg) -> Sub msg"""

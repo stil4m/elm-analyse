@@ -1,6 +1,7 @@
 module Parser.Declarations exposing (..)
 
 import Combine exposing (..)
+import Combine.Char exposing (anyChar)
 import Combine.Num
 import Parser.Imports exposing (importDefinition)
 import Parser.Infix as Infix exposing (Infix)
@@ -66,7 +67,8 @@ function =
 
 
 type alias FunctionSignature =
-    { name : String
+    { operatorDefinition : Bool
+    , name : String
     , typeReference : TypeReference
     }
 
@@ -81,7 +83,8 @@ type Declaration
 
 
 type alias FunctionDeclaration =
-    { name : String
+    { operatorDefinition : Bool
+    , name : String
     , arguments : List Pattern
     , expression : Expression
     }
@@ -120,7 +123,8 @@ portDeclaration =
 signature : Parser State FunctionSignature
 signature =
     succeed FunctionSignature
-        <*> functionName
+        <*> (lookAhead anyChar >>= (\c -> succeed (c == '(')))
+        <*> (or functionName (parens prefixOperatorToken))
         <*> (maybe moreThanIndentWhitespace *> string ":" *> maybe moreThanIndentWhitespace *> typeReference)
 
 
@@ -129,7 +133,8 @@ functionDeclaration =
     lazy
         (\() ->
             succeed FunctionDeclaration
-                <*> functionName
+                <*> (lookAhead anyChar >>= (\c -> succeed (c == '(')))
+                <*> (or functionName (parens prefixOperatorToken))
                 <*> (many (moreThanIndentWhitespace *> functionArgument))
                 <*> (maybe moreThanIndentWhitespace
                         *> string "="

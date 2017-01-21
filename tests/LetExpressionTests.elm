@@ -15,8 +15,8 @@ all =
                 parseFullStringState (emptyState |> pushIndent 2) "foo = bar\n  \n  john = doe" Parser.letBody
                     |> Expect.equal
                         (Just
-                            [ FuncDecl { documentation = Nothing, signature = Nothing, declaration = { name = "foo", arguments = [], expression = (FunctionOrValue "bar") } }
-                            , FuncDecl { documentation = Nothing, signature = Nothing, declaration = { name = "john", arguments = [], expression = (FunctionOrValue "doe") } }
+                            [ FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = "foo", arguments = [], expression = (FunctionOrValue "bar") } }
+                            , FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = "john", arguments = [], expression = (FunctionOrValue "doe") } }
                             ]
                         )
         , test "let block" <|
@@ -24,8 +24,8 @@ all =
                 parseFullStringState emptyState "let\n  foo = bar\n  \n  john = doe" Parser.letBlock
                     |> Expect.equal
                         (Just
-                            [ FuncDecl { documentation = Nothing, signature = Nothing, declaration = { name = "foo", arguments = [], expression = (FunctionOrValue "bar") } }
-                            , FuncDecl { documentation = Nothing, signature = Nothing, declaration = { name = "john", arguments = [], expression = (FunctionOrValue "doe") } }
+                            [ FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = "foo", arguments = [], expression = (FunctionOrValue "bar") } }
+                            , FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = "john", arguments = [], expression = (FunctionOrValue "doe") } }
                             ]
                         )
         , test "in block" <|
@@ -41,7 +41,7 @@ all =
                                 [ FuncDecl
                                     { documentation = Nothing
                                     , signature = Nothing
-                                    , declaration = { name = "bar", arguments = [], expression = Integer 1 }
+                                    , declaration = { operatorDefinition = False, name = "bar", arguments = [], expression = Integer 1 }
                                     }
                                 ]
                                 (FunctionOrValue "bar")
