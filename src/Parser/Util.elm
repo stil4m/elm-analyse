@@ -40,13 +40,16 @@ maybeNewLineWithStartOfComment =
 
 commentSequence : Parser State (List Char)
 commentSequence =
-    (List.concat >> List.concat)
+    List.concat
         <$> (many
-                (sequence
-                    [ List.singleton <$> char '\n'
-                    , many (char ' ')
-                    , String.toList <$> someComment
-                    ]
+                (or (String.toList <$> someComment)
+                    (List.concat
+                        <$> sequence
+                                [ List.singleton <$> char '\n'
+                                , many (char ' ')
+                                , String.toList <$> someComment
+                                ]
+                    )
                 )
             )
 

@@ -74,4 +74,8 @@ all =
             \() ->
                 parseFullStringState (emptyState |> pushIndent 2) "\n  \n    \n\n  " exactIndentWhitespace
                     |> Expect.equal (Just "\n  \n    \n\n  ")
+        , test "exactIndentWhitespace with multiple new lines" <|
+            \() ->
+                parseFullStringState emptyState "-- bar\n " moreThanIndentWhitespace
+                    |> Expect.equal (Just "-- bar\n ")
         ]

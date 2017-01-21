@@ -1,7 +1,7 @@
 module Parser.Declarations exposing (..)
 
 import Combine exposing (..)
-import Combine.Char exposing (anyChar)
+import Combine.Char exposing (anyChar, noneOf)
 import Combine.Num
 import Parser.Imports exposing (importDefinition)
 import Parser.Infix as Infix exposing (Infix)
@@ -11,7 +11,7 @@ import Parser.Tokens exposing (..)
 import Parser.TypeReference exposing (..)
 import Parser.Types exposing (..)
 import Parser.Typings exposing (typeDeclaration)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace)
+import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed)
 
 
 type alias File =
@@ -117,7 +117,7 @@ destructuringDeclaration =
 
 portDeclaration : Parser State Declaration
 portDeclaration =
-    lazy (\() -> PortDeclaration <$> (portToken *> moreThanIndentWhitespace *> signature))
+    portToken *> lazy (\() -> PortDeclaration <$> (moreThanIndentWhitespace *> signature))
 
 
 signature : Parser State FunctionSignature
@@ -176,6 +176,10 @@ type Expression
     | RecordUpdate String (List ( String, Expression ))
 
 
+
+-- Expressions
+
+
 expressionNotApplication : Parser State Expression
 expressionNotApplication =
     lazy
@@ -207,9 +211,35 @@ expression : Parser State Expression
 expression =
     lazy
         (\() ->
-            or applicationExpression
-                expressionNotApplication
+            expressionNotApplication
+                >>= (\expr ->
+                        or (promoteToApplicationExpression expr)
+                            (succeed expr)
+                    )
         )
+
+
+promoteToApplicationExpression : Expression -> Parser State Expression
+promoteToApplicationExpression expr =
+    lazy
+        (\() ->
+            succeed (\rest -> Application (expr :: rest))
+                <*> (lazy (\() -> (many1 (maybe moreThanIndentWhitespace *> expressionNotApplication))))
+        )
+
+
+applicationExpression : Parser State Expression
+applicationExpression =
+    lazy
+        (\() ->
+            succeed (\x rest -> Application (x :: rest))
+                <*> (lazy (\() -> expressionNotApplication))
+                <*> (lazy (\() -> (many1 (maybe moreThanIndentWhitespace *> expressionNotApplication))))
+        )
+
+
+
+-- End expression
 
 
 withIndentedState : Parser State a -> Parser State a
@@ -431,13 +461,15 @@ floatableExpression =
 
 ifBlockExpression : Parser State Expression
 ifBlockExpression =
-    lazy
-        (\() ->
-            succeed IfBlock
-                <*> (ifToken *> moreThanIndentWhitespace *> expression)
-                <*> (moreThanIndentWhitespace *> thenToken *> moreThanIndentWhitespace *> expression)
-                <*> (moreThanIndentWhitespace *> elseToken *> moreThanIndentWhitespace *> expression)
-        )
+    ((ifToken)
+        *> lazy
+            (\() ->
+                succeed IfBlock
+                    <*> (trimmed expression)
+                    <*> (thenToken *> trimmed expression)
+                    <*> (elseToken *> moreThanIndentWhitespace *> expression)
+            )
+    )
 
 
 prefixOperatorExpression : Parser State Expression
@@ -493,14 +525,4 @@ tupledExpression =
                         TupledExpression xs
             )
                 <$> parens (sepBy1 (string ",") (maybe moreThanIndentWhitespace *> expression <* maybe moreThanIndentWhitespace))
-        )
-
-
-applicationExpression : Parser State Expression
-applicationExpression =
-    lazy
-        (\() ->
-            succeed (\x rest -> Application (x :: rest))
-                <*> (lazy (\() -> expressionNotApplication))
-                <*> (lazy (\() -> (many1 (maybe moreThanIndentWhitespace *> expressionNotApplication))))
         )

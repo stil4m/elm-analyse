@@ -77,6 +77,11 @@ all =
                                 ]
                             )
                         )
+        , test "compoundExpression 2" <|
+            \() ->
+                parseFullStringWithNullState "{ key = value } ! []" expression
+                    |> Expect.equal
+                        (Just (Application ([ RecordExpr ([ ( "key", FunctionOrValue "value" ) ]), Operator "!", ListExpr [] ])))
         , test "ifBlockExpression" <|
             \() ->
                 parseFullStringWithNullState "if True then foo else bar" expression
@@ -112,6 +117,17 @@ all =
                                 [ ( "model", Integer 0 )
                                 , ( "view", FunctionOrValue "view" )
                                 , ( "update", FunctionOrValue "update" )
+                                ]
+                            )
+                        )
+        , test "recordExpression with comment" <|
+            \() ->
+                parseFullStringWithNullState "{ foo = 1 -- bar\n , baz = 2 }" expression
+                    |> Expect.equal
+                        (Just
+                            (RecordExpr
+                                [ ( "foo", Integer 1 )
+                                , ( "baz", Integer 2 )
                                 ]
                             )
                         )

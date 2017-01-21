@@ -21,6 +21,8 @@ allSamples =
     , sample16
     , sample17
     , sample18
+    , sample19
+    , sample20
     ]
 
 
@@ -152,16 +154,9 @@ update msg model =
             model ! []
 
         Increment ->
-            ({ model | value = model.value + 1})
-              ! []
+            { model | value = model}! []
 
-        Decrement ->
-            ({ model | value = max 0 (model.value - 1)})
-              ! []
 
-        SetString str ->
-            ({ model | inputString = toUpper str })
-              ! []
 
       """
 
@@ -260,3 +255,75 @@ sample18 =
 import Scroll exposing (Move)
 
 port scroll : (Move -> msg) -> Sub msg"""
+
+
+sample19 : String
+sample19 =
+    """module Foo
+
+
+timeAgo time now =
+    if x then
+        1
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else if x then
+        2
+    else
+        3
+
+"""
+
+
+sample20 : String
+sample20 =
+    """module Date.Extra.Config.Config exposing (..)
+
+config : Config.Config
+config =
+
+      { date = "%d.%m.%Y"
+      , longDate = "%A, %-d %B %Y"
+      , time = "%-H:%M"
+      , longTime = "%-H:%M:%S"  --foo
+      , dateTime = "%-d.%m.%Y %-H:%M"
+      , firstDayOfWeek = Date.Mon
+      }
+
+"""

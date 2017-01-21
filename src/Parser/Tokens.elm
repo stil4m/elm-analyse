@@ -141,7 +141,7 @@ moduleName =
 
 excludedOperators : List String
 excludedOperators =
-    [ ":", "->" ]
+    [ ":", "->", "--" ]
 
 
 allowedOperatorTokens : List Char
