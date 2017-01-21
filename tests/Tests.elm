@@ -17,6 +17,7 @@ import TypeReferenceTests
 import TypingsTests
 import UtilTests
 import InfixTests
+import GlslTests
 
 
 all : Test
@@ -36,6 +37,7 @@ all =
         , CaseExpressionTests.all
         , LambdaExpressionTests.all
         , PatternTests.all
-        , FileTests.all
         , InfixTests.all
+        , GlslTests.all
+        , FileTests.all
         ]

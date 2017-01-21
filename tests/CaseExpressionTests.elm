@@ -8,16 +8,6 @@ import Test exposing (..)
 import Parser.Patterns exposing (..)
 
 
-x : String
-x =
-    case True of
-        True ->
-            "A"
-
-        False ->
-            "B"
-
-
 all : Test
 all =
     describe "Case expression tests"

@@ -174,6 +174,7 @@ type Expression
     | QualifiedExpr ModuleName String
     | RecordAccess (List String)
     | RecordUpdate String (List ( String, Expression ))
+    | GLSLExpression String
 
 
 
@@ -201,6 +202,7 @@ expressionNotApplication =
                 , charLiteralExpression
                 , recordExpression
                 , recordUpdateExpression
+                , glslExpression
                 , listExpression
                 , caseExpression
                 ]
@@ -255,6 +257,24 @@ withIndentedState p =
 unitExpression : Parser State Expression
 unitExpression =
     UnitExpr <$ string "()"
+
+
+glslExpression : Parser State Expression
+glslExpression =
+    (String.fromList >> GLSLExpression)
+        <$> (between (string "[glsl|")
+                (string "|]")
+                (many
+                    (lookAhead (String.fromList <$> count 2 anyChar)
+                        >>= (\s ->
+                                if s == "|]" then
+                                    fail "end symbol"
+                                else
+                                    anyChar
+                            )
+                    )
+                )
+            )
 
 
 
