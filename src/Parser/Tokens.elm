@@ -125,7 +125,7 @@ multiLineStringLiteral =
 
 functionName : Parser s String
 functionName =
-    regex "[a-z][a-zA-Z0-9_]*"
+    regex "[a-z][a-zA-Z0-9_]*'?"
         >>= notReserved
 
 
@@ -146,7 +146,7 @@ excludedOperators =
 
 allowedOperatorTokens : List Char
 allowedOperatorTokens =
-    [ '+', '-', ':', '/', '*', '>', '<', '=', '/', '&', '^', '%', '|', '!', '.', '#', '$' ]
+    [ '+', '-', ':', '/', '*', '>', '<', '=', '/', '&', '^', '%', '|', '!', '.', '#', '$', '≡' ]
 
 
 allowedPrefixOperatorTokens : List Char

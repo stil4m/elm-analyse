@@ -47,4 +47,8 @@ all =
             \() ->
                 parseFullStringWithNullState "module Foo exposing (..)" Parser.moduleDefinition
                     |> Expect.equal (Just (Types.NormalModule { moduleName = Types.ModuleName [ "Foo" ], exposingList = Types.All }))
+        , test "module name with _" <|
+            \() ->
+                parseFullStringWithNullState "module I_en_gb exposing (..)" Parser.moduleDefinition
+                    |> Expect.equal (Just (Types.NormalModule { moduleName = Types.ModuleName [ "I_en_gb" ], exposingList = Types.All }))
         ]

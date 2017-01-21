@@ -313,17 +313,9 @@ timeAgo time now =
 
 sample20 : String
 sample20 =
-    """module Date.Extra.Config.Config exposing (..)
+    """module Baz
 
-config : Config.Config
-config =
-
-      { date = "%d.%m.%Y"
-      , longDate = "%A, %-d %B %Y"
-      , time = "%-H:%M"
-      , longTime = "%-H:%M:%S"  --foo
-      , dateTime = "%-d.%m.%Y %-H:%M"
-      , firstDayOfWeek = Date.Mon
-      }
+foo = bar
+-- some
 
 """

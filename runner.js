@@ -40,7 +40,7 @@ function analyseNextFile() {
     return;
   }
 
-  const content = fs.readFileSync(next[0]).toString();
+  const content = fs.readFileSync(next[0], {encoding : 'utf-8'}).toString();
   app.ports.onFile.send([next[0],content]);
 }
 

@@ -1,7 +1,7 @@
 module Parser.Declarations exposing (..)
 
 import Combine exposing (..)
-import Combine.Char exposing (anyChar, noneOf)
+import Combine.Char exposing (anyChar, char, noneOf)
 import Combine.Num
 import Parser.Imports exposing (importDefinition)
 import Parser.Infix as Infix exposing (Infix)
@@ -36,7 +36,7 @@ file =
                 in
                     succeed (File modDef)
                         <*> importParser
-                        <*> ((many (exactIndentWhitespace *> declaration)) <* maybe whitespace)
+                        <*> ((many (exactIndentWhitespace *> declaration)) <* maybe exactIndentWhitespace <* (many (char ' ')))
             )
 
 

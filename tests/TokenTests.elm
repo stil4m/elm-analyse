@@ -110,6 +110,10 @@ all =
             \() ->
                 parseFullString "--" Parser.prefixOperatorToken
                     |> Expect.equal Nothing
+        , test "operatorToken 12" <|
+            \() ->
+                parseFullString "≡" Parser.prefixOperatorToken
+                    |> Expect.equal (Just "≡")
         , test "multiline string" <|
             \() ->
                 parseFullString "\"\"\"Bar foo \n a\"\"\"" Parser.multiLineStringLiteral
