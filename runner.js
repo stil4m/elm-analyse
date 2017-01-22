@@ -50,7 +50,7 @@ function analyseNextFile() {
 
     var matched =
       content.match(/\nport [a-z][a-zA-Z0-9_]*'? =/) ||
-      content.match(/`[a-z][a-zA-Z0-9_]*`/);
+      content.match(/`([A-Z][a-zA-Z0-9_]*\.)*[a-z][a-zA-Z0-9_]*`/);
 
     if (matched) {
       analyseNextFile();
