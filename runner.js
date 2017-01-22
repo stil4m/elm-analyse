@@ -48,9 +48,11 @@ function analyseNextFile() {
         encoding: 'utf-8'
     }).toString();
 
-    var matched = content.match(/\nport [a-z][a-zA-Z0-9_]*'? =/);
+    var matched =
+      content.match(/\nport [a-z][a-zA-Z0-9_]*'? =/) ||
+      content.match(/`[a-z][a-zA-Z0-9_]*`/);
+
     if (matched) {
-      console.log(matched[0]);
       analyseNextFile();
       return;
     }
