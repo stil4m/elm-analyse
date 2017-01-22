@@ -146,7 +146,7 @@ excludedOperators =
 
 allowedOperatorTokens : List Char
 allowedOperatorTokens =
-    [ '+', '-', ':', '/', '*', '>', '<', '=', '/', '&', '^', '%', '|', '!', '.', '#', '$', '≡', '~' ]
+    [ '+', '-', ':', '/', '*', '>', '<', '=', '/', '&', '^', '%', '|', '!', '.', '#', '$', '≡', '~', '?' ]
 
 
 allowedPrefixOperatorTokens : List Char
