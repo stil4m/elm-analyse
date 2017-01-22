@@ -22,7 +22,7 @@ reserved =
     , "infixr"
     , "infixl"
     , "type"
-    , "alias"
+      --, "alias" Apparently this is not a reserved keyword
     , "where"
     ]
 
