@@ -87,7 +87,7 @@ all =
                         )
         , test "tuple pattern" <|
             \() ->
-                parseFullStringState emptyState "({model,context} as appState)" Parser.pattern
+                parseFullStringState emptyState "{model,context} as appState" Parser.pattern
                     |> Expect.equal
                         (Just
                             (AsPattern
@@ -95,4 +95,9 @@ all =
                                 "appState"
                             )
                         )
+        , test "complex pattern" <|
+            \() ->
+                parseFullStringState emptyState "(Index irec as index, docVector)" Parser.pattern
+                    |> Expect.equal
+                        (Just (TuplePattern ([ NamedPattern [] "Index" ([ AsPattern (VarPattern "irec") "index" ]), VarPattern "docVector" ])))
         ]

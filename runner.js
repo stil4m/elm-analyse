@@ -14,16 +14,21 @@ targetFiles = targetFiles.map(function(f) {
         return [f, fileSizeInBytes];
     }).filter(x => x)
     .sort((x, y) => x[1] - y[1])
-    .slice(0, 1000);
+    // .slice(0, 1000);
 
 var app = Elm.Main.worker();
 
 var counter = 0;
 var failed = 0;
+var invalid = 0;
+var totalTime = 0;
+
 app.ports.parseResponse.subscribe(function(result) {
     counter++;
+    console.log(counter + ' Analysed file:', result[0], 'in milliseconds ' + result[2]);
+    totalTime += result[2];
+
     if (result[1] === 'Nothing') {
-        console.log(counter + ' Analysed file:', result[0], 'in milliseconds ' + result[2]);
         console.log('  > Failed');
         failed++;
     }
@@ -35,7 +40,9 @@ function analyseNextFile() {
     const next = targetFiles.shift();
     if (!next) {
         console.log('Failed:', failed);
+        console.log('Invalid:', invalid);
         console.log('Counter:', counter);
+        console.log('Total Time:', totalTime / 1000)
         return;
     }
     if (next[1] > 10 * 1024) {
@@ -59,6 +66,7 @@ function analyseNextFile() {
       (startsWithModule && firstLineContainsWhere);
 
     if (matched) {
+      invalid++;
       analyseNextFile();
       return;
     }

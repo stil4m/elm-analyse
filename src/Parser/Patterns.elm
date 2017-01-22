@@ -30,6 +30,7 @@ pattern =
         (\() ->
             choice
                 [ unConsPattern
+                , asPattern
                 , declarablePattern
                 , variablePattern
                 ]
@@ -38,6 +39,18 @@ pattern =
 
 nonConsPattern : Parser State Pattern
 nonConsPattern =
+    lazy
+        (\() ->
+            choice
+                [ declarablePattern
+                , asPattern
+                , variablePattern
+                ]
+        )
+
+
+nonAsPattern : Parser State Pattern
+nonAsPattern =
     lazy
         (\() ->
             choice
@@ -59,7 +72,7 @@ declarablePattern : Parser State Pattern
 declarablePattern =
     lazy
         (\() ->
-            choice [ allPattern, asPattern, tuplePattern, recordPattern ]
+            choice [ allPattern, tuplePattern, recordPattern ]
         )
 
 
@@ -108,11 +121,10 @@ asPattern : Parser State Pattern
 asPattern =
     lazy
         (\() ->
-            parens
-                (succeed AsPattern
-                    <*> (maybe moreThanIndentWhitespace *> pattern)
-                    <*> (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> functionName)
-                )
+            (succeed AsPattern
+                <*> (maybe moreThanIndentWhitespace *> nonAsPattern)
+                <*> (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> functionName)
+            )
         )
 
 

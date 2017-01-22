@@ -25,7 +25,6 @@ allSamples =
     , sample20
     , sample21
     , sample22
-    , sample23
     ]
 
 
