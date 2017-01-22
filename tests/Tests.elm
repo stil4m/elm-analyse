@@ -23,8 +23,8 @@ import GlslTests
 all : Test
 all =
     Test.concat
-        [ DeclarationsTests.all
-        , TokenTests.all
+        [ TokenTests.all
+        , DeclarationsTests.all
         , ModuleTests.all
         , ImportsTests.all
         , ExposeTests.all

@@ -288,12 +288,12 @@ listExpression =
             ListExpr
                 -- Not sure on this or
                 <$>
-                    (or (always [] <$> (string "[" *> (maybe (or moreThanIndentWhitespace exactIndentWhitespace)) *> string "]"))
+                    (or ([] <$ (string "[" *> (maybe (or moreThanIndentWhitespace exactIndentWhitespace)) *> string "]"))
                         (between
                             (string "[")
                             (string "]")
                             (sepBy (string ",")
-                                (maybe moreThanIndentWhitespace *> expression <* maybe moreThanIndentWhitespace)
+                                (trimmed expression)
                             )
                         )
                     )
@@ -445,26 +445,30 @@ letBlock : Parser State (List Declaration)
 letBlock =
     lazy
         (\() ->
-            (string "let"
-                *> moreThanIndentWhitespace
+            ((string "let" *> moreThanIndentWhitespace)
                 *> withIndentedState letBody
+                <* (exactIndentWhitespace *> string "in")
             )
         )
 
 
-inBlock : Parser State Expression
-inBlock =
-    lazy (\() -> string "in" *> moreThanIndentWhitespace *> expression)
+
+--
+-- inBlock : Parser State Expression
+-- inBlock =
+--     lazy (\() -> string "in" *> moreThanIndentWhitespace *> expression)
 
 
 letExpression : Parser State Expression
 letExpression =
     lazy
         (\() ->
-            withIndentedState
-                (succeed LetBlock
-                    <*> letBlock
-                    <*> (exactIndentWhitespace *> inBlock)
+            withLocation
+                (\l ->
+                    (succeed LetBlock
+                        <*> (withIndentedState letBlock)
+                        <*> (moreThanIndentWhitespace *> expression)
+                    )
                 )
         )
 
