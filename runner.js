@@ -48,9 +48,15 @@ function analyseNextFile() {
         encoding: 'utf-8'
     }).toString();
 
+    var lines = content.split('\n');
+    var firstLine = lines[0];
+    var startsWithModule = firstLine.startsWith('module')
+    var firstLineContainsWhere = firstLine.indexOf('where') != -1;
+
     var matched =
       content.match(/\nport [a-z][a-zA-Z0-9_]*'? =/) ||
-      content.match(/`([A-Z][a-zA-Z0-9_]*\.)*[a-z][a-zA-Z0-9_]*`/);
+      content.match(/`([A-Z][a-zA-Z0-9_]*\.)*[a-z][a-zA-Z0-9_]*`/) ||
+      (startsWithModule && firstLineContainsWhere);
 
     if (matched) {
       analyseNextFile();
