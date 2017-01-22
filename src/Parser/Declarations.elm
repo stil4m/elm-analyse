@@ -4,7 +4,7 @@ import Combine exposing (..)
 import Combine.Char exposing (anyChar, char, noneOf)
 import Combine.Num
 import Parser.Imports exposing (importDefinition)
-import Parser.Infix as Infix exposing (Infix)
+import Parser.Infix as Infix
 import Parser.Modules exposing (moduleDefinition)
 import Parser.Patterns exposing (..)
 import Parser.Tokens exposing (..)
@@ -12,13 +12,6 @@ import Parser.TypeReference exposing (..)
 import Parser.Types exposing (..)
 import Parser.Typings exposing (typeDeclaration)
 import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed)
-
-
-type alias File =
-    { moduleDefinition : Module
-    , imports : List Import
-    , declarations : List Declaration
-    }
 
 
 file : Parser State File
@@ -64,37 +57,6 @@ function =
                 <*> (maybe (signature <* exactIndentWhitespace))
                 <*> functionDeclaration
         )
-
-
-type alias FunctionSignature =
-    { operatorDefinition : Bool
-    , name : String
-    , typeReference : TypeReference
-    }
-
-
-type Declaration
-    = FuncDecl Function
-    | AliasDecl TypeAlias
-    | TypeDecl Type
-    | PortDeclaration FunctionSignature
-    | InfixDeclaration Infix
-    | Destructuring Pattern Expression
-
-
-type alias FunctionDeclaration =
-    { operatorDefinition : Bool
-    , name : String
-    , arguments : List Pattern
-    , expression : Expression
-    }
-
-
-type alias Function =
-    { documentation : Maybe DocumentationComment
-    , signature : Maybe FunctionSignature
-    , declaration : FunctionDeclaration
-    }
 
 
 infixDeclaration : Parser State Declaration
@@ -147,34 +109,6 @@ functionDeclaration =
 functionArgument : Parser State Pattern
 functionArgument =
     pattern
-
-
-
--- Expression
-
-
-type Expression
-    = UnitExpr
-    | Application (List Expression)
-    | FunctionOrValue String
-    | IfBlock Expression Expression Expression
-    | PrefixOperator String
-    | Operator String
-    | Integer Int
-    | Floatable Float
-    | Literal String
-    | CharLiteral Char
-    | TupledExpression (List Expression)
-    | Parentesized Expression
-    | LetBlock (List Declaration) Expression
-    | CaseBlock Expression Cases
-    | Lambda (List Pattern) Expression
-    | RecordExpr (List ( String, Expression ))
-    | ListExpr (List Expression)
-    | QualifiedExpr ModuleName String
-    | RecordAccess (List String)
-    | RecordUpdate String (List ( String, Expression ))
-    | GLSLExpression String
 
 
 
@@ -387,14 +321,6 @@ lambdaExpression =
 
 
 -- Case Expression
-
-
-type alias Case =
-    ( Pattern, Expression )
-
-
-type alias Cases =
-    List Case
 
 
 caseBlock : Parser State Expression

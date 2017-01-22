@@ -35,9 +35,9 @@ typeReference =
 
 functionTypeReference : Parser State TypeReference
 functionTypeReference =
-    succeed Function
+    succeed FunctionTypeReference
         <*> typeReferenceNoFn
-        <*> (maybe moreThanIndentWhitespace *> string "->" *> maybe moreThanIndentWhitespace *> typeReference)
+        <*> (trimmed (string "->") *> typeReference)
 
 
 unitTypeReference : Parser State TypeReference

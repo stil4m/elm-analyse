@@ -7,23 +7,6 @@ import Parser.Util exposing (moreThanIndentWhitespace, exactIndentWhitespace)
 import Combine.Num
 
 
-type Pattern
-    = AllPattern
-    | UnitPattern
-    | CharPattern Char
-    | StringPattern String
-    | IntPattern Int
-    | FloatPattern Float
-    | TuplePattern (List Pattern)
-    | RecordPattern (List String)
-    | UnConsPattern Pattern Pattern
-    | VarPattern String
-    | ListPattern (List Pattern)
-    | NamedPattern (List String) String (List Pattern)
-    | AsPattern Pattern String
-    | ParentisizedPattern Pattern
-
-
 pattern : Parser State Pattern
 pattern =
     lazy

@@ -6,7 +6,6 @@ import Expect
 import Parser.Declarations as Parser exposing (..)
 import Parser.Imports exposing (importDefinition)
 import Parser.Modules exposing (moduleDefinition)
-import Parser.Patterns exposing (..)
 import Parser.Types as Types exposing (..)
 import Parser.Util exposing (exactIndentWhitespace)
 import Test exposing (..)
@@ -184,7 +183,7 @@ all =
                                 { operatorDefinition = False
                                 , name = "parseResponse"
                                 , typeReference =
-                                    (Types.Function
+                                    (FunctionTypeReference
                                         (Tupled [ Typed [] "String" [], Typed [] "String" [] ])
                                         (Typed [] "Cmd" [ Generic "msg" ])
                                     )
@@ -216,8 +215,8 @@ all =
                                 { operatorDefinition = False
                                 , name = "scroll"
                                 , typeReference =
-                                    (Types.Function
-                                        (Types.Function (Typed [] "Move" []) (GenericType "msg"))
+                                    (FunctionTypeReference
+                                        (FunctionTypeReference (Typed [] "Move" []) (GenericType "msg"))
                                         (Typed [] "Sub" ([ Generic "msg" ]))
                                     )
                                 }

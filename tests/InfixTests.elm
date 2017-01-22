@@ -13,9 +13,9 @@ all =
         [ test "right infix" <|
             \() ->
                 parseFullStringState emptyState "infixr 3 <<" Infix.infixDefinition
-                    |> Expect.equal (Just ({ direction = Infix.Right, precedence = 3, operator = "<<" }))
+                    |> Expect.equal (Just ({ direction = Right, precedence = 3, operator = "<<" }))
         , test "left infix" <|
             \() ->
                 parseFullStringState emptyState "infixl 5 >>" Infix.infixDefinition
-                    |> Expect.equal (Just ({ direction = Infix.Left, precedence = 5, operator = ">>" }))
+                    |> Expect.equal (Just ({ direction = Left, precedence = 5, operator = ">>" }))
         ]

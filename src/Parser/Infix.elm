@@ -7,15 +7,6 @@ import Parser.Types exposing (..)
 import Parser.Util exposing (moreThanIndentWhitespace)
 
 
-type InfixDirection
-    = Left
-    | Right
-
-
-type alias Infix =
-    { direction : InfixDirection, precedence : Int, operator : String }
-
-
 infixDefinition : Parser State Infix
 infixDefinition =
     succeed Infix

@@ -25,6 +25,24 @@ pushIndent x (State s) =
     State (x :: s)
 
 
+
+-- AST
+
+
+type alias File =
+    { moduleDefinition : Module
+    , imports : List Import
+    , declarations : List Declaration
+    }
+
+
+type Module
+    = NormalModule DefaultModuleData
+    | PortModule DefaultModuleData
+    | EffectModule EffectModuleData
+    | NoModule
+
+
 type alias DefaultModuleData =
     { moduleName : ModuleName
     , exposingList : Exposure Expose
@@ -39,19 +57,113 @@ type alias EffectModuleData =
     }
 
 
-type Module
-    = NormalModule DefaultModuleData
-    | PortModule DefaultModuleData
-    | EffectModule EffectModuleData
-    | NoModule
+type ModuleName
+    = ModuleName (List String)
+
+
+type Declaration
+    = FuncDecl Function
+    | AliasDecl TypeAlias
+    | TypeDecl Type
+    | PortDeclaration FunctionSignature
+    | InfixDeclaration Infix
+    | Destructuring Pattern Expression
+
+
+type InfixDirection
+    = Left
+    | Right
+
+
+type alias Infix =
+    { direction : InfixDirection, precedence : Int, operator : String }
 
 
 type alias DocumentationComment =
     String
 
 
-type ModuleName
-    = ModuleName (List String)
+type Pattern
+    = AllPattern
+    | UnitPattern
+    | CharPattern Char
+    | StringPattern String
+    | IntPattern Int
+    | FloatPattern Float
+    | TuplePattern (List Pattern)
+    | RecordPattern (List String)
+    | UnConsPattern Pattern Pattern
+    | VarPattern String
+    | ListPattern (List Pattern)
+    | NamedPattern (List String) String (List Pattern)
+    | AsPattern Pattern String
+    | ParentisizedPattern Pattern
+
+
+
+-- Functions
+
+
+type alias FunctionSignature =
+    { operatorDefinition : Bool
+    , name : String
+    , typeReference : TypeReference
+    }
+
+
+type alias FunctionDeclaration =
+    { operatorDefinition : Bool
+    , name : String
+    , arguments : List Pattern
+    , expression : Expression
+    }
+
+
+type alias Function =
+    { documentation : Maybe DocumentationComment
+    , signature : Maybe FunctionSignature
+    , declaration : FunctionDeclaration
+    }
+
+
+
+-- Expressions
+
+
+type Expression
+    = UnitExpr
+    | Application (List Expression)
+    | FunctionOrValue String
+    | IfBlock Expression Expression Expression
+    | PrefixOperator String
+    | Operator String
+    | Integer Int
+    | Floatable Float
+    | Literal String
+    | CharLiteral Char
+    | TupledExpression (List Expression)
+    | Parentesized Expression
+    | LetBlock (List Declaration) Expression
+    | CaseBlock Expression Cases
+    | Lambda (List Pattern) Expression
+    | RecordExpr (List ( String, Expression ))
+    | ListExpr (List Expression)
+    | QualifiedExpr ModuleName String
+    | RecordAccess (List String)
+    | RecordUpdate String (List ( String, Expression ))
+    | GLSLExpression String
+
+
+type alias Case =
+    ( Pattern, Expression )
+
+
+type alias Cases =
+    List Case
+
+
+
+-- Type Referencing
 
 
 type alias TypeAlias =
@@ -83,7 +195,7 @@ type TypeReference
     | Tupled (List TypeReference)
     | Record RecordDefinition
     | GenericRecord String RecordDefinition
-    | Function TypeReference TypeReference
+    | FunctionTypeReference TypeReference TypeReference
 
 
 type alias RecordDefinition =
@@ -94,23 +206,27 @@ type alias RecordField =
     ( String, TypeReference )
 
 
-type Exposure a
-    = None
-    | All
-    | Explicit (List a)
+
+-- Import
 
 
 type alias Import =
     { moduleName : ModuleName, moduleAlias : Maybe ModuleName, exposingList : Exposure Expose }
 
 
-type alias ExposeList inner =
-    Eiter ExposeAny (List inner)
+
+-- Exposing
 
 
-type Eiter left right
-    = Left left
-    | Right right
+type Exposure a
+    = None
+    | All
+    | Explicit (List a)
+
+
+type ExposeList inner
+    = ExposeAny
+    | Specified (List inner)
 
 
 type Expose
