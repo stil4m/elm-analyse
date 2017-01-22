@@ -22,6 +22,10 @@ all =
             \() ->
                 parseFullStringState emptyState "\"Foo\"" Parser.pattern
                     |> Expect.equal (Just (StringPattern "Foo"))
+        , test "char pattern" <|
+            \() ->
+                parseFullStringState emptyState "'f'" Parser.pattern
+                    |> Expect.equal (Just (CharPattern 'f'))
         , test "non cons pattern pattern" <|
             \() ->
                 parseFullStringState emptyState "(X x)" Parser.nonConsPattern

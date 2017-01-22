@@ -10,6 +10,7 @@ import Combine.Num
 type Pattern
     = AllPattern
     | UnitPattern
+    | CharPattern Char
     | StringPattern String
     | IntPattern Int
     | FloatPattern Float
@@ -50,7 +51,7 @@ variablePattern : Parser State Pattern
 variablePattern =
     lazy
         (\() ->
-            choice [ allPattern, stringPattern, floatPattern, intPattern, unitPattern, varPattern, namedPattern, listPattern ]
+            choice [ allPattern, charPattern, stringPattern, floatPattern, intPattern, unitPattern, varPattern, namedPattern, listPattern ]
         )
 
 
@@ -81,6 +82,11 @@ unConsPattern =
                 <*> nonConsPattern
                 <*> (maybe moreThanIndentWhitespace *> string "::" *> maybe moreThanIndentWhitespace *> pattern)
         )
+
+
+charPattern : Parser State Pattern
+charPattern =
+    lazy (\() -> CharPattern <$> characterLiteral)
 
 
 stringPattern : Parser State Pattern
