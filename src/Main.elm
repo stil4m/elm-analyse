@@ -1,8 +1,9 @@
 module Main exposing (..)
 
-import Parser
+import Parser.Parser as Parser
 import Platform exposing (program)
 import Ports
+import PostProcessing
 import Task
 import Time
 
@@ -39,10 +40,12 @@ update msg model =
         Trigger fileName content currentTime ->
             ( ()
             , Parser.parse content
-                |> (\r ->
+                -- |> Maybe.map PostProcessing.postProcess
+                |>
+                    (\r ->
                         Time.now
                             |> Task.perform (Done fileName (toString <| r) currentTime)
-                   )
+                    )
             )
 
         Done fileName result before after ->

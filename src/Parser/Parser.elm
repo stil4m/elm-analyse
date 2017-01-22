@@ -1,4 +1,4 @@
-module Parser exposing (..)
+module Parser.Parser exposing (..)
 
 import Combine exposing ((<*))
 import Parser.Types exposing (emptyState, File)

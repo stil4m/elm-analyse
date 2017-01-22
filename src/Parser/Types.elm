@@ -133,6 +133,7 @@ type alias Function =
 type Expression
     = UnitExpr
     | Application (List Expression)
+    | OperatorApplication InfixDirection Expression Expression
     | FunctionOrValue String
     | IfBlock Expression Expression Expression
     | PrefixOperator String
