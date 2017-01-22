@@ -3,6 +3,7 @@ module Parser.Comments exposing (..)
 import Combine exposing (..)
 import Combine.Char exposing (..)
 import Parser.Types exposing (..)
+import Parser.Whitespace exposing (untilNewlineToken)
 
 
 documentationComment : Parser State String
@@ -18,7 +19,7 @@ singleLineComment : Parser s String
 singleLineComment =
     succeed (++)
         <*> string "--"
-        <*> while ((==) '\n' >> not)
+        <*> untilNewlineToken
 
 
 multilineComment : Parser a String

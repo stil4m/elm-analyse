@@ -2,9 +2,9 @@ module Parser.Util exposing (..)
 
 import Combine exposing (..)
 import Combine.Char exposing (..)
-import Parser.Types exposing (..)
-import List.Extra as List
 import Parser.Comments exposing (..)
+import Parser.Types exposing (..)
+import Parser.Whitespace exposing (realNewLine)
 
 
 nextChar : Parser a Char
@@ -39,7 +39,7 @@ maybeNewLineWithStartOfComment : Parser State String
 maybeNewLineWithStartOfComment =
     String.concat
         <$> (sequence
-                [ Maybe.withDefault "" <$> maybe (string "\n")
+                [ Maybe.withDefault "" <$> maybe realNewLine
                 , String.fromList <$> (many (char ' '))
                 , someComment
                 ]
@@ -53,7 +53,7 @@ commentSequence =
                 (or (String.toList <$> someComment)
                     (List.concat
                         <$> sequence
-                                [ List.singleton <$> char '\n'
+                                [ String.toList <$> realNewLine
                                 , many (char ' ')
                                 , String.toList <$> someComment
                                 ]
@@ -90,12 +90,12 @@ newLineWithIndentExact : State -> Parser State (List Char)
 newLineWithIndentExact state =
     List.concat
         <$> sequence
-                [ List.singleton <$> char '\n'
+                [ String.toList <$> realNewLine
                 , List.concat
                     <$> many
                             (succeed (++)
                                 <*> (many (char ' '))
-                                <*> (List.singleton <$> char '\n')
+                                <*> (String.toList <$> realNewLine)
                             )
                 , count (currentIndent state) (char ' ')
                 ]
@@ -107,12 +107,12 @@ newLineWithIndentPlus state =
         <$> many1
                 (List.concat
                     <$> sequence
-                            [ List.singleton <$> char '\n'
+                            [ String.toList <$> realNewLine
                             , List.concat
                                 <$> many
                                         (succeed (++)
                                             <*> (many (char ' '))
-                                            <*> (List.singleton <$> char '\n')
+                                            <*> (String.toList <$> realNewLine)
                                         )
                             , count (currentIndent state) (char ' ')
                             , many1 (char ' ')

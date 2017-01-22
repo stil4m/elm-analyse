@@ -40,8 +40,18 @@ update msg model =
             ( ()
             , Parser.parse content
                 |> (\r ->
-                        Time.now
-                            |> Task.perform (Done fileName (toString <| r) currentTime)
+                        case r of
+                            Just _ ->
+                                Time.now
+                                    |> Task.perform (Done fileName (toString <| r) currentTime)
+
+                            Nothing ->
+                                let
+                                    _ =
+                                        Debug.log "Failed\n" content
+                                in
+                                    Time.now
+                                        |> Task.perform (Done fileName (toString <| r) currentTime)
                    )
             )
 
