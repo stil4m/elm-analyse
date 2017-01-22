@@ -58,7 +58,7 @@ declarablePattern : Parser State Pattern
 declarablePattern =
     lazy
         (\() ->
-            choice [ asPattern, tuplePattern, recordPattern ]
+            choice [ allPattern, asPattern, tuplePattern, recordPattern ]
         )
 
 

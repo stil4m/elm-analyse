@@ -1,10 +1,9 @@
 module LetExpressionTests exposing (..)
 
-import Combine exposing ((*>), many, whitespace)
-import Combine.Char exposing (char)
 import CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
+import Parser.Patterns exposing (..)
 import Parser.Types as Types exposing (..)
 import Test exposing (..)
 
@@ -30,10 +29,6 @@ all =
                             , FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = "john", arguments = [], expression = (FunctionOrValue "doe") } }
                             ]
                         )
-          -- , test "in block" <|
-          --     \() ->
-          --         parseFullStringState emptyState "in\n  foo bar 1" Parser.inBlock
-          --             |> Expect.equal (Just (Application [ FunctionOrValue "foo", FunctionOrValue "bar", Integer 1 ]))
         , test "correct let with indent" <|
             \() ->
                 parseFullStringState (emptyState |> pushIndent 1) "let\n  bar = 1\n in\n  bar" Parser.expression
@@ -84,6 +79,18 @@ all =
                                     ]
                                     (FunctionOrValue "bar")
                                 ]
+                            )
+                        )
+        , test "some let" <|
+            \() ->
+                parseFullStringState emptyState "let\n    _ = b\n in\n    z" (Parser.letExpression)
+                    |> Expect.equal
+                        (Just
+                            (LetBlock
+                                ([ Destructuring AllPattern (FunctionOrValue "b")
+                                 ]
+                                )
+                                (FunctionOrValue "z")
                             )
                         )
         ]

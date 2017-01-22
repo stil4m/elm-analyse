@@ -222,6 +222,11 @@ all =
                                     )
                                 }
                         )
+        , test "Destructuring declaration" <|
+            \() ->
+                parseFullStringWithNullState "_ = b" destructuringDeclaration
+                    |> Expect.equal
+                        (Just <| Destructuring AllPattern (FunctionOrValue "b"))
         ]
 
 

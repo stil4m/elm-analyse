@@ -7,6 +7,14 @@ import List.Extra as List
 import Parser.Comments exposing (..)
 
 
+nextChar : Parser a Char
+nextChar =
+    lazy
+        (\() ->
+            lookAhead anyChar |> map (Debug.log "Next Char")
+        )
+
+
 exactIndentWhitespace : Parser State String
 exactIndentWhitespace =
     withState

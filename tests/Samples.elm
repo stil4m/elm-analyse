@@ -24,6 +24,7 @@ allSamples =
     , sample19
     , sample20
     , sample21
+    , sample22
     ]
 
 
@@ -364,4 +365,17 @@ tileMapVertextShader =
     }
 |]
 
+"""
+
+
+sample22 : String
+sample22 =
+    """module Foo
+
+x : a -> b -> a
+x y z =
+  let
+    _ = 1
+  in
+    z
 """

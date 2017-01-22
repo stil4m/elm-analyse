@@ -437,7 +437,7 @@ letBody : Parser State (List Declaration)
 letBody =
     lazy
         (\() ->
-            sepBy1 exactIndentWhitespace declaration
+            sepBy1 exactIndentWhitespace (or destructuringDeclaration (FuncDecl <$> function))
         )
 
 
@@ -463,13 +463,10 @@ letExpression : Parser State Expression
 letExpression =
     lazy
         (\() ->
-            withLocation
-                (\l ->
-                    (succeed LetBlock
-                        <*> (withIndentedState letBlock)
-                        <*> (moreThanIndentWhitespace *> expression)
-                    )
-                )
+            (succeed LetBlock
+                <*> (withIndentedState letBlock)
+                <*> (moreThanIndentWhitespace *> expression)
+            )
         )
 
 
