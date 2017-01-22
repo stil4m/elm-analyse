@@ -27,6 +27,10 @@ all =
             \() ->
                 parseFullStringState emptyState "Foo.Bar -> 1" Parser.caseStatement
                     |> Expect.equal (Just ( NamedPattern [ "Foo" ] "Bar" [], Integer 1 ))
+        , test "caseStatement no spacing" <|
+            \() ->
+                parseFullStringState emptyState "32->Backspace" Parser.caseStatement
+                    |> Expect.equal (Just ( IntPattern 32, FunctionOrValue "Backspace" ))
         , test "caseStatement wrong indent" <|
             \() ->
                 parseFullStringState emptyState "True -> \n1" Parser.caseStatement
