@@ -164,10 +164,10 @@ all =
                             , expression =
                                 (CaseBlock
                                     (FunctionOrValue "msg")
-                                    [ ( NamedPattern [] "Increment" []
+                                    [ ( NamedPattern (QualifiedNameRef [] "Increment") []
                                       , Application [ FunctionOrValue "model", Operator "+", Integer 1 ]
                                       )
-                                    , ( NamedPattern [] "Decrement" []
+                                    , ( NamedPattern (QualifiedNameRef [] "Decrement") []
                                       , Application [ FunctionOrValue "model", Operator "-", Integer 1 ]
                                       )
                                     ]

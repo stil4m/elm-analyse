@@ -45,11 +45,11 @@ function analyseNextFile() {
         console.log('Total Time:', totalTime / 1000)
         return;
     }
-    if (next[1] > 15 * 1024) {
-        console.log("Skip file due to greater than 15kb");
-        analyseNextFile();
-        return;
-    }
+    // if (next[1] > 15 * 1024) {
+        // console.log("Skip file due to greater than 15kb");
+        // analyseNextFile();
+        // return;
+    // }
 
     const content = fs.readFileSync(next[0], {
         encoding: 'utf-8'

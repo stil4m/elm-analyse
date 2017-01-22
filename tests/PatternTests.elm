@@ -29,11 +29,11 @@ all =
         , test "non cons pattern pattern" <|
             \() ->
                 parseFullStringState emptyState "(X x)" Parser.nonConsPattern
-                    |> Expect.equal (Just (TuplePattern ([ NamedPattern [] "X" ([ VarPattern "x" ]) ])))
+                    |> Expect.equal (Just (TuplePattern ([ NamedPattern (QualifiedNameRef [] "X") ([ VarPattern "x" ]) ])))
         , test "parentiszed pattern" <|
             \() ->
                 parseFullStringState emptyState "(X x) :: xs" Parser.pattern
-                    |> Expect.equal (Just (UnConsPattern (TuplePattern ([ NamedPattern [] "X" ([ VarPattern "x" ]) ])) (VarPattern "xs")))
+                    |> Expect.equal (Just (UnConsPattern (TuplePattern ([ NamedPattern (QualifiedNameRef [] "X") ([ VarPattern "x" ]) ])) (VarPattern "xs")))
         , test "int pattern" <|
             \() ->
                 parseFullStringState emptyState "1" Parser.pattern
@@ -57,7 +57,7 @@ all =
         , test "named pattern" <|
             \() ->
                 parseFullStringState emptyState "True" Parser.namedPattern
-                    |> Expect.equal (Just (NamedPattern [] "True" []))
+                    |> Expect.equal (Just (NamedPattern (QualifiedNameRef [] "True") []))
         , test "tuple pattern" <|
             \() ->
                 parseFullStringState emptyState "(a,{b,c},())" Parser.pattern
@@ -73,7 +73,7 @@ all =
         , test "destructure pattern" <|
             \() ->
                 parseFullStringState emptyState "Set x" Parser.pattern
-                    |> Expect.equal (Just (NamedPattern [] "Set" [ VarPattern "x" ]))
+                    |> Expect.equal (Just (NamedPattern (QualifiedNameRef [] "Set") [ VarPattern "x" ]))
         , test "tuple pattern 2" <|
             \() ->
                 parseFullStringState emptyState "(model, cmd)" Parser.pattern
@@ -99,5 +99,26 @@ all =
             \() ->
                 parseFullStringState emptyState "(Index irec as index, docVector)" Parser.pattern
                     |> Expect.equal
-                        (Just (TuplePattern ([ NamedPattern [] "Index" ([ AsPattern (VarPattern "irec") "index" ]), VarPattern "docVector" ])))
+                        (Just (TuplePattern ([ NamedPattern (QualifiedNameRef [] "Index") ([ AsPattern (VarPattern "irec") "index" ]), VarPattern "docVector" ])))
+        , test "complex pattern 2" <|
+            \() ->
+                parseFullStringState emptyState "RBNode_elm_builtin col (RBNode_elm_builtin Red  (RBNode_elm_builtin Red xv))" Parser.pattern
+                    |> Expect.equal
+                        (Just
+                            (NamedPattern (QualifiedNameRef [] "RBNode_elm_builtin")
+                                [ VarPattern "col"
+                                , TuplePattern
+                                    [ NamedPattern (QualifiedNameRef [] "RBNode_elm_builtin")
+                                        [ (QualifiedNamePattern (QualifiedNameRef [] "Red"))
+                                        , TuplePattern
+                                            [ NamedPattern (QualifiedNameRef [] "RBNode_elm_builtin")
+                                                [ QualifiedNamePattern (QualifiedNameRef [] "Red")
+                                                , VarPattern "xv"
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            )
+                        )
         ]

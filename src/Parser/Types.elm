@@ -93,11 +93,16 @@ type Pattern
     | TuplePattern (List Pattern)
     | RecordPattern (List String)
     | UnConsPattern Pattern Pattern
-    | VarPattern String
     | ListPattern (List Pattern)
-    | NamedPattern (List String) String (List Pattern)
+    | VarPattern String
+    | NamedPattern QualifiedNameRef (List Pattern)
+    | QualifiedNamePattern QualifiedNameRef
     | AsPattern Pattern String
     | ParentisizedPattern Pattern
+
+
+type QualifiedNameRef
+    = QualifiedNameRef (List String) String
 
 
 

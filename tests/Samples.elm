@@ -26,18 +26,8 @@ allSamples =
     , sample21
     , sample22
     , sample23
+    , sample24
     ]
-
-
-sample23 : String
-sample23 =
-    """module Foo
-
-x s =
-  let indent = String.length s in
-  indent
-
-"""
 
 
 sample1 : String
@@ -390,4 +380,24 @@ x y z =
     _ = 1
   in
     z
+"""
+
+
+sample23 : String
+sample23 =
+    """module Foo
+
+x s =
+  let indent = String.length s in
+  indent
+
+"""
+
+
+sample24 : String
+sample24 =
+    """module Foo
+
+tests =
+    \\() -> Expect.equal "'\\\\''" (toString '\\'')
 """

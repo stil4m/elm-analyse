@@ -95,9 +95,15 @@ notReserved match =
         succeed match
 
 
+quotedSingleQuote : String
+quotedSingleQuote =
+    String.fromList [ '\'', '\\', '\'', '\'' ]
+
+
 characterLiteral : Parser s Char
 characterLiteral =
-    char '\'' *> anyChar <* char '\''
+    or ('\'' <$ string quotedSingleQuote)
+        (char '\'' *> anyChar <* char '\'')
 
 
 stringLiteral : Parser s String

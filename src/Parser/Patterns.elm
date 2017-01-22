@@ -16,6 +16,19 @@ pattern =
                 , asPattern
                 , declarablePattern
                 , variablePattern
+                , namedPattern
+                ]
+        )
+
+
+nonNamedPattern : Parser State Pattern
+nonNamedPattern =
+    lazy
+        (\() ->
+            choice
+                [ declarablePattern
+                , asPattern
+                , variablePattern
                 ]
         )
 
@@ -28,6 +41,7 @@ nonConsPattern =
                 [ declarablePattern
                 , asPattern
                 , variablePattern
+                , namedPattern
                 ]
         )
 
@@ -39,6 +53,7 @@ nonAsPattern =
             choice
                 [ declarablePattern
                 , variablePattern
+                , namedPattern
                 ]
         )
 
@@ -47,7 +62,7 @@ variablePattern : Parser State Pattern
 variablePattern =
     lazy
         (\() ->
-            choice [ allPattern, charPattern, stringPattern, floatPattern, intPattern, unitPattern, varPattern, namedPattern, listPattern ]
+            choice [ allPattern, charPattern, stringPattern, floatPattern, intPattern, unitPattern, varPattern, listPattern ]
         )
 
 
@@ -136,14 +151,25 @@ varPattern =
     lazy (\() -> VarPattern <$> functionName)
 
 
+qualifiedNameRef : Parser s QualifiedNameRef
+qualifiedNameRef =
+    succeed QualifiedNameRef
+        <*> many (typeName <* string ".")
+        <*> typeName
+
+
+qualifiedNamePattern : Parser s Pattern
+qualifiedNamePattern =
+    QualifiedNamePattern <$> qualifiedNameRef
+
+
 namedPattern : Parser State Pattern
 namedPattern =
     lazy
         (\() ->
             succeed NamedPattern
-                <*> many (typeName <* string ".")
-                <*> typeName
-                <*> many (moreThanIndentWhitespace *> pattern)
+                <*> qualifiedNameRef
+                <*> many (moreThanIndentWhitespace *> (or qualifiedNamePattern nonNamedPattern))
         )
 
 

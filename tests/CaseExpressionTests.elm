@@ -5,7 +5,6 @@ import Expect
 import Parser.Declarations as Parser exposing (..)
 import Parser.Types as Types exposing (..)
 import Test exposing (..)
-import Parser.Patterns exposing (..)
 
 
 all : Test
@@ -22,11 +21,11 @@ all =
         , test "caseStatement" <|
             \() ->
                 parseFullStringState emptyState "True -> 1" Parser.caseStatement
-                    |> Expect.equal (Just ( NamedPattern [] "True" [], Integer 1 ))
+                    |> Expect.equal (Just ( NamedPattern (QualifiedNameRef [] "True") [], Integer 1 ))
         , test "caseStatement qualified" <|
             \() ->
                 parseFullStringState emptyState "Foo.Bar -> 1" Parser.caseStatement
-                    |> Expect.equal (Just ( NamedPattern [ "Foo" ] "Bar" [], Integer 1 ))
+                    |> Expect.equal (Just ( NamedPattern (QualifiedNameRef [ "Foo" ] "Bar") [], Integer 1 ))
         , test "caseStatement no spacing" <|
             \() ->
                 parseFullStringState emptyState "32->Backspace" Parser.caseStatement
@@ -38,14 +37,14 @@ all =
         , test "caseStatement correct on new line" <|
             \() ->
                 parseFullStringState emptyState "True ->\n  1" Parser.caseStatement
-                    |> Expect.equal (Just ( NamedPattern [] "True" [], Integer 1 ))
+                    |> Expect.equal (Just ( NamedPattern (QualifiedNameRef [] "True") [], Integer 1 ))
         , test "caseStatements" <|
             \() ->
                 parseFullStringState emptyState "True -> 1\nFalse -> 2" Parser.caseStatements
                     |> Expect.equal
                         (Just
-                            [ ( NamedPattern [] "True" [], Integer 1 )
-                            , ( NamedPattern [] "False" [], Integer 2 )
+                            [ ( NamedPattern (QualifiedNameRef [] "True") [], Integer 1 )
+                            , ( NamedPattern (QualifiedNameRef [] "False") [], Integer 2 )
                             ]
                         )
         , test "case expression" <|
@@ -54,8 +53,8 @@ all =
                     |> Expect.equal
                         (Just
                             (CaseBlock (FunctionOrValue "f")
-                                [ ( NamedPattern [] "True" [], Integer 1 )
-                                , ( NamedPattern [] "False" [], Integer 2 )
+                                [ ( NamedPattern (QualifiedNameRef [] "True") [], Integer 1 )
+                                , ( NamedPattern (QualifiedNameRef [] "False") [], Integer 2 )
                                 ]
                             )
                         )
@@ -69,8 +68,8 @@ all =
                     |> Expect.equal
                         (Just
                             (CaseBlock (FunctionOrValue "msg")
-                                [ ( NamedPattern [] "Increment" [], Application [ FunctionOrValue "model", Operator "+", Integer 1 ] )
-                                , ( NamedPattern [] "Decrement" [], Application [ FunctionOrValue "model", Operator "-", Integer 1 ] )
+                                [ ( NamedPattern (QualifiedNameRef [] "Increment") [], Application [ FunctionOrValue "model", Operator "+", Integer 1 ] )
+                                , ( NamedPattern (QualifiedNameRef [] "Decrement") [], Application [ FunctionOrValue "model", Operator "-", Integer 1 ] )
                                 ]
                             )
                         )

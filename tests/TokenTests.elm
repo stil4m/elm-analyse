@@ -130,4 +130,8 @@ all =
             \() ->
                 parseFullString "\"\"\"Bar foo \n a\"\"\"" Parser.multiLineStringLiteral
                     |> Expect.equal (Just "Bar foo \n a")
+        , test "character" <|
+            \() ->
+                parseFullString "'\\''" Parser.characterLiteral
+                    |> Expect.equal (Just '\'')
         ]
