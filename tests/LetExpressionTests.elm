@@ -3,7 +3,6 @@ module LetExpressionTests exposing (..)
 import CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
-import Parser.Patterns exposing (..)
 import Parser.Types as Types exposing (..)
 import Test exposing (..)
 
@@ -91,6 +90,27 @@ all =
                                  ]
                                 )
                                 (FunctionOrValue "z")
+                            )
+                        )
+        , test "let inlined" <|
+            \() ->
+                parseFullStringState emptyState "let indent = String.length s in indent" (Parser.letExpression)
+                    |> Expect.equal
+                        (Just
+                            (LetBlock
+                                ([ FuncDecl
+                                    { documentation = Nothing
+                                    , signature = Nothing
+                                    , declaration =
+                                        { operatorDefinition = False
+                                        , name = "indent"
+                                        , arguments = []
+                                        , expression = Application ([ QualifiedExpr (ModuleName [ "String" ]) "length", FunctionOrValue "s" ])
+                                        }
+                                    }
+                                 ]
+                                )
+                                (FunctionOrValue "indent")
                             )
                         )
         ]

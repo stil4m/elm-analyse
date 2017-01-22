@@ -25,7 +25,19 @@ allSamples =
     , sample20
     , sample21
     , sample22
+    , sample23
     ]
+
+
+sample23 : String
+sample23 =
+    """module Foo
+
+x s =
+  let indent = String.length s in
+  indent
+
+"""
 
 
 sample1 : String

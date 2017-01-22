@@ -22,6 +22,10 @@ all =
             \() ->
                 parseFullStringState emptyState " \n" moreThanIndentWhitespace
                     |> Expect.equal Nothing
+        , test "no newlines with state" <|
+            \() ->
+                parseFullStringState (emptyState |> pushIndent 8) " " moreThanIndentWhitespace
+                    |> Expect.equal (Just " ")
         , test "with newline and higher indent 2" <|
             \() ->
                 parseFullStringState emptyState "\n  " moreThanIndentWhitespace

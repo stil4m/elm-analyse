@@ -1,8 +1,8 @@
 module Parser exposing (..)
 
 import Combine exposing ((<*))
-import Parser.Types exposing (emptyState)
-import Parser.Declarations exposing (file, File)
+import Parser.Types exposing (emptyState, File)
+import Parser.Declarations exposing (file)
 
 
 parse : String -> Maybe File

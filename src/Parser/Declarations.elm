@@ -11,7 +11,7 @@ import Parser.Tokens exposing (..)
 import Parser.TypeReference exposing (..)
 import Parser.Types exposing (..)
 import Parser.Typings exposing (typeDeclaration)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed)
+import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, onlySpaces, trimmed)
 
 
 file : Parser State File
@@ -371,18 +371,11 @@ letBlock : Parser State (List Declaration)
 letBlock =
     lazy
         (\() ->
-            ((string "let" *> moreThanIndentWhitespace)
+            ((string "let" *> (moreThanIndentWhitespace))
                 *> withIndentedState letBody
-                <* (exactIndentWhitespace *> string "in")
+                <* (or exactIndentWhitespace onlySpaces *> string "in")
             )
         )
-
-
-
---
--- inBlock : Parser State Expression
--- inBlock =
---     lazy (\() -> string "in" *> moreThanIndentWhitespace *> expression)
 
 
 letExpression : Parser State Expression

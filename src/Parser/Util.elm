@@ -15,6 +15,11 @@ nextChar =
         )
 
 
+onlySpaces : Parser State String
+onlySpaces =
+    String.fromList <$> many (char ' ')
+
+
 exactIndentWhitespace : Parser State String
 exactIndentWhitespace =
     withState
