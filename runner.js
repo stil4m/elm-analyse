@@ -14,7 +14,7 @@ targetFiles = targetFiles.map(function(f) {
         return [f, fileSizeInBytes];
     }).filter(x => x)
     .sort((x, y) => x[1] - y[1])
-    // .slice(0, 600);
+    .slice(0, 2231);
 
 var app = Elm.Main.worker();
 

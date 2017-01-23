@@ -3,6 +3,7 @@ module Parser.Declarations exposing (..)
 import Combine exposing (..)
 import Combine.Char exposing (anyChar, char, noneOf)
 import Combine.Num
+import List.Extra as List
 import Parser.Imports exposing (importDefinition)
 import Parser.Infix as Infix
 import Parser.Modules exposing (moduleDefinition)
@@ -11,7 +12,7 @@ import Parser.Tokens exposing (..)
 import Parser.TypeReference exposing (..)
 import Parser.Types exposing (..)
 import Parser.Typings exposing (typeDeclaration)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, onlySpaces, trimmed)
+import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, nextChar, nextChars, onlySpaces, trimmed, unstrictIndentWhitespace)
 
 
 file : Parser State File
@@ -183,9 +184,25 @@ withIndentedState : Parser State a -> Parser State a
 withIndentedState p =
     withLocation
         (\location ->
-            ((modifyState (pushIndent (location.column + 1)) *> p)
+            (modifyState (pushIndent (location.column + 1)) *> p)
                 <* modifyState popIndent
-            )
+        )
+
+
+withIndentedState2 : Parser State a -> Parser State a
+withIndentedState2 p =
+    withLocation
+        (\location ->
+            let
+                x =
+                    location.source
+                        |> String.toList
+                        |> List.takeWhile ((==) ' ')
+                        |> List.length
+            in
+                ((modifyState (pushIndent x) *> p)
+                    <* modifyState popIndent
+                )
         )
 
 
@@ -374,7 +391,12 @@ letBlock =
         (\() ->
             ((string "let" *> (moreThanIndentWhitespace))
                 *> withIndentedState letBody
-                <* (or exactIndentWhitespace onlySpaces *> string "in")
+                <* (choice
+                        [ unstrictIndentWhitespace
+                        , onlySpaces
+                        ]
+                        *> string "in"
+                   )
             )
         )
 
@@ -384,7 +406,7 @@ letExpression =
     lazy
         (\() ->
             (succeed LetBlock
-                <*> (withIndentedState letBlock)
+                <*> (withIndentedState2 letBlock)
                 <*> (moreThanIndentWhitespace *> expression)
             )
         )

@@ -7,6 +7,14 @@ import Parser.Types exposing (..)
 import Parser.Whitespace exposing (realNewLine)
 
 
+nextChars : Int -> Parser a String
+nextChars i =
+    lazy
+        (\() ->
+            lookAhead (String.fromList <$> count i anyChar) |> map (Debug.log "Next Char")
+        )
+
+
 nextChar : Parser a Char
 nextChar =
     lazy
@@ -15,9 +23,29 @@ nextChar =
         )
 
 
+printLocation : String -> Parser a String
+printLocation s =
+    withLocation (Debug.log s >> (always (succeed "")))
+
+
 onlySpaces : Parser State String
 onlySpaces =
     String.fromList <$> many (char ' ')
+
+
+unstrictIndentWhitespace : Parser State String
+unstrictIndentWhitespace =
+    withState
+        (\state ->
+            (List.concat >> List.concat >> String.fromList)
+                <$> many1
+                        (sequence
+                            [ many (char ' ')
+                            , Maybe.withDefault [] <$> maybe (String.toList <$> someComment)
+                            , List.concat <$> many1 newLineWithSomeIndent
+                            ]
+                        )
+        )
 
 
 exactIndentWhitespace : Parser State String
@@ -97,6 +125,21 @@ moreThanIndentWhitespace =
                 )
                 (String.fromList <$> many1 (char ' '))
         )
+
+
+newLineWithSomeIndent : Parser State (List Char)
+newLineWithSomeIndent =
+    List.concat
+        <$> sequence
+                [ String.toList <$> realNewLine
+                , List.concat
+                    <$> many
+                            (succeed (++)
+                                <*> (many (char ' '))
+                                <*> (String.toList <$> realNewLine)
+                            )
+                , many1 (char ' ')
+                ]
 
 
 newLineWithIndentExact : State -> Parser State (List Char)

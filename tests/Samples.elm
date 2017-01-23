@@ -28,17 +28,38 @@ allSamples =
     , sample23
     , sample24
     , sample25
+    , sample26
     ]
 
 
-{-| Trailing whitespace multiline comment -}
+{-| Let with comments and exact indent
+-}
+sample26 : String
+sample26 =
+    """module Foo
+
+x b =
+  let
+      a =
+          b
+
+      --time
+  in
+      1
+
+
+"""
+
+
+{-| Trailing whitespace multiline comment
+-}
 sample25 : String
 sample25 =
-  String.concat
-  ["module HelloWorld exposing (..)\n\n"
-  , "{-| an individual Note (no pitch class implies a rest) -}    \n"
-  , "type alias AnInt = Int\n"
-  ]
+    String.concat
+        [ "module HelloWorld exposing (..)\n\n"
+        , "{-| an individual Note (no pitch class implies a rest) -}    \n"
+        , "type alias AnInt = Int\n"
+        ]
 
 
 sample1 : String

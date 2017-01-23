@@ -1,8 +1,10 @@
 module LetExpressionTests exposing (..)
 
+import Combine exposing ((*>), string, whitespace)
 import CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
+import Parser.Tokens exposing (functionName)
 import Parser.Types as Types exposing (..)
 import Test exposing (..)
 
@@ -21,7 +23,7 @@ all =
                         )
         , test "let block" <|
             \() ->
-                parseFullStringState emptyState "let\n  foo = bar\n  \n  john = doe\nin" Parser.letBlock
+                parseFullStringState emptyState "let\n  foo = bar\n  \n  john = doe\n in" Parser.letBlock
                     |> Expect.equal
                         (Just
                             [ FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = "foo", arguments = [], expression = (FunctionOrValue "bar") } }
@@ -106,6 +108,27 @@ all =
                                         , name = "indent"
                                         , arguments = []
                                         , expression = Application ([ QualifiedExpr ([ "String" ]) "length", FunctionOrValue "s" ])
+                                        }
+                                    }
+                                 ]
+                                )
+                                (FunctionOrValue "indent")
+                            )
+                        )
+        , test "let starting after definition" <|
+            \() ->
+                parseFullStringState emptyState "foo = let\n  indent = 1\n in\n indent" (functionName *> string " = " *> Parser.letExpression)
+                    |> Expect.equal
+                        (Just
+                            (LetBlock
+                                ([ FuncDecl
+                                    { documentation = Nothing
+                                    , signature = Nothing
+                                    , declaration =
+                                        { operatorDefinition = False
+                                        , name = "indent"
+                                        , arguments = []
+                                        , expression = Integer 1
                                         }
                                     }
                                  ]
