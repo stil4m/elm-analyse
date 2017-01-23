@@ -24,20 +24,20 @@ all : Test
 all =
     Test.concat
         [ TokenTests.all
-        , DeclarationsTests.all
+        , UtilTests.all
         , ModuleTests.all
         , ImportsTests.all
-        , ExposeTests.all
         , CommentTest.all
+        , ExposeTests.all
         , TypingsTests.all
         , TypeReferenceTests.all
-        , UtilTests.all
+        , InfixTests.all
+        , GlslTests.all
         , ExpressionTests.all
         , LetExpressionTests.all
+        , DeclarationsTests.all
         , CaseExpressionTests.all
         , LambdaExpressionTests.all
         , PatternTests.all
-        , InfixTests.all
-        , GlslTests.all
         , FileTests.all
         ]

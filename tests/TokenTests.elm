@@ -1,7 +1,6 @@
 module TokenTests exposing (..)
 
 import Parser.Tokens as Parser
-import Parser.Types as Types
 import Test exposing (..)
 import Expect
 import CombineTestUtil exposing (..)
@@ -122,6 +121,10 @@ all =
             \() ->
                 parseFullString "~" Parser.prefixOperatorToken
                     |> Expect.equal (Just "~")
+                    , test "operatorToken 13" <|
+                        \() ->
+                            parseFullString "=" Parser.prefixOperatorToken
+                                |> Expect.equal Nothing
         , test "operatorToken 14" <|
             \() ->
                 parseFullString "?" Parser.prefixOperatorToken
@@ -134,6 +137,10 @@ all =
             \() ->
                 parseFullString "'\\''" Parser.characterLiteral
                     |> Expect.equal (Just '\'')
+        , test "string escaped" <|
+            \() ->
+                parseFullString "\"foo\\\\\"" Parser.stringLiteral
+                    |> Expect.equal (Just "foo\\")
         , test "character escaped 2" <|
             \() ->
                 parseFullString "'\\n'" Parser.characterLiteral

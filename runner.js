@@ -14,7 +14,7 @@ targetFiles = targetFiles.map(function(f) {
         return [f, fileSizeInBytes];
     }).filter(x => x)
     .sort((x, y) => x[1] - y[1])
-    .slice(0, 2231);
+    // .slice(0, 2231);
 
 var app = Elm.Main.worker();
 
@@ -55,7 +55,7 @@ function analyseNextFile() {
         // return;
     // }
 
-    console.log("Next:", next[0]);
+    // console.log("Next:", next[0]);
     const content = fs.readFileSync(next[0], {
         encoding: 'utf-8'
     }).toString();

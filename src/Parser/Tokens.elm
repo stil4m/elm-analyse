@@ -3,6 +3,7 @@ module Parser.Tokens exposing (..)
 import Combine exposing (..)
 import Combine.Char exposing (..)
 import Parser.Types exposing (ModuleName)
+import Parser.Util exposing (nextChar)
 
 
 reserved : List String
@@ -51,7 +52,6 @@ asToken : Parser s String
 asToken =
     string "as"
 
-
 ifToken : Parser s String
 ifToken =
     string "if"
@@ -95,6 +95,22 @@ notReserved match =
         succeed match
 
 
+quotedEscaped : Char -> Parser s Char
+quotedEscaped c =
+    char '\\'
+        *> (choice
+                [ c <$ char c
+                , '\n' <$ char 'n'
+                , '\t' <$ char 't'
+                , '\x07' <$ char 'a'
+                , '\x08' <$ char 'b'
+                , '\x0C' <$ char 'f'
+                , '\x0D' <$ char 'r'
+                , '\x0B' <$ char 'v'
+                ]
+           )
+
+
 quotedSingleQuote : Parser s Char
 quotedSingleQuote =
     char '\''
@@ -103,6 +119,7 @@ quotedSingleQuote =
                 [ '\'' <$ char '\''
                 , '\n' <$ char 'n'
                 , '\t' <$ char 't'
+                , '\\' <$ char '\\'
                 , '\x07' <$ char 'a'
                 , '\x08' <$ char 'b'
                 , '\x0C' <$ char 'f'
@@ -121,7 +138,14 @@ characterLiteral =
 
 stringLiteral : Parser s String
 stringLiteral =
-    (string "\"" *> regex "(\\\\\"|[^\"\n])*" <* Combine.string "\"")
+    (char '"')
+        *> (String.fromList
+                <$> many
+                        (or (char '\\' *> anyChar)
+                                (noneOf [ '"' ])
+                        )
+           )
+        <* (char '"')
 
 
 multiLineStringLiteral : Parser s String
@@ -160,7 +184,7 @@ moduleName =
 
 excludedOperators : List String
 excludedOperators =
-    [ ":", "->", "--" ]
+    [ ":", "->", "--", "=" ]
 
 
 allowedOperatorTokens : List Char

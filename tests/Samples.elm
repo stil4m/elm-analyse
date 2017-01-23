@@ -29,7 +29,32 @@ allSamples =
     , sample24
     , sample25
     , sample26
+    , sample27
+    , sample28
     ]
+
+sample28 = """Foo
+
+x =
+    let
+        result : Int
+        result =
+            1
+    in
+        result
+"""
+
+sample27 : String
+sample27 =
+    """module Foo
+
+type alias Post = {
+  id: Int,
+  title: String,
+  text: Maybe String
+}
+
+"""
 
 
 {-| Let with comments and exact indent
@@ -49,6 +74,16 @@ x b =
 
 
 """
+
+
+foo : number -> number1
+foo x =
+    case x of
+        1 ->
+            2
+
+        _ ->
+            1
 
 
 {-| Trailing whitespace multiline comment

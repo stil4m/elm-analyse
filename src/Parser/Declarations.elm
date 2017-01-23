@@ -302,8 +302,8 @@ recordUpdateExpression =
             (between (string "{")
                 (string "}")
                 (succeed RecordUpdate
-                    <*> (moreThanIndentWhitespace *> functionName)
-                    <*> (moreThanIndentWhitespace *> string "|" *> recordFields True)
+                    <*> (trimmed functionName)
+                    <*> (string "|" *> recordFields True)
                 )
             )
         )
