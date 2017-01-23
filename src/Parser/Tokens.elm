@@ -123,6 +123,7 @@ escapedChar =
     char '\\'
         *> (choice
                 [ '\'' <$ char '\''
+                , '"' <$ char '"'
                 , '\n' <$ char 'n'
                 , '\t' <$ char 't'
                 , '\\' <$ char '\\'
@@ -182,7 +183,7 @@ multiLineStringLiteral =
                                 if x == [ '"', '"', '"' ] then
                                     fail "end of input"
                                 else
-                                    anyChar
+                                    or escapedChar anyChar
                             )
                     )
         )

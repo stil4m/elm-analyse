@@ -4,6 +4,7 @@ import Combine exposing (..)
 import Parser.Tokens exposing (functionName, typeName)
 import Parser.Types exposing (..)
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
+import Parser.Whitespace exposing (realNewLine)
 
 
 typeReferenceNoFn : Parser State TypeReference
@@ -80,7 +81,7 @@ genericRecordTypeReference =
         (\() ->
             between
                 (string "{")
-                (string "}")
+                (maybe realNewLine *> string "}")
                 (succeed GenericRecord
                     <*> (maybe whitespace *> functionName)
                     <*> (maybe whitespace *> string "|" *> maybe whitespace *> recordFieldsTypeReference)
@@ -94,7 +95,7 @@ recordTypeReference =
         (\() ->
             between
                 (string "{")
-                (string "}")
+                (maybe realNewLine *> string "}")
                 (Record <$> recordFieldsTypeReference)
         )
 

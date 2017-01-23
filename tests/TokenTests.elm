@@ -149,6 +149,10 @@ all =
             \() ->
                 parseFullString "\"\\x07\"" Parser.stringLiteral
                     |> Expect.equal (Just "\x07")
+        , test "string escaped 3" <|
+            \() ->
+                parseFullString "\"\\\"\"" Parser.stringLiteral
+                    |> Expect.equal (Just "\"")
         , test "string escaped" <|
             \() ->
                 parseFullString "\"foo\\\\\"" Parser.stringLiteral
