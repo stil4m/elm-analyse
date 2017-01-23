@@ -14,12 +14,13 @@ targetFiles = targetFiles.map(function(f) {
         return [f, fileSizeInBytes];
     }).filter(x => x)
     .sort((x, y) => x[1] - y[1])
-    // .slice(0, 5);
+    // .slice(0, 600);
 
 var app = Elm.Main.worker();
 
 var counter = 0;
 var failed = 0;
+var failedFiles = [];
 var invalid = 0;
 var totalTime = 0;
 
@@ -30,6 +31,7 @@ app.ports.parseResponse.subscribe(function(result) {
 
     if (result[1] === 'Nothing') {
         console.log('  > Failed');
+        failedFiles.push(result[0]);
         failed++;
     }
 
@@ -42,7 +44,9 @@ function analyseNextFile() {
         console.log('Failed:', failed);
         console.log('Invalid:', invalid);
         console.log('Counter:', counter);
-        console.log('Total Time:', totalTime / 1000)
+        console.log('Total Time:', totalTime / 1000);
+        console.log();
+        console.log(JSON.stringify(failedFiles, null, '  '));
         return;
     }
     // if (next[1] > 15 * 1024) {

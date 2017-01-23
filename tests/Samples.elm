@@ -27,7 +27,18 @@ allSamples =
     , sample22
     , sample23
     , sample24
+    , sample25
     ]
+
+
+{-| Trailing whitespace multiline comment -}
+sample25 : String
+sample25 =
+  String.concat
+  ["module HelloWorld exposing (..)\n\n"
+  , "{-| an individual Note (no pitch class implies a rest) -}    \n"
+  , "type alias AnInt = Int\n"
+  ]
 
 
 sample1 : String

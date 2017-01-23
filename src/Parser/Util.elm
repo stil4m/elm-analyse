@@ -35,9 +35,17 @@ exactIndentWhitespace =
         )
 
 
+multiLineCommentWithTrailingSpaces : Parser s String
+multiLineCommentWithTrailingSpaces =
+    succeed (++)
+        <*> multilineComment
+        <*> (String.fromList <$> (many <| char ' '))
+
+
 someComment : Parser a String
 someComment =
-    (or singleLineComment multilineComment)
+    or singleLineComment
+        multiLineCommentWithTrailingSpaces
 
 
 maybeNewLineWithStartOfComment : Parser State String

@@ -1,15 +1,16 @@
 module UtilTests exposing (..)
 
-import Parser.Util as Parser exposing (moreThanIndentWhitespace, exactIndentWhitespace)
-import Parser.Types exposing (..)
-import Test exposing (..)
-import Expect
+import Combine exposing (..)
 import CombineTestUtil exposing (..)
+import Expect
+import Parser.Types exposing (..)
+import Parser.Util as Parser exposing (commentSequence, exactIndentWhitespace, moreThanIndentWhitespace, multiLineCommentWithTrailingSpaces)
+import Test exposing (..)
 
 
 all : Test
 all =
-    describe "ImportTest"
+    describe "UtilTest"
         [ test "no whitespace" <|
             \() ->
                 parseFullStringState emptyState "" moreThanIndentWhitespace
@@ -82,4 +83,20 @@ all =
             \() ->
                 parseFullStringState emptyState "-- bar\n " moreThanIndentWhitespace
                     |> Expect.equal (Just "-- bar\n ")
+        , test "multiLineCommentWithTrailingSpaces" <|
+            \() ->
+                parseFullStringState emptyState "{- some note -}    " multiLineCommentWithTrailingSpaces
+                    |> Expect.equal (Just "{- some note -}    ")
+        , test "exactIndentWhitspace with multiline comment plus trailing whitespace" <|
+            \() ->
+                parseFullStringState emptyState "\n{- some note -}    \n" exactIndentWhitespace
+                    |> Expect.equal (Just "\n{- some note -}    \n")
+        , test "commentSequence" <|
+            \() ->
+                parseFullStringState emptyState "\n{- some note -}    " (String.fromList <$> commentSequence)
+                    |> Expect.equal (Just "\n{- some note -}    ")
+        , test "moreThanIndentWhitespace with multiline comment plus trailing whitespace" <|
+            \() ->
+                parseFullStringState emptyState "\n{- some note -}    \n " moreThanIndentWhitespace
+                    |> Expect.equal (Just "\n{- some note -}    \n ")
         ]
