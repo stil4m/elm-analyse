@@ -95,14 +95,27 @@ notReserved match =
         succeed match
 
 
-quotedSingleQuote : String
+quotedSingleQuote : Parser s Char
 quotedSingleQuote =
-    String.fromList [ '\'', '\\', '\'', '\'' ]
+    char '\''
+        *> char '\\'
+        *> (choice
+                [ '\'' <$ char '\''
+                , '\n' <$ char 'n'
+                , '\t' <$ char 't'
+                , '\x07' <$ char 'a'
+                , '\x08' <$ char 'b'
+                , '\x0C' <$ char 'f'
+                , '\x0D' <$ char 'r'
+                , '\x0B' <$ char 'v'
+                ]
+           )
+        <* char '\''
 
 
 characterLiteral : Parser s Char
 characterLiteral =
-    or ('\'' <$ string quotedSingleQuote)
+    or quotedSingleQuote
         (char '\'' *> anyChar <* char '\'')
 
 
@@ -142,7 +155,7 @@ typeName =
 
 moduleName : Parser s ModuleName
 moduleName =
-    Parser.Types.ModuleName <$> sepBy1 (string ".") typeName
+    sepBy1 (string ".") typeName
 
 
 excludedOperators : List String

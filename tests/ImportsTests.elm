@@ -1,7 +1,7 @@
 module ImportsTests exposing (..)
 
 import Parser.Imports as Parser
-import Parser.Types as Types
+import Parser.Types exposing (..)
 import Test exposing (..)
 import Expect
 import CombineTestUtil exposing (..)
@@ -15,12 +15,12 @@ all =
                 parseFullStringWithNullState "import Foo exposing (Model, Msg(..))" Parser.importDefinition
                     |> Expect.equal
                         (Just
-                            ({ moduleName = Types.ModuleName [ "Foo" ]
+                            ({ moduleName = [ "Foo" ]
                              , moduleAlias = Nothing
                              , exposingList =
-                                Types.Explicit
-                                    [ Types.DefinitionExpose "Model"
-                                    , Types.TypeExpose "Msg" (Types.All)
+                                Explicit
+                                    [ DefinitionExpose "Model"
+                                    , TypeExpose "Msg" (All)
                                     ]
                              }
                             )
@@ -30,9 +30,9 @@ all =
                 parseFullStringWithNullState "import Html exposing (text)" Parser.importDefinition
                     |> Expect.equal
                         (Just
-                            ({ moduleName = Types.ModuleName [ "Html" ]
+                            ({ moduleName = [ "Html" ]
                              , moduleAlias = Nothing
-                             , exposingList = Types.Explicit [ Types.DefinitionExpose "text" ]
+                             , exposingList = Explicit [ DefinitionExpose "text" ]
                              }
                             )
                         )
@@ -41,9 +41,9 @@ all =
                 parseFullStringWithNullState "import Foo" Parser.importDefinition
                     |> Expect.equal
                         (Just
-                            ({ moduleName = Types.ModuleName [ "Foo" ]
+                            ({ moduleName = [ "Foo" ]
                              , moduleAlias = Nothing
-                             , exposingList = Types.None
+                             , exposingList = None
                              }
                             )
                         )
@@ -52,9 +52,9 @@ all =
                 parseFullStringWithNullState "import Foo as Bar" Parser.importDefinition
                     |> Expect.equal
                         (Just
-                            ({ moduleName = Types.ModuleName [ "Foo" ]
-                             , moduleAlias = Just (Types.ModuleName [ "Bar" ])
-                             , exposingList = Types.None
+                            ({ moduleName = [ "Foo" ]
+                             , moduleAlias = Just ([ "Bar" ])
+                             , exposingList = None
                              }
                             )
                         )

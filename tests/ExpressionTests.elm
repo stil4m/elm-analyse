@@ -61,7 +61,7 @@ all =
                     |> Expect.equal
                         (Just
                             (Application
-                                [ QualifiedExpr (ModuleName [ "Task" ]) "succeed"
+                                [ QualifiedExpr [ "Task" ] "succeed"
                                 , UnitExpr
                                 ]
                             )
@@ -153,7 +153,7 @@ all =
         , test "qualified expression" <|
             \() ->
                 parseFullStringWithNullState "Html.text" expression
-                    |> Expect.equal (Just (QualifiedExpr (ModuleName [ "Html" ]) "text"))
+                    |> Expect.equal (Just (QualifiedExpr [ "Html" ] "text"))
         , test "record access" <|
             \() ->
                 parseFullStringWithNullState "foo.bar" expression
@@ -166,6 +166,18 @@ all =
                             (RecordUpdate "model"
                                 [ ( "count", Integer 1 )
                                 , ( "loading", FunctionOrValue "True" )
+                                ]
+                            )
+                        )
+        , test "record access as function" <|
+            \() ->
+                parseFullStringWithNullState "List.map .name people" expression
+                    |> Expect.equal
+                        (Just
+                            (Application
+                                [ QualifiedExpr [ "List" ] "map"
+                                , RecordAccessFunction ".name"
+                                , FunctionOrValue "people"
                                 ]
                             )
                         )

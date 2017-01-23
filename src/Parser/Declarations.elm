@@ -127,6 +127,7 @@ expressionNotApplication =
                 , ifBlockExpression
                 , tupledExpression
                 , prefixOperatorExpression
+                , recordAccessFunctionExpression
                 , operatorExpression
                 , floatableExpression
                 , integerExpression
@@ -435,9 +436,14 @@ qualifiedExpression =
     lazy
         (\() ->
             succeed QualifiedExpr
-                <*> (ModuleName <$> many1 (typeName <* string "."))
+                <*> many1 (typeName <* string ".")
                 <*> choice [ functionName, typeName ]
         )
+
+
+recordAccessFunctionExpression : Parser State Expression
+recordAccessFunctionExpression =
+    ((++) "." >> RecordAccessFunction) <$> (string "." *> functionName)
 
 
 recordAccessExpression : Parser State Expression

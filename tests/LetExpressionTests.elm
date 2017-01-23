@@ -105,7 +105,7 @@ all =
                                         { operatorDefinition = False
                                         , name = "indent"
                                         , arguments = []
-                                        , expression = Application ([ QualifiedExpr (ModuleName [ "String" ]) "length", FunctionOrValue "s" ])
+                                        , expression = Application ([ QualifiedExpr ([ "String" ]) "length", FunctionOrValue "s" ])
                                         }
                                     }
                                  ]

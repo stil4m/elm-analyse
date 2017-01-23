@@ -57,8 +57,8 @@ type alias EffectModuleData =
     }
 
 
-type ModuleName
-    = ModuleName (List String)
+type alias ModuleName =
+    List String
 
 
 type Declaration
@@ -156,6 +156,7 @@ type Expression
     | ListExpr (List Expression)
     | QualifiedExpr ModuleName String
     | RecordAccess (List String)
+    | RecordAccessFunction String
     | RecordUpdate String (List ( String, Expression ))
     | GLSLExpression String
 

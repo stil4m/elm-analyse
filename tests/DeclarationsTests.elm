@@ -67,7 +67,7 @@ all =
                             , expression =
                                 (Application
                                     [ FunctionOrValue "flip"
-                                    , QualifiedExpr (ModuleName [ "Maybe" ]) "andThen"
+                                    , QualifiedExpr [ "Maybe" ] "andThen"
                                     ]
                                 )
                             }
@@ -198,7 +198,7 @@ all =
                             { moduleDefinition =
                                 NoModule
                             , imports =
-                                [ { moduleName = ModuleName [ "Html" ]
+                                [ { moduleName = [ "Html" ]
                                   , moduleAlias = Nothing
                                   , exposingList = Types.None
                                   }

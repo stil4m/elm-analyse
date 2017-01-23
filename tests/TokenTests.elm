@@ -61,11 +61,11 @@ all =
         , test "moduleName" <|
             \() ->
                 parseFullString "Foo" Parser.moduleName
-                    |> Expect.equal (Just <| Types.ModuleName [ "Foo" ])
+                    |> Expect.equal (Just <| [ "Foo" ])
         , test "moduleNameDir" <|
             \() ->
                 parseFullString "Foo.Bar" Parser.moduleName
-                    |> Expect.equal (Just <| Types.ModuleName [ "Foo", "Bar" ])
+                    |> Expect.equal (Just <| [ "Foo", "Bar" ])
         , test "exposingToken" <|
             \() ->
                 parseFullString "exposing" Parser.exposingToken
@@ -130,8 +130,12 @@ all =
             \() ->
                 parseFullString "\"\"\"Bar foo \n a\"\"\"" Parser.multiLineStringLiteral
                     |> Expect.equal (Just "Bar foo \n a")
-        , test "character" <|
+        , test "character escaped" <|
             \() ->
                 parseFullString "'\\''" Parser.characterLiteral
                     |> Expect.equal (Just '\'')
+        , test "character escaped 2" <|
+            \() ->
+                parseFullString "'\\n'" Parser.characterLiteral
+                    |> Expect.equal (Just '\n')
         ]

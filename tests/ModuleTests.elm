@@ -13,11 +13,11 @@ all =
         [ test "formatted moduleDefinition" <|
             \() ->
                 parseFullStringWithNullState "module Foo exposing (Bar)" Parser.moduleDefinition
-                    |> Expect.equal (Just (Types.NormalModule { moduleName = Types.ModuleName [ "Foo" ], exposingList = Types.Explicit [ Types.DefinitionExpose "Bar" ] }))
+                    |> Expect.equal (Just (Types.NormalModule { moduleName = [ "Foo" ], exposingList = Types.Explicit [ Types.DefinitionExpose "Bar" ] }))
         , test "port moduleDefinition" <|
             \() ->
                 parseFullStringWithNullState "port module Foo exposing (Bar)" Parser.moduleDefinition
-                    |> Expect.equal (Just (Types.PortModule { moduleName = Types.ModuleName [ "Foo" ], exposingList = Types.Explicit [ Types.DefinitionExpose "Bar" ] }))
+                    |> Expect.equal (Just (Types.PortModule { moduleName = [ "Foo" ], exposingList = Types.Explicit [ Types.DefinitionExpose "Bar" ] }))
         , test "moduleless" <|
             \() ->
                 parseFullStringWithNullState "" Parser.moduleDefinition
@@ -28,7 +28,7 @@ all =
                     |> Expect.equal
                         (Just
                             (Types.EffectModule
-                                { moduleName = Types.ModuleName [ "Foo" ]
+                                { moduleName = [ "Foo" ]
                                 , exposingList = Types.Explicit [ Types.DefinitionExpose "Bar" ]
                                 , command = Just "MyCmd"
                                 , subscription = Just "MySub"
@@ -38,7 +38,7 @@ all =
         , test "unformatted" <|
             \() ->
                 parseFullStringWithNullState "module \n Foo \n exposing  (..)" Parser.moduleDefinition
-                    |> Expect.equal (Just (Types.NormalModule { moduleName = Types.ModuleName [ "Foo" ], exposingList = Types.All }))
+                    |> Expect.equal (Just (Types.NormalModule { moduleName = [ "Foo" ], exposingList = Types.All }))
         , test "unformatted wrong" <|
             \() ->
                 parseFullStringWithNullState "module \nFoo \n exposing  (..)" Parser.moduleDefinition
@@ -46,9 +46,9 @@ all =
         , test "exposing all" <|
             \() ->
                 parseFullStringWithNullState "module Foo exposing (..)" Parser.moduleDefinition
-                    |> Expect.equal (Just (Types.NormalModule { moduleName = Types.ModuleName [ "Foo" ], exposingList = Types.All }))
+                    |> Expect.equal (Just (Types.NormalModule { moduleName = [ "Foo" ], exposingList = Types.All }))
         , test "module name with _" <|
             \() ->
                 parseFullStringWithNullState "module I_en_gb exposing (..)" Parser.moduleDefinition
-                    |> Expect.equal (Just (Types.NormalModule { moduleName = Types.ModuleName [ "I_en_gb" ], exposingList = Types.All }))
+                    |> Expect.equal (Just (Types.NormalModule { moduleName = [ "I_en_gb" ], exposingList = Types.All }))
         ]

@@ -51,6 +51,7 @@ function analyseNextFile() {
         // return;
     // }
 
+    console.log("Next:", next[0]);
     const content = fs.readFileSync(next[0], {
         encoding: 'utf-8'
     }).toString();
