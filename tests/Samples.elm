@@ -31,9 +31,18 @@ allSamples =
     , sample26
     , sample27
     , sample28
+    , sample29
     ]
 
 
+sample29 : String
+sample29 =
+  """module Foo
+
+x = '\\x0D'
+"""
+
+sample28 : String
 sample28 =
     """Foo
 
