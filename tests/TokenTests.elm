@@ -133,6 +133,12 @@ all =
             \() ->
                 parseFullString "\"\"\"Bar foo \n a\"\"\"" Parser.multiLineStringLiteral
                     |> Expect.equal (Just "Bar foo \n a")
+
+          , test "multiline string escape" <|
+            \() ->
+                parseFullString """\"\"\" \\\"\"\" \"\"\"""" Parser.multiLineStringLiteral
+                    |> Expect.equal (Just """ \""" """)
+
         , test "character escaped" <|
             \() ->
                 parseFullString "'\\''" Parser.characterLiteral

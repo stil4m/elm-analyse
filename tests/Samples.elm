@@ -32,8 +32,8 @@ allSamples =
     , sample27
     , sample28
     , sample29
-    ]
 
+    ]
 
 sample29 : String
 sample29 =
