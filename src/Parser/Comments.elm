@@ -24,10 +24,24 @@ singleLineComment =
 
 multilineComment : Parser a String
 multilineComment =
-    (String.concat
-        <$> sequence
-                [ (string "{-")
-                , (String.fromList <$> manyTill anyChar (string "-}"))
-                , succeed "-}"
-                ]
-    )
+    lazy
+        (\() ->
+            (String.concat
+                <$> sequence
+                        [ (string "{-")
+                        , String.concat
+                            <$> (manyTill
+                                    (lookAhead (count 2 anyChar)
+                                        >>= (\x ->
+                                                if x == [ '{', '-' ] then
+                                                    multilineComment
+                                                else
+                                                    String.fromChar <$> anyChar
+                                            )
+                                    )
+                                    (string "-}")
+                                )
+                        , succeed "-}"
+                        ]
+            )
+        )

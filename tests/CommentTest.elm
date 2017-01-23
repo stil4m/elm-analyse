@@ -23,10 +23,10 @@ all =
                     |> Expect.equal (Just "{-foo\nbar-}")
         , test "nested multilineComment only open" <|
             \() ->
-                parseFullString "{- {|- -}" Parser.multilineComment
+                parseFullString "{- {- -}" Parser.multilineComment
                     |> Expect.equal Nothing
         , test "nested multilineComment open and close" <|
             \() ->
-                parseFullString "{- {|- -|} -}" Parser.multilineComment
-                    |> Expect.equal (Just " {|- -|} ")
+                parseFullString "{- {- -} -}" Parser.multilineComment
+                    |> Expect.equal (Just "{- {- -} -}")
         ]
