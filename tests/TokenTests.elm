@@ -121,10 +121,10 @@ all =
             \() ->
                 parseFullString "~" Parser.prefixOperatorToken
                     |> Expect.equal (Just "~")
-                    , test "operatorToken 13" <|
-                        \() ->
-                            parseFullString "=" Parser.prefixOperatorToken
-                                |> Expect.equal Nothing
+        , test "operatorToken 13" <|
+            \() ->
+                parseFullString "=" Parser.prefixOperatorToken
+                    |> Expect.equal Nothing
         , test "operatorToken 14" <|
             \() ->
                 parseFullString "?" Parser.prefixOperatorToken

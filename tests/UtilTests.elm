@@ -4,7 +4,7 @@ import Combine exposing (..)
 import CombineTestUtil exposing (..)
 import Expect
 import Parser.Types exposing (..)
-import Parser.Util as Parser exposing (commentSequence, exactIndentWhitespace,unstrictIndentWhitespace, moreThanIndentWhitespace, multiLineCommentWithTrailingSpaces)
+import Parser.Util as Parser exposing (commentSequence, exactIndentWhitespace, unstrictIndentWhitespace, moreThanIndentWhitespace, multiLineCommentWithTrailingSpaces)
 import Test exposing (..)
 
 
@@ -35,10 +35,10 @@ all =
             \() ->
                 parseFullStringState emptyState " \n " moreThanIndentWhitespace
                     |> Expect.equal (Just " \n ")
-        -- , test "with newline and higher indent 3" <|
-        --     \() ->
-        --         parseFullStringState (emptyState |> pushIndent 1) " \n " moreThanIndentWhitespace
-        --             |> Expect.equal Nothing
+          -- , test "with newline and higher indent 3" <|
+          --     \() ->
+          --         parseFullStringState (emptyState |> pushIndent 1) " \n " moreThanIndentWhitespace
+          --             |> Expect.equal Nothing
         , test "with newline and higher indent 4" <|
             \() ->
                 parseFullStringState (emptyState |> pushIndent 1) " \n  " moreThanIndentWhitespace
@@ -67,12 +67,10 @@ all =
             \() ->
                 parseFullStringState (emptyState |> pushIndent 2) "\n  \n    \n\n   " moreThanIndentWhitespace
                     |> Expect.equal (Just "\n  \n    \n\n   ")
-                    , test "exactIndentWhitespace some" <|
-                        \() ->
-                            parseFullStringState (emptyState |> pushIndent 2) "\n  \n  " exactIndentWhitespace
-                                |> Expect.equal (Just "\n  \n  ")
-
-
+        , test "exactIndentWhitespace some" <|
+            \() ->
+                parseFullStringState (emptyState |> pushIndent 2) "\n  \n  " exactIndentWhitespace
+                    |> Expect.equal (Just "\n  \n  ")
         , test "moreThanIndentWhitespace with comments" <|
             \() ->
                 parseFullStringState emptyState "\n --foo\n " moreThanIndentWhitespace

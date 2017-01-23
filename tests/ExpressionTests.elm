@@ -169,17 +169,17 @@ all =
                                 ]
                             )
                         )
-                        , test "record update no spacing" <|
-                            \() ->
-                                parseFullStringWithNullState "{model| count = 1, loading = True }" expression
-                                    |> Expect.equal
-                                        (Just
-                                            (RecordUpdate "model"
-                                                [ ( "count", Integer 1 )
-                                                , ( "loading", FunctionOrValue "True" )
-                                                ]
-                                            )
-                                        )
+        , test "record update no spacing" <|
+            \() ->
+                parseFullStringWithNullState "{model| count = 1, loading = True }" expression
+                    |> Expect.equal
+                        (Just
+                            (RecordUpdate "model"
+                                [ ( "count", Integer 1 )
+                                , ( "loading", FunctionOrValue "True" )
+                                ]
+                            )
+                        )
         , test "record access as function" <|
             \() ->
                 parseFullStringWithNullState "List.map .name people" expression

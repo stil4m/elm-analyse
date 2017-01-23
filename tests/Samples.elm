@@ -33,7 +33,9 @@ allSamples =
     , sample28
     ]
 
-sample28 = """Foo
+
+sample28 =
+    """Foo
 
 x =
     let
@@ -43,6 +45,7 @@ x =
     in
         result
 """
+
 
 sample27 : String
 sample27 =

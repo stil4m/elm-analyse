@@ -52,6 +52,7 @@ asToken : Parser s String
 asToken =
     string "as"
 
+
 ifToken : Parser s String
 ifToken =
     string "if"
@@ -142,7 +143,7 @@ stringLiteral =
         *> (String.fromList
                 <$> many
                         (or (char '\\' *> anyChar)
-                                (noneOf [ '"' ])
+                            (noneOf [ '"' ])
                         )
            )
         <* (char '"')
