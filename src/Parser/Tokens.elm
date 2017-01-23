@@ -1,9 +1,10 @@
 module Parser.Tokens exposing (..)
 
+import Char exposing (fromCode)
 import Combine exposing (..)
 import Combine.Char exposing (..)
+import Hex
 import Parser.Types exposing (ModuleName)
-import Parser.Util exposing (nextChar)
 
 
 reserved : List String
@@ -112,10 +113,14 @@ quotedEscaped c =
            )
 
 
-quotedSingleQuote : Parser s Char
-quotedSingleQuote =
-    char '\''
-        *> char '\\'
+hexdigits : List Char
+hexdigits =
+    [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' ]
+
+
+escapedChar : Parser s Char
+escapedChar =
+    char '\\'
         *> (choice
                 [ '\'' <$ char '\''
                 , '\n' <$ char 'n'
@@ -126,8 +131,24 @@ quotedSingleQuote =
                 , '\x0C' <$ char 'f'
                 , '\x0D' <$ char 'r'
                 , '\x0B' <$ char 'v'
+                , (char 'x' *> sequence [ hexDigit, hexDigit ])
+                    |> andThen
+                        (\l ->
+                            case Hex.fromString (String.fromList <| List.map Char.toLower l) of
+                                Ok x ->
+                                    succeed (fromCode x)
+
+                                Err x ->
+                                    fail x
+                        )
                 ]
            )
+
+
+quotedSingleQuote : Parser s Char
+quotedSingleQuote =
+    char '\''
+        *> escapedChar
         <* char '\''
 
 
@@ -142,7 +163,7 @@ stringLiteral =
     (char '"')
         *> (String.fromList
                 <$> many
-                        (or (char '\\' *> anyChar)
+                        (or escapedChar
                             (noneOf [ '"' ])
                         )
            )
