@@ -36,6 +36,18 @@ all =
                         )
         , test "on newline signature with wrong indent " <|
             \() ->
+                parseFullStringWithNullState
+                    "initModel : ( cMsg -> cModel -> ( cModel, Cmd cMsg ) )\n          -> ( cModel -> Sub cMsg )\n          -> Model cModel cMsg"
+                    Parser.signature
+                    |> Expect.equal
+                        (Just
+                            { operatorDefinition = False
+                            , name = "foo"
+                            , typeReference = Types.Typed [] "Int" []
+                            }
+                        )
+        , test "on newline signature with wrong indent " <|
+            \() ->
                 parseFullStringWithNullState "foo :\nInt" Parser.signature
                     |> Expect.equal Nothing
         , test "on newline signature with good indent" <|

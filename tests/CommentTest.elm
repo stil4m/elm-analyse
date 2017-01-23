@@ -6,10 +6,6 @@ import Expect
 import CombineTestUtil exposing (..)
 
 
-{--}
---afasd
-
-
 all : Test
 all =
     describe "ModuleTests"
@@ -25,4 +21,12 @@ all =
             \() ->
                 parseFullString "{-foo\nbar-}" Parser.multilineComment
                     |> Expect.equal (Just "{-foo\nbar-}")
+        , test "nested multilineComment only open" <|
+            \() ->
+                parseFullString "{- {|- -}" Parser.multilineComment
+                    |> Expect.equal Nothing
+        , test "nested multilineComment open and close" <|
+            \() ->
+                parseFullString "{- {|- -|} -}" Parser.multilineComment
+                    |> Expect.equal (Just " {|- -|} ")
         ]

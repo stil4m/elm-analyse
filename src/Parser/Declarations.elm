@@ -180,6 +180,12 @@ applicationExpression =
 -- End expression
 
 
+modIndent : Int -> Parser State a -> Parser State a
+modIndent x p =
+    (modifyState (pushIndent x) *> p)
+        <* modifyState popIndent
+
+
 withIndentedState : Parser State a -> Parser State a
 withIndentedState p =
     withLocation
