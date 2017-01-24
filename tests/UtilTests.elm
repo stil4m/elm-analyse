@@ -1,6 +1,5 @@
 module UtilTests exposing (..)
 
-import Combine exposing (..)
 import CombineTestUtil exposing (..)
 import Expect
 import Parser.Types exposing (..)
@@ -105,7 +104,7 @@ all =
                     |> Expect.equal (Just "\n{- some note -}    \n")
         , test "commentSequence" <|
             \() ->
-                parseFullStringState emptyState "\n{- some note -}    " (String.fromList <$> commentSequence)
+                parseFullStringState emptyState "\n{- some note -}    " (commentSequence)
                     |> Expect.equal (Just "\n{- some note -}    ")
         , test "moreThanIndentWhitespace with multiline comment plus trailing whitespace" <|
             \() ->

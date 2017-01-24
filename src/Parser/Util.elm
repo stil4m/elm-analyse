@@ -4,7 +4,7 @@ import Combine exposing (..)
 import Combine.Char exposing (..)
 import Parser.Comments exposing (..)
 import Parser.Types exposing (..)
-import Parser.Whitespace exposing (realNewLine)
+import Parser.Whitespace exposing (many1Spaces, manySpaces, nSpaces, realNewLine)
 
 
 nextChars : Int -> Parser a String
@@ -28,21 +28,16 @@ printLocation s =
     withLocation (Debug.log s >> (always (succeed "")))
 
 
-onlySpaces : Parser State String
-onlySpaces =
-    String.fromList <$> many (char ' ')
-
-
 unstrictIndentWhitespace : Parser State String
 unstrictIndentWhitespace =
     withState
         (\state ->
-            (List.concat >> List.concat >> String.fromList)
+            (List.concat >> String.concat)
                 <$> many1
                         (sequence
-                            [ many (char ' ')
-                            , Maybe.withDefault [] <$> maybe (String.toList <$> someComment)
-                            , List.concat <$> many1 newLineWithSomeIndent
+                            [ manySpaces
+                            , Maybe.withDefault "" <$> maybe (someComment)
+                            , (String.concat) <$> many1 newLineWithSomeIndent
                             ]
                         )
         )
@@ -52,12 +47,12 @@ exactIndentWhitespace : Parser State String
 exactIndentWhitespace =
     withState
         (\state ->
-            (List.concat >> List.concat >> String.fromList)
+            (List.concat >> String.concat)
                 <$> many1
                         (sequence
-                            [ many (char ' ')
-                            , Maybe.withDefault [] <$> maybe (String.toList <$> someComment)
-                            , List.concat <$> many1 (newLineWithIndentExact state)
+                            [ manySpaces
+                            , Maybe.withDefault "" <$> maybe someComment
+                            , String.concat <$> many1 (newLineWithIndentExact state)
                             ]
                         )
         )
@@ -67,7 +62,7 @@ multiLineCommentWithTrailingSpaces : Parser s String
 multiLineCommentWithTrailingSpaces =
     succeed (++)
         <*> multilineComment
-        <*> (String.fromList <$> (many <| char ' '))
+        <*> manySpaces
 
 
 someComment : Parser a String
@@ -81,22 +76,22 @@ maybeNewLineWithStartOfComment =
     String.concat
         <$> (sequence
                 [ Maybe.withDefault "" <$> maybe realNewLine
-                , String.fromList <$> (many (char ' '))
+                , manySpaces
                 , someComment
                 ]
             )
 
 
-commentSequence : Parser State (List Char)
+commentSequence : Parser State String
 commentSequence =
-    List.concat
+    String.concat
         <$> (many
-                (or (String.toList <$> someComment)
-                    (List.concat
+                (or (someComment)
+                    (String.concat
                         <$> sequence
-                                [ String.toList <$> realNewLine
-                                , many (char ' ')
-                                , String.toList <$> someComment
+                                [ realNewLine
+                                , manySpaces
+                                , someComment
                                 ]
                     )
                 )
@@ -113,10 +108,10 @@ moreThanIndentWhitespace =
     withState
         (\state ->
             or
-                ((List.concat >> List.concat >> String.fromList)
+                ((List.concat >> String.concat)
                     <$> (many1
                             (sequence
-                                [ many (char ' ')
+                                [ manySpaces
                                 , commentSequence
                                 , newLineWithIndentPlus state
                                 ]
@@ -124,56 +119,56 @@ moreThanIndentWhitespace =
                         )
                 )
                 (succeed (++)
-                    <*> (String.fromList <$> many1 (char ' '))
+                    <*> many1Spaces
                     <*> (Maybe.withDefault "" <$> (maybe someComment))
                 )
         )
 
 
-newLineWithSomeIndent : Parser State (List Char)
+newLineWithSomeIndent : Parser State String
 newLineWithSomeIndent =
-    List.concat
+    String.concat
         <$> sequence
-                [ String.toList <$> realNewLine
-                , List.concat
+                [ realNewLine
+                , String.concat
                     <$> many
                             (succeed (++)
-                                <*> (many (char ' '))
-                                <*> (String.toList <$> realNewLine)
+                                <*> manySpaces
+                                <*> realNewLine
                             )
-                , many1 (char ' ')
+                , manySpaces
                 ]
 
 
-newLineWithIndentExact : State -> Parser State (List Char)
+newLineWithIndentExact : State -> Parser State String
 newLineWithIndentExact state =
-    List.concat
+    String.concat
         <$> sequence
-                [ String.toList <$> realNewLine
-                , List.concat
+                [ realNewLine
+                , String.concat
                     <$> many
                             (succeed (++)
-                                <*> (many (char ' '))
-                                <*> (String.toList <$> realNewLine)
+                                <*> (manySpaces)
+                                <*> (realNewLine)
                             )
-                , count (currentIndent state) (char ' ')
+                , nSpaces (currentIndent state)
                 ]
 
 
-newLineWithIndentPlus : State -> Parser State (List Char)
+newLineWithIndentPlus : State -> Parser State String
 newLineWithIndentPlus state =
-    List.concat
+    String.concat
         <$> many1
-                (List.concat
+                (String.concat
                     <$> sequence
-                            [ String.toList <$> realNewLine
-                            , List.concat
+                            [ realNewLine
+                            , String.concat
                                 <$> many
                                         (succeed (++)
-                                            <*> (many (char ' '))
-                                            <*> (String.toList <$> realNewLine)
+                                            <*> manySpaces
+                                            <*> realNewLine
                                         )
-                            , count (currentIndent state) (char ' ')
-                            , many1 (char ' ')
+                            , nSpaces (currentIndent state)
+                            , many1Spaces
                             ]
                 )

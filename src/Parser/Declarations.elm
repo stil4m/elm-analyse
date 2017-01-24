@@ -12,7 +12,8 @@ import Parser.Tokens exposing (..)
 import Parser.TypeReference exposing (..)
 import Parser.Types exposing (..)
 import Parser.Typings exposing (typeDeclaration)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, nextChar, nextChars, onlySpaces, trimmed, unstrictIndentWhitespace)
+import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, nextChar, nextChars, trimmed, unstrictIndentWhitespace)
+import Parser.Whitespace exposing (manySpaces)
 
 
 file : Parser State File
@@ -399,7 +400,7 @@ letBlock =
                 *> withIndentedState letBody
                 <* (choice
                         [ unstrictIndentWhitespace
-                        , onlySpaces
+                        , manySpaces
                         ]
                         *> string "in"
                    )

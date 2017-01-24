@@ -32,9 +32,9 @@ allSamples =
     , sample27
     , sample28
     , sample29
-    , sample30
-    , sample31
-    , sample32
+      -- , sample30
+      -- , sample31
+      -- , sample32
     , sample33
     ]
 
@@ -50,44 +50,45 @@ y x =
 """
 
 
-sample32 : String
-sample32 =
-    """module Foo
 
-y =
-    let
-    x = 1
-
-  in
-    x
-"""
-
-
-sample31 : String
-sample31 =
-    """module Foo
-
-x =
-  let
-    y = [ 1
-    ]
-  in
-    y
-
-"""
-
-
-sample30 : String
-sample30 =
-    """module Foo
-
-y =
-  let x =
-      1
-
-  in
-      x
-"""
+-- sample32 : String
+-- sample32 =
+--     """module Foo
+--
+-- y =
+--     let
+--     x = 1
+--
+--   in
+--     x
+-- """
+--
+--
+-- sample31 : String
+-- sample31 =
+--     """module Foo
+--
+-- x =
+--   let
+--     y = [ 1
+--     ]
+--   in
+--     y
+--
+-- """
+--
+--
+-- sample30 : String
+-- sample30 =
+--     """module Foo
+--
+-- y =
+--   let x =
+--       1
+--
+--   in
+--       x
+-- """
 
 
 sample29 : String
