@@ -135,6 +135,33 @@ all =
                                     (GenericType "baz")
                                 )
                         )
+        , test "function type reference generics" <|
+            \() ->
+                parseFullStringWithNullState "cMsg -> cModel -> a" Parser.typeReference
+                    |> Expect.equal
+                        (Just <|
+                            FunctionTypeReference
+                                (GenericType "cMsg")
+                                (FunctionTypeReference
+                                    (GenericType "cModel")
+                                    (GenericType "a")
+                                )
+                        )
+        , test "function as argument" <|
+            \() ->
+                parseFullStringWithNullState "( cMsg -> cModel -> a ) -> b" Parser.typeReference
+                    |> Expect.equal
+                        (Just <|
+                            FunctionTypeReference
+                                (FunctionTypeReference
+                                    (GenericType "cMsg")
+                                    (FunctionTypeReference
+                                        (GenericType "cModel")
+                                        (GenericType "a")
+                                    )
+                                )
+                                (GenericType "b")
+                        )
         , test "type with params" <|
             \() ->
                 parseFullStringWithNullState "(Foo -> Bar)" Parser.typeReference

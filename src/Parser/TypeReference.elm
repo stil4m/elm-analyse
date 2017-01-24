@@ -18,7 +18,7 @@ typeReferenceNoFn =
                 , recordTypeReference
                 , genericRecordTypeReference
                 , genericTypeReference
-                , parens typeReference
+                , parens (trimmed typeReference)
                 ]
         )
 
