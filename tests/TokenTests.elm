@@ -6,6 +6,11 @@ import Expect
 import CombineTestUtil exposing (..)
 
 
+longString : String
+longString =
+    "\"" ++ (String.repeat (5 * 10 ^ 5) "a") ++ "\""
+
+
 all : Test
 all =
     describe "TokenTests"
@@ -161,4 +166,8 @@ all =
             \() ->
                 parseFullString "'\\n'" Parser.characterLiteral
                     |> Expect.equal (Just '\n')
+        , test "long string" <|
+            \() ->
+                parseFullString longString Parser.stringLiteral
+                    |> Expect.notEqual Nothing
         ]

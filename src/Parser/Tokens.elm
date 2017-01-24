@@ -161,11 +161,21 @@ characterLiteral =
 
 stringLiteral : Parser s String
 stringLiteral =
+    -- (char '"')
+    --     *> (String.fromList
+    --             <$> many
+    --                     (or escapedChar
+    --                         (noneOf [ '"' ])
+    --                     )
+    --        )
+    --     <* (char '"')
     (char '"')
-        *> (String.fromList
+        *> (String.concat
                 <$> many
-                        (or escapedChar
-                            (noneOf [ '"' ])
+                        (choice
+                            [ (regex "[^\\\\\\\"]+")
+                            , String.fromChar <$> escapedChar
+                            ]
                         )
            )
         <* (char '"')
