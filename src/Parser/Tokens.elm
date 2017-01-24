@@ -1,5 +1,6 @@
 module Parser.Tokens exposing (..)
 
+import Dict exposing (Dict)
 import Char exposing (fromCode)
 import Combine exposing (..)
 import Combine.Char exposing (..)
@@ -7,7 +8,7 @@ import Hex
 import Parser.Types exposing (ModuleName)
 
 
-reserved : List String
+reserved : Dict String Bool
 reserved =
     [ "module"
     , "exposing"
@@ -27,6 +28,8 @@ reserved =
       --, "alias" Apparently this is not a reserved keyword
     , "where"
     ]
+        |> (List.map (flip (,) True))
+        |> Dict.fromList
 
 
 portToken : Parser s String
@@ -91,7 +94,7 @@ functionOrTypeName =
 
 notReserved : String -> Parser s String
 notReserved match =
-    if List.member match reserved then
+    if Dict.member match reserved then
         fail "functionName is reserved"
     else
         succeed match
@@ -111,11 +114,6 @@ quotedEscaped c =
                 , '\x0B' <$ char 'v'
                 ]
            )
-
-
-hexdigits : List Char
-hexdigits =
-    [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' ]
 
 
 escapedChar : Parser s Char
