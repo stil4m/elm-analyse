@@ -35,7 +35,19 @@ allSamples =
     , sample30
     , sample31
     , sample32
+    , sample33
     ]
+
+
+sample33 : String
+sample33 =
+    """module Foo
+
+y x =
+  case x of
+    _
+    -> 1
+"""
 
 
 sample32 : String

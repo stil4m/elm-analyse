@@ -358,7 +358,7 @@ caseStatement =
         (\() ->
             succeed (,)
                 <*> pattern
-                <*> (maybe moreThanIndentWhitespace *> string "->" *> maybe moreThanIndentWhitespace *> expression)
+                <*> (maybe (or moreThanIndentWhitespace exactIndentWhitespace) *> string "->" *> maybe moreThanIndentWhitespace *> expression)
         )
 
 
