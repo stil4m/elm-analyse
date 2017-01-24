@@ -111,4 +111,8 @@ all =
             \() ->
                 parseFullStringState emptyState "\n{- some note -}    \n " moreThanIndentWhitespace
                     |> Expect.equal (Just "\n{- some note -}    \n ")
+        , test "moreThanIndentWhitespace with multiline comment plus trailing whitespace" <|
+            \() ->
+                parseFullStringState emptyState " {- \"Shoes\" NodeId -}" moreThanIndentWhitespace
+                    |> Expect.equal (Just " {- \"Shoes\" NodeId -}")
         ]
