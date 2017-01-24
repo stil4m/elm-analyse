@@ -11,20 +11,24 @@ nSpaces x =
 
 manySpaces : Parser s String
 manySpaces =
-    String.fromList <$> many (char ' ')
+    -- String.fromList <$> many (char ' ')
+    regex " *"
 
 
 many1Spaces : Parser s String
 many1Spaces =
-    String.fromList <$> many1 (char ' ')
+    -- String.fromList <$> many1 (char ' ')
+    regex " +"
 
 
 realNewLine : Parser s String
 realNewLine =
-    or (string "\x0D\n")
-        (string "\n")
+    -- or (string "\x0D\n")
+    -- (string "\n")
+    regex "\x0D?\n"
 
 
 untilNewlineToken : Parser s String
 untilNewlineToken =
-    while (\c -> not (c == '\x0D' || c == '\n'))
+    -- while (\c -> not (c == '\x0D' || c == '\n'))
+    regex "[^\x0D\n]*"

@@ -132,10 +132,10 @@ escapedChar =
                 , '\x0C' <$ char 'f'
                 , '\x0D' <$ char 'r'
                 , '\x0B' <$ char 'v'
-                , (char 'x' *> sequence [ hexDigit, hexDigit ])
+                , (char 'x' *> regex "[0-9A-Fa-f]{2}")
                     |> andThen
                         (\l ->
-                            case Hex.fromString (String.fromList <| List.map Char.toLower l) of
+                            case Hex.fromString <| String.toLower l of
                                 Ok x ->
                                     succeed (fromCode x)
 

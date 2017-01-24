@@ -31,7 +31,7 @@ file =
                 in
                     succeed (File modDef)
                         <*> importParser
-                        <*> ((many (exactIndentWhitespace *> declaration)) <* maybe exactIndentWhitespace <* (many (char ' ')))
+                        <*> ((many (exactIndentWhitespace *> declaration)) <* maybe exactIndentWhitespace <* manySpaces)
             )
 
 
