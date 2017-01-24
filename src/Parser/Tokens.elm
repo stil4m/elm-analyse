@@ -186,15 +186,17 @@ multiLineStringLiteral =
     between
         (string "\"\"\"")
         (string "\"\"\"")
-        (String.fromList
+        (String.concat
             <$> many
-                    (lookAhead (count 3 anyChar)
-                        >>= (\x ->
-                                if x == [ '"', '"', '"' ] then
-                                    fail "end of input"
-                                else
-                                    or escapedChar anyChar
-                            )
+                    (or (regex "[^\\\\\\\"]+")
+                        (lookAhead (count 3 anyChar)
+                            >>= (\x ->
+                                    if x == [ '"', '"', '"' ] then
+                                        fail "end of input"
+                                    else
+                                        String.fromChar <$> (or escapedChar anyChar)
+                                )
+                        )
                     )
         )
 

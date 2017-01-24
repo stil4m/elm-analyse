@@ -11,6 +11,11 @@ longString =
     "\"" ++ (String.repeat (5 * 10 ^ 5) "a") ++ "\""
 
 
+longMultiLineString : String
+longMultiLineString =
+    "\"\"\"" ++ (String.repeat (5 * 10 ^ 5) "a") ++ "\"\"\""
+
+
 all : Test
 all =
     describe "TokenTests"
@@ -169,5 +174,9 @@ all =
         , test "long string" <|
             \() ->
                 parseFullString longString Parser.stringLiteral
+                    |> Expect.notEqual Nothing
+        , test "long multi line string" <|
+            \() ->
+                parseFullString longMultiLineString Parser.multiLineStringLiteral
                     |> Expect.notEqual Nothing
         ]
