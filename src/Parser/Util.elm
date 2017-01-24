@@ -123,7 +123,10 @@ moreThanIndentWhitespace =
                             )
                         )
                 )
-                (String.fromList <$> many1 (char ' '))
+                (succeed (++)
+                    <*> (String.fromList <$> many1 (char ' '))
+                    <*> (Maybe.withDefault "" <$> (maybe someComment))
+                )
         )
 
 
