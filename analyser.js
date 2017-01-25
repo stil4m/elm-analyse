@@ -1,7 +1,7 @@
 const fs = require('fs');
 const cp = require('child_process');
 const _ = require('lodash');
-const directory = "./tests";
+const directory = ".";
 
 function targetFilesForPathAndPackage(path, pack) {
     const packTargetDirs = pack['source-directories'];

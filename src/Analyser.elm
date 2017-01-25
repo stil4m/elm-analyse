@@ -1,55 +1,38 @@
 module Analyser exposing (..)
 
-import AST.Types as AST
-import AnalyserPorts as Ports
-import Interfaces.Interface as Interface
-import Parser.Parser
+import Analyser.InterfaceLoadingStage as InterfaceLoadingStage
+import Analyser.Types exposing (LoadedDependencies)
 import Platform exposing (program, programWithFlags)
-import AST.Util as Util
 
 
 type alias Flags =
     { interfaceFiles : InputInterfaces
-    , sourceFiles : List String
+    , sourceFiles : InputFiles
     }
-
-
-type alias InputInterfaces =
-    List ( String, List String )
-
-
-type Msg
-    = OnFileContent ( String, String )
 
 
 type alias InputFiles =
     List String
 
 
+type alias InputInterfaces =
+    List ( String, InputFiles )
+
+
+type Msg
+    = InterfaceLoadingStageMsg InterfaceLoadingStage.Msg
+
+
 type alias Model =
-    State
-
-
-type alias LoadedDependencies =
-    List LoadedDependency
-
-
-type alias LoadedDependency =
-    { dependency : String
-    , interfaces : List (Result String LoadedInterface)
+    { interfaceFiles : InputInterfaces
+    , sourceFiles : InputFiles
+    , stage : Stage
     }
 
 
-type alias LoadedInterface =
-    { moduleName : Maybe AST.ModuleName
-    , interface : Interface.Interface
-    }
-
-
-type State
-    = LoadingInterfaces InputInterfaces InputFiles LoadedDependencies
-    | LoadingInterface InputInterfaces InputFiles LoadedDependencies ( String, String )
-    | LoadingSourceFiles InputFiles LoadedDependencies
+type Stage
+    = InterfaceLoadingStage InterfaceLoadingStage.Model
+    | Finished LoadedDependencies
 
 
 main : Program Flags Model Msg
@@ -59,91 +42,51 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init { interfaceFiles, sourceFiles } =
-    (LoadingInterfaces interfaceFiles sourceFiles [])
-        |> nextAction
-
-
-nextAction : Model -> ( Model, Cmd Msg )
-nextAction model =
-    case model of
-        LoadingInterfaces inputInterfaces inputFiles loadedInterfaces ->
-            handleLoadingInterfaces inputInterfaces inputFiles loadedInterfaces
-
-        LoadingSourceFiles inputFiles loadedInterfaces ->
-            handleLoadingSourceFiles inputFiles loadedInterfaces
-
-        LoadingInterface _ _ _ _ ->
-            --TODO some debug statement
-            model ! []
-
-
-handleLoadingInterfaces : InputInterfaces -> InputFiles -> LoadedDependencies -> ( Model, Cmd Msg )
-handleLoadingInterfaces inputInterfaces inputFiles loadedInterfaces =
-    case inputInterfaces of
-        [] ->
-            handleLoadingSourceFiles inputFiles loadedInterfaces
-
-        ( pack, files ) :: xs ->
-            case files of
-                file :: restFiles ->
-                    ( LoadingInterface (( pack, restFiles ) :: xs) inputFiles loadedInterfaces ( pack, file )
-                    , Ports.loadFile file
-                    )
-
-                [] ->
-                    handleLoadingInterfaces xs inputFiles loadedInterfaces
-
-
-handleLoadingSourceFiles : InputFiles -> LoadedDependencies -> ( Model, Cmd Msg )
-handleLoadingSourceFiles inputFiles loadedInterfaces =
-    LoadingSourceFiles inputFiles (Debug.log "X" loadedInterfaces) ! []
+    let
+        ( stage, cmds ) =
+            InterfaceLoadingStage.init interfaceFiles
+    in
+        ( { interfaceFiles = interfaceFiles
+          , sourceFiles = sourceFiles
+          , stage = InterfaceLoadingStage stage
+          }
+        , Cmd.map InterfaceLoadingStageMsg cmds
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        OnFileContent ( _, content ) ->
-            case model of
-                LoadingInterface x y z ( dependency, fileName ) ->
-                    onInputLoadingInterface x y z ( dependency, fileName, content )
+    case ( msg, model.stage ) of
+        ( InterfaceLoadingStageMsg x, InterfaceLoadingStage stage ) ->
+            let
+                ( newStage, cmds ) =
+                    InterfaceLoadingStage.update x stage
+            in
+                if InterfaceLoadingStage.isDone newStage then
+                    { model | stage = Finished (InterfaceLoadingStage.parsedInterfaces newStage) } ! []
+                else
+                    ( { model | stage = InterfaceLoadingStage newStage }
+                    , Cmd.map InterfaceLoadingStageMsg cmds
+                    )
 
-                _ ->
-                    model ! []
-
-
-onInputLoadingInterface : InputInterfaces -> InputFiles -> LoadedDependencies -> ( String, String, String ) -> ( Model, Cmd Msg )
-onInputLoadingInterface x y z ( dependency, fileName, content ) =
-    let
-        loadedInterfaceForFile : AST.File -> LoadedInterface
-        loadedInterfaceForFile file =
-            { moduleName = Util.fileModuleName file, interface = Interface.build file }
-
-        result : Result String LoadedInterface
-        result =
-            Parser.Parser.parse content
-                |> Result.fromMaybe "Could not parse file"
-                |> Result.map loadedInterfaceForFile
-    in
-        (LoadingInterfaces x y (addLoadedInterface dependency result z))
-            |> nextAction
+        ( _, Finished x ) ->
+            let
+                _ =
+                    Debug.log "Interfaces" x
+            in
+                model ! []
 
 
-addLoadedInterface : String -> Result String LoadedInterface -> LoadedDependencies -> LoadedDependencies
-addLoadedInterface dependency loadedInterface input =
-    let
-        ( left, right ) =
-            List.partition (.dependency >> (==) dependency) input
 
-        newLeft =
-            left
-                |> List.head
-                |> Maybe.map (\x -> { x | interfaces = loadedInterface :: x.interfaces })
-                |> Maybe.map (flip (::) (List.drop 1 left))
-                |> Maybe.withDefault [ { dependency = dependency, interfaces = [ loadedInterface ] } ]
-    in
-        newLeft ++ right
+-- ( _, _ ) ->
+-- Debug.log "model" model ! []
 
 
-subscriptions : a -> Sub Msg
+subscriptions : Model -> Sub Msg
 subscriptions model =
-    Ports.fileContent OnFileContent
+    case model.stage of
+        InterfaceLoadingStage state ->
+            InterfaceLoadingStage.subscriptions state |> Sub.map InterfaceLoadingStageMsg
+
+        Finished _ ->
+            Sub.none
