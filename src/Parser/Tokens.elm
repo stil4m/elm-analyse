@@ -199,10 +199,21 @@ multiLineStringLiteral =
         )
 
 
+functionNamePattern : String
+functionNamePattern =
+    "[a-z][a-zA-Z0-9_]*'?"
+
+
+functionNamePatternInfix : String
+functionNamePatternInfix =
+    "\\`" ++ functionNamePattern ++ "\\`"
+
+
 functionName : Parser s String
 functionName =
-    regex "[a-z][a-zA-Z0-9_]*'?"
-        >>= notReserved
+    or
+        (regex functionNamePatternInfix)
+        (regex functionNamePattern >>= notReserved)
 
 
 typeName : Parser s String

@@ -31,6 +31,10 @@ all =
             \() ->
                 parseFullString "n1" Parser.functionName
                     |> Expect.equal (Just "n1")
+        , test "functionName legacy with backticks" <|
+            \() ->
+                parseFullString "`n1`" Parser.functionName
+                    |> Expect.equal (Just "`n1`")
         , test "alias can be a functionName (it is not reserved)" <|
             \() ->
                 parseFullString "alias" Parser.functionName

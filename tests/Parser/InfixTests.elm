@@ -18,4 +18,8 @@ all =
             \() ->
                 parseFullStringState emptyState "infixl 5 >>" Infix.infixDefinition
                     |> Expect.equal (Just ({ direction = Left, precedence = 5, operator = ">>" }))
+        , test "infix neutral" <|
+            \() ->
+                parseFullStringState emptyState "infix 2 >>" Infix.infixDefinition
+                    |> Expect.equal (Just ({ direction = Left, precedence = 2, operator = ">>" }))
         ]

@@ -19,5 +19,5 @@ infixDirection : Parser State InfixDirection
 infixDirection =
     choice
         [ Right <$ string "infixr"
-        , Left <$ string "infixl"
+        , Left <$ or (string "infixl") (string "infix")
         ]

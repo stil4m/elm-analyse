@@ -11,6 +11,7 @@
   "dependencies": {
     "elm": "^0.18.0",
     "elm-test": "^0.18.2",
+    "lodash": "^4.17.4",
     "walk": "^2.3.9"
   }
 }
