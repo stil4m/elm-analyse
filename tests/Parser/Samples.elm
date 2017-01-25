@@ -39,7 +39,21 @@ allSamples =
     , ""
       -- , sample32
     , sample33
+    , ""
+      -- , sample34
     ]
+
+
+sample34 : String
+sample34 =
+    """module Bar
+
+foo = case x of
+    Foo -> {
+      who = "thinks of"
+    , these = "Things"
+    }
+"""
 
 
 sample33 : String

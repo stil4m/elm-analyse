@@ -35,6 +35,10 @@ all =
             \() ->
                 parseFullString "`n1`" Parser.functionName
                     |> Expect.equal (Just "`n1`")
+        , test "functionName legacy with backticks and qualifier" <|
+            \() ->
+                parseFullString "`Maybe.Extra.apply`" Parser.functionName
+                    |> Expect.equal (Just "`Maybe.Extra.apply`")
         , test "alias can be a functionName (it is not reserved)" <|
             \() ->
                 parseFullString "alias" Parser.functionName
@@ -143,6 +147,10 @@ all =
             \() ->
                 parseFullString "?" Parser.prefixOperatorToken
                     |> Expect.equal (Just "?")
+        , test "operatorToken 15" <|
+            \() ->
+                parseFullString "@" Parser.prefixOperatorToken
+                    |> Expect.equal (Just "@")
         , test "multiline string" <|
             \() ->
                 parseFullString "\"\"\"Bar foo \n a\"\"\"" Parser.multiLineStringLiteral
