@@ -1,10 +1,10 @@
 module Parser.Patterns exposing (..)
 
 import Combine exposing (..)
+import Combine.Num
 import Parser.Tokens exposing (..)
 import Parser.Types exposing (..)
-import Parser.Util exposing (moreThanIndentWhitespace, exactIndentWhitespace)
-import Combine.Num
+import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed)
 
 
 pattern : Parser State Pattern
@@ -81,7 +81,7 @@ listPattern =
             between
                 (string "[")
                 (string "]")
-                (ListPattern <$> (sepBy (string ",") (maybe moreThanIndentWhitespace *> pattern <* maybe moreThanIndentWhitespace)))
+                (ListPattern <$> (sepBy (string ",") (trimmed pattern)))
         )
 
 
@@ -91,7 +91,7 @@ unConsPattern =
         (\() ->
             succeed UnConsPattern
                 <*> nonConsPattern
-                <*> (maybe moreThanIndentWhitespace *> string "::" *> maybe moreThanIndentWhitespace *> pattern)
+                <*> (trimmed (string "::") *> pattern)
         )
 
 
@@ -130,7 +130,7 @@ tuplePattern : Parser State Pattern
 tuplePattern =
     lazy
         (\() ->
-            TuplePattern <$> parens (sepBy1 (string ",") (maybe moreThanIndentWhitespace *> pattern <* maybe moreThanIndentWhitespace))
+            TuplePattern <$> parens (sepBy1 (string ",") (trimmed pattern))
         )
 
 
@@ -142,7 +142,7 @@ recordPattern =
                 <$> between
                         (string "{" *> maybe moreThanIndentWhitespace)
                         (maybe moreThanIndentWhitespace *> string "}")
-                        (sepBy1 (string ",") (maybe moreThanIndentWhitespace *> functionName <* maybe moreThanIndentWhitespace))
+                        (sepBy1 (string ",") (trimmed functionName))
         )
 
 

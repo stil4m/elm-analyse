@@ -89,7 +89,7 @@ signature =
     succeed FunctionSignature
         <*> (lookAhead anyChar >>= (\c -> succeed (c == '(')))
         <*> (or functionName (parens prefixOperatorToken))
-        <*> (maybe moreThanIndentWhitespace *> string ":" *> maybe moreThanIndentWhitespace *> typeReference)
+        <*> (trimmed (string ":") *> maybe moreThanIndentWhitespace *> typeReference)
 
 
 functionDeclaration : Parser State FunctionDeclaration
@@ -286,8 +286,7 @@ recordFields oneOrMore =
             else
                 sepBy
     in
-        p (string ",")
-            (maybe moreThanIndentWhitespace *> recordExpressionField <* maybe moreThanIndentWhitespace)
+        p (string ",") (trimmed recordExpressionField)
 
 
 recordExpression : Parser State Expression
@@ -340,7 +339,7 @@ lambdaExpression =
         (\() ->
             succeed Lambda
                 <*> (string "\\" *> maybe moreThanIndentWhitespace *> (sepBy1 moreThanIndentWhitespace functionArgument))
-                <*> (maybe moreThanIndentWhitespace *> string "->" *> maybe moreThanIndentWhitespace *> expression)
+                <*> (trimmed (string "->") *> expression)
         )
 
 
@@ -499,5 +498,5 @@ tupledExpression =
                     xs ->
                         TupledExpression xs
             )
-                <$> parens (sepBy1 (string ",") (maybe moreThanIndentWhitespace *> expression <* maybe moreThanIndentWhitespace))
+                <$> parens (sepBy1 (string ",") (trimmed expression))
         )

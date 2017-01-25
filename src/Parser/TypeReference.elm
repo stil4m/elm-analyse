@@ -71,7 +71,7 @@ recordFieldsTypeReference : Parser State RecordDefinition
 recordFieldsTypeReference =
     lazy
         (\() ->
-            RecordDefinition <$> sepBy (string ",") (maybe moreThanIndentWhitespace *> recordFieldDefinition <* maybe moreThanIndentWhitespace)
+            RecordDefinition <$> sepBy (string ",") (trimmed recordFieldDefinition)
         )
 
 

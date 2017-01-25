@@ -4,7 +4,7 @@ import Combine exposing (..)
 import Parser.Expose exposing (exposable, exposeDefinition)
 import Parser.Tokens exposing (..)
 import Parser.Types exposing (..)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace)
+import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed)
 
 
 moduleDefinition : Parser State Module
@@ -26,7 +26,7 @@ effectWhereClause : Parser State ( String, String )
 effectWhereClause =
     succeed (,)
         <*> functionName
-        <*> (maybe moreThanIndentWhitespace *> string "=" *> maybe moreThanIndentWhitespace *> typeName)
+        <*> (trimmed (string "=") *> typeName)
 
 
 whereBlock : Parser State { command : Maybe String, subscription : Maybe String }
@@ -40,7 +40,7 @@ whereBlock =
                 (string "{")
                 (string "}")
                 (sepBy1 (string ",")
-                    (maybe moreThanIndentWhitespace *> effectWhereClause <* maybe moreThanIndentWhitespace)
+                    (trimmed effectWhereClause)
                 )
 
 

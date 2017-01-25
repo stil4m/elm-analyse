@@ -4,7 +4,7 @@ import Combine exposing (..)
 import Parser.Tokens exposing (functionName, typeName)
 import Parser.TypeReference exposing (typeReference)
 import Parser.Types exposing (..)
-import Parser.Util exposing (moreThanIndentWhitespace)
+import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
 
 
 typeDeclaration : Parser State Type
@@ -12,12 +12,12 @@ typeDeclaration =
     succeed Type
         <*> (typePrefix *> typeName)
         <*> genericList
-        <*> (maybe moreThanIndentWhitespace *> string "=" *> maybe moreThanIndentWhitespace *> valueConstructors)
+        <*> (trimmed (string "=") *> valueConstructors)
 
 
 valueConstructors : Parser State (List ValueConstructor)
 valueConstructors =
-    sepBy (string "|") (maybe moreThanIndentWhitespace *> valueConstructor <* maybe moreThanIndentWhitespace)
+    sepBy (string "|") (trimmed valueConstructor)
 
 
 valueConstructor : Parser State ValueConstructor
@@ -32,7 +32,7 @@ typeAlias =
     succeed TypeAlias
         <*> (typeAliasPrefix *> typeName)
         <*> genericList
-        <*> (maybe moreThanIndentWhitespace *> string "=" *> maybe moreThanIndentWhitespace *> typeReference)
+        <*> (trimmed (string "=") *> typeReference)
 
 
 genericList : Parser State (List String)
