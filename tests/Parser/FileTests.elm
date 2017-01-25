@@ -1,11 +1,11 @@
-module FileTests exposing (..)
+module Parser.FileTests exposing (..)
 
-import CombineTestUtil exposing (..)
+import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
 import Parser.Types as Types exposing (..)
+import Parser.Samples as Samples
 import Test exposing (..)
-import Samples
 
 
 all : Test

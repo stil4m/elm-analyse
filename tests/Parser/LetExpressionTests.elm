@@ -1,7 +1,7 @@
-module LetExpressionTests exposing (..)
+module Parser.LetExpressionTests exposing (..)
 
 import Combine exposing ((*>), string, whitespace)
-import CombineTestUtil exposing (..)
+import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
 import Parser.Tokens exposing (functionName)

@@ -1,4 +1,4 @@
-module CombineTestUtil exposing (..)
+module Parser.CombineTestUtil exposing (..)
 
 import Combine exposing (..)
 import Parser.Types exposing (State, emptyState)

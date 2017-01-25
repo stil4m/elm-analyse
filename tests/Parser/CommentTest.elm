@@ -1,9 +1,9 @@
-module CommentTest exposing (..)
+module Parser.CommentTest exposing (..)
 
 import Parser.Comments as Parser
 import Test exposing (..)
 import Expect
-import CombineTestUtil exposing (..)
+import Parser.CombineTestUtil exposing (..)
 
 
 all : Test

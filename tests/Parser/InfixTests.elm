@@ -1,6 +1,6 @@
-module InfixTests exposing (..)
+module Parser.InfixTests exposing (..)
 
-import CombineTestUtil exposing (..)
+import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Types as Types exposing (..)
 import Test exposing (..)

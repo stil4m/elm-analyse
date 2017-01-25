@@ -1,6 +1,6 @@
-module UtilTests exposing (..)
+module Parser.UtilTests exposing (..)
 
-import CombineTestUtil exposing (..)
+import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Types exposing (..)
 import Parser.Util as Parser exposing (commentSequence, exactIndentWhitespace, unstrictIndentWhitespace, moreThanIndentWhitespace, multiLineCommentWithTrailingSpaces)

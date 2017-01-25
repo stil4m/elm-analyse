@@ -1,7 +1,7 @@
-module DeclarationsTests exposing (..)
+module Parser.DeclarationsTests exposing (..)
 
 import Combine exposing ((*>), Parser)
-import CombineTestUtil exposing (..)
+import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
 import Parser.Imports exposing (importDefinition)

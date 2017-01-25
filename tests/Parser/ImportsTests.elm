@@ -1,10 +1,10 @@
-module ImportsTests exposing (..)
+module Parser.ImportsTests exposing (..)
 
 import Parser.Imports as Parser
 import Parser.Types exposing (..)
 import Test exposing (..)
 import Expect
-import CombineTestUtil exposing (..)
+import Parser.CombineTestUtil exposing (..)
 
 
 all : Test

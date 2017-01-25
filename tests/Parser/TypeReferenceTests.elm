@@ -1,10 +1,10 @@
-module TypeReferenceTests exposing (..)
+module Parser.TypeReferenceTests exposing (..)
 
 import Parser.TypeReference as Parser
 import Parser.Types exposing (..)
 import Test exposing (..)
 import Expect
-import CombineTestUtil exposing (..)
+import Parser.CombineTestUtil exposing (..)
 
 
 all : Test

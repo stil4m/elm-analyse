@@ -1,6 +1,6 @@
-module CaseExpressionTests exposing (..)
+module Parser.CaseExpressionTests exposing (..)
 
-import CombineTestUtil exposing (..)
+import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
 import Parser.Types as Types exposing (..)

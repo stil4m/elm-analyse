@@ -1,4 +1,4 @@
-module Samples exposing (..)
+module Parser.Samples exposing (..)
 
 
 allSamples : List String

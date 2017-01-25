@@ -1,9 +1,9 @@
-module TokenTests exposing (..)
+module Parser.TokenTests exposing (..)
 
 import Parser.Tokens as Parser
 import Test exposing (..)
 import Expect
-import CombineTestUtil exposing (..)
+import Parser.CombineTestUtil exposing (..)
 
 
 longString : String
