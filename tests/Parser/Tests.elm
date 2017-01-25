@@ -17,7 +17,7 @@ import Parser.TypingsTests as TypingsTests
 import Parser.UtilTests as UtilTests
 import Parser.InfixTests as InfixTests
 import Parser.GlslTests as GlslTests
-import Test exposing (..)
+import Test exposing (Test)
 
 
 all : Test

@@ -2,7 +2,7 @@ module Parser.Comments exposing (..)
 
 import Combine exposing (..)
 import Combine.Char exposing (..)
-import Parser.Types exposing (..)
+import AST.Types exposing (..)
 import Parser.Whitespace exposing (untilNewlineToken)
 
 

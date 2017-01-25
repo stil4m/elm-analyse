@@ -1,7 +1,7 @@
 module Parser.Parser exposing (..)
 
 import Combine exposing ((<*))
-import Parser.Types exposing (emptyState, File)
+import AST.Types exposing (emptyState, File)
 import Parser.Declarations exposing (file)
 
 

@@ -1,7 +1,7 @@
 module Parser.ModuleTests exposing (..)
 
 import Parser.Modules as Parser
-import Parser.Types as Types
+import AST.Types as Types
 import Test exposing (..)
 import Expect
 import Parser.CombineTestUtil exposing (..)

@@ -2,7 +2,7 @@ module Parser.TypeReference exposing (..)
 
 import Combine exposing (..)
 import Parser.Tokens exposing (functionName, typeName)
-import Parser.Types exposing (..)
+import AST.Types exposing (..)
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
 import Parser.Whitespace exposing (realNewLine)
 

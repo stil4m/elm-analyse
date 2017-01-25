@@ -3,7 +3,7 @@ module Parser.Patterns exposing (..)
 import Combine exposing (..)
 import Combine.Num
 import Parser.Tokens exposing (..)
-import Parser.Types exposing (..)
+import AST.Types exposing (..)
 import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed)
 
 
@@ -175,9 +175,9 @@ namedPattern =
 
 allPattern : Parser State Pattern
 allPattern =
-    lazy (\() -> (always AllPattern) <$> string "_")
+    lazy (\() -> AllPattern <$ string "_")
 
 
 unitPattern : Parser State Pattern
 unitPattern =
-    lazy (\() -> (always UnitPattern) <$> string "()")
+    lazy (\() -> UnitPattern <$ string "()")

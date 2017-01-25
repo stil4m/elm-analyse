@@ -3,7 +3,7 @@ module Parser.Util exposing (..)
 import Combine exposing (..)
 import Combine.Char exposing (..)
 import Parser.Comments exposing (..)
-import Parser.Types exposing (..)
+import AST.Types exposing (..)
 import Parser.Whitespace exposing (many1Spaces, manySpaces, nSpaces, realNewLine)
 
 

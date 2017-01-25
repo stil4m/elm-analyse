@@ -4,7 +4,7 @@ import Combine exposing ((*>), whitespace)
 import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations exposing (..)
-import Parser.Types exposing (..)
+import AST.Types exposing (..)
 import Test exposing (..)
 
 

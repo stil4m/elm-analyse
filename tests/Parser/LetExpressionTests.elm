@@ -5,7 +5,7 @@ import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
 import Parser.Tokens exposing (functionName)
-import Parser.Types as Types exposing (..)
+import AST.Types as Types exposing (..)
 import Test exposing (..)
 
 

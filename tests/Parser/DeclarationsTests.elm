@@ -6,7 +6,7 @@ import Expect
 import Parser.Declarations as Parser exposing (..)
 import Parser.Imports exposing (importDefinition)
 import Parser.Modules exposing (moduleDefinition)
-import Parser.Types as Types exposing (..)
+import AST.Types as Types exposing (..)
 import Parser.Util exposing (exactIndentWhitespace)
 import Test exposing (..)
 

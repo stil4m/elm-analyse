@@ -3,7 +3,7 @@ module Parser.Infix exposing (..)
 import Combine exposing (..)
 import Combine.Num exposing (int)
 import Parser.Tokens exposing (..)
-import Parser.Types exposing (..)
+import AST.Types exposing (..)
 import Parser.Util exposing (moreThanIndentWhitespace)
 
 

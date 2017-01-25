@@ -3,7 +3,7 @@ module Parser.CaseExpressionTests exposing (..)
 import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
-import Parser.Types as Types exposing (..)
+import AST.Types as Types exposing (..)
 import Test exposing (..)
 
 

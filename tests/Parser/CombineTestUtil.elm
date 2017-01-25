@@ -1,7 +1,7 @@
 module Parser.CombineTestUtil exposing (..)
 
 import Combine exposing (..)
-import Parser.Types exposing (State, emptyState)
+import AST.Types exposing (State, emptyState)
 
 
 parseFullStringState : State -> String -> Parser State b -> Maybe b

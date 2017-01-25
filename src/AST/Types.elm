@@ -1,4 +1,4 @@
-module Parser.Types exposing (..)
+module AST.Types exposing (..)
 
 
 type State

@@ -2,7 +2,7 @@ module PostProcessing exposing (..)
 
 import Dict exposing (Dict)
 import List exposing (maximum)
-import Parser.Types exposing (..)
+import AST.Types exposing (..)
 import List.Extra as List
 
 
@@ -225,6 +225,9 @@ visitExpressionInner visitor context expression =
             expression
 
         RecordAccess stringList ->
+            expression
+
+        RecordAccessFunction s ->
             expression
 
         RecordUpdate string expressionStringList ->

@@ -1,7 +1,7 @@
 module Parser.TypeReferenceTests exposing (..)
 
 import Parser.TypeReference as Parser
-import Parser.Types exposing (..)
+import AST.Types exposing (..)
 import Test exposing (..)
 import Expect
 import Parser.CombineTestUtil exposing (..)

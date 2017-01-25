@@ -3,7 +3,7 @@ module Parser.Expose exposing (..)
 import Combine exposing (..)
 import Combine.Char exposing (..)
 import Parser.Tokens exposing (..)
-import Parser.Types exposing (..)
+import AST.Types exposing (..)
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
 
 
@@ -38,8 +38,8 @@ typeExpose =
 
 exposingListInner : Parser State b -> Parser State (Exposure b)
 exposingListInner p =
-    or ((always Parser.Types.All) <$> (trimmed (string "..")))
-        (Parser.Types.Explicit <$> sepBy (char ',') (trimmed p))
+    or (All <$ (trimmed (string "..")))
+        (Explicit <$> sepBy (char ',') (trimmed p))
 
 
 exposeListWith : Parser State b -> Parser State (Exposure b)

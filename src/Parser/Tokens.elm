@@ -5,7 +5,7 @@ import Char exposing (fromCode)
 import Combine exposing (..)
 import Combine.Char exposing (..)
 import Hex
-import Parser.Types exposing (ModuleName)
+import AST.Types exposing (ModuleName)
 
 
 reserved : Dict String Bool
