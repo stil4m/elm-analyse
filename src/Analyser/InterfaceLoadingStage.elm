@@ -1,7 +1,9 @@
 module Analyser.InterfaceLoadingStage exposing (..)
 
+import AST.Types
 import AST.Util as Util
-import Analyser.Types exposing (LoadedDependencies, LoadedInterface)
+import Analyser.Types exposing (FileLoad)
+import Analyser.LoadedDependencies exposing (LoadedDependencies, LoadedInterface)
 import AnalyserPorts
 import Dict exposing (Dict)
 import Interfaces.Interface as Interface
@@ -19,7 +21,7 @@ type Msg
 
 type alias State =
     { filesToLoad : Maybe ( ( String, String ), List ( String, String ) )
-    , parsedInterfaces : List ( String, ( String, Result String LoadedInterface ) )
+    , parsedInterfaces : List ( String, ( String, FileLoad ) )
     }
 
 
@@ -43,9 +45,9 @@ isDone (Model model) =
 
 
 insertDependencyInterface :
-    ( String, ( String, Result String LoadedInterface ) )
-    -> Dict String (List ( String, Result String LoadedInterface ))
-    -> Dict String (List ( String, Result String LoadedInterface ))
+    ( String, ( String, FileLoad ) )
+    -> Dict String (List ( String, FileLoad ))
+    -> Dict String (List ( String, FileLoad ))
 insertDependencyInterface ( name, result ) b =
     Dict.get name b
         |> Maybe.withDefault []
@@ -80,17 +82,18 @@ update msg (Model state) =
                 |> Maybe.withDefault (Model state ! [])
 
 
-onInputLoadingInterface : ( String, String, String ) -> ( String, ( String, Result String LoadedInterface ) )
+onInputLoadingInterface : ( String, String, String ) -> ( String, ( String, FileLoad ) )
 onInputLoadingInterface ( dependency, fileName, content ) =
     let
+        loadedInterfaceForFile : AST.Types.File -> FileLoad
         loadedInterfaceForFile file =
-            { moduleName = Util.fileModuleName file, interface = Interface.build file }
+            Analyser.Types.Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
     in
         ( dependency
         , ( fileName
           , Parser.parse content
-                |> Result.fromMaybe "Could not parse file"
-                |> Result.map loadedInterfaceForFile
+                |> Maybe.map loadedInterfaceForFile
+                |> Maybe.withDefault Analyser.Types.Failed
           )
         )
 

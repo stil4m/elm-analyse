@@ -15,6 +15,19 @@ type ExposedInterface
     | Operator AST.Infix
 
 
+getOperators : Interface -> List AST.Infix
+getOperators =
+    List.filterMap
+        (\i ->
+            case i of
+                Operator o ->
+                    Just o
+
+                _ ->
+                    Nothing
+        )
+
+
 build : AST.File -> Interface
 build file =
     let

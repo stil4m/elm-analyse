@@ -38,9 +38,16 @@ function dependencyFiles(dep) {
 
     const Elm = require('./elm');
     var app = Elm.Analyser.worker(input);
+    app.ports.sendMessages.subscribe(function(x) {
+      console.log("Messages:")
+      console.log("---------")
+      x.forEach(y => console.log(y));
+    })
     app.ports.loadFile.subscribe(function(x) {
       console.log("Load file", x, "...")
-      app.ports.fileContent.send([x,fs.readFileSync(x).toString()]);
+      fs.readFile(x, function(e, content) {
+          app.ports.fileContent.send([x,content.toString()]);
+      })
     });
 
 })();

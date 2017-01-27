@@ -2,19 +2,29 @@ module Analyser.Types exposing (..)
 
 import AST.Types as AST
 import Interfaces.Interface as Interface
+import Dict exposing (Dict)
 
 
-type alias LoadedDependencies =
-    List LoadedDependency
+type alias LoadedSourceFiles =
+    List LoadedSourceFile
 
 
-type alias LoadedDependency =
-    { dependency : String
-    , interfaces : List ( String, Result String LoadedInterface )
-    }
+type alias LoadedSourceFile =
+    ( String, FileLoad )
 
 
-type alias LoadedInterface =
-    { moduleName : Maybe AST.ModuleName
-    , interface : Interface.Interface
-    }
+type FileLoad
+    = Failed
+    | Loaded
+        { interface : Interface.Interface
+        , moduleName : Maybe AST.ModuleName
+        , ast : AST.File
+        }
+
+
+type alias ModuleIndex =
+    Dict AST.ModuleName Interface.Interface
+
+
+type alias OperatorTable =
+    Dict String AST.Infix

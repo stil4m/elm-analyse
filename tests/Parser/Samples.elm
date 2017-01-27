@@ -162,16 +162,6 @@ x b =
 """
 
 
-foo : number -> number1
-foo x =
-    case x of
-        1 ->
-            2
-
-        _ ->
-            1
-
-
 {-| Trailing whitespace multiline comment
 -}
 sample25 : String
