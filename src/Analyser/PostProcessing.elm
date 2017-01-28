@@ -231,10 +231,11 @@ visitExpressionInner visitor context expression =
             Parentesized e1 ->
                 Parentesized (subVisit e1)
 
-            LetBlock declarationList e1 ->
-                LetBlock
-                    (visitDeclarations visitor context declarationList)
-                    (subVisit e1)
+            LetExpression letBlock ->
+                LetExpression
+                    { declarations = (visitDeclarations visitor context letBlock.declarations)
+                    , expression = (subVisit letBlock.expression)
+                    }
 
             CaseBlock e1 cases ->
                 CaseBlock

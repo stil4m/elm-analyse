@@ -117,19 +117,21 @@ all =
                             , name = "foo"
                             , arguments = []
                             , expression =
-                                (LetBlock
-                                    [ FuncDecl
-                                        { documentation = Nothing
-                                        , signature = Nothing
-                                        , declaration =
-                                            { operatorDefinition = False
-                                            , name = "b"
-                                            , arguments = []
-                                            , expression = Integer 1
+                                (LetExpression
+                                    { declarations =
+                                        [ FuncDecl
+                                            { documentation = Nothing
+                                            , signature = Nothing
+                                            , declaration =
+                                                { operatorDefinition = False
+                                                , name = "b"
+                                                , arguments = []
+                                                , expression = Integer 1
+                                                }
                                             }
-                                        }
-                                    ]
-                                    (FunctionOrValue "b")
+                                        ]
+                                    , expression = (FunctionOrValue "b")
+                                    }
                                 )
                             }
                         )

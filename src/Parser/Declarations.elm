@@ -411,7 +411,7 @@ letExpression : Parser State Expression
 letExpression =
     lazy
         (\() ->
-            (succeed LetBlock
+            (succeed (\decls -> LetBlock decls >> LetExpression)
                 <*> (withIndentedState2 letBlock)
                 <*> (moreThanIndentWhitespace *> expression)
             )

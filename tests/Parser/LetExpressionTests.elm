@@ -35,14 +35,16 @@ all =
                 parseFullStringState (emptyState |> pushIndent 1) "let\n  bar = 1\n in\n  bar" Parser.expression
                     |> Expect.equal
                         (Just
-                            (LetBlock
-                                [ FuncDecl
-                                    { documentation = Nothing
-                                    , signature = Nothing
-                                    , declaration = { operatorDefinition = False, name = "bar", arguments = [], expression = Integer 1 }
-                                    }
-                                ]
-                                (FunctionOrValue "bar")
+                            (LetExpression
+                                { declarations =
+                                    [ FuncDecl
+                                        { documentation = Nothing
+                                        , signature = Nothing
+                                        , declaration = { operatorDefinition = False, name = "bar", arguments = [], expression = Integer 1 }
+                                        }
+                                    ]
+                                , expression = (FunctionOrValue "bar")
+                                }
                             )
                         )
         , test "let with deindented expression in in" <|
@@ -50,14 +52,16 @@ all =
                 parseFullStringState emptyState "let\n  bar = 1\n in\n   bar" Parser.expression
                     |> Expect.equal
                         (Just
-                            (LetBlock
-                                [ FuncDecl
-                                    { documentation = Nothing
-                                    , signature = Nothing
-                                    , declaration = { operatorDefinition = False, name = "bar", arguments = [], expression = Integer 1 }
-                                    }
-                                ]
-                                (FunctionOrValue "bar")
+                            (LetExpression
+                                { declarations =
+                                    [ FuncDecl
+                                        { documentation = Nothing
+                                        , signature = Nothing
+                                        , declaration = { operatorDefinition = False, name = "bar", arguments = [], expression = Integer 1 }
+                                        }
+                                    ]
+                                , expression = (FunctionOrValue "bar")
+                                }
                             )
                         )
         , test "let in list" <|
@@ -66,19 +70,21 @@ all =
                     |> Expect.equal
                         (Just
                             (ListExpr
-                                [ LetBlock
-                                    [ FuncDecl
-                                        { documentation = Nothing
-                                        , signature = Nothing
-                                        , declaration =
-                                            { operatorDefinition = False
-                                            , name = "bar"
-                                            , arguments = []
-                                            , expression = Integer 1
+                                [ LetExpression
+                                    { declarations =
+                                        [ FuncDecl
+                                            { documentation = Nothing
+                                            , signature = Nothing
+                                            , declaration =
+                                                { operatorDefinition = False
+                                                , name = "bar"
+                                                , arguments = []
+                                                , expression = Integer 1
+                                                }
                                             }
-                                        }
-                                    ]
-                                    (FunctionOrValue "bar")
+                                        ]
+                                    , expression = (FunctionOrValue "bar")
+                                    }
                                 ]
                             )
                         )
@@ -87,11 +93,13 @@ all =
                 parseFullStringState emptyState "let\n    _ = b\n in\n    z" (Parser.letExpression)
                     |> Expect.equal
                         (Just
-                            (LetBlock
-                                ([ Destructuring AllPattern (FunctionOrValue "b")
-                                 ]
-                                )
-                                (FunctionOrValue "z")
+                            (LetExpression
+                                { declarations =
+                                    ([ Destructuring AllPattern (FunctionOrValue "b")
+                                     ]
+                                    )
+                                , expression = (FunctionOrValue "z")
+                                }
                             )
                         )
         , test "let inlined" <|
@@ -99,20 +107,22 @@ all =
                 parseFullStringState emptyState "let indent = String.length s in indent" (Parser.letExpression)
                     |> Expect.equal
                         (Just
-                            (LetBlock
-                                ([ FuncDecl
-                                    { documentation = Nothing
-                                    , signature = Nothing
-                                    , declaration =
-                                        { operatorDefinition = False
-                                        , name = "indent"
-                                        , arguments = []
-                                        , expression = Application ([ QualifiedExpr ([ "String" ]) "length", FunctionOrValue "s" ])
+                            (LetExpression
+                                { declarations =
+                                    ([ FuncDecl
+                                        { documentation = Nothing
+                                        , signature = Nothing
+                                        , declaration =
+                                            { operatorDefinition = False
+                                            , name = "indent"
+                                            , arguments = []
+                                            , expression = Application ([ QualifiedExpr ([ "String" ]) "length", FunctionOrValue "s" ])
+                                            }
                                         }
-                                    }
-                                 ]
-                                )
-                                (FunctionOrValue "indent")
+                                     ]
+                                    )
+                                , expression = (FunctionOrValue "indent")
+                                }
                             )
                         )
         , test "let starting after definition" <|
@@ -120,20 +130,22 @@ all =
                 parseFullStringState emptyState "foo = let\n  indent = 1\n in\n indent" (functionName *> string " = " *> Parser.letExpression)
                     |> Expect.equal
                         (Just
-                            (LetBlock
-                                ([ FuncDecl
-                                    { documentation = Nothing
-                                    , signature = Nothing
-                                    , declaration =
-                                        { operatorDefinition = False
-                                        , name = "indent"
-                                        , arguments = []
-                                        , expression = Integer 1
+                            (LetExpression
+                                { declarations =
+                                    ([ FuncDecl
+                                        { documentation = Nothing
+                                        , signature = Nothing
+                                        , declaration =
+                                            { operatorDefinition = False
+                                            , name = "indent"
+                                            , arguments = []
+                                            , expression = Integer 1
+                                            }
                                         }
-                                    }
-                                 ]
-                                )
-                                (FunctionOrValue "indent")
+                                     ]
+                                    )
+                                , expression = (FunctionOrValue "indent")
+                                }
                             )
                         )
         ]

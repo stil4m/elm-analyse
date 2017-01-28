@@ -17,6 +17,7 @@ type alias Config context =
     , onFunction : Action context Function
     , onExpression : Action context Expression
     , onLambda : Action context Lambda
+    , onLetBlock : Action context LetBlock
     }
 
 
@@ -27,6 +28,7 @@ defaultConfig =
     , onFunction = Continue
     , onExpression = Continue
     , onLambda = Continue
+    , onLetBlock = Continue
     }
 
 

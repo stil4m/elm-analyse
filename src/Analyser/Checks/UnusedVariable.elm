@@ -72,7 +72,7 @@ onFile : File -> UsedVariableContext -> UsedVariableContext
 onFile file context =
     let
         decls =
-            getDeclarations file
+            getDeclarationVars file.declarations
                 |> Debug.log "Decls"
 
         preContext =
@@ -95,35 +95,57 @@ onFunction f function context =
         postContext |> popScope
 
 
-onLambda : (UsedVariableContext -> UsedVariableContext) -> Function -> UsedVariableContext -> UsedVariableContext
+onLambda : (UsedVariableContext -> UsedVariableContext) -> Lambda -> UsedVariableContext -> UsedVariableContext
 onLambda f lambda context =
-    context
+    let
+        preContext =
+            lambda.args
+                |> List.concatMap patternToVars
+                |> flip pushScope context
+
+        postContext =
+            f preContext
+    in
+        postContext |> popScope
 
 
-getDeclarations : File -> List String
-getDeclarations =
-    .declarations
-        >> List.concatMap
-            (\x ->
-                case x of
-                    FuncDecl f ->
-                        [ f.declaration.name ]
+onLet : (UsedVariableContext -> UsedVariableContext) -> LetBlock -> UsedVariableContext -> UsedVariableContext
+onLet f letBlock context =
+    let
+        preContext =
+            letBlock.declarations
+                |> getDeclarationVars
+                |> flip pushScope context
 
-                    AliasDecl _ ->
-                        []
+        postContext =
+            f preContext
+    in
+        postContext |> popScope
 
-                    TypeDecl t ->
-                        t.name :: (List.map .name t.cases)
 
-                    PortDeclaration p ->
-                        [ p.name ]
+getDeclarationVars : List Declaration -> List String
+getDeclarationVars =
+    List.concatMap
+        (\x ->
+            case x of
+                FuncDecl f ->
+                    [ f.declaration.name ]
 
-                    InfixDeclaration i ->
-                        [ i.operator ]
+                AliasDecl _ ->
+                    []
 
-                    Destructuring p _ ->
-                        patternToVars p
-            )
+                TypeDecl t ->
+                    t.name :: (List.map .name t.cases)
+
+                PortDeclaration p ->
+                    [ p.name ]
+
+                InfixDeclaration i ->
+                    [ i.operator ]
+
+                Destructuring p _ ->
+                    patternToVars p
+        )
 
 
 patternToVars : Pattern -> List String
