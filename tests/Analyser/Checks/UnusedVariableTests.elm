@@ -19,15 +19,39 @@ table =
 
 withUnusedVariableInFunction : String
 withUnusedVariableInFunction =
-    """module Bar
+    """module Bar exposing (..)
 
 bar x y z = x + z
 """
 
 
+unusedInLetExpression : String
+unusedInLetExpression =
+    """module Bar exposing (..)
+
+x =
+  let
+    y = 1
+  in
+    2
+"""
+
+
+unusedFunction : String
+unusedFunction =
+    """module Bar exposing (foo)
+
+foo = some
+
+baz = 2
+
+some = 1
+"""
+
+
 usedVariableAsRecordUpdate : String
 usedVariableAsRecordUpdate =
-    """module Bar
+    """module Bar exposing (..)
 
 addUsedVariable x =
     { x | name = "John" }
@@ -37,7 +61,7 @@ addUsedVariable x =
 
 usedVariableInCaseExpression : String
 usedVariableInCaseExpression =
-    """module Bar
+    """module Bar exposing (..)
 
 foo x =
     case x of
@@ -48,7 +72,7 @@ foo x =
 
 usedVariableInAllDeclaration : String
 usedVariableInAllDeclaration =
-    """module Bar
+    """module Bar exposing (..)
 
 x y =
   case y of
@@ -58,18 +82,6 @@ x y =
             Debug.log "Unknown" b
     in
         model ! []"""
-
-
-unusedInLetExpression : String
-unusedInLetExpression =
-    """module Bar
-
-x =
-  let
-    y = 1
-  in
-    2
-"""
 
 
 getMessages : String -> Maybe (List Message)
@@ -90,12 +102,16 @@ all =
                 getMessages withUnusedVariableInFunction
                     |> Expect.equal
                         (Just
-                            [ Warning (UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }) ]
+                            [ (UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }) ]
                         )
         , test "unusedInLetExpression" <|
             \() ->
                 getMessages unusedInLetExpression
-                    |> Expect.equal (Just ([ Warning (UnusedVariable "./foo.elm" "y" { start = { row = 4, column = 3 }, end = { row = 4, column = 4 } }) ]))
+                    |> Expect.equal (Just ([ (UnusedVariable "./foo.elm" "y" { start = { row = 4, column = 3 }, end = { row = 4, column = 4 } }) ]))
+        , test "unusedFunction" <|
+            \() ->
+                getMessages unusedFunction
+                    |> Expect.equal (Just ([ UnusedTopLevel "./foo.elm" "baz" { start = { row = 4, column = -1 }, end = { row = 4, column = 2 } } ]))
         , test "usedVariableAsRecordUpdate" <|
             \() -> getMessages usedVariableAsRecordUpdate |> Expect.equal (Just [])
         , test "usedVariableInCaseExpression" <|

@@ -12,7 +12,8 @@ import Analyser.PostProcessing as PostProcessing
 
 
 type alias FileContext =
-    { moduleName : Maybe AST.ModuleName
+    { interface : Interface
+    , moduleName : Maybe AST.ModuleName
     , ast : AST.File
     , path : String
     }
@@ -37,6 +38,7 @@ create sourceFiles dependencies ( path, target ) =
                         { moduleName = l.moduleName
                         , ast = PostProcessing.postProcess operatorTable l.ast
                         , path = path
+                        , interface = Interfaces.Interface.build l.ast
                         }
 
 

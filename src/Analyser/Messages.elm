@@ -4,50 +4,60 @@ import AST.Types as AST
 
 
 type Message
-    = Warning WarningMessage
-    | Error ErrorMessage
-
-
-type ErrorMessage
-    = UnreadableSourceFile String
+    = UnreadableSourceFile FileName
+    | UnreadableDependencyFile FileName String
+    | UnusedVariable FileName String AST.Range
+    | UnusedTopLevel FileName String AST.Range
 
 
 type alias FileName =
     String
 
 
-type WarningMessage
-    = UnreadableDependencyFile String String
-    | UnusedVariable FileName String AST.Range
-
-
 unreadableSourceFile : String -> Message
-unreadableSourceFile path =
-    Error (UnreadableSourceFile path)
+unreadableSourceFile =
+    UnreadableSourceFile
 
 
 unreadableDependencyFile : String -> String -> Message
 unreadableDependencyFile dependency path =
-    Warning (UnreadableDependencyFile dependency path)
+    (UnreadableDependencyFile dependency path)
 
 
 asString : Message -> String
 asString m =
     case m of
-        Warning w ->
-            warningAsString w
+        UnusedTopLevel fileName varName range ->
+            String.concat
+                [ "Unused top level definition `"
+                , varName
+                , "` in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
 
-        Error e ->
-            errorAsString e
+        UnusedVariable fileName varName range ->
+            String.concat
+                [ "Unused variable `"
+                , varName
+                , "` in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
 
+        UnreadableSourceFile s ->
+            String.concat
+                [ "Could not parse source file: ", s ]
 
-errorAsString : ErrorMessage -> String
-errorAsString e =
-    (++) "ERROR: " <|
-        case e of
-            UnreadableSourceFile s ->
-                String.concat
-                    [ "Could not parse source file: ", s ]
+        UnreadableDependencyFile dependency path ->
+            String.concat
+                [ "Could not parse file in dependency"
+                , dependency
+                , ": "
+                , path
+                ]
 
 
 locationToString : AST.Location -> String
@@ -58,26 +68,3 @@ locationToString { row, column } =
 rangeToString : AST.Range -> String
 rangeToString { start, end } =
     "(" ++ locationToString start ++ "," ++ locationToString end ++ ")"
-
-
-warningAsString : WarningMessage -> String
-warningAsString w =
-    (++) "WARN:  " <|
-        case w of
-            UnusedVariable fileName varName range ->
-                String.concat
-                    [ "Unused variable `"
-                    , varName
-                    , "` in file \""
-                    , fileName
-                    , "\" at "
-                    , rangeToString range
-                    ]
-
-            UnreadableDependencyFile dependency path ->
-                String.concat
-                    [ "Could not parse file in dependency"
-                    , dependency
-                    , ": "
-                    , path
-                    ]

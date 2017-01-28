@@ -2,6 +2,7 @@ module Analyser.Checks.UnusedVariable exposing (..)
 
 import AST.Types exposing (..)
 import Analyser.FileContext exposing (FileContext)
+import Interfaces.Interface as Interface
 import Analyser.Messages exposing (..)
 import Dict exposing (Dict)
 import Inspector exposing (..)
@@ -37,14 +38,25 @@ scan fileContext =
                 fileContext.ast
                 emptyContext
 
-        --TODO Do something with exposing List
-        y =
+        onlyUnused =
+            List.filter (Tuple.second >> Tuple.first >> (==) 0)
+
+        unusedVariables =
             x.poppedScopes
                 |> List.concatMap Dict.toList
-                |> List.filter (Tuple.second >> Tuple.first >> (==) 0)
-                |> List.map (\( x, ( _, y ) ) -> UnusedVariable fileContext.path x y |> Warning)
+                |> onlyUnused
+                |> List.map (\( x, ( _, y ) ) -> UnusedVariable fileContext.path x y)
+
+        unusedTopLevels =
+            x.activeScopes
+                |> List.head
+                |> Maybe.withDefault (Dict.empty)
+                |> Dict.toList
+                |> onlyUnused
+                |> List.filter (Tuple.first >> flip Interface.doesExposeFunction fileContext.interface >> not)
+                |> List.map (\( x, ( _, y ) ) -> UnusedTopLevel fileContext.path x y)
     in
-        y
+        unusedVariables ++ unusedTopLevels
 
 
 pushScope : List VariablePointer -> UsedVariableContext -> UsedVariableContext

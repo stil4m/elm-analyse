@@ -15,6 +15,20 @@ type ExposedInterface
     | Operator AST.Infix
 
 
+doesExposeFunction : String -> Interface -> Bool
+doesExposeFunction k interface =
+    interface
+        |> List.any
+            (\x ->
+                case x of
+                    Function l ->
+                        k == l
+
+                    _ ->
+                        False
+            )
+
+
 getOperators : Interface -> List AST.Infix
 getOperators =
     List.filterMap
