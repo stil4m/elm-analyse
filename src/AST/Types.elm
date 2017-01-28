@@ -5,6 +5,23 @@ type State
     = State (List Int)
 
 
+type alias Location =
+    { row : Int, column : Int }
+
+
+type alias Range =
+    { start : Location, end : Location }
+
+
+type alias VariablePointer =
+    { value : String, range : Range }
+
+
+emptyRange : Range
+emptyRange =
+    { start = { row = 0, column = 0 }, end = { row = 0, column = 0 } }
+
+
 emptyState : State
 emptyState =
     State []
@@ -91,13 +108,13 @@ type Pattern
     | IntPattern Int
     | FloatPattern Float
     | TuplePattern (List Pattern)
-    | RecordPattern (List String)
+    | RecordPattern (List VariablePointer)
     | UnConsPattern Pattern Pattern
     | ListPattern (List Pattern)
-    | VarPattern String
+    | VarPattern VariablePointer
     | NamedPattern QualifiedNameRef (List Pattern)
     | QualifiedNamePattern QualifiedNameRef
-    | AsPattern Pattern String
+    | AsPattern Pattern VariablePointer
     | ParentisizedPattern Pattern
 
 

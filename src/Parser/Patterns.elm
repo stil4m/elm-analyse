@@ -7,6 +7,19 @@ import AST.Types exposing (..)
 import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed)
 
 
+asPointerLocation : ParseLocation -> Location
+asPointerLocation { line, column } =
+    { row = line, column = column }
+
+
+asPointer : Parser State String -> Parser State VariablePointer
+asPointer p =
+    withLocation
+        (\start ->
+            p |> andThen (\v -> withLocation (\end -> succeed { value = v, range = { start = asPointerLocation start, end = asPointerLocation end } }))
+        )
+
+
 pattern : Parser State Pattern
 pattern =
     lazy
@@ -121,7 +134,7 @@ asPattern =
         (\() ->
             (succeed AsPattern
                 <*> (maybe moreThanIndentWhitespace *> nonAsPattern)
-                <*> (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> functionName)
+                <*> (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> asPointer functionName)
             )
         )
 
@@ -142,13 +155,13 @@ recordPattern =
                 <$> between
                         (string "{" *> maybe moreThanIndentWhitespace)
                         (maybe moreThanIndentWhitespace *> string "}")
-                        (sepBy1 (string ",") (trimmed functionName))
+                        (sepBy1 (string ",") (trimmed (asPointer functionName)))
         )
 
 
 varPattern : Parser State Pattern
 varPattern =
-    lazy (\() -> VarPattern <$> functionName)
+    lazy (\() -> VarPattern <$> asPointer functionName)
 
 
 qualifiedNameRef : Parser s QualifiedNameRef

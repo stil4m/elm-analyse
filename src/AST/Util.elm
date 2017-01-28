@@ -17,3 +17,8 @@ fileModuleName file =
 
         NoModule ->
             Nothing
+
+
+rangeFromInts : ( Int, Int, Int, Int ) -> Range
+rangeFromInts ( x, y, z, a ) =
+    { start = { row = x, column = y }, end = { row = z, column = a } }

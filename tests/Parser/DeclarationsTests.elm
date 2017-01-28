@@ -76,19 +76,7 @@ all =
             \() ->
                 parseFullStringWithNullState "inc x = x + 1" Parser.functionDeclaration
                     |> Expect.equal
-                        (Just
-                            { operatorDefinition = False
-                            , name = "inc"
-                            , arguments = [ VarPattern "x" ]
-                            , expression =
-                                (Application
-                                    [ FunctionOrValue "x"
-                                    , Operator "+"
-                                    , Integer 1
-                                    ]
-                                )
-                            }
-                        )
+                        (Just { operatorDefinition = False, name = "inc", arguments = [ VarPattern { value = "x", range = { start = { row = 1, column = 4 }, end = { row = 1, column = 5 } } } ], expression = Application ([ FunctionOrValue "x", Operator "+", Integer 1 ]) })
         , test "some signature" <|
             \() ->
                 parseFullStringWithNullState "bar : List ( Int , Maybe m )" Parser.signature
@@ -162,21 +150,24 @@ all =
                         (Just
                             { operatorDefinition = False
                             , name = "update"
-                            , arguments = [ VarPattern "msg", VarPattern "model" ]
+                            , arguments = [ VarPattern { value = "msg", range = { start = { row = 1, column = 7 }, end = { row = 1, column = 10 } } }, VarPattern { value = "model", range = { start = { row = 1, column = 11 }, end = { row = 1, column = 16 } } } ]
                             , expression =
-                                (CaseExpression
-                                    { expression =
-                                        (FunctionOrValue "msg")
+                                CaseExpression
+                                    { expression = FunctionOrValue "msg"
                                     , cases =
                                         [ ( NamedPattern (QualifiedNameRef [] "Increment") []
-                                          , Application [ FunctionOrValue "model", Operator "+", Integer 1 ]
+                                          , Application ([ FunctionOrValue "model", Operator "+", Integer 1 ])
                                           )
                                         , ( NamedPattern (QualifiedNameRef [] "Decrement") []
-                                          , Application [ FunctionOrValue "model", Operator "-", Integer 1 ]
+                                          , Application
+                                                ([ FunctionOrValue "model"
+                                                 , Operator "-"
+                                                 , Integer 1
+                                                 ]
+                                                )
                                           )
                                         ]
                                     }
-                                )
                             }
                         )
         , test "port declaration" <|

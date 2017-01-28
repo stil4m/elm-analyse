@@ -1,17 +1,15 @@
 module Analyser.Checks.UnusedVariable exposing (..)
 
 import AST.Types exposing (..)
-import Inspector exposing (..)
-import Dict exposing (Dict)
 import Analyser.FileContext exposing (FileContext)
-
-
-type alias Pointer =
-    String
+import Analyser.Messages exposing (..)
+import Dict exposing (Dict)
+import Inspector exposing (..)
+import Tuple2
 
 
 type alias Scope =
-    Dict Pointer Int
+    Dict String ( Int, Range )
 
 
 type alias UsedVariableContext =
@@ -20,13 +18,40 @@ type alias UsedVariableContext =
     }
 
 
-pushScope : List String -> UsedVariableContext -> UsedVariableContext
+scan : FileContext -> List Message
+scan fileContext =
+    let
+        x : UsedVariableContext
+        x =
+            Inspector.inspect
+                { defaultConfig
+                    | onFile = Pre onFile
+                    , onFunction = Inner onFunction
+                    , onLetBlock = Inner onLetBlock
+                    , onLambda = Inner onLambda
+                    , onCase = Inner onCase
+                    , onFunctionOrValue = Post onFunctionOrValue
+                }
+                fileContext.ast
+                emptyContext
+
+        --TODO Do something with exposing List
+        y =
+            x.poppedScopes
+                |> List.concatMap Dict.toList
+                |> List.filter (Tuple.second >> Tuple.first >> (==) 0)
+                |> List.map (\( x, ( _, y ) ) -> UnusedVariable fileContext.path x y |> Warning)
+    in
+        y
+
+
+pushScope : List VariablePointer -> UsedVariableContext -> UsedVariableContext
 pushScope vars x =
     let
         y : Scope
         y =
             vars
-                |> List.map (flip (,) 0)
+                |> List.map (\x -> ( x.value, ( 0, x.range ) ))
                 |> Dict.fromList
     in
         { x | activeScopes = y :: x.activeScopes }
@@ -54,35 +79,6 @@ emptyContext =
     { poppedScopes = [], activeScopes = [] }
 
 
-scan : FileContext -> Int
-scan fileContext =
-    let
-        x : UsedVariableContext
-        x =
-            Inspector.inspect
-                { defaultConfig
-                    | onFile = Pre onFile
-                    , onFunction = Inner onFunction
-                    , onLetBlock = Inner onLetBlock
-                    , onLambda = Inner onLambda
-                    , onCase = Inner onCase
-                    , onFunctionOrValue = Post onFunctionOrValue
-                }
-                fileContext.ast
-                emptyContext
-                |> Debug.log "Result"
-
-        --TODO Do something with exposing List
-        y =
-            x.poppedScopes
-                |> List.concatMap Dict.toList
-                |> List.filter (Tuple.second >> (==) 0)
-                |> List.map Tuple.first
-                |> Debug.log ("Unused variables in " ++ fileContext.path)
-    in
-        1
-
-
 flagVariable : String -> List Scope -> List Scope
 flagVariable k l =
     case l of
@@ -91,7 +87,7 @@ flagVariable k l =
 
         x :: xs ->
             if Dict.member k x then
-                (Dict.update k (Maybe.map ((+) 1)) x) :: xs
+                (Dict.update k (Maybe.map (Tuple2.mapFirst ((+) 1))) x) :: xs
             else
                 x :: (flagVariable k xs)
 
@@ -120,15 +116,8 @@ onRecordUpdate recordUpdate context =
 
 onFile : File -> UsedVariableContext -> UsedVariableContext
 onFile file context =
-    let
-        decls =
-            getDeclarationVars file.declarations
-                |> Debug.log "Decls"
-
-        preContext =
-            pushScope decls context
-    in
-        preContext
+    getDeclarationVars file.declarations
+        |> flip pushScope context
 
 
 onFunction : (UsedVariableContext -> UsedVariableContext) -> Function -> UsedVariableContext -> UsedVariableContext
@@ -187,32 +176,37 @@ onCase f caze context =
         postContext |> popScope
 
 
-getDeclarationVars : List Declaration -> List String
+getDeclarationVars : List Declaration -> List VariablePointer
 getDeclarationVars =
     List.concatMap
         (\x ->
             case x of
                 FuncDecl f ->
-                    [ f.declaration.name ]
+                    --TODO
+                    [ { value = f.declaration.name, range = emptyRange } ]
 
                 AliasDecl _ ->
                     []
 
                 TypeDecl t ->
-                    t.name :: (List.map .name t.cases)
+                    --TODO
+                    { value = t.name, range = emptyRange }
+                        :: (List.map (\x -> { value = x.name, range = emptyRange }) t.cases)
 
                 PortDeclaration p ->
-                    [ p.name ]
+                    --TODO
+                    [ { value = p.name, range = emptyRange } ]
 
                 InfixDeclaration i ->
-                    [ i.operator ]
+                    --TODO
+                    [ { value = i.operator, range = emptyRange } ]
 
                 Destructuring p _ ->
                     patternToVars p
         )
 
 
-patternToVars : Pattern -> List String
+patternToVars : Pattern -> List VariablePointer
 patternToVars p =
     case p of
         TuplePattern t ->
