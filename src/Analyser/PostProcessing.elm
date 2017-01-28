@@ -161,7 +161,7 @@ visitExpression visitor context expression =
         inner =
             visitExpressionInner visitor context
     in
-        (visitor.onExpression |> Maybe.withDefault (\context inner expr -> inner expr))
+        (visitor.onExpression |> Maybe.withDefault (\_ inner expr -> inner expr))
             context
             inner
             expression
@@ -204,10 +204,10 @@ visitExpressionInner visitor context expression =
             RecordAccess _ ->
                 expression
 
-            RecordAccessFunction s ->
+            RecordAccessFunction _ ->
                 expression
 
-            GLSLExpression string ->
+            GLSLExpression _ ->
                 expression
 
             Application expressionList ->
