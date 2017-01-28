@@ -10,22 +10,21 @@ import Tuple2
 
 postProcess : OperatorTable -> File -> File
 postProcess table file =
-    Debug.log "O" <|
-        visit
-            { onExpression =
-                Just
-                    (\context inner expression ->
-                        inner <|
-                            case expression of
-                                Application args ->
-                                    fixApplication context args
+    visit
+        { onExpression =
+            Just
+                (\context inner expression ->
+                    inner <|
+                        case expression of
+                            Application args ->
+                                fixApplication context args
 
-                                _ ->
-                                    expression
-                    )
-            }
-            table
-            file
+                            _ ->
+                                expression
+                )
+        }
+        table
+        file
 
 
 fixApplication : OperatorTable -> List Expression -> Expression
@@ -117,9 +116,6 @@ type alias Visitor a =
 visit : Visitor context -> context -> File -> File
 visit visitor context file =
     let
-        _ =
-            Debug.log "Declaration count" (List.length file.declarations)
-
         newDeclarations =
             visitDeclarations visitor context file.declarations
     in
@@ -245,8 +241,8 @@ visitExpressionInner visitor context expression =
                     (subVisit e1)
                     (List.map (Tuple2.mapSecond subVisit) cases)
 
-            Lambda patternList e1 ->
-                Lambda patternList (subVisit e1)
+            LambdaExpression { args, expression } ->
+                LambdaExpression <| { args = args, expression = (subVisit expression) }
 
             RecordExpr expressionStringList ->
                 expressionStringList

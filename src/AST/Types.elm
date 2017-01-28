@@ -151,7 +151,7 @@ type Expression
     | Parentesized Expression
     | LetBlock (List Declaration) Expression
     | CaseBlock Expression Cases
-    | Lambda (List Pattern) Expression
+    | LambdaExpression Lambda
     | RecordExpr (List ( String, Expression ))
     | ListExpr (List Expression)
     | QualifiedExpr ModuleName String
@@ -159,6 +159,12 @@ type Expression
     | RecordAccessFunction String
     | RecordUpdate String (List ( String, Expression ))
     | GLSLExpression String
+
+
+type alias Lambda =
+    { args : List Pattern
+    , expression : Expression
+    }
 
 
 type alias Case =

@@ -35,7 +35,7 @@ create sourceFiles dependencies ( path, target ) =
                             OperatorTable.build l.ast.imports moduleIndex
                     in
                         { moduleName = l.moduleName
-                        , ast = l.ast |> PostProcessing.postProcess operatorTable
+                        , ast = PostProcessing.postProcess operatorTable l.ast
                         , path = path
                         }
 

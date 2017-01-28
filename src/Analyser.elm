@@ -4,12 +4,12 @@ import Analyser.InterfaceLoadingStage as InterfaceLoadingStage
 import Analyser.LoadedDependencies as LoadedDependencies exposing (LoadedDependencies)
 import Analyser.Messages exposing (Message)
 import Analyser.SourceLoadingStage as SourceLoadingStage
-import Analyser.Types exposing (FileLoad(Failed), LoadedSourceFiles)
 import AnalyserPorts
 import Platform exposing (program, programWithFlags)
 import Task
 import Time exposing (Time)
 import Analyser.FileContext as FileContext
+import Inspection
 
 
 type alias Flags =
@@ -43,7 +43,7 @@ type alias Model =
 type Stage
     = InterfaceLoadingStage InterfaceLoadingStage.Model
     | SourceLoadingStage SourceLoadingStage.Model LoadedDependencies
-    | Finished LoadedSourceFiles LoadedDependencies
+    | Finished (List Message)
 
 
 main : Program Flags Model Msg
@@ -106,17 +106,17 @@ update msg model =
                         contexts =
                             List.map (FileContext.create files loadedDependencies) files
                     in
-                        { model | stage = Finished (SourceLoadingStage.parsedFiles newStage) loadedDependencies } ! [ Time.now |> Task.perform Now ]
+                        { model | stage = Finished <| Inspection.run (SourceLoadingStage.parsedFiles newStage) loadedDependencies } ! [ Time.now |> Task.perform Now ]
                 else
                     ( { model | stage = SourceLoadingStage newStage loadedDependencies }
                     , Cmd.map SourceLoadingStageMsg cmds
                     )
 
-        ( _, Finished x y ) ->
+        ( _, Finished messages ) ->
             let
                 _ =
-                    x
-                        |> List.map (FileContext.create x y)
+                    messages
+                        |> Debug.log "Messages"
             in
                 model ! [ AnalyserPorts.sendMessagesAsStrings model.messages ]
 
@@ -137,5 +137,5 @@ subscriptions model =
         SourceLoadingStage stage _ ->
             SourceLoadingStage.subscriptions stage |> Sub.map SourceLoadingStageMsg
 
-        Finished _ _ ->
+        Finished _ ->
             Sub.none

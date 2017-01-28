@@ -5,7 +5,6 @@ import Expect
 import Parser.Declarations as Parser exposing (..)
 import AST.Types as Types exposing (..)
 import Test exposing (..)
-import Parser.Patterns exposing (..)
 
 
 all : Test
@@ -16,9 +15,10 @@ all =
                 parseFullStringState emptyState "\\() -> foo" Parser.expression
                     |> Expect.equal
                         (Just
-                            (Lambda
-                                [ UnitPattern ]
-                                (FunctionOrValue "foo")
+                            (LambdaExpression
+                                { args = [ UnitPattern ]
+                                , expression = (FunctionOrValue "foo")
+                                }
                             )
                         )
         , test "args lambda" <|
@@ -26,14 +26,16 @@ all =
                 parseFullStringState emptyState "\\a b -> a + b" Parser.expression
                     |> Expect.equal
                         (Just
-                            (Lambda
-                                [ VarPattern "a", VarPattern "b" ]
-                                (Application
-                                    [ FunctionOrValue "a"
-                                    , Operator "+"
-                                    , FunctionOrValue "b"
-                                    ]
-                                )
+                            (LambdaExpression
+                                { args = [ VarPattern "a", VarPattern "b" ]
+                                , expression =
+                                    (Application
+                                        [ FunctionOrValue "a"
+                                        , Operator "+"
+                                        , FunctionOrValue "b"
+                                        ]
+                                    )
+                                }
                             )
                         )
         , test "tuple lambda" <|
@@ -41,14 +43,16 @@ all =
                 parseFullStringState emptyState "\\(a,b) -> a + b" Parser.expression
                     |> Expect.equal
                         (Just
-                            (Lambda
-                                [ TuplePattern [ VarPattern "a", VarPattern "b" ] ]
-                                (Application
-                                    [ FunctionOrValue "a"
-                                    , Operator "+"
-                                    , FunctionOrValue "b"
-                                    ]
-                                )
+                            (LambdaExpression
+                                { args = [ TuplePattern [ VarPattern "a", VarPattern "b" ] ]
+                                , expression =
+                                    (Application
+                                        [ FunctionOrValue "a"
+                                        , Operator "+"
+                                        , FunctionOrValue "b"
+                                        ]
+                                    )
+                                }
                             )
                         )
         ]

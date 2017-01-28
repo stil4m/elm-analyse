@@ -337,7 +337,7 @@ lambdaExpression : Parser State Expression
 lambdaExpression =
     lazy
         (\() ->
-            succeed Lambda
+            succeed (\args expr -> Lambda args expr |> LambdaExpression)
                 <*> (string "\\" *> maybe moreThanIndentWhitespace *> (sepBy1 moreThanIndentWhitespace functionArgument))
                 <*> (trimmed (string "->") *> expression)
         )
