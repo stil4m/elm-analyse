@@ -209,10 +209,14 @@ inspectExpressionInner config expression context =
                 List.foldl (\a b -> inspectExpression config (Tuple.second a) b) context expressionStringList
 
             RecordUpdateExpression recordUpdate ->
-                actionLambda config.onRecordUpdate
-                    (\c -> List.foldl (\a b -> inspectExpression config (Tuple.second a) b) c recordUpdate.updates)
-                    recordUpdate
-                    context
+                let
+                    _ =
+                        Debug.log "RecordUpdate inspector" recordUpdate
+                in
+                    actionLambda config.onRecordUpdate
+                        (\c -> List.foldl (\a b -> inspectExpression config (Tuple.second a) b) c recordUpdate.updates)
+                        recordUpdate
+                        context
 
 
 inspectCase : Config context -> Case -> context -> context

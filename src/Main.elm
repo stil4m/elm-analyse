@@ -28,7 +28,7 @@ init =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg _ =
     case msg of
         OnFileContent ( fileName, x ) ->
             ( ()
@@ -54,5 +54,5 @@ update msg model =
 
 
 subscriptions : a -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Ports.onFile OnFileContent

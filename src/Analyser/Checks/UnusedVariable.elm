@@ -31,6 +31,8 @@ scan fileContext =
                     , onLambda = Inner onLambda
                     , onCase = Inner onCase
                     , onFunctionOrValue = Post onFunctionOrValue
+                    , onRecordAccess = Post onRecordAccess
+                    , onRecordUpdate = Post onRecordUpdate
                 }
                 fileContext.ast
                 emptyContext
@@ -111,7 +113,11 @@ onRecordAccess x context =
 
 onRecordUpdate : RecordUpdate -> UsedVariableContext -> UsedVariableContext
 onRecordUpdate recordUpdate context =
-    addUsedVariable recordUpdate.name context
+    let
+        _ =
+            Debug.log "onRecordUpdate" recordUpdate
+    in
+        addUsedVariable recordUpdate.name context
 
 
 onFile : File -> UsedVariableContext -> UsedVariableContext

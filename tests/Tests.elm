@@ -11,9 +11,9 @@ import Analyser.Checks.UnusedVariableTests
 all : Test
 all =
     Test.concat
-        [ InterfaceTest.all
-        , DependencyTests.all
-        , PostProcessingTests.all
-        , ParserTests.all
-        , Analyser.Checks.UnusedVariableTests.all
+        [ Analyser.Checks.UnusedVariableTests.all
+          -- , InterfaceTest.all
+          -- , DependencyTests.all
+          -- , PostProcessingTests.all
+          -- , ParserTests.all
         ]

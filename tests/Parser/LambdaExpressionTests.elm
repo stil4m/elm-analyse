@@ -4,7 +4,6 @@ import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
 import AST.Types as Types exposing (..)
-import AST.Util exposing (rangeFromInts)
 import Test exposing (..)
 
 

@@ -140,7 +140,7 @@ fileToDefinitions file =
                 [ x ] ->
                     Just x
 
-                [ ( n1, t1 ), ( n2, t2 ) ] ->
+                [ ( n1, t1 ), ( _, t2 ) ] ->
                     getValidOperatorInterface t1 t2
                         |> Maybe.map ((,) n1)
 

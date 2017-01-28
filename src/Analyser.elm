@@ -2,7 +2,7 @@ module Analyser exposing (..)
 
 import Analyser.InterfaceLoadingStage as InterfaceLoadingStage
 import Analyser.LoadedDependencies as LoadedDependencies exposing (LoadedDependencies)
-import Analyser.Messages exposing (Message)
+import Analyser.Messages as Messages exposing (Message)
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import AnalyserPorts
 import Platform exposing (program, programWithFlags)
@@ -113,12 +113,7 @@ update msg model =
                     )
 
         ( _, Finished messages ) ->
-            let
-                _ =
-                    messages
-                        |> Debug.log "Messages"
-            in
-                model ! [ AnalyserPorts.sendMessagesAsStrings model.messages ]
+            model ! [ AnalyserPorts.sendMessagesAsStrings messages ]
 
         ( b, a ) ->
             let

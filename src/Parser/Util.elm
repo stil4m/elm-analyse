@@ -30,17 +30,14 @@ printLocation s =
 
 unstrictIndentWhitespace : Parser State String
 unstrictIndentWhitespace =
-    withState
-        (\state ->
-            (List.concat >> String.concat)
-                <$> many1
-                        (sequence
-                            [ manySpaces
-                            , Maybe.withDefault "" <$> maybe (someComment)
-                            , (String.concat) <$> many1 newLineWithSomeIndent
-                            ]
-                        )
-        )
+    (List.concat >> String.concat)
+        <$> many1
+                (sequence
+                    [ manySpaces
+                    , Maybe.withDefault "" <$> maybe (someComment)
+                    , (String.concat) <$> many1 newLineWithSomeIndent
+                    ]
+                )
 
 
 exactIndentWhitespace : Parser State String
