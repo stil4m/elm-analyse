@@ -8,7 +8,6 @@ import AnalyserPorts
 import Platform exposing (program, programWithFlags)
 import Task
 import Time exposing (Time)
-import Analyser.FileContext as FileContext
 import Inspection
 
 
@@ -99,11 +98,7 @@ update msg model =
                     SourceLoadingStage.update x stage
             in
                 if SourceLoadingStage.isDone newStage then
-                    let
-                        files =
-                            SourceLoadingStage.parsedFiles newStage
-                    in
-                        { model | stage = Finished <| Inspection.run (SourceLoadingStage.parsedFiles newStage) loadedDependencies } ! [ Time.now |> Task.perform Now ]
+                    { model | stage = Finished <| Inspection.run (SourceLoadingStage.parsedFiles newStage) loadedDependencies } ! [ Time.now |> Task.perform Now ]
                 else
                     ( { model | stage = SourceLoadingStage newStage loadedDependencies }
                     , Cmd.map SourceLoadingStageMsg cmds
