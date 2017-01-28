@@ -84,6 +84,35 @@ x y =
         model ! []"""
 
 
+usedValueConstructor : String
+usedValueConstructor =
+    """module Bar exposing (foo)
+type Some = Thing
+
+
+foo = Thing
+"""
+
+
+unusedValueConstructor : String
+unusedValueConstructor =
+    """module Bar exposing (foo,Some(Thing))
+
+type Some = Thing | Other
+
+"""
+
+
+exposedValueConstructor : String
+exposedValueConstructor =
+    """module Bar exposing (foo,Some(Thing))
+type Some = Thing
+
+
+foo = 1
+"""
+
+
 getMessages : String -> Maybe (List Message)
 getMessages input =
     Parser.Parser.parse input
@@ -118,4 +147,12 @@ all =
             \() -> getMessages usedVariableInCaseExpression |> Expect.equal (Just [])
         , test "usedVariableInAllDeclaration" <|
             \() -> getMessages usedVariableInAllDeclaration |> Expect.equal (Just [])
+        , test "usedValueConstructor" <|
+            \() -> getMessages usedValueConstructor |> Expect.equal (Just [])
+        , test "unusedValueConstructor" <|
+            \() ->
+                getMessages unusedValueConstructor
+                    |> Expect.equal (Just ([ UnusedTopLevel "./foo.elm" "Other" { start = { row = 2, column = 19 }, end = { row = 3, column = -2 } } ]))
+        , test "exposedValueConstructor" <|
+            \() -> getMessages exposedValueConstructor |> Expect.equal (Just [])
         ]

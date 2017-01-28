@@ -4,20 +4,12 @@ import Combine exposing (..)
 import Combine.Num
 import Parser.Tokens exposing (..)
 import AST.Types exposing (..)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed)
-
-
-asPointerLocation : ParseLocation -> Location
-asPointerLocation { line, column } =
-    { row = line, column = column }
+import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, withRange)
 
 
 asPointer : Parser State String -> Parser State VariablePointer
 asPointer p =
-    withLocation
-        (\start ->
-            p |> andThen (\v -> withLocation (\end -> succeed { value = v, range = { start = asPointerLocation start, end = asPointerLocation end } }))
-        )
+    withRange (VariablePointer <$> p)
 
 
 pattern : Parser State Pattern

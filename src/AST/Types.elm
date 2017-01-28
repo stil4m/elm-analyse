@@ -227,13 +227,14 @@ type alias TypeAlias =
 type alias Type =
     { name : String
     , generics : List String
-    , cases : List ValueConstructor
+    , constructors : List ValueConstructor
     }
 
 
 type alias ValueConstructor =
     { name : String
     , arguments : List TypeReference
+    , range : Range
     }
 
 

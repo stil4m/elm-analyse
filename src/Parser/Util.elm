@@ -7,6 +7,29 @@ import AST.Types exposing (..)
 import Parser.Whitespace exposing (many1Spaces, manySpaces, nSpaces, realNewLine)
 
 
+asPointerLocation : ParseLocation -> Location
+asPointerLocation { line, column } =
+    { row = line, column = column }
+
+
+withRange : Parser State (Range -> a) -> Parser State a
+withRange p =
+    withLocation
+        (\start ->
+            p
+                >>= (\pResult ->
+                        withLocation
+                            (\end ->
+                                succeed <|
+                                    pResult
+                                        { start = asPointerLocation start
+                                        , end = asPointerLocation end
+                                        }
+                            )
+                    )
+        )
+
+
 nextChars : Int -> Parser a String
 nextChars i =
     lazy

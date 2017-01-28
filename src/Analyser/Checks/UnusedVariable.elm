@@ -203,9 +203,7 @@ getDeclarationVars =
                     []
 
                 TypeDecl t ->
-                    --TODO
-                    { value = t.name, range = emptyRange }
-                        :: (List.map (\x -> { value = x.name, range = emptyRange }) t.cases)
+                    (List.map (\{ name, range } -> { value = name, range = range }) t.constructors)
 
                 PortDeclaration p ->
                     --TODO

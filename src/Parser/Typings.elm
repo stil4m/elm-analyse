@@ -4,7 +4,7 @@ import Combine exposing (..)
 import Parser.Tokens exposing (functionName, typeName)
 import Parser.TypeReference exposing (typeReference)
 import AST.Types exposing (..)
-import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
+import Parser.Util exposing (moreThanIndentWhitespace, trimmed, withRange)
 
 
 typeDeclaration : Parser State Type
@@ -22,9 +22,11 @@ valueConstructors =
 
 valueConstructor : Parser State ValueConstructor
 valueConstructor =
-    succeed ValueConstructor
-        <*> typeName
-        <*> many (moreThanIndentWhitespace *> typeReference)
+    withRange
+        (succeed ValueConstructor
+            <*> typeName
+            <*> many (moreThanIndentWhitespace *> typeReference)
+        )
 
 
 typeAlias : Parser State TypeAlias

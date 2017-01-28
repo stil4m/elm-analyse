@@ -24,6 +24,9 @@ doesExposeFunction k interface =
                     Function l ->
                         k == l
 
+                    Type ( _, constructors ) ->
+                        List.member k constructors
+
                     _ ->
                         False
             )
@@ -112,7 +115,7 @@ fileToDefinitions file =
                     (\decl ->
                         case decl of
                             AST.TypeDecl t ->
-                                Just ( t.name, Type ( t.name, t.cases |> List.map .name ) )
+                                Just ( t.name, Type ( t.name, t.constructors |> List.map .name ) )
 
                             AST.AliasDecl a ->
                                 Just ( a.name, Alias a.name )

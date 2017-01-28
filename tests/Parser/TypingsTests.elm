@@ -48,29 +48,12 @@ all =
             \() ->
                 parseFullStringWithNullState "type Color = Blue String | Red | Green" Parser.typeDeclaration
                     |> Expect.equal
-                        (Just <|
-                            { name = "Color"
-                            , generics = []
-                            , cases =
-                                [ { name = "Blue", arguments = [ Typed [] "String" [] ] }
-                                , { name = "Red", arguments = [] }
-                                , { name = "Green", arguments = [] }
-                                ]
-                            }
-                        )
+                        (Just { name = "Color", generics = [], constructors = [ { name = "Blue", arguments = [ Typed [] "String" [] ], range = { start = { row = 1, column = 13 }, end = { row = 1, column = 25 } } }, { name = "Red", arguments = [], range = { start = { row = 1, column = 27 }, end = { row = 1, column = 30 } } }, { name = "Green", arguments = [], range = { start = { row = 1, column = 33 }, end = { row = 1, column = 38 } } } ] })
         , test "type with generic " <|
             \() ->
                 parseFullStringWithNullState "type Maybe a = Just a | Nothing" Parser.typeDeclaration
                     |> Expect.equal
-                        (Just <|
-                            { name = "Maybe"
-                            , generics = [ "a" ]
-                            , cases =
-                                [ { name = "Just", arguments = [ GenericType "a" ] }
-                                , { name = "Nothing", arguments = [] }
-                                ]
-                            }
-                        )
+                        (Just { name = "Maybe", generics = [ "a" ], constructors = [ { name = "Just", arguments = [ GenericType "a" ], range = { start = { row = 1, column = 15 }, end = { row = 1, column = 21 } } }, { name = "Nothing", arguments = [], range = { start = { row = 1, column = 24 }, end = { row = 1, column = 31 } } } ] })
         , test "type with value on next line " <|
             \() ->
                 parseFullStringWithNullState "type Maybe a = Just a |\nNothing" Parser.typeDeclaration
