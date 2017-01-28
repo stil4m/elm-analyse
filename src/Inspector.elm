@@ -19,6 +19,9 @@ type alias Config context =
     , onLambda : Action context Lambda
     , onLetBlock : Action context LetBlock
     , onCase : Action context Case
+    , onFunctionOrValue : Action context String
+    , onRecordAccess : Action context (List String)
+    , onRecordUpdate : Action context RecordUpdate
     }
 
 
@@ -31,6 +34,9 @@ defaultConfig =
     , onLambda = Continue
     , onLetBlock = Continue
     , onCase = Continue
+    , onFunctionOrValue = Continue
+    , onRecordAccess = Continue
+    , onRecordUpdate = Continue
     }
 
 
@@ -116,8 +122,11 @@ inspectExpressionInner config expression context =
             UnitExpr ->
                 context
 
-            FunctionOrValue string ->
-                context
+            FunctionOrValue functionOrVal ->
+                actionLambda config.onFunctionOrValue
+                    identity
+                    functionOrVal
+                    context
 
             PrefixOperator string ->
                 context
@@ -141,7 +150,10 @@ inspectExpressionInner config expression context =
                 context
 
             RecordAccess stringList ->
-                context
+                actionLambda config.onRecordAccess
+                    identity
+                    stringList
+                    context
 
             RecordAccessFunction s ->
                 context
@@ -190,14 +202,17 @@ inspectExpressionInner config expression context =
                     lambda
                     context
 
-            RecordExpr expressionStringList ->
-                context
-
             ListExpr expressionList ->
-                context
+                List.foldl (inspectExpression config) context expressionList
 
-            RecordUpdate string expressionStringList ->
-                context
+            RecordExpr expressionStringList ->
+                List.foldl (\a b -> inspectExpression config (Tuple.second a) b) context expressionStringList
+
+            RecordUpdateExpression recordUpdate ->
+                actionLambda config.onRecordUpdate
+                    (\c -> List.foldl (\a b -> inspectExpression config (Tuple.second a) b) c recordUpdate.updates)
+                    recordUpdate
+                    context
 
 
 inspectCase : Config context -> Case -> context -> context

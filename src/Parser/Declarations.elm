@@ -307,9 +307,11 @@ recordUpdateExpression =
         (\() ->
             (between (string "{")
                 (string "}")
-                (succeed RecordUpdate
-                    <*> (trimmed functionName)
-                    <*> (string "|" *> recordFields True)
+                (RecordUpdateExpression
+                    <$> (succeed RecordUpdate
+                            <*> (trimmed functionName)
+                            <*> (string "|" *> recordFields True)
+                        )
                 )
             )
         )

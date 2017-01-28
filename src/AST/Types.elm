@@ -157,8 +157,14 @@ type Expression
     | QualifiedExpr ModuleName String
     | RecordAccess (List String)
     | RecordAccessFunction String
-    | RecordUpdate String (List ( String, Expression ))
+    | RecordUpdateExpression RecordUpdate
     | GLSLExpression String
+
+
+type alias RecordUpdate =
+    { name : String
+    , updates : List ( String, Expression )
+    }
 
 
 type alias CaseBlock =

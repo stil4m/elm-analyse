@@ -60,12 +60,51 @@ scan file =
                 { defaultConfig
                     | onFile = Pre onFile
                     , onFunction = Inner onFunction
+                    , onLetBlock = Inner onLetBlock
+                    , onLambda = Inner onLambda
+                    , onCase = Inner onCase
+                    , onFunctionOrValue = Post onFunctionOrValue
                 }
                 file
                 emptyContext
                 |> Debug.log "Result"
     in
         1
+
+
+flagVariable : String -> List Scope -> List Scope
+flagVariable k l =
+    case l of
+        [] ->
+            []
+
+        x :: xs ->
+            if Dict.member k x then
+                (Dict.update k (Maybe.map ((+) 1)) x) :: xs
+            else
+                x :: (flagVariable k xs)
+
+
+addUsedVariable : String -> UsedVariableContext -> UsedVariableContext
+addUsedVariable x context =
+    { context | activeScopes = flagVariable x context.activeScopes }
+
+
+onFunctionOrValue : String -> UsedVariableContext -> UsedVariableContext
+onFunctionOrValue x context =
+    addUsedVariable x context
+
+
+onRecordAccess : List String -> UsedVariableContext -> UsedVariableContext
+onRecordAccess x context =
+    List.head x
+        |> Maybe.map (flip addUsedVariable context)
+        |> Maybe.withDefault context
+
+
+onRecordUpdate : RecordUpdate -> UsedVariableContext -> UsedVariableContext
+onRecordUpdate recordUpdate context =
+    addUsedVariable recordUpdate.name context
 
 
 onFile : File -> UsedVariableContext -> UsedVariableContext
@@ -109,8 +148,8 @@ onLambda f lambda context =
         postContext |> popScope
 
 
-onLet : (UsedVariableContext -> UsedVariableContext) -> LetBlock -> UsedVariableContext -> UsedVariableContext
-onLet f letBlock context =
+onLetBlock : (UsedVariableContext -> UsedVariableContext) -> LetBlock -> UsedVariableContext -> UsedVariableContext
+onLetBlock f letBlock context =
     let
         preContext =
             letBlock.declarations

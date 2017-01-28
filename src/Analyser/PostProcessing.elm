@@ -254,7 +254,7 @@ visitExpressionInner visitor context expression =
             ListExpr expressionList ->
                 ListExpr (List.map subVisit expressionList)
 
-            RecordUpdate string expressionStringList ->
-                expressionStringList
+            RecordUpdateExpression recordUpdate ->
+                recordUpdate.updates
                     |> List.map (Tuple.mapSecond subVisit)
-                    |> (RecordUpdate string)
+                    |> (RecordUpdate recordUpdate.name >> RecordUpdateExpression)

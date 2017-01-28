@@ -163,10 +163,13 @@ all =
                 parseFullStringWithNullState "{ model | count = 1, loading = True }" expression
                     |> Expect.equal
                         (Just
-                            (RecordUpdate "model"
-                                [ ( "count", Integer 1 )
-                                , ( "loading", FunctionOrValue "True" )
-                                ]
+                            (RecordUpdateExpression
+                                { name = "model"
+                                , updates =
+                                    [ ( "count", Integer 1 )
+                                    , ( "loading", FunctionOrValue "True" )
+                                    ]
+                                }
                             )
                         )
         , test "record update no spacing" <|
@@ -174,10 +177,13 @@ all =
                 parseFullStringWithNullState "{model| count = 1, loading = True }" expression
                     |> Expect.equal
                         (Just
-                            (RecordUpdate "model"
-                                [ ( "count", Integer 1 )
-                                , ( "loading", FunctionOrValue "True" )
-                                ]
+                            (RecordUpdateExpression
+                                { name = "model"
+                                , updates =
+                                    [ ( "count", Integer 1 )
+                                    , ( "loading", FunctionOrValue "True" )
+                                    ]
+                                }
                             )
                         )
         , test "record access as function" <|
