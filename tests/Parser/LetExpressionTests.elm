@@ -95,7 +95,7 @@ all =
                         (Just
                             (LetExpression
                                 { declarations =
-                                    ([ Destructuring AllPattern (FunctionOrValue "b")
+                                    ([ DestructuringDeclaration { pattern = AllPattern, expression = (FunctionOrValue "b") }
                                      ]
                                     )
                                 , expression = (FunctionOrValue "z")

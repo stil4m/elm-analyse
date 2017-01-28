@@ -63,7 +63,6 @@ x y =
 getMessages : String -> Maybe (List Message)
 getMessages input =
     Parser.Parser.parse input
-        |> Debug.log "File"
         |> Maybe.map (\file -> ( "./foo.elm", Loaded { interface = Interface.build file, ast = file, moduleName = AST.Util.fileModuleName file } ))
         |> Maybe.andThen (\file -> FileContext.create [ file ] [] file)
         |> Maybe.map UnusedVariable.scan
@@ -80,18 +79,9 @@ all =
                             [ Warning (UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }) ]
                         )
         , test "usedVariableAsRecordUpdate" <|
-            \() ->
-                getMessages usedVariableAsRecordUpdate
-                    |> Expect.equal
-                        (Just [])
+            \() -> getMessages usedVariableAsRecordUpdate |> Expect.equal (Just [])
         , test "usedVariableInCaseExpression" <|
-            \() ->
-                getMessages usedVariableInCaseExpression
-                    |> Expect.equal
-                        (Just [])
+            \() -> getMessages usedVariableInCaseExpression |> Expect.equal (Just [])
         , test "usedVariableInAllDeclaration" <|
-            \() ->
-                getMessages usedVariableInAllDeclaration
-                    |> Expect.equal
-                        (Just [])
+            \() -> getMessages usedVariableInAllDeclaration |> Expect.equal (Just [])
         ]

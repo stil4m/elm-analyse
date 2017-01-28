@@ -73,9 +73,11 @@ destructuringDeclaration : Parser State Declaration
 destructuringDeclaration =
     lazy
         (\() ->
-            succeed Destructuring
-                <*> declarablePattern
-                <*> (moreThanIndentWhitespace *> string "=" *> moreThanIndentWhitespace *> expression)
+            DestructuringDeclaration
+                <$> (succeed Destructuring
+                        <*> declarablePattern
+                        <*> (moreThanIndentWhitespace *> string "=" *> moreThanIndentWhitespace *> expression)
+                    )
         )
 
 

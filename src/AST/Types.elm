@@ -84,7 +84,13 @@ type Declaration
     | TypeDecl Type
     | PortDeclaration FunctionSignature
     | InfixDeclaration Infix
-    | Destructuring Pattern Expression
+    | DestructuringDeclaration Destructuring
+
+
+type alias Destructuring =
+    { pattern : Pattern
+    , expression : Expression
+    }
 
 
 type InfixDirection

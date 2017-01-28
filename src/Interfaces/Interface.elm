@@ -115,7 +115,7 @@ fileToDefinitions file =
                             AST.InfixDeclaration i ->
                                 Just ( i.operator, Operator i )
 
-                            AST.Destructuring _ _ ->
+                            AST.DestructuringDeclaration _ ->
                                 --TODO As expression?
                                 Nothing
                     )

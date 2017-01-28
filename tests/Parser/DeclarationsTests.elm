@@ -221,7 +221,7 @@ all =
             \() ->
                 parseFullStringWithNullState "_ = b" destructuringDeclaration
                     |> Expect.equal
-                        (Just <| Destructuring AllPattern (FunctionOrValue "b"))
+                        (Just <| DestructuringDeclaration { pattern = AllPattern, expression = (FunctionOrValue "b") })
         ]
 
 

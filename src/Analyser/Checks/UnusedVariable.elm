@@ -113,11 +113,7 @@ onRecordAccess x context =
 
 onRecordUpdate : RecordUpdate -> UsedVariableContext -> UsedVariableContext
 onRecordUpdate recordUpdate context =
-    let
-        _ =
-            Debug.log "onRecordUpdate" recordUpdate
-    in
-        addUsedVariable recordUpdate.name context
+    addUsedVariable recordUpdate.name context
 
 
 onFile : File -> UsedVariableContext -> UsedVariableContext
@@ -207,8 +203,8 @@ getDeclarationVars =
                     --TODO
                     [ { value = i.operator, range = emptyRange } ]
 
-                Destructuring p _ ->
-                    patternToVars p
+                DestructuringDeclaration destructuring ->
+                    patternToVars destructuring.pattern
         )
 
 

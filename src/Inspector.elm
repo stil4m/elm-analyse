@@ -15,6 +15,7 @@ type alias Config context =
     { onFile : Action context File
     , onDeclaration : Action context Declaration
     , onFunction : Action context Function
+    , onDestructuring : Action context Destructuring
     , onExpression : Action context Expression
     , onLambda : Action context Lambda
     , onLetBlock : Action context LetBlock
@@ -30,6 +31,7 @@ defaultConfig =
     { onFile = Continue
     , onDeclaration = Continue
     , onFunction = Continue
+    , onDestructuring = Continue
     , onExpression = Continue
     , onLambda = Continue
     , onLetBlock = Continue
@@ -94,9 +96,13 @@ inspectDeclaration config declaration context =
             --TODO
             context
 
-        Destructuring p x ->
-            --TODO
-            context
+        DestructuringDeclaration destructing ->
+            inspectDestructuring config destructing context
+
+
+inspectDestructuring : Config context -> Destructuring -> context -> context
+inspectDestructuring config destructring context =
+    inspectExpression config destructring.expression context
 
 
 inspectFunction : Config context -> Function -> context -> context
@@ -214,14 +220,10 @@ inspectExpressionInner config expression context =
                 List.foldl (\a b -> inspectExpression config (Tuple.second a) b) context expressionStringList
 
             RecordUpdateExpression recordUpdate ->
-                let
-                    _ =
-                        Debug.log "RecordUpdate inspector" recordUpdate
-                in
-                    actionLambda config.onRecordUpdate
-                        (\c -> List.foldl (\a b -> inspectExpression config (Tuple.second a) b) c recordUpdate.updates)
-                        recordUpdate
-                        context
+                actionLambda config.onRecordUpdate
+                    (\c -> List.foldl (\a b -> inspectExpression config (Tuple.second a) b) c recordUpdate.updates)
+                    recordUpdate
+                    context
 
 
 inspectCase : Config context -> Case -> context -> context
