@@ -64,7 +64,7 @@ buildInterfaceFromExplicit x fileDefinitionList =
 
                     AST.DefinitionExpose s ->
                         lookupForDefinition s fileDefinitionList
-                            |> Maybe.map (ifType (\( name, vals ) -> Type ( name, [] )))
+                            |> Maybe.map (ifType (\( name, _ ) -> Type ( name, [] )))
 
                     AST.TypeExpose n vals ->
                         case vals of

@@ -102,7 +102,7 @@ loadNextFile : Model -> ( Model, Cmd Msg )
 loadNextFile (Model model) =
     model.filesToLoad
         |> Maybe.map
-            (\( next, rest ) ->
+            (\( next, _ ) ->
                 ( Model model
                 , AnalyserPorts.loadFile (Tuple.second next)
                 )
@@ -111,5 +111,5 @@ loadNextFile (Model model) =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     AnalyserPorts.fileContent OnFileContent

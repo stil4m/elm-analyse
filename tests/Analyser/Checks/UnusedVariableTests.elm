@@ -46,6 +46,20 @@ foo x =
 """
 
 
+usedVariableInAllDeclaration : String
+usedVariableInAllDeclaration =
+    """module Bar
+
+x y =
+  case y of
+   ( b, _ ) ->
+    let
+        _ =
+            Debug.log "Unknown" b
+    in
+        model ! []"""
+
+
 getMessages : String -> Maybe (List Message)
 getMessages input =
     Parser.Parser.parse input
@@ -73,6 +87,11 @@ all =
         , test "usedVariableInCaseExpression" <|
             \() ->
                 getMessages usedVariableInCaseExpression
+                    |> Expect.equal
+                        (Just [])
+        , test "usedVariableInAllDeclaration" <|
+            \() ->
+                getMessages usedVariableInAllDeclaration
                     |> Expect.equal
                         (Just [])
         ]

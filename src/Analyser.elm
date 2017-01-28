@@ -115,7 +115,7 @@ update msg model =
         ( _, Finished messages ) ->
             model ! [ AnalyserPorts.sendMessagesAsStrings messages ]
 
-        ( b, a ) ->
+        ( b, _ ) ->
             let
                 _ =
                     Debug.log "Unknown" b

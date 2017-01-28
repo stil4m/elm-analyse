@@ -177,31 +177,31 @@ visitExpressionInner visitor context expression =
             UnitExpr ->
                 expression
 
-            FunctionOrValue string ->
+            FunctionOrValue _ ->
                 expression
 
-            PrefixOperator string ->
+            PrefixOperator _ ->
                 expression
 
-            Operator string ->
+            Operator _ ->
                 expression
 
-            Integer int ->
+            Integer _ ->
                 expression
 
-            Floatable float ->
+            Floatable _ ->
                 expression
 
-            Literal string ->
+            Literal _ ->
                 expression
 
-            CharLiteral char ->
+            CharLiteral _ ->
                 expression
 
-            QualifiedExpr moduleName string ->
+            QualifiedExpr _ _ ->
                 expression
 
-            RecordAccess stringList ->
+            RecordAccess _ ->
                 expression
 
             RecordAccessFunction s ->

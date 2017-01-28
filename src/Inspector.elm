@@ -44,10 +44,10 @@ actionLambda : Action config x -> (config -> config) -> x -> config -> config
 actionLambda act =
     case act of
         Skip ->
-            (\f x c -> c)
+            (\_ _ c -> c)
 
         Continue ->
-            (\f x c -> f c)
+            (\f _ c -> f c)
 
         Pre g ->
             (\f x c -> g x c |> f)
@@ -79,18 +79,23 @@ inspectDeclaration config declaration context =
             inspectFunction config function context
 
         AliasDecl _ ->
+            --TODO
             context
 
         TypeDecl _ ->
+            --TODO
             context
 
         PortDeclaration _ ->
+            --TODO
             context
 
         InfixDeclaration _ ->
+            --TODO
             context
 
-        Destructuring _ _ ->
+        Destructuring p x ->
+            --TODO
             context
 
 
@@ -128,25 +133,25 @@ inspectExpressionInner config expression context =
                     functionOrVal
                     context
 
-            PrefixOperator string ->
+            PrefixOperator _ ->
                 context
 
-            Operator string ->
+            Operator _ ->
                 context
 
-            Integer int ->
+            Integer _ ->
                 context
 
-            Floatable float ->
+            Floatable _ ->
                 context
 
-            Literal string ->
+            Literal _ ->
                 context
 
-            CharLiteral char ->
+            CharLiteral _ ->
                 context
 
-            QualifiedExpr moduleName string ->
+            QualifiedExpr _ _ ->
                 context
 
             RecordAccess stringList ->
@@ -155,16 +160,16 @@ inspectExpressionInner config expression context =
                     stringList
                     context
 
-            RecordAccessFunction s ->
+            RecordAccessFunction _ ->
                 context
 
-            GLSLExpression string ->
+            GLSLExpression _ ->
                 context
 
             Application expressionList ->
                 List.foldl (inspectExpression config) context expressionList
 
-            OperatorApplication dir e1 e2 ->
+            OperatorApplication _ e1 e2 ->
                 List.foldl (inspectExpression config) context [ e1, e2 ]
 
             IfBlock e1 e2 e3 ->
