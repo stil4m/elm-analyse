@@ -60,10 +60,24 @@ x y =
         model ! []"""
 
 
+unusedInLetExpression : String
+unusedInLetExpression =
+    """module Bar
+
+x =
+  let
+    y = 1
+  in
+    2
+"""
+
+
 getMessages : String -> Maybe (List Message)
 getMessages input =
     Parser.Parser.parse input
-        |> Maybe.map (\file -> ( "./foo.elm", Loaded { interface = Interface.build file, ast = file, moduleName = AST.Util.fileModuleName file } ))
+        -- |> Debug.log "File"
+        |>
+            Maybe.map (\file -> ( "./foo.elm", Loaded { interface = Interface.build file, ast = file, moduleName = AST.Util.fileModuleName file } ))
         |> Maybe.andThen (\file -> FileContext.create [ file ] [] file)
         |> Maybe.map UnusedVariable.scan
 
@@ -78,6 +92,10 @@ all =
                         (Just
                             [ Warning (UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }) ]
                         )
+        , test "unusedInLetExpression" <|
+            \() ->
+                getMessages unusedInLetExpression
+                    |> Expect.equal (Just ([ Warning (UnusedVariable "./foo.elm" "y" { start = { row = 4, column = 3 }, end = { row = 4, column = 4 } }) ]))
         , test "usedVariableAsRecordUpdate" <|
             \() -> getMessages usedVariableAsRecordUpdate |> Expect.equal (Just [])
         , test "usedVariableInCaseExpression" <|

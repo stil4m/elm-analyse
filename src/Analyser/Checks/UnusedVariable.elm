@@ -185,7 +185,7 @@ getDeclarationVars =
             case x of
                 FuncDecl f ->
                     --TODO
-                    [ { value = f.declaration.name, range = emptyRange } ]
+                    [ f.declaration.name ]
 
                 AliasDecl _ ->
                     []

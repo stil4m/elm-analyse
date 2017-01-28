@@ -100,7 +100,7 @@ functionDeclaration =
         (\() ->
             succeed FunctionDeclaration
                 <*> (lookAhead anyChar >>= (\c -> succeed (c == '(')))
-                <*> (or functionName (parens prefixOperatorToken))
+                <*> (asPointer <| or functionName (parens prefixOperatorToken))
                 <*> (many (moreThanIndentWhitespace *> functionArgument))
                 <*> (maybe moreThanIndentWhitespace
                         *> string "="

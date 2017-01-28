@@ -141,7 +141,7 @@ type alias FunctionSignature =
 
 type alias FunctionDeclaration =
     { operatorDefinition : Bool
-    , name : String
+    , name : VariablePointer
     , arguments : List Pattern
     , expression : Expression
     }

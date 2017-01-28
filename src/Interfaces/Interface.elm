@@ -108,9 +108,9 @@ fileToDefinitions file =
 
                             AST.FuncDecl f ->
                                 if f.declaration.operatorDefinition then
-                                    Just ( f.declaration.name, Operator { operator = f.declaration.name, precedence = 5, direction = AST.Left } )
+                                    Just ( f.declaration.name.value, Operator { operator = f.declaration.name.value, precedence = 5, direction = AST.Left } )
                                 else
-                                    Just ( f.declaration.name, Function f.declaration.name )
+                                    Just ( f.declaration.name.value, Function f.declaration.name.value )
 
                             AST.InfixDeclaration i ->
                                 Just ( i.operator, Operator i )

@@ -11,42 +11,7 @@ import Test exposing (..)
 all : Test
 all =
     describe "FileTests"
-        [ test "declaration" <|
-            \() ->
-                parseFullStringState emptyState "main =\n  text \"Hello, World!\"" Parser.functionDeclaration
-                    |> Expect.equal
-                        (Just
-                            { operatorDefinition = False
-                            , name = "main"
-                            , arguments = []
-                            , expression =
-                                Application
-                                    [ FunctionOrValue "text"
-                                    , Literal "Hello, World!"
-                                    ]
-                            }
-                        )
-        , test "function" <|
-            (\() ->
-                parseFullStringState emptyState "main =\n  text \"Hello, World!\"" Parser.function
-                    |> Expect.equal
-                        (Just
-                            { documentation = Nothing
-                            , signature = Nothing
-                            , declaration =
-                                { operatorDefinition = False
-                                , name = "main"
-                                , arguments = []
-                                , expression =
-                                    Application
-                                        [ FunctionOrValue "text"
-                                        , Literal "Hello, World!"
-                                        ]
-                                }
-                            }
-                        )
-            )
-        , Samples.allSamples
+        [ Samples.allSamples
             |> List.indexedMap
                 (\n s ->
                     test ("sample " ++ toString (n + 1)) <|

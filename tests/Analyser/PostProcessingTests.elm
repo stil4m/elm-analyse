@@ -39,7 +39,7 @@ all =
                                 , signature = Nothing
                                 , declaration =
                                     { operatorDefinition = False
-                                    , name = "bar"
+                                    , name = { value = "bar", range = { start = { row = 3, column = -1 }, end = { row = 3, column = 2 } } }
                                     , arguments = []
                                     , expression =
                                         OperatorApplication Left

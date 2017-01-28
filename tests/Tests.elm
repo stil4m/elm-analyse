@@ -12,8 +12,8 @@ all : Test
 all =
     Test.concat
         [ Analyser.Checks.UnusedVariableTests.all
-          -- , InterfaceTest.all
-          -- , DependencyTests.all
-          -- , PostProcessingTests.all
-          -- , ParserTests.all
+        , InterfaceTest.all
+        , DependencyTests.all
+        , PostProcessingTests.all
+        , ParserTests.all
         ]
