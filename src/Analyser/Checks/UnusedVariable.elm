@@ -3,6 +3,7 @@ module Analyser.Checks.UnusedVariable exposing (..)
 import AST.Types exposing (..)
 import Inspector exposing (..)
 import Dict exposing (Dict)
+import Analyser.FileContext exposing (FileContext)
 
 
 type alias Pointer =
@@ -24,7 +25,9 @@ pushScope vars x =
     let
         y : Scope
         y =
-            vars |> List.map (flip (,) 0) |> Dict.fromList
+            vars
+                |> List.map (flip (,) 0)
+                |> Dict.fromList
     in
         { x | activeScopes = y :: x.activeScopes }
 
@@ -51,8 +54,8 @@ emptyContext =
     { poppedScopes = [], activeScopes = [] }
 
 
-scan : File -> Int
-scan file =
+scan : FileContext -> Int
+scan fileContext =
     let
         x : UsedVariableContext
         x =
@@ -65,9 +68,17 @@ scan file =
                     , onCase = Inner onCase
                     , onFunctionOrValue = Post onFunctionOrValue
                 }
-                file
+                fileContext.ast
                 emptyContext
                 |> Debug.log "Result"
+
+        --TODO Do something with exposing List
+        y =
+            x.poppedScopes
+                |> List.concatMap Dict.toList
+                |> List.filter (Tuple.second >> (==) 0)
+                |> List.map Tuple.first
+                |> Debug.log ("Unused variables in " ++ fileContext.path)
     in
         1
 

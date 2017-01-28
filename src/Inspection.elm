@@ -16,6 +16,8 @@ run source deps =
                 -- |> List.drop 3
                 -- |> List.head
                 |>
-                    List.map (.ast >> UnusedVariable.scan >> Debug.log "Contexts")
+                    List.map UnusedVariable.scan
+
+        -- List.map (UnusedVariable.scan >> Debug.log "Contexts")
     in
         []
