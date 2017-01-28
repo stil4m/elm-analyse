@@ -237,10 +237,11 @@ visitExpressionInner visitor context expression =
                     , expression = (subVisit letBlock.expression)
                     }
 
-            CaseBlock e1 cases ->
-                CaseBlock
-                    (subVisit e1)
-                    (List.map (Tuple2.mapSecond subVisit) cases)
+            CaseExpression caseBlock ->
+                CaseExpression
+                    { expression = (subVisit caseBlock.expression)
+                    , cases = (List.map (Tuple2.mapSecond subVisit) caseBlock.cases)
+                    }
 
             LambdaExpression { args, expression } ->
                 LambdaExpression <| { args = args, expression = (subVisit expression) }

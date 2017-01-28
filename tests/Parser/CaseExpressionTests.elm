@@ -52,10 +52,13 @@ all =
                 parseFullStringState emptyState "case f of\n  True -> 1\n  False -> 2" Parser.expression
                     |> Expect.equal
                         (Just
-                            (CaseBlock (FunctionOrValue "f")
-                                [ ( NamedPattern (QualifiedNameRef [] "True") [], Integer 1 )
-                                , ( NamedPattern (QualifiedNameRef [] "False") [], Integer 2 )
-                                ]
+                            (CaseExpression
+                                { expression = (FunctionOrValue "f")
+                                , cases =
+                                    [ ( NamedPattern (QualifiedNameRef [] "True") [], Integer 1 )
+                                    , ( NamedPattern (QualifiedNameRef [] "False") [], Integer 2 )
+                                    ]
+                                }
                             )
                         )
         , test "case expression wrong - indent second case" <|
@@ -67,10 +70,13 @@ all =
                 parseFullStringState emptyState "case msg of\n  Increment ->\n    model + 1\n  Decrement ->\n    model - 1" Parser.expression
                     |> Expect.equal
                         (Just
-                            (CaseBlock (FunctionOrValue "msg")
-                                [ ( NamedPattern (QualifiedNameRef [] "Increment") [], Application [ FunctionOrValue "model", Operator "+", Integer 1 ] )
-                                , ( NamedPattern (QualifiedNameRef [] "Decrement") [], Application [ FunctionOrValue "model", Operator "-", Integer 1 ] )
-                                ]
+                            (CaseExpression
+                                { expression = (FunctionOrValue "msg")
+                                , cases =
+                                    [ ( NamedPattern (QualifiedNameRef [] "Increment") [], Application [ FunctionOrValue "model", Operator "+", Integer 1 ] )
+                                    , ( NamedPattern (QualifiedNameRef [] "Decrement") [], Application [ FunctionOrValue "model", Operator "-", Integer 1 ] )
+                                    ]
+                                }
                             )
                         )
         ]

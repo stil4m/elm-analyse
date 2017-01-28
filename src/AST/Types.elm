@@ -150,7 +150,7 @@ type Expression
     | TupledExpression (List Expression)
     | Parentesized Expression
     | LetExpression LetBlock
-    | CaseBlock Expression Cases
+    | CaseExpression CaseBlock
     | LambdaExpression Lambda
     | RecordExpr (List ( String, Expression ))
     | ListExpr (List Expression)
@@ -159,6 +159,12 @@ type Expression
     | RecordAccessFunction String
     | RecordUpdate String (List ( String, Expression ))
     | GLSLExpression String
+
+
+type alias CaseBlock =
+    { expression : Expression
+    , cases : Cases
+    }
 
 
 type alias LetBlock =

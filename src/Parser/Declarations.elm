@@ -371,11 +371,11 @@ caseExpression : Parser State Expression
 caseExpression =
     lazy
         (\() ->
-            -- withIndentedState
-            (succeed CaseBlock
-                <*> caseBlock
-                <*> (moreThanIndentWhitespace *> withIndentedState caseStatements)
-            )
+            CaseExpression
+                <$> (succeed CaseBlock
+                        <*> caseBlock
+                        <*> (moreThanIndentWhitespace *> withIndentedState caseStatements)
+                    )
         )
 
 

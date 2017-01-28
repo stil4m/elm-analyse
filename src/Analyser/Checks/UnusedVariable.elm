@@ -123,6 +123,20 @@ onLet f letBlock context =
         postContext |> popScope
 
 
+onCase : (UsedVariableContext -> UsedVariableContext) -> Case -> UsedVariableContext -> UsedVariableContext
+onCase f caze context =
+    let
+        preContext =
+            (Tuple.first caze)
+                |> patternToVars
+                |> flip pushScope context
+
+        postContext =
+            f preContext
+    in
+        postContext |> popScope
+
+
 getDeclarationVars : List Declaration -> List String
 getDeclarationVars =
     List.concatMap

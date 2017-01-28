@@ -164,15 +164,18 @@ all =
                             , name = "update"
                             , arguments = [ VarPattern "msg", VarPattern "model" ]
                             , expression =
-                                (CaseBlock
-                                    (FunctionOrValue "msg")
-                                    [ ( NamedPattern (QualifiedNameRef [] "Increment") []
-                                      , Application [ FunctionOrValue "model", Operator "+", Integer 1 ]
-                                      )
-                                    , ( NamedPattern (QualifiedNameRef [] "Decrement") []
-                                      , Application [ FunctionOrValue "model", Operator "-", Integer 1 ]
-                                      )
-                                    ]
+                                (CaseExpression
+                                    { expression =
+                                        (FunctionOrValue "msg")
+                                    , cases =
+                                        [ ( NamedPattern (QualifiedNameRef [] "Increment") []
+                                          , Application [ FunctionOrValue "model", Operator "+", Integer 1 ]
+                                          )
+                                        , ( NamedPattern (QualifiedNameRef [] "Decrement") []
+                                          , Application [ FunctionOrValue "model", Operator "-", Integer 1 ]
+                                          )
+                                        ]
+                                    }
                                 )
                             }
                         )
