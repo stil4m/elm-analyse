@@ -102,9 +102,6 @@ update msg model =
                     let
                         files =
                             SourceLoadingStage.parsedFiles newStage
-
-                        contexts =
-                            List.map (FileContext.create files loadedDependencies) files
                     in
                         { model | stage = Finished <| Inspection.run (SourceLoadingStage.parsedFiles newStage) loadedDependencies } ! [ Time.now |> Task.perform Now ]
                 else

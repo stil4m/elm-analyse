@@ -125,105 +125,101 @@ inspectExpression config expression context =
 
 inspectExpressionInner : Config context -> Expression -> context -> context
 inspectExpressionInner config expression context =
-    let
-        subVisit =
-            (inspectExpression config)
-    in
-        case expression of
-            UnitExpr ->
+    case expression of
+        UnitExpr ->
+            context
+
+        FunctionOrValue functionOrVal ->
+            actionLambda config.onFunctionOrValue
+                identity
+                functionOrVal
                 context
 
-            FunctionOrValue functionOrVal ->
-                actionLambda config.onFunctionOrValue
-                    identity
-                    functionOrVal
+        PrefixOperator _ ->
+            context
+
+        Operator _ ->
+            context
+
+        Integer _ ->
+            context
+
+        Floatable _ ->
+            context
+
+        Literal _ ->
+            context
+
+        CharLiteral _ ->
+            context
+
+        QualifiedExpr _ _ ->
+            context
+
+        RecordAccess stringList ->
+            actionLambda config.onRecordAccess
+                identity
+                stringList
+                context
+
+        RecordAccessFunction _ ->
+            context
+
+        GLSLExpression _ ->
+            context
+
+        Application expressionList ->
+            List.foldl (inspectExpression config) context expressionList
+
+        OperatorApplication _ e1 e2 ->
+            List.foldl (inspectExpression config) context [ e1, e2 ]
+
+        IfBlock e1 e2 e3 ->
+            List.foldl (inspectExpression config) context [ e1, e2, e3 ]
+
+        TupledExpression expressionList ->
+            List.foldl (inspectExpression config) context expressionList
+
+        Parentesized e1 ->
+            inspectExpression config e1 context
+
+        LetExpression letBlock ->
+            let
+                next =
+                    inspectDeclarations config letBlock.declarations >> inspectExpression config letBlock.expression
+            in
+                actionLambda config.onLetBlock
+                    next
+                    letBlock
                     context
 
-            PrefixOperator _ ->
+        CaseExpression caseBlock ->
+            let
+                context2 =
+                    inspectExpression config caseBlock.expression context
+
+                context3 =
+                    List.foldl (\a b -> inspectCase config a b) context2 caseBlock.cases
+            in
+                context3
+
+        LambdaExpression lambda ->
+            actionLambda config.onLambda
+                (inspectExpression config lambda.expression)
+                lambda
                 context
 
-            Operator _ ->
+        ListExpr expressionList ->
+            List.foldl (inspectExpression config) context expressionList
+
+        RecordExpr expressionStringList ->
+            List.foldl (\a b -> inspectExpression config (Tuple.second a) b) context expressionStringList
+
+        RecordUpdateExpression recordUpdate ->
+            actionLambda config.onRecordUpdate
+                (\c -> List.foldl (\a b -> inspectExpression config (Tuple.second a) b) c recordUpdate.updates)
+                recordUpdate
                 context
-
-            Integer _ ->
-                context
-
-            Floatable _ ->
-                context
-
-            Literal _ ->
-                context
-
-            CharLiteral _ ->
-                context
-
-            QualifiedExpr _ _ ->
-                context
-
-            RecordAccess stringList ->
-                actionLambda config.onRecordAccess
-                    identity
-                    stringList
-                    context
-
-            RecordAccessFunction _ ->
-                context
-
-            GLSLExpression _ ->
-                context
-
-            Application expressionList ->
-                List.foldl (inspectExpression config) context expressionList
-
-            OperatorApplication _ e1 e2 ->
-                List.foldl (inspectExpression config) context [ e1, e2 ]
-
-            IfBlock e1 e2 e3 ->
-                List.foldl (inspectExpression config) context [ e1, e2, e3 ]
-
-            TupledExpression expressionList ->
-                List.foldl (inspectExpression config) context expressionList
-
-            Parentesized e1 ->
-                inspectExpression config e1 context
-
-            LetExpression letBlock ->
-                let
-                    next =
-                        inspectDeclarations config letBlock.declarations >> inspectExpression config letBlock.expression
-                in
-                    actionLambda config.onLetBlock
-                        next
-                        letBlock
-                        context
-
-            CaseExpression caseBlock ->
-                let
-                    context2 =
-                        inspectExpression config caseBlock.expression context
-
-                    context3 =
-                        List.foldl (\a b -> inspectCase config a b) context2 caseBlock.cases
-                in
-                    context3
-
-            LambdaExpression lambda ->
-                actionLambda config.onLambda
-                    (inspectExpression config lambda.expression)
-                    lambda
-                    context
-
-            ListExpr expressionList ->
-                List.foldl (inspectExpression config) context expressionList
-
-            RecordExpr expressionStringList ->
-                List.foldl (\a b -> inspectExpression config (Tuple.second a) b) context expressionStringList
-
-            RecordUpdateExpression recordUpdate ->
-                actionLambda config.onRecordUpdate
-                    (\c -> List.foldl (\a b -> inspectExpression config (Tuple.second a) b) c recordUpdate.updates)
-                    recordUpdate
-                    context
 
 
 inspectCase : Config context -> Case -> context -> context
