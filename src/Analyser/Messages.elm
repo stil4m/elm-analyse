@@ -9,6 +9,7 @@ type Message
     | UnusedVariable FileName String AST.Range
     | UnusedTopLevel FileName String AST.Range
     | ExposeAll FileName AST.Range
+    | ImportAll FileName AST.ModuleName AST.Range
     | NoTopLevelSignature FileName String AST.Range
 
 
@@ -54,6 +55,16 @@ asString m =
         ExposeAll fileName range ->
             String.concat
                 [ "Exposing all in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+
+        ImportAll fileName moduleName range ->
+            String.concat
+                [ "Importing all from module `"
+                , String.join "." moduleName
+                , "`in file \""
                 , fileName
                 , "\" at "
                 , rangeToString range
