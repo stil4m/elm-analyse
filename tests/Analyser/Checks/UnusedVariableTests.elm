@@ -110,6 +110,17 @@ foo = 1
 """
 
 
+onlyUsedInSelf : String
+onlyUsedInSelf =
+    """module Bar exposing (foo,Some(Thing))
+type Some = Thing
+
+foo = 1
+
+bar = bar + foo
+"""
+
+
 all : Test
 all =
     describe "Analyser.PostProcessingTests"
@@ -142,4 +153,8 @@ all =
                     |> Expect.equal (Just ([ UnusedTopLevel "./foo.elm" "Other" { start = { row = 2, column = 19 }, end = { row = 3, column = -2 } } ]))
         , test "exposedValueConstructor" <|
             \() -> getMessages exposedValueConstructor UnusedVariable.scan |> Expect.equal (Just [])
+        , test "onlyUsedInSelf" <|
+            \() ->
+                getMessages onlyUsedInSelf UnusedVariable.scan
+                    |> Expect.equal (Just ([ UnusedTopLevel "./foo.elm" "bar" { start = { row = 5, column = -1 }, end = { row = 5, column = 2 } } ]))
         ]

@@ -13,9 +13,13 @@ type alias Scope =
     Dict String ( Int, Range )
 
 
+type alias ActiveScope =
+    ( List String, Scope )
+
+
 type alias UsedVariableContext =
     { poppedScopes : List Scope
-    , activeScopes : List Scope
+    , activeScopes : List ActiveScope
     }
 
 
@@ -50,6 +54,7 @@ scan fileContext =
         unusedTopLevels =
             x.activeScopes
                 |> List.head
+                |> Maybe.map Tuple.second
                 |> Maybe.withDefault (Dict.empty)
                 |> Dict.toList
                 |> onlyUnused
@@ -62,11 +67,12 @@ scan fileContext =
 pushScope : List VariablePointer -> UsedVariableContext -> UsedVariableContext
 pushScope vars x =
     let
-        y : Scope
+        y : ActiveScope
         y =
             vars
                 |> List.map (\x -> ( x.value, ( 0, x.range ) ))
                 |> Dict.fromList
+                |> ((,) [])
     in
         { x | activeScopes = y :: x.activeScopes }
 
@@ -78,11 +84,11 @@ popScope x =
         , poppedScopes =
             List.head x.activeScopes
                 |> Maybe.map
-                    (\y ->
-                        if Dict.isEmpty y then
+                    (\( _, activeScope ) ->
+                        if Dict.isEmpty activeScope then
                             x.poppedScopes
                         else
-                            y :: x.poppedScopes
+                            activeScope :: x.poppedScopes
                     )
                 |> Maybe.withDefault x.poppedScopes
     }
@@ -93,17 +99,32 @@ emptyContext =
     { poppedScopes = [], activeScopes = [] }
 
 
-flagVariable : String -> List Scope -> List Scope
+maskVariable : String -> UsedVariableContext -> UsedVariableContext
+maskVariable k context =
+    { context
+        | activeScopes =
+            case context.activeScopes of
+                [] ->
+                    []
+
+                ( masked, vs ) :: xs ->
+                    ( k :: masked, vs ) :: xs
+    }
+
+
+flagVariable : String -> List ActiveScope -> List ActiveScope
 flagVariable k l =
     case l of
         [] ->
             []
 
-        x :: xs ->
-            if Dict.member k x then
-                (Dict.update k (Maybe.map (Tuple2.mapFirst ((+) 1))) x) :: xs
+        ( masked, x ) :: xs ->
+            if List.member k masked then
+                ( masked, x ) :: xs
+            else if Dict.member k x then
+                ( masked, (Dict.update k (Maybe.map (Tuple2.mapFirst ((+) 1))) x) ) :: xs
             else
-                x :: (flagVariable k xs)
+                ( masked, x ) :: (flagVariable k xs)
 
 
 addUsedVariable : String -> UsedVariableContext -> UsedVariableContext
@@ -141,11 +162,13 @@ onFunction f function context =
             function.declaration.arguments
                 |> List.concatMap patternToVars
                 |> flip pushScope context
+                |> maskVariable function.declaration.name.value
 
         postContext =
             f preContext
     in
-        postContext |> popScope
+        postContext
+            |> popScope
 
 
 onLambda : (UsedVariableContext -> UsedVariableContext) -> Lambda -> UsedVariableContext -> UsedVariableContext
