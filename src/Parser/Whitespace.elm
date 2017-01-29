@@ -1,4 +1,4 @@
-module Parser.Whitespace exposing (..)
+module Parser.Whitespace exposing (nSpaces, manySpaces, many1Spaces, realNewLine, untilNewlineToken)
 
 import Combine exposing (..)
 import Combine.Char exposing (char)

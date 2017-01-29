@@ -1,4 +1,4 @@
-module Interfaces.Interface exposing (..)
+module Interfaces.Interface exposing (Interface, ExposedInterface(Function, Type, Alias, Operator), doesExposeFunction, getOperators, build)
 
 import AST.Types as AST
 import List.Extra

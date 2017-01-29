@@ -1,4 +1,26 @@
-module Parser.Tokens exposing (..)
+module Parser.Tokens
+    exposing
+        ( portToken
+        , moduleToken
+        , exposingToken
+        , asToken
+        , ifToken
+        , thenToken
+        , elseToken
+        , caseToken
+        , ofToken
+        , unitToken
+        , prefixOperatorToken
+        , infixOperatorToken
+        , characterLiteral
+        , stringLiteral
+        , typeName
+        , functionName
+        , functionOrTypeName
+        , multiLineStringLiteral
+        , moduleName
+        , importToken
+        )
 
 import Dict exposing (Dict)
 import Char exposing (fromCode)
@@ -98,22 +120,6 @@ notReserved match =
         fail "functionName is reserved"
     else
         succeed match
-
-
-quotedEscaped : Char -> Parser s Char
-quotedEscaped c =
-    char '\\'
-        *> (choice
-                [ c <$ char c
-                , '\n' <$ char 'n'
-                , '\t' <$ char 't'
-                , '\x07' <$ char 'a'
-                , '\x08' <$ char 'b'
-                , '\x0C' <$ char 'f'
-                , '\x0D' <$ char 'r'
-                , '\x0B' <$ char 'v'
-                ]
-           )
 
 
 escapedChar : Parser s Char

@@ -1,15 +1,10 @@
-module Parser.Patterns exposing (..)
+module Parser.Patterns exposing (pattern, declarablePattern)
 
 import Combine exposing (..)
 import Combine.Num
 import Parser.Tokens exposing (..)
 import AST.Types exposing (..)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, withRange)
-
-
-asPointer : Parser State String -> Parser State VariablePointer
-asPointer p =
-    withRange (VariablePointer <$> p)
+import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, withRange, asPointer)
 
 
 pattern : Parser State Pattern

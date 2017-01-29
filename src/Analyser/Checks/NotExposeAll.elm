@@ -1,4 +1,4 @@
-module Analyser.Checks.NotExposeAll exposing (..)
+module Analyser.Checks.NotExposeAll exposing (scan)
 
 import AST.Types exposing (..)
 import AST.Util
@@ -25,7 +25,7 @@ scan fileContext =
 
 
 onFile : (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
-onFile _ file context =
+onFile _ file _ =
     case AST.Util.fileExposingList file |> Maybe.withDefault None of
         None ->
             []
@@ -49,80 +49,3 @@ onFile _ file context =
                             _ ->
                                 Nothing
                     )
-
-
-getDeclarationVars : List Declaration -> List VariablePointer
-getDeclarationVars =
-    List.concatMap
-        (\x ->
-            case x of
-                FuncDecl f ->
-                    --TODO
-                    [ f.declaration.name ]
-
-                AliasDecl _ ->
-                    []
-
-                TypeDecl t ->
-                    (List.map (\{ name, range } -> { value = name, range = range }) t.constructors)
-
-                PortDeclaration p ->
-                    --TODO
-                    [ { value = p.name, range = emptyRange } ]
-
-                InfixDeclaration i ->
-                    --TODO
-                    [ { value = i.operator, range = emptyRange } ]
-
-                DestructuringDeclaration destructuring ->
-                    patternToVars destructuring.pattern
-        )
-
-
-patternToVars : Pattern -> List VariablePointer
-patternToVars p =
-    case p of
-        TuplePattern t ->
-            List.concatMap patternToVars t
-
-        RecordPattern r ->
-            r
-
-        UnConsPattern l r ->
-            patternToVars l ++ patternToVars r
-
-        ListPattern l ->
-            List.concatMap patternToVars l
-
-        VarPattern x ->
-            [ x ]
-
-        NamedPattern _ args ->
-            List.concatMap patternToVars args
-
-        AsPattern sub name ->
-            name :: (patternToVars sub)
-
-        ParentisizedPattern sub ->
-            patternToVars sub
-
-        QualifiedNamePattern _ ->
-            []
-
-        AllPattern ->
-            []
-
-        UnitPattern ->
-            []
-
-        StringPattern _ ->
-            []
-
-        CharPattern _ ->
-            []
-
-        IntPattern _ ->
-            []
-
-        FloatPattern _ ->
-            []

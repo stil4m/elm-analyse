@@ -1,4 +1,6 @@
-module Parser.Declarations exposing (..)
+module Parser.Declarations exposing (file, signature, declaration, function, functionDeclaration, expression, letBlock, letBody, caseBlock, caseStatement, caseStatements)
+
+-- TODO Expose for tests
 
 import Combine exposing (..)
 import Combine.Char exposing (anyChar, char, noneOf)
@@ -12,7 +14,7 @@ import Parser.Tokens exposing (..)
 import Parser.TypeReference exposing (..)
 import AST.Types exposing (..)
 import Parser.Typings exposing (typeDeclaration)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, nextChar, nextChars, trimmed, unstrictIndentWhitespace)
+import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer)
 import Parser.Whitespace exposing (manySpaces)
 
 
@@ -169,24 +171,8 @@ promoteToApplicationExpression expr =
         )
 
 
-applicationExpression : Parser State Expression
-applicationExpression =
-    lazy
-        (\() ->
-            succeed (\x rest -> Application (x :: rest))
-                <*> (lazy (\() -> expressionNotApplication))
-                <*> (lazy (\() -> (many1 (maybe moreThanIndentWhitespace *> expressionNotApplication))))
-        )
-
-
 
 -- End expression
-
-
-modIndent : Int -> Parser State a -> Parser State a
-modIndent x p =
-    (modifyState (pushIndent x) *> p)
-        <* modifyState popIndent
 
 
 withIndentedState : Parser State a -> Parser State a

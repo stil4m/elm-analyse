@@ -29,7 +29,7 @@ all =
                     |> Expect.equal (Just (CharPattern 'f'))
         , test "non cons pattern " <|
             \() ->
-                parseFullStringState emptyState "(X x)" Parser.nonConsPattern
+                parseFullStringState emptyState "(X x)" Parser.pattern
                     |> Expect.equal
                         (Just (TuplePattern ([ NamedPattern (QualifiedNameRef [] "X") ([ VarPattern { value = "x", range = { start = { row = 1, column = 3 }, end = { row = 1, column = 4 } } } ]) ])))
         , test "parentiszed pattern" <|
@@ -59,7 +59,7 @@ all =
                     |> Expect.equal (Just (RecordPattern ([ { value = "a", range = { start = { row = 1, column = 1 }, end = { row = 1, column = 2 } } }, { value = "b", range = { start = { row = 1, column = 3 }, end = { row = 1, column = 4 } } } ])))
         , test "named pattern" <|
             \() ->
-                parseFullStringState emptyState "True" Parser.namedPattern
+                parseFullStringState emptyState "True" Parser.pattern
                     |> Expect.equal (Just (NamedPattern (QualifiedNameRef [] "True") []))
         , test "tuple pattern" <|
             \() ->

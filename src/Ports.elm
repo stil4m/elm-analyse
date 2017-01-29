@@ -1,4 +1,6 @@
-port module Ports exposing (..)
+port module Ports exposing (onFile, parseResponse)
+
+-- This is needed for a ref error
 
 import Json.Decode
 

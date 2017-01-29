@@ -1,4 +1,4 @@
-module Inspector exposing (..)
+module Inspector exposing (Action(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
 import AST.Types exposing (..)
 

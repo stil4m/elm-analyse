@@ -1,9 +1,8 @@
-module Analyser.FileContext exposing (..)
+module Analyser.FileContext exposing (FileContext, create)
 
 import AST.Types as AST
 import Analyser.LoadedDependencies exposing (LoadedDependencies)
 import Analyser.Types exposing (LoadedSourceFile, LoadedSourceFiles)
-import Dict exposing (Dict)
 import Interfaces.Interface exposing (Interface)
 import Maybe exposing (Maybe(Just, Nothing))
 import Analyser.OperatorTable as OperatorTable
@@ -40,14 +39,3 @@ create sourceFiles dependencies ( path, target ) =
                         , path = path
                         , interface = Interfaces.Interface.build l.ast
                         }
-
-
-collectInterfaces : ModuleIndex -> AST.File -> List Interface
-collectInterfaces moduleIndex file =
-    file.imports |> List.filterMap (collectInterfaceForImport moduleIndex)
-
-
-collectInterfaceForImport : ModuleIndex -> AST.Import -> Maybe Interface
-collectInterfaceForImport moduleIndex imp =
-    Dict.get (Debug.log "Interfaces" imp.moduleName)
-        moduleIndex

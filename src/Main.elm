@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Parser.Parser as Parser
 import Platform exposing (program)

@@ -1,4 +1,6 @@
-module Parser.Expose exposing (..)
+module Parser.Expose exposing (exposeDefinition, infixExpose, typeExpose, exposingListInner, definitionExpose, exposable)
+
+-- TODO Expose for tests
 
 import Combine exposing (..)
 import Combine.Char exposing (..)

@@ -1,4 +1,4 @@
-module Analyser exposing (..)
+module Analyser exposing (main)
 
 import Analyser.InterfaceLoadingStage as InterfaceLoadingStage
 import Analyser.LoadedDependencies as LoadedDependencies exposing (LoadedDependencies)

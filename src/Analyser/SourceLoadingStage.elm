@@ -1,4 +1,4 @@
-module Analyser.SourceLoadingStage exposing (..)
+module Analyser.SourceLoadingStage exposing (init, update, isDone, parsedFiles, Model, Msg, subscriptions)
 
 import AST.Types
 import AST.Util as Util
@@ -35,14 +35,6 @@ init input =
 isDone : Model -> Bool
 isDone (Model model) =
     model.filesToLoad == Nothing
-
-
-insertDependencyInterface :
-    ( String, FileLoad )
-    -> List ( String, FileLoad )
-    -> List ( String, FileLoad )
-insertDependencyInterface =
-    (::)
 
 
 parsedFiles : Model -> Analyser.Types.LoadedSourceFiles

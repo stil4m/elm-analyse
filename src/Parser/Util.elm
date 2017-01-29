@@ -1,7 +1,6 @@
-module Parser.Util exposing (..)
+module Parser.Util exposing (withRange, asPointer, unstrictIndentWhitespace, exactIndentWhitespace, moreThanIndentWhitespace, trimmed, commentSequence, multiLineCommentWithTrailingSpaces)
 
 import Combine exposing (..)
-import Combine.Char exposing (..)
 import Parser.Comments exposing (..)
 import AST.Types exposing (..)
 import Parser.Whitespace exposing (many1Spaces, manySpaces, nSpaces, realNewLine)
@@ -10,6 +9,11 @@ import Parser.Whitespace exposing (many1Spaces, manySpaces, nSpaces, realNewLine
 asPointerLocation : ParseLocation -> Location
 asPointerLocation { line, column } =
     { row = line, column = column }
+
+
+asPointer : Parser State String -> Parser State VariablePointer
+asPointer p =
+    withRange (VariablePointer <$> p)
 
 
 withRange : Parser State (Range -> a) -> Parser State a
@@ -28,27 +32,6 @@ withRange p =
                             )
                     )
         )
-
-
-nextChars : Int -> Parser a String
-nextChars i =
-    lazy
-        (\() ->
-            lookAhead (String.fromList <$> count i anyChar) |> map (Debug.log "Next Char")
-        )
-
-
-nextChar : Parser a Char
-nextChar =
-    lazy
-        (\() ->
-            lookAhead anyChar |> map (Debug.log "Next Char")
-        )
-
-
-printLocation : String -> Parser a String
-printLocation s =
-    withLocation (Debug.log s >> (always (succeed "")))
 
 
 unstrictIndentWhitespace : Parser State String
@@ -89,17 +72,6 @@ someComment : Parser a String
 someComment =
     or singleLineComment
         multiLineCommentWithTrailingSpaces
-
-
-maybeNewLineWithStartOfComment : Parser State String
-maybeNewLineWithStartOfComment =
-    String.concat
-        <$> (sequence
-                [ Maybe.withDefault "" <$> maybe realNewLine
-                , manySpaces
-                , someComment
-                ]
-            )
 
 
 commentSequence : Parser State String

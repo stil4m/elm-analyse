@@ -1,4 +1,4 @@
-port module AnalyserPorts exposing (..)
+port module AnalyserPorts exposing (loadFile, fileContent, sendMessagesAsStrings)
 
 import Analyser.Messages exposing (Message)
 

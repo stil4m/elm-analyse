@@ -1,4 +1,4 @@
-module Analyser.PostProcessing exposing (..)
+module Analyser.PostProcessing exposing (postProcess)
 
 import Dict exposing (Dict)
 import List exposing (maximum)

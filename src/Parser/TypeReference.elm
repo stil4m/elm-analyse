@@ -1,4 +1,6 @@
-module Parser.TypeReference exposing (..)
+module Parser.TypeReference exposing (typeReference, tupledTypeReference)
+
+-- TODO Export for test. Failing when use first
 
 import Combine exposing (..)
 import Parser.Tokens exposing (functionName, typeName)

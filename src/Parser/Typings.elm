@@ -1,4 +1,4 @@
-module Parser.Typings exposing (..)
+module Parser.Typings exposing (typeDeclaration, typeAlias)
 
 import Combine exposing (..)
 import Parser.Tokens exposing (functionName, typeName)

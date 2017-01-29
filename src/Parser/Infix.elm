@@ -1,4 +1,4 @@
-module Parser.Infix exposing (..)
+module Parser.Infix exposing (infixDefinition)
 
 import Combine exposing (..)
 import Combine.Num exposing (int)

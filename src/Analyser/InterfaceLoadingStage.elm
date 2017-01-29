@@ -1,4 +1,4 @@
-module Analyser.InterfaceLoadingStage exposing (..)
+module Analyser.InterfaceLoadingStage exposing (Model, Msg, init, isDone, parsedInterfaces, update, subscriptions)
 
 import AST.Types
 import AST.Util as Util

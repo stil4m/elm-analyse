@@ -1,4 +1,4 @@
-module Parser.Comments exposing (..)
+module Parser.Comments exposing (singleLineComment, multilineComment, documentationComment)
 
 import Combine exposing (..)
 import Combine.Char exposing (..)

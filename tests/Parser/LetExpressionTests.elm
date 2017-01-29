@@ -34,12 +34,12 @@ all =
                         (Just (LetExpression { declarations = [ FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = { value = "bar", range = { start = { row = 1, column = 1 }, end = { row = 1, column = 4 } } }, arguments = [], expression = Integer 1 } } ], expression = FunctionOrValue "bar" }))
         , test "let in list" <|
             \() ->
-                parseFullStringState emptyState "[\n  let\n    bar = 1\n  in\n    bar\n ]" Parser.listExpression
+                parseFullStringState emptyState "[\n  let\n    bar = 1\n  in\n    bar\n ]" Parser.expression
                     |> Expect.equal
                         (Just (ListExpr ([ LetExpression { declarations = [ FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = { value = "bar", range = { start = { row = 2, column = 3 }, end = { row = 2, column = 6 } } }, arguments = [], expression = Integer 1 } } ], expression = FunctionOrValue "bar" } ])))
         , test "some let" <|
             \() ->
-                parseFullStringState emptyState "let\n    _ = b\n in\n    z" (Parser.letExpression)
+                parseFullStringState emptyState "let\n    _ = b\n in\n    z" (Parser.expression)
                     |> Expect.equal
                         (Just
                             (LetExpression
@@ -53,12 +53,12 @@ all =
                         )
         , test "let inlined" <|
             \() ->
-                parseFullStringState emptyState "let indent = String.length s in indent" (Parser.letExpression)
+                parseFullStringState emptyState "let indent = String.length s in indent" (Parser.expression)
                     |> Expect.equal
                         (Just (LetExpression { declarations = [ FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = { value = "indent", range = { start = { row = 1, column = 4 }, end = { row = 1, column = 10 } } }, arguments = [], expression = Application ([ QualifiedExpr [ "String" ] "length", FunctionOrValue "s" ]) } } ], expression = FunctionOrValue "indent" }))
         , test "let starting after definition" <|
             \() ->
-                parseFullStringState emptyState "foo = let\n  indent = 1\n in\n indent" (functionName *> string " = " *> Parser.letExpression)
+                parseFullStringState emptyState "foo = let\n  indent = 1\n in\n indent" (functionName *> string " = " *> Parser.expression)
                     |> Expect.equal
                         (Just (LetExpression { declarations = [ FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = { value = "indent", range = { start = { row = 1, column = 1 }, end = { row = 1, column = 7 } } }, arguments = [], expression = Integer 1 } } ], expression = FunctionOrValue "indent" }))
         ]

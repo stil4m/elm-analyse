@@ -144,11 +144,11 @@ all =
                         )
         , test "listExpression empty" <|
             \() ->
-                parseFullStringWithNullState "[\n]" listExpression
+                parseFullStringWithNullState "[\n]" expression
                     |> Expect.equal (Just (ListExpr []))
         , test "listExpression on indent" <|
             \() ->
-                parseFullStringWithNullState "  [\n]" (whitespace *> listExpression)
+                parseFullStringWithNullState "  [\n]" (whitespace *> expression)
                     |> Expect.equal (Just (ListExpr []))
         , test "qualified expression" <|
             \() ->

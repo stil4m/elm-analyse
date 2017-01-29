@@ -1,4 +1,4 @@
-module Parser.Imports exposing (..)
+module Parser.Imports exposing (importDefinition)
 
 import Combine exposing (..)
 import Parser.Expose exposing (exposable, exposeDefinition)

@@ -12,6 +12,6 @@ all =
     describe "GlslTests"
         [ test "case block" <|
             \() ->
-                parseFullStringState emptyState "[glsl| precision mediump float; |]" Parser.glslExpression
+                parseFullStringState emptyState "[glsl| precision mediump float; |]" Parser.expression
                     |> Expect.equal (Just (GLSLExpression " precision mediump float; "))
         ]

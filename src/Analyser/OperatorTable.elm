@@ -1,4 +1,4 @@
-module Analyser.OperatorTable exposing (..)
+module Analyser.OperatorTable exposing (build, buildModuleIndex)
 
 import AST.Types as AST exposing (Import, InfixDirection, ModuleName, Infix)
 import Analyser.LoadedDependencies exposing (LoadedDependencies)

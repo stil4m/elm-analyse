@@ -103,7 +103,7 @@ all =
                         (Just { operatorDefinition = False, name = { value = "update", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 6 } } }, arguments = [ VarPattern { value = "msg", range = { start = { row = 1, column = 7 }, end = { row = 1, column = 10 } } }, VarPattern { value = "model", range = { start = { row = 1, column = 11 }, end = { row = 1, column = 16 } } } ], expression = CaseExpression { expression = FunctionOrValue "msg", cases = [ ( NamedPattern (QualifiedNameRef [] "Increment") [], Application ([ FunctionOrValue "model", Operator "+", Integer 1 ]) ), ( NamedPattern (QualifiedNameRef [] "Decrement") [], Application ([ FunctionOrValue "model", Operator "-", Integer 1 ]) ) ] } })
         , test "port declaration" <|
             \() ->
-                parseFullStringWithNullState "port parseResponse : ( String, String ) -> Cmd msg" Parser.portDeclaration
+                parseFullStringWithNullState "port parseResponse : ( String, String ) -> Cmd msg" Parser.declaration
                     |> Expect.equal
                         (Just
                             (PortDeclaration
@@ -150,7 +150,7 @@ all =
                         )
         , test "Destructuring declaration" <|
             \() ->
-                parseFullStringWithNullState "_ = b" destructuringDeclaration
+                parseFullStringWithNullState "_ = b" declaration
                     |> Expect.equal
                         (Just <| DestructuringDeclaration { pattern = AllPattern, expression = (FunctionOrValue "b") })
         , test "declaration" <|

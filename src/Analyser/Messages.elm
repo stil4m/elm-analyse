@@ -1,4 +1,4 @@
-module Analyser.Messages exposing (..)
+module Analyser.Messages exposing (Message(..), asString)
 
 import AST.Types as AST
 
@@ -13,16 +13,6 @@ type Message
 
 type alias FileName =
     String
-
-
-unreadableSourceFile : String -> Message
-unreadableSourceFile =
-    UnreadableSourceFile
-
-
-unreadableDependencyFile : String -> String -> Message
-unreadableDependencyFile dependency path =
-    (UnreadableDependencyFile dependency path)
 
 
 asString : Message -> String

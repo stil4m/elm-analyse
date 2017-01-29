@@ -1,4 +1,4 @@
-module Interfaces.Dependencies exposing (..)
+module Interfaces.Dependencies exposing (find)
 
 import AST.Types as AST
 

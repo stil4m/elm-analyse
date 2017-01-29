@@ -1,4 +1,4 @@
-module Analyser.Checks.UnusedVariable exposing (..)
+module Analyser.Checks.UnusedVariable exposing (scan)
 
 import AST.Types exposing (..)
 import Analyser.FileContext exposing (FileContext)

@@ -1,4 +1,11 @@
-module Analyser.Types exposing (..)
+module Analyser.Types
+    exposing
+        ( LoadedSourceFiles
+        , LoadedSourceFile
+        , FileLoad(Failed, Loaded)
+        , ModuleIndex
+        , OperatorTable
+        )
 
 import AST.Types as AST
 import Interfaces.Interface as Interface

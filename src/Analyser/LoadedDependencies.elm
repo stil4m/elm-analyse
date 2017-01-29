@@ -1,4 +1,4 @@
-module Analyser.LoadedDependencies exposing (..)
+module Analyser.LoadedDependencies exposing (LoadedDependencies, LoadedDependency, LoadedInterface, messages)
 
 import AST.Types as AST
 import Analyser.Messages as M exposing (Message)
@@ -28,5 +28,5 @@ messages =
         (\{ dependency, interfaces } ->
             interfaces
                 |> List.filter (Tuple.second >> (==) Failed)
-                |> List.map (Tuple.first >> M.unreadableDependencyFile dependency)
+                |> List.map (Tuple.first >> M.UnreadableDependencyFile dependency)
         )

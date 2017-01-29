@@ -12,15 +12,15 @@ all =
     describe "TypeReferenceTests"
         [ test "unitTypeReference" <|
             \() ->
-                parseFullStringWithNullState "()" Parser.unitTypeReference
+                parseFullStringWithNullState "()" Parser.typeReference
                     |> Expect.equal (Just Unit)
         , test "unitTypeReference with spaces" <|
             \() ->
-                parseFullStringWithNullState "( )" Parser.unitTypeReference
+                parseFullStringWithNullState "( )" Parser.typeReference
                     |> Expect.equal (Just Unit)
         , test "tupledTypeReference" <|
             \() ->
-                parseFullStringWithNullState "( (), ())" Parser.tupledTypeReference
+                parseFullStringWithNullState "( (), ())" Parser.typeReference
                     |> Expect.equal (Just <| Tupled [ Unit, Unit ])
         , test "tupledTypeReference 2" <|
             \() ->
@@ -28,7 +28,7 @@ all =
                     |> Expect.equal Nothing
         , test "tupledTypeReference 3" <|
             \() ->
-                parseFullStringWithNullState "( Int , Maybe m )" Parser.tupledTypeReference
+                parseFullStringWithNullState "( Int , Maybe m )" Parser.typeReference
                     |> Expect.equal
                         (Just
                             (Tupled
@@ -43,15 +43,11 @@ all =
                     |> Expect.equal (Just (Typed [ "Foo" ] "Bar" []))
         , test "typeReferenceNoFn" <|
             \() ->
-                parseFullStringWithNullState "Bar" Parser.typeReferenceNoFn
+                parseFullStringWithNullState "Bar" Parser.typeReference
                     |> Expect.equal (Just (Typed [] "Bar" []))
-        , test "typeArg" <|
-            \() ->
-                parseFullStringWithNullState "Bar" Parser.typeArg
-                    |> Expect.equal (Just (Concrete (Typed [] "Bar" [])))
         , test "typedTypeReference 1" <|
             \() ->
-                parseFullStringWithNullState "Foo () a Bar" Parser.typedTypeReference
+                parseFullStringWithNullState "Foo () a Bar" Parser.typeReference
                     |> Expect.equal
                         (Just <|
                             Typed []
@@ -63,7 +59,7 @@ all =
                         )
         , test "typedTypeReference 2" <|
             \() ->
-                parseFullStringWithNullState "Foo () a Bar" Parser.typedTypeReference
+                parseFullStringWithNullState "Foo () a Bar" Parser.typeReference
                     |> Expect.equal
                         (Just <|
                             Typed []
@@ -75,21 +71,21 @@ all =
                         )
         , test "recordTypeReference empty" <|
             \() ->
-                parseFullStringWithNullState "{}" Parser.recordTypeReference
+                parseFullStringWithNullState "{}" Parser.typeReference
                     |> Expect.equal
                         (Just <|
                             Record { fields = [] }
                         )
         , test "recordTypeReference one field" <|
             \() ->
-                parseFullStringWithNullState "{color: String }" Parser.recordTypeReference
+                parseFullStringWithNullState "{color: String }" Parser.typeReference
                     |> Expect.equal
                         (Just <|
                             Record { fields = [ ( "color", Typed [] "String" [] ) ] }
                         )
         , test "recordTypeReference nested record" <|
             \() ->
-                parseFullStringWithNullState "{color: {r : Int, g :Int, b: Int } }" Parser.recordTypeReference
+                parseFullStringWithNullState "{color: {r : Int, g :Int, b: Int } }" Parser.typeReference
                     |> Expect.equal
                         (Just <|
                             Record
@@ -108,7 +104,7 @@ all =
                         )
         , test "recordTypeReference with generic" <|
             \() ->
-                parseFullStringWithNullState "{color: s }" Parser.recordTypeReference
+                parseFullStringWithNullState "{color: s }" Parser.typeReference
                     |> Expect.equal
                         (Just <|
                             Record
@@ -121,11 +117,11 @@ all =
                         )
         , test "function type reference" <|
             \() ->
-                parseFullStringWithNullState "Foo -> Bar" Parser.functionTypeReference
+                parseFullStringWithNullState "Foo -> Bar" Parser.typeReference
                     |> Expect.equal (Just <| FunctionTypeReference (Typed [] "Foo" []) (Typed [] "Bar" []))
         , test "function type reference multiple" <|
             \() ->
-                parseFullStringWithNullState "Foo -> Bar -> baz" Parser.functionTypeReference
+                parseFullStringWithNullState "Foo -> Bar -> baz" Parser.typeReference
                     |> Expect.equal
                         (Just <|
                             FunctionTypeReference
@@ -173,7 +169,7 @@ all =
                         )
         , test "function type reference multiple and parens" <|
             \() ->
-                parseFullStringWithNullState "(Foo -> Bar) -> baz" Parser.functionTypeReference
+                parseFullStringWithNullState "(Foo -> Bar) -> baz" Parser.typeReference
                     |> Expect.equal
                         (Just <|
                             FunctionTypeReference

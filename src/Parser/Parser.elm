@@ -1,4 +1,4 @@
-module Parser.Parser exposing (..)
+module Parser.Parser exposing (parse)
 
 import Combine exposing ((<*))
 import AST.Types exposing (emptyState, File)
