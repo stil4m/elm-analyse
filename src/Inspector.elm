@@ -101,8 +101,12 @@ inspectDeclaration config declaration context =
 
 
 inspectDestructuring : Config context -> Destructuring -> context -> context
-inspectDestructuring config destructring context =
-    inspectExpression config destructring.expression context
+inspectDestructuring config destructuring context =
+    actionLambda
+        config.onDestructuring
+        (inspectExpression config destructuring.expression)
+        destructuring
+        context
 
 
 inspectFunction : Config context -> Function -> context -> context

@@ -9,6 +9,7 @@ type Message
     | UnusedVariable FileName String AST.Range
     | UnusedTopLevel FileName String AST.Range
     | ExposeAll FileName AST.Range
+    | NoTopLevelSignature FileName String AST.Range
 
 
 type alias FileName =
@@ -53,6 +54,16 @@ asString m =
         ExposeAll fileName range ->
             String.concat
                 [ "Exposing all in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+
+        NoTopLevelSignature fileName varName range ->
+            String.concat
+                [ "No signature for top level definition `"
+                , varName
+                , "` in file \""
                 , fileName
                 , "\" at "
                 , rangeToString range

@@ -6,6 +6,7 @@ import Analyser.Messages exposing (Message)
 import Analyser.Types exposing (LoadedSourceFiles)
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.NotExposeAll as NotExposeAll
+import Analyser.Checks.NoSignature as NoSignature
 
 
 run : LoadedSourceFiles -> LoadedDependencies -> List Message
@@ -14,6 +15,7 @@ run source deps =
         checks =
             [ UnusedVariable.scan
             , NotExposeAll.scan
+            , NoSignature.scan
             ]
 
         messages =
