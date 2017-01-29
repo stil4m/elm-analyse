@@ -20,7 +20,7 @@ all =
                              , exposingList =
                                 Explicit
                                     [ DefinitionExpose "Model"
-                                    , TypeExpose "Msg" (All)
+                                    , TypeExpose "Msg" (All { start = { row = 1, column = 32 }, end = { row = 1, column = 34 } })
                                     ]
                              }
                             )

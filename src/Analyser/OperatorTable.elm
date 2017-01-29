@@ -37,7 +37,7 @@ buildSingle imp moduleIndex =
         AST.None ->
             []
 
-        AST.All ->
+        AST.All _ ->
             moduleIndex
                 |> Dict.get imp.moduleName
                 |> Maybe.withDefault []

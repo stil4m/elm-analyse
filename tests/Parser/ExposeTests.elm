@@ -30,7 +30,7 @@ all =
                             (Parser.Explicit
                                 [ Parser.DefinitionExpose "Model"
                                 , Parser.TypeExpose "Msg" <| Parser.Explicit [ "Go", "Back" ]
-                                , Parser.TypeExpose "Info" <| Parser.All
+                                , Parser.TypeExpose "Info" <| Parser.All { start = { row = 1, column = 35 }, end = { row = 1, column = 37 } }
                                 , Parser.DefinitionExpose "init"
                                 , Parser.InfixExpose "::"
                                 ]
@@ -64,7 +64,7 @@ all =
                             (Parser.Explicit
                                 [ Parser.DefinitionExpose "Model"
                                 , Parser.TypeExpose "Msg" <| Parser.Explicit [ "Go", "Back" ]
-                                , Parser.TypeExpose "Info" <| Parser.All
+                                , Parser.TypeExpose "Info" <| Parser.All { start = { row = 1, column = 38 }, end = { row = 1, column = 40 } }
                                 , Parser.DefinitionExpose "init"
                                 , Parser.InfixExpose "::"
                                 ]

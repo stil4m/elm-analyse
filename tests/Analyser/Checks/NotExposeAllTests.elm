@@ -46,7 +46,7 @@ all =
             \() ->
                 CTU.getMessages exposingAll NotExposeAll.scan
                     |> Expect.equal
-                        (Just [ (UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }) ])
+                        (Just [ (ExposeAll "./foo.elm" { start = { row = 1, column = 21 }, end = { row = 1, column = 23 } }) ])
         , test "exposingStrict" <|
             \() ->
                 CTU.getMessages exposingStrict NotExposeAll.scan
@@ -56,7 +56,7 @@ all =
             \() ->
                 CTU.getMessages exposingAllConstructors NotExposeAll.scan
                     |> Expect.equal
-                        (Just [ (UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }) ])
+                        (Just [ (ExposeAll "./foo.elm" { start = { row = 1, column = 27 }, end = { row = 1, column = 29 } }) ])
         , test "exposingStrictConstructors" <|
             \() ->
                 CTU.getMessages exposingStrictConstructors NotExposeAll.scan

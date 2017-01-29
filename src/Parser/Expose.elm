@@ -4,7 +4,7 @@ import Combine exposing (..)
 import Combine.Char exposing (..)
 import Parser.Tokens exposing (..)
 import AST.Types exposing (..)
-import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
+import Parser.Util exposing (moreThanIndentWhitespace, trimmed, withRange)
 
 
 exposeDefinition : Parser State a -> Parser State (Exposure a)
@@ -38,7 +38,7 @@ typeExpose =
 
 exposingListInner : Parser State b -> Parser State (Exposure b)
 exposingListInner p =
-    or (All <$ (trimmed (string "..")))
+    or (withRange (All <$ (trimmed (string ".."))))
         (Explicit <$> sepBy (char ',') (trimmed p))
 
 

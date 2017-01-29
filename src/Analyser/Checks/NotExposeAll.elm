@@ -30,8 +30,8 @@ onFile _ file context =
         None ->
             []
 
-        All ->
-            [ emptyRange ]
+        All x ->
+            [ x ]
 
         Explicit x ->
             x
@@ -40,8 +40,8 @@ onFile _ file context =
                         case y of
                             TypeExpose _ constructors ->
                                 case constructors of
-                                    All ->
-                                        Just emptyRange
+                                    All y ->
+                                        Just y
 
                                     _ ->
                                         Nothing

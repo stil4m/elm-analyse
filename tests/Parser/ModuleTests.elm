@@ -1,10 +1,10 @@
 module Parser.ModuleTests exposing (..)
 
-import Parser.Modules as Parser
-import AST.Types as Types
-import Test exposing (..)
+import AST.Types as Types exposing (emptyRange)
 import Expect
 import Parser.CombineTestUtil exposing (..)
+import Parser.Modules as Parser
+import Test exposing (..)
 
 
 all : Test
@@ -38,7 +38,7 @@ all =
         , test "unformatted" <|
             \() ->
                 parseFullStringWithNullState "module \n Foo \n exposing  (..)" Parser.moduleDefinition
-                    |> Expect.equal (Just (Types.NormalModule { moduleName = [ "Foo" ], exposingList = Types.All }))
+                    |> Expect.equal (Just (Types.NormalModule { moduleName = [ "Foo" ], exposingList = Types.All { start = { row = 3, column = 12 }, end = { row = 3, column = 14 } } }))
         , test "unformatted wrong" <|
             \() ->
                 parseFullStringWithNullState "module \nFoo \n exposing  (..)" Parser.moduleDefinition
@@ -46,9 +46,9 @@ all =
         , test "exposing all" <|
             \() ->
                 parseFullStringWithNullState "module Foo exposing (..)" Parser.moduleDefinition
-                    |> Expect.equal (Just (Types.NormalModule { moduleName = [ "Foo" ], exposingList = Types.All }))
+                    |> Expect.equal (Just (Types.NormalModule { moduleName = [ "Foo" ], exposingList = Types.All { start = { row = 1, column = 21 }, end = { row = 1, column = 23 } } }))
         , test "module name with _" <|
             \() ->
                 parseFullStringWithNullState "module I_en_gb exposing (..)" Parser.moduleDefinition
-                    |> Expect.equal (Just (Types.NormalModule { moduleName = [ "I_en_gb" ], exposingList = Types.All }))
+                    |> Expect.equal (Just (Types.NormalModule { moduleName = [ "I_en_gb" ], exposingList = Types.All { start = { row = 1, column = 25 }, end = { row = 1, column = 27 } } }))
         ]

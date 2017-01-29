@@ -61,7 +61,7 @@ build file =
             AST.Explicit x ->
                 buildInterfaceFromExplicit x fileDefinitionList
 
-            AST.All ->
+            AST.All _ ->
                 fileDefinitionList |> List.map Tuple.second
 
 
@@ -88,7 +88,7 @@ buildInterfaceFromExplicit x fileDefinitionList =
                             AST.None ->
                                 Just <| Type ( n, [] )
 
-                            AST.All ->
+                            AST.All _ ->
                                 lookupForDefinition n fileDefinitionList
 
                             AST.Explicit v ->

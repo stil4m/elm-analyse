@@ -275,7 +275,7 @@ type alias Import =
 
 type Exposure a
     = None
-    | All
+    | All Range
     | Explicit (List a)
 
 
