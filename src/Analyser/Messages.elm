@@ -8,6 +8,7 @@ type Message
     | UnreadableDependencyFile FileName String
     | UnusedVariable FileName String AST.Range
     | UnusedTopLevel FileName String AST.Range
+    | ExposeAll FileName AST.Range
 
 
 type alias FileName =
@@ -57,6 +58,14 @@ asString m =
                 , dependency
                 , ": "
                 , path
+                ]
+
+        ExposeAll fileName range ->
+            String.concat
+                [ "Exposing all in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
                 ]
 
 

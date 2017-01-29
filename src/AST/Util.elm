@@ -3,6 +3,22 @@ module AST.Util exposing (..)
 import AST.Types exposing (..)
 
 
+fileExposingList : File -> Maybe (Exposure Expose)
+fileExposingList file =
+    case file.moduleDefinition of
+        NormalModule x ->
+            Just x.exposingList
+
+        PortModule x ->
+            Just x.exposingList
+
+        EffectModule x ->
+            Just x.exposingList
+
+        NoModule ->
+            Nothing
+
+
 fileModuleName : File -> Maybe ModuleName
 fileModuleName file =
     case file.moduleDefinition of
