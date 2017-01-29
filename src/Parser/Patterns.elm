@@ -1,9 +1,9 @@
 module Parser.Patterns exposing (pattern, declarablePattern)
 
-import Combine exposing (..)
+import Combine exposing (Parser, choice, lazy, between, string, sepBy, sepBy1, succeed, maybe, parens, many, or, (<$>), (<$), (<*), (<*>), (*>))
 import Combine.Num
-import Parser.Tokens exposing (..)
-import AST.Types exposing (..)
+import Parser.Tokens exposing (characterLiteral, stringLiteral, asToken, functionName, typeName)
+import AST.Types exposing (State, Pattern(ListPattern, UnConsPattern, CharPattern, StringPattern, IntPattern, FloatPattern, AsPattern, TuplePattern, RecordPattern, VarPattern, NamedPattern, QualifiedNamePattern, AllPattern, UnitPattern), QualifiedNameRef(QualifiedNameRef))
 import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, withRange, asPointer)
 
 

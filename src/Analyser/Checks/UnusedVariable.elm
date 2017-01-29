@@ -1,11 +1,11 @@
 module Analyser.Checks.UnusedVariable exposing (scan)
 
-import AST.Types exposing (..)
+import AST.Types exposing (File, Lambda, RecordUpdate, Range, LetBlock, Function, VariablePointer, Declaration(FuncDecl, AliasDecl, DestructuringDeclaration, TypeDecl, PortDeclaration, InfixDeclaration), Case, emptyRange, Pattern(TuplePattern, RecordPattern, ListPattern, UnConsPattern, VarPattern, NamedPattern, AsPattern, ParentisizedPattern))
 import Analyser.FileContext exposing (FileContext)
 import Interfaces.Interface as Interface
-import Analyser.Messages exposing (..)
+import Analyser.Messages exposing (Message(UnusedVariable, UnusedTopLevel))
 import Dict exposing (Dict)
-import Inspector exposing (..)
+import Inspector exposing (defaultConfig, Action(Inner, Pre, Post))
 import Tuple2
 
 
@@ -245,23 +245,5 @@ patternToVars p =
         ParentisizedPattern sub ->
             patternToVars sub
 
-        QualifiedNamePattern _ ->
-            []
-
-        AllPattern ->
-            []
-
-        UnitPattern ->
-            []
-
-        StringPattern _ ->
-            []
-
-        CharPattern _ ->
-            []
-
-        IntPattern _ ->
-            []
-
-        FloatPattern _ ->
+        _ ->
             []

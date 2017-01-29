@@ -2,9 +2,9 @@ module Parser.TypeReference exposing (typeReference, tupledTypeReference)
 
 -- TODO Export for test. Failing when use first
 
-import Combine exposing (..)
+import Combine exposing (choice, lazy, Parser, parens, (<*>), succeed, (*>), string, maybe, many1, sepBy1, (<$>), sepBy, between, many, (<*), or, whitespace)
 import Parser.Tokens exposing (functionName, typeName)
-import AST.Types exposing (..)
+import AST.Types exposing (State, TypeReference(FunctionTypeReference, Unit, Tupled, GenericType, GenericRecord, Record, Typed), RecordField, RecordDefinition, TypeArg(Generic, Concrete))
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
 import Parser.Whitespace exposing (realNewLine)
 

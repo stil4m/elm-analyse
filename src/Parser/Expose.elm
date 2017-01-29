@@ -2,10 +2,10 @@ module Parser.Expose exposing (exposeDefinition, infixExpose, typeExpose, exposi
 
 -- TODO Expose for tests
 
-import Combine exposing (..)
-import Combine.Char exposing (..)
-import Parser.Tokens exposing (..)
-import AST.Types exposing (..)
+import AST.Types exposing (State, Expression, Exposure(None, All, Explicit), Expose(InfixExpose, TypeExpose, DefinitionExpose))
+import Combine exposing ((*>), (<$), (<$>), (<*>), Parser, choice, maybe, or, parens, sepBy, string, succeed, while)
+import Combine.Char exposing (char)
+import Parser.Tokens exposing (exposingToken, functionOrTypeName, typeName)
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed, withRange)
 
 

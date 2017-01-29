@@ -1,10 +1,10 @@
 module Analyser.Checks.NotExposeAll exposing (scan)
 
-import AST.Types exposing (..)
+import AST.Types exposing (Exposure(All, None, Explicit), Range, Expose(TypeExpose), File)
 import AST.Util
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages exposing (..)
-import Inspector exposing (..)
+import Analyser.Messages exposing (Message(ExposeAll))
+import Inspector exposing (defaultConfig, Action(Inner))
 
 
 type alias ExposeAllContext =

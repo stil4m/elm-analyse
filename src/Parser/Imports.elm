@@ -1,9 +1,9 @@
 module Parser.Imports exposing (importDefinition)
 
-import Combine exposing (..)
+import Combine exposing (Parser, succeed, (<*>), (*>), maybe)
 import Parser.Expose exposing (exposable, exposeDefinition)
-import Parser.Tokens exposing (..)
-import AST.Types exposing (..)
+import Parser.Tokens exposing (importToken, moduleName, asToken)
+import AST.Types exposing (State, Import)
 import Parser.Util exposing (moreThanIndentWhitespace)
 
 

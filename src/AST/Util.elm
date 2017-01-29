@@ -1,6 +1,6 @@
 module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts)
 
-import AST.Types exposing (..)
+import AST.Types exposing (Range, File, Exposure, ModuleName, Expose, Module(NormalModule, PortModule, EffectModule, NoModule))
 
 
 fileExposingList : File -> Maybe (Exposure Expose)

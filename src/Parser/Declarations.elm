@@ -2,17 +2,17 @@ module Parser.Declarations exposing (file, signature, declaration, function, fun
 
 -- TODO Expose for tests
 
-import Combine exposing (..)
+import Combine exposing (maybe, (*>), (>>=), (<*), (<$), (<$>), sepBy, many, succeed, Parser, string, choice, lookAhead, or, withLocation, parens, modifyState, count, between, fail, (<*>), lazy, many1, sepBy1)
 import Combine.Char exposing (anyChar, char, noneOf)
 import Combine.Num
 import List.Extra as List
 import Parser.Imports exposing (importDefinition)
 import Parser.Infix as Infix
 import Parser.Modules exposing (moduleDefinition)
-import Parser.Patterns exposing (..)
-import Parser.Tokens exposing (..)
-import Parser.TypeReference exposing (..)
-import AST.Types exposing (..)
+import Parser.Patterns exposing (pattern, declarablePattern)
+import Parser.Tokens exposing (portToken, prefixOperatorToken, multiLineStringLiteral, caseToken, characterLiteral, ofToken, stringLiteral, typeName, thenToken, infixOperatorToken, functionName, ifToken, elseToken)
+import Parser.TypeReference exposing (typeReference)
+import AST.Types exposing (State, File, Module(NoModule), Declaration(AliasDecl, FuncDecl, TypeDecl, InfixDeclaration, DestructuringDeclaration, PortDeclaration), Destructuring, Function, FunctionSignature, FunctionDeclaration, Pattern, Expression(..), RecordUpdate, Lambda, Case, CaseBlock, LetBlock, Cases, pushIndent, popIndent)
 import Parser.Typings exposing (typeDeclaration)
 import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer)
 import Parser.Whitespace exposing (manySpaces)

@@ -2,8 +2,18 @@ module Analyser.PostProcessing exposing (postProcess)
 
 import Dict exposing (Dict)
 import List exposing (maximum)
-import AST.Types exposing (..)
-import Analyser.Types exposing (..)
+import AST.Types
+    exposing
+        ( File
+        , RecordUpdate
+        , Expression(Application, Operator, OperatorApplication, RecordExpr, IfBlock, TupledExpression, Parentesized, LetExpression, CaseExpression, LambdaExpression, ListExpr, RecordUpdateExpression)
+        , Function
+        , InfixDirection(Left)
+        , Infix
+        , Declaration(FuncDecl)
+        , FunctionDeclaration
+        )
+import Analyser.Types exposing (OperatorTable)
 import List.Extra as List
 import Tuple2
 
@@ -174,42 +184,6 @@ visitExpressionInner visitor context expression =
             (visitExpression visitor context)
     in
         case expression of
-            UnitExpr ->
-                expression
-
-            FunctionOrValue _ ->
-                expression
-
-            PrefixOperator _ ->
-                expression
-
-            Operator _ ->
-                expression
-
-            Integer _ ->
-                expression
-
-            Floatable _ ->
-                expression
-
-            Literal _ ->
-                expression
-
-            CharLiteral _ ->
-                expression
-
-            QualifiedExpr _ _ ->
-                expression
-
-            RecordAccess _ ->
-                expression
-
-            RecordAccessFunction _ ->
-                expression
-
-            GLSLExpression _ ->
-                expression
-
             Application expressionList ->
                 expressionList
                     |> List.map subVisit
@@ -258,3 +232,6 @@ visitExpressionInner visitor context expression =
                 recordUpdate.updates
                     |> List.map (Tuple.mapSecond subVisit)
                     |> (RecordUpdate recordUpdate.name >> RecordUpdateExpression)
+
+            _ ->
+                expression

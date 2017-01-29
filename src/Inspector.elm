@@ -1,6 +1,6 @@
 module Inspector exposing (Action(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
-import AST.Types exposing (..)
+import AST.Types exposing (File, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression(..), Lambda, LetBlock, Case, RecordUpdate)
 
 
 type Action context x

@@ -1,9 +1,9 @@
 module Parser.Infix exposing (infixDefinition)
 
-import Combine exposing (..)
+import AST.Types exposing (Infix, InfixDirection(Right, Left), State)
+import Combine exposing ((*>), (<$), (<*>), Parser, choice, or, string, succeed)
 import Combine.Num exposing (int)
-import Parser.Tokens exposing (..)
-import AST.Types exposing (..)
+import Parser.Tokens exposing (prefixOperatorToken)
 import Parser.Util exposing (moreThanIndentWhitespace)
 
 

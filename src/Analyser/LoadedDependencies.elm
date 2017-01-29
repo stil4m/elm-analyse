@@ -2,7 +2,7 @@ module Analyser.LoadedDependencies exposing (LoadedDependencies, LoadedDependenc
 
 import AST.Types as AST
 import Analyser.Messages as M exposing (Message)
-import Analyser.Types exposing (FileLoad(..))
+import Analyser.Types exposing (FileLoad(Failed))
 import Interfaces.Interface as Interface
 
 

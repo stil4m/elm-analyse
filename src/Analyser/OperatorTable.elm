@@ -2,8 +2,8 @@ module Analyser.OperatorTable exposing (build, buildModuleIndex)
 
 import AST.Types as AST exposing (Import, InfixDirection, ModuleName, Infix)
 import Analyser.LoadedDependencies exposing (LoadedDependencies)
-import Analyser.Types exposing (..)
-import Dict exposing (..)
+import Analyser.Types exposing (FileLoad, LoadedSourceFiles, LoadedSourceFile, ModuleIndex, OperatorTable)
+import Dict exposing (Dict)
 import Interfaces.Interface as Interface exposing (Interface)
 import Parser.Parser
 

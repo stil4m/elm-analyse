@@ -24,8 +24,8 @@ module Parser.Tokens
 
 import Dict exposing (Dict)
 import Char exposing (fromCode)
-import Combine exposing (..)
-import Combine.Char exposing (..)
+import Combine exposing (string, regex, Parser, succeed, fail, or, (*>), choice, (<$), (>>=), many, lookAhead, between, count, (<*), sepBy1, many1, (<$>))
+import Combine.Char exposing (anyChar, char, oneOf)
 import Hex
 import AST.Types exposing (ModuleName)
 
@@ -137,8 +137,7 @@ escapedChar =
                 , '\x0D' <$ char 'r'
                 , '\x0B' <$ char 'v'
                 , (char 'x' *> regex "[0-9A-Fa-f]{2}")
-                    |> andThen
-                        (\l ->
+                    >>= (\l ->
                             case Hex.fromString <| String.toLower l of
                                 Ok x ->
                                     succeed (fromCode x)
@@ -261,8 +260,7 @@ operatorTokenFromList : List Char -> Parser s String
 operatorTokenFromList allowedChars =
     String.fromList
         <$> many1 (oneOf allowedChars)
-        |> andThen
-            (\m ->
+        >>= (\m ->
                 if List.member m excludedOperators then
                     fail "operator is not allowed"
                 else
