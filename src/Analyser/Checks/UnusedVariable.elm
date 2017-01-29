@@ -1,6 +1,6 @@
 module Analyser.Checks.UnusedVariable exposing (scan)
 
-import AST.Types exposing (File, Lambda, RecordUpdate, Range, LetBlock, Function, VariablePointer, Declaration(FuncDecl, AliasDecl, DestructuringDeclaration, TypeDecl, PortDeclaration, InfixDeclaration), Case, emptyRange, Pattern(TuplePattern, RecordPattern, ListPattern, UnConsPattern, VarPattern, NamedPattern, AsPattern, ParentisizedPattern))
+import AST.Types exposing (File, Lambda, RecordUpdate, Range, LetBlock, Function, VariablePointer, Declaration(FuncDecl, AliasDecl, DestructuringDeclaration, TypeDecl, PortDeclaration, InfixDeclaration), Case, emptyRange, Pattern(TuplePattern, RecordPattern, ListPattern, UnConsPattern, VarPattern, NamedPattern, AsPattern, ParentisizedPattern), OperatorApplication)
 import Analyser.FileContext exposing (FileContext)
 import Interfaces.Interface as Interface
 import Analyser.Messages exposing (Message(UnusedVariable, UnusedTopLevel))
@@ -35,6 +35,7 @@ scan fileContext =
                     , onLetBlock = Inner onLetBlock
                     , onLambda = Inner onLambda
                     , onCase = Inner onCase
+                    , onOperatorApplication = Post onOperatorAppliction
                     , onFunctionOrValue = Post onFunctionOrValue
                     , onRecordAccess = Post onRecordAccess
                     , onRecordUpdate = Post onRecordUpdate
@@ -147,6 +148,11 @@ onRecordAccess x context =
 onRecordUpdate : RecordUpdate -> UsedVariableContext -> UsedVariableContext
 onRecordUpdate recordUpdate context =
     addUsedVariable recordUpdate.name context
+
+
+onOperatorAppliction : OperatorApplication -> UsedVariableContext -> UsedVariableContext
+onOperatorAppliction operatorApplication context =
+    addUsedVariable operatorApplication.operator context
 
 
 onFile : File -> UsedVariableContext -> UsedVariableContext

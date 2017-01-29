@@ -6,7 +6,7 @@ import AST.Types
     exposing
         ( File
         , RecordUpdate
-        , Expression(Application, Operator, OperatorApplication, RecordExpr, IfBlock, TupledExpression, Parentesized, LetExpression, CaseExpression, LambdaExpression, ListExpr, RecordUpdateExpression)
+        , Expression(Application, Operator, OperatorApplicationExpression, RecordExpr, IfBlock, TupledExpression, Parentesized, LetExpression, CaseExpression, LambdaExpression, ListExpr, RecordUpdateExpression)
         , Function
         , InfixDirection(Left)
         , Infix
@@ -68,13 +68,21 @@ fixApplication operators expressions =
                 fixExprs exps
             else
                 findNextSplit ops exps
-                    |> Maybe.map (\( p, o, s ) -> OperatorApplication o (doTheThing p) (doTheThing s))
+                    |> Maybe.map
+                        (\( p, infix, s ) ->
+                            OperatorApplicationExpression
+                                { operator = infix.operator
+                                , direction = infix.direction
+                                , left = (doTheThing p)
+                                , right = (doTheThing s)
+                                }
+                        )
                     |> Maybe.withDefault (fixExprs exps)
     in
         doTheThing expressions
 
 
-findNextSplit : Dict String Infix -> List Expression -> Maybe ( List Expression, InfixDirection, List Expression )
+findNextSplit : Dict String Infix -> List Expression -> Maybe ( List Expression, Infix, List Expression )
 findNextSplit dict exps =
     let
         prefix =
@@ -89,10 +97,12 @@ findNextSplit dict exps =
         suffix =
             List.drop (List.length prefix + 1) exps
     in
-        if List.isEmpty suffix then
-            Nothing
-        else
-            Just ( prefix, Left, suffix )
+        exps
+            |> List.drop (List.length prefix)
+            |> List.head
+            |> Maybe.andThen expressionOperators
+            |> Maybe.andThen (\x -> Dict.get x dict)
+            |> Maybe.map (\x -> ( prefix, x, suffix ))
 
 
 highestPrecedence : List ( String, Infix ) -> Dict String Infix
@@ -189,10 +199,12 @@ visitExpressionInner visitor context expression =
                     |> List.map subVisit
                     |> Application
 
-            OperatorApplication dir e1 e2 ->
-                OperatorApplication dir
-                    (subVisit e1)
-                    (subVisit e2)
+            OperatorApplicationExpression operatorApplication ->
+                OperatorApplicationExpression
+                    { operatorApplication
+                        | left = (subVisit operatorApplication.left)
+                        , right = (subVisit operatorApplication.right)
+                    }
 
             IfBlock e1 e2 e3 ->
                 IfBlock (subVisit e1) (subVisit e2) (subVisit e3)

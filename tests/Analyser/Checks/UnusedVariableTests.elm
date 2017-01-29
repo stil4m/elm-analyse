@@ -121,6 +121,18 @@ bar = bar + foo
 """
 
 
+usedOperator : String
+usedOperator =
+    """module Bar exposing (foo,Some(Thing))
+type Some = Thing
+
+(&>) _ b = b
+
+foo =
+    1 &> 2
+"""
+
+
 all : Test
 all =
     describe "Analyser.PostProcessingTests"
@@ -157,4 +169,8 @@ all =
             \() ->
                 getMessages onlyUsedInSelf UnusedVariable.scan
                     |> Expect.equal (Just ([ UnusedTopLevel "./foo.elm" "bar" { start = { row = 5, column = -1 }, end = { row = 5, column = 2 } } ]))
+        , test "usedOperator" <|
+            \() ->
+                getMessages usedOperator UnusedVariable.scan
+                    |> Expect.equal (Just ([]))
         ]

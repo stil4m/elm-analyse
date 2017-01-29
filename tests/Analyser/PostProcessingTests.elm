@@ -42,9 +42,12 @@ all =
                                     , name = { value = "bar", range = { start = { row = 3, column = -1 }, end = { row = 3, column = 2 } } }
                                     , arguments = []
                                     , expression =
-                                        OperatorApplication Left
-                                            (Parentesized (OperatorApplication Left (FunctionOrValue "x") (Integer 1)))
-                                            (Parentesized (OperatorApplication Left (Integer 2) (FunctionOrValue "y")))
+                                        OperatorApplicationExpression
+                                            { operator = "*"
+                                            , direction = Left
+                                            , left = (Parentesized (OperatorApplicationExpression { operator = "+", direction = Left, left = (FunctionOrValue "x"), right = (Integer 1) }))
+                                            , right = (Parentesized (OperatorApplicationExpression { operator = "*", direction = Left, left = (Integer 2), right = (FunctionOrValue "y") }))
+                                            }
                                     }
                                 }
                             )

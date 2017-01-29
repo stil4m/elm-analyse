@@ -1,6 +1,6 @@
 module Inspector exposing (Action(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
-import AST.Types exposing (File, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression(..), Lambda, LetBlock, Case, RecordUpdate)
+import AST.Types exposing (File, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression(..), Lambda, LetBlock, Case, RecordUpdate, OperatorApplication)
 
 
 type Action context x
@@ -17,6 +17,7 @@ type alias Config context =
     , onFunction : Action context Function
     , onDestructuring : Action context Destructuring
     , onExpression : Action context Expression
+    , onOperatorApplication : Action context OperatorApplication
     , onLambda : Action context Lambda
     , onLetBlock : Action context LetBlock
     , onCase : Action context Case
@@ -34,6 +35,7 @@ defaultConfig =
     , onDestructuring = Continue
     , onExpression = Continue
     , onLambda = Continue
+    , onOperatorApplication = Continue
     , onLetBlock = Continue
     , onCase = Continue
     , onFunctionOrValue = Continue
@@ -175,8 +177,11 @@ inspectExpressionInner config expression context =
         Application expressionList ->
             List.foldl (inspectExpression config) context expressionList
 
-        OperatorApplication _ e1 e2 ->
-            List.foldl (inspectExpression config) context [ e1, e2 ]
+        OperatorApplicationExpression operatorApplication ->
+            actionLambda config.onOperatorApplication
+                (flip (List.foldl (inspectExpression config)) [ operatorApplication.left, operatorApplication.right ])
+                operatorApplication
+                context
 
         IfBlock e1 e2 e3 ->
             List.foldl (inspectExpression config) context [ e1, e2, e3 ]

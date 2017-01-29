@@ -13,7 +13,7 @@ function targetFilesForPathAndPackage(path, pack) {
                 return x.replace(path, '')
                     .indexOf('elm-stuff') === -1 && (x.length > 0)
             });
-    })));
+    }))).map(s => s.replace(directory, "."));
     return targetFiles;
 }
 
@@ -45,7 +45,8 @@ function dependencyFiles(dep) {
     })
     app.ports.loadFile.subscribe(function(x) {
       console.log("Load file", x, "...")
-      fs.readFile(x, function(e, content) {
+      const real = x.replace(".", directory);
+      fs.readFile(real, function(e, content) {
           app.ports.fileContent.send([x,content.toString()]);
       })
     });
