@@ -100,6 +100,19 @@ emptyContext =
     { poppedScopes = [], activeScopes = [] }
 
 
+unMaskVariable : String -> UsedVariableContext -> UsedVariableContext
+unMaskVariable k context =
+    { context
+        | activeScopes =
+            case context.activeScopes of
+                [] ->
+                    []
+
+                ( masked, vs ) :: xs ->
+                    ( List.filter ((/=) k) masked, vs ) :: xs
+    }
+
+
 maskVariable : String -> UsedVariableContext -> UsedVariableContext
 maskVariable k context =
     { context
@@ -165,16 +178,16 @@ onFunction : (UsedVariableContext -> UsedVariableContext) -> Function -> UsedVar
 onFunction f function context =
     let
         preContext =
-            function.declaration.arguments
-                |> List.concatMap patternToVars
-                |> flip pushScope context
-                |> maskVariable function.declaration.name.value
+            context
+                |> (maskVariable function.declaration.name.value)
+                |> (\c -> function.declaration.arguments |> List.concatMap patternToVars |> flip pushScope c)
 
         postContext =
             f preContext
     in
         postContext
             |> popScope
+            |> unMaskVariable function.declaration.name.value
 
 
 onLambda : (UsedVariableContext -> UsedVariableContext) -> Lambda -> UsedVariableContext -> UsedVariableContext

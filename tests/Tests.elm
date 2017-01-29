@@ -14,10 +14,10 @@ import Analyser.Checks.NoImportAllTests
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.NotExposeAllTests.all
+        [ Analyser.Checks.UnusedVariableTests.all
         , Analyser.Checks.NoSignatureTests.all
         , Analyser.Checks.NoImportAllTests.all
-        , Analyser.Checks.UnusedVariableTests.all
+        , Analyser.Checks.NotExposeAllTests.all
         , InterfaceTest.all
         , DependencyTests.all
         , PostProcessingTests.all

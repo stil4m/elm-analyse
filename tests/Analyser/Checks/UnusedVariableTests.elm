@@ -133,6 +133,16 @@ foo =
 """
 
 
+destructuringSameName : String
+destructuringSameName =
+    """module Foo exposing (..)
+
+error : Model -> Maybe Error
+error { error } =
+    error
+"""
+
+
 all : Test
 all =
     describe "Analyser.PostProcessingTests"
@@ -172,5 +182,9 @@ all =
         , test "usedOperator" <|
             \() ->
                 getMessages usedOperator UnusedVariable.scan
+                    |> Expect.equal (Just ([]))
+        , test "destructuringSameName" <|
+            \() ->
+                getMessages destructuringSameName UnusedVariable.scan
                     |> Expect.equal (Just ([]))
         ]
