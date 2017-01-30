@@ -4,7 +4,20 @@ import AST.Types
     exposing
         ( Exposure(All, Explicit, None)
         , Expose(TypeExpose)
-        , Expression(ParenthesizedExpression, OperatorApplicationExpression, FunctionOrValue, Integer, Floatable, Literal, CharLiteral, Application)
+        , Expression
+            ( ListExpr
+            , ParenthesizedExpression
+            , OperatorApplicationExpression
+            , FunctionOrValue
+            , Integer
+            , Floatable
+            , Literal
+            , CharLiteral
+            , Application
+            , IfBlock
+            , CaseExpression
+            )
+        , CaseBlock
         , Parenthesized
         , File
         , Range
@@ -54,8 +67,32 @@ onExpression expression context =
         Application parts ->
             onApplication parts context
 
+        IfBlock a b c ->
+            onIfBlock a b c context
+
+        CaseExpression caseBlock ->
+            onCaseBlock caseBlock context
+
         _ ->
             context
+
+
+onCaseBlock : CaseBlock -> Context -> Context
+onCaseBlock caseBlock context =
+    case getParenthesized caseBlock.expression of
+        Just parens ->
+            parens.range :: context
+
+        Nothing ->
+            context
+
+
+onIfBlock : Expression -> Expression -> Expression -> Context -> Context
+onIfBlock clause thenBranch elseBranch context =
+    [ clause, thenBranch, elseBranch ]
+        |> List.filterMap getParenthesized
+        |> List.map .range
+        |> flip (++) context
 
 
 onApplication : List Expression -> Context -> Context
@@ -87,6 +124,9 @@ onOperatorApplicationExpression oparatorApplication context =
 onParenthesizedExpression : Parenthesized -> Context -> Context
 onParenthesizedExpression { expression, range } context =
     case expression of
+        ListExpr _ ->
+            range :: context
+
         FunctionOrValue _ ->
             range :: context
 

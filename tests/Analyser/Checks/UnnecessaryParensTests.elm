@@ -106,6 +106,65 @@ foo = (\\x -> x + 1) <| 2
     )
 
 
+parensInCaseClause : ( String, String, List Message )
+parensInCaseClause =
+    ( "parensInCaseClause"
+    , """module Bar exposing (..)
+
+foo x =
+  case (x 1) of
+    True -> 2
+    False -> 3
+
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 6 }, end = { row = 3, column = 11 } } ]
+    )
+
+
+parensInIfClause : ( String, String, List Message )
+parensInIfClause =
+    ( "parensInIfClause"
+    , """module Bar exposing (..)
+
+foo x =
+  if (x 1) then
+    (f x)
+  else
+    (g x)
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 4 }, end = { row = 3, column = 9 } }
+      , UnnecessaryParens "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 5, column = -2 } }
+      , UnnecessaryParens "./foo.elm" { start = { row = 6, column = 3 }, end = { row = 8, column = -1 } }
+      ]
+    )
+
+
+parensAroundListExpression : ( String, String, List Message )
+parensAroundListExpression =
+    ( "parensAroundListExpression"
+    , """module Bar exposing (..)
+
+foo x = ([x])
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 4, column = -1 } }
+      ]
+    )
+
+
+parensInRecordFieldValues : ( String, String, List Message )
+parensInRecordFieldValues =
+    ( "parensInRecordFieldValues"
+    , """module Bar exposing (..)
+
+foo =
+  { bar = (x y)
+  }
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 5 }, end = { row = 2, column = 10 } }
+      ]
+    )
+
+
 all : Test
 all =
     describe "Analyser.Checks.UnnecessaryParensTests"
@@ -116,6 +175,9 @@ all =
          , parensOnFirstPartOfApplication
          , parensOnFirstPartOfApplicationWithOperator
          , allowParensForLambdaOnLhs
+         , parensInCaseClause
+         , parensInIfClause
+         , parensAroundListExpression
          ]
             |> List.map
                 (\( name, input, messages ) ->
