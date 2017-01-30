@@ -13,5 +13,6 @@ all =
         [ test "case block" <|
             \() ->
                 parseFullStringState emptyState "[glsl| precision mediump float; |]" Parser.expression
-                    |> Expect.equal (Just (GLSLExpression " precision mediump float; "))
+                    |> Maybe.map noRangeExpression
+                    |> Expect.equal (Just (emptyRanged <| GLSLExpression " precision mediump float; "))
         ]

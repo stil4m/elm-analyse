@@ -14,7 +14,7 @@ debugCrash =
 foo = Debug.crash "NOOO"
 
 """
-    , [ DebugCrash "./foo.elm" { start = { row = 2, column = 11 }, end = { row = 2, column = 16 } }
+    , [ DebugCrash "./foo.elm" { start = { row = 2, column = 5 }, end = { row = 2, column = 16 } }
       ]
     )
 
@@ -26,7 +26,7 @@ debugLog =
 
 foo x = Debug.log "This is X" x
 """
-    , [ DebugLog "./foo.elm" { start = { row = 2, column = 13 }, end = { row = 2, column = 16 } }
+    , [ DebugLog "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 2, column = 16 } }
       ]
     )
 
@@ -44,7 +44,7 @@ foo x = x
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.UnnecessaryParensTests"
+    CTU.build "Analyser.Checks.NoDebugTests"
         NoDebug.scan
         [ debugCrash
         , debugLog
