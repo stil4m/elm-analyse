@@ -151,6 +151,42 @@ foo x = ([x])
     )
 
 
+parensAroundTupleExpression : ( String, String, List Message )
+parensAroundTupleExpression =
+    ( "parensAroundTupleExpression"
+    , """module Bar exposing (..)
+
+foo x = ((x, 1))
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 4, column = -1 } }
+      ]
+    )
+
+
+parensAroundRecordExpression : ( String, String, List Message )
+parensAroundRecordExpression =
+    ( "parensAroundTupleExpression"
+    , """module Bar exposing (..)
+
+foo x = ({name = x})
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 4, column = -1 } }
+      ]
+    )
+
+
+parensAroundRecordUpdateExpression : ( String, String, List Message )
+parensAroundRecordUpdateExpression =
+    ( "parensAroundTupleExpression"
+    , """module Bar exposing (..)
+
+foo x = ({ x | name = "Foo"})
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 4, column = -1 } }
+      ]
+    )
+
+
 parensInRecordFieldValues : ( String, String, List Message )
 parensInRecordFieldValues =
     ( "parensInRecordFieldValues"
@@ -160,7 +196,7 @@ foo =
   { bar = (x y)
   }
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 5 }, end = { row = 2, column = 10 } }
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 9 }, end = { row = 4, column = -2 } }
       ]
     )
 
@@ -178,6 +214,10 @@ all =
          , parensInCaseClause
          , parensInIfClause
          , parensAroundListExpression
+         , parensAroundTupleExpression
+         , parensAroundRecordUpdateExpression
+         , parensAroundRecordUpdateExpression
+         , parensInRecordFieldValues
          ]
             |> List.map
                 (\( name, input, messages ) ->

@@ -10,11 +10,14 @@ import AST.Types
             , OperatorApplicationExpression
             , FunctionOrValue
             , Integer
+            , TupledExpression
             , Floatable
             , Literal
             , CharLiteral
             , Application
             , IfBlock
+            , RecordExpr
+            , RecordUpdateExpression
             , CaseExpression
             )
         , CaseBlock
@@ -73,8 +76,19 @@ onExpression expression context =
         CaseExpression caseBlock ->
             onCaseBlock caseBlock context
 
+        RecordExpr parts ->
+            onRecord parts context
+
         _ ->
             context
+
+
+onRecord : List ( String, Expression ) -> Context -> Context
+onRecord fields context =
+    fields
+        |> List.filterMap (Tuple.second >> getParenthesized)
+        |> List.map .range
+        |> flip (++) context
 
 
 onCaseBlock : CaseBlock -> Context -> Context
@@ -124,6 +138,15 @@ onOperatorApplicationExpression oparatorApplication context =
 onParenthesizedExpression : Parenthesized -> Context -> Context
 onParenthesizedExpression { expression, range } context =
     case expression of
+        RecordUpdateExpression _ ->
+            range :: context
+
+        RecordExpr _ ->
+            range :: context
+
+        TupledExpression _ ->
+            range :: context
+
         ListExpr _ ->
             range :: context
 
