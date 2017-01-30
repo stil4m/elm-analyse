@@ -449,7 +449,7 @@ qualifiedExpression =
         (\() ->
             succeed QualifiedExpr
                 <*> many1 (typeName <* string ".")
-                <*> choice [ functionName, typeName ]
+                <*> asPointer (or functionName typeName)
         )
 
 

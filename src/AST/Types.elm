@@ -177,7 +177,7 @@ type Expression
     | LambdaExpression Lambda
     | RecordExpr (List ( String, Expression ))
     | ListExpr (List Expression)
-    | QualifiedExpr ModuleName String
+    | QualifiedExpr ModuleName VariablePointer
     | RecordAccess (List String)
     | RecordAccessFunction String
     | RecordUpdateExpression RecordUpdate

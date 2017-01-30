@@ -61,7 +61,7 @@ all =
             \() ->
                 parseFullStringWithNullState "(&>) = flip Maybe.andThen" Parser.functionDeclaration
                     |> Expect.equal
-                        (Just { operatorDefinition = True, name = { value = "&>", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 4 } } }, arguments = [], expression = Application ([ FunctionOrValue "flip", QualifiedExpr [ "Maybe" ] "andThen" ]) })
+                        (Just { operatorDefinition = True, name = { value = "&>", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 4 } } }, arguments = [], expression = Application ([ FunctionOrValue "flip", QualifiedExpr [ "Maybe" ] { value = "andThen", range = { start = { row = 1, column = 18 }, end = { row = 1, column = 25 } } } ]) })
         , test "function declaration with args" <|
             \() ->
                 parseFullStringWithNullState "inc x = x + 1" Parser.functionDeclaration

@@ -3,8 +3,7 @@ module Analyser.Checks.UnnecessaryParensTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 import Analyser.Messages exposing (..)
-import Expect
-import Test exposing (..)
+import Test exposing (Test)
 
 
 parensBetweenOperators : ( String, String, List Message )
@@ -242,31 +241,23 @@ foo x = List.map (.name) x
 
 all : Test
 all =
-    describe "Analyser.Checks.UnnecessaryParensTests"
-        ([ parensBetweenOperators
-         , parensForInfixCombinations
-         , parensAroundSimpleValue
-         , parensInOperatorForSimpleValue
-         , parensOnFirstPartOfApplication
-         , parensOnFirstPartOfApplicationWithOperator
-         , allowParensForLambdaOnLhs
-         , parensInCaseClause
-         , parensInIfClause
-         , parensAroundListExpression
-         , parensAroundTupleExpression
-         , parensAroundRecordUpdateExpression
-         , parensAroundRecordUpdateExpression
-         , parensInRecordFieldValues
-         , parensInRecordFieldValuesForUpdate
-         , parensAroundRecordAccess
-         , parensAroundRecordFunction
-         ]
-            |> List.map
-                (\( name, input, messages ) ->
-                    test name <|
-                        \() ->
-                            CTU.getMessages input UnnecessaryParens.scan
-                                |> Expect.equal
-                                    (Just messages)
-                )
-        )
+    CTU.build "Analyser.Checks.UnnecessaryParensTests"
+        UnnecessaryParens.scan
+        [ parensBetweenOperators
+        , parensForInfixCombinations
+        , parensAroundSimpleValue
+        , parensInOperatorForSimpleValue
+        , parensOnFirstPartOfApplication
+        , parensOnFirstPartOfApplicationWithOperator
+        , allowParensForLambdaOnLhs
+        , parensInCaseClause
+        , parensInIfClause
+        , parensAroundListExpression
+        , parensAroundTupleExpression
+        , parensAroundRecordUpdateExpression
+        , parensAroundRecordUpdateExpression
+        , parensInRecordFieldValues
+        , parensInRecordFieldValuesForUpdate
+        , parensAroundRecordAccess
+        , parensAroundRecordFunction
+        ]

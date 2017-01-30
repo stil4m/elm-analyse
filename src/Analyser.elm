@@ -108,11 +108,7 @@ update msg model =
             model ! [ AnalyserPorts.sendMessagesAsStrings messages ]
 
         ( b, _ ) ->
-            let
-                _ =
-                    Debug.log "Unknown" b
-            in
-                model ! []
+            model ! []
 
 
 subscriptions : Model -> Sub Msg

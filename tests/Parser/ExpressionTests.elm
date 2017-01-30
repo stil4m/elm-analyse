@@ -61,7 +61,7 @@ all =
                     |> Expect.equal
                         (Just
                             (Application
-                                [ QualifiedExpr [ "Task" ] "succeed"
+                                [ QualifiedExpr [ "Task" ] { value = "succeed", range = { start = { row = 1, column = 5 }, end = { row = 1, column = 12 } } }
                                 , UnitExpr
                                 ]
                             )
@@ -153,7 +153,7 @@ all =
         , test "qualified expression" <|
             \() ->
                 parseFullStringWithNullState "Html.text" expression
-                    |> Expect.equal (Just (QualifiedExpr [ "Html" ] "text"))
+                    |> Expect.equal (Just (QualifiedExpr [ "Html" ] { value = "text", range = { start = { row = 1, column = 5 }, end = { row = 1, column = 9 } } }))
         , test "record access" <|
             \() ->
                 parseFullStringWithNullState "foo.bar" expression
@@ -192,7 +192,7 @@ all =
                     |> Expect.equal
                         (Just
                             (Application
-                                [ QualifiedExpr [ "List" ] "map"
+                                [ QualifiedExpr [ "List" ] { value = "map", range = { start = { row = 1, column = 5 }, end = { row = 1, column = 8 } } }
                                 , RecordAccessFunction ".name"
                                 , FunctionOrValue "people"
                                 ]

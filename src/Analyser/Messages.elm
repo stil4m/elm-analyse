@@ -12,6 +12,8 @@ type Message
     | ImportAll FileName AST.ModuleName AST.Range
     | NoTopLevelSignature FileName String AST.Range
     | UnnecessaryParens FileName AST.Range
+    | DebugLog FileName AST.Range
+    | DebugCrash FileName AST.Range
 
 
 type alias FileName =
@@ -84,6 +86,22 @@ asString m =
         UnnecessaryParens fileName range ->
             String.concat
                 [ "Unnecessary parens in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+
+        DebugLog fileName range ->
+            String.concat
+                [ "Use of debug log in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+
+        DebugCrash fileName range ->
+            String.concat
+                [ "Use of debug crash in file \""
                 , fileName
                 , "\" at "
                 , rangeToString range

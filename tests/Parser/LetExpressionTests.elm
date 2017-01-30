@@ -55,7 +55,7 @@ all =
             \() ->
                 parseFullStringState emptyState "let indent = String.length s in indent" (Parser.expression)
                     |> Expect.equal
-                        (Just (LetExpression { declarations = [ FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = { value = "indent", range = { start = { row = 1, column = 4 }, end = { row = 1, column = 10 } } }, arguments = [], expression = Application ([ QualifiedExpr [ "String" ] "length", FunctionOrValue "s" ]) } } ], expression = FunctionOrValue "indent" }))
+                        (Just (LetExpression { declarations = [ FuncDecl { documentation = Nothing, signature = Nothing, declaration = { operatorDefinition = False, name = { value = "indent", range = { start = { row = 1, column = 4 }, end = { row = 1, column = 10 } } }, arguments = [], expression = Application ([ QualifiedExpr [ "String" ] { value = "length", range = { start = { row = 1, column = 20 }, end = { row = 1, column = 26 } } }, FunctionOrValue "s" ]) } } ], expression = FunctionOrValue "indent" }))
         , test "let starting after definition" <|
             \() ->
                 parseFullStringState emptyState "foo = let\n  indent = 1\n in\n indent" (functionName *> string " = " *> Parser.expression)
