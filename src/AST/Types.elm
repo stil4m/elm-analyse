@@ -1,25 +1,14 @@
 module AST.Types exposing (..)
 
+import AST.Ranges exposing (Range)
+
 
 type State
     = State (List Int)
 
 
-type alias Location =
-    { row : Int, column : Int }
-
-
-type alias Range =
-    { start : Location, end : Location }
-
-
 type alias VariablePointer =
     { value : String, range : Range }
-
-
-emptyRange : Range
-emptyRange =
-    { start = { row = 0, column = 0 }, end = { row = 0, column = 0 } }
 
 
 emptyState : State
@@ -158,7 +147,11 @@ type alias Function =
 -- Expressions
 
 
-type Expression
+type alias Expression =
+    ( Range, InnerExpression )
+
+
+type InnerExpression
     = UnitExpr
     | Application (List Expression)
     | OperatorApplicationExpression OperatorApplication
@@ -171,23 +164,17 @@ type Expression
     | Literal String
     | CharLiteral Char
     | TupledExpression (List Expression)
-    | ParenthesizedExpression Parenthesized
+    | ParenthesizedExpression Expression
     | LetExpression LetBlock
     | CaseExpression CaseBlock
     | LambdaExpression Lambda
     | RecordExpr (List ( String, Expression ))
     | ListExpr (List Expression)
-    | QualifiedExpr ModuleName VariablePointer
+    | QualifiedExpr ModuleName String
     | RecordAccess (List String)
     | RecordAccessFunction String
     | RecordUpdateExpression RecordUpdate
     | GLSLExpression String
-
-
-type alias Parenthesized =
-    { expression : Expression
-    , range : Range
-    }
 
 
 type alias OperatorApplication =

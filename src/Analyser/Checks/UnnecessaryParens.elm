@@ -5,6 +5,7 @@ import AST.Types
         ( Exposure(All, Explicit, None)
         , Expose(TypeExpose)
         , Expression
+        , InnerExpression
             ( ListExpr
             , ParenthesizedExpression
             , OperatorApplicationExpression
@@ -23,11 +24,10 @@ import AST.Types
             , CaseExpression
             )
         , CaseBlock
-        , Parenthesized
         , File
-        , Range
         , OperatorApplication
         )
+import AST.Ranges exposing (Range)
 import AST.Util exposing (getParenthesized, isOperatorApplication, isLambda)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(UnnecessaryParens))
@@ -61,10 +61,10 @@ scan fileContext =
 
 
 onExpression : Expression -> Context -> Context
-onExpression expression context =
+onExpression ( range, expression ) context =
     case expression of
         ParenthesizedExpression inner ->
-            onParenthesizedExpression inner context
+            onParenthesizedExpression range inner context
 
         OperatorApplicationExpression inner ->
             onOperatorApplicationExpression inner context
@@ -92,15 +92,15 @@ onRecord : List ( String, Expression ) -> Context -> Context
 onRecord fields context =
     fields
         |> List.filterMap (Tuple.second >> getParenthesized)
-        |> List.map .range
+        |> List.map Tuple.first
         |> flip (++) context
 
 
 onCaseBlock : CaseBlock -> Context -> Context
 onCaseBlock caseBlock context =
     case getParenthesized caseBlock.expression of
-        Just parens ->
-            parens.range :: context
+        Just ( range, _ ) ->
+            range :: context
 
         Nothing ->
             context
@@ -110,7 +110,7 @@ onIfBlock : Expression -> Expression -> Expression -> Context -> Context
 onIfBlock clause thenBranch elseBranch context =
     [ clause, thenBranch, elseBranch ]
         |> List.filterMap getParenthesized
-        |> List.map .range
+        |> List.map Tuple.first
         |> flip (++) context
 
 
@@ -118,8 +118,8 @@ onApplication : List Expression -> Context -> Context
 onApplication parts context =
     List.head parts
         |> Maybe.andThen getParenthesized
-        |> Maybe.filter (.expression >> isOperatorApplication >> not)
-        |> Maybe.map .range
+        |> Maybe.filter (Tuple.second >> isOperatorApplication >> not)
+        |> Maybe.map Tuple.first
         |> Maybe.map (flip (::) context)
         |> Maybe.withDefault context
 
@@ -129,9 +129,9 @@ onOperatorApplicationExpression oparatorApplication context =
     let
         fixHandSide f =
             getParenthesized
-                >> Maybe.filter (.expression >> isOperatorApplication >> not)
-                >> Maybe.filter (.expression >> f)
-                >> Maybe.map .range
+                >> Maybe.filter (Tuple.second >> isOperatorApplication >> not)
+                >> Maybe.filter (Tuple.second >> f)
+                >> Maybe.map Tuple.first
     in
         [ fixHandSide (isLambda >> not) oparatorApplication.left
         , fixHandSide (always True) oparatorApplication.right
@@ -140,9 +140,9 @@ onOperatorApplicationExpression oparatorApplication context =
             |> flip (++) context
 
 
-onParenthesizedExpression : Parenthesized -> Context -> Context
-onParenthesizedExpression { expression, range } context =
-    case expression of
+onParenthesizedExpression : Range -> Expression -> Context -> Context
+onParenthesizedExpression range expression context =
+    case Tuple.second expression of
         RecordAccess _ ->
             range :: context
 

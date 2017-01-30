@@ -1,6 +1,7 @@
 module Analyser.Checks.UnusedVariable exposing (scan)
 
-import AST.Types exposing (File, Lambda, RecordUpdate, Range, LetBlock, Function, VariablePointer, Declaration(FuncDecl, AliasDecl, DestructuringDeclaration, TypeDecl, PortDeclaration, InfixDeclaration), Case, emptyRange, Pattern(TuplePattern, RecordPattern, ListPattern, UnConsPattern, VarPattern, NamedPattern, AsPattern, ParentisizedPattern), OperatorApplication)
+import AST.Types exposing (File, Lambda, RecordUpdate, LetBlock, Function, VariablePointer, Declaration(FuncDecl, AliasDecl, DestructuringDeclaration, TypeDecl, PortDeclaration, InfixDeclaration), Case, Pattern(TuplePattern, RecordPattern, ListPattern, UnConsPattern, VarPattern, NamedPattern, AsPattern, ParentisizedPattern), OperatorApplication)
+import AST.Ranges exposing (Range, emptyRange)
 import Analyser.FileContext exposing (FileContext)
 import Interfaces.Interface as Interface
 import Analyser.Messages exposing (Message(UnusedVariable, UnusedTopLevel))

@@ -1,6 +1,6 @@
 module Inspector exposing (Action(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
-import AST.Types exposing (File, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression(..), Lambda, LetBlock, Case, RecordUpdate, OperatorApplication)
+import AST.Types exposing (File, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate, OperatorApplication)
 
 
 type Action context x
@@ -124,13 +124,13 @@ inspectExpression : Config context -> Expression -> context -> context
 inspectExpression config expression context =
     actionLambda
         config.onExpression
-        (inspectExpressionInner config expression)
+        (inspectInnerExpression config <| Tuple.second expression)
         expression
         context
 
 
-inspectExpressionInner : Config context -> Expression -> context -> context
-inspectExpressionInner config expression context =
+inspectInnerExpression : Config context -> InnerExpression -> context -> context
+inspectInnerExpression config expression context =
     case expression of
         UnitExpr ->
             context
@@ -189,8 +189,8 @@ inspectExpressionInner config expression context =
         TupledExpression expressionList ->
             List.foldl (inspectExpression config) context expressionList
 
-        ParenthesizedExpression parenthesized ->
-            inspectExpression config parenthesized.expression context
+        ParenthesizedExpression expression ->
+            inspectExpression config expression context
 
         LetExpression letBlock ->
             let

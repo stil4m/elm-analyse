@@ -1,19 +1,20 @@
 module Analyser.Messages exposing (Message(..), asString)
 
 import AST.Types as AST
+import AST.Ranges exposing (Range, rangeToString)
 
 
 type Message
     = UnreadableSourceFile FileName
     | UnreadableDependencyFile FileName String
-    | UnusedVariable FileName String AST.Range
-    | UnusedTopLevel FileName String AST.Range
-    | ExposeAll FileName AST.Range
-    | ImportAll FileName AST.ModuleName AST.Range
-    | NoTopLevelSignature FileName String AST.Range
-    | UnnecessaryParens FileName AST.Range
-    | DebugLog FileName AST.Range
-    | DebugCrash FileName AST.Range
+    | UnusedVariable FileName String Range
+    | UnusedTopLevel FileName String Range
+    | ExposeAll FileName Range
+    | ImportAll FileName AST.ModuleName Range
+    | NoTopLevelSignature FileName String Range
+    | UnnecessaryParens FileName Range
+    | DebugLog FileName Range
+    | DebugCrash FileName Range
 
 
 type alias FileName =
@@ -106,13 +107,3 @@ asString m =
                 , "\" at "
                 , rangeToString range
                 ]
-
-
-locationToString : AST.Location -> String
-locationToString { row, column } =
-    "(" ++ toString row ++ "," ++ toString column ++ ")"
-
-
-rangeToString : AST.Range -> String
-rangeToString { start, end } =
-    "(" ++ locationToString start ++ "," ++ locationToString end ++ ")"

@@ -1,6 +1,7 @@
 module Analyser.Checks.NotExposeAll exposing (scan)
 
-import AST.Types exposing (Exposure(All, None, Explicit), Range, Expose(TypeExpose), File)
+import AST.Types exposing (Exposure(All, None, Explicit), Expose(TypeExpose), File)
+import AST.Ranges exposing (Range)
 import AST.Util
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(ExposeAll))

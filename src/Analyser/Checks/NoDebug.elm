@@ -1,6 +1,7 @@
 module Analyser.Checks.NoDebug exposing (scan)
 
-import AST.Types exposing (Expression(QualifiedExpr), Range, emptyRange)
+import AST.Types exposing (Expression, InnerExpression(QualifiedExpr))
+import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(DebugLog, DebugCrash))
 import Inspector exposing (Action(Inner, Post, Pre), defaultConfig)
@@ -35,14 +36,14 @@ scan fileContext =
 
 
 onExpression : Expression -> Context -> Context
-onExpression expression context =
+onExpression ( range, expression ) context =
     case expression of
         QualifiedExpr moduleName f ->
             if moduleName == [ "Debug" ] then
-                if f.value == "log" then
-                    ( Log, f.range ) :: context
-                else if f.value == "crash" then
-                    ( Crash, f.range ) :: context
+                if f == "log" then
+                    ( Log, range ) :: context
+                else if f == "crash" then
+                    ( Crash, range ) :: context
                 else
                     context
             else

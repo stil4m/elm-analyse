@@ -2,7 +2,8 @@ module Parser.Util exposing (withRange, asPointer, unstrictIndentWhitespace, exa
 
 import Combine exposing (Parser, ParseLocation, succeed, withLocation, many1, many, sequence, maybe, withState, or, (>>=), (<$>), (<*>), (<*), (*>))
 import Parser.Comments exposing (multilineComment, singleLineComment)
-import AST.Types exposing (State, VariablePointer, Range, Location, currentIndent)
+import AST.Types exposing (State, VariablePointer, currentIndent)
+import AST.Ranges exposing (Range, Location)
 import Parser.Whitespace exposing (many1Spaces, manySpaces, nSpaces, realNewLine)
 
 

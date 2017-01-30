@@ -1,6 +1,7 @@
 module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts, getParenthesized, isOperatorApplication, isLambda)
 
-import AST.Types exposing (Range, File, Exposure, ModuleName, Expose, Parenthesized, Module(NormalModule, PortModule, EffectModule, NoModule), Expression(OperatorApplicationExpression, ParenthesizedExpression, LambdaExpression))
+import AST.Types exposing (File, Exposure, ModuleName, Expose, Module(NormalModule, PortModule, EffectModule, NoModule), Expression, InnerExpression(OperatorApplicationExpression, ParenthesizedExpression, LambdaExpression))
+import AST.Ranges exposing (Range)
 
 
 fileExposingList : File -> Maybe (Exposure Expose)
@@ -41,7 +42,7 @@ rangeFromInts ( x, y, z, a ) =
 
 
 isLambda : Expression -> Bool
-isLambda e =
+isLambda ( _, e ) =
     case e of
         LambdaExpression _ ->
             True
@@ -51,7 +52,7 @@ isLambda e =
 
 
 isOperatorApplication : Expression -> Bool
-isOperatorApplication e =
+isOperatorApplication ( _, e ) =
     case e of
         OperatorApplicationExpression _ ->
             True
@@ -60,11 +61,11 @@ isOperatorApplication e =
             False
 
 
-getParenthesized : Expression -> Maybe Parenthesized
-getParenthesized e =
+getParenthesized : Expression -> Maybe ( Range, Expression )
+getParenthesized ( r, e ) =
     case e of
         ParenthesizedExpression p ->
-            Just p
+            Just ( r, p )
 
         _ ->
             Nothing

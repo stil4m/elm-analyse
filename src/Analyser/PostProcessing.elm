@@ -2,11 +2,13 @@ module Analyser.PostProcessing exposing (postProcess)
 
 import Dict exposing (Dict)
 import List exposing (maximum)
+import AST.Ranges exposing (getRange)
 import AST.Types
     exposing
         ( File
         , RecordUpdate
-        , Expression(Application, Operator, OperatorApplicationExpression, RecordExpr, IfBlock, TupledExpression, ParenthesizedExpression, LetExpression, CaseExpression, LambdaExpression, ListExpr, RecordUpdateExpression)
+        , Expression
+        , InnerExpression(Application, Operator, OperatorApplicationExpression, RecordExpr, IfBlock, TupledExpression, ParenthesizedExpression, LetExpression, CaseExpression, LambdaExpression, ListExpr, RecordUpdateExpression)
         , Function
         , InfixDirection(Left)
         , Infix
@@ -26,8 +28,8 @@ postProcess table file =
                 (\context inner expression ->
                     inner <|
                         case expression of
-                            Application args ->
-                                fixApplication context args
+                            ( r, Application args ) ->
+                                ( r, fixApplication context args )
 
                             _ ->
                                 expression
@@ -37,9 +39,10 @@ postProcess table file =
         file
 
 
-fixApplication : OperatorTable -> List Expression -> Expression
+fixApplication : OperatorTable -> List Expression -> InnerExpression
 fixApplication operators expressions =
     let
+        ops : Dict String Infix
         ops =
             List.filterMap expressionOperators expressions
                 |> List.map
@@ -55,15 +58,17 @@ fixApplication operators expressions =
                     )
                 |> highestPrecedence
 
+        fixExprs : List Expression -> InnerExpression
         fixExprs exps =
             case exps of
                 [ x ] ->
-                    x
+                    Tuple.second x
 
                 _ ->
                     Application exps
 
-        doTheThing exps =
+        divideAndConquer : List Expression -> InnerExpression
+        divideAndConquer exps =
             if Dict.isEmpty ops then
                 fixExprs exps
             else
@@ -73,13 +78,13 @@ fixApplication operators expressions =
                             OperatorApplicationExpression
                                 { operator = infix.operator
                                 , direction = infix.direction
-                                , left = doTheThing p
-                                , right = doTheThing s
+                                , left = ( getRange <| List.map Tuple.first p, divideAndConquer p )
+                                , right = ( getRange <| List.map Tuple.first s, divideAndConquer s )
                                 }
                         )
                     |> Maybe.withDefault (fixExprs exps)
     in
-        doTheThing expressions
+        divideAndConquer expressions
 
 
 findNextSplit : Dict String Infix -> List Expression -> Maybe ( List Expression, Infix, List Expression )
@@ -120,7 +125,7 @@ highestPrecedence input =
 
 
 expressionOperators : Expression -> Maybe String
-expressionOperators expression =
+expressionOperators ( _, expression ) =
     case expression of
         Operator s ->
             Just s
@@ -188,62 +193,63 @@ visitExpression visitor context expression =
 
 
 visitExpressionInner : Visitor context -> context -> Expression -> Expression
-visitExpressionInner visitor context expression =
+visitExpressionInner visitor context ( r, expression ) =
     let
         subVisit =
             (visitExpression visitor context)
     in
-        case expression of
-            Application expressionList ->
-                expressionList
-                    |> List.map subVisit
-                    |> Application
+        (,) r <|
+            case expression of
+                Application expressionList ->
+                    expressionList
+                        |> List.map subVisit
+                        |> Application
 
-            OperatorApplicationExpression operatorApplication ->
-                OperatorApplicationExpression
-                    { operatorApplication
-                        | left = subVisit operatorApplication.left
-                        , right = subVisit operatorApplication.right
-                    }
+                OperatorApplicationExpression operatorApplication ->
+                    OperatorApplicationExpression
+                        { operatorApplication
+                            | left = subVisit operatorApplication.left
+                            , right = subVisit operatorApplication.right
+                        }
 
-            IfBlock e1 e2 e3 ->
-                IfBlock (subVisit e1) (subVisit e2) (subVisit e3)
+                IfBlock e1 e2 e3 ->
+                    IfBlock (subVisit e1) (subVisit e2) (subVisit e3)
 
-            TupledExpression expressionList ->
-                expressionList
-                    |> List.map subVisit
-                    |> TupledExpression
+                TupledExpression expressionList ->
+                    expressionList
+                        |> List.map subVisit
+                        |> TupledExpression
 
-            ParenthesizedExpression parenthesized ->
-                ParenthesizedExpression { parenthesized | expression = subVisit parenthesized.expression }
+                ParenthesizedExpression expr1 ->
+                    ParenthesizedExpression (subVisit expr1)
 
-            LetExpression letBlock ->
-                LetExpression
-                    { declarations = visitDeclarations visitor context letBlock.declarations
-                    , expression = subVisit letBlock.expression
-                    }
+                LetExpression letBlock ->
+                    LetExpression
+                        { declarations = visitDeclarations visitor context letBlock.declarations
+                        , expression = subVisit letBlock.expression
+                        }
 
-            CaseExpression caseBlock ->
-                CaseExpression
-                    { expression = subVisit caseBlock.expression
-                    , cases = List.map (Tuple2.mapSecond subVisit) caseBlock.cases
-                    }
+                CaseExpression caseBlock ->
+                    CaseExpression
+                        { expression = subVisit caseBlock.expression
+                        , cases = List.map (Tuple2.mapSecond subVisit) caseBlock.cases
+                        }
 
-            LambdaExpression { args, expression } ->
-                LambdaExpression <| { args = args, expression = subVisit expression }
+                LambdaExpression { args, expression } ->
+                    LambdaExpression <| { args = args, expression = subVisit expression }
 
-            RecordExpr expressionStringList ->
-                expressionStringList
-                    |> List.map (Tuple2.mapSecond subVisit)
-                    |> RecordExpr
+                RecordExpr expressionStringList ->
+                    expressionStringList
+                        |> List.map (Tuple2.mapSecond subVisit)
+                        |> RecordExpr
 
-            ListExpr expressionList ->
-                ListExpr (List.map subVisit expressionList)
+                ListExpr expressionList ->
+                    ListExpr (List.map subVisit expressionList)
 
-            RecordUpdateExpression recordUpdate ->
-                recordUpdate.updates
-                    |> List.map (Tuple.mapSecond subVisit)
-                    |> (RecordUpdate recordUpdate.name >> RecordUpdateExpression)
+                RecordUpdateExpression recordUpdate ->
+                    recordUpdate.updates
+                        |> List.map (Tuple.mapSecond subVisit)
+                        |> (RecordUpdate recordUpdate.name >> RecordUpdateExpression)
 
-            _ ->
-                expression
+                _ ->
+                    expression

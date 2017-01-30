@@ -1,6 +1,7 @@
 module Analyser.Checks.NoImportAll exposing (scan)
 
-import AST.Types exposing (File, Exposure(All, None, Explicit), ModuleName, Range, Expose(TypeExpose))
+import AST.Types exposing (File, Exposure(All, None, Explicit), ModuleName, Expose(TypeExpose))
+import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(ImportAll))
 import Inspector exposing (defaultConfig, Action(Inner))
