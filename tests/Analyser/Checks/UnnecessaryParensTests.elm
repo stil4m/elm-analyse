@@ -82,6 +82,18 @@ foo = (x y) z
     )
 
 
+parensOnFirstPartOfApplicationWithOperator : ( String, String, List Message )
+parensOnFirstPartOfApplicationWithOperator =
+    ( "parensOnFirstPartOfApplicationWithOperator"
+    , """module Bar exposing (..)
+
+foo = (x |> y z ) a b c
+
+"""
+    , []
+    )
+
+
 allowParensForLambdaOnLhs : ( String, String, List Message )
 allowParensForLambdaOnLhs =
     ( "allowParensForLambdaOnLhs"
@@ -102,6 +114,7 @@ all =
          , parensAroundSimpleValue
          , parensInOperatorForSimpleValue
          , parensOnFirstPartOfApplication
+         , parensOnFirstPartOfApplicationWithOperator
          , allowParensForLambdaOnLhs
          ]
             |> List.map

@@ -62,6 +62,7 @@ onApplication : List Expression -> Context -> Context
 onApplication parts context =
     List.head parts
         |> Maybe.andThen getParenthesized
+        |> Maybe.filter (.expression >> isOperatorApplication >> not)
         |> Maybe.map .range
         |> Maybe.map (flip (::) context)
         |> Maybe.withDefault context
