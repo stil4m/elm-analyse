@@ -45,8 +45,18 @@ all =
                                         OperatorApplicationExpression
                                             { operator = "*"
                                             , direction = Left
-                                            , left = (Parentesized (OperatorApplicationExpression { operator = "+", direction = Left, left = (FunctionOrValue "x"), right = (Integer 1) }))
-                                            , right = (Parentesized (OperatorApplicationExpression { operator = "*", direction = Left, left = (Integer 2), right = (FunctionOrValue "y") }))
+                                            , left =
+                                                (ParenthesizedExpression
+                                                    { expression = (OperatorApplicationExpression { operator = "+", direction = Left, left = (FunctionOrValue "x"), right = (Integer 1) })
+                                                    , range = { start = { row = 3, column = 5 }, end = { row = 3, column = 12 } }
+                                                    }
+                                                )
+                                            , right =
+                                                (ParenthesizedExpression
+                                                    { expression = (OperatorApplicationExpression { operator = "*", direction = Left, left = (Integer 2), right = (FunctionOrValue "y") })
+                                                    , range = { start = { row = 3, column = 15 }, end = { row = 5, column = -1 } }
+                                                    }
+                                                )
                                             }
                                     }
                                 }

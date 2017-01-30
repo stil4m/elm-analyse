@@ -8,6 +8,7 @@ import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.NotExposeAll as NotExposeAll
 import Analyser.Checks.NoImportAll as NoImportAll
 import Analyser.Checks.NoSignature as NoSignature
+import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 
 
 run : LoadedSourceFiles -> LoadedDependencies -> List Message
@@ -18,6 +19,7 @@ run source deps =
             , NotExposeAll.scan
             , NoImportAll.scan
             , NoSignature.scan
+            , UnnecessaryParens.scan
             ]
 
         messages =

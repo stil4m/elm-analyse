@@ -11,6 +11,7 @@ type Message
     | ExposeAll FileName AST.Range
     | ImportAll FileName AST.ModuleName AST.Range
     | NoTopLevelSignature FileName String AST.Range
+    | UnnecessaryParens FileName AST.Range
 
 
 type alias FileName =
@@ -75,6 +76,14 @@ asString m =
                 [ "No signature for top level definition `"
                 , varName
                 , "` in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+
+        UnnecessaryParens fileName range ->
+            String.concat
+                [ "Unnecessary parens in file \""
                 , fileName
                 , "\" at "
                 , rangeToString range

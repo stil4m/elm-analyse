@@ -1,6 +1,6 @@
-module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts)
+module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts, getParenthesized, isOperatorApplication)
 
-import AST.Types exposing (Range, File, Exposure, ModuleName, Expose, Module(NormalModule, PortModule, EffectModule, NoModule))
+import AST.Types exposing (Range, File, Exposure, ModuleName, Expose, Parenthesized, Module(NormalModule, PortModule, EffectModule, NoModule), Expression(OperatorApplicationExpression, ParenthesizedExpression))
 
 
 fileExposingList : File -> Maybe (Exposure Expose)
@@ -38,3 +38,23 @@ fileModuleName file =
 rangeFromInts : ( Int, Int, Int, Int ) -> Range
 rangeFromInts ( x, y, z, a ) =
     { start = { row = x, column = y }, end = { row = z, column = a } }
+
+
+isOperatorApplication : Expression -> Bool
+isOperatorApplication e =
+    case e of
+        OperatorApplicationExpression _ ->
+            True
+
+        _ ->
+            False
+
+
+getParenthesized : Expression -> Maybe Parenthesized
+getParenthesized e =
+    case e of
+        ParenthesizedExpression p ->
+            Just p
+
+        _ ->
+            Nothing

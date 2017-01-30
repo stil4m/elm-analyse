@@ -189,8 +189,8 @@ inspectExpressionInner config expression context =
         TupledExpression expressionList ->
             List.foldl (inspectExpression config) context expressionList
 
-        Parentesized e1 ->
-            inspectExpression config e1 context
+        ParenthesizedExpression parenthesized ->
+            inspectExpression config parenthesized.expression context
 
         LetExpression letBlock ->
             let

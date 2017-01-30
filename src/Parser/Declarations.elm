@@ -12,9 +12,9 @@ import Parser.Modules exposing (moduleDefinition)
 import Parser.Patterns exposing (pattern, declarablePattern)
 import Parser.Tokens exposing (portToken, prefixOperatorToken, multiLineStringLiteral, caseToken, characterLiteral, ofToken, stringLiteral, typeName, thenToken, infixOperatorToken, functionName, ifToken, elseToken)
 import Parser.TypeReference exposing (typeReference)
-import AST.Types exposing (State, File, Module(NoModule), Declaration(AliasDecl, FuncDecl, TypeDecl, InfixDeclaration, DestructuringDeclaration, PortDeclaration), Destructuring, Function, FunctionSignature, FunctionDeclaration, Pattern, Expression(..), RecordUpdate, Lambda, Case, CaseBlock, LetBlock, Cases, pushIndent, popIndent)
+import AST.Types exposing (Parenthesized, State, File, Module(NoModule), Declaration(AliasDecl, FuncDecl, TypeDecl, InfixDeclaration, DestructuringDeclaration, PortDeclaration), Destructuring, Function, FunctionSignature, FunctionDeclaration, Pattern, Expression(..), RecordUpdate, Lambda, Case, CaseBlock, LetBlock, Cases, pushIndent, popIndent)
 import Parser.Typings exposing (typeDeclaration)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer)
+import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer, withRange)
 import Parser.Whitespace exposing (manySpaces)
 
 
@@ -480,13 +480,15 @@ tupledExpression : Parser State Expression
 tupledExpression =
     lazy
         (\() ->
-            (\l ->
-                case l of
-                    [ x ] ->
-                        Parentesized x
+            withRange
+                ((\l ->
+                    case l of
+                        [ x ] ->
+                            (Parenthesized x >> ParenthesizedExpression)
 
-                    xs ->
-                        TupledExpression xs
-            )
-                <$> parens (sepBy1 (string ",") (trimmed expression))
+                        xs ->
+                            (always (TupledExpression xs))
+                 )
+                    <$> parens (sepBy1 (string ",") (trimmed expression))
+                )
         )

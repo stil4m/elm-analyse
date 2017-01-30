@@ -6,7 +6,7 @@ import AST.Types
     exposing
         ( File
         , RecordUpdate
-        , Expression(Application, Operator, OperatorApplicationExpression, RecordExpr, IfBlock, TupledExpression, Parentesized, LetExpression, CaseExpression, LambdaExpression, ListExpr, RecordUpdateExpression)
+        , Expression(Application, Operator, OperatorApplicationExpression, RecordExpr, IfBlock, TupledExpression, ParenthesizedExpression, LetExpression, CaseExpression, LambdaExpression, ListExpr, RecordUpdateExpression)
         , Function
         , InfixDirection(Left)
         , Infix
@@ -214,8 +214,8 @@ visitExpressionInner visitor context expression =
                     |> List.map subVisit
                     |> TupledExpression
 
-            Parentesized e1 ->
-                Parentesized (subVisit e1)
+            ParenthesizedExpression parenthesized ->
+                ParenthesizedExpression { parenthesized | expression = (subVisit parenthesized.expression) }
 
             LetExpression letBlock ->
                 LetExpression

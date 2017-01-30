@@ -47,10 +47,10 @@ all =
             \() ->
                 parseFullStringWithNullState "++" expression
                     |> Expect.equal (Just (Operator "++"))
-        , test "parentesizedExpression" <|
+        , test "parenthesizedExpression" <|
             \() ->
                 parseFullStringWithNullState "(bar)" expression
-                    |> Expect.equal (Just (Parentesized (FunctionOrValue "bar")))
+                    |> Expect.equal (Just (ParenthesizedExpression { expression = (FunctionOrValue "bar"), range = { start = { row = 1, column = 0 }, end = { row = 1, column = 5 } } }))
         , test "expressionNotApplication simple" <|
             \() ->
                 parseFullStringWithNullState "foo" expression

@@ -171,7 +171,7 @@ type Expression
     | Literal String
     | CharLiteral Char
     | TupledExpression (List Expression)
-    | Parentesized Expression
+    | ParenthesizedExpression Parenthesized
     | LetExpression LetBlock
     | CaseExpression CaseBlock
     | LambdaExpression Lambda
@@ -182,6 +182,12 @@ type Expression
     | RecordAccessFunction String
     | RecordUpdateExpression RecordUpdate
     | GLSLExpression String
+
+
+type alias Parenthesized =
+    { expression : Expression
+    , range : Range
+    }
 
 
 type alias OperatorApplication =
