@@ -201,6 +201,30 @@ foo =
     )
 
 
+parensAroundRecordAccess : ( String, String, List Message )
+parensAroundRecordAccess =
+    ( "parensAroundRecordAccess"
+    , """module Bar exposing (..)
+
+foo x = (x.name.first)
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 4, column = -1 } }
+      ]
+    )
+
+
+parensAroundRecordFunction : ( String, String, List Message )
+parensAroundRecordFunction =
+    ( "parensAroundRecordFunction"
+    , """module Bar exposing (..)
+
+foo x = List.map (.name) x
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 16 }, end = { row = 2, column = 23 } }
+      ]
+    )
+
+
 all : Test
 all =
     describe "Analyser.Checks.UnnecessaryParensTests"
@@ -218,6 +242,8 @@ all =
          , parensAroundRecordUpdateExpression
          , parensAroundRecordUpdateExpression
          , parensInRecordFieldValues
+         , parensAroundRecordAccess
+         , parensAroundRecordFunction
          ]
             |> List.map
                 (\( name, input, messages ) ->

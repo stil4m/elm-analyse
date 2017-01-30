@@ -18,6 +18,8 @@ import AST.Types
             , IfBlock
             , RecordExpr
             , RecordUpdateExpression
+            , RecordAccessFunction
+            , RecordAccess
             , CaseExpression
             )
         , CaseBlock
@@ -138,6 +140,12 @@ onOperatorApplicationExpression oparatorApplication context =
 onParenthesizedExpression : Parenthesized -> Context -> Context
 onParenthesizedExpression { expression, range } context =
     case expression of
+        RecordAccess _ ->
+            range :: context
+
+        RecordAccessFunction _ ->
+            range :: context
+
         RecordUpdateExpression _ ->
             range :: context
 
