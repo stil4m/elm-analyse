@@ -6,23 +6,31 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(UnnecessaryParens))
 import Inspector exposing (Action(Post), defaultConfig)
 import Maybe.Extra as Maybe
+import List.Extra as List
 
 
 type alias UnnecessaryParensContext =
     List Range
 
 
+rangetoTuple : Range -> ( Int, Int, Int, Int )
+rangetoTuple x =
+    ( x.start.row, x.start.column, x.end.row, x.end.column )
+
+
 scan : FileContext -> List Message
 scan fileContext =
     let
-        x : UnnecessaryParensContext
+        x : List Range
         x =
             Inspector.inspect
                 { defaultConfig | onExpression = Post onExpression }
                 fileContext.ast
                 []
     in
-        x |> List.map (UnnecessaryParens fileContext.path)
+        x
+            |> List.uniqueBy rangetoTuple
+            |> List.map (UnnecessaryParens fileContext.path)
 
 
 onExpression : Expression -> UnnecessaryParensContext -> UnnecessaryParensContext

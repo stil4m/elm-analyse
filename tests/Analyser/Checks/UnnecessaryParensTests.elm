@@ -56,12 +56,26 @@ jon = (john)
     )
 
 
+parensInOperatorForSimpleValue : ( String, String, List Message )
+parensInOperatorForSimpleValue =
+    ( "parensInOperatorForSimpleValue"
+    , """module Bar exposing (..)
+
+foo = 1 + (1)
+
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 9 }, end = { row = 3, column = -2 } }
+      ]
+    )
+
+
 all : Test
 all =
     describe "Analyser.Checks.UnnecessaryParensTests"
         ([ parensBetweenOperators
          , parensForInfixCombinations
          , parensAroundSimpleValue
+         , parensInOperatorForSimpleValue
          ]
             |> List.map
                 (\( name, input, messages ) ->
