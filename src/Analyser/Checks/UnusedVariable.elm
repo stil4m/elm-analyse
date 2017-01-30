@@ -73,7 +73,7 @@ pushScope vars x =
             vars
                 |> List.map (\x -> ( x.value, ( 0, x.range ) ))
                 |> Dict.fromList
-                |> ((,) [])
+                |> (,) []
     in
         { x | activeScopes = y :: x.activeScopes }
 
@@ -138,7 +138,7 @@ flagVariable k l =
             else if Dict.member k x then
                 ( masked, (Dict.update k (Maybe.map (Tuple2.mapFirst ((+) 1))) x) ) :: xs
             else
-                ( masked, x ) :: (flagVariable k xs)
+                ( masked, x ) :: flagVariable k xs
 
 
 addUsedVariable : String -> UsedVariableContext -> UsedVariableContext
@@ -179,8 +179,8 @@ onFunction f function context =
     let
         preContext =
             context
-                |> (maskVariable function.declaration.name.value)
-                |> (\c -> function.declaration.arguments |> List.concatMap patternToVars |> flip pushScope c)
+                |> maskVariable function.declaration.name.value
+                |> \c -> function.declaration.arguments |> List.concatMap patternToVars |> flip pushScope c
 
         postContext =
             f preContext
@@ -222,7 +222,7 @@ onCase : (UsedVariableContext -> UsedVariableContext) -> Case -> UsedVariableCon
 onCase f caze context =
     let
         preContext =
-            (Tuple.first caze)
+            Tuple.first caze
                 |> patternToVars
                 |> flip pushScope context
 
@@ -282,7 +282,7 @@ patternToVars p =
             List.concatMap patternToVars args
 
         AsPattern sub name ->
-            name :: (patternToVars sub)
+            name :: patternToVars sub
 
         ParentisizedPattern sub ->
             patternToVars sub

@@ -81,7 +81,7 @@ listPattern =
             between
                 (string "[")
                 (string "]")
-                (ListPattern <$> (sepBy (string ",") (trimmed pattern)))
+                (ListPattern <$> sepBy (string ",") (trimmed pattern))
         )
 
 
@@ -169,7 +169,7 @@ namedPattern =
         (\() ->
             succeed NamedPattern
                 <*> qualifiedNameRef
-                <*> many (moreThanIndentWhitespace *> (or qualifiedNamePattern nonNamedPattern))
+                <*> many (moreThanIndentWhitespace *> or qualifiedNamePattern nonNamedPattern)
         )
 
 

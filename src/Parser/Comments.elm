@@ -30,17 +30,15 @@ multilineComment =
                 <$> sequence
                         [ (string "{-")
                         , String.concat
-                            <$> (manyTill
+                            <$> manyTill
                                     (lookAhead (count 2 anyChar)
-                                        >>= (\x ->
+                                        >>= \x ->
                                                 if x == [ '{', '-' ] then
                                                     multilineComment
                                                 else
                                                     String.fromChar <$> anyChar
-                                            )
                                     )
                                     (string "-}")
-                                )
                         , succeed "-}"
                         ]
             )

@@ -21,7 +21,7 @@ withRange p =
     withLocation
         (\start ->
             p
-                >>= (\pResult ->
+                >>= \pResult ->
                         withLocation
                             (\end ->
                                 succeed <|
@@ -30,7 +30,6 @@ withRange p =
                                         , end = asPointerLocation end
                                         }
                             )
-                    )
         )
 
 
@@ -40,8 +39,8 @@ unstrictIndentWhitespace =
         <$> many1
                 (sequence
                     [ manySpaces
-                    , Maybe.withDefault "" <$> maybe (someComment)
-                    , (String.concat) <$> many1 newLineWithSomeIndent
+                    , Maybe.withDefault "" <$> maybe someComment
+                    , String.concat <$> many1 newLineWithSomeIndent
                     ]
                 )
 
@@ -77,7 +76,7 @@ someComment =
 commentSequence : Parser State String
 commentSequence =
     String.concat
-        <$> (many
+        <$> many
                 (or (someComment)
                     (String.concat
                         <$> sequence
@@ -87,7 +86,6 @@ commentSequence =
                                 ]
                     )
                 )
-            )
 
 
 trimmed : Parser State x -> Parser State x
@@ -101,18 +99,17 @@ moreThanIndentWhitespace =
         (\state ->
             or
                 ((List.concat >> String.concat)
-                    <$> (many1
+                    <$> many1
                             (sequence
                                 [ manySpaces
                                 , commentSequence
                                 , newLineWithIndentPlus state
                                 ]
                             )
-                        )
                 )
                 (succeed (++)
                     <*> many1Spaces
-                    <*> (Maybe.withDefault "" <$> (maybe someComment))
+                    <*> (Maybe.withDefault "" <$> maybe someComment)
                 )
         )
 
@@ -140,8 +137,8 @@ newLineWithIndentExact state =
                 , String.concat
                     <$> many
                             (succeed (++)
-                                <*> (manySpaces)
-                                <*> (realNewLine)
+                                <*> manySpaces
+                                <*> realNewLine
                             )
                 , nSpaces (currentIndent state)
                 ]

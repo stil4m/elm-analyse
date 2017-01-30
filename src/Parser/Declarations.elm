@@ -21,7 +21,7 @@ import Parser.Whitespace exposing (manySpaces)
 file : Parser State File
 file =
     ((maybe exactIndentWhitespace) *> moduleDefinition)
-        >>= (\modDef ->
+        >>= \modDef ->
                 let
                     importParser =
                         case modDef of
@@ -33,8 +33,7 @@ file =
                 in
                     succeed (File modDef)
                         <*> importParser
-                        <*> ((many (exactIndentWhitespace *> declaration)) <* maybe exactIndentWhitespace <* manySpaces)
-            )
+                        <*> (many (exactIndentWhitespace *> declaration) <* maybe exactIndentWhitespace <* manySpaces)
 
 
 declaration : Parser State Declaration
@@ -58,7 +57,7 @@ function =
         (\() ->
             succeed Function
                 <*> succeed Nothing
-                <*> (maybe (signature <* exactIndentWhitespace))
+                <*> maybe (signature <* exactIndentWhitespace)
                 <*> functionDeclaration
         )
 
@@ -91,8 +90,8 @@ portDeclaration =
 signature : Parser State FunctionSignature
 signature =
     succeed FunctionSignature
-        <*> (lookAhead anyChar >>= (\c -> succeed (c == '(')))
-        <*> (or functionName (parens prefixOperatorToken))
+        <*> (lookAhead anyChar >>= \c -> succeed (c == '('))
+        <*> or functionName (parens prefixOperatorToken)
         <*> (trimmed (string ":") *> maybe moreThanIndentWhitespace *> typeReference)
 
 
@@ -101,9 +100,9 @@ functionDeclaration =
     lazy
         (\() ->
             succeed FunctionDeclaration
-                <*> (lookAhead anyChar >>= (\c -> succeed (c == '(')))
+                <*> (lookAhead anyChar >>= \c -> succeed (c == '('))
                 <*> (asPointer <| or functionName (parens prefixOperatorToken))
-                <*> (many (moreThanIndentWhitespace *> functionArgument))
+                <*> many (moreThanIndentWhitespace *> functionArgument)
                 <*> (maybe moreThanIndentWhitespace
                         *> string "="
                         *> maybe moreThanIndentWhitespace
@@ -155,10 +154,9 @@ expression =
     lazy
         (\() ->
             expressionNotApplication
-                >>= (\expr ->
+                >>= \expr ->
                         or (promoteToApplicationExpression expr)
                             (succeed expr)
-                    )
         )
 
 
@@ -167,7 +165,7 @@ promoteToApplicationExpression expr =
     lazy
         (\() ->
             succeed (\rest -> Application (expr :: rest))
-                <*> (lazy (\() -> (many1 (maybe moreThanIndentWhitespace *> expressionNotApplication))))
+                <*> lazy (\() -> (many1 (maybe moreThanIndentWhitespace *> expressionNotApplication)))
         )
 
 
@@ -209,19 +207,17 @@ unitExpression =
 glslExpression : Parser State Expression
 glslExpression =
     (String.fromList >> GLSLExpression)
-        <$> (between (string "[glsl|")
+        <$> between (string "[glsl|")
                 (string "|]")
                 (many
                     (lookAhead (String.fromList <$> count 2 anyChar)
-                        >>= (\s ->
+                        >>= \s ->
                                 if s == "|]" then
                                     fail "end symbol"
                                 else
                                     anyChar
-                            )
                     )
                 )
-            )
 
 
 
@@ -233,9 +229,9 @@ listExpression =
     lazy
         (\() ->
             ListExpr
-                -- Not sure on this or
+                -- TODO Not sure on this or
                 <$>
-                    (or ([] <$ (string "[" *> (maybe (or moreThanIndentWhitespace exactIndentWhitespace)) *> string "]"))
+                    or ([] <$ (string "[" *> maybe (or moreThanIndentWhitespace exactIndentWhitespace) *> string "]"))
                         (between
                             (string "[")
                             (string "]")
@@ -243,7 +239,6 @@ listExpression =
                                 (trimmed expression)
                             )
                         )
-                    )
         )
 
 
@@ -258,8 +253,8 @@ recordExpressionField =
             succeed (,)
                 <*> functionName
                 <*> (maybe moreThanIndentWhitespace
-                        *> (string "=")
-                        *> (maybe moreThanIndentWhitespace)
+                        *> string "="
+                        *> maybe moreThanIndentWhitespace
                         *> expression
                     )
         )
@@ -282,10 +277,9 @@ recordExpression =
     lazy
         (\() ->
             RecordExpr
-                <$> (between (string "{")
+                <$> between (string "{")
                         (string "}")
                         (recordFields False)
-                    )
         )
 
 
@@ -297,7 +291,7 @@ recordUpdateExpression =
                 (string "}")
                 (RecordUpdateExpression
                     <$> (succeed RecordUpdate
-                            <*> (trimmed functionName)
+                            <*> trimmed functionName
                             <*> (string "|" *> recordFields True)
                         )
                 )
@@ -328,7 +322,7 @@ lambdaExpression =
     lazy
         (\() ->
             succeed (\args expr -> Lambda args expr |> LambdaExpression)
-                <*> (string "\\" *> maybe moreThanIndentWhitespace *> (sepBy1 moreThanIndentWhitespace functionArgument))
+                <*> (string "\\" *> maybe moreThanIndentWhitespace *> sepBy1 moreThanIndentWhitespace functionArgument)
                 <*> (trimmed (string "->") *> expression)
         )
 
@@ -385,7 +379,7 @@ letBlock : Parser State (List Declaration)
 letBlock =
     lazy
         (\() ->
-            ((string "let" *> (moreThanIndentWhitespace))
+            ((string "let" *> moreThanIndentWhitespace)
                 *> withIndentedState letBody
                 <* (choice
                         [ unstrictIndentWhitespace
@@ -420,11 +414,11 @@ floatableExpression =
 
 ifBlockExpression : Parser State Expression
 ifBlockExpression =
-    ((ifToken)
+    (ifToken
         *> lazy
             (\() ->
                 succeed IfBlock
-                    <*> (trimmed expression)
+                    <*> trimmed expression
                     <*> (thenToken *> trimmed expression)
                     <*> (elseToken *> moreThanIndentWhitespace *> expression)
             )
@@ -433,7 +427,7 @@ ifBlockExpression =
 
 prefixOperatorExpression : Parser State Expression
 prefixOperatorExpression =
-    PrefixOperator <$> (parens prefixOperatorToken)
+    PrefixOperator <$> parens prefixOperatorToken
 
 
 operatorExpression : Parser State Expression
@@ -471,7 +465,7 @@ recordAccessExpression =
             succeed RecordAccess
                 <*> (succeed (::)
                         <*> functionName
-                        <*> (many1 (string "." *> functionName))
+                        <*> many1 (string "." *> functionName)
                     )
         )
 

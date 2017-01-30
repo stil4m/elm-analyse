@@ -58,7 +58,7 @@ onOperatorApplicationExpression oparatorApplication context =
         , fixHandSide oparatorApplication.right
         ]
             |> List.filterMap identity
-            |> (flip (++) context)
+            |> flip (++) context
 
 
 onParenthesizedExpression : Parenthesized -> UnnecessaryParensContext -> UnnecessaryParensContext

@@ -1,1 +1,2 @@
 - Do not see effect manager functions as unused
+- Unused parens LHS for lambda

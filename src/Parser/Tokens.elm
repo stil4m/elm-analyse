@@ -50,7 +50,7 @@ reserved =
       --, "alias" Apparently this is not a reserved keyword
     , "where"
     ]
-        |> (List.map (flip (,) True))
+        |> List.map (flip (,) True)
         |> Dict.fromList
 
 
@@ -125,28 +125,26 @@ notReserved match =
 escapedChar : Parser s Char
 escapedChar =
     char '\\'
-        *> (choice
-                [ '\'' <$ char '\''
-                , '"' <$ char '"'
-                , '\n' <$ char 'n'
-                , '\t' <$ char 't'
-                , '\\' <$ char '\\'
-                , '\x07' <$ char 'a'
-                , '\x08' <$ char 'b'
-                , '\x0C' <$ char 'f'
-                , '\x0D' <$ char 'r'
-                , '\x0B' <$ char 'v'
-                , (char 'x' *> regex "[0-9A-Fa-f]{2}")
-                    >>= (\l ->
-                            case Hex.fromString <| String.toLower l of
-                                Ok x ->
-                                    succeed (fromCode x)
+        *> choice
+            [ '\'' <$ char '\''
+            , '"' <$ char '"'
+            , '\n' <$ char 'n'
+            , '\t' <$ char 't'
+            , '\\' <$ char '\\'
+            , '\x07' <$ char 'a'
+            , '\x08' <$ char 'b'
+            , '\x0C' <$ char 'f'
+            , '\x0D' <$ char 'r'
+            , '\x0B' <$ char 'v'
+            , (char 'x' *> regex "[0-9A-Fa-f]{2}")
+                >>= \l ->
+                        case Hex.fromString <| String.toLower l of
+                            Ok x ->
+                                succeed (fromCode x)
 
-                                Err x ->
-                                    fail x
-                        )
-                ]
-           )
+                            Err x ->
+                                fail x
+            ]
 
 
 quotedSingleQuote : Parser s Char
@@ -172,7 +170,7 @@ stringLiteral =
     --                     )
     --        )
     --     <* (char '"')
-    (char '"')
+    char '"'
         *> (String.concat
                 <$> many
                         (choice
@@ -181,7 +179,7 @@ stringLiteral =
                             ]
                         )
            )
-        <* (char '"')
+        <* char '"'
 
 
 multiLineStringLiteral : Parser s String
@@ -193,12 +191,11 @@ multiLineStringLiteral =
             <$> many
                     (or (regex "[^\\\\\\\"]+")
                         (lookAhead (count 3 anyChar)
-                            >>= (\x ->
+                            >>= \x ->
                                     if x == [ '"', '"', '"' ] then
                                         fail "end of input"
                                     else
-                                        String.fromChar <$> (or escapedChar anyChar)
-                                )
+                                        String.fromChar <$> or escapedChar anyChar
                         )
                     )
         )
@@ -260,9 +257,8 @@ operatorTokenFromList : List Char -> Parser s String
 operatorTokenFromList allowedChars =
     String.fromList
         <$> many1 (oneOf allowedChars)
-        >>= (\m ->
+        >>= \m ->
                 if List.member m excludedOperators then
                     fail "operator is not allowed"
                 else
                     succeed m
-            )

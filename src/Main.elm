@@ -39,12 +39,9 @@ update msg _ =
         Trigger fileName content currentTime ->
             ( ()
             , Parser.parse content
-                -- |> Maybe.map PostProcessing.postProcess
-                |>
-                    (\r ->
-                        Time.now
-                            |> Task.perform (Done fileName (toString <| r) currentTime)
-                    )
+                |> \r ->
+                    Time.now
+                        |> Task.perform (Done fileName (toString <| r) currentTime)
             )
 
         Done fileName result before after ->

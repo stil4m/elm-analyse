@@ -40,7 +40,7 @@ typeExpose =
 
 exposingListInner : Parser State b -> Parser State (Exposure b)
 exposingListInner p =
-    or (withRange (All <$ (trimmed (string ".."))))
+    or (withRange (All <$ trimmed (string "..")))
         (Explicit <$> sepBy (char ',') (trimmed p))
 
 

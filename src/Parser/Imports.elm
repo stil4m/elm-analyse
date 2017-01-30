@@ -11,5 +11,5 @@ importDefinition : Parser State Import
 importDefinition =
     succeed Import
         <*> (importToken *> moreThanIndentWhitespace *> moduleName)
-        <*> (maybe (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> moduleName))
+        <*> maybe (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> moduleName)
         <*> exposeDefinition exposable

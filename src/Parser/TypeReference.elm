@@ -55,8 +55,8 @@ tupledTypeReference =
             Tupled
                 <$> parens
                         (succeed (::)
-                            <*> (trimmed typeReference)
-                            <*> (many1 (string "," *> trimmed typeReference))
+                            <*> trimmed typeReference
+                            <*> many1 (string "," *> trimmed typeReference)
                         )
         )
 

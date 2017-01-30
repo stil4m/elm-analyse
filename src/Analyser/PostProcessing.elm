@@ -41,7 +41,7 @@ fixApplication : OperatorTable -> List Expression -> Expression
 fixApplication operators expressions =
     let
         ops =
-            (List.filterMap expressionOperators expressions)
+            List.filterMap expressionOperators expressions
                 |> List.map
                     (\x ->
                         ( x
