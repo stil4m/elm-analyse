@@ -107,7 +107,7 @@ update msg model =
         ( _, Finished messages ) ->
             model ! [ AnalyserPorts.sendMessagesAsStrings messages ]
 
-        ( b, _ ) ->
+        _ ->
             model ! []
 
 
