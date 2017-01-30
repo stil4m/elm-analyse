@@ -77,7 +77,7 @@ commentSequence : Parser State String
 commentSequence =
     String.concat
         <$> many
-                (or (someComment)
+                (or someComment
                     (String.concat
                         <$> sequence
                                 [ realNewLine

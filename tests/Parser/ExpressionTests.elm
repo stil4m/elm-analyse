@@ -198,4 +198,14 @@ all =
                                 ]
                             )
                         )
+        , test "prefix notation" <|
+            \() ->
+                parseFullStringWithNullState "(::) x" expression
+                    |> Expect.equal
+                        (Just <|
+                            Application
+                                [ PrefixOperator "::"
+                                , FunctionOrValue "x"
+                                ]
+                        )
         ]

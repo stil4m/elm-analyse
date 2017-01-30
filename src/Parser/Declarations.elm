@@ -130,8 +130,8 @@ expressionNotApplication =
                 , recordAccessExpression
                 , functionOrValueExpression
                 , ifBlockExpression
-                , tupledExpression
                 , prefixOperatorExpression
+                , tupledExpression
                 , recordAccessFunctionExpression
                 , operatorExpression
                 , floatableExpression
