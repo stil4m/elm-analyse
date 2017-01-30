@@ -1,6 +1,6 @@
-module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts, getParenthesized, isOperatorApplication)
+module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts, getParenthesized, isOperatorApplication, isLambda)
 
-import AST.Types exposing (Range, File, Exposure, ModuleName, Expose, Parenthesized, Module(NormalModule, PortModule, EffectModule, NoModule), Expression(OperatorApplicationExpression, ParenthesizedExpression))
+import AST.Types exposing (Range, File, Exposure, ModuleName, Expose, Parenthesized, Module(NormalModule, PortModule, EffectModule, NoModule), Expression(OperatorApplicationExpression, ParenthesizedExpression, LambdaExpression))
 
 
 fileExposingList : File -> Maybe (Exposure Expose)
@@ -38,6 +38,16 @@ fileModuleName file =
 rangeFromInts : ( Int, Int, Int, Int ) -> Range
 rangeFromInts ( x, y, z, a ) =
     { start = { row = x, column = y }, end = { row = z, column = a } }
+
+
+isLambda : Expression -> Bool
+isLambda e =
+    case e of
+        LambdaExpression _ ->
+            True
+
+        _ ->
+            False
 
 
 isOperatorApplication : Expression -> Bool

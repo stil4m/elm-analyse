@@ -69,6 +69,31 @@ foo = 1 + (1)
     )
 
 
+parensOnFirstPartOfApplication : ( String, String, List Message )
+parensOnFirstPartOfApplication =
+    ( "parensOnFirstPartOfApplication"
+    , """module Bar exposing (..)
+
+foo = (x y) z
+
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 5 }, end = { row = 2, column = 10 } }
+      ]
+    )
+
+
+allowParensForLambdaOnLhs : ( String, String, List Message )
+allowParensForLambdaOnLhs =
+    ( "allowParensForLambdaOnLhs"
+    , """module Bar exposing (..)
+
+foo = (\\x -> x + 1) <| 2
+
+"""
+    , []
+    )
+
+
 all : Test
 all =
     describe "Analyser.Checks.UnnecessaryParensTests"
@@ -76,6 +101,8 @@ all =
          , parensForInfixCombinations
          , parensAroundSimpleValue
          , parensInOperatorForSimpleValue
+         , parensOnFirstPartOfApplication
+         , allowParensForLambdaOnLhs
          ]
             |> List.map
                 (\( name, input, messages ) ->
