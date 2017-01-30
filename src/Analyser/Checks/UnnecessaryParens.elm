@@ -81,6 +81,9 @@ onExpression expression context =
         RecordExpr parts ->
             onRecord parts context
 
+        RecordUpdateExpression recordUpdate ->
+            onRecord recordUpdate.updates context
+
         _ ->
             context
 

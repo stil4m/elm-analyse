@@ -201,6 +201,21 @@ foo =
     )
 
 
+parensInRecordFieldValuesForUpdate : ( String, String, List Message )
+parensInRecordFieldValuesForUpdate =
+    ( "parensInRecordFieldValuesForUpdate"
+    , """module Bar exposing (..)
+
+foo =
+  { a
+    | bar = (x y)
+  }
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 4, column = 11 }, end = { row = 5, column = -2 } }
+      ]
+    )
+
+
 parensAroundRecordAccess : ( String, String, List Message )
 parensAroundRecordAccess =
     ( "parensAroundRecordAccess"
@@ -242,6 +257,7 @@ all =
          , parensAroundRecordUpdateExpression
          , parensAroundRecordUpdateExpression
          , parensInRecordFieldValues
+         , parensInRecordFieldValuesForUpdate
          , parensAroundRecordAccess
          , parensAroundRecordFunction
          ]
