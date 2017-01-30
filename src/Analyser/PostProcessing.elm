@@ -73,8 +73,8 @@ fixApplication operators expressions =
                             OperatorApplicationExpression
                                 { operator = infix.operator
                                 , direction = infix.direction
-                                , left = (doTheThing p)
-                                , right = (doTheThing s)
+                                , left = doTheThing p
+                                , right = doTheThing s
                                 }
                         )
                     |> Maybe.withDefault (fixExprs exps)
@@ -202,8 +202,8 @@ visitExpressionInner visitor context expression =
             OperatorApplicationExpression operatorApplication ->
                 OperatorApplicationExpression
                     { operatorApplication
-                        | left = (subVisit operatorApplication.left)
-                        , right = (subVisit operatorApplication.right)
+                        | left = subVisit operatorApplication.left
+                        , right = subVisit operatorApplication.right
                     }
 
             IfBlock e1 e2 e3 ->
@@ -215,22 +215,22 @@ visitExpressionInner visitor context expression =
                     |> TupledExpression
 
             ParenthesizedExpression parenthesized ->
-                ParenthesizedExpression { parenthesized | expression = (subVisit parenthesized.expression) }
+                ParenthesizedExpression { parenthesized | expression = subVisit parenthesized.expression }
 
             LetExpression letBlock ->
                 LetExpression
-                    { declarations = (visitDeclarations visitor context letBlock.declarations)
-                    , expression = (subVisit letBlock.expression)
+                    { declarations = visitDeclarations visitor context letBlock.declarations
+                    , expression = subVisit letBlock.expression
                     }
 
             CaseExpression caseBlock ->
                 CaseExpression
-                    { expression = (subVisit caseBlock.expression)
-                    , cases = (List.map (Tuple2.mapSecond subVisit) caseBlock.cases)
+                    { expression = subVisit caseBlock.expression
+                    , cases = List.map (Tuple2.mapSecond subVisit) caseBlock.cases
                     }
 
             LambdaExpression { args, expression } ->
-                LambdaExpression <| { args = args, expression = (subVisit expression) }
+                LambdaExpression <| { args = args, expression = subVisit expression }
 
             RecordExpr expressionStringList ->
                 expressionStringList
