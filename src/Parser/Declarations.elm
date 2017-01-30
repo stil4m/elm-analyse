@@ -20,7 +20,7 @@ import Parser.Whitespace exposing (manySpaces)
 
 file : Parser State File
 file =
-    ((maybe exactIndentWhitespace) *> moduleDefinition)
+    (maybe exactIndentWhitespace *> moduleDefinition)
         >>= \modDef ->
                 let
                     importParser =
@@ -396,7 +396,7 @@ letExpression =
     lazy
         (\() ->
             (succeed (\decls -> LetBlock decls >> LetExpression)
-                <*> (withIndentedState2 letBlock)
+                <*> withIndentedState2 letBlock
                 <*> (moreThanIndentWhitespace *> expression)
             )
         )
