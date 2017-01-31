@@ -12,33 +12,27 @@ type alias Range =
     { start : Location, end : Location }
 
 
-decodeLocation : Decoder Location
-decodeLocation =
-    JD.map2 Location
-        (JD.field "r" JD.int)
-        (JD.field "c" JD.int)
-
-
 decode : Decoder Range
 decode =
-    JD.map2 Range
-        (JD.field "s" decodeLocation)
-        (JD.field "e" decodeLocation)
+    JD.list JD.int
+        |> JD.andThen
+            (\l ->
+                case l of
+                    [ a, b, c, d ] ->
+                        JD.succeed { start = { row = a, column = b }, end = { row = c, column = d } }
 
-
-encodeLocation : Location -> Value
-encodeLocation { row, column } =
-    JE.object
-        [ ( "r", JE.int row )
-        , ( "c", JE.int column )
-        ]
+                    _ ->
+                        JD.fail "Invalid range"
+            )
 
 
 encode : Range -> Value
 encode { start, end } =
-    JE.object
-        [ ( "s", encodeLocation start )
-        , ( "e", encodeLocation end )
+    JE.list
+        [ JE.int start.row
+        , JE.int start.column
+        , JE.int end.row
+        , JE.int end.column
         ]
 
 
