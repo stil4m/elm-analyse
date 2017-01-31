@@ -3,8 +3,10 @@ module Analyser.Types
         ( LoadedSourceFiles
         , LoadedSourceFile
         , FileLoad(Failed, Loaded)
+        , LoadedFile
         , ModuleIndex
         , OperatorTable
+        , FileContent
         )
 
 import AST.Types as AST
@@ -17,7 +19,11 @@ type alias LoadedSourceFiles =
 
 
 type alias LoadedSourceFile =
-    ( String, FileLoad )
+    ( FileContent, FileLoad )
+
+
+type alias LoadedFile =
+    ( FileContent, FileLoad )
 
 
 type FileLoad
@@ -35,3 +41,12 @@ type alias ModuleIndex =
 
 type alias OperatorTable =
     Dict String AST.Infix
+
+
+type alias FileContent =
+    { path : String
+    , success : Bool
+    , sha1 : Maybe String
+    , content : Maybe String
+    , formatted : Bool
+    }

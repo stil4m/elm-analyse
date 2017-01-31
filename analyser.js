@@ -1,6 +1,8 @@
 const fs = require('fs');
 const cp = require('child_process');
 const _ = require('lodash');
+const fileReader = require('./fileReader');
+
 const directory = ".";
 
 function targetFilesForPathAndPackage(path, pack) {
@@ -22,7 +24,11 @@ function dependencyFiles(dep) {
     const version = exactDeps[dep];
     const depPath = directory + "/elm-stuff/packages/" + dep + "/" + version;
     const depPackageFile = require(depPath + '/elm-package.json');
-    return targetFilesForPathAndPackage(depPath, depPackageFile);
+    const exposedModules = depPackageFile['exposed-modules'].map(x => '/' + x.replace('.','/') + '.elm');
+    const unfilteredTargetFiles = targetFilesForPathAndPackage(depPath, depPackageFile);
+    return unfilteredTargetFiles.filter(function(x) {
+      return exposedModules.filter(e => x.endsWith(e))[0];
+    });
 }
 
 (function() {
@@ -44,11 +50,14 @@ function dependencyFiles(dep) {
       x.forEach(y => console.log(y));
     })
     app.ports.loadFile.subscribe(function(x) {
-      console.log("Load file", x, "...")
-      const real = x.replace(".", directory);
-      fs.readFile(real, function(e, content) {
-          app.ports.fileContent.send([x,content.toString()]);
+      fileReader(directory, x, function(result) {
+        app.ports.fileContent.send(result);
       })
+
+      // const real = x.replace(".", directory);
+      // fs.readFile(real, function(e, content) {
+      //     app.ports.fileContent.send([x,content.toString()]);
+      // })
     });
 
 })();

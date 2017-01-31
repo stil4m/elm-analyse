@@ -2,7 +2,7 @@ module Analyser.InterfaceLoadingStage exposing (Model, Msg, init, isDone, parsed
 
 import AST.Types
 import AST.Util as Util
-import Analyser.Types exposing (FileLoad)
+import Analyser.Types exposing (FileLoad, FileContent)
 import Analyser.LoadedDependencies exposing (LoadedDependencies, LoadedInterface)
 import AnalyserPorts
 import Dict exposing (Dict)
@@ -16,12 +16,12 @@ type Model
 
 
 type Msg
-    = OnFileContent ( String, String )
+    = OnFileContent FileContent
 
 
 type alias State =
     { filesToLoad : Maybe ( ( String, String ), List ( String, String ) )
-    , parsedInterfaces : List ( String, ( String, FileLoad ) )
+    , parsedInterfaces : List ( String, ( FileContent, FileLoad ) )
     }
 
 
@@ -45,9 +45,9 @@ isDone (Model model) =
 
 
 insertDependencyInterface :
-    ( String, ( String, FileLoad ) )
-    -> Dict String (List ( String, FileLoad ))
-    -> Dict String (List ( String, FileLoad ))
+    ( String, ( FileContent, FileLoad ) )
+    -> Dict String (List ( FileContent, FileLoad ))
+    -> Dict String (List ( FileContent, FileLoad ))
 insertDependencyInterface ( name, result ) b =
     Dict.get name b
         |> Maybe.withDefault []
@@ -66,15 +66,15 @@ parsedInterfaces (Model model) =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg (Model state) =
     case msg of
-        OnFileContent ( _, content ) ->
+        OnFileContent fileContent ->
             state.filesToLoad
                 |> Maybe.map
-                    (\( ( dependency, fileName ), rest ) ->
+                    (\( ( dependency, _ ), rest ) ->
                         Model
                             { state
                                 | filesToLoad = List.Extra.uncons rest
                                 , parsedInterfaces =
-                                    onInputLoadingInterface ( dependency, fileName, content )
+                                    onInputLoadingInterface ( dependency, fileContent )
                                         :: state.parsedInterfaces
                             }
                     )
@@ -82,20 +82,29 @@ update msg (Model state) =
                 |> Maybe.withDefault (Model state ! [])
 
 
-onInputLoadingInterface : ( String, String, String ) -> ( String, ( String, FileLoad ) )
-onInputLoadingInterface ( dependency, fileName, content ) =
+onInputLoadingInterface : ( String, FileContent ) -> ( String, ( FileContent, FileLoad ) )
+onInputLoadingInterface ( dependency, fileContent ) =
     let
         loadedInterfaceForFile : AST.Types.File -> FileLoad
         loadedInterfaceForFile file =
-            Analyser.Types.Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
+            Analyser.Types.Loaded
+                { ast = file
+                , moduleName = Util.fileModuleName file
+                , interface = Interface.build file
+                }
     in
-        ( dependency
-        , ( fileName
-          , Parser.parse content
-                |> Maybe.map loadedInterfaceForFile
-                |> Maybe.withDefault Analyser.Types.Failed
-          )
-        )
+        case fileContent.content of
+            Nothing ->
+                ( dependency, ( fileContent, Analyser.Types.Failed ) )
+
+            Just content ->
+                ( dependency
+                , ( fileContent
+                  , Parser.parse content
+                        |> Maybe.map loadedInterfaceForFile
+                        |> Maybe.withDefault Analyser.Types.Failed
+                  )
+                )
 
 
 loadNextFile : Model -> ( Model, Cmd Msg )

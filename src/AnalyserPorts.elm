@@ -1,12 +1,13 @@
 port module AnalyserPorts exposing (loadFile, fileContent, sendMessagesAsStrings)
 
 import Analyser.Messages exposing (Message)
+import Analyser.Types exposing (FileContent)
 
 
 port loadFile : String -> Cmd msg
 
 
-port fileContent : (( String, String ) -> msg) -> Sub msg
+port fileContent : (FileContent -> msg) -> Sub msg
 
 
 port sendMessages : List String -> Cmd msg

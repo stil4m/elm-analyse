@@ -2,7 +2,7 @@ module Analyser.SourceLoadingStage exposing (init, update, isDone, parsedFiles, 
 
 import AST.Types
 import AST.Util as Util
-import Analyser.Types exposing (FileLoad)
+import Analyser.Types exposing (FileContent, FileLoad, LoadedFile)
 import AnalyserPorts
 import Interfaces.Interface as Interface
 import List.Extra
@@ -14,12 +14,12 @@ type Model
 
 
 type Msg
-    = OnFileContent ( String, String )
+    = OnFileContent FileContent
 
 
 type alias State =
     { filesToLoad : Maybe ( String, List String )
-    , parsedFiles : List ( String, FileLoad )
+    , parsedFiles : List LoadedFile
     }
 
 
@@ -45,15 +45,15 @@ parsedFiles (Model model) =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg (Model state) =
     case msg of
-        OnFileContent ( _, content ) ->
+        OnFileContent fileContent ->
             state.filesToLoad
                 |> Maybe.map
-                    (\( fileName, rest ) ->
+                    (\( _, rest ) ->
                         Model
                             { state
                                 | filesToLoad = List.Extra.uncons rest
                                 , parsedFiles =
-                                    onInputLoadingInterface ( fileName, content )
+                                    onInputLoadingInterface fileContent
                                         :: state.parsedFiles
                             }
                     )
@@ -61,18 +61,25 @@ update msg (Model state) =
                 |> Maybe.withDefault (Model state ! [])
 
 
-onInputLoadingInterface : ( String, String ) -> ( String, FileLoad )
-onInputLoadingInterface ( fileName, content ) =
+onInputLoadingInterface : FileContent -> LoadedFile
+onInputLoadingInterface fileContent =
     let
         loadedInterfaceForFile : AST.Types.File -> FileLoad
         loadedInterfaceForFile file =
             Analyser.Types.Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
     in
-        ( fileName
-        , Parser.parse content
-            |> Maybe.map loadedInterfaceForFile
-            |> Maybe.withDefault Analyser.Types.Failed
-        )
+        case fileContent.content of
+            Just content ->
+                ( fileContent
+                , Parser.parse content
+                    |> Maybe.map loadedInterfaceForFile
+                    |> Maybe.withDefault Analyser.Types.Failed
+                )
+
+            Nothing ->
+                ( fileContent
+                , Analyser.Types.Failed
+                )
 
 
 loadNextFile : Model -> ( Model, Cmd Msg )

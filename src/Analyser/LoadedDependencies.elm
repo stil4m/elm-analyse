@@ -2,7 +2,7 @@ module Analyser.LoadedDependencies exposing (LoadedDependencies, LoadedDependenc
 
 import AST.Types as AST
 import Analyser.Messages as M exposing (Message)
-import Analyser.Types exposing (FileLoad(Failed))
+import Analyser.Types exposing (FileLoad(Failed), LoadedFile)
 import Interfaces.Interface as Interface
 
 
@@ -12,7 +12,7 @@ type alias LoadedDependencies =
 
 type alias LoadedDependency =
     { dependency : String
-    , interfaces : List ( String, FileLoad )
+    , interfaces : List LoadedFile
     }
 
 
@@ -28,5 +28,5 @@ messages =
         (\{ dependency, interfaces } ->
             interfaces
                 |> List.filter (Tuple.second >> (==) Failed)
-                |> List.map (Tuple.first >> M.UnreadableDependencyFile dependency)
+                |> List.map (Tuple.first >> .path >> M.UnreadableDependencyFile dependency)
         )

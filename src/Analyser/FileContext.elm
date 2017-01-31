@@ -14,12 +14,13 @@ type alias FileContext =
     { interface : Interface
     , moduleName : Maybe AST.ModuleName
     , ast : AST.File
+    , content : String
     , path : String
     }
 
 
 create : LoadedSourceFiles -> LoadedDependencies -> LoadedSourceFile -> Maybe FileContext
-create sourceFiles dependencies ( path, target ) =
+create sourceFiles dependencies ( fileContent, target ) =
     let
         moduleIndex =
             OperatorTable.buildModuleIndex sourceFiles dependencies
@@ -36,6 +37,7 @@ create sourceFiles dependencies ( path, target ) =
                     in
                         { moduleName = l.moduleName
                         , ast = PostProcessing.postProcess operatorTable l.ast
-                        , path = path
+                        , path = fileContent.path
+                        , content = fileContent.content |> Maybe.withDefault ""
                         , interface = Interfaces.Interface.build l.ast
                         }
