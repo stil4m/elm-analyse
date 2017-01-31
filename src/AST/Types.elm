@@ -168,7 +168,7 @@ type InnerExpression
     | LetExpression LetBlock
     | CaseExpression CaseBlock
     | LambdaExpression Lambda
-    | RecordExpr (List ( String, Expression ))
+    | RecordExpr (List RecordSetter)
     | ListExpr (List Expression)
     | QualifiedExpr ModuleName String
     | RecordAccess (List String)
@@ -187,8 +187,12 @@ type alias OperatorApplication =
 
 type alias RecordUpdate =
     { name : String
-    , updates : List ( String, Expression )
+    , updates : List RecordSetter
     }
+
+
+type alias RecordSetter =
+    ( String, Expression )
 
 
 type alias CaseBlock =
@@ -246,7 +250,7 @@ type TypeArg
 
 type TypeReference
     = GenericType String
-    | Typed (List String) String (List TypeArg)
+    | Typed ModuleName String (List TypeArg)
     | Unit
     | Tupled (List TypeReference)
     | Record RecordDefinition
@@ -255,7 +259,7 @@ type TypeReference
 
 
 type alias RecordDefinition =
-    { fields : List RecordField }
+    List RecordField
 
 
 type alias RecordField =
@@ -267,7 +271,10 @@ type alias RecordField =
 
 
 type alias Import =
-    { moduleName : ModuleName, moduleAlias : Maybe ModuleName, exposingList : Exposure Expose }
+    { moduleName : ModuleName
+    , moduleAlias : Maybe ModuleName
+    , exposingList : Exposure Expose
+    }
 
 
 

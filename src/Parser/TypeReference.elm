@@ -63,18 +63,12 @@ tupledTypeReference =
 
 genericTypeReference : Parser State TypeReference
 genericTypeReference =
-    lazy
-        (\() ->
-            GenericType <$> functionName
-        )
+    lazy (\() -> GenericType <$> functionName)
 
 
 recordFieldsTypeReference : Parser State RecordDefinition
 recordFieldsTypeReference =
-    lazy
-        (\() ->
-            RecordDefinition <$> sepBy (string ",") (trimmed recordFieldDefinition)
-        )
+    lazy (\() -> sepBy (string ",") (trimmed recordFieldDefinition))
 
 
 genericRecordTypeReference : Parser State TypeReference

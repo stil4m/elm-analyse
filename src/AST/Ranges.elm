@@ -1,4 +1,7 @@
-module AST.Ranges exposing (Location, Range, rangeToString, getRange, emptyRange)
+module AST.Ranges exposing (Location, Range, rangeToString, getRange, emptyRange, encode, decode)
+
+import Json.Decode as JD exposing (Decoder)
+import Json.Encode as JE exposing (Value)
 
 
 type alias Location =
@@ -7,6 +10,36 @@ type alias Location =
 
 type alias Range =
     { start : Location, end : Location }
+
+
+decodeLocation : Decoder Location
+decodeLocation =
+    JD.map2 Location
+        (JD.field "r" JD.int)
+        (JD.field "c" JD.int)
+
+
+decode : Decoder Range
+decode =
+    JD.map2 Range
+        (JD.field "s" decodeLocation)
+        (JD.field "e" decodeLocation)
+
+
+encodeLocation : Location -> Value
+encodeLocation { row, column } =
+    JE.object
+        [ ( "r", JE.int row )
+        , ( "c", JE.int column )
+        ]
+
+
+encode : Range -> Value
+encode { start, end } =
+    JE.object
+        [ ( "s", encodeLocation start )
+        , ( "e", encodeLocation end )
+        ]
 
 
 rangeToString : Range -> String

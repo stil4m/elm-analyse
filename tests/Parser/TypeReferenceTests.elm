@@ -74,14 +74,14 @@ all =
                 parseFullStringWithNullState "{}" Parser.typeReference
                     |> Expect.equal
                         (Just <|
-                            Record { fields = [] }
+                            Record []
                         )
         , test "recordTypeReference one field" <|
             \() ->
                 parseFullStringWithNullState "{color: String }" Parser.typeReference
                     |> Expect.equal
                         (Just <|
-                            Record { fields = [ ( "color", Typed [] "String" [] ) ] }
+                            Record [ ( "color", Typed [] "String" [] ) ]
                         )
         , test "recordTypeReference nested record" <|
             \() ->
@@ -89,18 +89,14 @@ all =
                     |> Expect.equal
                         (Just <|
                             Record
-                                { fields =
-                                    [ ( "color"
-                                      , Record
-                                            { fields =
-                                                [ ( "r", Typed [] "Int" [] )
-                                                , ( "g", Typed [] "Int" [] )
-                                                , ( "b", Typed [] "Int" [] )
-                                                ]
-                                            }
-                                      )
-                                    ]
-                                }
+                                [ ( "color"
+                                  , Record
+                                        [ ( "r", Typed [] "Int" [] )
+                                        , ( "g", Typed [] "Int" [] )
+                                        , ( "b", Typed [] "Int" [] )
+                                        ]
+                                  )
+                                ]
                         )
         , test "recordTypeReference with generic" <|
             \() ->
@@ -108,12 +104,10 @@ all =
                     |> Expect.equal
                         (Just <|
                             Record
-                                { fields =
-                                    [ ( "color"
-                                      , GenericType "s"
-                                      )
-                                    ]
-                                }
+                                [ ( "color"
+                                  , GenericType "s"
+                                  )
+                                ]
                         )
         , test "function type reference" <|
             \() ->

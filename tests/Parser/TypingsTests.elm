@@ -19,12 +19,10 @@ all =
                             , generics = []
                             , typeReference =
                                 Record
-                                    { fields =
-                                        [ ( "color"
-                                          , Typed [] "String" []
-                                          )
-                                        ]
-                                    }
+                                    [ ( "color"
+                                      , Typed [] "String" []
+                                      )
+                                    ]
                             }
                         )
         , test "type alias with generic " <|
@@ -36,12 +34,10 @@ all =
                             , generics = [ "a" ]
                             , typeReference =
                                 Record
-                                    { fields =
-                                        [ ( "some"
-                                          , GenericType "a"
-                                          )
-                                        ]
-                                    }
+                                    [ ( "some"
+                                      , GenericType "a"
+                                      )
+                                    ]
                             }
                         )
         , test "type" <|
@@ -58,8 +54,4 @@ all =
             \() ->
                 parseFullStringWithNullState "type Maybe a = Just a |\nNothing" Parser.typeDeclaration
                     |> Expect.equal Nothing
-          -- , test "some type alias" <|
-          --     \() ->
-          --         parseFullStringWithNullState "type alias SendPort msg model = model -> Cmd msg" Parser.typeAlias
-          --             |> Expect.equal Nothing
         ]
