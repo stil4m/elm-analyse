@@ -15,6 +15,7 @@ type Message
     | UnnecessaryParens FileName Range
     | DebugLog FileName Range
     | DebugCrash FileName Range
+    | UnformattedFile FileName
 
 
 type alias FileName =
@@ -106,4 +107,11 @@ asString m =
                 , fileName
                 , "\" at "
                 , rangeToString range
+                ]
+
+        UnformattedFile fileName ->
+            String.concat
+                [ "Unformatted file \""
+                , fileName
+                , "\""
                 ]

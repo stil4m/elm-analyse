@@ -2,7 +2,7 @@ module Inspection exposing (run)
 
 import Analyser.FileContext as FileContext
 import Analyser.LoadedDependencies exposing (LoadedDependencies)
-import Analyser.Messages exposing (Message)
+import Analyser.Messages exposing (Message(UnformattedFile))
 import Analyser.Types exposing (LoadedSourceFiles)
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.NotExposeAll as NotExposeAll
@@ -13,7 +13,7 @@ import Analyser.Checks.NoDebug as NoDebug
 
 
 run : LoadedSourceFiles -> LoadedDependencies -> List Message
-run source deps =
+run sources deps =
     let
         checks =
             [ UnusedVariable.scan
@@ -24,9 +24,18 @@ run source deps =
             , NoDebug.scan
             ]
 
-        messages =
-            source
-                |> List.filterMap (FileContext.create source deps)
+        fileMessages =
+            sources
+                |> List.map Tuple.first
+                |> List.filter (not << .formatted)
+                |> List.map (.path >> UnformattedFile)
+
+        inspectionMessages =
+            sources
+                |> List.filterMap (FileContext.create sources deps)
                 |> List.concatMap (\x -> List.concatMap ((|>) x) checks)
+
+        messages =
+            List.concat [ inspectionMessages, fileMessages ]
     in
         messages

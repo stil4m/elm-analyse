@@ -35,6 +35,7 @@ function readFile(directory, path, cb) {
     }
     const normalized = normalizeNewline(content.toString());
     const fileName = sha1(normalized);
+    console.log(fileName);
     const fullPath ='./cache/' + fileName + '.elm';
     fs.writeFileSync(fullPath , normalized);
     const formatted = isFormatted(fullPath);

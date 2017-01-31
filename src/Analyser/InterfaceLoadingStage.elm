@@ -73,9 +73,7 @@ update msg (Model state) =
                         Model
                             { state
                                 | filesToLoad = List.Extra.uncons rest
-                                , parsedInterfaces =
-                                    onInputLoadingInterface ( dependency, fileContent )
-                                        :: state.parsedInterfaces
+                                , parsedInterfaces = onInputLoadingInterface ( dependency, fileContent ) :: state.parsedInterfaces
                             }
                     )
                 |> Maybe.map loadNextFile
