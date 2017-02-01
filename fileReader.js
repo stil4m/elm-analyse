@@ -18,7 +18,6 @@ function isFormatted (path) {
 
 function readFile(directory, path, cb) {
   console.log("Load file", path, "...")
-  //TODO
   const real = path.replace(".", directory);
 
   fs.readFile(real, function(e, content) {

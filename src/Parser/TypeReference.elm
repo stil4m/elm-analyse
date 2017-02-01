@@ -1,6 +1,4 @@
-module Parser.TypeReference exposing (typeReference, tupledTypeReference)
-
--- TODO Export for test. Failing when use first
+module Parser.TypeReference exposing (typeReference)
 
 import Combine exposing (choice, lazy, Parser, parens, (<*>), succeed, (*>), string, maybe, many1, sepBy1, (<$>), sepBy, between, many, (<*), or, whitespace)
 import Parser.Tokens exposing (functionName, typeName)

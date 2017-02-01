@@ -24,8 +24,8 @@ all =
                     |> Expect.equal (Just <| Tupled [ Unit, Unit ])
         , test "tupledTypeReference 2" <|
             \() ->
-                parseFullStringWithNullState "( () )" Parser.tupledTypeReference
-                    |> Expect.equal Nothing
+                parseFullStringWithNullState "( () )" Parser.typeReference
+                    |> Expect.equal (Just Unit)
         , test "tupledTypeReference 3" <|
             \() ->
                 parseFullStringWithNullState "( Int , Maybe m )" Parser.typeReference

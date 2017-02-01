@@ -1,7 +1,5 @@
 module Parser.Declarations exposing (file, signature, declaration, function, functionDeclaration, expression, letBlock, letBody, caseBlock, caseStatement, caseStatements)
 
--- TODO Expose for tests
-
 import Combine exposing (maybe, (*>), (>>=), (<*), (<$), (<$>), sepBy, many, succeed, Parser, string, choice, lookAhead, or, withLocation, parens, modifyState, count, between, fail, (<*>), lazy, many1, sepBy1)
 import Combine.Char exposing (anyChar, char, noneOf)
 import Combine.Num
@@ -243,9 +241,7 @@ listExpression =
     lazy
         (\() ->
             ListExpr
-                -- TODO Not sure on this or
-                <$>
-                    or ([] <$ (string "[" *> maybe (or moreThanIndentWhitespace exactIndentWhitespace) *> string "]"))
+                <$> or ([] <$ (string "[" *> maybe (or moreThanIndentWhitespace exactIndentWhitespace) *> string "]"))
                         (between
                             (string "[")
                             (string "]")

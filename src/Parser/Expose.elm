@@ -1,7 +1,5 @@
 module Parser.Expose exposing (exposeDefinition, infixExpose, typeExpose, exposingListInner, definitionExpose, exposable)
 
--- TODO Expose for tests
-
 import AST.Types exposing (State, Expression, Exposure(None, All, Explicit), Expose(InfixExpose, TypeExpose, DefinitionExpose))
 import Combine exposing ((*>), (<$), (<$>), (<*>), Parser, choice, maybe, or, parens, sepBy, string, succeed, while)
 import Combine.Char exposing (char)

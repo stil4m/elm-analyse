@@ -476,7 +476,6 @@ sample21 =
 
 Used for rendering backgrounds (and maps?)
 
-TODO: Decide if just for backgrounds or for maps/levels too
 
 -}
 
@@ -485,7 +484,7 @@ import WebGL
 
 
 -- From http://blog.tojicode.com/2012/07/sprite-tile-maps-on-gpu.html
--- TODO: make this work :)
+
 
 
 tileMapVertextShader : WebGL.Shader { attr | position : Vec2, texture : Vec2 } { uniform | viewOffset : Vec2, viewportSize : Vec2, inverseTileTextureSize : Vec2, inverseTileSize : Float } { pixelCoord : Vec2, texCoord : Vec2 }

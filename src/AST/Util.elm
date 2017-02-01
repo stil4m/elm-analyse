@@ -1,7 +1,23 @@
-module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts, getParenthesized, isOperatorApplication, isLambda)
+module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts, getParenthesized, isOperatorApplication, isLambda, moduleExposingList)
 
-import AST.Types exposing (File, Exposure, ModuleName, Expose, Module(NormalModule, PortModule, EffectModule, NoModule), Expression, InnerExpression(OperatorApplicationExpression, ParenthesizedExpression, LambdaExpression))
+import AST.Types exposing (File, Exposure(None), Expose, Module(NormalModule, PortModule, EffectModule, NoModule), Exposure, ModuleName, Expose, Module(NormalModule, PortModule, EffectModule, NoModule), Expression, InnerExpression(OperatorApplicationExpression, ParenthesizedExpression, LambdaExpression))
 import AST.Ranges exposing (Range)
+
+
+moduleExposingList : Module -> Exposure Expose
+moduleExposingList m =
+    case m of
+        NormalModule x ->
+            x.exposingList
+
+        PortModule x ->
+            x.exposingList
+
+        EffectModule x ->
+            x.exposingList
+
+        NoModule ->
+            None
 
 
 fileExposingList : File -> Maybe (Exposure Expose)

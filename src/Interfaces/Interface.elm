@@ -2,6 +2,7 @@ module Interfaces.Interface exposing (Interface, ExposedInterface(Function, Type
 
 import AST.Types as AST
 import List.Extra
+import AST.Util exposing (moduleExposingList)
 
 
 type alias Interface =
@@ -147,7 +148,6 @@ fileToDefinitions file =
                                 Just ( i.operator, Operator i )
 
                             AST.DestructuringDeclaration _ ->
-                                --TODO As expression?
                                 Nothing
                     )
 
@@ -189,21 +189,3 @@ fileToDefinitions file =
                     )
                 )
             |> List.filterMap (Tuple.second >> resolveGroup)
-
-
-{-| TODO To other module
--}
-moduleExposingList : AST.Module -> AST.Exposure AST.Expose
-moduleExposingList m =
-    case m of
-        AST.NormalModule x ->
-            x.exposingList
-
-        AST.PortModule x ->
-            x.exposingList
-
-        AST.EffectModule x ->
-            x.exposingList
-
-        AST.NoModule ->
-            AST.None

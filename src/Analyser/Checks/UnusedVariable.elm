@@ -248,7 +248,6 @@ getDeclarationVars =
         (\x ->
             case x of
                 FuncDecl f ->
-                    --TODO
                     [ f.declaration.name ]
 
                 AliasDecl _ ->
@@ -258,11 +257,9 @@ getDeclarationVars =
                     (List.map (\{ name, range } -> { value = name, range = range }) t.constructors)
 
                 PortDeclaration p ->
-                    --TODO
                     [ { value = p.name, range = emptyRange } ]
 
                 InfixDeclaration i ->
-                    --TODO
                     [ { value = i.operator, range = emptyRange } ]
 
                 DestructuringDeclaration destructuring ->
