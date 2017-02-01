@@ -226,7 +226,11 @@ type alias Cases =
 
 
 type alias TypeAlias =
-    { name : String, generics : List String, typeReference : TypeReference }
+    { name : String
+    , generics : List String
+    , typeReference : TypeReference
+    , range : Range
+    }
 
 
 type alias Type =

@@ -11,6 +11,7 @@ import Analyser.Checks.NoSignature as NoSignature
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 import Analyser.Checks.NoDebug as NoDebug
 import Analyser.Checks.DuplicateImports as DuplicateImports
+import Analyser.Checks.UnusedAliases as UnusedAliases
 
 
 run : LoadedSourceFiles -> LoadedDependencies -> List Message
@@ -24,6 +25,7 @@ run sources deps =
             , UnnecessaryParens.scan
             , NoDebug.scan
             , DuplicateImports.scan
+            , UnusedAliases.scan
             ]
 
         fileMessages =

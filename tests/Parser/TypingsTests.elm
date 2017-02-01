@@ -17,12 +17,8 @@ all =
                         (Just <|
                             { name = "Foo"
                             , generics = []
-                            , typeReference =
-                                Record
-                                    [ ( "color"
-                                      , Typed [] "String" []
-                                      )
-                                    ]
+                            , typeReference = Record ([ ( "color", Typed [] "String" [] ) ])
+                            , range = { start = { row = 1, column = 0 }, end = { row = 1, column = 33 } }
                             }
                         )
         , test "type alias with generic " <|
@@ -32,12 +28,8 @@ all =
                         (Just <|
                             { name = "Foo"
                             , generics = [ "a" ]
-                            , typeReference =
-                                Record
-                                    [ ( "some"
-                                      , GenericType "a"
-                                      )
-                                    ]
+                            , typeReference = Record ([ ( "some", GenericType "a" ) ])
+                            , range = { start = { row = 1, column = 0 }, end = { row = 1, column = 30 } }
                             }
                         )
         , test "type" <|

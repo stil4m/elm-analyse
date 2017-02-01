@@ -12,12 +12,14 @@ import Analyser.Checks.NoImportAllTests
 import Analyser.Checks.UnnecessaryParensTests
 import Analyser.Checks.NoDebugTests
 import Analyser.Checks.DuplicateImportsTests
+import Analyser.Checks.UnusedAliasesTests
 
 
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.UnnecessaryParensTests.all
+        [ Analyser.Checks.UnusedAliasesTests.all
+        , Analyser.Checks.UnnecessaryParensTests.all
         , Analyser.Checks.DuplicateImportsTests.all
         , Analyser.Checks.NoDebugTests.all
         , Analyser.Checks.UnusedVariableTests.all

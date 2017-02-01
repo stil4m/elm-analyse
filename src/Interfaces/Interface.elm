@@ -1,4 +1,4 @@
-module Interfaces.Interface exposing (Interface, ExposedInterface(Function, Type, Alias, Operator), doesExposeFunction, getOperators, build)
+module Interfaces.Interface exposing (Interface, ExposedInterface(Function, Type, Alias, Operator), doesExposeFunction, getOperators, build, doesExposeAlias)
 
 import AST.Types as AST
 import List.Extra
@@ -13,6 +13,20 @@ type ExposedInterface
     | Type ( String, List String )
     | Alias String
     | Operator AST.Infix
+
+
+doesExposeAlias : String -> Interface -> Bool
+doesExposeAlias k interface =
+    interface
+        |> List.any
+            (\x ->
+                case x of
+                    Alias l ->
+                        k == l
+
+                    _ ->
+                        False
+            )
 
 
 doesExposeFunction : String -> Interface -> Bool

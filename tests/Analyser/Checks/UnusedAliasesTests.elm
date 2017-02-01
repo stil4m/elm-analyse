@@ -1,6 +1,5 @@
 module Analyser.Checks.UnusedAliasesTests exposing (..)
 
-import AST.Ranges exposing (emptyRange)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedAliases as UnusedAliases
 import Analyser.Messages exposing (..)
@@ -47,6 +46,21 @@ foo =
     )
 
 
+usedInPort : ( String, String, List Message )
+usedInPort =
+    ( "usedInPort"
+    , """module Foo exposing (foo)
+
+type alias Person = { name : String, age : Int}
+
+port foo : Person -> Cmd msg
+
+
+"""
+    , []
+    )
+
+
 unusedAlias : ( String, String, List Message )
 unusedAlias =
     ( "unusedAlias"
@@ -56,7 +70,8 @@ type alias Person = { name : String, age : Int}
 
 foo = 1
 """
-    , [ UnusedAlias "./foo" "Person" emptyRange ]
+    , [ UnusedAlias "./foo.elm" "Person" { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+      ]
     )
 
 
@@ -67,5 +82,6 @@ all =
         [ unusedButExposed
         , usedInSignature
         , usedAsFunction
+        , usedInPort
         , unusedAlias
         ]

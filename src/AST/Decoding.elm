@@ -147,6 +147,7 @@ decodeTypeAlias =
         |: JD.field "name" JD.string
         |: JD.field "generics" (JD.list JD.string)
         |: JD.field "typeReference" decodeTypeReference
+        |: JD.field "range" Ranges.decode
 
 
 decodeFunction : Decoder Function

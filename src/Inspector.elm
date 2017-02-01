@@ -1,6 +1,6 @@
 module Inspector exposing (Action(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
-import AST.Types exposing (File, Import, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate, OperatorApplication)
+import AST.Types exposing (File, Import, TypeAlias, TypeReference(..), TypeArg(Concrete, Generic), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate, OperatorApplication)
 
 
 type Action context x
@@ -14,11 +14,13 @@ type Action context x
 type alias Config context =
     { onFile : Action context File
     , onImport : Action context Import
-    , onDeclaration : Action context Declaration
     , onFunction : Action context Function
+    , onFunctionSignature : Action context FunctionSignature
+    , onTypeAlias : Action context TypeAlias
     , onDestructuring : Action context Destructuring
     , onExpression : Action context Expression
     , onOperatorApplication : Action context OperatorApplication
+    , onTypeReference : Action context TypeReference
     , onLambda : Action context Lambda
     , onLetBlock : Action context LetBlock
     , onCase : Action context Case
@@ -32,8 +34,10 @@ defaultConfig : Config x
 defaultConfig =
     { onFile = Continue
     , onImport = Continue
-    , onDeclaration = Continue
     , onFunction = Continue
+    , onFunctionSignature = Continue
+    , onTypeReference = Continue
+    , onTypeAlias = Continue
     , onDestructuring = Continue
     , onExpression = Continue
     , onLambda = Continue
@@ -97,17 +101,15 @@ inspectDeclaration config declaration context =
         FuncDecl function ->
             inspectFunction config function context
 
-        AliasDecl _ ->
-            --TODO
-            context
+        AliasDecl typeAlias ->
+            inspectTypeAlias config typeAlias context
 
         TypeDecl _ ->
             --TODO
             context
 
-        PortDeclaration _ ->
-            --TODO
-            context
+        PortDeclaration signature ->
+            inspectSignature config signature context
 
         InfixDeclaration _ ->
             --TODO
@@ -115,6 +117,15 @@ inspectDeclaration config declaration context =
 
         DestructuringDeclaration destructing ->
             inspectDestructuring config destructing context
+
+
+inspectTypeAlias : Config context -> TypeAlias -> context -> context
+inspectTypeAlias config typeAlias context =
+    actionLambda
+        config.onTypeAlias
+        identity
+        typeAlias
+        context
 
 
 inspectDestructuring : Config context -> Destructuring -> context -> context
@@ -130,9 +141,66 @@ inspectFunction : Config context -> Function -> context -> context
 inspectFunction config function context =
     actionLambda
         config.onFunction
-        (inspectExpression config function.declaration.expression)
+        (inspectExpression config function.declaration.expression
+            >> (Maybe.withDefault identity <|
+                    Maybe.map (inspectSignature config) function.signature
+               )
+        )
         function
         context
+
+
+inspectSignature : Config context -> FunctionSignature -> context -> context
+inspectSignature config signature context =
+    actionLambda
+        config.onFunctionSignature
+        (inspectTypeReference config signature.typeReference)
+        signature
+        context
+
+
+inspectTypeReference : Config context -> TypeReference -> context -> context
+inspectTypeReference config typeReference context =
+    actionLambda
+        config.onTypeReference
+        (inspectTypeReferenceInner config typeReference)
+        typeReference
+        context
+
+
+inspectTypeReferenceInner : Config context -> TypeReference -> context -> context
+inspectTypeReferenceInner config typeRefence context =
+    case typeRefence of
+        Typed _ _ typeArgs ->
+            List.foldl (inspectTypeArg config) context typeArgs
+
+        Tupled typeReferences ->
+            List.foldl (inspectTypeReference config) context typeReferences
+
+        Record recordDefinition ->
+            List.foldl (inspectTypeReference config) context (List.map Tuple.second recordDefinition)
+
+        GenericRecord _ recordDefinition ->
+            List.foldl (inspectTypeReference config) context (List.map Tuple.second recordDefinition)
+
+        FunctionTypeReference left right ->
+            List.foldl (inspectTypeReference config) context [ left, right ]
+
+        Unit ->
+            context
+
+        GenericType _ ->
+            context
+
+
+inspectTypeArg : Config context -> TypeArg -> context -> context
+inspectTypeArg config typeArg context =
+    case typeArg of
+        Generic _ ->
+            context
+
+        Concrete t ->
+            inspectTypeReference config t context
 
 
 inspectExpression : Config context -> Expression -> context -> context

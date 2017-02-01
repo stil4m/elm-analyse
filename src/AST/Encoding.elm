@@ -165,11 +165,12 @@ encodeValueConstructor { name, arguments, range } =
 
 
 encodeTypeAlias : TypeAlias -> Value
-encodeTypeAlias { name, generics, typeReference } =
+encodeTypeAlias { name, generics, typeReference, range } =
     JE.object
         [ ( "name", JE.string name )
         , ( "generics", asList JE.string generics )
         , ( "typeReference", encodeTypeReference typeReference )
+        , ( "range", Ranges.encode range )
         ]
 
 
