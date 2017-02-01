@@ -1,9 +1,9 @@
 module Analyser.Checks.UnusedVariableTests exposing (..)
 
+import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Types exposing (..)
 import Dict exposing (Dict)
-import Expect
 import Test exposing (..)
 import Analyser.Messages exposing (..)
 import Analyser.Checks.CheckTestUtil exposing (getMessages)
@@ -14,17 +14,21 @@ table =
     Dict.fromList []
 
 
-withUnusedVariableInFunction : String
+withUnusedVariableInFunction : ( String, String, List Message )
 withUnusedVariableInFunction =
-    """module Bar exposing (..)
+    ( "withUnusedVariableInFunction"
+    , """module Bar exposing (..)
 
 bar x y z = x + z
 """
+    , [ (UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }) ]
+    )
 
 
-unusedInLetExpression : String
+unusedInLetExpression : ( String, String, List Message )
 unusedInLetExpression =
-    """module Bar exposing (..)
+    ( "unusedInLetExpression"
+    , """module Bar exposing (..)
 
 x =
   let
@@ -32,11 +36,15 @@ x =
   in
     2
 """
+    , [ (UnusedVariable "./foo.elm" "y" { start = { row = 4, column = 3 }, end = { row = 4, column = 4 } })
+      ]
+    )
 
 
-unusedFunction : String
+unusedFunction : ( String, String, List Message )
 unusedFunction =
-    """module Bar exposing (foo)
+    ( "unusedFunction"
+    , """module Bar exposing (foo)
 
 foo = some
 
@@ -44,32 +52,42 @@ baz = 2
 
 some = 1
 """
+    , [ UnusedTopLevel "./foo.elm" "baz" { start = { row = 4, column = -1 }, end = { row = 4, column = 2 } }
+      ]
+    )
 
 
-usedVariableAsRecordUpdate : String
+usedVariableAsRecordUpdate : ( String, String, List Message )
 usedVariableAsRecordUpdate =
-    """module Bar exposing (..)
+    ( "usedVariableAsRecordUpdate"
+    , """module Bar exposing (..)
 
 addUsedVariable x =
     { x | name = "John" }
 
 """
+    , []
+    )
 
 
-usedVariableInCaseExpression : String
+usedVariableInCaseExpression : ( String, String, List Message )
 usedVariableInCaseExpression =
-    """module Bar exposing (..)
+    ( "usedVariableInCaseExpression"
+    , """module Bar exposing (..)
 
 foo x =
     case x of
       Bar -> 1
 
 """
+    , []
+    )
 
 
-usedVariableInAllDeclaration : String
+usedVariableInAllDeclaration : ( String, String, List Message )
 usedVariableInAllDeclaration =
-    """module Bar exposing (..)
+    ( "usedVariableInAllDeclaration"
+    , """module Bar exposing (..)
 
 x y =
   case y of
@@ -79,51 +97,68 @@ x y =
             Debug.log "Unknown" b
     in
         model ! []"""
+    , []
+    )
 
 
-usedValueConstructor : String
+usedValueConstructor : ( String, String, List Message )
 usedValueConstructor =
-    """module Bar exposing (foo)
+    ( "usedValueConstructor"
+    , """module Bar exposing (foo)
 type Some = Thing
 
 
 foo = Thing
 """
+    , []
+    )
 
 
-unusedValueConstructor : String
+unusedValueConstructor : ( String, String, List Message )
 unusedValueConstructor =
-    """module Bar exposing (foo,Some(Thing))
+    ( "unusedValueConstructor"
+    , """module Bar exposing (foo,Some(Thing))
 
 type Some = Thing | Other
 
 """
+    , [ UnusedTopLevel "./foo.elm" "Other" { start = { row = 2, column = 19 }, end = { row = 3, column = -2 } }
+      ]
+    )
 
 
-exposedValueConstructor : String
+exposedValueConstructor : ( String, String, List Message )
 exposedValueConstructor =
-    """module Bar exposing (foo,Some(Thing))
+    ( "exposedValueConstructor"
+    , """module Bar exposing (foo,Some(Thing))
 type Some = Thing
 
 
 foo = 1
 """
+    , []
+    )
 
 
-onlyUsedInSelf : String
+onlyUsedInSelf : ( String, String, List Message )
 onlyUsedInSelf =
-    """module Bar exposing (foo,Some(Thing))
+    ( "onlyUsedInSelf"
+    , """module Bar exposing (foo,Some(Thing))
 type Some = Thing
 
 foo = 1
 
 bar = bar + foo
 """
+    , [ UnusedTopLevel "./foo.elm" "bar" { start = { row = 5, column = -1 }, end = { row = 5, column = 2 } }
+      ]
+    )
 
 
-usedOperator : String
+usedOperator : ( String, String, List Message )
 usedOperator =
-    """module Bar exposing (foo,Some(Thing))
+    ( "usedOperator"
+    , """module Bar exposing (foo,Some(Thing))
 type Some = Thing
 
 (&>) _ b = b
@@ -131,60 +166,52 @@ type Some = Thing
 foo =
     1 &> 2
 """
+    , []
+    )
 
 
-destructuringSameName : String
+destructuringSameName : ( String, String, List Message )
 destructuringSameName =
-    """module Foo exposing (..)
+    ( "destructuringSameName"
+    , """module Foo exposing (..)
 
 error : Model -> Maybe Error
 error { error } =
     error
 """
+    , []
+    )
+
+
+unusedInEffectModule : ( String, String, List Message )
+unusedInEffectModule =
+    ( "unusedInEffectModule"
+    , """effect module X where {subscription = MySub} exposing (foo)
+
+
+foo = 1
+
+init = 2
+"""
+    , []
+    )
 
 
 all : Test
 all =
-    describe "Analyser.PostProcessingTests"
-        [ test "withUnusedVariableInFunction" <|
-            \() ->
-                getMessages withUnusedVariableInFunction UnusedVariable.scan
-                    |> Expect.equal
-                        (Just
-                            [ (UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }) ]
-                        )
-        , test "unusedInLetExpression" <|
-            \() ->
-                getMessages unusedInLetExpression UnusedVariable.scan
-                    |> Expect.equal (Just ([ (UnusedVariable "./foo.elm" "y" { start = { row = 4, column = 3 }, end = { row = 4, column = 4 } }) ]))
-        , test "unusedFunction" <|
-            \() ->
-                getMessages unusedFunction UnusedVariable.scan
-                    |> Expect.equal (Just ([ UnusedTopLevel "./foo.elm" "baz" { start = { row = 4, column = -1 }, end = { row = 4, column = 2 } } ]))
-        , test "usedVariableAsRecordUpdate" <|
-            \() -> getMessages usedVariableAsRecordUpdate UnusedVariable.scan |> Expect.equal (Just [])
-        , test "usedVariableInCaseExpression" <|
-            \() -> getMessages usedVariableInCaseExpression UnusedVariable.scan |> Expect.equal (Just [])
-        , test "usedVariableInAllDeclaration" <|
-            \() -> getMessages usedVariableInAllDeclaration UnusedVariable.scan |> Expect.equal (Just [])
-        , test "usedValueConstructor" <|
-            \() -> getMessages usedValueConstructor UnusedVariable.scan |> Expect.equal (Just [])
-        , test "unusedValueConstructor" <|
-            \() ->
-                getMessages unusedValueConstructor UnusedVariable.scan
-                    |> Expect.equal (Just ([ UnusedTopLevel "./foo.elm" "Other" { start = { row = 2, column = 19 }, end = { row = 3, column = -2 } } ]))
-        , test "exposedValueConstructor" <|
-            \() -> getMessages exposedValueConstructor UnusedVariable.scan |> Expect.equal (Just [])
-        , test "onlyUsedInSelf" <|
-            \() ->
-                getMessages onlyUsedInSelf UnusedVariable.scan
-                    |> Expect.equal (Just ([ UnusedTopLevel "./foo.elm" "bar" { start = { row = 5, column = -1 }, end = { row = 5, column = 2 } } ]))
-        , test "usedOperator" <|
-            \() ->
-                getMessages usedOperator UnusedVariable.scan
-                    |> Expect.equal (Just ([]))
-        , test "destructuringSameName" <|
-            \() ->
-                getMessages destructuringSameName UnusedVariable.scan
-                    |> Expect.equal (Just ([]))
+    CTU.build "Analyser.Checks.UnusedVariable"
+        UnusedVariable.scan
+        [ withUnusedVariableInFunction
+        , unusedInLetExpression
+        , unusedFunction
+        , usedVariableInCaseExpression
+        , usedVariableAsRecordUpdate
+        , usedVariableInAllDeclaration
+        , usedValueConstructor
+        , unusedValueConstructor
+        , exposedValueConstructor
+        , onlyUsedInSelf
+        , usedOperator
+        , destructuringSameName
+        , unusedInEffectModule
         ]

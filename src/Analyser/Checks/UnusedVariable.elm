@@ -1,6 +1,6 @@
 module Analyser.Checks.UnusedVariable exposing (scan)
 
-import AST.Types exposing (File, Lambda, RecordUpdate, LetBlock, Function, VariablePointer, Declaration(FuncDecl, AliasDecl, DestructuringDeclaration, TypeDecl, PortDeclaration, InfixDeclaration), Case, Pattern(TuplePattern, RecordPattern, ListPattern, UnConsPattern, VarPattern, NamedPattern, AsPattern, ParentisizedPattern), OperatorApplication)
+import AST.Types exposing (File, Lambda, RecordUpdate, LetBlock, Function, VariablePointer, Declaration(FuncDecl, AliasDecl, DestructuringDeclaration, TypeDecl, PortDeclaration, InfixDeclaration), Case, Pattern(TuplePattern, RecordPattern, ListPattern, UnConsPattern, VarPattern, NamedPattern, AsPattern, ParentisizedPattern), OperatorApplication, Module(EffectModule))
 import AST.Ranges exposing (Range, emptyRange)
 import Analyser.FileContext exposing (FileContext)
 import Interfaces.Interface as Interface
@@ -44,6 +44,7 @@ scan fileContext =
                 fileContext.ast
                 emptyContext
 
+        onlyUnused : List ( String, ( Int, Range ) ) -> List ( String, ( Int, Range ) )
         onlyUnused =
             List.filter (Tuple.second >> Tuple.first >> (==) 0)
 
@@ -60,10 +61,26 @@ scan fileContext =
                 |> Maybe.withDefault (Dict.empty)
                 |> Dict.toList
                 |> onlyUnused
+                |> List.filter (filterByModuleType fileContext)
                 |> List.filter (Tuple.first >> flip Interface.doesExposeFunction fileContext.interface >> not)
                 |> List.map (\( x, ( _, y ) ) -> UnusedTopLevel fileContext.path x y)
     in
         unusedVariables ++ unusedTopLevels
+
+
+filterByModuleType : FileContext -> ( String, ( Int, Range ) ) -> Bool
+filterByModuleType fileContext =
+    case fileContext.ast.moduleDefinition of
+        EffectModule _ ->
+            filterForEffectModule
+
+        _ ->
+            (always True)
+
+
+filterForEffectModule : ( String, ( Int, Range ) ) -> Bool
+filterForEffectModule ( k, _ ) =
+    not <| List.member k [ "init", "onEffects", "onSelfMsg", "subMap", "cmdMap" ]
 
 
 pushScope : List VariablePointer -> UsedVariableContext -> UsedVariableContext
