@@ -17,6 +17,7 @@ type Message
     | DebugCrash FileName Range
     | UnformattedFile FileName
     | DuplicateImport FileName AST.ModuleName Range
+    | UnusedAlias FileName String Range
 
 
 type alias FileName =
@@ -122,6 +123,16 @@ asString m =
                 [ "Duplicate import for module `"
                 , String.join "." moduleName
                 , "`in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+
+        UnusedAlias fileName name range ->
+            String.concat
+                [ "Type alias `"
+                , name
+                , "` is not used in file \""
                 , fileName
                 , "\" at "
                 , rangeToString range
