@@ -239,6 +239,17 @@ foo x = List.map (.name) x
     )
 
 
+parensFirstArgumentApplicationWithRecordAccess : ( String, String, List Message )
+parensFirstArgumentApplicationWithRecordAccess =
+    ( "parensFirstArgumentApplicationWithRecordAccess"
+    , """module Bar exposing (..)
+
+foo = (Tuple.first newFileContent).sha1
+"""
+    , []
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnnecessaryParensTests"
@@ -260,4 +271,5 @@ all =
         , parensInRecordFieldValuesForUpdate
         , parensAroundRecordAccess
         , parensAroundRecordFunction
+        , parensFirstArgumentApplicationWithRecordAccess
         ]
