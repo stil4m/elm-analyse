@@ -7,6 +7,8 @@ import AnalyserPorts
 import Interfaces.Interface as Interface
 import List.Extra
 import Parser.Parser as Parser
+import AST.Encoding
+import Json.Encode
 
 
 type Model
@@ -25,10 +27,12 @@ type alias State =
 
 init : List String -> ( Model, Cmd Msg )
 init input =
-    Model
+    ( Model
         { filesToLoad = List.Extra.uncons input
         , parsedFiles = []
         }
+    , Cmd.none
+    )
         |> loadNextFile
 
 
@@ -49,13 +53,27 @@ update msg (Model state) =
             state.filesToLoad
                 |> Maybe.map
                     (\( _, rest ) ->
-                        Model
-                            { state
-                                | filesToLoad = List.Extra.uncons rest
-                                , parsedFiles =
-                                    onInputLoadingInterface fileContent
-                                        :: state.parsedFiles
-                            }
+                        let
+                            newFileContent =
+                                onInputLoadingInterface fileContent
+                        in
+                            ( Model
+                                { state
+                                    | filesToLoad = List.Extra.uncons rest
+                                    , parsedFiles = newFileContent :: state.parsedFiles
+                                }
+                            , case (Tuple.first newFileContent).sha1 of
+                                Nothing ->
+                                    Cmd.none
+
+                                Just sha1 ->
+                                    case (Tuple.second newFileContent) of
+                                        Analyser.Types.Loaded x ->
+                                            AnalyserPorts.storeAstForSha ( sha1, (Json.Encode.encode 0 (AST.Encoding.encode x.ast)) )
+
+                                        _ ->
+                                            Cmd.none
+                            )
                     )
                 |> Maybe.map loadNextFile
                 |> Maybe.withDefault (Model state ! [])
@@ -82,16 +100,16 @@ onInputLoadingInterface fileContent =
                 )
 
 
-loadNextFile : Model -> ( Model, Cmd Msg )
-loadNextFile (Model model) =
+loadNextFile : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+loadNextFile ( Model model, msgs ) =
     model.filesToLoad
         |> Maybe.map
             (\( next, _ ) ->
                 ( Model model
-                , AnalyserPorts.loadFile next
+                , Cmd.batch [ msgs, AnalyserPorts.loadFile next ]
                 )
             )
-        |> Maybe.withDefault (Model model ! [])
+        |> Maybe.withDefault ( Model model, msgs )
 
 
 subscriptions : Model -> Sub Msg

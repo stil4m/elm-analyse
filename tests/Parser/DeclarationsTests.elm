@@ -7,6 +7,7 @@ import Parser.Declarations as Parser exposing (..)
 import Parser.Imports exposing (importDefinition)
 import Parser.Modules exposing (moduleDefinition)
 import AST.Types as Types exposing (..)
+import AST.Ranges exposing (emptyRange)
 import Parser.Util exposing (exactIndentWhitespace)
 import Test exposing (..)
 
@@ -233,6 +234,7 @@ all =
         , test "no-module and then import" <|
             \() ->
                 parseFullStringWithNullState "import Html" file
+                    |> Maybe.map noRangeFile
                     |> Expect.equal
                         (Just
                             { moduleDefinition =
@@ -241,6 +243,7 @@ all =
                                 [ { moduleName = [ "Html" ]
                                   , moduleAlias = Nothing
                                   , exposingList = Types.None
+                                  , range = emptyRange
                                   }
                                 ]
                             , declarations = []

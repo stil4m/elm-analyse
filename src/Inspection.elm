@@ -10,6 +10,7 @@ import Analyser.Checks.NoImportAll as NoImportAll
 import Analyser.Checks.NoSignature as NoSignature
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 import Analyser.Checks.NoDebug as NoDebug
+import Analyser.Checks.DuplicateImports as DuplicateImports
 
 
 run : LoadedSourceFiles -> LoadedDependencies -> List Message
@@ -22,6 +23,7 @@ run sources deps =
             , NoSignature.scan
             , UnnecessaryParens.scan
             , NoDebug.scan
+            , DuplicateImports.scan
             ]
 
         fileMessages =

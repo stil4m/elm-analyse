@@ -16,6 +16,7 @@ type Message
     | DebugLog FileName Range
     | DebugCrash FileName Range
     | UnformattedFile FileName
+    | DuplicateImport FileName AST.ModuleName Range
 
 
 type alias FileName =
@@ -114,4 +115,14 @@ asString m =
                 [ "Unformatted file \""
                 , fileName
                 , "\""
+                ]
+
+        DuplicateImport fileName moduleName range ->
+            String.concat
+                [ "Duplicate import for module `"
+                , String.join "." moduleName
+                , "`in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
                 ]

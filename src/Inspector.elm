@@ -1,6 +1,6 @@
 module Inspector exposing (Action(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
-import AST.Types exposing (File, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate, OperatorApplication)
+import AST.Types exposing (File, Import, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate, OperatorApplication)
 
 
 type Action context x
@@ -13,6 +13,7 @@ type Action context x
 
 type alias Config context =
     { onFile : Action context File
+    , onImport : Action context Import
     , onDeclaration : Action context Declaration
     , onFunction : Action context Function
     , onDestructuring : Action context Destructuring
@@ -30,6 +31,7 @@ type alias Config context =
 defaultConfig : Config x
 defaultConfig =
     { onFile = Continue
+    , onImport = Continue
     , onDeclaration = Continue
     , onFunction = Continue
     , onDestructuring = Continue
@@ -66,8 +68,21 @@ actionLambda act =
 inspect : Config a -> File -> a -> a
 inspect config file context =
     actionLambda config.onFile
-        (inspectDeclarations config file.declarations)
+        (inspectDeclarations config file.declarations >> inspectImports config file.imports)
         file
+        context
+
+
+inspectImports : Config context -> List Import -> context -> context
+inspectImports config imports context =
+    List.foldl (inspectImport config) context imports
+
+
+inspectImport : Config context -> Import -> context -> context
+inspectImport config imp context =
+    actionLambda config.onImport
+        identity
+        imp
         context
 
 

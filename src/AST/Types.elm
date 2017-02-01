@@ -274,6 +274,7 @@ type alias Import =
     { moduleName : ModuleName
     , moduleAlias : Maybe ModuleName
     , exposingList : Exposure Expose
+    , range : Range
     }
 
 

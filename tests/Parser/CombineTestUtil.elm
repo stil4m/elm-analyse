@@ -46,6 +46,18 @@ noRangeExpression ( _, inner ) =
     ( emptyRange, noRangeInnerExpression inner )
 
 
+noRangeFile : File -> File
+noRangeFile file =
+    { file
+        | imports = List.map noRangeImport file.imports
+    }
+
+
+noRangeImport : Import -> Import
+noRangeImport imp =
+    { imp | range = emptyRange }
+
+
 noRangeDeclaration : Declaration -> Declaration
 noRangeDeclaration decl =
     case decl of

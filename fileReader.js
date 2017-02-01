@@ -12,7 +12,6 @@ function isFormatted (path) {
     });
     return true;
   } catch (e) {
-    // console.log(e);
     return false;
   }
 }
@@ -33,8 +32,9 @@ function readFile(directory, path, cb) {
       })
       return;
     }
-    const normalized = normalizeNewline(content.toString());
-    const fileName = sha1(normalized);
+    const originalContent= content.toString();
+    const normalized = normalizeNewline(originalContent);
+    const fileName = sha1(originalContent);
     console.log(fileName);
     const fullPath ='./cache/' + fileName + '.elm';
     fs.writeFileSync(fullPath , normalized);
