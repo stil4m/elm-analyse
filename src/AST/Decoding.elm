@@ -26,9 +26,9 @@ decodeTyped opts =
 decode : Decoder File
 decode =
     JD.succeed File
-        |: (JD.field "moduleDefinition" decodeModule)
-        |: (JD.field "imports" (JD.list decodeImport))
-        |: (JD.field "declarations" (JD.list decodeDeclaration))
+        |: JD.field "moduleDefinition" decodeModule
+        |: JD.field "imports" (JD.list decodeImport)
+        |: JD.field "declarations" (JD.list decodeDeclaration)
 
 
 decodeModule : Decoder Module
@@ -44,17 +44,17 @@ decodeModule =
 decodeDefaultModuleData : Decoder DefaultModuleData
 decodeDefaultModuleData =
     JD.succeed DefaultModuleData
-        |: (JD.field "moduleName" decodeModuleName)
-        |: (JD.field "exposingList" <| decodeExposingList decodeExpose)
+        |: JD.field "moduleName" decodeModuleName
+        |: JD.field "exposingList" (decodeExposingList decodeExpose)
 
 
 decodeEffectModuleData : Decoder EffectModuleData
 decodeEffectModuleData =
     JD.succeed EffectModuleData
-        |: (JD.field "moduleName" decodeModuleName)
-        |: (JD.field "exposingList" <| decodeExposingList decodeExpose)
-        |: (JD.field "command" <| JD.maybe JD.string)
-        |: (JD.field "subscription" <| JD.maybe JD.string)
+        |: JD.field "moduleName" decodeModuleName
+        |: JD.field "exposingList" (decodeExposingList decodeExpose)
+        |: JD.field "command" (JD.maybe JD.string)
+        |: JD.field "subscription" (JD.maybe JD.string)
 
 
 decodeModuleName : Decoder ModuleName
@@ -86,10 +86,10 @@ decodeExposingList x =
 decodeImport : Decoder Import
 decodeImport =
     JD.succeed Import
-        |: (JD.field "moduleName" decodeModuleName)
-        |: (JD.field "moduleAlias" (JD.maybe decodeModuleName))
-        |: (JD.field "exposingList" (decodeExposingList decodeExpose))
-        |: (JD.field "range" Ranges.decode)
+        |: JD.field "moduleName" decodeModuleName
+        |: JD.field "moduleAlias" (JD.maybe decodeModuleName)
+        |: JD.field "exposingList" (decodeExposingList decodeExpose)
+        |: JD.field "range" Ranges.decode
 
 
 decodeDeclaration : Decoder Declaration
@@ -110,9 +110,9 @@ decodeDeclaration =
 decodeInfix : Decoder Infix
 decodeInfix =
     JD.succeed Infix
-        |: (JD.field "direction" decodeInfixDirection)
-        |: (JD.field "precedence" JD.int)
-        |: (JD.field "operator" JD.string)
+        |: JD.field "direction" decodeInfixDirection
+        |: JD.field "precedence" JD.int
+        |: JD.field "operator" JD.string
 
 
 decodeDestructuring : Decoder Destructuring
@@ -120,33 +120,33 @@ decodeDestructuring =
     JD.lazy
         (\() ->
             JD.succeed Destructuring
-                |: (JD.field "pattern" decodePattern)
-                |: (JD.field "expression" decodeExpression)
+                |: JD.field "pattern" decodePattern
+                |: JD.field "expression" decodeExpression
         )
 
 
 decodeType : Decoder Type
 decodeType =
     JD.succeed Type
-        |: (JD.field "name" JD.string)
-        |: (JD.field "generics" (JD.list JD.string))
-        |: (JD.field "constructors" (JD.list decodeValueConstructor))
+        |: JD.field "name" JD.string
+        |: JD.field "generics" (JD.list JD.string)
+        |: JD.field "constructors" (JD.list decodeValueConstructor)
 
 
 decodeValueConstructor : Decoder ValueConstructor
 decodeValueConstructor =
     JD.succeed ValueConstructor
-        |: (JD.field "name" JD.string)
-        |: (JD.field "arguments" (JD.list decodeTypeReference))
-        |: (JD.field "range" Ranges.decode)
+        |: JD.field "name" JD.string
+        |: JD.field "arguments" (JD.list decodeTypeReference)
+        |: JD.field "range" Ranges.decode
 
 
 decodeTypeAlias : Decoder TypeAlias
 decodeTypeAlias =
     JD.succeed TypeAlias
-        |: (JD.field "name" JD.string)
-        |: (JD.field "generics" (JD.list JD.string))
-        |: (JD.field "typeReference" decodeTypeReference)
+        |: JD.field "name" JD.string
+        |: JD.field "generics" (JD.list JD.string)
+        |: JD.field "typeReference" decodeTypeReference
 
 
 decodeFunction : Decoder Function
@@ -154,18 +154,18 @@ decodeFunction =
     JD.lazy
         (\() ->
             JD.succeed Function
-                |: (JD.field "documentation" (JD.maybe JD.string))
-                |: (JD.field "signature" (JD.maybe decodeSignature))
-                |: (JD.field "declaration" decodeFunctionDeclaration)
+                |: JD.field "documentation" (JD.maybe JD.string)
+                |: JD.field "signature" (JD.maybe decodeSignature)
+                |: JD.field "declaration" decodeFunctionDeclaration
         )
 
 
 decodeSignature : Decoder FunctionSignature
 decodeSignature =
     JD.succeed FunctionSignature
-        |: (JD.field "operatorDefinition" JD.bool)
-        |: (JD.field "name" JD.string)
-        |: (JD.field "typeReference" decodeTypeReference)
+        |: JD.field "operatorDefinition" JD.bool
+        |: JD.field "name" JD.string
+        |: JD.field "typeReference" decodeTypeReference
 
 
 decodeTypeReference : Decoder TypeReference
@@ -197,8 +197,8 @@ decodeRecordField =
     JD.lazy
         (\() ->
             JD.succeed (,)
-                |: (JD.field "name" JD.string)
-                |: (JD.field "typeReference" decodeTypeReference)
+                |: JD.field "name" JD.string
+                |: JD.field "typeReference" decodeTypeReference
         )
 
 
@@ -218,18 +218,18 @@ decodeFunctionDeclaration =
     JD.lazy
         (\() ->
             JD.succeed FunctionDeclaration
-                |: (JD.field "operatorDefinition" JD.bool)
-                |: (JD.field "name" decodeVariablePointer)
-                |: (JD.field "arguments" (JD.list decodePattern))
-                |: (JD.field "expression" decodeExpression)
+                |: JD.field "operatorDefinition" JD.bool
+                |: JD.field "name" decodeVariablePointer
+                |: JD.field "arguments" (JD.list decodePattern)
+                |: JD.field "expression" decodeExpression
         )
 
 
 decodeVariablePointer : Decoder VariablePointer
 decodeVariablePointer =
     JD.succeed VariablePointer
-        |: (JD.field "value" JD.string)
-        |: (JD.field "range" Ranges.decode)
+        |: JD.field "value" JD.string
+        |: JD.field "range" Ranges.decode
 
 
 decodeChar : Decoder Char
@@ -273,8 +273,8 @@ decodePattern =
 decodeQualifiedNameRef : Decoder QualifiedNameRef
 decodeQualifiedNameRef =
     JD.succeed QualifiedNameRef
-        |: (JD.field "moduleName" decodeModuleName)
-        |: (JD.field "name" JD.string)
+        |: JD.field "moduleName" decodeModuleName
+        |: JD.field "name" JD.string
 
 
 decodeExpression : Decoder Expression
@@ -282,8 +282,8 @@ decodeExpression =
     JD.lazy
         (\() ->
             JD.succeed (,)
-                |: (JD.field "range" Ranges.decode)
-                |: (JD.field "inner" decodeInnerExpression)
+                |: JD.field "range" Ranges.decode
+                |: JD.field "inner" decodeInnerExpression
         )
 
 
@@ -310,7 +310,7 @@ decodeInnerExpression =
                 , ( "case", decodeCaseBlock |> JD.map CaseExpression )
                 , ( "lambda", decodeLambda |> JD.map LambdaExpression )
                 , ( "qualified", JD.map2 QualifiedExpr (JD.field "moduleName" decodeModuleName) (JD.field "name" JD.string) )
-                , ( "recordAccess", JD.list JD.string |> JD.map RecordAccess )
+                , ( "recordAccess", JD.map2 RecordAccess (JD.field "expression" decodeExpression) (JD.field "name" JD.string) )
                 , ( "recordAccessFunction", JD.string |> JD.map RecordAccessFunction )
                 , ( "record", JD.list decodeRecordSetter |> JD.map RecordExpr )
                 , ( "recordUpdate", decodeRecordUpdate |> JD.map RecordUpdateExpression )
@@ -324,8 +324,8 @@ decodeRecordUpdate =
     JD.lazy
         (\() ->
             JD.succeed RecordUpdate
-                |: (JD.field "name" JD.string)
-                |: (JD.field "updates" (JD.list decodeRecordSetter))
+                |: JD.field "name" JD.string
+                |: JD.field "updates" (JD.list decodeRecordSetter)
         )
 
 
@@ -334,8 +334,8 @@ decodeRecordSetter =
     JD.lazy
         (\() ->
             JD.succeed (,)
-                |: (JD.field "field" JD.string)
-                |: (JD.field "expression" decodeExpression)
+                |: JD.field "field" JD.string
+                |: JD.field "expression" decodeExpression
         )
 
 
@@ -344,8 +344,8 @@ decodeLambda =
     JD.lazy
         (\() ->
             JD.succeed Lambda
-                |: (JD.field "patterns" (JD.list decodePattern))
-                |: (JD.field "expression" decodeExpression)
+                |: JD.field "patterns" (JD.list decodePattern)
+                |: JD.field "expression" decodeExpression
         )
 
 
@@ -354,8 +354,8 @@ decodeCaseBlock =
     JD.lazy
         (\() ->
             JD.succeed CaseBlock
-                |: (JD.field "expression" decodeExpression)
-                |: (JD.field "cases" (JD.list decodeCase))
+                |: JD.field "expression" decodeExpression
+                |: JD.field "cases" (JD.list decodeCase)
         )
 
 
@@ -364,8 +364,8 @@ decodeCase =
     JD.lazy
         (\() ->
             JD.succeed (,)
-                |: (JD.field "pattern" decodePattern)
-                |: (JD.field "expression" decodeExpression)
+                |: JD.field "pattern" decodePattern
+                |: JD.field "expression" decodeExpression
         )
 
 
@@ -374,8 +374,8 @@ decodeLetBlock =
     JD.lazy
         (\() ->
             JD.succeed LetBlock
-                |: (JD.field "declarations" (JD.list decodeDeclaration))
-                |: (JD.field "expression" decodeExpression)
+                |: JD.field "declarations" (JD.list decodeDeclaration)
+                |: JD.field "expression" decodeExpression
         )
 
 
@@ -384,10 +384,10 @@ decodeOperatorApplication =
     JD.lazy
         (\() ->
             JD.succeed OperatorApplication
-                |: (JD.field "operator" JD.string)
-                |: (JD.field "direction" decodeInfixDirection)
-                |: (JD.field "left" decodeExpression)
-                |: (JD.field "left" decodeExpression)
+                |: JD.field "operator" JD.string
+                |: JD.field "direction" decodeInfixDirection
+                |: JD.field "left" decodeExpression
+                |: JD.field "left" decodeExpression
         )
 
 

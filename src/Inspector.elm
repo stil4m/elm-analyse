@@ -23,7 +23,7 @@ type alias Config context =
     , onLetBlock : Action context LetBlock
     , onCase : Action context Case
     , onFunctionOrValue : Action context String
-    , onRecordAccess : Action context (List String)
+    , onRecordAccess : Action context ( Expression, String )
     , onRecordUpdate : Action context RecordUpdate
     }
 
@@ -177,10 +177,10 @@ inspectInnerExpression config expression context =
         QualifiedExpr _ _ ->
             context
 
-        RecordAccess stringList ->
+        RecordAccess ex1 key ->
             actionLambda config.onRecordAccess
-                identity
-                stringList
+                (inspectExpression config ex1)
+                ( ex1, key )
                 context
 
         RecordAccessFunction _ ->

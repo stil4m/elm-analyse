@@ -38,7 +38,6 @@ scan fileContext =
                     , onCase = Inner onCase
                     , onOperatorApplication = Post onOperatorAppliction
                     , onFunctionOrValue = Post onFunctionOrValue
-                    , onRecordAccess = Post onRecordAccess
                     , onRecordUpdate = Post onRecordUpdate
                 }
                 fileContext.ast
@@ -167,13 +166,6 @@ addUsedVariable x context =
 onFunctionOrValue : String -> UsedVariableContext -> UsedVariableContext
 onFunctionOrValue x context =
     addUsedVariable x context
-
-
-onRecordAccess : List String -> UsedVariableContext -> UsedVariableContext
-onRecordAccess x context =
-    List.head x
-        |> Maybe.map (flip addUsedVariable context)
-        |> Maybe.withDefault context
 
 
 onRecordUpdate : RecordUpdate -> UsedVariableContext -> UsedVariableContext

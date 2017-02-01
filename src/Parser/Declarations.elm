@@ -129,11 +129,10 @@ expressionNotApplication : Parser State Expression
 expressionNotApplication =
     lazy
         (\() ->
-            rangedExpression <|
+            (rangedExpression <|
                 choice
                     [ unitExpression
                     , qualifiedExpression
-                    , recordAccessExpression
                     , functionOrValueExpression
                     , ifBlockExpression
                     , prefixOperatorExpression
@@ -152,7 +151,15 @@ expressionNotApplication =
                     , listExpression
                     , caseExpression
                     ]
+            )
+                >>= liftRecordAccess
         )
+
+
+liftRecordAccess : Expression -> Parser State Expression
+liftRecordAccess e =
+    or ((rangedExpression <| RecordAccess e <$> (string "." *> functionName)) >>= liftRecordAccess)
+        (succeed e)
 
 
 expression : Parser State Expression
@@ -463,18 +470,6 @@ qualifiedExpression =
 recordAccessFunctionExpression : Parser State InnerExpression
 recordAccessFunctionExpression =
     ((++) "." >> RecordAccessFunction) <$> (string "." *> functionName)
-
-
-recordAccessExpression : Parser State InnerExpression
-recordAccessExpression =
-    lazy
-        (\() ->
-            succeed RecordAccess
-                <*> (succeed (::)
-                        <*> functionName
-                        <*> many1 (string "." *> functionName)
-                    )
-        )
 
 
 tupledExpression : Parser State InnerExpression

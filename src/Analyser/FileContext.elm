@@ -6,7 +6,6 @@ import Analyser.Types exposing (LoadedSourceFile, LoadedSourceFiles)
 import Interfaces.Interface exposing (Interface)
 import Maybe exposing (Maybe(Just, Nothing))
 import Analyser.OperatorTable as OperatorTable
-import Analyser.Types exposing (LoadedSourceFiles, LoadedSourceFile)
 import Analyser.PostProcessing as PostProcessing
 
 

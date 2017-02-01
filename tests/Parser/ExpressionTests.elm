@@ -5,6 +5,7 @@ import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations exposing (..)
 import AST.Types exposing (..)
+import AST.Ranges exposing (..)
 import Test exposing (..)
 
 
@@ -211,7 +212,25 @@ all =
                 parseFullStringWithNullState "foo.bar" expression
                     |> Maybe.map noRangeExpression
                     |> Maybe.map Tuple.second
-                    |> Expect.equal (Just (RecordAccess [ "foo", "bar" ]))
+                    |> Expect.equal (Just (RecordAccess ( emptyRange, FunctionOrValue "foo" ) "bar"))
+        , test "record access multiple" <|
+            \() ->
+                parseFullStringWithNullState "foo.bar.baz" expression
+                    |> Maybe.map noRangeExpression
+                    |> Maybe.map Tuple.second
+                    |> Expect.equal
+                        (Just
+                            (RecordAccess
+                                ( emptyRange
+                                , RecordAccess
+                                    ( emptyRange
+                                    , FunctionOrValue "foo"
+                                    )
+                                    "bar"
+                                )
+                                "baz"
+                            )
+                        )
         , test "record update" <|
             \() ->
                 parseFullStringWithNullState "{ model | count = 1, loading = True }" expression

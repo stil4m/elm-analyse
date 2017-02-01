@@ -17,9 +17,9 @@ import Analyser.Checks.DuplicateImportsTests
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.DuplicateImportsTests.all
+        [ Analyser.Checks.UnnecessaryParensTests.all
+        , Analyser.Checks.DuplicateImportsTests.all
         , Analyser.Checks.NoDebugTests.all
-        , Analyser.Checks.UnnecessaryParensTests.all
         , Analyser.Checks.UnusedVariableTests.all
         , Analyser.Checks.NoSignatureTests.all
         , Analyser.Checks.NoImportAllTests.all

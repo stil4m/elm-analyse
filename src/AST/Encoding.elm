@@ -409,8 +409,12 @@ encodeExpression ( range, inner ) =
                             , ( "name", JE.string name )
                             ]
 
-                RecordAccess xs ->
-                    typed "recordAccess" (asList JE.string xs)
+                RecordAccess exp name ->
+                    typed "recordAccess" <|
+                        JE.object
+                            [ ( "expression", encodeExpression exp )
+                            , ( "name", JE.string name )
+                            ]
 
                 RecordAccessFunction x ->
                     typed "recordAccessFunction" (JE.string x)

@@ -171,7 +171,7 @@ type InnerExpression
     | RecordExpr (List RecordSetter)
     | ListExpr (List Expression)
     | QualifiedExpr ModuleName String
-    | RecordAccess (List String)
+    | RecordAccess Expression String
     | RecordAccessFunction String
     | RecordUpdateExpression RecordUpdate
     | GLSLExpression String

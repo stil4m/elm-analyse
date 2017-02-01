@@ -126,5 +126,8 @@ noRangeInnerExpression inner =
         ParenthesizedExpression x ->
             ParenthesizedExpression <| noRangeExpression x
 
+        RecordAccess e n ->
+            RecordAccess (noRangeExpression e) n
+
         _ ->
             inner

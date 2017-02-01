@@ -143,7 +143,7 @@ onOperatorApplicationExpression oparatorApplication context =
 onParenthesizedExpression : Range -> Expression -> Context -> Context
 onParenthesizedExpression range expression context =
     case Tuple.second expression of
-        RecordAccess _ ->
+        RecordAccess _ _ ->
             range :: context
 
         RecordAccessFunction _ ->
