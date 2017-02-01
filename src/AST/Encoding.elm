@@ -345,7 +345,7 @@ encodePattern pattern =
                 ]
 
         ParentisizedPattern p1 ->
-            typedJEObject "parentisized" [ ( "value", encodePattern pattern ) ]
+            typedJEObject "parentisized" [ ( "value", encodePattern p1 ) ]
 
 
 encodeQualifiedNameRef : QualifiedNameRef -> Value

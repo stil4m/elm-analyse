@@ -62,12 +62,12 @@ update msg (Model state) =
                                     | filesToLoad = List.Extra.uncons rest
                                     , parsedFiles = newFileContent :: state.parsedFiles
                                 }
-                            , case (Tuple.first newFileContent).sha1 of
+                            , case Tuple.first newFileContent |> .sha1 of
                                 Nothing ->
                                     Cmd.none
 
                                 Just sha1 ->
-                                    case (Tuple.second newFileContent) of
+                                    case Tuple.second newFileContent of
                                         Analyser.Types.Loaded x ->
                                             AnalyserPorts.storeAstForSha ( sha1, (Json.Encode.encode 0 (AST.Encoding.encode x.ast)) )
 

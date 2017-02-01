@@ -21,7 +21,7 @@ scan fileContext =
         }
         fileContext.ast
         Dict.empty
-        |> Dict.filter (\k -> Tuple.second >> (<) 1)
+        |> Dict.filter (\_ -> Tuple.second >> (<) 1)
         |> Dict.toList
         |> List.map (\( k, ( r, _ ) ) -> ( k, r ))
         |> List.map (uncurry (DuplicateImport fileContext.path))
@@ -30,7 +30,7 @@ scan fileContext =
 onImport : Import -> Context -> Context
 onImport imp context =
     case Dict.get imp.moduleName context of
-        Just x ->
+        Just _ ->
             Dict.update imp.moduleName (Maybe.map (Tuple2.mapSecond ((+) 1))) context
 
         Nothing ->
