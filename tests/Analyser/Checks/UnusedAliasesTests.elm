@@ -61,6 +61,38 @@ port foo : Person -> Cmd msg
     )
 
 
+usedAliasInRecord : ( String, String, List Message )
+usedAliasInRecord =
+    ( "usedAliasInRecord"
+    , """module Foo exposing (InputInterfaces)
+
+type alias InputFiles =
+    List String
+
+
+type alias InputInterfaces =
+    List ( String, InputFiles )
+"""
+    , []
+    )
+
+
+usedAliasInType : ( String, String, List Message )
+usedAliasInType =
+    ( "usedAliasInType"
+    , """module Foo exposing (Patch(..))
+
+type alias InputFiles =
+    List String
+
+
+type Patch
+    = OnFiles InputFiles
+"""
+    , []
+    )
+
+
 unusedAlias : ( String, String, List Message )
 unusedAlias =
     ( "unusedAlias"
@@ -83,5 +115,7 @@ all =
         , usedInSignature
         , usedAsFunction
         , usedInPort
+        , usedAliasInRecord
+        , usedAliasInType
         , unusedAlias
         ]

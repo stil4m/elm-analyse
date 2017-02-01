@@ -18,9 +18,7 @@ fileContentFromInput input =
 getMessages : String -> (FileContext -> List Message) -> Maybe (List Message)
 getMessages input f =
     Parser.Parser.parse input
-        -- |> Debug.log "File"
-        |>
-            Maybe.map (\file -> ( fileContentFromInput input, Loaded { interface = Interface.build file, ast = file, moduleName = AST.Util.fileModuleName file } ))
+        |> Maybe.map (\file -> ( fileContentFromInput input, Loaded { interface = Interface.build file, ast = file, moduleName = AST.Util.fileModuleName file } ))
         |> Maybe.andThen (\file -> FileContext.create [ file ] [] file)
         |> Maybe.map f
 

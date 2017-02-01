@@ -1,6 +1,6 @@
 module Inspector exposing (Action(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
-import AST.Types exposing (File, Import, TypeAlias, TypeReference(..), TypeArg(Concrete, Generic), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate, OperatorApplication)
+import AST.Types exposing (File, Import, ValueConstructor, Type, TypeAlias, TypeReference(..), TypeArg(Concrete, Generic), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate, OperatorApplication)
 
 
 type Action context x
@@ -104,9 +104,8 @@ inspectDeclaration config declaration context =
         AliasDecl typeAlias ->
             inspectTypeAlias config typeAlias context
 
-        TypeDecl _ ->
-            --TODO
-            context
+        TypeDecl typeDecl ->
+            inspectType config typeDecl context
 
         PortDeclaration signature ->
             inspectSignature config signature context
@@ -119,11 +118,21 @@ inspectDeclaration config declaration context =
             inspectDestructuring config destructing context
 
 
+inspectType : Config context -> Type -> context -> context
+inspectType config typeDecl context =
+    List.foldl (inspectValueConstructor config) context typeDecl.constructors
+
+
+inspectValueConstructor : Config context -> ValueConstructor -> context -> context
+inspectValueConstructor config valueConstructor context =
+    List.foldl (inspectTypeReference config) context valueConstructor.arguments
+
+
 inspectTypeAlias : Config context -> TypeAlias -> context -> context
 inspectTypeAlias config typeAlias context =
     actionLambda
         config.onTypeAlias
-        identity
+        (inspectTypeReference config typeAlias.typeReference)
         typeAlias
         context
 
