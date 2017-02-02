@@ -8,6 +8,7 @@ import Analyser.Messages exposing (Message(UnusedVariable, UnusedTopLevel))
 import Dict exposing (Dict)
 import Inspector exposing (defaultConfig, Action(Inner, Pre, Post))
 import Tuple2
+import Analyser.Checks.Variables exposing (getTopLevels, patternToVars, getDeclarationsVars)
 
 
 type alias Scope =
@@ -180,7 +181,7 @@ onOperatorAppliction operatorApplication context =
 
 onFile : File -> UsedVariableContext -> UsedVariableContext
 onFile file context =
-    getDeclarationVars file.declarations
+    getTopLevels file
         |> flip pushScope context
 
 
@@ -216,16 +217,11 @@ onLambda f lambda context =
 
 onLetBlock : (UsedVariableContext -> UsedVariableContext) -> LetBlock -> UsedVariableContext -> UsedVariableContext
 onLetBlock f letBlock context =
-    let
-        preContext =
-            letBlock.declarations
-                |> getDeclarationVars
-                |> flip pushScope context
-
-        postContext =
-            f preContext
-    in
-        postContext |> popScope
+    letBlock.declarations
+        |> getDeclarationsVars
+        |> flip pushScope context
+        |> f
+        |> popScope
 
 
 onCase : (UsedVariableContext -> UsedVariableContext) -> Case -> UsedVariableContext -> UsedVariableContext
@@ -240,59 +236,3 @@ onCase f caze context =
             f preContext
     in
         postContext |> popScope
-
-
-getDeclarationVars : List Declaration -> List VariablePointer
-getDeclarationVars =
-    List.concatMap
-        (\x ->
-            case x of
-                FuncDecl f ->
-                    [ f.declaration.name ]
-
-                AliasDecl _ ->
-                    []
-
-                TypeDecl t ->
-                    (List.map (\{ name, range } -> { value = name, range = range }) t.constructors)
-
-                PortDeclaration p ->
-                    [ { value = p.name, range = emptyRange } ]
-
-                InfixDeclaration i ->
-                    [ { value = i.operator, range = emptyRange } ]
-
-                DestructuringDeclaration destructuring ->
-                    patternToVars destructuring.pattern
-        )
-
-
-patternToVars : Pattern -> List VariablePointer
-patternToVars p =
-    case p of
-        TuplePattern t ->
-            List.concatMap patternToVars t
-
-        RecordPattern r ->
-            r
-
-        UnConsPattern l r ->
-            patternToVars l ++ patternToVars r
-
-        ListPattern l ->
-            List.concatMap patternToVars l
-
-        VarPattern x ->
-            [ x ]
-
-        NamedPattern _ args ->
-            List.concatMap patternToVars args
-
-        AsPattern sub name ->
-            name :: patternToVars sub
-
-        ParentisizedPattern sub ->
-            patternToVars sub
-
-        _ ->
-            []

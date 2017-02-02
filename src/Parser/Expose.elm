@@ -1,9 +1,9 @@
 module Parser.Expose exposing (exposeDefinition, infixExpose, typeExpose, exposingListInner, definitionExpose, exposable)
 
-import AST.Types exposing (State, Expression, Exposure(None, All, Explicit), Expose(InfixExpose, TypeExpose, DefinitionExpose))
+import AST.Types exposing (State, Expression, Exposure(None, All, Explicit), ValueConstructorExpose, Expose(InfixExpose, TypeExpose, TypeOrAliasExpose, FunctionExpose))
 import Combine exposing ((*>), (<$), (<$>), (<*>), Parser, choice, maybe, or, parens, sepBy, string, succeed, while)
 import Combine.Char exposing (char)
-import Parser.Tokens exposing (exposingToken, functionOrTypeName, typeName)
+import Parser.Tokens exposing (exposingToken, functionName, typeName)
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed, withRange)
 
 
@@ -26,14 +26,20 @@ exposable =
 
 infixExpose : Parser State Expose
 infixExpose =
-    InfixExpose <$> parens (while ((/=) ')'))
+    withRange (InfixExpose <$> parens (while ((/=) ')')))
 
 
 typeExpose : Parser State Expose
 typeExpose =
-    succeed TypeExpose
-        <*> typeName
-        <*> (maybe moreThanIndentWhitespace *> exposeListWith typeName)
+    withRange <|
+        succeed TypeExpose
+            <*> typeName
+            <*> (maybe moreThanIndentWhitespace *> exposeListWith valueConstructorExpose)
+
+
+valueConstructorExpose : Parser State ValueConstructorExpose
+valueConstructorExpose =
+    withRange ((,) <$> typeName)
 
 
 exposingListInner : Parser State b -> Parser State (Exposure b)
@@ -49,4 +55,7 @@ exposeListWith p =
 
 definitionExpose : Parser State Expose
 definitionExpose =
-    DefinitionExpose <$> functionOrTypeName
+    withRange <|
+        or
+            (FunctionExpose <$> functionName)
+            (TypeOrAliasExpose <$> typeName)

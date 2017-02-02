@@ -91,14 +91,17 @@ buildInterfaceFromExplicit x fileDefinitionList =
         |> List.filterMap
             (\expose ->
                 case expose of
-                    AST.InfixExpose k ->
+                    AST.InfixExpose k range ->
                         lookupForDefinition k fileDefinitionList
 
-                    AST.DefinitionExpose s ->
+                    AST.TypeOrAliasExpose s range ->
                         lookupForDefinition s fileDefinitionList
                             |> Maybe.map (ifType (\( name, _ ) -> Type ( name, [] )))
 
-                    AST.TypeExpose n vals ->
+                    AST.FunctionExpose s range ->
+                        Just <| Function s
+
+                    AST.TypeExpose n vals range ->
                         case vals of
                             AST.None ->
                                 Just <| Type ( n, [] )
@@ -107,7 +110,7 @@ buildInterfaceFromExplicit x fileDefinitionList =
                                 lookupForDefinition n fileDefinitionList
 
                             AST.Explicit v ->
-                                Just <| Type ( n, v )
+                                Just <| Type ( n, List.map Tuple.first v )
             )
 
 

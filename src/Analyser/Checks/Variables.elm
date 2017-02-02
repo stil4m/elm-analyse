@@ -1,4 +1,4 @@
-module Analyaser.Checks.TopLevels exposing (getTopLevels)
+module Analyser.Checks.Variables exposing (getTopLevels, getDeclarationsVars, patternToVars)
 
 import AST.Types exposing (Import, Exposure(..), Expose(..), File, Declaration(..), VariablePointer, Pattern(..))
 import AST.Ranges exposing (..)
@@ -8,8 +8,13 @@ getTopLevels : File -> List VariablePointer
 getTopLevels file =
     List.concat
         [ List.concatMap getImportVars file.imports
-        , List.concatMap getDeclarationVars file.declarations
+        , getDeclarationsVars file.declarations
         ]
+
+
+getDeclarationsVars : List Declaration -> List VariablePointer
+getDeclarationsVars =
+    List.concatMap getDeclarationVars
 
 
 getImportVars : Import -> List VariablePointer
@@ -31,15 +36,17 @@ getImportExposedVars e =
                 |> List.concatMap
                     (\exposed ->
                         case exposed of
-                            InfixExpose inf ->
+                            InfixExpose inf _ ->
                                 --TODO
                                 []
 
-                            DefinitionExpose k ->
-                                -- TODO No types, only functions
-                                [ VariablePointer k emptyRange ]
+                            FunctionExpose x r ->
+                                [ VariablePointer x r ]
 
-                            TypeExpose t ts ->
+                            TypeOrAliasExpose _ _ ->
+                                []
+
+                            TypeExpose t ts _ ->
                                 case ts of
                                     All _ ->
                                         []
@@ -49,7 +56,7 @@ getImportExposedVars e =
 
                                     --TODO
                                     Explicit tsx ->
-                                        tsx |> List.map (flip VariablePointer emptyRange)
+                                        tsx |> List.map (uncurry VariablePointer)
                     )
 
 

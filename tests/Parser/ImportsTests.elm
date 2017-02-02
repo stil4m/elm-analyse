@@ -21,8 +21,8 @@ all =
                              , moduleAlias = Nothing
                              , exposingList =
                                 Explicit
-                                    [ DefinitionExpose "Model"
-                                    , TypeExpose "Msg" (All { start = { row = 1, column = 32 }, end = { row = 1, column = 34 } })
+                                    [ TypeOrAliasExpose "Model" emptyRange
+                                    , TypeExpose "Msg" (All emptyRange) emptyRange
                                     ]
                              , range = emptyRange
                              }
@@ -36,7 +36,7 @@ all =
                         (Just
                             ({ moduleName = [ "Html" ]
                              , moduleAlias = Nothing
-                             , exposingList = Explicit [ DefinitionExpose "text" ]
+                             , exposingList = Explicit [ FunctionExpose "text" emptyRange ]
                              , range = emptyRange
                              }
                             )

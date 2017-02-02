@@ -43,7 +43,7 @@ onFile _ file _ =
                             |> List.filterMap
                                 (\explicitItem ->
                                     case explicitItem of
-                                        TypeExpose _ constructors ->
+                                        TypeExpose _ constructors _ ->
                                             case constructors of
                                                 All range ->
                                                     Just ( imp.moduleName, range )

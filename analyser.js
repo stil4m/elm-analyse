@@ -24,10 +24,10 @@ function dependencyFiles(dep) {
     const version = exactDeps[dep];
     const depPath = directory + "/elm-stuff/packages/" + dep + "/" + version;
     const depPackageFile = require(depPath + '/elm-package.json');
-    const exposedModules = depPackageFile['exposed-modules'].map(x => '/' + x.replace('.','/') + '.elm');
+    const exposedModules = depPackageFile['exposed-modules'].map(x => '/' + x.replace('.', '/') + '.elm');
     const unfilteredTargetFiles = targetFilesForPathAndPackage(depPath, depPackageFile);
     return unfilteredTargetFiles.filter(function(x) {
-      return exposedModules.filter(e => x.endsWith(e))[0];
+        return exposedModules.filter(e => x.endsWith(e))[0];
     });
 }
 
@@ -45,24 +45,19 @@ function dependencyFiles(dep) {
     const Elm = require('./elm');
     var app = Elm.Analyser.worker(input);
     app.ports.sendMessages.subscribe(function(x) {
-      console.log("Messages:")
-      console.log("---------")
-      x.forEach(y => console.log(y));
+        console.log("Messages:")
+        console.log("---------")
+        x.forEach(y => console.log(y));
     })
     app.ports.storeAstForSha.subscribe(function(x) {
-      const sha1 =x[0];
-      const content =x[1];
-      fs.writeFileSync('./cache/' +sha1+ ".json", content);
+        const sha1 = x[0];
+        const content = x[1];
+        fs.writeFileSync('./cache/' + sha1 + ".json", content);
     })
     app.ports.loadFile.subscribe(function(x) {
-      fileReader(directory, x, function(result) {
-        app.ports.fileContent.send(result);
-      })
-
-      // const real = x.replace(".", directory);
-      // fs.readFile(real, function(e, content) {
-      //     app.ports.fileContent.send([x,content.toString()]);
-      // })
+        fileReader(directory, x, function(result) {
+            app.ports.fileContent.send(result);
+        });
     });
 
 })();

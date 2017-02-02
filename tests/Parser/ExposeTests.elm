@@ -1,7 +1,8 @@
 module Parser.ExposeTests exposing (..)
 
-import Parser.Expose as Parser
-import AST.Types as Parser
+import Parser.Expose exposing (..)
+import AST.Types exposing (..)
+import AST.Ranges exposing (..)
 import Test exposing (..)
 import Expect
 import Parser.CombineTestUtil exposing (..)
@@ -12,61 +13,68 @@ all =
     describe "ModuleTests"
         [ test "infixExpose" <|
             \() ->
-                parseFullStringWithNullState "($>)" Parser.infixExpose
-                    |> Expect.equal (Just (Parser.InfixExpose "$>"))
+                parseFullStringWithNullState "($>)" infixExpose
+                    |> Maybe.map noRangeExpose
+                    |> Expect.equal (Just (InfixExpose "$>" emptyRange))
         , test "definitionExpose" <|
             \() ->
-                parseFullStringWithNullState "Model" Parser.definitionExpose
-                    |> Expect.equal (Just (Parser.DefinitionExpose "Model"))
+                parseFullStringWithNullState "Model" definitionExpose
+                    |> Maybe.map noRangeExpose
+                    |> Expect.equal (Just (TypeOrAliasExpose "Model" emptyRange))
         , test "typeExpose" <|
             \() ->
-                parseFullStringWithNullState "Msg(Go,Back)" Parser.typeExpose
-                    |> Expect.equal (Just (Parser.TypeExpose "Msg" (Parser.Explicit [ "Go", "Back" ])))
+                parseFullStringWithNullState "Msg(Go,Back)" typeExpose
+                    |> Maybe.map noRangeExpose
+                    |> Expect.equal (Just (TypeExpose "Msg" (Explicit [ ( "Go", emptyRange ), ( "Back", emptyRange ) ]) emptyRange))
         , test "exposingList" <|
             \() ->
-                parseFullStringWithNullState " exposing (Model,Msg(Go,Back),Info(..),init,(::))" (Parser.exposeDefinition Parser.exposable)
+                parseFullStringWithNullState " exposing (Model,Msg(Go,Back),Info(..),init,(::))" (exposeDefinition exposable)
+                    |> Maybe.map noRangeExposingList
                     |> Expect.equal
                         (Just
-                            (Parser.Explicit
-                                [ Parser.DefinitionExpose "Model"
-                                , Parser.TypeExpose "Msg" <| Parser.Explicit [ "Go", "Back" ]
-                                , Parser.TypeExpose "Info" <| Parser.All { start = { row = 1, column = 35 }, end = { row = 1, column = 37 } }
-                                , Parser.DefinitionExpose "init"
-                                , Parser.InfixExpose "::"
+                            (Explicit
+                                [ TypeOrAliasExpose "Model" emptyRange
+                                , TypeExpose "Msg" (Explicit [ ( "Go", emptyRange ), ( "Back", emptyRange ) ]) emptyRange
+                                , TypeExpose "Info" (All emptyRange) emptyRange
+                                , FunctionExpose "init" emptyRange
+                                , InfixExpose "::" emptyRange
                                 ]
                             )
                         )
         , test "exposingListInner with comment" <|
             \() ->
-                parseFullStringWithNullState "foo\n --bar\n " (Parser.exposingListInner Parser.exposable)
+                parseFullStringWithNullState "foo\n --bar\n " (exposingListInner exposable)
+                    |> Maybe.map noRangeExposingList
                     |> Expect.equal
                         (Just
-                            (Parser.Explicit
-                                [ Parser.DefinitionExpose "foo"
+                            (Explicit
+                                [ FunctionExpose "foo" emptyRange
                                 ]
                             )
                         )
-        , test "exposingList with comment" <|
+        , test "exposingList with comment 2" <|
             \() ->
-                parseFullStringWithNullState " exposing (foo\n --bar\n )" (Parser.exposeDefinition Parser.exposable)
+                parseFullStringWithNullState " exposing (foo\n --bar\n )" (exposeDefinition exposable)
+                    |> Maybe.map noRangeExposingList
                     |> Expect.equal
                         (Just
-                            (Parser.Explicit
-                                [ Parser.DefinitionExpose "foo"
+                            (Explicit
+                                [ FunctionExpose "foo" emptyRange
                                 ]
                             )
                         )
         , test "exposingList with spacing" <|
             \() ->
-                parseFullStringWithNullState " exposing (Model, Msg(Go,Back) , Info(..),init,(::) )" (Parser.exposeDefinition Parser.exposable)
+                parseFullStringWithNullState " exposing (Model, Msg(Go,Back) , Info(..),init,(::) )" (exposeDefinition exposable)
+                    |> Maybe.map noRangeExposingList
                     |> Expect.equal
                         (Just
-                            (Parser.Explicit
-                                [ Parser.DefinitionExpose "Model"
-                                , Parser.TypeExpose "Msg" <| Parser.Explicit [ "Go", "Back" ]
-                                , Parser.TypeExpose "Info" <| Parser.All { start = { row = 1, column = 38 }, end = { row = 1, column = 40 } }
-                                , Parser.DefinitionExpose "init"
-                                , Parser.InfixExpose "::"
+                            (Explicit
+                                [ TypeOrAliasExpose "Model" emptyRange
+                                , TypeExpose "Msg" (Explicit [ ( "Go", emptyRange ), ( "Back", emptyRange ) ]) emptyRange
+                                , TypeExpose "Info" (All emptyRange) emptyRange
+                                , FunctionExpose "init" emptyRange
+                                , InfixExpose "::" emptyRange
                                 ]
                             )
                         )

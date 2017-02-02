@@ -69,18 +69,42 @@ encodeModuleName =
 encodeExpose : Expose -> Value
 encodeExpose exp =
     case exp of
-        InfixExpose x ->
-            typed "infix" (JE.string x)
-
-        DefinitionExpose x ->
-            typed "definition" (JE.string x)
-
-        TypeExpose x inner ->
-            typed "typeexpose" <|
+        InfixExpose x r ->
+            typed "infix" <|
                 JE.object
                     [ ( "name", JE.string x )
-                    , ( "inner", encodeExposingList inner JE.string )
+                    , ( "range", Ranges.encode r )
                     ]
+
+        FunctionExpose x r ->
+            typed "function" <|
+                JE.object
+                    [ ( "name", JE.string x )
+                    , ( "range", Ranges.encode r )
+                    ]
+
+        TypeOrAliasExpose x r ->
+            typed "typeOrAlias" <|
+                JE.object
+                    [ ( "name", JE.string x )
+                    , ( "range", Ranges.encode r )
+                    ]
+
+        TypeExpose x inner r ->
+            typed "type" <|
+                JE.object
+                    [ ( "name", JE.string x )
+                    , ( "inner", encodeExposingList inner encodeValueConstructorExpose )
+                    , ( "range", Ranges.encode r )
+                    ]
+
+
+encodeValueConstructorExpose : ValueConstructorExpose -> Value
+encodeValueConstructorExpose ( name, range ) =
+    JE.object
+        [ ( "name", JE.string name )
+        , ( "range", Ranges.encode range )
+        ]
 
 
 encodeExposingList : Exposure a -> (a -> Value) -> Value

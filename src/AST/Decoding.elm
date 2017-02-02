@@ -65,10 +65,23 @@ decodeModuleName =
 decodeExpose : Decoder Expose
 decodeExpose =
     decodeTyped
-        [ ( "infix", JD.string |> JD.map InfixExpose )
-        , ( "definition", JD.string |> JD.map DefinitionExpose )
-        , ( "typeexpose", JD.map2 TypeExpose (JD.field "name" JD.string) (JD.field "inner" <| decodeExposingList JD.string) )
+        [ ( "infix", JD.map2 InfixExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
+        , ( "function", JD.map2 FunctionExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
+        , ( "typeOrAlias", JD.map2 TypeOrAliasExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
+        , ( "type"
+          , JD.map3 TypeExpose
+                (JD.field "name" JD.string)
+                (JD.field "inner" <| decodeExposingList decodeValueConstructorExpose)
+                (JD.field "range" Ranges.decode)
+          )
         ]
+
+
+decodeValueConstructorExpose : Decoder ValueConstructorExpose
+decodeValueConstructorExpose =
+    JD.succeed (,)
+        |: JD.field "name" JD.string
+        |: JD.field "range" Ranges.decode
 
 
 decodeExposingList : Decoder a -> Decoder (Exposure a)

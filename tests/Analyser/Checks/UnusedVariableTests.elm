@@ -199,14 +199,14 @@ init = 2
 
 unusedImportedVariable : ( String, String, List Message )
 unusedImportedVariable =
-    ( "unusedInEffectModule"
+    ( "unusedImportedVariable"
     , """module Foo exposing (foo)
 
 import Html exposing (div)
 
 foo = 1
 """
-    , [ UnusedTopLevel "./foo.elm" "div" { start = { row = 5, column = -1 }, end = { row = 5, column = 2 } }
+    , [ UnusedTopLevel "./foo.elm" "div" { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
       ]
     )
 

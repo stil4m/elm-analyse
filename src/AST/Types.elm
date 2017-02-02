@@ -292,16 +292,12 @@ type Exposure a
     | Explicit (List a)
 
 
-type ExposeList inner
-    = ExposeAny
-    | Specified (List inner)
-
-
 type Expose
-    = InfixExpose String
-    | DefinitionExpose String
-    | TypeExpose String (Exposure String)
+    = InfixExpose String Range
+    | FunctionExpose String Range
+    | TypeOrAliasExpose String Range
+    | TypeExpose String (Exposure ValueConstructorExpose) Range
 
 
-type alias ExposeAny =
-    ()
+type alias ValueConstructorExpose =
+    ( String, Range )

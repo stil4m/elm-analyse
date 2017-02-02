@@ -49,13 +49,76 @@ noRangeExpression ( _, inner ) =
 noRangeFile : File -> File
 noRangeFile file =
     { file
-        | imports = List.map noRangeImport file.imports
+        | moduleDefinition = noRangeModule file.moduleDefinition
+        , imports = List.map noRangeImport file.imports
     }
+
+
+noRangeModule : Module -> Module
+noRangeModule m =
+    case m of
+        NormalModule n ->
+            NormalModule { n | exposingList = noRangeExposingList n.exposingList }
+
+        PortModule n ->
+            PortModule { n | exposingList = noRangeExposingList n.exposingList }
+
+        EffectModule n ->
+            EffectModule { n | exposingList = noRangeExposingList n.exposingList }
+
+        NoModule ->
+            NoModule
 
 
 noRangeImport : Import -> Import
 noRangeImport imp =
-    { imp | range = emptyRange }
+    { imp
+        | range = emptyRange
+        , exposingList = noRangeExposingList imp.exposingList
+    }
+
+
+noRangeExposingList : Exposure Expose -> Exposure Expose
+noRangeExposingList x =
+    case x of
+        All r ->
+            All emptyRange
+
+        None ->
+            None
+
+        Explicit list ->
+            list
+                |> List.map noRangeExpose
+                |> Explicit
+
+
+noRangeExpose : Expose -> Expose
+noRangeExpose l =
+    case l of
+        InfixExpose s r ->
+            InfixExpose s emptyRange
+
+        FunctionExpose s r ->
+            FunctionExpose s emptyRange
+
+        TypeOrAliasExpose s _ ->
+            TypeOrAliasExpose s emptyRange
+
+        TypeExpose s t _ ->
+            let
+                newT =
+                    case t of
+                        All r ->
+                            All emptyRange
+
+                        None ->
+                            None
+
+                        Explicit list ->
+                            Explicit <| List.map (Tuple2.mapSecond (always emptyRange)) list
+            in
+                TypeExpose s newT emptyRange
 
 
 noRangeDeclaration : Declaration -> Declaration
