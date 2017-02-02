@@ -1,4 +1,4 @@
-module Analyser.Checks.Variables exposing (getTopLevels, getDeclarationsVars, patternToVars)
+module Analyser.Checks.Variables exposing (getTopLevels, getDeclarationsVars, getImportsVars, patternToVars)
 
 import AST.Types exposing (Import, Exposure(..), Expose(..), File, Declaration(..), VariablePointer, Pattern(..))
 import AST.Ranges exposing (..)
@@ -7,7 +7,7 @@ import AST.Ranges exposing (..)
 getTopLevels : File -> List VariablePointer
 getTopLevels file =
     List.concat
-        [ List.concatMap getImportVars file.imports
+        [ getImportsVars file.imports
         , getDeclarationsVars file.declarations
         ]
 
@@ -15,6 +15,11 @@ getTopLevels file =
 getDeclarationsVars : List Declaration -> List VariablePointer
 getDeclarationsVars =
     List.concatMap getDeclarationVars
+
+
+getImportsVars : List Import -> List VariablePointer
+getImportsVars =
+    List.concatMap getImportVars
 
 
 getImportVars : Import -> List VariablePointer
