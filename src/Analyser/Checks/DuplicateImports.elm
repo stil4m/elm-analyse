@@ -4,7 +4,7 @@ import AST.Types exposing (InnerExpression(QualifiedExpr), ModuleName, Import)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(DuplicateImport))
-import Inspector exposing (Action(Inner, Post, Pre), defaultConfig)
+import Inspector exposing (Action(Post, Skip), defaultConfig)
 import Dict exposing (Dict)
 import Tuple2
 
@@ -18,6 +18,7 @@ scan fileContext =
     Inspector.inspect
         { defaultConfig
             | onImport = Post onImport
+            , onFunction = Skip
         }
         fileContext.ast
         Dict.empty

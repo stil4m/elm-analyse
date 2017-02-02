@@ -18,6 +18,7 @@ type Message
     | UnformattedFile FileName
     | DuplicateImport FileName AST.ModuleName Range
     | UnusedAlias FileName String Range
+    | RedefineVariable FileName String Range Range
 
 
 type alias FileName =
@@ -136,4 +137,16 @@ asString m =
                 , fileName
                 , "\" at "
                 , rangeToString range
+                ]
+
+        RedefineVariable fileName name range1 range2 ->
+            String.concat
+                [ "Variable `"
+                , name
+                , "` is not redefined in file \""
+                , fileName
+                , "\". At "
+                , rangeToString range1
+                , " and "
+                , rangeToString range2
                 ]

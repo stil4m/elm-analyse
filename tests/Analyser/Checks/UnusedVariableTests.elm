@@ -197,6 +197,20 @@ init = 2
     )
 
 
+unusedImportedVariable : ( String, String, List Message )
+unusedImportedVariable =
+    ( "unusedInEffectModule"
+    , """module Foo exposing (foo)
+
+import Html exposing (div)
+
+foo = 1
+"""
+    , [ UnusedTopLevel "./foo.elm" "div" { start = { row = 5, column = -1 }, end = { row = 5, column = 2 } }
+      ]
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedVariable"
@@ -214,4 +228,5 @@ all =
         , usedOperator
         , destructuringSameName
         , unusedInEffectModule
+        , unusedImportedVariable
         ]

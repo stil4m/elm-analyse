@@ -72,7 +72,7 @@ actionLambda act =
 inspect : Config a -> File -> a -> a
 inspect config file context =
     actionLambda config.onFile
-        (inspectDeclarations config file.declarations >> inspectImports config file.imports)
+        (inspectImports config file.imports >> inspectDeclarations config file.declarations)
         file
         context
 
