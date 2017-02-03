@@ -1,6 +1,6 @@
 module AST.Decoding exposing (decode)
 
-import AST.Ranges as Ranges exposing (encode)
+import AST.Ranges as Ranges
 import AST.Types exposing (..)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))

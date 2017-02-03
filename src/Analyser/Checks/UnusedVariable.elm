@@ -1,7 +1,18 @@
 module Analyser.Checks.UnusedVariable exposing (scan)
 
-import AST.Types exposing (File, Lambda, RecordUpdate, LetBlock, Function, VariablePointer, Declaration(FuncDecl, AliasDecl, DestructuringDeclaration, TypeDecl, PortDeclaration, InfixDeclaration), Case, Pattern(TuplePattern, RecordPattern, ListPattern, UnConsPattern, VarPattern, NamedPattern, AsPattern, ParentisizedPattern), OperatorApplication, Module(EffectModule))
-import AST.Ranges exposing (Range, emptyRange)
+import AST.Types
+    exposing
+        ( File
+        , Lambda
+        , RecordUpdate
+        , LetBlock
+        , Function
+        , VariablePointer
+        , Case
+        , OperatorApplication
+        , Module(EffectModule)
+        )
+import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Interfaces.Interface as Interface
 import Analyser.Messages exposing (Message(UnusedVariable, UnusedTopLevel))

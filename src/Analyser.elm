@@ -5,7 +5,7 @@ import Analyser.LoadedDependencies as LoadedDependencies exposing (LoadedDepende
 import Analyser.Messages as Messages exposing (Message)
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import AnalyserPorts
-import Platform exposing (program, programWithFlags)
+import Platform exposing (programWithFlags)
 import Task
 import Time exposing (Time)
 import Inspection

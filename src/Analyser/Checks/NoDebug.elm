@@ -4,7 +4,7 @@ import AST.Types exposing (Expression, InnerExpression(QualifiedExpr))
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(DebugLog, DebugCrash))
-import Inspector exposing (Action(Inner, Post, Pre), defaultConfig)
+import Inspector exposing (Action(Post), defaultConfig)
 
 
 type DebugType

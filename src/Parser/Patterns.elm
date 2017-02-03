@@ -4,7 +4,7 @@ import Combine exposing (Parser, choice, lazy, between, string, sepBy, sepBy1, s
 import Combine.Num
 import Parser.Tokens exposing (characterLiteral, stringLiteral, asToken, functionName, typeName)
 import AST.Types exposing (State, Pattern(ListPattern, UnConsPattern, CharPattern, StringPattern, IntPattern, FloatPattern, AsPattern, TuplePattern, RecordPattern, VarPattern, NamedPattern, QualifiedNamePattern, AllPattern, UnitPattern), QualifiedNameRef)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, withRange, asPointer)
+import Parser.Util exposing (moreThanIndentWhitespace, trimmed, withRange, asPointer)
 
 
 pattern : Parser State Pattern

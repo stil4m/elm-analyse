@@ -1,6 +1,6 @@
 module Analyser.Checks.DuplicateImports exposing (scan)
 
-import AST.Types exposing (InnerExpression(QualifiedExpr), ModuleName, Import)
+import AST.Types exposing (InnerExpression, ModuleName, Import)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(DuplicateImport))

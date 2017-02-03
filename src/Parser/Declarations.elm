@@ -1,7 +1,7 @@
 module Parser.Declarations exposing (file, signature, declaration, function, functionDeclaration, expression, letBlock, letBody, caseBlock, caseStatement, caseStatements)
 
 import Combine exposing (maybe, (*>), (>>=), (<*), (<$), (<$>), sepBy, many, succeed, Parser, string, choice, lookAhead, or, withLocation, parens, modifyState, count, between, fail, (<*>), lazy, many1, sepBy1)
-import Combine.Char exposing (anyChar, char, noneOf)
+import Combine.Char exposing (anyChar)
 import Combine.Num
 import List.Extra as List
 import Parser.Imports exposing (importDefinition)

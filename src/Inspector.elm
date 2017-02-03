@@ -110,7 +110,7 @@ inspectDeclaration config declaration context =
         PortDeclaration signature ->
             inspectSignature config signature context
 
-        InfixDeclaration infixDecl ->
+        InfixDeclaration _ ->
             context
 
         DestructuringDeclaration destructing ->

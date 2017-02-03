@@ -60,7 +60,7 @@ buildSingle imp moduleIndex =
 getExposedOperators : AST.Expose -> Maybe String
 getExposedOperators x =
     case x of
-        AST.InfixExpose s r ->
+        AST.InfixExpose s _ ->
             Just s
 
         _ ->

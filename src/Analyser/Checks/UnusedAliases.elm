@@ -1,6 +1,6 @@
 module Analyser.Checks.UnusedAliases exposing (scan)
 
-import AST.Ranges exposing (Range, emptyRange)
+import AST.Ranges exposing (Range)
 import AST.Types exposing (FunctionSignature, TypeAlias, TypeReference(Typed))
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(UnusedAlias))

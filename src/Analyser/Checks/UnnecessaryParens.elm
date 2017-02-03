@@ -2,9 +2,7 @@ module Analyser.Checks.UnnecessaryParens exposing (scan)
 
 import AST.Types
     exposing
-        ( Exposure(All, Explicit, None)
-        , Expose(TypeExpose)
-        , Expression
+        ( Expression
         , InnerExpression
             ( ListExpr
             , ParenthesizedExpression

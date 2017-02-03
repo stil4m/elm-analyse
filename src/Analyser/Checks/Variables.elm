@@ -1,6 +1,6 @@
 module Analyser.Checks.Variables exposing (getTopLevels, getDeclarationsVars, getImportsVars, patternToVars, patternToUsedVars)
 
-import AST.Ranges exposing (..)
+import AST.Ranges exposing (Range, emptyRange)
 import AST.Types exposing (Declaration(..), Expose(..), Exposure(..), File, Import, Pattern(..), QualifiedNameRef, VariablePointer)
 
 
@@ -41,7 +41,7 @@ getImportExposedVars e =
                 |> List.concatMap
                     (\exposed ->
                         case exposed of
-                            InfixExpose inf _ ->
+                            InfixExpose _ _ ->
                                 --TODO
                                 []
 
@@ -51,7 +51,7 @@ getImportExposedVars e =
                             TypeOrAliasExpose _ _ ->
                                 []
 
-                            TypeExpose t ts _ ->
+                            TypeExpose _ ts _ ->
                                 case ts of
                                     All _ ->
                                         []
@@ -164,7 +164,7 @@ patternToVars p =
         VarPattern x ->
             [ x ]
 
-        NamedPattern qualifiedNameRef args ->
+        NamedPattern _ args ->
             List.concatMap patternToVars args
 
         AsPattern sub name ->
@@ -173,7 +173,7 @@ patternToVars p =
         ParentisizedPattern sub ->
             patternToVars sub
 
-        QualifiedNamePattern x ->
+        QualifiedNamePattern _ ->
             []
 
         AllPattern ->

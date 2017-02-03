@@ -4,7 +4,7 @@ import Combine exposing (choice, succeed, Parser, (*>), between, (<$>), (<*>), (
 import Parser.Expose exposing (exposable, exposeDefinition)
 import Parser.Tokens exposing (functionName, typeName, moduleToken, moduleName, portToken)
 import AST.Types exposing (Module(NormalModule, EffectModule, NoModule, PortModule), DefaultModuleData, State)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed)
+import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
 
 
 moduleDefinition : Parser State Module
