@@ -1,7 +1,7 @@
-module Analyser.Checks.Variables exposing (getTopLevels, getDeclarationsVars, getImportsVars, patternToVars)
+module Analyser.Checks.Variables exposing (getTopLevels, getDeclarationsVars, getImportsVars, patternToVars, patternToUsedVars)
 
-import AST.Types exposing (Import, Exposure(..), Expose(..), File, Declaration(..), VariablePointer, Pattern(..))
 import AST.Ranges exposing (..)
+import AST.Types exposing (Declaration(..), Expose(..), Exposure(..), File, Import, Pattern(..), QualifiedNameRef, VariablePointer)
 
 
 getTopLevels : File -> List VariablePointer
@@ -89,6 +89,63 @@ getDeclarationVars decl =
             patternToVars destructuring.pattern
 
 
+qualifiedNameUsedVars : QualifiedNameRef -> List VariablePointer
+qualifiedNameUsedVars { moduleName, name, range } =
+    if moduleName == [] then
+        [ { value = name, range = range } ]
+    else
+        []
+
+
+patternToUsedVars : Pattern -> List VariablePointer
+patternToUsedVars p =
+    case p of
+        TuplePattern t ->
+            List.concatMap patternToUsedVars t
+
+        RecordPattern r ->
+            r
+
+        UnConsPattern l r ->
+            patternToUsedVars l ++ patternToUsedVars r
+
+        ListPattern l ->
+            List.concatMap patternToUsedVars l
+
+        VarPattern x ->
+            [ x ]
+
+        NamedPattern qualifiedNameRef args ->
+            qualifiedNameUsedVars qualifiedNameRef ++ List.concatMap patternToUsedVars args
+
+        AsPattern sub name ->
+            name :: patternToUsedVars sub
+
+        ParentisizedPattern sub ->
+            patternToUsedVars sub
+
+        QualifiedNamePattern x ->
+            qualifiedNameUsedVars x
+
+        AllPattern ->
+            []
+
+        UnitPattern ->
+            []
+
+        CharPattern _ ->
+            []
+
+        StringPattern _ ->
+            []
+
+        IntPattern _ ->
+            []
+
+        FloatPattern _ ->
+            []
+
+
 patternToVars : Pattern -> List VariablePointer
 patternToVars p =
     case p of
@@ -107,7 +164,7 @@ patternToVars p =
         VarPattern x ->
             [ x ]
 
-        NamedPattern _ args ->
+        NamedPattern qualifiedNameRef args ->
             List.concatMap patternToVars args
 
         AsPattern sub name ->
@@ -116,5 +173,23 @@ patternToVars p =
         ParentisizedPattern sub ->
             patternToVars sub
 
-        _ ->
+        QualifiedNamePattern x ->
+            []
+
+        AllPattern ->
+            []
+
+        UnitPattern ->
+            []
+
+        CharPattern _ ->
+            []
+
+        StringPattern _ ->
+            []
+
+        IntPattern _ ->
+            []
+
+        FloatPattern _ ->
             []

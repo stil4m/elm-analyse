@@ -19,17 +19,17 @@ import Analyser.Checks.OverriddenVariablesTests
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.OverriddenVariablesTests.all
-          -- , Analyser.Checks.UnusedAliasesTests.all
-          -- , Analyser.Checks.UnnecessaryParensTests.all
-          -- , Analyser.Checks.DuplicateImportsTests.all
-          -- , Analyser.Checks.NoDebugTests.all
-          -- , Analyser.Checks.UnusedVariableTests.all
-          -- , Analyser.Checks.NoSignatureTests.all
-          -- , Analyser.Checks.NoImportAllTests.all
-          -- , Analyser.Checks.NotExposeAllTests.all
-          -- , InterfaceTest.all
-          -- , DependencyTests.all
-          -- , PostProcessingTests.all
-          -- , ParserTests.all
+        [ Analyser.Checks.UnusedVariableTests.all
+        , Analyser.Checks.OverriddenVariablesTests.all
+        , Analyser.Checks.UnnecessaryParensTests.all
+        , Analyser.Checks.DuplicateImportsTests.all
+        , Analyser.Checks.NoDebugTests.all
+        , Analyser.Checks.UnusedAliasesTests.all
+        , Analyser.Checks.NoSignatureTests.all
+        , Analyser.Checks.NoImportAllTests.all
+        , Analyser.Checks.NotExposeAllTests.all
+        , InterfaceTest.all
+        , DependencyTests.all
+        , PostProcessingTests.all
+        , ParserTests.all
         ]

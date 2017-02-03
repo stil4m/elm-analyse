@@ -7,6 +7,7 @@ import Parser.Declarations as Parser exposing (..)
 import Parser.Tokens exposing (functionName)
 import AST.Types as Types exposing (..)
 import Test exposing (..)
+import AST.Ranges exposing (emptyRange)
 
 
 all : Test
@@ -23,7 +24,7 @@ all =
                                 , signature = Nothing
                                 , declaration =
                                     { operatorDefinition = False
-                                    , name = { value = "foo", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 3 } } }
+                                    , name = { value = "foo", range = emptyRange }
                                     , arguments = []
                                     , expression = emptyRanged <| FunctionOrValue "bar"
                                     }
@@ -33,7 +34,7 @@ all =
                                 , signature = Nothing
                                 , declaration =
                                     { operatorDefinition = False
-                                    , name = { value = "john", range = { start = { row = 3, column = 2 }, end = { row = 3, column = 6 } } }
+                                    , name = { value = "john", range = emptyRange }
                                     , arguments = []
                                     , expression = emptyRanged <| FunctionOrValue "doe"
                                     }
@@ -51,7 +52,7 @@ all =
                                 , signature = Nothing
                                 , declaration =
                                     { operatorDefinition = False
-                                    , name = { value = "foo", range = { start = { row = 1, column = 1 }, end = { row = 1, column = 4 } } }
+                                    , name = { value = "foo", range = emptyRange }
                                     , arguments = []
                                     , expression = emptyRanged <| FunctionOrValue "bar"
                                     }
@@ -61,7 +62,7 @@ all =
                                 , signature = Nothing
                                 , declaration =
                                     { operatorDefinition = False
-                                    , name = { value = "john", range = { start = { row = 3, column = 1 }, end = { row = 3, column = 5 } } }
+                                    , name = { value = "john", range = emptyRange }
                                     , arguments = []
                                     , expression = emptyRanged <| FunctionOrValue "doe"
                                     }
@@ -85,10 +86,7 @@ all =
                                             { operatorDefinition = False
                                             , name =
                                                 { value = "bar"
-                                                , range =
-                                                    { start = { row = 1, column = 1 }
-                                                    , end = { row = 1, column = 4 }
-                                                    }
+                                                , range = emptyRange
                                                 }
                                             , arguments = []
                                             , expression = emptyRanged <| Integer 1
@@ -113,7 +111,7 @@ all =
                                         , signature = Nothing
                                         , declaration =
                                             { operatorDefinition = False
-                                            , name = { value = "bar", range = { start = { row = 1, column = 1 }, end = { row = 1, column = 4 } } }
+                                            , name = { value = "bar", range = emptyRange }
                                             , arguments = []
                                             , expression = emptyRanged <| Integer 1
                                             }
@@ -139,7 +137,7 @@ all =
                                                 , signature = Nothing
                                                 , declaration =
                                                     { operatorDefinition = False
-                                                    , name = { value = "bar", range = { start = { row = 2, column = 3 }, end = { row = 2, column = 6 } } }
+                                                    , name = { value = "bar", range = emptyRange }
                                                     , arguments = []
                                                     , expression = emptyRanged <| Integer 1
                                                     }
@@ -181,7 +179,7 @@ all =
                                         , signature = Nothing
                                         , declaration =
                                             { operatorDefinition = False
-                                            , name = { value = "indent", range = { start = { row = 1, column = 4 }, end = { row = 1, column = 10 } } }
+                                            , name = { value = "indent", range = emptyRange }
                                             , arguments = []
                                             , expression =
                                                 emptyRanged <|
@@ -210,11 +208,7 @@ all =
                                             { operatorDefinition = False
                                             , name =
                                                 { value = "indent"
-                                                , range =
-                                                    { start =
-                                                        { row = 1, column = 1 }
-                                                    , end = { row = 1, column = 7 }
-                                                    }
+                                                , range = emptyRange
                                                 }
                                             , arguments = []
                                             , expression = emptyRanged <| Integer 1

@@ -4,6 +4,7 @@ import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
 import AST.Types as Types exposing (..)
+import AST.Ranges exposing (..)
 import Test exposing (..)
 
 
@@ -32,9 +33,9 @@ all =
                                 { args =
                                     [ VarPattern
                                         { value = "a"
-                                        , range = { start = { row = 1, column = 1 }, end = { row = 1, column = 2 } }
+                                        , range = emptyRange
                                         }
-                                    , VarPattern { value = "b", range = { start = { row = 1, column = 3 }, end = { row = 1, column = 4 } } }
+                                    , VarPattern { value = "b", range = emptyRange }
                                     ]
                                 , expression =
                                     emptyRanged <|
@@ -58,12 +59,9 @@ all =
                                     [ TuplePattern
                                         ([ VarPattern
                                             { value = "a"
-                                            , range =
-                                                { start = { row = 1, column = 2 }
-                                                , end = { row = 1, column = 3 }
-                                                }
+                                            , range = emptyRange
                                             }
-                                         , VarPattern { value = "b", range = { start = { row = 1, column = 4 }, end = { row = 1, column = 5 } } }
+                                         , VarPattern { value = "b", range = emptyRange }
                                          ]
                                         )
                                     ]

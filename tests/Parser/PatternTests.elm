@@ -3,9 +3,9 @@ module Parser.PatternTests exposing (..)
 import Parser.CombineTestUtil exposing (..)
 import Expect
 import AST.Types as Types exposing (..)
+import AST.Ranges exposing (emptyRange)
 import Test exposing (..)
 import Parser.Patterns as Parser exposing (..)
-import AST.Util exposing (rangeFromInts)
 
 
 all : Test
@@ -22,55 +22,97 @@ all =
         , test "string pattern" <|
             \() ->
                 parseFullStringState emptyState "\"Foo\"" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal (Just (StringPattern "Foo"))
         , test "char pattern" <|
             \() ->
                 parseFullStringState emptyState "'f'" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal (Just (CharPattern 'f'))
         , test "non cons pattern " <|
             \() ->
                 parseFullStringState emptyState "(X x)" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal
-                        (Just (TuplePattern ([ NamedPattern (QualifiedNameRef [] "X") ([ VarPattern { value = "x", range = { start = { row = 1, column = 3 }, end = { row = 1, column = 4 } } } ]) ])))
+                        (Just
+                            (TuplePattern
+                                ([ NamedPattern (QualifiedNameRef [] "X" emptyRange)
+                                    ([ VarPattern { value = "x", range = emptyRange } ])
+                                 ]
+                                )
+                            )
+                        )
         , test "parentiszed pattern" <|
             \() ->
                 parseFullStringState emptyState "(X x) :: xs" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal
-                        (Just ((UnConsPattern (TuplePattern ([ NamedPattern (QualifiedNameRef [] "X") ([ VarPattern { value = "x", range = { start = { row = 1, column = 3 }, end = { row = 1, column = 4 } } } ]) ])) (VarPattern { value = "xs", range = { start = { row = 1, column = 9 }, end = { row = 1, column = 11 } } }))))
+                        (Just
+                            ((UnConsPattern
+                                (TuplePattern
+                                    ([ NamedPattern (QualifiedNameRef [] "X" emptyRange)
+                                        ([ VarPattern { value = "x", range = emptyRange } ])
+                                     ]
+                                    )
+                                )
+                                (VarPattern { value = "xs", range = emptyRange })
+                             )
+                            )
+                        )
         , test "int pattern" <|
             \() ->
                 parseFullStringState emptyState "1" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal (Just (IntPattern 1))
         , test "uncons pattern" <|
             \() ->
                 parseFullStringState emptyState "n :: tail" Parser.pattern
-                    |> Expect.equal (Just (UnConsPattern (VarPattern { value = "n", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 1 } } }) (VarPattern { value = "tail", range = { start = { row = 1, column = 5 }, end = { row = 1, column = 9 } } })))
+                    |> Maybe.map noRangePattern
+                    |> Expect.equal
+                        (Just
+                            (UnConsPattern (VarPattern { value = "n", range = emptyRange })
+                                (VarPattern { value = "tail", range = emptyRange })
+                            )
+                        )
         , test "list pattern" <|
             \() ->
                 parseFullStringState emptyState "[1]" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal (Just (ListPattern [ IntPattern 1 ]))
         , test "float pattern" <|
             \() ->
                 parseFullStringState emptyState "1.2" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal (Just (FloatPattern 1.2))
         , test "record pattern" <|
             \() ->
                 parseFullStringState emptyState "{a,b}" Parser.pattern
-                    |> Expect.equal (Just (RecordPattern ([ { value = "a", range = { start = { row = 1, column = 1 }, end = { row = 1, column = 2 } } }, { value = "b", range = { start = { row = 1, column = 3 }, end = { row = 1, column = 4 } } } ])))
+                    |> Maybe.map noRangePattern
+                    |> Expect.equal
+                        (Just
+                            (RecordPattern
+                                ([ { value = "a", range = emptyRange }
+                                 , { value = "b", range = emptyRange }
+                                 ]
+                                )
+                            )
+                        )
         , test "named pattern" <|
             \() ->
                 parseFullStringState emptyState "True" Parser.pattern
-                    |> Expect.equal (Just (NamedPattern (QualifiedNameRef [] "True") []))
+                    |> Maybe.map noRangePattern
+                    |> Expect.equal (Just (NamedPattern (QualifiedNameRef [] "True" emptyRange) []))
         , test "tuple pattern" <|
             \() ->
                 parseFullStringState emptyState "(a,{b,c},())" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal
                         (Just
                             (TuplePattern
-                                [ VarPattern { value = "a", range = { start = { row = 1, column = 1 }, end = { row = 1, column = 2 } } }
+                                [ VarPattern { value = "a", range = emptyRange }
                                 , RecordPattern
-                                    [ { value = "b", range = { start = { row = 1, column = 4 }, end = { row = 1, column = 5 } } }
-                                    , { value = "c", range = { start = { row = 1, column = 6 }, end = { row = 1, column = 7 } } }
+                                    [ { value = "b", range = emptyRange }
+                                    , { value = "c", range = emptyRange }
                                     ]
                                 , UnitPattern
                                 ]
@@ -79,49 +121,53 @@ all =
         , test "destructure pattern" <|
             \() ->
                 parseFullStringState emptyState "Set x" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal
                         (Just
-                            (NamedPattern (QualifiedNameRef [] "Set")
-                                [ VarPattern { value = "x", range = rangeFromInts ( 1, 4, 1, 5 ) } ]
+                            (NamedPattern (QualifiedNameRef [] "Set" emptyRange)
+                                [ VarPattern { value = "x", range = emptyRange } ]
                             )
                         )
         , test "tuple pattern 2" <|
             \() ->
                 parseFullStringState emptyState "(model, cmd)" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal
                         (Just
                             (TuplePattern
-                                [ VarPattern { value = "model", range = rangeFromInts ( 1, 1, 1, 6 ) }
-                                , VarPattern { value = "cmd", range = rangeFromInts ( 1, 8, 1, 11 ) }
+                                [ VarPattern { value = "model", range = emptyRange }
+                                , VarPattern { value = "cmd", range = emptyRange }
                                 ]
                             )
                         )
         , test "record as pattern" <|
             \() ->
                 parseFullStringState emptyState "{model,context} as appState" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal
                         (Just
                             (AsPattern
                                 (RecordPattern
-                                    [ { value = "model", range = rangeFromInts ( 1, 1, 1, 6 ) }
-                                    , { value = "context", range = rangeFromInts ( 1, 7, 1, 14 ) }
+                                    [ { value = "model", range = emptyRange }
+                                    , { value = "context", range = emptyRange }
                                     ]
                                 )
-                                { value = "appState", range = rangeFromInts ( 1, 19, 1, 27 ) }
+                                { value = "appState", range = emptyRange }
                             )
                         )
         , test "complex pattern" <|
             \() ->
                 parseFullStringState emptyState "(Index irec as index, docVector)" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal
                         (Just
                             (TuplePattern
-                                ([ NamedPattern (QualifiedNameRef [] "Index")
-                                    ([ AsPattern (VarPattern { value = "irec", range = rangeFromInts ( 1, 7, 1, 11 ) })
-                                        { value = "index", range = rangeFromInts ( 1, 15, 1, 20 ) }
+                                ([ NamedPattern (QualifiedNameRef [] "Index" emptyRange)
+                                    ([ AsPattern (VarPattern { value = "irec", range = emptyRange })
+                                        { value = "index", range = emptyRange }
                                      ]
                                     )
-                                 , VarPattern { value = "docVector", range = rangeFromInts ( 1, 22, 1, 31 ) }
+                                 , VarPattern { value = "docVector", range = emptyRange }
                                  ]
                                 )
                             )
@@ -129,17 +175,18 @@ all =
         , test "complex pattern 2" <|
             \() ->
                 parseFullStringState emptyState "RBNode_elm_builtin col (RBNode_elm_builtin Red  (RBNode_elm_builtin Red xv))" Parser.pattern
+                    |> Maybe.map noRangePattern
                     |> Expect.equal
                         (Just
-                            (NamedPattern (QualifiedNameRef [] "RBNode_elm_builtin")
-                                [ VarPattern { value = "col", range = rangeFromInts ( 1, 19, 1, 22 ) }
+                            (NamedPattern (QualifiedNameRef [] "RBNode_elm_builtin" emptyRange)
+                                [ VarPattern { value = "col", range = emptyRange }
                                 , TuplePattern
-                                    [ NamedPattern (QualifiedNameRef [] "RBNode_elm_builtin")
-                                        [ (QualifiedNamePattern (QualifiedNameRef [] "Red"))
+                                    [ NamedPattern (QualifiedNameRef [] "RBNode_elm_builtin" emptyRange)
+                                        [ (QualifiedNamePattern (QualifiedNameRef [] "Red" emptyRange))
                                         , TuplePattern
-                                            [ NamedPattern (QualifiedNameRef [] "RBNode_elm_builtin")
-                                                [ QualifiedNamePattern (QualifiedNameRef [] "Red")
-                                                , VarPattern { value = "xv", range = rangeFromInts ( 1, 72, 1, 74 ) }
+                                            [ NamedPattern (QualifiedNameRef [] "RBNode_elm_builtin" emptyRange)
+                                                [ QualifiedNamePattern (QualifiedNameRef [] "Red" emptyRange)
+                                                , VarPattern { value = "xv", range = emptyRange }
                                                 ]
                                             ]
                                         ]

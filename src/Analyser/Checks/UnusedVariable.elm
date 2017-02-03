@@ -8,7 +8,7 @@ import Analyser.Messages exposing (Message(UnusedVariable, UnusedTopLevel))
 import Dict exposing (Dict)
 import Inspector exposing (defaultConfig, Action(Inner, Pre, Post))
 import Tuple2
-import Analyser.Checks.Variables exposing (getTopLevels, patternToVars, getDeclarationsVars)
+import Analyser.Checks.Variables exposing (getTopLevels, patternToVars, getDeclarationsVars, patternToUsedVars)
 
 
 type alias Scope =
@@ -188,17 +188,22 @@ onFile file context =
 onFunction : (UsedVariableContext -> UsedVariableContext) -> Function -> UsedVariableContext -> UsedVariableContext
 onFunction f function context =
     let
-        preContext =
-            context
-                |> maskVariable function.declaration.name.value
-                |> \c -> function.declaration.arguments |> List.concatMap patternToVars |> flip pushScope c
+        used =
+            List.concatMap patternToUsedVars function.declaration.arguments
+                |> List.map .value
 
         postContext =
-            f preContext
+            context
+                |> maskVariable function.declaration.name.value
+                |> \c ->
+                    function.declaration.arguments
+                        |> List.concatMap patternToVars
+                        |> flip pushScope c
+                        |> f
+                        |> popScope
+                        |> unMaskVariable function.declaration.name.value
     in
-        postContext
-            |> popScope
-            |> unMaskVariable function.declaration.name.value
+        List.foldl addUsedVariable postContext used
 
 
 onLambda : (UsedVariableContext -> UsedVariableContext) -> Lambda -> UsedVariableContext -> UsedVariableContext
@@ -227,12 +232,14 @@ onLetBlock f letBlock context =
 onCase : (UsedVariableContext -> UsedVariableContext) -> Case -> UsedVariableContext -> UsedVariableContext
 onCase f caze context =
     let
-        preContext =
+        used =
+            patternToUsedVars (Tuple.first caze) |> List.map .value
+
+        postContext =
             Tuple.first caze
                 |> patternToVars
                 |> flip pushScope context
-
-        postContext =
-            f preContext
+                |> f
+                |> popScope
     in
-        postContext |> popScope
+        List.foldl addUsedVariable postContext used

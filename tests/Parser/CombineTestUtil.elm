@@ -2,7 +2,7 @@ module Parser.CombineTestUtil exposing (..)
 
 import Combine exposing (..)
 import AST.Types exposing (..)
-import AST.Ranges exposing (emptyRange)
+import AST.Ranges exposing (emptyRange, Range)
 import Tuple2
 
 
@@ -93,6 +93,60 @@ noRangeExposingList x =
                 |> Explicit
 
 
+noRangePattern : Pattern -> Pattern
+noRangePattern p =
+    case p of
+        QualifiedNamePattern x ->
+            QualifiedNamePattern <| unRange x
+
+        RecordPattern ls ->
+            RecordPattern <| List.map unRange ls
+
+        VarPattern x ->
+            VarPattern <| unRange x
+
+        NamedPattern x y ->
+            NamedPattern (unRange x) (List.map noRangePattern y)
+
+        ParentisizedPattern x ->
+            ParentisizedPattern <| noRangePattern x
+
+        AsPattern x y ->
+            AsPattern (noRangePattern x) (unRange y)
+
+        UnConsPattern x y ->
+            UnConsPattern (noRangePattern x) (noRangePattern y)
+
+        CharPattern _ ->
+            p
+
+        StringPattern _ ->
+            p
+
+        FloatPattern _ ->
+            p
+
+        IntPattern _ ->
+            p
+
+        AllPattern ->
+            AllPattern
+
+        UnitPattern ->
+            UnitPattern
+
+        ListPattern x ->
+            List.map noRangePattern x |> ListPattern
+
+        TuplePattern x ->
+            List.map noRangePattern x |> TuplePattern
+
+
+unRange : { a | range : Range } -> { a | range : Range }
+unRange p =
+    { p | range = emptyRange }
+
+
 noRangeExpose : Expose -> Expose
 noRangeExpose l =
     case l of
@@ -125,23 +179,51 @@ noRangeDeclaration : Declaration -> Declaration
 noRangeDeclaration decl =
     case decl of
         DestructuringDeclaration d ->
-            DestructuringDeclaration { d | expression = noRangeExpression d.expression }
+            DestructuringDeclaration
+                { d
+                    | pattern = noRangePattern d.pattern
+                    , expression = noRangeExpression d.expression
+                }
 
         FuncDecl f ->
             FuncDecl <| noRangeFunction f
+
+        TypeDecl d ->
+            TypeDecl <| noRangeTypeDeclaration d
 
         _ ->
             decl
 
 
+noRangeTypeAlias : TypeAlias -> TypeAlias
+noRangeTypeAlias =
+    unRange
+
+
+noRangeTypeDeclaration : Type -> Type
+noRangeTypeDeclaration x =
+    { x | constructors = List.map noRangeValueConstructor x.constructors }
+
+
+noRangeValueConstructor : ValueConstructor -> ValueConstructor
+noRangeValueConstructor valueConstructor =
+    unRange valueConstructor
+
+
 noRangeFunction : Function -> Function
 noRangeFunction f =
-    { f | declaration = noRangeFunctionDeclaration f.declaration }
+    { f
+        | declaration = noRangeFunctionDeclaration f.declaration
+    }
 
 
 noRangeFunctionDeclaration : FunctionDeclaration -> FunctionDeclaration
 noRangeFunctionDeclaration d =
-    { d | expression = noRangeExpression d.expression }
+    { d
+        | expression = noRangeExpression d.expression
+        , arguments = List.map noRangePattern d.arguments
+        , name = unRange d.name
+    }
 
 
 noRangeInnerExpression : InnerExpression -> InnerExpression
@@ -166,14 +248,21 @@ noRangeInnerExpression inner =
             RecordExpr <| List.map (Tuple2.mapSecond noRangeExpression) fields
 
         LambdaExpression lambda ->
-            LambdaExpression { lambda | expression = noRangeExpression lambda.expression }
+            LambdaExpression
+                { lambda
+                    | expression = noRangeExpression lambda.expression
+                    , args = List.map noRangePattern lambda.args
+                }
 
         RecordUpdateExpression update ->
             RecordUpdateExpression { update | updates = List.map (Tuple2.mapSecond noRangeExpression) update.updates }
 
         CaseExpression { cases, expression } ->
             CaseExpression
-                { cases = List.map (Tuple2.mapSecond noRangeExpression) cases
+                { cases =
+                    cases
+                        |> List.map (Tuple2.mapFirst noRangePattern)
+                        |> List.map (Tuple2.mapSecond noRangeExpression)
                 , expression = noRangeExpression expression
                 }
 

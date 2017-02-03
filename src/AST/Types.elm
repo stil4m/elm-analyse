@@ -113,8 +113,11 @@ type Pattern
     | ParentisizedPattern Pattern
 
 
-type QualifiedNameRef
-    = QualifiedNameRef (List String) String
+type alias QualifiedNameRef =
+    { moduleName : List String
+    , name : String
+    , range : Range
+    }
 
 
 

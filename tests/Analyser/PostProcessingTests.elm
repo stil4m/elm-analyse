@@ -28,7 +28,7 @@ bar = (x + 1) * (2 * y)
 all : Test
 all =
     describe "Analyser.PostProcessingTests"
-        [ test "foo" <|
+        [ test "post processing" <|
             \() ->
                 Parser.Parser.parse someInput
                     |> Maybe.map (PostProcessing.postProcess table)
@@ -42,7 +42,7 @@ all =
                                 , signature = Nothing
                                 , declaration =
                                     { operatorDefinition = False
-                                    , name = { value = "bar", range = { start = { row = 3, column = -1 }, end = { row = 3, column = 2 } } }
+                                    , name = { value = "bar", range = emptyRange }
                                     , arguments = []
                                     , expression =
                                         ( emptyRange

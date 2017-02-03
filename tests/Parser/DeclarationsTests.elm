@@ -60,7 +60,7 @@ all =
                     |> Expect.equal
                         (Just
                             { operatorDefinition = False
-                            , name = { value = "foo", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 3 } } }
+                            , name = { value = "foo", range = emptyRange }
                             , arguments = []
                             , expression = emptyRanged <| FunctionOrValue "bar"
                             }
@@ -72,7 +72,7 @@ all =
                     |> Expect.equal
                         (Just
                             { operatorDefinition = True
-                            , name = { value = "&>", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 4 } } }
+                            , name = { value = "&>", range = emptyRange }
                             , arguments = []
                             , expression =
                                 emptyRanged <|
@@ -90,8 +90,8 @@ all =
                     |> Expect.equal
                         (Just
                             { operatorDefinition = False
-                            , name = { value = "inc", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 3 } } }
-                            , arguments = [ VarPattern { value = "x", range = { start = { row = 1, column = 4 }, end = { row = 1, column = 5 } } } ]
+                            , name = { value = "inc", range = emptyRange }
+                            , arguments = [ VarPattern { value = "x", range = emptyRange } ]
                             , expression =
                                 emptyRanged <|
                                     Application
@@ -128,7 +128,7 @@ all =
                     |> Expect.equal
                         (Just
                             { operatorDefinition = False
-                            , name = { value = "foo", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 3 } } }
+                            , name = { value = "foo", range = emptyRange }
                             , arguments = []
                             , expression =
                                 emptyRanged <|
@@ -141,10 +141,7 @@ all =
                                                     { operatorDefinition = False
                                                     , name =
                                                         { value = "b"
-                                                        , range =
-                                                            { start = { row = 2, column = 1 }
-                                                            , end = { row = 2, column = 2 }
-                                                            }
+                                                        , range = emptyRange
                                                         }
                                                     , arguments = []
                                                     , expression = emptyRanged <| Integer 1
@@ -162,7 +159,7 @@ all =
                     |> Expect.equal
                         (Just
                             { operatorDefinition = False
-                            , name = { value = "main", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 4 } } }
+                            , name = { value = "main", range = emptyRange }
                             , arguments = []
                             , expression =
                                 emptyRanged <|
@@ -186,14 +183,14 @@ all =
                     |> Expect.equal
                         (Just
                             { operatorDefinition = False
-                            , name = { value = "update", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 6 } } }
-                            , arguments = [ VarPattern { value = "msg", range = { start = { row = 1, column = 7 }, end = { row = 1, column = 10 } } }, VarPattern { value = "model", range = { start = { row = 1, column = 11 }, end = { row = 1, column = 16 } } } ]
+                            , name = { value = "update", range = emptyRange }
+                            , arguments = [ VarPattern { value = "msg", range = emptyRange }, VarPattern { value = "model", range = emptyRange } ]
                             , expression =
                                 emptyRanged <|
                                     CaseExpression
                                         { expression = emptyRanged <| FunctionOrValue "msg"
                                         , cases =
-                                            [ ( NamedPattern (QualifiedNameRef [] "Increment") []
+                                            [ ( NamedPattern (QualifiedNameRef [] "Increment" emptyRange) []
                                               , emptyRanged <|
                                                     Application
                                                         ([ emptyRanged <| FunctionOrValue "model"
@@ -202,7 +199,7 @@ all =
                                                          ]
                                                         )
                                               )
-                                            , ( NamedPattern (QualifiedNameRef [] "Decrement") []
+                                            , ( NamedPattern (QualifiedNameRef [] "Decrement" emptyRange) []
                                               , emptyRanged <|
                                                     Application
                                                         ([ emptyRanged <| FunctionOrValue "model"
@@ -283,7 +280,7 @@ all =
                     |> Expect.equal
                         (Just
                             { operatorDefinition = False
-                            , name = { value = "main", range = { start = { row = 1, column = 0 }, end = { row = 1, column = 4 } } }
+                            , name = { value = "main", range = emptyRange }
                             , arguments = []
                             , expression =
                                 emptyRanged <|
@@ -306,10 +303,7 @@ all =
                                 { operatorDefinition = False
                                 , name =
                                     { value = "main"
-                                    , range =
-                                        { start = { row = 1, column = 0 }
-                                        , end = { row = 1, column = 4 }
-                                        }
+                                    , range = emptyRange
                                     }
                                 , arguments = []
                                 , expression =

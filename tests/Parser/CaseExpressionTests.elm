@@ -4,6 +4,7 @@ import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
 import AST.Types as Types exposing (..)
+import AST.Ranges exposing (emptyRange)
 import Test exposing (..)
 import Tuple2
 
@@ -23,20 +24,20 @@ all =
         , test "caseStatement" <|
             \() ->
                 parseFullStringState emptyState "True -> 1" Parser.caseStatement
-                    |> Maybe.map ((Tuple2.mapSecond noRangeExpression))
+                    |> Maybe.map (((Tuple2.mapSecond noRangeExpression >> Tuple2.mapFirst noRangePattern)))
                     |> Expect.equal
                         (Just
-                            ( NamedPattern (QualifiedNameRef [] "True") []
+                            ( NamedPattern (QualifiedNameRef [] "True" emptyRange) []
                             , emptyRanged <| Integer 1
                             )
                         )
         , test "caseStatement qualified" <|
             \() ->
                 parseFullStringState emptyState "Foo.Bar -> 1" Parser.caseStatement
-                    |> Maybe.map ((Tuple2.mapSecond noRangeExpression))
+                    |> Maybe.map (((Tuple2.mapSecond noRangeExpression >> Tuple2.mapFirst noRangePattern)))
                     |> Expect.equal
                         (Just
-                            ( NamedPattern (QualifiedNameRef [ "Foo" ] "Bar") []
+                            ( NamedPattern (QualifiedNameRef [ "Foo" ] "Bar" emptyRange) []
                             , emptyRanged <| Integer 1
                             )
                         )
@@ -57,23 +58,23 @@ all =
         , test "caseStatement correct on new line" <|
             \() ->
                 parseFullStringState emptyState "True ->\n  1" Parser.caseStatement
-                    |> Maybe.map ((Tuple2.mapSecond noRangeExpression))
+                    |> Maybe.map (Tuple2.mapSecond noRangeExpression >> Tuple2.mapFirst noRangePattern)
                     |> Expect.equal
                         (Just
-                            ( NamedPattern (QualifiedNameRef [] "True") []
+                            ( NamedPattern (QualifiedNameRef [] "True" emptyRange) []
                             , emptyRanged <| Integer 1
                             )
                         )
         , test "caseStatements" <|
             \() ->
                 parseFullStringState emptyState "True -> 1\nFalse -> 2" Parser.caseStatements
-                    |> Maybe.map (List.map (Tuple2.mapSecond noRangeExpression))
+                    |> Maybe.map (List.map (Tuple2.mapSecond noRangeExpression >> Tuple2.mapFirst noRangePattern))
                     |> Expect.equal
                         (Just
-                            [ ( NamedPattern (QualifiedNameRef [] "True") []
+                            [ ( NamedPattern (QualifiedNameRef [] "True" emptyRange) []
                               , emptyRanged <| Integer 1
                               )
-                            , ( NamedPattern (QualifiedNameRef [] "False") []
+                            , ( NamedPattern (QualifiedNameRef [] "False" emptyRange) []
                               , emptyRanged <| Integer 2
                               )
                             ]
@@ -87,10 +88,10 @@ all =
                             (CaseExpression
                                 { expression = (emptyRanged <| FunctionOrValue "f")
                                 , cases =
-                                    [ ( NamedPattern (QualifiedNameRef [] "True") []
+                                    [ ( NamedPattern (QualifiedNameRef [] "True" emptyRange) []
                                       , emptyRanged <| Integer 1
                                       )
-                                    , ( NamedPattern (QualifiedNameRef [] "False") []
+                                    , ( NamedPattern (QualifiedNameRef [] "False" emptyRange) []
                                       , emptyRanged <| Integer 2
                                       )
                                     ]
@@ -111,7 +112,7 @@ all =
                             (CaseExpression
                                 { expression = (emptyRanged <| FunctionOrValue "msg")
                                 , cases =
-                                    [ ( NamedPattern (QualifiedNameRef [] "Increment") []
+                                    [ ( NamedPattern (QualifiedNameRef [] "Increment" emptyRange) []
                                       , emptyRanged <|
                                             Application
                                                 [ emptyRanged <| FunctionOrValue "model"
@@ -119,7 +120,7 @@ all =
                                                 , emptyRanged <| Integer 1
                                                 ]
                                       )
-                                    , ( NamedPattern (QualifiedNameRef [] "Decrement") []
+                                    , ( NamedPattern (QualifiedNameRef [] "Decrement" emptyRange) []
                                       , emptyRanged <|
                                             Application
                                                 [ emptyRanged <| FunctionOrValue "model"

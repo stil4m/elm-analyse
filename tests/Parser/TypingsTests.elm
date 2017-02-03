@@ -5,6 +5,7 @@ import AST.Types exposing (..)
 import Test exposing (..)
 import Expect
 import Parser.CombineTestUtil exposing (..)
+import AST.Ranges exposing (emptyRange)
 
 
 all : Test
@@ -13,35 +14,68 @@ all =
         [ test "type alias" <|
             \() ->
                 parseFullStringWithNullState "type alias Foo = {color: String }" Parser.typeAlias
+                    |> Maybe.map noRangeTypeAlias
                     |> Expect.equal
                         (Just <|
                             { name = "Foo"
                             , generics = []
                             , typeReference = Record ([ ( "color", Typed [] "String" [] ) ])
-                            , range = { start = { row = 1, column = 0 }, end = { row = 1, column = 33 } }
+                            , range = emptyRange
                             }
                         )
         , test "type alias with generic " <|
             \() ->
                 parseFullStringWithNullState "type alias Foo a = {some : a }" Parser.typeAlias
+                    |> Maybe.map noRangeTypeAlias
                     |> Expect.equal
                         (Just <|
                             { name = "Foo"
                             , generics = [ "a" ]
                             , typeReference = Record ([ ( "some", GenericType "a" ) ])
-                            , range = { start = { row = 1, column = 0 }, end = { row = 1, column = 30 } }
+                            , range = emptyRange
                             }
                         )
         , test "type" <|
             \() ->
                 parseFullStringWithNullState "type Color = Blue String | Red | Green" Parser.typeDeclaration
+                    |> Maybe.map noRangeTypeDeclaration
                     |> Expect.equal
-                        (Just { name = "Color", generics = [], constructors = [ { name = "Blue", arguments = [ Typed [] "String" [] ], range = { start = { row = 1, column = 13 }, end = { row = 1, column = 25 } } }, { name = "Red", arguments = [], range = { start = { row = 1, column = 27 }, end = { row = 1, column = 30 } } }, { name = "Green", arguments = [], range = { start = { row = 1, column = 33 }, end = { row = 1, column = 38 } } } ] })
+                        (Just
+                            { name = "Color"
+                            , generics = []
+                            , constructors =
+                                [ { name = "Blue"
+                                  , arguments = [ Typed [] "String" [] ]
+                                  , range = emptyRange
+                                  }
+                                , { name = "Red"
+                                  , arguments = []
+                                  , range = emptyRange
+                                  }
+                                , { name = "Green"
+                                  , arguments = []
+                                  , range = emptyRange
+                                  }
+                                ]
+                            }
+                        )
         , test "type with generic " <|
             \() ->
                 parseFullStringWithNullState "type Maybe a = Just a | Nothing" Parser.typeDeclaration
+                    |> Maybe.map noRangeTypeDeclaration
                     |> Expect.equal
-                        (Just { name = "Maybe", generics = [ "a" ], constructors = [ { name = "Just", arguments = [ GenericType "a" ], range = { start = { row = 1, column = 15 }, end = { row = 1, column = 21 } } }, { name = "Nothing", arguments = [], range = { start = { row = 1, column = 24 }, end = { row = 1, column = 31 } } } ] })
+                        (Just
+                            { name = "Maybe"
+                            , generics = [ "a" ]
+                            , constructors =
+                                [ { name = "Just"
+                                  , arguments = [ GenericType "a" ]
+                                  , range = emptyRange
+                                  }
+                                , { name = "Nothing", arguments = [], range = emptyRange }
+                                ]
+                            }
+                        )
         , test "type with value on next line " <|
             \() ->
                 parseFullStringWithNullState "type Maybe a = Just a |\nNothing" Parser.typeDeclaration

@@ -289,6 +289,7 @@ decodeQualifiedNameRef =
     JD.succeed QualifiedNameRef
         |: JD.field "moduleName" decodeModuleName
         |: JD.field "name" JD.string
+        |: JD.field "range" Ranges.decode
 
 
 decodeExpression : Decoder Expression

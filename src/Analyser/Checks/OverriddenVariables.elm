@@ -51,9 +51,6 @@ visitWithVariablePointers variablePointers f ( redefines, known ) =
         newKnown =
             List.foldl (\a b -> Dict.insert a.value a.range b) known variablePointers
 
-        _ =
-            Debug.log "Pointers" variablePointers
-
         ( newRedefines, _ ) =
             f ( redefines, newKnown )
     in

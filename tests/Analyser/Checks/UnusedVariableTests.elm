@@ -211,6 +211,36 @@ foo = 1
     )
 
 
+usedImportedVariableInPatterMatch : ( String, String, List Message )
+usedImportedVariableInPatterMatch =
+    ( "usedImportedVariableInPatterMatch"
+    , """module Foo exposing (foo)
+
+import Color exposing (Color(Blue))
+
+foo c =
+  case c of
+    Blue -> 1
+
+"""
+    , []
+    )
+
+
+usedImportedVariableAsOpaque : ( String, String, List Message )
+usedImportedVariableAsOpaque =
+    ( "usedImportedVariableAsOpaque"
+    , """module Foo exposing (foo)
+
+import Color exposing (Color(Blue))
+
+foo (Blue c) =
+  c
+"""
+    , []
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedVariable"
@@ -229,4 +259,6 @@ all =
         , destructuringSameName
         , unusedInEffectModule
         , unusedImportedVariable
+        , usedImportedVariableInPatterMatch
+        , usedImportedVariableAsOpaque
         ]

@@ -358,10 +358,11 @@ encodePattern pattern =
 
 
 encodeQualifiedNameRef : QualifiedNameRef -> Value
-encodeQualifiedNameRef (QualifiedNameRef moduleName name) =
+encodeQualifiedNameRef { moduleName, name, range } =
     JE.object
         [ ( "moduleName", encodeModuleName moduleName )
         , ( "name", JE.string name )
+        , ( "range", Ranges.encode range )
         ]
 
 
