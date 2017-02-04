@@ -1,9 +1,9 @@
-module Analyser.Checks.UnusedImportAliases exposing (scan)
+module Analyser.Checks.UnusedImports exposing (scan)
 
 import AST.Ranges exposing (Range)
-import AST.Types exposing (Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
+import AST.Types exposing (Exposure(None), Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages exposing (Message(UnusedImportAlias))
+import Analyser.Messages exposing (Message(UnusedImport))
 import Dict exposing (Dict)
 import Inspector exposing (Action(Post), defaultConfig)
 import Tuple2
@@ -33,7 +33,7 @@ scan fileContext =
             |> Dict.toList
             |> List.filter (Tuple.second >> Tuple.second >> (==) 0)
             |> List.map (Tuple2.mapSecond Tuple.first)
-            |> List.map (uncurry (UnusedImportAlias fileContext.path))
+            |> List.map (uncurry (UnusedImport fileContext.path))
 
 
 markUsage : ModuleName -> Context -> Context
@@ -43,12 +43,10 @@ markUsage key context =
 
 onImport : Import -> Context -> Context
 onImport imp context =
-    case imp.moduleAlias of
-        Just x ->
-            Dict.insert x ( imp.range, 0 ) context
-
-        Nothing ->
-            context
+    if imp.moduleAlias == Nothing && imp.exposingList == None then
+        Dict.insert imp.moduleName ( imp.range, 0 ) context
+    else
+        context
 
 
 onTypeReference : TypeReference -> Context -> Context

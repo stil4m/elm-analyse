@@ -14,6 +14,8 @@ import Analyser.Checks.DuplicateImports as DuplicateImports
 import Analyser.Checks.UnusedTypeAliases as UnusedTypeAliases
 import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
+import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
+import Analyser.Checks.UnusedImports as UnusedImports
 
 
 run : LoadedSourceFiles -> LoadedDependencies -> List Message
@@ -30,6 +32,8 @@ run sources deps =
             , UnusedTypeAliases.scan
             , OverriddenVariables.scan
             , NoUncurriedPrefix.scan
+            , UnusedImportAliases.scan
+            , UnusedImports.scan
             ]
 
         fileMessages =

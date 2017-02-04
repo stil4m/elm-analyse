@@ -2,7 +2,7 @@ module Analyser exposing (main)
 
 import Analyser.InterfaceLoadingStage as InterfaceLoadingStage
 import Analyser.LoadedDependencies as LoadedDependencies exposing (LoadedDependencies)
-import Analyser.Messages as Messages exposing (Message)
+import Analyser.Messages exposing (Message)
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import AnalyserPorts
 import Platform exposing (programWithFlags)

@@ -21,6 +21,7 @@ type Message
     | RedefineVariable FileName String Range Range
     | NoUnurriedPrefix FileName String Range
     | UnusedImportAlias FileName AST.ModuleName Range
+    | UnusedImport FileName AST.ModuleName Range
 
 
 type alias FileName =
@@ -134,6 +135,16 @@ asString m =
         UnusedImportAlias fileName moduleName range ->
             String.concat
                 [ "Unused import alias `"
+                , String.join "." moduleName
+                , "`in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+
+        UnusedImport fileName moduleName range ->
+            String.concat
+                [ "Unused import `"
                 , String.join "." moduleName
                 , "`in file \""
                 , fileName

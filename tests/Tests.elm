@@ -16,12 +16,14 @@ import Analyser.Checks.UnusedTypeAliasesTests
 import Analyser.Checks.OverriddenVariablesTests
 import Analyser.Checks.NoUncurriedPrefixTests
 import Analyser.Checks.UnusedImportAliasesTests
+import Analyser.Checks.UnusedImportsTests
 
 
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.UnusedImportAliasesTests.all
+        [ Analyser.Checks.UnusedImportsTests.all
+        , Analyser.Checks.UnusedImportAliasesTests.all
         , Analyser.Checks.NoUncurriedPrefixTests.all
         , Analyser.Checks.UnusedVariableTests.all
         , Analyser.Checks.OverriddenVariablesTests.all
