@@ -20,6 +20,7 @@ type Message
     | UnusedAlias FileName String Range
     | RedefineVariable FileName String Range Range
     | NoUnurriedPrefix FileName String Range
+    | UnusedImportAlias FileName AST.ModuleName Range
 
 
 type alias FileName =
@@ -123,6 +124,16 @@ asString m =
         DuplicateImport fileName moduleName range ->
             String.concat
                 [ "Duplicate import for module `"
+                , String.join "." moduleName
+                , "`in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+
+        UnusedImportAlias fileName moduleName range ->
+            String.concat
+                [ "Unused import alias `"
                 , String.join "." moduleName
                 , "`in file \""
                 , fileName

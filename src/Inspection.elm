@@ -11,7 +11,7 @@ import Analyser.Checks.NoSignature as NoSignature
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 import Analyser.Checks.NoDebug as NoDebug
 import Analyser.Checks.DuplicateImports as DuplicateImports
-import Analyser.Checks.UnusedAliases as UnusedAliases
+import Analyser.Checks.UnusedTypeAliases as UnusedTypeAliases
 import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 
@@ -27,7 +27,7 @@ run sources deps =
             , UnnecessaryParens.scan
             , NoDebug.scan
             , DuplicateImports.scan
-            , UnusedAliases.scan
+            , UnusedTypeAliases.scan
             , OverriddenVariables.scan
             , NoUncurriedPrefix.scan
             ]

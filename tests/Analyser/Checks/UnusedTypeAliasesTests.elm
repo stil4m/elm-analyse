@@ -1,7 +1,7 @@
-module Analyser.Checks.UnusedAliasesTests exposing (..)
+module Analyser.Checks.UnusedTypeAliasesTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Checks.UnusedAliases as UnusedAliases
+import Analyser.Checks.UnusedTypeAliases as UnusedTypeAliases
 import Analyser.Messages exposing (..)
 import Test exposing (Test)
 
@@ -109,8 +109,8 @@ foo = 1
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.UnusedAliasesTests"
-        UnusedAliases.scan
+    CTU.build "Analyser.Checks.UnusedTypeAliasesTests"
+        UnusedTypeAliases.scan
         [ unusedButExposed
         , usedInSignature
         , usedAsFunction
