@@ -100,7 +100,7 @@ pushScope vars x =
         y : ActiveScope
         y =
             vars
-                |> List.map (\x -> ( x.value, ( 0, x.range ) ))
+                |> List.map (\z -> ( z.value, ( 0, z.range ) ))
                 |> Dict.fromList
                 |> (,) []
     in

@@ -235,8 +235,8 @@ visitExpressionInner visitor context ( r, expression ) =
                         , cases = List.map (Tuple2.mapSecond subVisit) caseBlock.cases
                         }
 
-                LambdaExpression { args, expression } ->
-                    LambdaExpression <| { args = args, expression = subVisit expression }
+                LambdaExpression lambda ->
+                    LambdaExpression <| { lambda | expression = subVisit lambda.expression }
 
                 RecordExpr expressionStringList ->
                     expressionStringList

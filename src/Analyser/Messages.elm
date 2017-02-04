@@ -154,7 +154,7 @@ asString m =
             String.concat
                 [ "Variable `"
                 , name
-                , "` is not redefined in file \""
+                , "` is redefined in file \""
                 , fileName
                 , "\". At "
                 , rangeToString range1

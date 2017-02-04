@@ -1,6 +1,6 @@
 module AST.Encoding exposing (encode)
 
-import AST.Ranges as Ranges exposing (encode)
+import AST.Ranges as Ranges
 import AST.Types exposing (..)
 import Json.Encode as JE exposing (Value)
 
@@ -346,11 +346,11 @@ encodePattern pattern =
         QualifiedNamePattern qualifiedNameRef ->
             typed "qualifiedName" <| encodeQualifiedNameRef qualifiedNameRef
 
-        AsPattern pattern variablePointer ->
+        AsPattern destructured variablePointer ->
             typed "as" <|
                 JE.object
                     [ ( "name", encodeVariablePointer variablePointer )
-                    , ( "pattern", encodePattern pattern )
+                    , ( "pattern", encodePattern destructured )
                     ]
 
         ParentisizedPattern p1 ->

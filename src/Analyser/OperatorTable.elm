@@ -10,8 +10,8 @@ import Parser.Parser
 
 buildModuleIndex : LoadedSourceFiles -> LoadedDependencies -> ModuleIndex
 buildModuleIndex sourceFiles dependencies =
-    (++) (sourceFiles |> List.filterMap (Tuple.second >> fromFileLoad))
-        (dependencies |> List.concatMap .interfaces |> List.filterMap (Tuple.second >> fromFileLoad))
+    List.filterMap (Tuple.second >> fromFileLoad) sourceFiles
+        ++ (dependencies |> List.concatMap .interfaces |> List.filterMap (Tuple.second >> fromFileLoad))
         |> Dict.fromList
 
 

@@ -23,11 +23,11 @@ scan fileContext =
 
 
 onExpression : Expression -> Context -> Context
-onExpression ( range, expression ) context =
+onExpression ( _, expression ) context =
     case expression of
         Application xs ->
             case xs of
-                [ ( r, PrefixOperator x ), ( _, lh ), ( _, rh ) ] ->
+                [ ( r, PrefixOperator x ), _, _ ] ->
                     ( x, r ) :: context
 
                 _ ->

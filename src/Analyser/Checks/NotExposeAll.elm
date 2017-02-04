@@ -41,8 +41,8 @@ onFile _ file _ =
                         case y of
                             TypeExpose _ constructors _ ->
                                 case constructors of
-                                    All y ->
-                                        Just y
+                                    All allRange ->
+                                        Just allRange
 
                                     _ ->
                                         Nothing

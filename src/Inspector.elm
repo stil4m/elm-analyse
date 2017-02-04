@@ -280,8 +280,8 @@ inspectInnerExpression config expression context =
         TupledExpression expressionList ->
             List.foldl (inspectExpression config) context expressionList
 
-        ParenthesizedExpression expression ->
-            inspectExpression config expression context
+        ParenthesizedExpression inner ->
+            inspectExpression config inner context
 
         LetExpression letBlock ->
             let
