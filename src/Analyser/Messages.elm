@@ -19,6 +19,7 @@ type Message
     | DuplicateImport FileName AST.ModuleName Range
     | UnusedAlias FileName String Range
     | RedefineVariable FileName String Range Range
+    | NoUnurriedPrefix FileName String Range
 
 
 type alias FileName =
@@ -134,6 +135,16 @@ asString m =
                 [ "Type alias `"
                 , name
                 , "` is not used in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+
+        NoUnurriedPrefix fileName operator range ->
+            String.concat
+                [ "Prefix notation for `"
+                , operator
+                , "` is unneeded in file \""
                 , fileName
                 , "\" at "
                 , rangeToString range

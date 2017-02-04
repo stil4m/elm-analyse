@@ -14,12 +14,14 @@ import Analyser.Checks.NoDebugTests
 import Analyser.Checks.DuplicateImportsTests
 import Analyser.Checks.UnusedAliasesTests
 import Analyser.Checks.OverriddenVariablesTests
+import Analyser.Checks.NoUncurriedPrefixTests
 
 
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.UnusedVariableTests.all
+        [ Analyser.Checks.NoUncurriedPrefixTests.all
+        , Analyser.Checks.UnusedVariableTests.all
         , Analyser.Checks.OverriddenVariablesTests.all
         , Analyser.Checks.UnnecessaryParensTests.all
         , Analyser.Checks.DuplicateImportsTests.all

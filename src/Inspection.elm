@@ -12,6 +12,8 @@ import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 import Analyser.Checks.NoDebug as NoDebug
 import Analyser.Checks.DuplicateImports as DuplicateImports
 import Analyser.Checks.UnusedAliases as UnusedAliases
+import Analyser.Checks.OverriddenVariables as OverriddenVariables
+import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 
 
 run : LoadedSourceFiles -> LoadedDependencies -> List Message
@@ -26,6 +28,8 @@ run sources deps =
             , NoDebug.scan
             , DuplicateImports.scan
             , UnusedAliases.scan
+            , OverriddenVariables.scan
+            , NoUncurriedPrefix.scan
             ]
 
         fileMessages =
