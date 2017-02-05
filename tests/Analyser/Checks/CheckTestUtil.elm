@@ -12,7 +12,7 @@ import Expect
 
 fileContentFromInput : String -> FileContent
 fileContentFromInput input =
-    { path = "./foo.elm", formatted = True, sha1 = Nothing, content = Just input, success = True }
+    { path = "./foo.elm", ast = Nothing, formatted = True, sha1 = Nothing, content = Just input, success = True }
 
 
 getMessages : String -> (FileContext -> List Message) -> Maybe (List Message)

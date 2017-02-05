@@ -1,14 +1,9 @@
-module Analyser.InterfaceLoadingStage exposing (Model, Msg, init, isDone, parsedInterfaces, update, subscriptions)
+module Analyser.InterfaceLoadingStage exposing (Model, Msg, init, isDone, getDependencies, update, subscriptions)
 
-import AST.Types
-import AST.Util as Util
-import Analyser.Types exposing (FileLoad, FileContent)
-import Analyser.LoadedDependencies exposing (LoadedDependencies, LoadedInterface)
-import AnalyserPorts
+import Analyser.DependencyLoader as DependencyLoader
+import Analyser.Dependencies exposing (Dependency, Version)
 import Dict exposing (Dict)
-import Interfaces.Interface as Interface
-import List.Extra
-import Parser.Parser as Parser
+import Tuple2
 
 
 type Model
@@ -16,107 +11,77 @@ type Model
 
 
 type Msg
-    = OnFileContent FileContent
+    = DependencyLoaderMsg ( String, Version ) DependencyLoader.Msg
 
 
 type alias State =
-    { filesToLoad : Maybe ( ( String, String ), List ( String, String ) )
-    , parsedInterfaces : List ( String, ( FileContent, FileLoad ) )
+    { dependencyLoaders : Dict ( String, Version ) DependencyLoader.Model
+    , loadedDependencies : List (Result String Dependency)
     }
 
 
-init : List ( String, List String ) -> ( Model, Cmd Msg )
+getDependencies : Model -> List Dependency
+getDependencies (Model state) =
+    state.loadedDependencies |> List.filterMap (Result.toMaybe)
+
+
+init : List ( String, Version ) -> ( Model, Cmd Msg )
 init input =
     let
-        x =
-            input
-                |> List.concatMap (\( dependency, files ) -> List.map ((,) dependency) files)
+        loaders : List ( ( String, Version ), ( DependencyLoader.Model, Cmd DependencyLoader.Msg ) )
+        loaders =
+            List.map (\x -> ( x, DependencyLoader.init x )) input
+
+        cmds =
+            loaders
+                |> List.map (Tuple2.mapSecond Tuple.second)
+                |> List.map (\( p, v ) -> v |> Cmd.map (DependencyLoaderMsg p))
+                |> Cmd.batch
+
+        dependencyLoaders : Dict ( String, Version ) DependencyLoader.Model
+        dependencyLoaders =
+            loaders |> List.map (Tuple2.mapSecond Tuple.first) |> Dict.fromList
     in
-        Model
-            { filesToLoad = List.Extra.uncons x
-            , parsedInterfaces = []
+        ( Model
+            { dependencyLoaders = dependencyLoaders
+            , loadedDependencies = []
             }
-            |> loadNextFile
+        , cmds
+        )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions (Model model) =
+    model.dependencyLoaders
+        |> Dict.toList
+        |> List.map (\( k, v ) -> DependencyLoader.subscriptions v |> Sub.map (DependencyLoaderMsg k))
+        |> Sub.batch
 
 
 isDone : Model -> Bool
 isDone (Model model) =
-    model.filesToLoad == Nothing
-
-
-insertDependencyInterface :
-    ( String, ( FileContent, FileLoad ) )
-    -> Dict String (List ( FileContent, FileLoad ))
-    -> Dict String (List ( FileContent, FileLoad ))
-insertDependencyInterface ( name, result ) b =
-    Dict.get name b
-        |> Maybe.withDefault []
-        |> (::) result
-        |> flip (Dict.insert name) b
-
-
-parsedInterfaces : Model -> LoadedDependencies
-parsedInterfaces (Model model) =
-    model.parsedInterfaces
-        |> List.foldr insertDependencyInterface Dict.empty
-        |> Dict.toList
-        |> List.map (\( k, v ) -> { dependency = k, interfaces = v })
+    Dict.isEmpty model.dependencyLoaders
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg (Model state) =
     case msg of
-        OnFileContent fileContent ->
-            state.filesToLoad
+        DependencyLoaderMsg pair subMsg ->
+            Dict.get pair (state.dependencyLoaders)
+                |> Maybe.map (DependencyLoader.update subMsg)
                 |> Maybe.map
-                    (\( ( dependency, _ ), rest ) ->
-                        Model
-                            { state
-                                | filesToLoad = List.Extra.uncons rest
-                                , parsedInterfaces = onInputLoadingInterface ( dependency, fileContent ) :: state.parsedInterfaces
-                            }
+                    (\( loader, cmds ) ->
+                        ( Model <|
+                            case DependencyLoader.getResult loader of
+                                Nothing ->
+                                    { state | dependencyLoaders = Dict.insert pair loader state.dependencyLoaders }
+
+                                Just result ->
+                                    { state
+                                        | dependencyLoaders = Dict.remove pair state.dependencyLoaders
+                                        , loadedDependencies = result :: state.loadedDependencies
+                                    }
+                        , cmds |> Cmd.map (DependencyLoaderMsg pair)
+                        )
                     )
-                |> Maybe.map loadNextFile
-                |> Maybe.withDefault (Model state ! [])
-
-
-onInputLoadingInterface : ( String, FileContent ) -> ( String, ( FileContent, FileLoad ) )
-onInputLoadingInterface ( dependency, fileContent ) =
-    let
-        loadedInterfaceForFile : AST.Types.File -> FileLoad
-        loadedInterfaceForFile file =
-            Analyser.Types.Loaded
-                { ast = file
-                , moduleName = Util.fileModuleName file
-                , interface = Interface.build file
-                }
-    in
-        case fileContent.content of
-            Nothing ->
-                ( dependency, ( fileContent, Analyser.Types.Failed ) )
-
-            Just content ->
-                ( dependency
-                , ( fileContent
-                  , Parser.parse content
-                        |> Maybe.map loadedInterfaceForFile
-                        |> Maybe.withDefault Analyser.Types.Failed
-                  )
-                )
-
-
-loadNextFile : Model -> ( Model, Cmd Msg )
-loadNextFile (Model model) =
-    model.filesToLoad
-        |> Maybe.map
-            (\( next, _ ) ->
-                ( Model model
-                , AnalyserPorts.loadFile (Tuple.second next)
-                )
-            )
-        |> Maybe.withDefault (Model model ! [])
-
-
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    AnalyserPorts.fileContent OnFileContent
+                |> Maybe.withDefault ( Model state, Cmd.none )

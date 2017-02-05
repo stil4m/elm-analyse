@@ -1,12 +1,12 @@
 module Analyser.FileContext exposing (FileContext, create)
 
 import AST.Types as AST
-import Analyser.LoadedDependencies exposing (LoadedDependencies)
 import Analyser.Types exposing (LoadedSourceFile, LoadedSourceFiles)
 import Interfaces.Interface exposing (Interface)
 import Maybe exposing (Maybe(Just, Nothing))
 import Analyser.OperatorTable as OperatorTable
 import Analyser.PostProcessing as PostProcessing
+import Analyser.Dependencies exposing (Dependency)
 
 
 type alias FileContext =
@@ -18,7 +18,7 @@ type alias FileContext =
     }
 
 
-create : LoadedSourceFiles -> LoadedDependencies -> LoadedSourceFile -> Maybe FileContext
+create : LoadedSourceFiles -> List Dependency -> LoadedSourceFile -> Maybe FileContext
 create sourceFiles dependencies ( fileContent, target ) =
     let
         moduleIndex =

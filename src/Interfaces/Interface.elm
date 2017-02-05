@@ -1,8 +1,14 @@
-module Interfaces.Interface exposing (Interface, ExposedInterface(Function, Type, Alias, Operator), doesExposeFunction, getOperators, build, doesExposeAlias)
+module Interfaces.Interface exposing (Interface, ExposedInterface(Function, Type, Alias, Operator), doesExposeFunction, getOperators, build, doesExposeAlias, decodeInterface, encodeInterface)
 
 import AST.Types as AST
 import List.Extra
 import AST.Util exposing (moduleExposingList)
+import Json.Decode as JD exposing (Decoder)
+import Json.Encode as JE exposing (Value)
+import Json.Decode.Extra exposing ((|:))
+import Util.Json exposing (decodeTyped, encodeTyped)
+import AST.Decoding exposing (decodeInfix)
+import AST.Encoding exposing (encodeInfix)
 
 
 type alias Interface =
@@ -14,6 +20,52 @@ type ExposedInterface
     | Type ( String, List String )
     | Alias String
     | Operator AST.Infix
+
+
+encodeInterface : Interface -> Value
+encodeInterface =
+    JE.list << List.map encodeExposedInterface
+
+
+encodeExposedInterface : ExposedInterface -> Value
+encodeExposedInterface x =
+    case x of
+        Function s ->
+            encodeTyped "function" (JE.string s)
+
+        Type ( name, constructors ) ->
+            encodeTyped "type_"
+                (JE.object
+                    [ ( "name", JE.string name )
+                    , ( "constructors", JE.list <| List.map JE.string constructors )
+                    ]
+                )
+
+        Alias s ->
+            encodeTyped "alias" (JE.string s)
+
+        Operator s ->
+            encodeTyped "operator" (encodeInfix s)
+
+
+decodeInterface : Decoder Interface
+decodeInterface =
+    JD.list decodeExposedInterface
+
+
+decodeExposedInterface : Decoder ExposedInterface
+decodeExposedInterface =
+    decodeTyped
+        [ ( "function", JD.string |> JD.map Function )
+        , ( "type_"
+          , JD.succeed (,)
+                |: JD.field "name" JD.string
+                |: JD.field "constructors" (JD.list JD.string)
+                |> JD.map Type
+          )
+        , ( "alias", JD.string |> JD.map Alias )
+        , ( "operator", decodeInfix |> JD.map Operator )
+        ]
 
 
 doesExposeAlias : String -> Interface -> Bool

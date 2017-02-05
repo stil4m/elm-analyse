@@ -5,48 +5,68 @@ const fs = require('fs');
 const cp = require('child_process');
 
 
-function isFormatted (path) {
-  try {
-    cp.execSync('elm-format --validate ' + path, {
-      stdio:[]
-    });
-    return true;
-  } catch (e) {
-    return false;
-  }
+function isFormatted(path) {
+    try {
+        cp.execSync('elm-format --validate ' + path, {
+            stdio: []
+        });
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
 function readFile(directory, path, cb) {
-  console.log("Load file", path, "...")
-  const real = path.replace(".", directory);
+    console.log("Load file", path, "...")
+    const real = path.replace(".", directory);
+    const fileName = cp.execSync('shasum ' + real).toString().match(/[a-f0-9]+/)[0];
 
-  fs.readFile(real, function(e, content) {
-    if (e) {
-      cb({
-        success : false,
-        path : path,
-        sha1 : null,
-        content : null,
-        formatted : false
-      })
-      return;
+
+    if (fs.existsSync('./cache/' + fileName + '.json')) {
+        const fullPath = './cache/' + fileName + '.elm';
+        console.log("Fast?")
+        setTimeout(function() {
+            cb({
+                success: true,
+                path: real,
+                sha1: fileName,
+                content: fs.readFileSync(fullPath).toString(),
+                formatted: isFormatted(fullPath),
+                ast: fs.readFileSync('./cache/' + fileName + '.json').toString()
+            });
+
+        }, 1);
+        return;
     }
-    const originalContent= content.toString();
-    const normalized = normalizeNewline(originalContent);
-    const fileName = sha1(originalContent);
-    console.log(fileName);
-    const fullPath ='./cache/' + fileName + '.elm';
-    fs.writeFileSync(fullPath , normalized);
-    const formatted = isFormatted(fullPath);
 
-    cb({
-      success : true,
-      path : real,
-      sha1 : fileName,
-      content : normalized,
-      formatted : formatted
-    });
-  })
+    fs.readFile(real, function(e, content) {
+        if (e) {
+            cb({
+                success: false,
+                path: path,
+                sha1: null,
+                content: null,
+                formatted: false,
+                ast: null
+            })
+            return;
+        }
+        const originalContent = content.toString();
+        const normalized = normalizeNewline(originalContent);
+        const fullPath = './cache/' + fileName + '.elm';
+
+        fs.writeFileSync(fullPath, normalized);
+        const formatted = isFormatted(fullPath);
+
+        cb({
+            success: true,
+            path: real,
+            sha1: fileName,
+            content: normalized,
+            formatted: formatted,
+            ast: null
+        });
+    })
 }
 
 module.exports = readFile;

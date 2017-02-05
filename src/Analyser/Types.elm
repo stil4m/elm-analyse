@@ -7,6 +7,7 @@ module Analyser.Types
         , ModuleIndex
         , OperatorTable
         , FileContent
+        , LoadedFileData
         )
 
 import AST.Types as AST
@@ -28,11 +29,14 @@ type alias LoadedFile =
 
 type FileLoad
     = Failed
-    | Loaded
-        { interface : Interface.Interface
-        , moduleName : Maybe AST.ModuleName
-        , ast : AST.File
-        }
+    | Loaded LoadedFileData
+
+
+type alias LoadedFileData =
+    { interface : Interface.Interface
+    , moduleName : Maybe AST.ModuleName
+    , ast : AST.File
+    }
 
 
 type alias ModuleIndex =
@@ -48,5 +52,6 @@ type alias FileContent =
     , success : Bool
     , sha1 : Maybe String
     , content : Maybe String
+    , ast : Maybe String
     , formatted : Bool
     }

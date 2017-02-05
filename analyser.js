@@ -2,45 +2,13 @@ const fs = require('fs');
 const cp = require('child_process');
 const _ = require('lodash');
 const fileReader = require('./fileReader');
+const fileGatherer= require('./util/file-gatherer');
+const fakeDir = "."
+const directory = process.cwd() + "/" +fakeDir;
 
-const directory = ".";
-
-function targetFilesForPathAndPackage(path, pack) {
-    const packTargetDirs = pack['source-directories'];
-    const targetFiles = _.uniq(_.flatten(packTargetDirs.map(x => {
-        return cp.execSync('find ' + (path + '/' + x) + ' -name "*.elm"')
-            .toString()
-            .split('\n')
-            .filter(x => {
-                return x.replace(path, '')
-                    .indexOf('elm-stuff') === -1 && (x.length > 0)
-            });
-    }))).map(s => s.replace(directory, "."));
-    return targetFiles;
-}
-
-function dependencyFiles(dep) {
-    const exactDeps = require(directory + '/elm-stuff/exact-dependencies.json');
-    const version = exactDeps[dep];
-    const depPath = directory + "/elm-stuff/packages/" + dep + "/" + version;
-    const depPackageFile = require(depPath + '/elm-package.json');
-    const exposedModules = depPackageFile['exposed-modules'].map(x => '/' + x.replace('.', '/') + '.elm');
-    const unfilteredTargetFiles = targetFilesForPathAndPackage(depPath, depPackageFile);
-    return unfilteredTargetFiles.filter(function(x) {
-        return exposedModules.filter(e => x.endsWith(e))[0];
-    });
-}
 
 (function() {
-    const packageFile = require(directory + '/elm-package.json');
-    const targetDirs = packageFile['source-directories'];
-    const dependencies = Object.keys(packageFile['dependencies']);
-
-    var interfaceFiles = dependencies.map(x => [x, dependencyFiles(x)]);
-    const input = {
-        interfaceFiles: interfaceFiles,
-        sourceFiles: targetFilesForPathAndPackage(directory, packageFile)
-    }
+    const input = fileGatherer.gather(directory);
 
     const Elm = require('./elm');
     var app = Elm.Analyser.worker(input);
@@ -60,4 +28,33 @@ function dependencyFiles(dep) {
         });
     });
 
+    app.ports.loadRawDependency.subscribe(function(x) {
+      //TODO
+      setTimeout(function() {
+        app.ports.onRawDependency.send([x[0], x[1],""+x]);
+      },1);
+    });
+
+    app.ports.loadDependencyFiles.subscribe(function(dep) {
+      var depName = dep[0];
+      var version = dep[1];
+      var result = fileGatherer.getDependencyFiles(directory, depName,version);
+      var targets = [];
+
+      //TODO Something with promises
+      function reduceTargets() {
+        if (targets.length == result.length) {
+          console.log("Finished", depName, version);
+          app.ports.onDependencyFiles.send([depName,version, targets]);
+          return;
+        }
+        fileReader(directory, result[targets.length], function(y) {
+          targets.push(y);
+          reduceTargets();
+        });
+      }
+      console.log("loadDependencyFiles",depName,version);
+      reduceTargets();
+
+    })
 })();

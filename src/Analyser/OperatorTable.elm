@@ -1,17 +1,17 @@
 module Analyser.OperatorTable exposing (build, buildModuleIndex)
 
 import AST.Types as AST exposing (Import, InfixDirection, ModuleName, Infix)
-import Analyser.LoadedDependencies exposing (LoadedDependencies)
 import Analyser.Types exposing (FileLoad, LoadedSourceFiles, LoadedSourceFile, ModuleIndex, OperatorTable)
 import Dict exposing (Dict)
 import Interfaces.Interface as Interface exposing (Interface)
 import Parser.Parser
+import Analyser.Dependencies exposing (Dependency)
 
 
-buildModuleIndex : LoadedSourceFiles -> LoadedDependencies -> ModuleIndex
+buildModuleIndex : LoadedSourceFiles -> List Dependency -> ModuleIndex
 buildModuleIndex sourceFiles dependencies =
     List.filterMap (Tuple.second >> fromFileLoad) sourceFiles
-        ++ (dependencies |> List.concatMap .interfaces |> List.filterMap (Tuple.second >> fromFileLoad))
+        ++ (dependencies |> List.concatMap (.interfaces >> Dict.toList))
         |> Dict.fromList
 
 

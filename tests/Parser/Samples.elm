@@ -41,7 +41,17 @@ allSamples =
     , sample33
     , ""
       -- , sample34
+    , sample35
     ]
+
+
+sample35 : String
+sample35 =
+    """module Bar exposing (..)
+
+type Color = Blue
+
+"""
 
 
 sample34 : String

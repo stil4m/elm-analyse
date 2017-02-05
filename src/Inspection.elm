@@ -1,7 +1,6 @@
 module Inspection exposing (run)
 
 import Analyser.FileContext as FileContext
-import Analyser.LoadedDependencies exposing (LoadedDependencies)
 import Analyser.Messages exposing (Message(UnformattedFile))
 import Analyser.Types exposing (LoadedSourceFiles)
 import Analyser.Checks.UnusedVariable as UnusedVariable
@@ -16,9 +15,10 @@ import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
 import Analyser.Checks.UnusedImports as UnusedImports
+import Analyser.Dependencies exposing (Dependency)
 
 
-run : LoadedSourceFiles -> LoadedDependencies -> List Message
+run : LoadedSourceFiles -> List Dependency -> List Message
 run sources deps =
     let
         checks =

@@ -1,26 +1,10 @@
-module AST.Decoding exposing (decode)
+module AST.Decoding exposing (decode, decodeInfix)
 
 import AST.Ranges as Ranges
 import AST.Types exposing (..)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
-
-
-decodeTyped : List ( String, Decoder a ) -> Decoder a
-decodeTyped opts =
-    JD.lazy
-        (\() ->
-            JD.field "type" JD.string
-                |> JD.andThen
-                    (\t ->
-                        case List.filter (Tuple.first >> (==) t) opts |> List.head of
-                            Just m ->
-                                JD.field (Tuple.first m) <| Tuple.second m
-
-                            Nothing ->
-                                JD.fail ("No decoder for type: " ++ t)
-                    )
-        )
+import Util.Json exposing (decodeTyped)
 
 
 decode : Decoder File
@@ -68,7 +52,7 @@ decodeExpose =
         [ ( "infix", JD.map2 InfixExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
         , ( "function", JD.map2 FunctionExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
         , ( "typeOrAlias", JD.map2 TypeOrAliasExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
-        , ( "type"
+        , ( "typeexpose"
           , JD.map3 TypeExpose
                 (JD.field "name" JD.string)
                 (JD.field "inner" <| decodeExposingList decodeValueConstructorExpose)

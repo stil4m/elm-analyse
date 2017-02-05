@@ -1,8 +1,9 @@
-module AST.Encoding exposing (encode)
+module AST.Encoding exposing (encode, encodeInfix)
 
 import AST.Ranges as Ranges
 import AST.Types exposing (..)
 import Json.Encode as JE exposing (Value)
+import Util.Json exposing (encodeTyped)
 
 
 asList : (a -> Value) -> List a -> Value
@@ -19,28 +20,20 @@ encode { moduleDefinition, imports, declarations } =
         ]
 
 
-typed : String -> Value -> Value
-typed x v =
-    JE.object
-        [ ( "type", JE.string x )
-        , ( x, v )
-        ]
-
-
 encodeModule : Module -> Value
 encodeModule m =
     case m of
         NormalModule d ->
-            typed "normal" (encodeDefaultModuleData d)
+            encodeTyped "normal" (encodeDefaultModuleData d)
 
         PortModule d ->
-            typed "port" (encodeDefaultModuleData d)
+            encodeTyped "port" (encodeDefaultModuleData d)
 
         EffectModule d ->
-            typed "effect" (encodeEffectModuleData d)
+            encodeTyped "effect" (encodeEffectModuleData d)
 
         NoModule ->
-            typed "nomodule" (JE.null)
+            encodeTyped "nomodule" (JE.null)
 
 
 encodeEffectModuleData : EffectModuleData -> Value
@@ -70,28 +63,28 @@ encodeExpose : Expose -> Value
 encodeExpose exp =
     case exp of
         InfixExpose x r ->
-            typed "infix" <|
+            encodeTyped "infix" <|
                 JE.object
                     [ ( "name", JE.string x )
                     , ( "range", Ranges.encode r )
                     ]
 
         FunctionExpose x r ->
-            typed "function" <|
+            encodeTyped "function" <|
                 JE.object
                     [ ( "name", JE.string x )
                     , ( "range", Ranges.encode r )
                     ]
 
         TypeOrAliasExpose x r ->
-            typed "typeOrAlias" <|
+            encodeTyped "typeOrAlias" <|
                 JE.object
                     [ ( "name", JE.string x )
                     , ( "range", Ranges.encode r )
                     ]
 
         TypeExpose x inner r ->
-            typed "type" <|
+            encodeTyped "typeexpose" <|
                 JE.object
                     [ ( "name", JE.string x )
                     , ( "inner", encodeExposingList inner encodeValueConstructorExpose )
@@ -111,13 +104,13 @@ encodeExposingList : Exposure a -> (a -> Value) -> Value
 encodeExposingList exp f =
     case exp of
         None ->
-            typed "none" <| JE.null
+            encodeTyped "none" <| JE.null
 
         All r ->
-            typed "all" <| Ranges.encode r
+            encodeTyped "all" <| Ranges.encode r
 
         Explicit l ->
-            typed "explicit" (asList f l)
+            encodeTyped "explicit" (asList f l)
 
 
 encodeImport : Import -> Value
@@ -138,28 +131,32 @@ encodeDeclaration : Declaration -> Value
 encodeDeclaration decl =
     case decl of
         FuncDecl function ->
-            typed "function" (encodeFunction function)
+            encodeTyped "function" (encodeFunction function)
 
         AliasDecl typeAlias ->
-            typed "typeAlias" (encodeTypeAlias typeAlias)
+            encodeTyped "typeAlias" (encodeTypeAlias typeAlias)
 
         TypeDecl typeDeclaration ->
-            typed "typedecl" (encodeType typeDeclaration)
+            encodeTyped "typedecl" (encodeType typeDeclaration)
 
         PortDeclaration sig ->
-            typed "port" (encodeSignature sig)
+            encodeTyped "port" (encodeSignature sig)
 
         InfixDeclaration inf ->
-            typed "infix"
-                (JE.object
-                    [ ( "direction", encodeInfixDirection inf.direction )
-                    , ( "precedence", JE.int inf.precedence )
-                    , ( "operator", JE.string inf.operator )
-                    ]
-                )
+            encodeTyped "infix"
+                (encodeInfix inf)
 
         DestructuringDeclaration x ->
-            typed "destrucutring" (encodeDestructuring x)
+            encodeTyped "destrucutring" (encodeDestructuring x)
+
+
+encodeInfix : Infix -> Value
+encodeInfix inf =
+    JE.object
+        [ ( "direction", encodeInfixDirection inf.direction )
+        , ( "precedence", JE.int inf.precedence )
+        , ( "operator", JE.string inf.operator )
+        ]
 
 
 encodeDestructuring : Destructuring -> Value
@@ -220,10 +217,10 @@ encodeTypeReference : TypeReference -> Value
 encodeTypeReference typeReference =
     case typeReference of
         GenericType name ->
-            typed "generic" (JE.string name)
+            encodeTyped "generic" (JE.string name)
 
         Typed moduleName name args ->
-            typed "typed" <|
+            encodeTyped "typed" <|
                 JE.object
                     [ ( "moduleName", encodeModuleName moduleName )
                     , ( "name", JE.string name )
@@ -231,23 +228,23 @@ encodeTypeReference typeReference =
                     ]
 
         Unit ->
-            typed "unit" (JE.null)
+            encodeTyped "unit" (JE.null)
 
         Tupled t ->
-            typed "tupled" (asList encodeTypeReference t)
+            encodeTyped "tupled" (asList encodeTypeReference t)
 
         FunctionTypeReference left right ->
-            typed "function" <|
+            encodeTyped "function" <|
                 JE.object
                     [ ( "left", encodeTypeReference left )
                     , ( "right", encodeTypeReference right )
                     ]
 
         Record recordDefinition ->
-            typed "record" (encodeRecordDefinition recordDefinition)
+            encodeTyped "record" (encodeRecordDefinition recordDefinition)
 
         GenericRecord name recordDefinition ->
-            typed "genericRecord" <|
+            encodeTyped "genericRecord" <|
                 JE.object
                     [ ( "name", JE.string name )
                     , ( "values", encodeRecordDefinition recordDefinition )
@@ -271,10 +268,10 @@ encodeTypeArg : TypeArg -> Value
 encodeTypeArg typeArg =
     case typeArg of
         Generic name ->
-            typed "generic" (JE.string name)
+            encodeTyped "generic" (JE.string name)
 
         Concrete tr ->
-            typed "concrete" (encodeTypeReference tr)
+            encodeTyped "concrete" (encodeTypeReference tr)
 
 
 encodeFunctionDeclaration : FunctionDeclaration -> Value
@@ -299,31 +296,31 @@ encodePattern : Pattern -> Value
 encodePattern pattern =
     case pattern of
         AllPattern ->
-            typed "all" (JE.null)
+            encodeTyped "all" (JE.null)
 
         UnitPattern ->
-            typed "unit" (JE.null)
+            encodeTyped "unit" (JE.null)
 
         CharPattern c ->
-            typed "char" (JE.string <| String.fromChar c)
+            encodeTyped "char" (JE.string <| String.fromChar c)
 
         StringPattern v ->
-            typed "char" (JE.string v)
+            encodeTyped "char" (JE.string v)
 
         IntPattern i ->
-            typed "int" (JE.int i)
+            encodeTyped "int" (JE.int i)
 
         FloatPattern f ->
-            typed "float" (JE.float f)
+            encodeTyped "float" (JE.float f)
 
         TuplePattern patterns ->
-            typed "tuple" (asList encodePattern patterns)
+            encodeTyped "tuple" (asList encodePattern patterns)
 
         RecordPattern pointers ->
-            typed "record" (asList encodeVariablePointer pointers)
+            encodeTyped "record" (asList encodeVariablePointer pointers)
 
         UnConsPattern p1 p2 ->
-            typed "uncons"
+            encodeTyped "uncons"
                 (JE.object
                     [ ( "left", encodePattern p1 )
                     , ( "right", encodePattern p2 )
@@ -331,30 +328,30 @@ encodePattern pattern =
                 )
 
         ListPattern patterns ->
-            typed "list" (asList encodePattern patterns)
+            encodeTyped "list" (asList encodePattern patterns)
 
         VarPattern pointer ->
-            typed "var" (encodeVariablePointer pointer)
+            encodeTyped "var" (encodeVariablePointer pointer)
 
         NamedPattern qualifiedNameRef patterns ->
-            typed "named" <|
+            encodeTyped "named" <|
                 JE.object
                     [ ( "qualified", encodeQualifiedNameRef qualifiedNameRef )
                     , ( "patterns", asList encodePattern patterns )
                     ]
 
         QualifiedNamePattern qualifiedNameRef ->
-            typed "qualifiedName" <| encodeQualifiedNameRef qualifiedNameRef
+            encodeTyped "qualifiedName" <| encodeQualifiedNameRef qualifiedNameRef
 
         AsPattern destructured variablePointer ->
-            typed "as" <|
+            encodeTyped "as" <|
                 JE.object
                     [ ( "name", encodeVariablePointer variablePointer )
                     , ( "pattern", encodePattern destructured )
                     ]
 
         ParentisizedPattern p1 ->
-            typed "parentisized" (encodePattern p1)
+            encodeTyped "parentisized" (encodePattern p1)
 
 
 encodeQualifiedNameRef : QualifiedNameRef -> Value
@@ -373,19 +370,19 @@ encodeExpression ( range, inner ) =
         , ( "inner"
           , case inner of
                 UnitExpr ->
-                    typed "unit" JE.null
+                    encodeTyped "unit" JE.null
 
                 Application l ->
-                    typed "application" (asList encodeExpression l)
+                    encodeTyped "application" (asList encodeExpression l)
 
                 OperatorApplicationExpression operatorApplication ->
-                    typed "operatorapplication" (encodeOperatorApplication operatorApplication)
+                    encodeTyped "operatorapplication" (encodeOperatorApplication operatorApplication)
 
                 FunctionOrValue x ->
-                    typed "functionOrValue" (JE.string x)
+                    encodeTyped "functionOrValue" (JE.string x)
 
                 IfBlock c t e ->
-                    typed "ifBlock" <|
+                    encodeTyped "ifBlock" <|
                         JE.object
                             [ ( "clause", encodeExpression c )
                             , ( "then", encodeExpression t )
@@ -393,66 +390,66 @@ encodeExpression ( range, inner ) =
                             ]
 
                 PrefixOperator x ->
-                    typed "prefixoperator" (JE.string x)
+                    encodeTyped "prefixoperator" (JE.string x)
 
                 Operator x ->
-                    typed "operator" (JE.string x)
+                    encodeTyped "operator" (JE.string x)
 
                 Integer x ->
-                    typed "integer" (JE.int x)
+                    encodeTyped "integer" (JE.int x)
 
                 Floatable x ->
-                    typed "float" (JE.float x)
+                    encodeTyped "float" (JE.float x)
 
                 Literal x ->
-                    typed "literal" (JE.string x)
+                    encodeTyped "literal" (JE.string x)
 
                 CharLiteral c ->
-                    typed "charLiteral" (JE.string <| String.fromChar c)
+                    encodeTyped "charLiteral" (JE.string <| String.fromChar c)
 
                 TupledExpression xs ->
-                    typed "tupled" (asList encodeExpression xs)
+                    encodeTyped "tupled" (asList encodeExpression xs)
 
                 ListExpr xs ->
-                    typed "list" (asList encodeExpression xs)
+                    encodeTyped "list" (asList encodeExpression xs)
 
                 ParenthesizedExpression x ->
-                    typed "parenthesized" (encodeExpression x)
+                    encodeTyped "parenthesized" (encodeExpression x)
 
                 LetExpression x ->
-                    typed "let" <| encodeLetBlock x
+                    encodeTyped "let" <| encodeLetBlock x
 
                 CaseExpression x ->
-                    typed "case" <| encodeCaseBlock x
+                    encodeTyped "case" <| encodeCaseBlock x
 
                 LambdaExpression x ->
-                    typed "lambda" <| encodeLambda x
+                    encodeTyped "lambda" <| encodeLambda x
 
                 QualifiedExpr moduleName name ->
-                    typed "qualified" <|
+                    encodeTyped "qualified" <|
                         JE.object
                             [ ( "moduleName", encodeModuleName moduleName )
                             , ( "name", JE.string name )
                             ]
 
                 RecordAccess exp name ->
-                    typed "recordAccess" <|
+                    encodeTyped "recordAccess" <|
                         JE.object
                             [ ( "expression", encodeExpression exp )
                             , ( "name", JE.string name )
                             ]
 
                 RecordAccessFunction x ->
-                    typed "recordAccessFunction" (JE.string x)
+                    encodeTyped "recordAccessFunction" (JE.string x)
 
                 RecordExpr xs ->
-                    typed "record" (asList encodeRecordSetter xs)
+                    encodeTyped "record" (asList encodeRecordSetter xs)
 
                 RecordUpdateExpression recordUpdate ->
-                    typed "recordUpdate" (encodeRecordUpdate recordUpdate)
+                    encodeTyped "recordUpdate" (encodeRecordUpdate recordUpdate)
 
                 GLSLExpression x ->
-                    typed "glsl" (JE.string x)
+                    encodeTyped "glsl" (JE.string x)
           )
         ]
 

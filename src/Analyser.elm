@@ -1,7 +1,6 @@
 module Analyser exposing (main)
 
 import Analyser.InterfaceLoadingStage as InterfaceLoadingStage
-import Analyser.LoadedDependencies as LoadedDependencies exposing (LoadedDependencies)
 import Analyser.Messages exposing (Message)
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import AnalyserPorts
@@ -9,10 +8,11 @@ import Platform exposing (programWithFlags)
 import Task
 import Time exposing (Time)
 import Inspection
+import Analyser.Dependencies exposing (Dependency, Version)
 
 
 type alias Flags =
-    { interfaceFiles : InputInterfaces
+    { interfaceFiles : List ( String, Version )
     , sourceFiles : InputFiles
     }
 
@@ -21,8 +21,8 @@ type alias InputFiles =
     List String
 
 
-type alias InputInterfaces =
-    List ( String, InputFiles )
+type alias TargetD =
+    List ( String, String )
 
 
 type Msg
@@ -32,7 +32,7 @@ type Msg
 
 
 type alias Model =
-    { interfaceFiles : InputInterfaces
+    { dependencies : List Dependency
     , sourceFiles : InputFiles
     , messages : List Message
     , stage : Stage
@@ -41,7 +41,7 @@ type alias Model =
 
 type Stage
     = InterfaceLoadingStage InterfaceLoadingStage.Model
-    | SourceLoadingStage SourceLoadingStage.Model LoadedDependencies
+    | SourceLoadingStage SourceLoadingStage.Model (List Dependency)
     | Finished (List Message)
 
 
@@ -56,10 +56,10 @@ init { interfaceFiles, sourceFiles } =
         ( stage, cmds ) =
             InterfaceLoadingStage.init interfaceFiles
     in
-        ( { interfaceFiles = interfaceFiles
-          , sourceFiles = sourceFiles
+        ( { sourceFiles = sourceFiles
           , stage = InterfaceLoadingStage stage
           , messages = []
+          , dependencies = []
           }
         , Cmd.map InterfaceLoadingStageMsg cmds
         )
@@ -75,17 +75,19 @@ update msg model =
             in
                 if InterfaceLoadingStage.isDone newStage then
                     let
-                        ( nextStage, cmds ) =
+                        ( nextStage, sourceCmds ) =
                             (SourceLoadingStage.init model.sourceFiles)
 
                         loadedDependencies =
-                            InterfaceLoadingStage.parsedInterfaces newStage
+                            InterfaceLoadingStage.getDependencies newStage
                     in
                         ( { model
-                            | messages = model.messages ++ LoadedDependencies.messages loadedDependencies
-                            , stage = SourceLoadingStage nextStage loadedDependencies
+                            | stage = SourceLoadingStage nextStage loadedDependencies
                           }
-                        , Cmd.map SourceLoadingStageMsg cmds
+                        , Cmd.batch
+                            [ Cmd.map SourceLoadingStageMsg sourceCmds
+                            , Cmd.map InterfaceLoadingStageMsg cmds
+                            ]
                         )
                 else
                     ( { model | stage = InterfaceLoadingStage newStage }
