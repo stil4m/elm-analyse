@@ -22,9 +22,8 @@ function readFile(directory, path, cb) {
     const fileName = cp.execSync('shasum ' + real).toString().match(/[a-f0-9]+/)[0];
 
 
-    if (fs.existsSync('./cache/' + fileName + '.json')) {
-        const fullPath = './cache/' + fileName + '.elm';
-        console.log("Fast?")
+    if (fs.existsSync('./cache/_shas/' + fileName + '.json')) {
+        const fullPath = './cache/_shas/' + fileName + '.elm';
         setTimeout(function() {
             cb({
                 success: true,
@@ -32,7 +31,7 @@ function readFile(directory, path, cb) {
                 sha1: fileName,
                 content: fs.readFileSync(fullPath).toString(),
                 formatted: isFormatted(fullPath),
-                ast: fs.readFileSync('./cache/' + fileName + '.json').toString()
+                ast: fs.readFileSync('./cache/_shas/' + fileName + '.json').toString()
             });
 
         }, 1);
@@ -53,7 +52,7 @@ function readFile(directory, path, cb) {
         }
         const originalContent = content.toString();
         const normalized = normalizeNewline(originalContent);
-        const fullPath = './cache/' + fileName + '.elm';
+        const fullPath = './cache/_shas/' + fileName + '.elm';
 
         fs.writeFileSync(fullPath, normalized);
         const formatted = isFormatted(fullPath);
@@ -68,5 +67,5 @@ function readFile(directory, path, cb) {
         });
     })
 }
-
+cp.execSync('mkdir -p ./cache/_shas');
 module.exports = readFile;

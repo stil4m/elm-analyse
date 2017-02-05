@@ -8,8 +8,9 @@ app.use(express.static('server/public'))
 const state = {
   initializing : true
 }
-require('./dashboard')(app,state);
-require('./worker')(app,state);
+const elm = require('./worker')(app,state);
+require('./dashboard')(app, elm,expressWs);
+
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!')

@@ -6,11 +6,10 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(DuplicateImport))
 import Inspector exposing (Action(Post, Skip), defaultConfig)
 import Dict exposing (Dict)
-import Tuple2
 
 
 type alias Context =
-    Dict ModuleName ( Range, Int )
+    Dict ModuleName (List Range)
 
 
 scan : FileContext -> List Message
@@ -22,17 +21,16 @@ scan fileContext =
         }
         fileContext.ast
         Dict.empty
-        |> Dict.filter (\_ -> Tuple.second >> (<) 1)
+        |> Dict.filter (\_ -> List.length >> (<) 1)
         |> Dict.toList
-        |> List.map (\( k, ( r, _ ) ) -> ( k, r ))
         |> List.map (uncurry (DuplicateImport fileContext.path))
 
 
 onImport : Import -> Context -> Context
 onImport imp context =
     case Dict.get imp.moduleName context of
-        Just _ ->
-            Dict.update imp.moduleName (Maybe.map (Tuple2.mapSecond ((+) 1))) context
+        Just x ->
+            Dict.update imp.moduleName (Maybe.map (flip (++) [ imp.range ])) context
 
         Nothing ->
-            Dict.insert imp.moduleName ( imp.range, 1 ) context
+            Dict.insert imp.moduleName [ imp.range ] context

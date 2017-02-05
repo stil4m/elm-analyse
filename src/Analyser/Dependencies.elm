@@ -26,7 +26,7 @@ deserialise =
 
 serialise : Dependency -> String
 serialise =
-    JE.encode 0 << encodeDependency
+    JE.encode 2 << encodeDependency
 
 
 decodeDependency : Decoder Dependency

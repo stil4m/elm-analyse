@@ -12,6 +12,11 @@ const directory = process.cwd() + "/" +fakeDir;
 
     const Elm = require('./elm');
     var app = Elm.Analyser.worker(input);
+    app.ports.messagesAsJson.subscribe(function(x) {
+      console.log("JSON Messages:")
+      console.log("---------")
+      x.forEach(y => console.log(y));
+    });
     app.ports.sendMessages.subscribe(function(x) {
         console.log("Messages:")
         console.log("---------")
@@ -20,7 +25,7 @@ const directory = process.cwd() + "/" +fakeDir;
     app.ports.storeAstForSha.subscribe(function(x) {
         const sha1 = x[0];
         const content = x[1];
-        fs.writeFileSync('./cache/' + sha1 + ".json", content);
+        fs.writeFileSync('./cache/_shas/' + sha1 + ".json", content);
     })
     app.ports.loadFile.subscribe(function(x) {
         fileReader(directory, x, function(result) {
@@ -30,9 +35,20 @@ const directory = process.cwd() + "/" +fakeDir;
 
     app.ports.loadRawDependency.subscribe(function(x) {
       //TODO
-      setTimeout(function() {
-        app.ports.onRawDependency.send([x[0], x[1],""+x]);
-      },1);
+      fs.readFile('./cache/' + x[0] + "/" + x[1] + "/dependency.json", function (err, content) {
+        if (err) {
+          app.ports.onRawDependency.send([x[0], x[1],""+x]);
+        } else {
+          app.ports.onRawDependency.send([x[0], x[1],content.toString()]);
+        }
+      });
+    });
+
+    app.ports.storeRawDependency.subscribe(function(x) {
+      console.log("Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+      console.log(x);
+      cp.execSync('mkdir -p ' + './cache/' + x[0] + "/" + x[1]);
+      fs.writeFileSync('./cache/' + x[0] + "/" + x[1] + "/dependency.json", x[2]);
     });
 
     app.ports.loadDependencyFiles.subscribe(function(dep) {
@@ -53,7 +69,6 @@ const directory = process.cwd() + "/" +fakeDir;
           reduceTargets();
         });
       }
-      console.log("loadDependencyFiles",depName,version);
       reduceTargets();
 
     })

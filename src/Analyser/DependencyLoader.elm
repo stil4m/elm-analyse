@@ -108,7 +108,7 @@ update msg model =
                     dependency =
                         (Dependency model.name model.version interfaces)
                 in
-                    if List.all isLoaded loadedFiles then
+                    if not <| List.all isLoaded loadedFiles then
                         ( { model | result = Just (Err "Could not load all dependency files") }
                         , Cmd.none
                         )

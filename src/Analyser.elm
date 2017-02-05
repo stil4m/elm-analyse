@@ -21,10 +21,6 @@ type alias InputFiles =
     List String
 
 
-type alias TargetD =
-    List ( String, String )
-
-
 type Msg
     = InterfaceLoadingStageMsg InterfaceLoadingStage.Msg
     | SourceLoadingStageMsg SourceLoadingStage.Msg
@@ -107,7 +103,10 @@ update msg model =
                     )
 
         ( _, Finished messages ) ->
-            model ! [ AnalyserPorts.sendMessagesAsStrings messages ]
+            model
+                ! [ AnalyserPorts.sendMessagesAsStrings messages
+                  , AnalyserPorts.sendMessagesAsJson messages
+                  ]
 
         _ ->
             model ! []

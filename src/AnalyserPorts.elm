@@ -1,18 +1,17 @@
-port module AnalyserPorts exposing (sendMessagesAsStrings)
+port module AnalyserPorts exposing (sendMessagesAsJson, sendMessagesAsStrings)
 
 import Analyser.Messages exposing (Message)
 
 
--- port loadFile : String -> Cmd msg
---
---
--- port fileContent : (FileContent -> msg) -> Sub msg
---
---
--- port storeAstForSha : ( String, String ) -> Cmd msg
+port messagesAsJson : List String -> Cmd msg
 
 
 port sendMessages : List String -> Cmd msg
+
+
+sendMessagesAsJson : List Message -> Cmd msg
+sendMessagesAsJson =
+    List.map Analyser.Messages.encodeMessage >> messagesAsJson
 
 
 sendMessagesAsStrings : List Message -> Cmd msg
