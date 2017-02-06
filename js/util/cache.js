@@ -32,7 +32,7 @@ function readAstForSha(sha) {
 }
 
 function setupShaFolder() {
-  cp.execSync('mkdir -p ./elm-stuff/elm-analyse/_shas');
+    cp.execSync('mkdir -p ./elm-stuff/elm-analyse/_shas');
 }
 
 module.exports = {
@@ -42,5 +42,6 @@ module.exports = {
     hasAstForSha: hasAstForSha,
     elmCachePathForSha: elmCachePathForSha,
     jsonCachePathForSha: astCachePathForSha,
-    setupShaFolder : setupShaFolder
+    readAstForSha: readAstForSha,
+    setupShaFolder: setupShaFolder
 }

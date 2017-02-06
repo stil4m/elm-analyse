@@ -46,4 +46,4 @@ gulp.task('watch', ['elm-backend', 'elm-client'], function() {
   });
 });
 
-gulp.task('build', ['elm-backend', 'elm-client']);
+gulp.task('default', ['elm-backend', 'elm-client']);

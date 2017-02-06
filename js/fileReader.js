@@ -31,7 +31,7 @@ function readFile(directory, path, cb) {
                 sha1: fileName,
                 content: fs.readFileSync(fullPath).toString(),
                 formatted: isFormatted(fullPath),
-                ast: cahe.readAstForSha(fileName)
+                ast: cache.readAstForSha(fileName)
             });
 
         }, 1);

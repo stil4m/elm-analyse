@@ -2,3 +2,5 @@ elm-stuff
 elm.js
 tmp
 /cache
+/js/backend-elm.js
+/js/public/client-elm.js
