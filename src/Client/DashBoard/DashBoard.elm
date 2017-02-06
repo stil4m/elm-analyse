@@ -1,22 +1,29 @@
 module Client.DashBoard.DashBoard exposing (..)
 
 import Client.DashBoard.State as State exposing (State)
+import Client.DashBoard.ActiveMessageDialog as ActiveMessageDialog
 import Html exposing (..)
+import Html.Events exposing (onClick)
 import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
 import Time
 import WebSocket as WS
 import Analyser.Messages as Messages exposing (Message)
 import Html.Attributes exposing (class, style)
+import Tuple2
 
 
 type alias Model =
-    RemoteData String State
+    { messages : RemoteData String State
+    , active : ActiveMessageDialog.Model
+    }
 
 
 type Msg
     = NewMsg (Result String State)
     | Tick
+    | Focus Message
+    | ActiveMessageDialogMsg ActiveMessageDialog.Msg
 
 
 socketAddress : String
@@ -28,13 +35,17 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ WS.listen socketAddress (JD.decodeString State.decodeState >> NewMsg)
-        , Time.every (Time.second * 10) (always Tick)
+          -- , Time.every (Time.second * 10) (always Tick)
         ]
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( RD.Loading, Cmd.none )
+    ( { messages = RD.Loading
+      , active = ActiveMessageDialog.init
+      }
+    , Cmd.none
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -46,27 +57,42 @@ update msg model =
         NewMsg x ->
             case x of
                 Ok o ->
-                    RD.Success o ! []
+                    ( { model | messages = RD.Success o }
+                    , Cmd.none
+                    )
 
                 Err e ->
-                    RD.Failure e ! []
+                    ( { model | messages = RD.Failure e }
+                    , Cmd.none
+                    )
+
+        Focus m ->
+            ActiveMessageDialog.show m model.active
+                |> Tuple2.mapFirst (\x -> { model | active = x })
+                |> Tuple2.mapSecond (Cmd.map ActiveMessageDialogMsg)
+
+        ActiveMessageDialogMsg x ->
+            ( { model | active = ActiveMessageDialog.update x model.active }
+            , Cmd.none
+            )
 
 
 view : Model -> Html Msg
 view m =
     div [ class "container" ]
-        [ case m of
+        [ case m.messages of
             RD.Loading ->
                 text "Loading..."
 
             RD.Success state ->
                 viewState state
 
-            RD.Failure x ->
+            RD.Failure _ ->
                 text "Something went wrong"
 
             RD.NotAsked ->
                 span [] []
+        , ActiveMessageDialog.view m.active |> Html.map ActiveMessageDialogMsg
         ]
 
 
@@ -96,8 +122,13 @@ viewMessage n x =
             ]
         ]
         [ div [ style [ ( "display", "table-row" ) ] ]
-            [ strong [ style [ ( "display", "table-cell" ), ( "padding-right", "20px" ), ( "font-size", "200%" ), ( "vertical-align", "middle" ) ] ]
-                [ text <| (++) "#" <| toString <| n + 1 ]
+            [ a
+                [ onClick (Focus x)
+                , style [ ( "cursor", "pointer" ), ( "display", "table-cell" ), ( "padding-right", "20px" ), ( "font-size", "200%" ), ( "vertical-align", "middle" ) ]
+                ]
+                [ strong []
+                    [ text <| (++) "#" <| toString <| n + 1 ]
+                ]
             , span [ style [ ( "display", "table-cell" ) ] ]
                 [ text <| Messages.asString x ]
             ]

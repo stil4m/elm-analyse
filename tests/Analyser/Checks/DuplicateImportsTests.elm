@@ -32,7 +32,11 @@ import Baz
 
 foo = 1
 """
-    , [ DuplicateImport "./foo.elm" [ "Baz" ] { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+    , [ DuplicateImport "./foo.elm"
+            [ "Baz" ]
+            [ { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+            , { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
+            ]
       ]
     )
 
@@ -48,7 +52,12 @@ import Baz
 
 foo = 1
 """
-    , [ DuplicateImport "./foo.elm" [ "Baz" ] { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+    , [ DuplicateImport "./foo.elm"
+            [ "Baz" ]
+            [ { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+            , { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } }
+            , { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
+            ]
       ]
     )
 
@@ -65,8 +74,16 @@ import John
 
 foo = 1
 """
-    , [ DuplicateImport "./foo.elm" [ "Baz" ] { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
-      , DuplicateImport "./foo.elm" [ "John" ] { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } }
+    , [ DuplicateImport "./foo.elm"
+            [ "Baz" ]
+            [ { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+            , { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
+            ]
+      , DuplicateImport "./foo.elm"
+            [ "John" ]
+            [ { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } }
+            , { start = { row = 5, column = -1 }, end = { row = 6, column = -2 } }
+            ]
       ]
     )
 

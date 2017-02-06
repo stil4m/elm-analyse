@@ -1,20 +1,28 @@
 var express = require('express')
 var app = express();
 var expressWs = require('express-ws')(app);
-
+const fs = require('fs');
 app.use(express.static('server/public'))
 
 
 const state = {
-  initializing : true
+    initializing: true
 }
-const elm = require('./worker')(app,state);
-require('./dashboard')(app, elm,expressWs);
 
+const elm = require('./worker')(app, state);
+require('./dashboard')(app, elm, expressWs);
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
+app.get('/file', function(req, res) {
+    const fileName = req.query.file;
+    fs.readFile(fileName, function(err, content) {
+        res.send(content);
+    });
 });
+
+app.listen(3000, function() {
+    console.log('Example app listening on port 3000!')
+});
+
 
 
 //
