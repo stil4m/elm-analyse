@@ -3,6 +3,7 @@ const normalizeNewline = require('normalize-newline');
 const sha1 = require('sha1');
 const fs = require('fs');
 const cp = require('child_process');
+const cache = require('./util/cache');
 
 
 function isFormatted(path) {
@@ -21,9 +22,8 @@ function readFile(directory, path, cb) {
     const real = path.replace(".", directory);
     const fileName = cp.execSync('shasum ' + real).toString().match(/[a-f0-9]+/)[0];
 
-
-    if (fs.existsSync('./cache/_shas/' + fileName + '.json')) {
-        const fullPath = './cache/_shas/' + fileName + '.elm';
+    if (cache.hasAstForSha(fileName)) {
+        const fullPath = cache.elmCachePathForSha(fileName);
         setTimeout(function() {
             cb({
                 success: true,
@@ -31,7 +31,7 @@ function readFile(directory, path, cb) {
                 sha1: fileName,
                 content: fs.readFileSync(fullPath).toString(),
                 formatted: isFormatted(fullPath),
-                ast: fs.readFileSync('./cache/_shas/' + fileName + '.json').toString()
+                ast: cahe.readAstForSha(fileName)
             });
 
         }, 1);
@@ -52,8 +52,7 @@ function readFile(directory, path, cb) {
         }
         const originalContent = content.toString();
         const normalized = normalizeNewline(originalContent);
-        const fullPath = './cache/_shas/' + fileName + '.elm';
-
+        const fullPath = cache.elmCachePathForSha(fileName);
         fs.writeFileSync(fullPath, normalized);
         const formatted = isFormatted(fullPath);
 
@@ -67,5 +66,5 @@ function readFile(directory, path, cb) {
         });
     })
 }
-cp.execSync('mkdir -p ./cache/_shas');
+cache.setupShaFolder();
 module.exports = readFile;

@@ -12,9 +12,7 @@ module.exports = function(app, elm, expressWs) {
 
     app.ws('/dashboard', function(ws, req) {
         ws.send(renderState());
-
         ws.on('message', function(msg) {
-            console.log("On message");
             ws.send(renderState())
         });
     });

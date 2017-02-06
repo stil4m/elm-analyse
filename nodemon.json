@@ -1,7 +1,7 @@
 {
   "verbose": false,
-  "watch": ["server/"],
+  "watch": ["js/server/", "js/bin/", "js/util/"],
   "execMap": {
-    "js": "node js/server/app.js"
+    "js": "node js/bin/index.js --serve"
   }
 }

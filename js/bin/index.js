@@ -18,10 +18,10 @@ var args = minimist(process.argv.slice(2), {
     }
 
     if (args.serve) {
-        console.log("TODO: Do serve");
+        var server = require('../server/app.js');
+        server();
         return
     }
-    console.log("Raw analyser");
     var analyser = require('../analyser.js');
     analyser();
 })();
