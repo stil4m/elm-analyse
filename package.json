@@ -21,6 +21,7 @@
     "lodash": "^4.17.4",
     "minimist": "^1.2.0",
     "nodemon": "^1.11.0",
+    "normalize-newline": "^3.0.0",
     "run-sequence": "^1.2.2",
     "sha1": "^1.1.1",
     "walk": "^2.3.9"
