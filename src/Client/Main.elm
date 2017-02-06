@@ -1,5 +1,6 @@
 module Client.Main exposing (..)
 
+import Client.App.Models as App
 import Client.App.App as App
 import Html exposing (program, div)
 import CssFrameworks

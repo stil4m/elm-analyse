@@ -2,9 +2,10 @@ module Client.App.Menu exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Client.App.Models exposing (Msg(Refresh))
 
 
-view : Html a
+view : Html Msg
 view =
     nav
         [ class "navbar navbar-default" ]
@@ -22,12 +23,11 @@ view =
                         [ text "Home" ]
                     ]
                 ]
-            , ul
-                [ class "nav navbar-nav navbar-right" ]
-                [ li
-                    []
-                    [ button [ class "btn btn-primary" ] [ text "Reload" ]
-                    ]
+            , Html.form
+                [ class "navbar-form navbar-right" ]
+                [ button
+                    [ type_ "button", class "btn btn-default" ]
+                    [ text "Refresh" ]
                 ]
             ]
         ]

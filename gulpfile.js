@@ -19,7 +19,7 @@ gulp.task('elm', ['elm-init'], function() {
         console.log(e)
       }
     })
-   .pipe(gulp.dest('server/public'));
+   .pipe(gulp.dest('public'));
 });
 
 gulp.task('watch', ['elm'], function() {

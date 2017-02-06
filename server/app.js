@@ -11,6 +11,7 @@ const state = {
 
 const elm = require('./worker')(app, state);
 require('./dashboard')(app, elm, expressWs);
+require('./control')(app, elm, expressWs);
 
 app.get('/file', function(req, res) {
     const fileName = req.query.file;

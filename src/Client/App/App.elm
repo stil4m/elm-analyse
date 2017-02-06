@@ -2,24 +2,29 @@ module Client.App.App exposing (..)
 
 import Html exposing (..)
 import Client.App.Menu
-import Client.App.Models exposing (Content(DashBoardContent))
+import Client.App.Models exposing (Content(DashBoardContent), Msg(..))
 import Client.DashBoard.DashBoard as DashBoard
 import Tuple2
+import WebSocket as WS
 
 
 type alias Model =
     Content
 
 
-type Msg
-    = DashBoardMsg DashBoard.Msg
+endpoint : String
+endpoint =
+    "http://localhost:3000/control"
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    case model of
-        DashBoardContent sub ->
-            DashBoard.subscriptions sub |> Sub.map DashBoardMsg
+    Sub.batch
+        [ case model of
+            DashBoardContent sub ->
+                DashBoard.subscriptions sub |> Sub.map DashBoardMsg
+        , WS.keepAlive endpoint
+        ]
 
 
 init : ( Model, Cmd Msg )
@@ -42,6 +47,11 @@ view m =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Refresh ->
+            ( model
+            , WS.send endpoint "reload"
+            )
+
         DashBoardMsg x ->
             case model of
                 DashBoardContent subModel ->
