@@ -32,18 +32,17 @@ serialise =
 decodeDependency : Decoder Dependency
 decodeDependency =
     JD.succeed Dependency
-        |: (JD.field "name" JD.string)
-        |: (JD.field "version" JD.string)
-        |: (JD.field "interfaces"
-                (JD.map Dict.fromList <|
-                    JD.list
-                        (JD.map2
-                            (,)
-                            (JD.field "key" (JD.list JD.string))
-                            (JD.field "value" Interface.decodeInterface)
-                        )
-                )
-           )
+        |: JD.field "name" JD.string
+        |: JD.field "version" JD.string
+        |: JD.field "interfaces"
+            (JD.map Dict.fromList <|
+                JD.list
+                    (JD.map2
+                        (,)
+                        (JD.field "key" (JD.list JD.string))
+                        (JD.field "value" Interface.decodeInterface)
+                    )
+            )
 
 
 encodeDependency : Dependency -> Value

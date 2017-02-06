@@ -22,5 +22,12 @@ view =
                         [ text "Home" ]
                     ]
                 ]
+            , ul
+                [ class "nav navbar-nav navbar-right" ]
+                [ li
+                    []
+                    [ button [ class "btn btn-primary" ] [ text "Reload" ]
+                    ]
+                ]
             ]
         ]

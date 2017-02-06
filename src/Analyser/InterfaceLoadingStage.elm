@@ -67,7 +67,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg (Model state) =
     case msg of
         DependencyLoaderMsg pair subMsg ->
-            Dict.get pair (state.dependencyLoaders)
+            Dict.get pair state.dependencyLoaders
                 |> Maybe.map (DependencyLoader.update subMsg)
                 |> Maybe.map
                     (\( loader, cmds ) ->

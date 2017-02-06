@@ -29,7 +29,7 @@ scan fileContext =
 onImport : Import -> Context -> Context
 onImport imp context =
     case Dict.get imp.moduleName context of
-        Just x ->
+        Just _ ->
             Dict.update imp.moduleName (Maybe.map (flip (++) [ imp.range ])) context
 
         Nothing ->

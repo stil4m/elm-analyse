@@ -35,7 +35,7 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ WS.listen socketAddress (JD.decodeString State.decodeState >> NewMsg)
-          -- , Time.every (Time.second * 10) (always Tick)
+        , Time.every (Time.second * 10) (always Tick)
         ]
 
 

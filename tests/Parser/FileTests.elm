@@ -10,7 +10,6 @@ import Parser.CombineTestUtil exposing (..)
 import Parser.Declarations as Parser exposing (..)
 import Parser.Samples as Samples
 import Test exposing (..)
-import Combine exposing (..)
 
 
 all : Test

@@ -4,7 +4,7 @@ import AST.Ranges exposing (Range)
 import Analyser.Messages as Messages exposing (Message)
 import Dialog exposing (Config)
 import Html exposing (..)
-import Html.Attributes exposing (target, style)
+import Html.Attributes exposing (style)
 import Http exposing (Error)
 import RemoteData as RD exposing (RemoteData)
 
@@ -69,7 +69,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     model
-        |> Maybe.map (dialogConfig)
+        |> Maybe.map dialogConfig
         |> Dialog.view
 
 
@@ -110,7 +110,7 @@ renderRange content range =
             String.split "\n" content
 
         startRow =
-            (max 0 (range.start.row - 3))
+            max 0 (range.start.row - 3)
 
         endRow =
             if range.end.column < 0 then
@@ -176,7 +176,7 @@ renderRange content range =
                            else
                             (String.left (range.end.column - range.start.column))
 
-                xs ->
+                _ ->
                     let
                         midHighlighedRows =
                             highlightedRowsFull |> List.drop 1 |> List.take (List.length highlightedRowsFull - 1)
