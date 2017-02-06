@@ -22,4 +22,6 @@ var args = minimist(process.argv.slice(2), {
         return
     }
     console.log("Raw analyser");
+    var analyser = require('../analyser.js');
+    analyser();
 })();

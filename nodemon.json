@@ -2,6 +2,6 @@
   "verbose": false,
   "watch": ["server/"],
   "execMap": {
-    "js": "node server/app.js"
+    "js": "node js/server/app.js"
   }
 }

@@ -10,7 +10,7 @@ gulp.task('elm-init', function() {
 
 gulp.task('elm-client', ['elm-init'], function() {
   return gulp.src('src/Client/Main.elm')
-    .pipe(elm.bundle('elm.js'))
+    .pipe(elm.bundle('client-elm.js'))
     .on('error', function(e) {
       //Elm compilation errors are already logged to the console
       if (!devMode) {
@@ -19,12 +19,12 @@ gulp.task('elm-client', ['elm-init'], function() {
         console.log(e)
       }
     })
-   .pipe(gulp.dest('public'));
+   .pipe(gulp.dest('js/public'));
 });
 
 gulp.task('elm-backend', ['elm-init'], function() {
   return gulp.src('src/Analyser.elm')
-    .pipe(elm.bundle('elm.js'))
+    .pipe(elm.bundle('backend-elm.js'))
     .on('error', function(e) {
       //Elm compilation errors are already logged to the console
       if (!devMode) {
@@ -33,7 +33,7 @@ gulp.task('elm-backend', ['elm-init'], function() {
         console.log(e)
       }
     })
-   .pipe(gulp.dest('.'));
+   .pipe(gulp.dest('js'));
 });
 
 gulp.task('elm-all', function() {
@@ -45,3 +45,5 @@ gulp.task('watch', ['elm-backend', 'elm-client'], function() {
     runSequence('elm-all');
   });
 });
+
+gulp.task('build', ['elm-backend', 'elm-client']);

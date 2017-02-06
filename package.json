@@ -7,7 +7,7 @@
   "author": "Mats Stijlaart",
   "license": "ISC",
   "bin": {
-    "elm-analyse": "bin/index.js"
+    "elm-analyse": "js/bin/index.js"
   },
   "dependencies": {
     "@dpwolfe/dos2unix": "1.1.3",
