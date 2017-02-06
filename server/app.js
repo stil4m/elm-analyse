@@ -2,7 +2,7 @@ var express = require('express')
 var app = express();
 var expressWs = require('express-ws')(app);
 const fs = require('fs');
-app.use(express.static('server/public'))
+app.use(express.static('public'))
 
 
 const state = {

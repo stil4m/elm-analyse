@@ -3,7 +3,7 @@ module Client.DashBoard.ActiveMessageDialog exposing (..)
 import AST.Ranges exposing (Range)
 import Analyser.Messages as Messages exposing (Message)
 import Dialog exposing (Config)
-import Html exposing (..)
+import Html exposing (div, pre, text, Html, span, h3)
 import Html.Attributes exposing (style)
 import Http exposing (Error)
 import RemoteData as RD exposing (RemoteData)
@@ -151,9 +151,9 @@ renderRange content range =
 
         postLines =
             (if endsOnLineEnding then
-                (range.end.row - startRow)
+                range.end.row - startRow
              else
-                (range.end.row - startRow + 1)
+                range.end.row - startRow + 1
             )
                 |> flip List.drop target
                 |> String.join "\n"
@@ -174,7 +174,7 @@ renderRange content range =
                         |> if range.end.row /= endRow then
                             identity >> flip (++) "\n"
                            else
-                            (String.left (range.end.column - range.start.column))
+                            String.left (range.end.column - range.start.column)
 
                 _ ->
                     let

@@ -14,7 +14,7 @@ type alias Model =
 
 endpoint : String
 endpoint =
-    "http://localhost:3000/control"
+    "ws://localhost:3000/control"
 
 
 subscriptions : Model -> Sub Msg

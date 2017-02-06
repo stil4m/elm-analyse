@@ -1,8 +1,8 @@
-module Client.DashBoard.DashBoard exposing (..)
+module Client.DashBoard.DashBoard exposing (Model, Msg, subscriptions, init, update, view)
 
 import Client.DashBoard.State as State exposing (State)
 import Client.DashBoard.ActiveMessageDialog as ActiveMessageDialog
-import Html exposing (..)
+import Html exposing (Html, div, text, span, h3, ul, li, a, strong)
 import Html.Events exposing (onClick)
 import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
@@ -52,7 +52,9 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Tick ->
-            ( model, WS.send socketAddress "ping" )
+            ( model
+            , WS.send socketAddress "ping"
+            )
 
         NewMsg x ->
             case x of

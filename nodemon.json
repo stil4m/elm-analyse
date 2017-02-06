@@ -1,4 +1,7 @@
 {
-  "verbose": true,
-  "watch": ["server/"]
+  "verbose": false,
+  "watch": ["server/"],
+  "execMap": {
+    "js": "node server/app.js"
+  }
 }

@@ -25,11 +25,12 @@ type Msg
     = InterfaceLoadingStageMsg InterfaceLoadingStage.Msg
     | SourceLoadingStageMsg SourceLoadingStage.Msg
     | Now Time
+    | Reset
 
 
 type alias Model =
     { dependencies : List Dependency
-    , sourceFiles : InputFiles
+    , flags : Flags
     , messages : List Message
     , stage : Stage
     }
@@ -47,12 +48,12 @@ main =
 
 
 init : Flags -> ( Model, Cmd Msg )
-init { interfaceFiles, sourceFiles } =
+init flags =
     let
         ( stage, cmds ) =
-            InterfaceLoadingStage.init interfaceFiles
+            InterfaceLoadingStage.init flags.interfaceFiles
     in
-        ( { sourceFiles = sourceFiles
+        ( { flags = flags
           , stage = InterfaceLoadingStage stage
           , messages = []
           , dependencies = []
@@ -64,6 +65,9 @@ init { interfaceFiles, sourceFiles } =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.stage ) of
+        ( Reset, _ ) ->
+            init model.flags
+
         ( InterfaceLoadingStageMsg x, InterfaceLoadingStage stage ) ->
             let
                 ( newStage, cmds ) =
@@ -72,7 +76,7 @@ update msg model =
                 if InterfaceLoadingStage.isDone newStage then
                     let
                         ( nextStage, sourceCmds ) =
-                            (SourceLoadingStage.init model.sourceFiles)
+                            (SourceLoadingStage.init model.flags.sourceFiles)
 
                         loadedDependencies =
                             InterfaceLoadingStage.getDependencies newStage
@@ -114,12 +118,15 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    case model.stage of
-        InterfaceLoadingStage stage ->
-            InterfaceLoadingStage.subscriptions stage |> Sub.map InterfaceLoadingStageMsg
+    Sub.batch
+        [ AnalyserPorts.onReset (always Reset)
+        , case model.stage of
+            InterfaceLoadingStage stage ->
+                InterfaceLoadingStage.subscriptions stage |> Sub.map InterfaceLoadingStageMsg
 
-        SourceLoadingStage stage _ ->
-            SourceLoadingStage.subscriptions stage |> Sub.map SourceLoadingStageMsg
+            SourceLoadingStage stage _ ->
+                SourceLoadingStage.subscriptions stage |> Sub.map SourceLoadingStageMsg
 
-        Finished _ ->
-            Sub.none
+            Finished _ ->
+                Sub.none
+        ]

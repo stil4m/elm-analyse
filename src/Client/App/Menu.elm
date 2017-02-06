@@ -3,6 +3,7 @@ module Client.App.Menu exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Client.App.Models exposing (Msg(Refresh))
+import Html.Events exposing (onClick)
 
 
 view : Html Msg
@@ -26,7 +27,7 @@ view =
             , Html.form
                 [ class "navbar-form navbar-right" ]
                 [ button
-                    [ type_ "button", class "btn btn-default" ]
+                    [ type_ "button", class "btn btn-default", onClick Refresh ]
                     [ text "Refresh" ]
                 ]
             ]
