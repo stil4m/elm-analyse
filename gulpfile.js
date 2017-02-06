@@ -40,7 +40,7 @@ gulp.task('elm-all', function() {
   return runSequence('elm-client', 'elm-backend');
 })
 
-gulp.task('watch', ['elm-all'], function() {
+gulp.task('watch', ['elm-backend', 'elm-client'], function() {
   gulp.watch('src/**', function () {
     runSequence('elm-all');
   });

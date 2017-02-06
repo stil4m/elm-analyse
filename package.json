@@ -1,13 +1,14 @@
 {
   "name": "elm-analyse",
   "version": "1.0.0",
-  "description": "",
+  "description": "Analyser for Elm packages",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
+  "scripts": {},
+  "author": "Mats Stijlaart",
   "license": "ISC",
+  "bin": {
+    "elm-analyse": "bin/index.js"
+  },
   "dependencies": {
     "@dpwolfe/dos2unix": "1.1.3",
     "elm": "^0.18.0",
@@ -18,6 +19,7 @@
     "gulp-elm": "^0.6.1",
     "hash-files": "^1.1.1",
     "lodash": "^4.17.4",
+    "minimist": "^1.2.0",
     "nodemon": "^1.11.0",
     "run-sequence": "^1.2.2",
     "sha1": "^1.1.1",
