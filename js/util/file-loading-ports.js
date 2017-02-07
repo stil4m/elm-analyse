@@ -1,10 +1,11 @@
 const fs = require('fs');
 const fileGatherer = require('../util/file-gatherer');
-const fileReader = require('../fileReader');
+
 const cp = require('child_process');
 const cache = require('./cache');
 
-module.exports = function(app, directory) {
+module.exports = function(app, config ,directory) {
+    const fileReader = require('../fileReader')(config);
     app.ports.storeAstForSha.subscribe(function(x) {
         const sha1 = x[0];
         const content = x[1];

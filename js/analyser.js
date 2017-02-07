@@ -1,13 +1,14 @@
 const fs = require('fs');
 const cp = require('child_process');
 const _ = require('lodash');
-const fileReader = require('./fileReader');
-const fileGatherer= require('./util/file-gatherer');
-const fakeDir = "."
-const directory = process.cwd() + "/" +fakeDir;
+const fileGatherer = require('./util/file-gatherer');
 
+const directory = process.cwd();
 
-module.exports = function() {
+module.exports = function(config) {
+    const fileReader = require('./fileReader')(config);
+    const fileLoadingPorts = require('./util/file-loading-ports');
+
     const input = fileGatherer.gather(directory);
 
     const Elm = require('./backend-elm');
@@ -23,7 +24,6 @@ module.exports = function() {
         x.forEach(y => console.log(y));
     });
 
-    var fileLoadingPorts = require('./util/file-loading-ports');
-    fileLoadingPorts(app, directory);
+    fileLoadingPorts(app, config, directory);
 
 };

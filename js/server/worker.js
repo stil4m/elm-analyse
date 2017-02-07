@@ -3,7 +3,7 @@ const fileReader = require('../fileReader');
 const fileLoadingPorts = require('../util/file-loading-ports')
 const fs =require('fs');
 
-module.exports =function worker(state) {
+module.exports =function worker(config) {
   const directory = process.cwd();
   const input = fileGatherer.gather(directory);
   var Elm = require('../backend-elm.js');
@@ -16,6 +16,6 @@ module.exports =function worker(state) {
       x.forEach(y => console.log(y));
   });
 
-  fileLoadingPorts(app, process.cwd());
+  fileLoadingPorts(app, config, process.cwd());
   return app;
 }
