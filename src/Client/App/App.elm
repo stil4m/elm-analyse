@@ -2,35 +2,32 @@ module Client.App.App exposing (..)
 
 import Html exposing (..)
 import Client.App.Menu
-import Client.App.Models exposing (Content(DashBoardContent), Msg(..))
+import Client.App.Models exposing (Model, Content(DashBoardContent), Msg(..))
 import Client.DashBoard.DashBoard as DashBoard
 import Tuple2
 import WebSocket as WS
+import Navigation exposing (Location)
 
 
-type alias Model =
-    Content
-
-
-endpoint : String
-endpoint =
-    "ws://localhost:3000/control"
+endpoint : Location -> String
+endpoint { host } =
+    "ws://" ++ host ++ "/control"
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ case model of
+        [ case model.content of
             DashBoardContent sub ->
-                DashBoard.subscriptions sub |> Sub.map DashBoardMsg
-        , WS.keepAlive endpoint
+                DashBoard.subscriptions model.location sub |> Sub.map DashBoardMsg
+        , WS.keepAlive (endpoint model.location)
         ]
 
 
-init : ( Model, Cmd Msg )
-init =
+init : Location -> ( Model, Cmd Msg )
+init l =
     DashBoard.init
-        |> Tuple2.mapFirst DashBoardContent
+        |> Tuple2.mapFirst (\x -> { content = DashBoardContent x, location = Debug.log "Loc" l })
         |> Tuple2.mapSecond (Cmd.map DashBoardMsg)
 
 
@@ -38,7 +35,7 @@ view : Model -> Html.Html Msg
 view m =
     div []
         [ Client.App.Menu.view
-        , case m of
+        , case m.content of
             DashBoardContent subModel ->
                 DashBoard.view subModel |> Html.map DashBoardMsg
         ]
@@ -47,14 +44,17 @@ view m =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        OnLocation _ ->
+            model ! []
+
         Refresh ->
             ( model
-            , WS.send endpoint "reload"
+            , WS.send (endpoint model.location) "reload"
             )
 
         DashBoardMsg x ->
-            case model of
+            case model.content of
                 DashBoardContent subModel ->
-                    DashBoard.update x subModel
-                        |> Tuple2.mapFirst DashBoardContent
+                    DashBoard.update model.location x subModel
+                        |> Tuple2.mapFirst (\x -> { model | content = DashBoardContent x })
                         |> Tuple2.mapSecond (Cmd.map DashBoardMsg)

@@ -11,6 +11,7 @@ import WebSocket as WS
 import Analyser.Messages as Messages exposing (Message)
 import Html.Attributes exposing (class, style)
 import Tuple2
+import Navigation exposing (Location)
 
 
 type alias Model =
@@ -26,15 +27,15 @@ type Msg
     | ActiveMessageDialogMsg ActiveMessageDialog.Msg
 
 
-socketAddress : String
-socketAddress =
-    "ws://localhost:3000/dashboard"
+socketAddress : Location -> String
+socketAddress { host } =
+    "ws://" ++ host ++ "/dashboard"
 
 
-subscriptions : Model -> Sub Msg
-subscriptions _ =
+subscriptions : Location -> Model -> Sub Msg
+subscriptions location _ =
     Sub.batch
-        [ WS.listen socketAddress (JD.decodeString State.decodeState >> NewMsg)
+        [ WS.listen (socketAddress location) (JD.decodeString State.decodeState >> NewMsg)
         , Time.every (Time.second * 10) (always Tick)
         ]
 
@@ -48,12 +49,12 @@ init =
     )
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Location -> Msg -> Model -> ( Model, Cmd Msg )
+update location msg model =
     case msg of
         Tick ->
             ( model
-            , WS.send socketAddress "ping"
+            , WS.send (socketAddress location) "ping"
             )
 
         NewMsg x ->
@@ -89,8 +90,11 @@ view m =
             RD.Success state ->
                 viewState state
 
-            RD.Failure _ ->
-                text "Something went wrong"
+            RD.Failure e ->
+                div []
+                    [ text "Something went wrong"
+                    , text <| toString e
+                    ]
 
             RD.NotAsked ->
                 span [] []

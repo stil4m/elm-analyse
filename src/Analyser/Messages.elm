@@ -96,7 +96,7 @@ decodeMessage =
           , JD.succeed DuplicateImport
                 |: fileField
                 |: moduleNameField
-                |: JD.field "ranged" (JD.list Ranges.decode)
+                |: JD.field "ranges" (JD.list Ranges.decode)
           )
         , ( "UnusedAlias", decodeFileVarNameAndRange UnusedAlias )
         , ( "RedefineVariable"

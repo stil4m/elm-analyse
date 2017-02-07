@@ -5,11 +5,13 @@ import Client.App.App as App
 import Html exposing (program, div)
 import CssFrameworks
 import CssFrameworks.Bootstrap
+import Navigation
 
 
 main : Program Never App.Model App.Msg
 main =
-    program
+    Navigation.program
+        App.OnLocation
         { init = App.init
         , view = view
         , update = App.update
