@@ -1,5 +1,6 @@
-var fs = require('fs');
-var cp = require('child_process');
+const fs = require('fs');
+const fsExtra = require('fs-extra');
+const cp = require('child_process');
 
 function readDependencyJson(dependency, version, cb) {
     //TODO Error handling
@@ -11,8 +12,9 @@ function storeShaJson(sha1, content) {
 }
 
 function storeDependencyJson(dependency, version, content) {
-    cp.execSync('mkdir -p ' + './elm-stuff/elm-analyse/' + dependency + "/" + version);
-    fs.writeFile('./elm-stuff/elm-analyse/' + dependency + "/" + version + "/dependency.json", content, function() {});
+    const targetDir = './elm-stuff/elm-analyse/' + dependency + "/" + version;
+    fsExtra.ensureDirSync(targetDir);
+    fs.writeFile(targetDir + "/dependency.json", content, function() {});
 }
 
 function elmCachePathForSha(sha) {
@@ -32,7 +34,7 @@ function readAstForSha(sha) {
 }
 
 function setupShaFolder() {
-    cp.execSync('mkdir -p ./elm-stuff/elm-analyse/_shas');
+    fsExtra.ensureDirSync('./elm-stuff/elm-analyse/_shas');
 }
 
 module.exports = {

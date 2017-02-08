@@ -15,6 +15,8 @@
     "elm-test": "^0.18.2",
     "express": "^4.14.1",
     "express-ws": "^2.0.0",
+    "find": "^0.2.7",
+    "fs-extra": "^2.0.0",
     "gulp": "^3.9.1",
     "gulp-elm": "^0.6.1",
     "hash-files": "^1.1.1",

@@ -1,13 +1,13 @@
 const fs = require('fs');
 const cp = require('child_process');
 const _ = require('lodash');
+const find = require('find');
 
 function targetFilesForPathAndPackage(directory, path, pack) {
     const packTargetDirs = pack['source-directories'];
+
     const targetFiles = _.uniq(_.flatten(packTargetDirs.map(x => {
-        return cp.execSync('find ' + (path + '/' + x) + ' -name "*.elm"')
-            .toString()
-            .split('\n')
+        return find.fileSync(/\.elm$/, path + '/' + x)
             .filter(x => {
                 return x.replace(path, '')
                     .indexOf('elm-stuff') === -1 && (x.length > 0)
