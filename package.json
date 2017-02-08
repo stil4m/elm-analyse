@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Analyser for Elm packages",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "postinstall": "./node_modules/.bin/gulp"
+  },
   "author": "Mats Stijlaart",
   "license": "ISC",
   "bin": {
