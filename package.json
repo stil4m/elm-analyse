@@ -24,6 +24,7 @@
     "normalize-newline": "^3.0.0",
     "run-sequence": "^1.2.2",
     "sha1": "^1.1.1",
+    "sums": "^0.2.4",
     "walk": "^2.3.9"
   }
 }

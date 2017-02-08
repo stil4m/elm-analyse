@@ -4,6 +4,7 @@ const sha1 = require('sha1');
 const fs = require('fs');
 const cp = require('child_process');
 const cache = require('./util/cache');
+const sums = require('sums');
 
 module.exports = function(config) {
     function isFormatted(path) {
@@ -18,54 +19,66 @@ module.exports = function(config) {
         }
     }
 
+    function errorResponse(path) {
+      return {
+          success: false,
+          path: path,
+          sha1: null,
+          content: null,
+          formatted: false,
+          ast: null
+      };
+    }
+
+    function readFileNotCached(realPath, path, checksum) {
+        return new Promise(function(accept, reject) {
+            fs.readFile(realPath, function(e, content) {
+                if (e) {
+                    accept(errorResponse(path));
+                    return;
+                }
+                const originalContent = content.toString();
+                const normalized = normalizeNewline(originalContent);
+                const fullPath = cache.elmCachePathForSha(checksum);
+                fs.writeFileSync(fullPath, normalized);
+                const formatted = isFormatted(fullPath);
+
+                accept({
+                    success: true,
+                    path: realPath,
+                    sha1: checksum,
+                    content: normalized,
+                    formatted: formatted,
+                    ast: null
+                });
+            })
+        });
+    }
+
     function readFile(directory, path, cb) {
         console.log("Load file", path, "...")
-        const real = path.replace(".", directory);
-        const fileName = cp.execSync('shasum ' + real).toString().match(/[a-f0-9]+/)[0];
 
-        if (cache.hasAstForSha(fileName)) {
-            const fullPath = cache.elmCachePathForSha(fileName);
-            setTimeout(function() {
-                cb({
+        const real = path.replace(".", directory);
+        sums.checksum(fs.createReadStream(real)).then(function(checkSumResult) {
+            const checksum = checkSumResult.sum
+
+            if (cache.hasAstForSha(checksum)) {
+                const fullPath = cache.elmCachePathForSha(checksum);
+                return {
                     success: true,
                     path: real,
-                    sha1: fileName,
+                    sha1: checksum,
                     content: fs.readFileSync(fullPath).toString(),
                     formatted: isFormatted(fullPath),
-                    ast: cache.readAstForSha(fileName)
-                });
-
-            }, 1);
-            return;
-        }
-
-        fs.readFile(real, function(e, content) {
-            if (e) {
-                cb({
-                    success: false,
-                    path: path,
-                    sha1: null,
-                    content: null,
-                    formatted: false,
-                    ast: null
-                })
-                return;
+                    ast: cache.readAstForSha(checksum)
+                }
             }
-            const originalContent = content.toString();
-            const normalized = normalizeNewline(originalContent);
-            const fullPath = cache.elmCachePathForSha(fileName);
-            fs.writeFileSync(fullPath, normalized);
-            const formatted = isFormatted(fullPath);
+            return readFileNotCached(real, path, checksum);
 
-            cb({
-                success: true,
-                path: real,
-                sha1: fileName,
-                content: normalized,
-                formatted: formatted,
-                ast: null
-            });
-        });
+        }, function(_) {
+            return errorResponse(path);
+        }).then(cb);
+
     };
 
     cache.setupShaFolder();
