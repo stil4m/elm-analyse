@@ -25,5 +25,4 @@ module.exports = function(config) {
     });
 
     fileLoadingPorts(app, config, directory);
-
 };

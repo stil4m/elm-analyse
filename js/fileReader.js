@@ -8,9 +8,10 @@ const cache = require('./util/cache');
 module.exports = function(config) {
     function isFormatted(path) {
         try {
-            cp.execSync('elm-format --validate ' + path, {
+            cp.execSync(config.elmFormatPath + ' --validate ' + path, {
                 stdio: []
             });
+
             return true;
         } catch (e) {
             return false;
