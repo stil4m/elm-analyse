@@ -1,6 +1,6 @@
-module Client.App.App exposing (..)
+module Client.App.App exposing (init, view, update, subscriptions)
 
-import Html exposing (..)
+import Html exposing (Html, div)
 import Client.App.Menu
 import Client.App.Models exposing (Model, Content(DashBoardContent), Msg(..))
 import Client.DashBoard.DashBoard as DashBoard
@@ -27,7 +27,7 @@ subscriptions model =
 init : Location -> ( Model, Cmd Msg )
 init l =
     DashBoard.init
-        |> Tuple2.mapFirst (\x -> { content = DashBoardContent x, location = Debug.log "Loc" l })
+        |> Tuple2.mapFirst (\x -> { content = DashBoardContent x, location = l })
         |> Tuple2.mapSecond (Cmd.map DashBoardMsg)
 
 
@@ -52,9 +52,9 @@ update msg model =
             , WS.send (endpoint model.location) "reload"
             )
 
-        DashBoardMsg x ->
+        DashBoardMsg subMsg ->
             case model.content of
                 DashBoardContent subModel ->
-                    DashBoard.update model.location x subModel
+                    DashBoard.update model.location subMsg subModel
                         |> Tuple2.mapFirst (\x -> { model | content = DashBoardContent x })
                         |> Tuple2.mapSecond (Cmd.map DashBoardMsg)

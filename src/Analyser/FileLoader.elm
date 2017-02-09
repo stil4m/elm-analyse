@@ -1,4 +1,4 @@
-port module Analyser.FileLoader exposing (..)
+port module Analyser.FileLoader exposing (Msg, init, subscriptions, update)
 
 import Analyser.Types exposing (FileContent, FileLoad, LoadedFile, LoadedFileData)
 import AST.Types

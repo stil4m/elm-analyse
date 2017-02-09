@@ -1,7 +1,7 @@
-module Client.App.Menu exposing (..)
+module Client.App.Menu exposing (view)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, nav, div, ul, li, a, button, form, text)
+import Html.Attributes exposing (class, href, type_)
 import Client.App.Models exposing (Msg(Refresh))
 import Html.Events exposing (onClick)
 
@@ -24,7 +24,7 @@ view =
                         [ text "Home" ]
                     ]
                 ]
-            , Html.form
+            , form
                 [ class "navbar-form navbar-right" ]
                 [ button
                     [ type_ "button", class "btn btn-default", onClick Refresh ]
