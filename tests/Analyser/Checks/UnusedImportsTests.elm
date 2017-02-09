@@ -20,6 +20,23 @@ foo = Bar.add 1
     )
 
 
+usedAsQualifiedInPattern : ( String, String, List Message )
+usedAsQualifiedInPattern =
+    ( "usedAsQualifiedInPattern"
+    , """module Main exposing (..)
+
+import Bar
+
+
+z a =
+    case a of
+        Bar.Z ->
+            1
+"""
+    , []
+    )
+
+
 usedInTypeReference : ( String, String, List Message )
 usedInTypeReference =
     ( "usedInTypeReference"
@@ -98,6 +115,7 @@ all =
     CTU.build "Analyser.Checks.UnusedImports"
         UnusedImports.scan
         [ usedAsQualified
+        , usedAsQualifiedInPattern
         , usedInTypeReference
         , usedInTypeAlias
         , unusedButHasAlias

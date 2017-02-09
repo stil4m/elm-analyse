@@ -1,12 +1,13 @@
 module Analyser.Checks.UnusedImports exposing (scan)
 
 import AST.Ranges exposing (Range)
-import AST.Types exposing (Exposure(None), Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
+import AST.Types exposing (Case, Exposure(None), Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(UnusedImport))
 import Dict exposing (Dict)
 import Inspector exposing (Action(Post), defaultConfig)
 import Tuple2
+import AST.Util as Util
 
 
 type alias Context =
@@ -27,6 +28,7 @@ scan fileContext =
             { defaultConfig
                 | onTypeReference = Post onTypeReference
                 , onExpression = Post onExpression
+                , onCase = Post onCase
             }
             fileContext.ast
             aliases
@@ -67,3 +69,8 @@ onExpression expr context =
 
         _ ->
             context
+
+
+onCase : Case -> Context -> Context
+onCase ( pattern, _ ) context =
+    List.foldl markUsage context (Util.patternModuleNames pattern)

@@ -1,6 +1,19 @@
-module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts, getParenthesized, isOperatorApplication, isLambda, moduleExposingList)
+module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts, getParenthesized, isOperatorApplication, isLambda, moduleExposingList, patternModuleNames)
 
-import AST.Types exposing (File, Exposure(None), Expose, Module(NormalModule, PortModule, EffectModule, NoModule), Exposure, ModuleName, Expose, Module(NormalModule, PortModule, EffectModule, NoModule), Expression, InnerExpression(OperatorApplicationExpression, ParenthesizedExpression, LambdaExpression))
+import AST.Types
+    exposing
+        ( File
+        , Exposure(None)
+        , Expose
+        , Module(NormalModule, PortModule, EffectModule, NoModule)
+        , Exposure
+        , ModuleName
+        , Expose
+        , Module(NormalModule, PortModule, EffectModule, NoModule)
+        , Expression
+        , Pattern(TuplePattern, RecordPattern, UnConsPattern, ListPattern, NamedPattern, QualifiedNamePattern, AsPattern, ParentisizedPattern)
+        , InnerExpression(OperatorApplicationExpression, ParenthesizedExpression, LambdaExpression)
+        )
 import AST.Ranges exposing (Range)
 
 
@@ -85,3 +98,34 @@ getParenthesized ( r, e ) =
 
         _ ->
             Nothing
+
+
+patternModuleNames : Pattern -> List ModuleName
+patternModuleNames p =
+    case p of
+        TuplePattern xs ->
+            (List.concatMap patternModuleNames xs)
+
+        RecordPattern _ ->
+            []
+
+        UnConsPattern left right ->
+            patternModuleNames left ++ patternModuleNames right
+
+        ListPattern xs ->
+            (List.concatMap patternModuleNames xs)
+
+        NamedPattern qualifiedNameRef subPatterns ->
+            qualifiedNameRef.moduleName :: List.concatMap patternModuleNames subPatterns
+
+        QualifiedNamePattern qualifiedNameRef ->
+            [ qualifiedNameRef.moduleName ]
+
+        AsPattern inner _ ->
+            patternModuleNames inner
+
+        ParentisizedPattern inner ->
+            patternModuleNames inner
+
+        _ ->
+            []
