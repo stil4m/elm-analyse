@@ -39,8 +39,8 @@ onFile _ file _ =
                 |> List.filterMap
                     (\y ->
                         case y of
-                            TypeExpose _ constructors _ ->
-                                case constructors of
+                            TypeExpose exposedType ->
+                                case exposedType.constructors of
                                     All allRange ->
                                         Just allRange
 

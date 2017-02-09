@@ -19,35 +19,42 @@ type alias Context =
 scan : FileContext -> List Message
 scan fileContext =
     Inspector.inspect
-        { defaultConfig
-            | onExpression = Post onExpression
-        }
+        { defaultConfig | onExpression = Post onExpression }
         fileContext.ast
         []
-        |> List.map
-            (\( t, r ) ->
-                case t of
-                    Log ->
-                        DebugLog fileContext.path r
+        |> List.map (asMessage fileContext.path)
 
-                    Crash ->
-                        DebugCrash fileContext.path r
-            )
+
+asMessage : String -> ( DebugType, Range ) -> Message
+asMessage path ( debugType, range ) =
+    case debugType of
+        Log ->
+            DebugLog path range
+
+        Crash ->
+            DebugCrash path range
 
 
 onExpression : Expression -> Context -> Context
 onExpression ( range, expression ) context =
     case expression of
         QualifiedExpr moduleName f ->
-            if moduleName == [ "Debug" ] then
-                if f == "log" then
-                    ( Log, range ) :: context
-                else if f == "crash" then
-                    ( Crash, range ) :: context
-                else
-                    context
-            else
-                context
+            entryForQualifiedExpr moduleName f
+                |> Maybe.map (flip (,) range >> flip (::) context)
+                |> Maybe.withDefault context
 
         _ ->
             context
+
+
+entryForQualifiedExpr : List String -> String -> Maybe DebugType
+entryForQualifiedExpr moduleName f =
+    if moduleName == [ "Debug" ] then
+        if f == "log" then
+            Just Log
+        else if f == "crash" then
+            Just Crash
+        else
+            Nothing
+    else
+        Nothing

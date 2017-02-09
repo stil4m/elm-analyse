@@ -25,7 +25,7 @@ all =
             \() ->
                 parseFullStringWithNullState "Msg(Go,Back)" typeExpose
                     |> Maybe.map noRangeExpose
-                    |> Expect.equal (Just (TypeExpose "Msg" (Explicit [ ( "Go", emptyRange ), ( "Back", emptyRange ) ]) emptyRange))
+                    |> Expect.equal (Just (TypeExpose (ExposedType "Msg" (Explicit [ ( "Go", emptyRange ), ( "Back", emptyRange ) ]) emptyRange)))
         , test "exposingList" <|
             \() ->
                 parseFullStringWithNullState " exposing (Model,Msg(Go,Back),Info(..),init,(::))" (exposeDefinition exposable)
@@ -34,8 +34,8 @@ all =
                         (Just
                             (Explicit
                                 [ TypeOrAliasExpose "Model" emptyRange
-                                , TypeExpose "Msg" (Explicit [ ( "Go", emptyRange ), ( "Back", emptyRange ) ]) emptyRange
-                                , TypeExpose "Info" (All emptyRange) emptyRange
+                                , TypeExpose (ExposedType "Msg" (Explicit [ ( "Go", emptyRange ), ( "Back", emptyRange ) ]) emptyRange)
+                                , TypeExpose (ExposedType "Info" (All emptyRange) emptyRange)
                                 , FunctionExpose "init" emptyRange
                                 , InfixExpose "::" emptyRange
                                 ]
@@ -71,8 +71,8 @@ all =
                         (Just
                             (Explicit
                                 [ TypeOrAliasExpose "Model" emptyRange
-                                , TypeExpose "Msg" (Explicit [ ( "Go", emptyRange ), ( "Back", emptyRange ) ]) emptyRange
-                                , TypeExpose "Info" (All emptyRange) emptyRange
+                                , TypeExpose (ExposedType "Msg" (Explicit [ ( "Go", emptyRange ), ( "Back", emptyRange ) ]) emptyRange)
+                                , TypeExpose (ExposedType "Info" (All emptyRange) emptyRange)
                                 , FunctionExpose "init" emptyRange
                                 , InfixExpose "::" emptyRange
                                 ]

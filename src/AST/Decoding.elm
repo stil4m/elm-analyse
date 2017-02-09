@@ -52,13 +52,16 @@ decodeExpose =
         [ ( "infix", JD.map2 InfixExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
         , ( "function", JD.map2 FunctionExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
         , ( "typeOrAlias", JD.map2 TypeOrAliasExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
-        , ( "typeexpose"
-          , JD.map3 TypeExpose
-                (JD.field "name" JD.string)
-                (JD.field "inner" <| decodeExposingList decodeValueConstructorExpose)
-                (JD.field "range" Ranges.decode)
-          )
+        , ( "typeexpose", JD.map TypeExpose decodeExposedType )
         ]
+
+
+decodeExposedType : Decoder ExposedType
+decodeExposedType =
+    JD.succeed ExposedType
+        |: JD.field "name" JD.string
+        |: JD.field "inner" (decodeExposingList decodeValueConstructorExpose)
+        |: JD.field "range" Ranges.decode
 
 
 decodeValueConstructorExpose : Decoder ValueConstructorExpose

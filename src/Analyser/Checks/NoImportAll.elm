@@ -1,10 +1,10 @@
 module Analyser.Checks.NoImportAll exposing (scan)
 
-import AST.Types exposing (File, Exposure(All, None, Explicit), ModuleName, Expose(TypeExpose))
-import AST.Ranges exposing (Range)
+import AST.Types exposing (Import, Exposure(All, None, Explicit), ModuleName, Expose(TypeExpose))
+import AST.Ranges as Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(ImportAll))
-import Inspector exposing (defaultConfig, Action(Inner))
+import Inspector exposing (defaultConfig, Action(Post))
 
 
 type alias ExposeAllContext =
@@ -13,45 +13,37 @@ type alias ExposeAllContext =
 
 scan : FileContext -> List Message
 scan fileContext =
-    let
-        x : ExposeAllContext
-        x =
-            Inspector.inspect
-                { defaultConfig
-                    | onFile = Inner onFile
-                }
-                fileContext.ast
+    Inspector.inspect
+        { defaultConfig | onImport = Post onImport }
+        fileContext.ast
+        []
+        |> List.sortWith (\( _, a ) ( _, b ) -> Ranges.orderByStart a b)
+        |> List.map (uncurry (ImportAll fileContext.path))
+
+
+onImport : Import -> ExposeAllContext -> ExposeAllContext
+onImport imp context =
+    flip List.append context <|
+        case imp.exposingList of
+            All range ->
+                [ ( imp.moduleName, range ) ]
+
+            None ->
                 []
-    in
-        x |> List.map (uncurry (ImportAll fileContext.path))
 
-
-onFile : (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
-onFile _ file _ =
-    file.imports
-        |> List.concatMap
-            (\imp ->
-                case imp.exposingList of
-                    All range ->
-                        [ ( imp.moduleName, range ) ]
-
-                    None ->
-                        []
-
-                    Explicit explicitList ->
-                        explicitList
-                            |> List.filterMap
-                                (\explicitItem ->
-                                    case explicitItem of
-                                        TypeExpose _ constructors _ ->
-                                            case constructors of
-                                                All range ->
-                                                    Just ( imp.moduleName, range )
-
-                                                _ ->
-                                                    Nothing
+            Explicit explicitList ->
+                explicitList
+                    |> List.filterMap
+                        (\explicitItem ->
+                            case explicitItem of
+                                TypeExpose exposedType ->
+                                    case exposedType.constructors of
+                                        All range ->
+                                            Just ( imp.moduleName, range )
 
                                         _ ->
                                             Nothing
-                                )
-            )
+
+                                _ ->
+                                    Nothing
+                        )

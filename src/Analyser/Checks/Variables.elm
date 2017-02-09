@@ -51,8 +51,8 @@ getImportExposedVars e =
                             TypeOrAliasExpose _ _ ->
                                 []
 
-                            TypeExpose _ ts _ ->
-                                case ts of
+                            TypeExpose exposedType ->
+                                case exposedType.constructors of
                                     All _ ->
                                         []
 
@@ -60,8 +60,8 @@ getImportExposedVars e =
                                         []
 
                                     --TODO
-                                    Explicit tsx ->
-                                        tsx |> List.map (uncurry VariablePointer)
+                                    Explicit constructors ->
+                                        constructors |> List.map (uncurry VariablePointer)
                     )
 
 

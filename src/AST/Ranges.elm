@@ -1,4 +1,4 @@
-module AST.Ranges exposing (Location, Range, rangeToString, getRange, emptyRange, encode, decode)
+module AST.Ranges exposing (Location, Range, rangeToString, getRange, emptyRange, encode, decode, orderByStart)
 
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE exposing (Value)
@@ -34,6 +34,14 @@ encode { start, end } =
         , JE.int end.row
         , JE.int end.column
         ]
+
+
+orderByStart : Range -> Range -> Order
+orderByStart r1 r2 =
+    if r1.start.row /= r2.start.row then
+        compare r1.start.row r2.start.row
+    else
+        compare r1.start.column r2.start.column
 
 
 rangeToString : Range -> String

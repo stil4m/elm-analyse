@@ -22,7 +22,7 @@ all =
                              , exposingList =
                                 Explicit
                                     [ TypeOrAliasExpose "Model" emptyRange
-                                    , TypeExpose "Msg" (All emptyRange) emptyRange
+                                    , TypeExpose (ExposedType "Msg" (All emptyRange) emptyRange)
                                     ]
                              , range = emptyRange
                              }

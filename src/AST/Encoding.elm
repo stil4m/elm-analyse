@@ -83,13 +83,17 @@ encodeExpose exp =
                     , ( "range", Ranges.encode r )
                     ]
 
-        TypeExpose x inner r ->
-            encodeTyped "typeexpose" <|
-                JE.object
-                    [ ( "name", JE.string x )
-                    , ( "inner", encodeExposingList inner encodeValueConstructorExpose )
-                    , ( "range", Ranges.encode r )
-                    ]
+        TypeExpose exposedType ->
+            encodeTyped "typeexpose" (encodeExposedType exposedType)
+
+
+encodeExposedType : ExposedType -> Value
+encodeExposedType { name, constructors, range } =
+    JE.object
+        [ ( "name", JE.string name )
+        , ( "inner", encodeExposingList constructors encodeValueConstructorExpose )
+        , ( "range", Ranges.encode range )
+        ]
 
 
 encodeValueConstructorExpose : ValueConstructorExpose -> Value

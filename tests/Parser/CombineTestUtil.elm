@@ -159,10 +159,10 @@ noRangeExpose l =
         TypeOrAliasExpose s _ ->
             TypeOrAliasExpose s emptyRange
 
-        TypeExpose s t _ ->
+        TypeExpose { name, constructors } ->
             let
                 newT =
-                    case t of
+                    case constructors of
                         All r ->
                             All emptyRange
 
@@ -172,7 +172,7 @@ noRangeExpose l =
                         Explicit list ->
                             Explicit <| List.map (Tuple2.mapSecond (always emptyRange)) list
             in
-                TypeExpose s newT emptyRange
+                TypeExpose (ExposedType name newT emptyRange)
 
 
 noRangeDeclaration : Declaration -> Declaration

@@ -21,16 +21,21 @@ scan fileContext =
         }
         fileContext.ast
         Dict.empty
-        |> Dict.filter (\_ -> List.length >> (<) 1)
+        |> Dict.filter (always (hasLength ((<) 1)))
         |> Dict.toList
         |> List.map (uncurry (DuplicateImport fileContext.path))
 
 
+hasLength : (Int -> Bool) -> List a -> Bool
+hasLength f =
+    List.length >> f
+
+
 onImport : Import -> Context -> Context
-onImport imp context =
-    case Dict.get imp.moduleName context of
+onImport { moduleName, range } context =
+    case Dict.get moduleName context of
         Just _ ->
-            Dict.update imp.moduleName (Maybe.map (flip (++) [ imp.range ])) context
+            Dict.update moduleName (Maybe.map (flip (++) [ range ])) context
 
         Nothing ->
-            Dict.insert imp.moduleName [ imp.range ] context
+            Dict.insert moduleName [ range ] context

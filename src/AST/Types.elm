@@ -299,7 +299,14 @@ type Expose
     = InfixExpose String Range
     | FunctionExpose String Range
     | TypeOrAliasExpose String Range
-    | TypeExpose String (Exposure ValueConstructorExpose) Range
+    | TypeExpose ExposedType
+
+
+type alias ExposedType =
+    { name : String
+    , constructors : Exposure ValueConstructorExpose
+    , range : Range
+    }
 
 
 type alias ValueConstructorExpose =

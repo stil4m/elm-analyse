@@ -1,6 +1,6 @@
 module Parser.Expose exposing (exposeDefinition, infixExpose, typeExpose, exposingListInner, definitionExpose, exposable)
 
-import AST.Types exposing (State, Expression, Exposure(None, All, Explicit), ValueConstructorExpose, Expose(InfixExpose, TypeExpose, TypeOrAliasExpose, FunctionExpose))
+import AST.Types exposing (State, Expression, ExposedType, Exposure(None, All, Explicit), ValueConstructorExpose, Expose(InfixExpose, TypeExpose, TypeOrAliasExpose, FunctionExpose))
 import Combine exposing ((*>), (<$), (<$>), (<*>), Parser, choice, maybe, or, parens, sepBy, string, succeed, while)
 import Combine.Char exposing (char)
 import Parser.Tokens exposing (exposingToken, functionName, typeName)
@@ -31,8 +31,13 @@ infixExpose =
 
 typeExpose : Parser State Expose
 typeExpose =
+    TypeExpose <$> exposedType
+
+
+exposedType : Parser State ExposedType
+exposedType =
     withRange <|
-        succeed TypeExpose
+        succeed ExposedType
             <*> typeName
             <*> (maybe moreThanIndentWhitespace *> exposeListWith valueConstructorExpose)
 

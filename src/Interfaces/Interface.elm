@@ -153,16 +153,16 @@ buildInterfaceFromExplicit x fileDefinitionList =
                     AST.FunctionExpose s _ ->
                         Just <| Function s
 
-                    AST.TypeExpose n vals _ ->
-                        case vals of
+                    AST.TypeExpose exposedType ->
+                        case exposedType.constructors of
                             AST.None ->
-                                Just <| Type ( n, [] )
+                                Just <| Type ( exposedType.name, [] )
 
                             AST.All _ ->
-                                lookupForDefinition n fileDefinitionList
+                                lookupForDefinition exposedType.name fileDefinitionList
 
                             AST.Explicit v ->
-                                Just <| Type ( n, List.map Tuple.first v )
+                                Just <| Type ( exposedType.name, List.map Tuple.first v )
             )
 
 
