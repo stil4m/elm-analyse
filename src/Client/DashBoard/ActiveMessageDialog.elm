@@ -1,7 +1,8 @@
 module Client.DashBoard.ActiveMessageDialog exposing (..)
 
 import AST.Ranges exposing (Range)
-import Analyser.Messages as Messages exposing (Message)
+import Analyser.Messages.Types exposing (MessageData)
+import Analyser.Messages.Util as Messages
 import Dialog exposing (Config)
 import Html exposing (div, pre, text, Html, span, h3)
 import Html.Attributes exposing (style)
@@ -14,7 +15,7 @@ type alias Model =
 
 
 type alias State =
-    { message : Message
+    { message : MessageData
     , ranges : List Range
     , codeBlock : RemoteData Error String
     }
@@ -25,7 +26,7 @@ type Msg
     | OnFile (Result Error String)
 
 
-show : Message -> Model -> ( Model, Cmd Msg )
+show : MessageData -> Model -> ( Model, Cmd Msg )
 show m _ =
     ( Just
         { message = m

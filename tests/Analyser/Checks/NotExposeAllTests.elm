@@ -3,7 +3,7 @@ module Analyser.Checks.NotExposeAllTests exposing (..)
 import Analyser.Checks.NotExposeAll as NotExposeAll
 import Expect
 import Test exposing (..)
-import Analyser.Messages exposing (..)
+import Analyser.Messages.Types  exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 
 

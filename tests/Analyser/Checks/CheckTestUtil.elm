@@ -1,7 +1,7 @@
 module Analyser.Checks.CheckTestUtil exposing (..)
 
 import Analyser.FileContext as FileContext exposing (FileContext)
-import Analyser.Messages exposing (Message)
+import Analyser.Messages.Types exposing (MessageData)
 import Interfaces.Interface as Interface
 import AST.Util
 import Analyser.Types exposing (..)
@@ -15,7 +15,7 @@ fileContentFromInput input =
     { path = "./foo.elm", ast = Nothing, formatted = True, sha1 = Nothing, content = Just input, success = True }
 
 
-getMessages : String -> (FileContext -> List Message) -> Maybe (List Message)
+getMessages : String -> (FileContext -> List MessageData) -> Maybe (List MessageData)
 getMessages input f =
     Parser.Parser.parse input
         |> Maybe.map (\file -> ( fileContentFromInput input, Loaded { interface = Interface.build file, ast = file, moduleName = AST.Util.fileModuleName file } ))
@@ -23,7 +23,7 @@ getMessages input f =
         |> Maybe.map f
 
 
-build : String -> (FileContext -> List Message) -> List ( String, String, List Message ) -> Test
+build : String -> (FileContext -> List MessageData) -> List ( String, String, List MessageData ) -> Test
 build suite f cases =
     describe suite <|
         List.map

@@ -2,11 +2,11 @@ module Analyser.Checks.NoDebugTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NoDebug as NoDebug
-import Analyser.Messages exposing (..)
+import Analyser.Messages.Types  exposing (..)
 import Test exposing (Test)
 
 
-debugCrash : ( String, String, List Message )
+debugCrash : ( String, String, List MessageData )
 debugCrash =
     ( "debugCrash"
     , """module Bar exposing (..)
@@ -19,7 +19,7 @@ foo = Debug.crash "NOOO"
     )
 
 
-debugLog : ( String, String, List Message )
+debugLog : ( String, String, List MessageData )
 debugLog =
     ( "debugLog"
     , """module Bar exposing (..)
@@ -31,7 +31,7 @@ foo x = Debug.log "This is X" x
     )
 
 
-noDebug : ( String, String, List Message )
+noDebug : ( String, String, List MessageData )
 noDebug =
     ( "noDebug"
     , """module Bar exposing (..)

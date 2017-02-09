@@ -4,7 +4,7 @@ import AST.Types exposing (Exposure(All, None, Explicit), Expose(TypeExpose), Fi
 import AST.Ranges exposing (Range)
 import AST.Util
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages exposing (Message(ExposeAll))
+import Analyser.Messages.Types  exposing (MessageData(ExposeAll))
 import Inspector exposing (defaultConfig, Action(Inner))
 
 
@@ -12,7 +12,7 @@ type alias ExposeAllContext =
     List Range
 
 
-scan : FileContext -> List Message
+scan : FileContext -> List MessageData
 scan fileContext =
     let
         x : ExposeAllContext

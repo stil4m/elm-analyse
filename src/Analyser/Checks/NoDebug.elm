@@ -3,7 +3,7 @@ module Analyser.Checks.NoDebug exposing (scan)
 import AST.Types exposing (Expression, InnerExpression(QualifiedExpr))
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages exposing (Message(DebugLog, DebugCrash))
+import Analyser.Messages.Types exposing (MessageData(DebugLog, DebugCrash))
 import Inspector exposing (Action(Post), defaultConfig)
 
 
@@ -16,7 +16,7 @@ type alias Context =
     List ( DebugType, Range )
 
 
-scan : FileContext -> List Message
+scan : FileContext -> List MessageData
 scan fileContext =
     Inspector.inspect
         { defaultConfig | onExpression = Post onExpression }
@@ -25,7 +25,7 @@ scan fileContext =
         |> List.map (asMessage fileContext.path)
 
 
-asMessage : String -> ( DebugType, Range ) -> Message
+asMessage : String -> ( DebugType, Range ) -> MessageData
 asMessage path ( debugType, range ) =
     case debugType of
         Log ->

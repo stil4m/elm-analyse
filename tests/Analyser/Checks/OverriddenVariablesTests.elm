@@ -2,11 +2,11 @@ module Analyser.Checks.OverriddenVariablesTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU exposing (getMessages)
 import Analyser.Checks.OverriddenVariables as OverriddenVariables
-import Analyser.Messages exposing (Message(RedefineVariable))
+import Analyser.Messages.Types  exposing (MessageData(RedefineVariable))
 import Test exposing (..)
 
 
-redefineImportedFunction : ( String, String, List Message )
+redefineImportedFunction : ( String, String, List MessageData )
 redefineImportedFunction =
     ( "redefineImportedFunction"
     , """module Bar exposing (foo)
@@ -23,7 +23,7 @@ foo bar = 1
     )
 
 
-redefineInLet : ( String, String, List Message )
+redefineInLet : ( String, String, List MessageData )
 redefineInLet =
     ( "redefineInLet"
     , """module Bar exposing (foo)
@@ -43,7 +43,7 @@ foo bar =
     )
 
 
-redefineInDestructuring : ( String, String, List Message )
+redefineInDestructuring : ( String, String, List MessageData )
 redefineInDestructuring =
     ( "redefineInDestructuring"
     , """module Foo exposing (foo)
@@ -61,7 +61,7 @@ foo bar =
     )
 
 
-redefineImportAsFunction : ( String, String, List Message )
+redefineImportAsFunction : ( String, String, List MessageData )
 redefineImportAsFunction =
     ( "redefineImportAsFunction"
     , """module Foo exposing (foo)
@@ -78,7 +78,7 @@ bar = 1
     )
 
 
-redefineViaDestructuring : ( String, String, List Message )
+redefineViaDestructuring : ( String, String, List MessageData )
 redefineViaDestructuring =
     ( "redefineViaDestructuring"
     , """module Foo exposing (..)

@@ -1,7 +1,7 @@
 module Analyser exposing (main)
 
 import Analyser.InterfaceLoadingStage as InterfaceLoadingStage
-import Analyser.Messages exposing (Message)
+import Analyser.Messages.Types exposing (MessageData)
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import AnalyserPorts
 import Platform exposing (programWithFlags)
@@ -31,7 +31,7 @@ type Msg
 type alias Model =
     { dependencies : List Dependency
     , flags : Flags
-    , messages : List Message
+    , messages : List MessageData
     , stage : Stage
     }
 
@@ -39,7 +39,7 @@ type alias Model =
 type Stage
     = InterfaceLoadingStage InterfaceLoadingStage.Model
     | SourceLoadingStage SourceLoadingStage.Model (List Dependency)
-    | Finished (List Message)
+    | Finished (List MessageData)
 
 
 main : Program Flags Model Msg

@@ -3,7 +3,7 @@ module Analyser.Checks.OverriddenVariables exposing (scan)
 import AST.Types exposing (File, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages exposing (Message(RedefineVariable))
+import Analyser.Messages.Types  exposing (MessageData(RedefineVariable))
 import Dict exposing (Dict)
 import Inspector exposing (Action(Inner), defaultConfig)
 import Analyser.Checks.Variables exposing (getImportsVars, patternToVars)
@@ -17,7 +17,7 @@ type alias Redefine =
     ( String, Range, Range )
 
 
-scan : FileContext -> List Message
+scan : FileContext -> List MessageData
 scan fileContext =
     let
         topLevels : Dict String Range

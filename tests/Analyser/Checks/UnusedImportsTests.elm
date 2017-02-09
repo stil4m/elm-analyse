@@ -2,11 +2,11 @@ module Analyser.Checks.UnusedImportsTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImports as UnusedImports
-import Analyser.Messages exposing (..)
+import Analyser.Messages.Types  exposing (..)
 import Test exposing (Test)
 
 
-usedAsQualified : ( String, String, List Message )
+usedAsQualified : ( String, String, List MessageData )
 usedAsQualified =
     ( "usedAsQualified"
     , """module Foo exposing (..)
@@ -20,7 +20,7 @@ foo = Bar.add 1
     )
 
 
-usedAsQualifiedInPattern : ( String, String, List Message )
+usedAsQualifiedInPattern : ( String, String, List MessageData )
 usedAsQualifiedInPattern =
     ( "usedAsQualifiedInPattern"
     , """module Main exposing (..)
@@ -37,7 +37,7 @@ z a =
     )
 
 
-usedInTypeReference : ( String, String, List Message )
+usedInTypeReference : ( String, String, List MessageData )
 usedInTypeReference =
     ( "usedInTypeReference"
     , """module Foo exposing (..)
@@ -52,7 +52,7 @@ foo = bar
     )
 
 
-usedInTypeAlias : ( String, String, List Message )
+usedInTypeAlias : ( String, String, List MessageData )
 usedInTypeAlias =
     ( "usedInTypeAlias"
     , """module Foo exposing (..)
@@ -67,7 +67,7 @@ type alias Thing = { name : Bar.Name }
     )
 
 
-unusedButHasAlias : ( String, String, List Message )
+unusedButHasAlias : ( String, String, List MessageData )
 unusedButHasAlias =
     ( "unusedButHasAlias"
     , """module Foo exposing (..)
@@ -81,7 +81,7 @@ foo = 1
     )
 
 
-unusedButHasExposing : ( String, String, List Message )
+unusedButHasExposing : ( String, String, List MessageData )
 unusedButHasExposing =
     ( "unusedButHasAlias"
     , """module Foo exposing (..)
@@ -95,7 +95,7 @@ foo = 1
     )
 
 
-unusedImport : ( String, String, List Message )
+unusedImport : ( String, String, List MessageData )
 unusedImport =
     ( "unusedButHasAlias"
     , """module Foo exposing (..)

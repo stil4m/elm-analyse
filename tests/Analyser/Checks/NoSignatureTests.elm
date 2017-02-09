@@ -2,7 +2,7 @@ module Analyser.Checks.NoSignatureTests exposing (..)
 
 import Analyser.Checks.NoSignature as NoSignature
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Messages exposing (..)
+import Analyser.Messages.Types  exposing (..)
 import Expect
 import Test exposing (..)
 

@@ -4,7 +4,7 @@ import AST.Ranges exposing (Range)
 import AST.Types exposing (Case, Pattern, Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
 import AST.Util as Util
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages exposing (Message(UnusedImportAlias))
+import Analyser.Messages.Types  exposing (MessageData(UnusedImportAlias))
 import Dict exposing (Dict)
 import Inspector exposing (Action(Post), defaultConfig)
 import Tuple2
@@ -14,7 +14,7 @@ type alias Context =
     Dict ModuleName ( Range, Int )
 
 
-scan : FileContext -> List Message
+scan : FileContext -> List MessageData
 scan fileContext =
     let
         aliases : Context

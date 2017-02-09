@@ -5,7 +5,7 @@ import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Types exposing (..)
 import Dict exposing (Dict)
 import Test exposing (..)
-import Analyser.Messages exposing (..)
+import Analyser.Messages.Types  exposing (..)
 import Analyser.Checks.CheckTestUtil exposing (getMessages)
 
 
@@ -14,7 +14,7 @@ table =
     Dict.fromList []
 
 
-withUnusedVariableInFunction : ( String, String, List Message )
+withUnusedVariableInFunction : ( String, String, List MessageData )
 withUnusedVariableInFunction =
     ( "withUnusedVariableInFunction"
     , """module Bar exposing (..)
@@ -25,7 +25,7 @@ bar x y z = x + z
     )
 
 
-unusedInLetExpression : ( String, String, List Message )
+unusedInLetExpression : ( String, String, List MessageData )
 unusedInLetExpression =
     ( "unusedInLetExpression"
     , """module Bar exposing (..)
@@ -41,7 +41,7 @@ x =
     )
 
 
-unusedFunction : ( String, String, List Message )
+unusedFunction : ( String, String, List MessageData )
 unusedFunction =
     ( "unusedFunction"
     , """module Bar exposing (foo)
@@ -57,7 +57,7 @@ some = 1
     )
 
 
-usedVariableAsRecordUpdate : ( String, String, List Message )
+usedVariableAsRecordUpdate : ( String, String, List MessageData )
 usedVariableAsRecordUpdate =
     ( "usedVariableAsRecordUpdate"
     , """module Bar exposing (..)
@@ -70,7 +70,7 @@ addUsedVariable x =
     )
 
 
-usedVariableInCaseExpression : ( String, String, List Message )
+usedVariableInCaseExpression : ( String, String, List MessageData )
 usedVariableInCaseExpression =
     ( "usedVariableInCaseExpression"
     , """module Bar exposing (..)
@@ -84,7 +84,7 @@ foo x =
     )
 
 
-usedVariableInAllDeclaration : ( String, String, List Message )
+usedVariableInAllDeclaration : ( String, String, List MessageData )
 usedVariableInAllDeclaration =
     ( "usedVariableInAllDeclaration"
     , """module Bar exposing (..)
@@ -101,7 +101,7 @@ x y =
     )
 
 
-usedValueConstructor : ( String, String, List Message )
+usedValueConstructor : ( String, String, List MessageData )
 usedValueConstructor =
     ( "usedValueConstructor"
     , """module Bar exposing (foo)
@@ -114,7 +114,7 @@ foo = Thing
     )
 
 
-unusedValueConstructor : ( String, String, List Message )
+unusedValueConstructor : ( String, String, List MessageData )
 unusedValueConstructor =
     ( "unusedValueConstructor"
     , """module Bar exposing (foo,Some(Thing))
@@ -127,7 +127,7 @@ type Some = Thing | Other
     )
 
 
-exposedValueConstructor : ( String, String, List Message )
+exposedValueConstructor : ( String, String, List MessageData )
 exposedValueConstructor =
     ( "exposedValueConstructor"
     , """module Bar exposing (foo,Some(Thing))
@@ -140,7 +140,7 @@ foo = 1
     )
 
 
-onlyUsedInSelf : ( String, String, List Message )
+onlyUsedInSelf : ( String, String, List MessageData )
 onlyUsedInSelf =
     ( "onlyUsedInSelf"
     , """module Bar exposing (foo,Some(Thing))
@@ -155,7 +155,7 @@ bar = bar + foo
     )
 
 
-usedOperator : ( String, String, List Message )
+usedOperator : ( String, String, List MessageData )
 usedOperator =
     ( "usedOperator"
     , """module Bar exposing (foo,Some(Thing))
@@ -170,7 +170,7 @@ foo =
     )
 
 
-destructuringSameName : ( String, String, List Message )
+destructuringSameName : ( String, String, List MessageData )
 destructuringSameName =
     ( "destructuringSameName"
     , """module Foo exposing (..)
@@ -183,7 +183,7 @@ error { error } =
     )
 
 
-unusedInEffectModule : ( String, String, List Message )
+unusedInEffectModule : ( String, String, List MessageData )
 unusedInEffectModule =
     ( "unusedInEffectModule"
     , """effect module X where {subscription = MySub} exposing (foo)
@@ -197,7 +197,7 @@ init = 2
     )
 
 
-unusedImportedVariable : ( String, String, List Message )
+unusedImportedVariable : ( String, String, List MessageData )
 unusedImportedVariable =
     ( "unusedImportedVariable"
     , """module Foo exposing (foo)
@@ -211,7 +211,7 @@ foo = 1
     )
 
 
-usedImportedVariableInPatterMatch : ( String, String, List Message )
+usedImportedVariableInPatterMatch : ( String, String, List MessageData )
 usedImportedVariableInPatterMatch =
     ( "usedImportedVariableInPatterMatch"
     , """module Foo exposing (foo)
@@ -227,7 +227,7 @@ foo c =
     )
 
 
-usedImportedVariableAsOpaque : ( String, String, List Message )
+usedImportedVariableAsOpaque : ( String, String, List MessageData )
 usedImportedVariableAsOpaque =
     ( "usedImportedVariableAsOpaque"
     , """module Foo exposing (foo)
@@ -241,7 +241,7 @@ foo (Blue c) =
     )
 
 
-exposeOperator : ( String, String, List Message )
+exposeOperator : ( String, String, List MessageData )
 exposeOperator =
     ( "usedImportedVariableAsOpaque"
     , """module Foo exposing ((@@))

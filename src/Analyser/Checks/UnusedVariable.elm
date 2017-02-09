@@ -15,7 +15,7 @@ import AST.Types
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Interfaces.Interface as Interface
-import Analyser.Messages exposing (Message(UnusedVariable, UnusedTopLevel))
+import Analyser.Messages.Types  exposing (MessageData(UnusedVariable, UnusedTopLevel))
 import Dict exposing (Dict)
 import Inspector exposing (defaultConfig, Action(Inner, Pre, Post))
 import Tuple2
@@ -36,7 +36,7 @@ type alias UsedVariableContext =
     }
 
 
-scan : FileContext -> List Message
+scan : FileContext -> List MessageData
 scan fileContext =
     let
         x : UsedVariableContext

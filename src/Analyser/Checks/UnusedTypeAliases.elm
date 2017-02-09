@@ -3,7 +3,7 @@ module Analyser.Checks.UnusedTypeAliases exposing (scan)
 import AST.Ranges exposing (Range)
 import AST.Types exposing (FunctionSignature, TypeAlias, TypeReference(Typed))
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages exposing (Message(UnusedAlias))
+import Analyser.Messages.Types  exposing (MessageData(UnusedAlias))
 import Dict exposing (Dict)
 import Inspector exposing (Action(Post), defaultConfig)
 import Interfaces.Interface exposing (doesExposeAlias)
@@ -15,7 +15,7 @@ type alias Context =
     Dict String ( String, Range, Int )
 
 
-scan : FileContext -> List Message
+scan : FileContext -> List MessageData
 scan fileContext =
     let
         collectedAliased : Context

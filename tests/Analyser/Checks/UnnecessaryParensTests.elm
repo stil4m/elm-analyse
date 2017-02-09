@@ -2,11 +2,11 @@ module Analyser.Checks.UnnecessaryParensTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
-import Analyser.Messages exposing (..)
+import Analyser.Messages.Types  exposing (..)
 import Test exposing (Test)
 
 
-parensBetweenOperators : ( String, String, List Message )
+parensBetweenOperators : ( String, String, List MessageData )
 parensBetweenOperators =
     ( "parensBetweenOperators"
     , """module Bar exposing (..)
@@ -19,7 +19,7 @@ foo =
     )
 
 
-parensForInfixCombinations : ( String, String, List Message )
+parensForInfixCombinations : ( String, String, List MessageData )
 parensForInfixCombinations =
     ( "parensForInfixCombinations"
     , """module Bar exposing (..)
@@ -31,7 +31,7 @@ foo =
     )
 
 
-parensAroundSimpleValue : ( String, String, List Message )
+parensAroundSimpleValue : ( String, String, List MessageData )
 parensAroundSimpleValue =
     ( "parensAroundSimpleValue"
     , """module Bar exposing (..)
@@ -55,7 +55,7 @@ jon = (john)
     )
 
 
-parensInOperatorForSimpleValue : ( String, String, List Message )
+parensInOperatorForSimpleValue : ( String, String, List MessageData )
 parensInOperatorForSimpleValue =
     ( "parensInOperatorForSimpleValue"
     , """module Bar exposing (..)
@@ -68,7 +68,7 @@ foo = 1 + (1)
     )
 
 
-parensOnFirstPartOfApplication : ( String, String, List Message )
+parensOnFirstPartOfApplication : ( String, String, List MessageData )
 parensOnFirstPartOfApplication =
     ( "parensOnFirstPartOfApplication"
     , """module Bar exposing (..)
@@ -81,7 +81,7 @@ foo = (x y) z
     )
 
 
-parensOnFirstPartOfApplicationWithOperator : ( String, String, List Message )
+parensOnFirstPartOfApplicationWithOperator : ( String, String, List MessageData )
 parensOnFirstPartOfApplicationWithOperator =
     ( "parensOnFirstPartOfApplicationWithOperator"
     , """module Bar exposing (..)
@@ -93,7 +93,7 @@ foo = (x |> y z ) a b c
     )
 
 
-allowParensForLambdaOnLhs : ( String, String, List Message )
+allowParensForLambdaOnLhs : ( String, String, List MessageData )
 allowParensForLambdaOnLhs =
     ( "allowParensForLambdaOnLhs"
     , """module Bar exposing (..)
@@ -105,7 +105,7 @@ foo = (\\x -> x + 1) <| 2
     )
 
 
-parensInCaseClause : ( String, String, List Message )
+parensInCaseClause : ( String, String, List MessageData )
 parensInCaseClause =
     ( "parensInCaseClause"
     , """module Bar exposing (..)
@@ -120,7 +120,7 @@ foo x =
     )
 
 
-parensInIfClause : ( String, String, List Message )
+parensInIfClause : ( String, String, List MessageData )
 parensInIfClause =
     ( "parensInIfClause"
     , """module Bar exposing (..)
@@ -138,7 +138,7 @@ foo x =
     )
 
 
-parensAroundListExpression : ( String, String, List Message )
+parensAroundListExpression : ( String, String, List MessageData )
 parensAroundListExpression =
     ( "parensAroundListExpression"
     , """module Bar exposing (..)
@@ -150,7 +150,7 @@ foo x = ([x])
     )
 
 
-parensAroundTupleExpression : ( String, String, List Message )
+parensAroundTupleExpression : ( String, String, List MessageData )
 parensAroundTupleExpression =
     ( "parensAroundTupleExpression"
     , """module Bar exposing (..)
@@ -162,7 +162,7 @@ foo x = ((x, 1))
     )
 
 
-parensAroundRecordExpression : ( String, String, List Message )
+parensAroundRecordExpression : ( String, String, List MessageData )
 parensAroundRecordExpression =
     ( "parensAroundTupleExpression"
     , """module Bar exposing (..)
@@ -174,7 +174,7 @@ foo x = ({name = x})
     )
 
 
-parensAroundRecordUpdateExpression : ( String, String, List Message )
+parensAroundRecordUpdateExpression : ( String, String, List MessageData )
 parensAroundRecordUpdateExpression =
     ( "parensAroundTupleExpression"
     , """module Bar exposing (..)
@@ -186,7 +186,7 @@ foo x = ({ x | name = "Foo"})
     )
 
 
-parensInRecordFieldValues : ( String, String, List Message )
+parensInRecordFieldValues : ( String, String, List MessageData )
 parensInRecordFieldValues =
     ( "parensInRecordFieldValues"
     , """module Bar exposing (..)
@@ -200,7 +200,7 @@ foo =
     )
 
 
-parensInRecordFieldValuesForUpdate : ( String, String, List Message )
+parensInRecordFieldValuesForUpdate : ( String, String, List MessageData )
 parensInRecordFieldValuesForUpdate =
     ( "parensInRecordFieldValuesForUpdate"
     , """module Bar exposing (..)
@@ -215,7 +215,7 @@ foo =
     )
 
 
-parensAroundRecordAccess : ( String, String, List Message )
+parensAroundRecordAccess : ( String, String, List MessageData )
 parensAroundRecordAccess =
     ( "parensAroundRecordAccess"
     , """module Bar exposing (..)
@@ -227,7 +227,7 @@ foo x = (x.name.first)
     )
 
 
-parensAroundRecordFunction : ( String, String, List Message )
+parensAroundRecordFunction : ( String, String, List MessageData )
 parensAroundRecordFunction =
     ( "parensAroundRecordFunction"
     , """module Bar exposing (..)
@@ -239,7 +239,7 @@ foo x = List.map (.name) x
     )
 
 
-parensFirstArgumentApplicationWithRecordAccess : ( String, String, List Message )
+parensFirstArgumentApplicationWithRecordAccess : ( String, String, List MessageData )
 parensFirstArgumentApplicationWithRecordAccess =
     ( "parensFirstArgumentApplicationWithRecordAccess"
     , """module Bar exposing (..)
@@ -250,7 +250,7 @@ foo = (Tuple.first newFileContent).sha1
     )
 
 
-allowParensForIfStatementOnLHS : ( String, String, List Message )
+allowParensForIfStatementOnLHS : ( String, String, List MessageData )
 allowParensForIfStatementOnLHS =
     ( "allowParensForIfStatementOnLHS"
     , """module Bar exposing (..)
@@ -266,7 +266,7 @@ foo =
     )
 
 
-allowParensForCaseOnLHS : ( String, String, List Message )
+allowParensForCaseOnLHS : ( String, String, List MessageData )
 allowParensForCaseOnLHS =
     ( "allowParensForCaseOnLHS"
     , """module Bar exposing (..)

@@ -3,7 +3,7 @@ module Analyser.Checks.NoImportAll exposing (scan)
 import AST.Types exposing (Import, Exposure(All, None, Explicit), ModuleName, Expose(TypeExpose))
 import AST.Ranges as Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages exposing (Message(ImportAll))
+import Analyser.Messages.Types  exposing (MessageData(ImportAll))
 import Inspector exposing (defaultConfig, Action(Post))
 
 
@@ -11,7 +11,7 @@ type alias ExposeAllContext =
     List ( ModuleName, Range )
 
 
-scan : FileContext -> List Message
+scan : FileContext -> List MessageData
 scan fileContext =
     Inspector.inspect
         { defaultConfig | onImport = Post onImport }

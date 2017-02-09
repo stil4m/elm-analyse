@@ -2,11 +2,11 @@ module Analyser.Checks.DuplicateImportsTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DuplicateImports as DuplicateImports
-import Analyser.Messages exposing (..)
+import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 
-goodImports : ( String, String, List Message )
+goodImports : ( String, String, List MessageData )
 goodImports =
     ( "parensBetweenOperators"
     , """module Bar exposing (..)
@@ -21,7 +21,7 @@ foo = 1
     )
 
 
-badImports : ( String, String, List Message )
+badImports : ( String, String, List MessageData )
 badImports =
     ( "parensBetweenOperators"
     , """module Bar exposing (..)
@@ -41,7 +41,7 @@ foo = 1
     )
 
 
-badImportsTripple : ( String, String, List Message )
+badImportsTripple : ( String, String, List MessageData )
 badImportsTripple =
     ( "badImportsTripple"
     , """module Bar exposing (..)
@@ -62,7 +62,7 @@ foo = 1
     )
 
 
-badImportDouble : ( String, String, List Message )
+badImportDouble : ( String, String, List MessageData )
 badImportDouble =
     ( "badImportDouble"
     , """module Bar exposing (..)

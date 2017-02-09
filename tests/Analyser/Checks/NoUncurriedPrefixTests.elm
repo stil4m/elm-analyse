@@ -2,11 +2,11 @@ module Analyser.Checks.NoUncurriedPrefixTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
-import Analyser.Messages exposing (..)
+import Analyser.Messages.Types  exposing (..)
 import Test exposing (Test)
 
 
-prefixAsApplicationWithTwoArgs : ( String, String, List Message )
+prefixAsApplicationWithTwoArgs : ( String, String, List MessageData )
 prefixAsApplicationWithTwoArgs =
     ( "prefixAsApplicationWithTwoArgs"
     , """module Foo exposing (..)
@@ -18,7 +18,7 @@ foo = (+) 1 2
     )
 
 
-prefixAsApplicationWithOneArg : ( String, String, List Message )
+prefixAsApplicationWithOneArg : ( String, String, List MessageData )
 prefixAsApplicationWithOneArg =
     ( "prefixAsApplicationWithOneArg"
     , """module Foo exposing (..)

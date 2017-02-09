@@ -1,6 +1,8 @@
 port module AnalyserPorts exposing (sendMessagesAsJson, sendMessagesAsStrings, onReset)
 
-import Analyser.Messages exposing (Message)
+import Analyser.Messages.Types exposing (MessageData)
+import Analyser.Messages.Util as Messages
+import Analyser.Messages.Json as Messages
 
 
 port messagesAsJson : List String -> Cmd msg
@@ -12,11 +14,11 @@ port sendMessages : List String -> Cmd msg
 port onReset : (Bool -> msg) -> Sub msg
 
 
-sendMessagesAsJson : List Message -> Cmd msg
+sendMessagesAsJson : List MessageData -> Cmd msg
 sendMessagesAsJson =
-    List.map Analyser.Messages.encodeMessage >> messagesAsJson
+    List.map Messages.encodeMessageData >> messagesAsJson
 
 
-sendMessagesAsStrings : List Message -> Cmd msg
+sendMessagesAsStrings : List MessageData -> Cmd msg
 sendMessagesAsStrings =
-    List.map Analyser.Messages.asString >> sendMessages
+    List.map Messages.asString >> sendMessages

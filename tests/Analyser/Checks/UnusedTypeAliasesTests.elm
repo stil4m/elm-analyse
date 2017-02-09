@@ -2,11 +2,11 @@ module Analyser.Checks.UnusedTypeAliasesTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedTypeAliases as UnusedTypeAliases
-import Analyser.Messages exposing (..)
+import Analyser.Messages.Types  exposing (..)
 import Test exposing (Test)
 
 
-unusedButExposed : ( String, String, List Message )
+unusedButExposed : ( String, String, List MessageData )
 unusedButExposed =
     ( "unusedButExposed"
     , """module Foo exposing (Bar)
@@ -17,7 +17,7 @@ type alias Bar = Int
     )
 
 
-usedInSignature : ( String, String, List Message )
+usedInSignature : ( String, String, List MessageData )
 usedInSignature =
     ( "usedInSignature"
     , """module Foo exposing (foo)
@@ -31,7 +31,7 @@ foo = 1
     )
 
 
-usedAsFunction : ( String, String, List Message )
+usedAsFunction : ( String, String, List MessageData )
 usedAsFunction =
     ( "usedAsFunction"
     , """module Foo exposing (foo)
@@ -46,7 +46,7 @@ foo =
     )
 
 
-usedInPort : ( String, String, List Message )
+usedInPort : ( String, String, List MessageData )
 usedInPort =
     ( "usedInPort"
     , """module Foo exposing (foo)
@@ -61,7 +61,7 @@ port foo : Person -> Cmd msg
     )
 
 
-usedAliasInRecord : ( String, String, List Message )
+usedAliasInRecord : ( String, String, List MessageData )
 usedAliasInRecord =
     ( "usedAliasInRecord"
     , """module Foo exposing (InputInterfaces)
@@ -77,7 +77,7 @@ type alias InputInterfaces =
     )
 
 
-usedAliasInType : ( String, String, List Message )
+usedAliasInType : ( String, String, List MessageData )
 usedAliasInType =
     ( "usedAliasInType"
     , """module Foo exposing (Patch(..))
@@ -93,7 +93,7 @@ type Patch
     )
 
 
-unusedAlias : ( String, String, List Message )
+unusedAlias : ( String, String, List MessageData )
 unusedAlias =
     ( "unusedAlias"
     , """module Foo exposing (foo)

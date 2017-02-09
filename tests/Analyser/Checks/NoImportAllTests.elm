@@ -2,7 +2,7 @@ module Analyser.Checks.NoImportAllTests exposing (..)
 
 import Analyser.Checks.NoImportAll as NoImportAll
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Messages exposing (..)
+import Analyser.Messages.Types  exposing (..)
 import Expect
 import Test exposing (..)
 

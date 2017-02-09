@@ -8,7 +8,8 @@ import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
 import Time
 import WebSocket as WS
-import Analyser.Messages as Messages exposing (Message)
+import Analyser.Messages.Types exposing (MessageData)
+import Analyser.Messages.Util as Messages
 import Html.Attributes exposing (class, style)
 import Tuple2
 import Navigation exposing (Location)
@@ -23,7 +24,7 @@ type alias Model =
 type Msg
     = NewMsg (Result String State)
     | Tick
-    | Focus Message
+    | Focus MessageData
     | ActiveMessageDialogMsg ActiveMessageDialog.Msg
 
 
@@ -116,7 +117,7 @@ viewState state =
         ]
 
 
-viewMessage : Int -> Message -> Html Msg
+viewMessage : Int -> MessageData -> Html Msg
 viewMessage n x =
     li
         [ style

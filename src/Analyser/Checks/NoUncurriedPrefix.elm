@@ -2,7 +2,7 @@ module Analyser.Checks.NoUncurriedPrefix exposing (scan)
 
 import AST.Types exposing (InnerExpression(Application, PrefixOperator), Expression)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages exposing (Message(NoUnurriedPrefix))
+import Analyser.Messages.Types  exposing (MessageData(NoUnurriedPrefix))
 import Inspector exposing (Action(Post), defaultConfig)
 import AST.Ranges exposing (Range)
 
@@ -11,7 +11,7 @@ type alias Context =
     List ( String, Range )
 
 
-scan : FileContext -> List Message
+scan : FileContext -> List MessageData
 scan fileContext =
     Inspector.inspect
         { defaultConfig
