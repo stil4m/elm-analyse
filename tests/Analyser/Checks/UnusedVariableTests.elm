@@ -241,6 +241,19 @@ foo (Blue c) =
     )
 
 
+exposeOperator : ( String, String, List Message )
+exposeOperator =
+    ( "usedImportedVariableAsOpaque"
+    , """module Foo exposing ((@@))
+
+
+(@@) x y =
+  (y,x)
+"""
+    , []
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedVariable"
@@ -261,4 +274,5 @@ all =
         , unusedImportedVariable
         , usedImportedVariableInPatterMatch
         , usedImportedVariableAsOpaque
+        , exposeOperator
         ]

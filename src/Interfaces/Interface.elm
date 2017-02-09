@@ -94,7 +94,10 @@ doesExposeFunction k interface =
                     Type ( _, constructors ) ->
                         List.member k constructors
 
-                    _ ->
+                    Operator inf ->
+                        inf.operator == k
+
+                    Alias _ ->
                         False
             )
 
