@@ -1,4 +1,4 @@
-module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts, getParenthesized, isOperatorApplication, isLambda, moduleExposingList, patternModuleNames)
+module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts, getParenthesized, isOperatorApplication, isLambda, isIf, isCase, moduleExposingList, patternModuleNames)
 
 import AST.Types
     exposing
@@ -9,10 +9,9 @@ import AST.Types
         , Exposure
         , ModuleName
         , Expose
-        , Module(NormalModule, PortModule, EffectModule, NoModule)
         , Expression
         , Pattern(TuplePattern, RecordPattern, UnConsPattern, ListPattern, NamedPattern, QualifiedNamePattern, AsPattern, ParentisizedPattern)
-        , InnerExpression(OperatorApplicationExpression, ParenthesizedExpression, LambdaExpression)
+        , InnerExpression(OperatorApplicationExpression, ParenthesizedExpression, LambdaExpression, IfBlock, CaseExpression)
         )
 import AST.Ranges exposing (Range)
 
@@ -74,6 +73,26 @@ isLambda : Expression -> Bool
 isLambda ( _, e ) =
     case e of
         LambdaExpression _ ->
+            True
+
+        _ ->
+            False
+
+
+isIf : Expression -> Bool
+isIf ( _, e ) =
+    case e of
+        IfBlock _ _ _ ->
+            True
+
+        _ ->
+            False
+
+
+isCase : Expression -> Bool
+isCase ( _, e ) =
+    case e of
+        CaseExpression _ ->
             True
 
         _ ->

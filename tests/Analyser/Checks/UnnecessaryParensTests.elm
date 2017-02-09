@@ -250,6 +250,37 @@ foo = (Tuple.first newFileContent).sha1
     )
 
 
+allowParensForIfStatementOnLHS : ( String, String, List Message )
+allowParensForIfStatementOnLHS =
+    ( "allowParensForIfStatementOnLHS"
+    , """module Bar exposing (..)
+
+foo =
+  (if x then
+     1
+   else
+     2
+  ) |> toString
+"""
+    , []
+    )
+
+
+allowParensForCaseOnLHS : ( String, String, List Message )
+allowParensForCaseOnLHS =
+    ( "allowParensForCaseOnLHS"
+    , """module Bar exposing (..)
+
+foo =
+  (case x of
+     True -> 1
+     False -> 2
+  ) |> toString
+"""
+    , []
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnnecessaryParensTests"
@@ -272,4 +303,6 @@ all =
         , parensAroundRecordAccess
         , parensAroundRecordFunction
         , parensFirstArgumentApplicationWithRecordAccess
+        , allowParensForIfStatementOnLHS
+        , allowParensForCaseOnLHS
         ]

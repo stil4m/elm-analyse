@@ -26,7 +26,7 @@ import AST.Types
         , OperatorApplication
         )
 import AST.Ranges exposing (Range)
-import AST.Util exposing (getParenthesized, isOperatorApplication, isLambda)
+import AST.Util exposing (getParenthesized, isOperatorApplication, isLambda, isIf, isCase)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(UnnecessaryParens))
 import Inspector exposing (Action(Post), defaultConfig)
@@ -131,11 +131,20 @@ onOperatorApplicationExpression oparatorApplication context =
                 >> Maybe.filter (Tuple.second >> f)
                 >> Maybe.map Tuple.first
     in
-        [ fixHandSide (isLambda >> not) oparatorApplication.left
+        [ fixHandSide allowedOnLHS oparatorApplication.left
         , fixHandSide (always True) oparatorApplication.right
         ]
             |> List.filterMap identity
             |> flip (++) context
+
+
+allowedOnLHS : Expression -> Bool
+allowedOnLHS expr =
+    List.all ((|>) expr)
+        [ (isLambda >> not)
+        , (isCase >> not)
+        , (isIf >> not)
+        ]
 
 
 onParenthesizedExpression : Range -> Expression -> Context -> Context
