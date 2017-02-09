@@ -56,9 +56,13 @@ module.exports = function(config) {
     }
 
     function readFile(directory, path, cb) {
-        console.log("Load file", path, "...")
+        var real;
+        if (!path.startsWith('/')) {
+          real = path.replace(".", directory);
+        } else {
+          real =  path;
+        }
 
-        const real = path.replace(".", directory);
         sums.checksum(fs.createReadStream(real)).then(function(checkSumResult) {
             const checksum = checkSumResult.sum
 
@@ -75,7 +79,7 @@ module.exports = function(config) {
             }
             return readFileNotCached(real, path, checksum);
 
-        }, function(_) {
+        }, function(x) {
             return errorResponse(path);
         }).then(cb);
 
