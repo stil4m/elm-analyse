@@ -1,7 +1,7 @@
 module Analyser.Checks.UnusedImportAliases exposing (scan)
 
 import AST.Ranges exposing (Range)
-import AST.Types exposing (Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
+import AST.Types exposing (Case, Pattern(NamedPattern, QualifiedNamePattern), Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages exposing (Message(UnusedImportAlias))
 import Dict exposing (Dict)
@@ -27,6 +27,7 @@ scan fileContext =
             { defaultConfig
                 | onTypeReference = Post onTypeReference
                 , onExpression = Post onExpression
+                , onCase = Post onCase
             }
             fileContext.ast
             aliases
@@ -66,6 +67,19 @@ onExpression expr context =
     case Tuple.second expr of
         QualifiedExpr moduleName _ ->
             markUsage moduleName context
+
+        _ ->
+            context
+
+
+onCase : Case -> Context -> Context
+onCase ( pattern, _ ) context =
+    case pattern of
+        NamedPattern qualifiedNameRef _ ->
+            markUsage qualifiedNameRef.moduleName context
+
+        QualifiedNamePattern qualifiedNameRef ->
+            markUsage qualifiedNameRef.moduleName context
 
         _ ->
             context

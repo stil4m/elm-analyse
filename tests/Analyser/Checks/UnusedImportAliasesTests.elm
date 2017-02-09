@@ -33,6 +33,23 @@ foo = B.add 1
     )
 
 
+usedAsQualifiedInPattern : ( String, String, List Message )
+usedAsQualifiedInPattern =
+    ( "usedAsQualifiedInPattern"
+    , """module Main exposing (..)
+
+import X as Y
+
+
+z a =
+    case a of
+        Y.Z ->
+            1
+"""
+    , []
+    )
+
+
 usedInTypeReference : ( String, String, List Message )
 usedInTypeReference =
     ( "usedInTypeReference"
@@ -69,6 +86,7 @@ all =
         UnusedImportAliases.scan
         [ noUsageForAlias
         , usedAsQualified
+        , usedAsQualifiedInPattern
         , usedInTypeReference
         , usedInTypeAlias
         ]
