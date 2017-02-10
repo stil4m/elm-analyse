@@ -3,7 +3,7 @@ module Analyser.Checks.DuplicateImports exposing (scan)
 import AST.Types exposing (InnerExpression, ModuleName, Import)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types  exposing (MessageData(DuplicateImport))
+import Analyser.Messages.Types exposing (MessageData(DuplicateImport))
 import Inspector exposing (Action(Post, Skip), defaultConfig)
 import Dict exposing (Dict)
 

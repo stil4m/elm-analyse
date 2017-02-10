@@ -3,7 +3,7 @@ module Analyser.Checks.UnusedImports exposing (scan)
 import AST.Ranges exposing (Range)
 import AST.Types exposing (Case, Exposure(None), Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types  exposing (MessageData(UnusedImport))
+import Analyser.Messages.Types exposing (MessageData(UnusedImport))
 import Dict exposing (Dict)
 import Inspector exposing (Action(Post), defaultConfig)
 import Tuple2

@@ -3,7 +3,7 @@ module Analyser.Checks.NoSignature exposing (scan)
 import AST.Types exposing (Function)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types  exposing (MessageData(NoTopLevelSignature))
+import Analyser.Messages.Types exposing (MessageData(NoTopLevelSignature))
 import Inspector exposing (defaultConfig, Action(Inner, Skip))
 
 

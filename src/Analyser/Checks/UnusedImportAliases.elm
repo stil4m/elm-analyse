@@ -4,7 +4,7 @@ import AST.Ranges exposing (Range)
 import AST.Types exposing (Case, Pattern, Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
 import AST.Util as Util
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types  exposing (MessageData(UnusedImportAlias))
+import Analyser.Messages.Types exposing (MessageData(UnusedImportAlias))
 import Dict exposing (Dict)
 import Inspector exposing (Action(Post), defaultConfig)
 import Tuple2

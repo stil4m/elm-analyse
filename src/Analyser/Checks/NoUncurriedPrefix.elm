@@ -2,7 +2,7 @@ module Analyser.Checks.NoUncurriedPrefix exposing (scan)
 
 import AST.Types exposing (InnerExpression(Application, PrefixOperator), Expression)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types  exposing (MessageData(NoUnurriedPrefix))
+import Analyser.Messages.Types exposing (MessageData(NoUnurriedPrefix))
 import Inspector exposing (Action(Post), defaultConfig)
 import AST.Ranges exposing (Range)
 
