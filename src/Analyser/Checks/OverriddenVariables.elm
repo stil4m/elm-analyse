@@ -23,7 +23,7 @@ scan fileContext =
         topLevels : Dict String Range
         topLevels =
             getImportsVars fileContext.ast.imports
-                |> List.map (\x -> ( x.value, x.range ))
+                |> List.map (\( x, t ) -> ( x.value, x.range ))
                 |> Dict.fromList
     in
         Inspector.inspect
@@ -65,13 +65,13 @@ visitWithVariablePointers variablePointers f ( redefines, known ) =
 
 visitWithPatterns : List Pattern -> (Context -> Context) -> Context -> Context
 visitWithPatterns patterns f context =
-    visitWithVariablePointers (patterns |> List.concatMap patternToVars) f context
+    visitWithVariablePointers (patterns |> List.concatMap patternToVars |> List.map Tuple.first) f context
 
 
 onDestructuring : (Context -> Context) -> Destructuring -> Context -> Context
 onDestructuring f destructuring context =
     visitWithVariablePointers
-        (destructuring.pattern |> patternToVars)
+        (destructuring.pattern |> patternToVars |> List.map Tuple.first)
         f
         context
 
@@ -79,7 +79,7 @@ onDestructuring f destructuring context =
 onFunction : (Context -> Context) -> Function -> Context -> Context
 onFunction f function context =
     visitWithVariablePointers
-        (function.declaration.arguments |> List.concatMap patternToVars |> (::) function.declaration.name)
+        (function.declaration.arguments |> List.concatMap patternToVars |> List.map Tuple.first |> (::) function.declaration.name)
         f
         context
 
@@ -91,4 +91,4 @@ onLambda f lambda context =
 
 onCase : (Context -> Context) -> Case -> Context -> Context
 onCase f caze context =
-    visitWithVariablePointers (Tuple.first caze |> patternToVars) f context
+    visitWithVariablePointers (Tuple.first caze |> patternToVars |> List.map Tuple.first) f context

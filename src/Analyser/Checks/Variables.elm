@@ -1,10 +1,15 @@
-module Analyser.Checks.Variables exposing (getTopLevels, getDeclarationsVars, getImportsVars, patternToVars, patternToUsedVars)
+module Analyser.Checks.Variables exposing (VariableType(Imported, Defined), getTopLevels, getDeclarationsVars, getImportsVars, patternToVars, patternToUsedVars)
 
 import AST.Ranges exposing (Range, emptyRange)
 import AST.Types exposing (Declaration(..), Expose(..), Exposure(..), File, Import, Pattern(..), QualifiedNameRef, VariablePointer)
 
 
-getTopLevels : File -> List VariablePointer
+type VariableType
+    = Imported
+    | Defined
+
+
+getTopLevels : File -> List ( VariablePointer, VariableType )
 getTopLevels file =
     List.concat
         [ getImportsVars file.imports
@@ -12,22 +17,22 @@ getTopLevels file =
         ]
 
 
-getDeclarationsVars : List Declaration -> List VariablePointer
+getDeclarationsVars : List Declaration -> List ( VariablePointer, VariableType )
 getDeclarationsVars =
     List.concatMap getDeclarationVars
 
 
-getImportsVars : List Import -> List VariablePointer
+getImportsVars : List Import -> List ( VariablePointer, VariableType )
 getImportsVars =
     List.concatMap getImportVars
 
 
-getImportVars : Import -> List VariablePointer
+getImportVars : Import -> List ( VariablePointer, VariableType )
 getImportVars imp =
     getImportExposedVars imp.exposingList
 
 
-getImportExposedVars : Exposure Expose -> List VariablePointer
+getImportExposedVars : Exposure Expose -> List ( VariablePointer, VariableType )
 getImportExposedVars e =
     case e of
         All _ ->
@@ -46,7 +51,7 @@ getImportExposedVars e =
                                 []
 
                             FunctionExpose x r ->
-                                [ VariablePointer x r ]
+                                [ ( VariablePointer x r, Imported ) ]
 
                             TypeOrAliasExpose _ _ ->
                                 []
@@ -61,29 +66,29 @@ getImportExposedVars e =
 
                                     --TODO
                                     Explicit constructors ->
-                                        constructors |> List.map (uncurry VariablePointer)
+                                        constructors |> List.map (uncurry VariablePointer >> flip (,) Imported)
                     )
 
 
-getDeclarationVars : Declaration -> List VariablePointer
+getDeclarationVars : Declaration -> List ( VariablePointer, VariableType )
 getDeclarationVars decl =
     case decl of
         FuncDecl f ->
-            [ f.declaration.name ]
+            [ ( f.declaration.name, Defined ) ]
 
         AliasDecl _ ->
             []
 
         TypeDecl t ->
-            (List.map (\{ name, range } -> { value = name, range = range }) t.constructors)
+            (List.map (\{ name, range } -> ( { value = name, range = range }, Defined )) t.constructors)
 
         PortDeclaration p ->
             --TODO Range + Test
-            [ { value = p.name, range = emptyRange } ]
+            [ ( { value = p.name, range = emptyRange }, Defined ) ]
 
         InfixDeclaration i ->
             --TODO Range + Test
-            [ { value = i.operator, range = emptyRange } ]
+            [ ( { value = i.operator, range = emptyRange }, Defined ) ]
 
         DestructuringDeclaration destructuring ->
             patternToVars destructuring.pattern
@@ -146,14 +151,14 @@ patternToUsedVars p =
             []
 
 
-patternToVars : Pattern -> List VariablePointer
+patternToVars : Pattern -> List ( VariablePointer, VariableType )
 patternToVars p =
     case p of
         TuplePattern t ->
             List.concatMap patternToVars t
 
         RecordPattern r ->
-            r
+            List.map (flip (,) Defined) r
 
         UnConsPattern l r ->
             patternToVars l ++ patternToVars r
@@ -162,13 +167,13 @@ patternToVars p =
             List.concatMap patternToVars l
 
         VarPattern x ->
-            [ x ]
+            [ ( x, Defined ) ]
 
         NamedPattern _ args ->
             List.concatMap patternToVars args
 
         AsPattern sub name ->
-            name :: patternToVars sub
+            ( name, Defined ) :: patternToVars sub
 
         ParentisizedPattern sub ->
             patternToVars sub

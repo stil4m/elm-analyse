@@ -15,15 +15,15 @@ import AST.Types
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Interfaces.Interface as Interface
-import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel), newMessage)
+import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel, UnusedImportedVariable), newMessage)
 import Dict exposing (Dict)
 import Inspector exposing (defaultConfig, Action(Inner, Pre, Post))
-import Tuple2
-import Analyser.Checks.Variables exposing (getTopLevels, patternToVars, getDeclarationsVars, patternToUsedVars)
+import Analyser.Checks.Variables exposing (VariableType(Imported, Defined), getTopLevels, patternToVars, getDeclarationsVars, patternToUsedVars)
+import Tuple3
 
 
 type alias Scope =
-    Dict String ( Int, Range )
+    Dict String ( Int, VariableType, Range )
 
 
 type alias ActiveScope =
@@ -55,15 +55,15 @@ scan fileContext =
                 fileContext.ast
                 emptyContext
 
-        onlyUnused : List ( String, ( Int, Range ) ) -> List ( String, ( Int, Range ) )
+        onlyUnused : List ( String, ( Int, VariableType, Range ) ) -> List ( String, ( Int, VariableType, Range ) )
         onlyUnused =
-            List.filter (Tuple.second >> Tuple.first >> (==) 0)
+            List.filter (Tuple.second >> Tuple3.first >> (==) 0)
 
         unusedVariables =
             x.poppedScopes
                 |> List.concatMap Dict.toList
                 |> onlyUnused
-                |> List.map (\( x, ( _, y ) ) -> UnusedVariable fileContext.path x y)
+                |> List.map (\( x, ( _, t, y ) ) -> UnusedVariable fileContext.path x y)
                 |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
         unusedTopLevels =
@@ -75,13 +75,21 @@ scan fileContext =
                 |> onlyUnused
                 |> List.filter (filterByModuleType fileContext)
                 |> List.filter (Tuple.first >> flip Interface.doesExposeFunction fileContext.interface >> not)
-                |> List.map (\( x, ( _, y ) ) -> UnusedTopLevel fileContext.path x y)
+                |> List.map
+                    (\( x, ( _, t, y ) ) ->
+                        case t of
+                            Imported ->
+                                UnusedImportedVariable fileContext.path x y
+
+                            Defined ->
+                                UnusedTopLevel fileContext.path x y
+                    )
                 |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
     in
         unusedVariables ++ unusedTopLevels
 
 
-filterByModuleType : FileContext -> ( String, ( Int, Range ) ) -> Bool
+filterByModuleType : FileContext -> ( String, ( Int, VariableType, Range ) ) -> Bool
 filterByModuleType fileContext =
     case fileContext.ast.moduleDefinition of
         EffectModule _ ->
@@ -91,18 +99,18 @@ filterByModuleType fileContext =
             (always True)
 
 
-filterForEffectModule : ( String, ( Int, Range ) ) -> Bool
+filterForEffectModule : ( String, ( Int, VariableType, Range ) ) -> Bool
 filterForEffectModule ( k, _ ) =
     not <| List.member k [ "init", "onEffects", "onSelfMsg", "subMap", "cmdMap" ]
 
 
-pushScope : List VariablePointer -> UsedVariableContext -> UsedVariableContext
+pushScope : List ( VariablePointer, VariableType ) -> UsedVariableContext -> UsedVariableContext
 pushScope vars x =
     let
         y : ActiveScope
         y =
             vars
-                |> List.map (\z -> ( z.value, ( 0, z.range ) ))
+                |> List.map (\( z, t ) -> ( z.value, ( 0, t, z.range ) ))
                 |> Dict.fromList
                 |> (,) []
     in
@@ -167,7 +175,7 @@ flagVariable k l =
             if List.member k masked then
                 ( masked, x ) :: xs
             else if Dict.member k x then
-                ( masked, (Dict.update k (Maybe.map (Tuple2.mapFirst ((+) 1))) x) ) :: xs
+                ( masked, (Dict.update k (Maybe.map (Tuple3.mapFirst ((+) 1))) x) ) :: xs
             else
                 ( masked, x ) :: flagVariable k xs
 

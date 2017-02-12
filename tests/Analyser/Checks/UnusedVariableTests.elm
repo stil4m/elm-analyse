@@ -5,7 +5,7 @@ import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Types exposing (..)
 import Dict exposing (Dict)
 import Test exposing (..)
-import Analyser.Messages.Types  exposing (..)
+import Analyser.Messages.Types exposing (..)
 import Analyser.Checks.CheckTestUtil exposing (getMessages)
 
 
@@ -206,7 +206,7 @@ import Html exposing (div)
 
 foo = 1
 """
-    , [ UnusedTopLevel "./foo.elm" "div" { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
+    , [ UnusedImportedVariable "./foo.elm" "div" { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
       ]
     )
 

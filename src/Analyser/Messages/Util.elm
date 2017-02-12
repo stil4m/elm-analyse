@@ -93,6 +93,20 @@ getMessageInfo m =
             , True
             )
 
+        UnusedImportedVariable fileName varName range ->
+            ( String.concat
+                [ "Unused imported variable `"
+                , varName
+                , "` in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , (always [ fileName ])
+            , [ range ]
+            , True
+            )
+
         UnreadableSourceFile fileName ->
             ( String.concat
                 [ "Could not parse source file: ", fileName ]

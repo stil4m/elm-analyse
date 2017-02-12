@@ -92,6 +92,7 @@ decodeMessageData =
         [ ( "UnreadableSourceFile", JD.string |> JD.map UnreadableSourceFile )
         , ( "UnusedVariable", decodeFileVarNameAndRange UnusedVariable )
         , ( "UnusedTopLevel", decodeFileVarNameAndRange UnusedTopLevel )
+        , ( "UnusedImportedVariable", decodeFileVarNameAndRange UnusedImportedVariable )
         , ( "ExposeAll", decodeFileAndRange ExposeAll )
         , ( "ImportAll", decodeFileModuleNameAndRange ImportAll )
         , ( "NoTopLevelSignature", decodeFileVarNameAndRange NoTopLevelSignature )
@@ -177,6 +178,14 @@ encodeMessageData m =
 
         UnusedTopLevel file varName range ->
             encodeTyped "UnusedTopLevel" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "varName", JE.string varName )
+                    , ( "range", Ranges.encode range )
+                    ]
+
+        UnusedImportedVariable file varName range ->
+            encodeTyped "UnusedImportedVariable" <|
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )
