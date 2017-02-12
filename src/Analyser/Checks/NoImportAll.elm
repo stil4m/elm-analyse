@@ -3,7 +3,7 @@ module Analyser.Checks.NoImportAll exposing (scan)
 import AST.Types exposing (Import, Exposure(All, None, Explicit), ModuleName, Expose(TypeExpose))
 import AST.Ranges as Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(ImportAll))
+import Analyser.Messages.Types exposing (Message, MessageData(ImportAll), newMessage)
 import Inspector exposing (defaultConfig, Action(Post))
 
 
@@ -19,7 +19,7 @@ scan fileContext =
         []
         |> List.sortWith (\( _, a ) ( _, b ) -> Ranges.orderByStart a b)
         |> List.map (uncurry (ImportAll fileContext.path))
-        |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
+        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 onImport : Import -> ExposeAllContext -> ExposeAllContext

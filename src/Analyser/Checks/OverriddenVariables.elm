@@ -3,7 +3,7 @@ module Analyser.Checks.OverriddenVariables exposing (scan)
 import AST.Types exposing (File, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(RedefineVariable))
+import Analyser.Messages.Types exposing (Message, MessageData(RedefineVariable), newMessage)
 import Dict exposing (Dict)
 import Inspector exposing (Action(Inner), defaultConfig)
 import Analyser.Checks.Variables exposing (getImportsVars, patternToVars)
@@ -37,7 +37,7 @@ scan fileContext =
             ( [], topLevels )
             |> Tuple.first
             |> List.map (\( n, r1, r2 ) -> RedefineVariable fileContext.path n r1 r2)
-            |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
+            |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 visitWithVariablePointers : List VariablePointer -> (Context -> Context) -> Context -> Context

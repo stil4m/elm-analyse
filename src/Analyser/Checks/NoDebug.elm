@@ -3,7 +3,7 @@ module Analyser.Checks.NoDebug exposing (scan)
 import AST.Types exposing (Expression, InnerExpression(QualifiedExpr))
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(DebugLog, DebugCrash))
+import Analyser.Messages.Types exposing (Message, MessageData(DebugLog, DebugCrash), newMessage)
 import Inspector exposing (Action(Post), defaultConfig)
 
 
@@ -23,7 +23,7 @@ scan fileContext =
         fileContext.ast
         []
         |> List.map (asMessage fileContext.path)
-        |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
+        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 asMessage : String -> ( DebugType, Range ) -> MessageData

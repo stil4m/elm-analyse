@@ -1,8 +1,10 @@
 module.exports = function(app, elm, expressWs) {
 
     var state = {
-        messages: [],
-        loading: true
+        status: 'initialising',
+        idCount: 0,
+        queue: [],
+        messages: []
     };
 
     function renderState() {
@@ -17,9 +19,8 @@ module.exports = function(app, elm, expressWs) {
         });
     });
 
-    elm.ports.messagesAsJson.subscribe(function(x) {
-        state.messages = x.map(i => JSON.parse(i));
-        state.loading = false;
+    elm.ports.sendState.subscribe(function(stateString) {
+        state = JSON.parse(stateString);
         expressWs.getWss().clients.forEach(x => x.send(renderState()))
     })
 

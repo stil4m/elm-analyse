@@ -2,16 +2,22 @@ module.exports = function(app, elm, expressWs) {
 
     app.ws('/control', function(ws, req) {
         ws.on('message', function(msg) {
-          if (msg === 'reload') {
-              elm.ports.onReset.send(true);
-          } else if (msg.match(/^fix:\d+$/)) {
-            const messageId = parseInt(msg.replace('fix:',''));
-            elm.ports.onFixMessage.send(messageId);
-          } else {
-            console.log("Unknown message for control:", msg);
-          }
+            if (msg === 'reload') {
+                elm.ports.onReset.send(true);
+            } else if (msg.match(/^fix:\d+$/)) {
+                const messageId = parseInt(msg.replace('fix:', ''));
+                elm.ports.onFixMessage.send(messageId);
+            } else {
+                console.log("Unknown message for control:", msg);
+            }
 
         });
+    });
+
+
+    elm.ports.sendFixResult.subscribe(function(m) {
+        console.log('sendFixResult');
+        console.log(m)
     });
 
 };

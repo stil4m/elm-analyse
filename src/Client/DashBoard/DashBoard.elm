@@ -1,6 +1,6 @@
 module Client.DashBoard.DashBoard exposing (Model, Msg, subscriptions, init, update, view)
 
-import Client.DashBoard.State as State exposing (State)
+import Analyser.State as State exposing (State)
 import Client.DashBoard.ActiveMessageDialog as ActiveMessageDialog
 import Html exposing (Html, div, text, span, h3, ul, li, a, strong)
 import Html.Events exposing (onClick)
@@ -83,13 +83,13 @@ update location msg model =
 
 view : Model -> Html Msg
 view m =
-    div [ class "container" ]
+    div []
         [ case m.messages of
             RD.Loading ->
                 text "Loading..."
 
             RD.Success state ->
-                if state.loading then
+                if State.isBusy state then
                     text "Loading..."
                 else
                     viewState state

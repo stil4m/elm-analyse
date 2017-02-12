@@ -3,7 +3,7 @@ module Analyser.Checks.UnusedImports exposing (scan)
 import AST.Ranges exposing (Range)
 import AST.Types exposing (Case, Exposure(None), Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnusedImport))
+import Analyser.Messages.Types exposing (Message, MessageData(UnusedImport), newMessage)
 import Dict exposing (Dict)
 import Inspector exposing (Action(Post), defaultConfig)
 import Tuple2
@@ -36,7 +36,7 @@ scan fileContext =
             |> List.filter (Tuple.second >> Tuple.second >> (==) 0)
             |> List.map (Tuple2.mapSecond Tuple.first)
             |> List.map (uncurry (UnusedImport fileContext.path))
-            |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
+            |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 markUsage : ModuleName -> Context -> Context

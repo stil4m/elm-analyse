@@ -15,7 +15,7 @@ import AST.Types
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Interfaces.Interface as Interface
-import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel))
+import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel), newMessage)
 import Dict exposing (Dict)
 import Inspector exposing (defaultConfig, Action(Inner, Pre, Post))
 import Tuple2
@@ -64,7 +64,7 @@ scan fileContext =
                 |> List.concatMap Dict.toList
                 |> onlyUnused
                 |> List.map (\( x, ( _, y ) ) -> UnusedVariable fileContext.path x y)
-                |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
+                |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
         unusedTopLevels =
             x.activeScopes
@@ -76,7 +76,7 @@ scan fileContext =
                 |> List.filter (filterByModuleType fileContext)
                 |> List.filter (Tuple.first >> flip Interface.doesExposeFunction fileContext.interface >> not)
                 |> List.map (\( x, ( _, y ) ) -> UnusedTopLevel fileContext.path x y)
-                |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
+                |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
     in
         unusedVariables ++ unusedTopLevels
 

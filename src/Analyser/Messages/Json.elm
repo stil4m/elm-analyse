@@ -1,11 +1,11 @@
-module Analyser.Messages.Json exposing (encodeMessage, decodeMessage)
+module Analyser.Messages.Json exposing (serialiseMessage, encodeMessage, decodeMessage)
 
 import AST.Types as AST
 import Util.Json exposing (encodeTyped, decodeTyped)
 import Json.Encode as JE
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
-import Analyser.Messages.Types exposing (Message, MessageData(..))
+import Analyser.Messages.Types exposing (Message, MessageData(..), MessageStatus(..))
 import AST.Ranges as Ranges exposing (Range)
 
 
@@ -51,8 +51,29 @@ decodeMessage : Decoder Message
 decodeMessage =
     JD.succeed Message
         |: JD.field "id" JD.int
+        |: JD.field "status" decodeMessageStatus
         |: JD.field "files" (JD.list decodeMessageFile)
         |: JD.field "data" decodeMessageData
+
+
+decodeMessageStatus : Decoder MessageStatus
+decodeMessageStatus =
+    JD.andThen
+        (\x ->
+            case x of
+                "outdated" ->
+                    JD.succeed Outdated
+
+                "blocked" ->
+                    JD.succeed Blocked
+
+                "applicable" ->
+                    JD.succeed Applicable
+
+                _ ->
+                    JD.fail ("Expecected message status, but got: " ++ x)
+        )
+        JD.string
 
 
 decodeMessageFile : Decoder ( String, String )
@@ -95,24 +116,43 @@ decodeMessageData =
         ]
 
 
-encodeMessage : Message -> String
+serialiseMessage : Message -> String
+serialiseMessage =
+    JE.encode 0 << encodeMessage
+
+
+encodeMessage : Message -> JE.Value
 encodeMessage m =
-    JE.encode 0 <|
-        JE.object
-            [ ( "id", JE.int m.id )
-            , ( "files"
-              , JE.list <|
-                    List.map
-                        (\( s, p ) ->
-                            JE.object
-                                [ ( "path", JE.string p )
-                                , ( "sha1", JE.string s )
-                                ]
-                        )
-                        m.files
-              )
-            , ( "data", encodeMessageData m.data )
-            ]
+    JE.object
+        [ ( "id", JE.int m.id )
+        , ( "status", encodeMessageStatus m.status )
+        , ( "files"
+          , JE.list <|
+                List.map
+                    (\( s, p ) ->
+                        JE.object
+                            [ ( "path", JE.string p )
+                            , ( "sha1", JE.string s )
+                            ]
+                    )
+                    m.files
+          )
+        , ( "data", encodeMessageData m.data )
+        ]
+
+
+encodeMessageStatus : MessageStatus -> JE.Value
+encodeMessageStatus m =
+    JE.string <|
+        case m of
+            Applicable ->
+                "applicable"
+
+            Outdated ->
+                "outdated"
+
+            Blocked ->
+                "blocked"
 
 
 encodeMessageData : MessageData -> JE.Value

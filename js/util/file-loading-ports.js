@@ -4,7 +4,7 @@ const fileGatherer = require('../util/file-gatherer');
 const cp = require('child_process');
 const cache = require('./cache');
 
-module.exports = function(app, config ,directory) {
+module.exports = function(app, config, directory) {
     const fileReader = require('../fileReader')(config);
     app.ports.storeAstForSha.subscribe(function(x) {
         const sha1 = x[0];
@@ -52,6 +52,34 @@ module.exports = function(app, config ,directory) {
             });
         }
         reduceTargets();
+    });
 
-    })
+    app.ports.loadFileContentWithShas.subscribe(function(files) {
+        console.log("Files", files);
+        const promises = files.map(fileName => new Promise(function(accept) {
+            fileReader(directory, fileName, accept);
+        }))
+        Promise.all(promises).then(function(pairs) {
+            app.ports.onFileContentWithShas.send(pairs.map(x => [x.sha1, x.path, x.content]));
+        }, function(e) {
+            console.log("Error when loading files for loadFileContentWithShas:");
+            console.log(e);
+        });
+    });
+
+    app.ports.storeFiles.subscribe(function(files) {
+        console.log("TODO store files");
+        console.log(files[0][0]);
+        files.forEach(file => {
+            fs.writeFile(file[0], file[1], function(err) {
+                console.log("Written file", file[0], "...");
+                cp.execSync(config.elmFormatPath + ' --yes ' + file[0], {
+                    stdio: []
+                });
+                console.log("Formatted file", file[0]);
+            })
+        })
+
+    });
+
 }

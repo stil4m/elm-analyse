@@ -4,7 +4,7 @@ import AST.Types exposing (Exposure(All, None, Explicit), Expose(TypeExpose), Fi
 import AST.Ranges exposing (Range)
 import AST.Util
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(ExposeAll))
+import Analyser.Messages.Types exposing (Message, MessageData(ExposeAll), newMessage)
 import Inspector exposing (defaultConfig, Action(Inner))
 
 
@@ -24,7 +24,7 @@ scan fileContext =
     in
         x
             |> List.map (ExposeAll fileContext.path)
-            |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
+            |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 onFile : (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
