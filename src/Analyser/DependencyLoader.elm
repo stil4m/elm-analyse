@@ -4,7 +4,7 @@ import AST.Decoding
 import AST.Types
 import AST.Util as Util
 import Analyser.Types exposing (FileContent, FileLoad, LoadedFile, LoadedFileData)
-import Interfaces.Interface as Interface
+import Analyser.Interface as Interface
 import Json.Decode
 import Parser.Parser as Parser
 import Result

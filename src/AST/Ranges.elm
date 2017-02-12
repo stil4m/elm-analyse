@@ -2,6 +2,7 @@ module AST.Ranges exposing (Location, Range, rangeToString, getRange, emptyRange
 
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE exposing (Value)
+import Json.Decode.Extra exposing (fromResult)
 
 
 type alias Location =
@@ -16,14 +17,20 @@ decode : Decoder Range
 decode =
     JD.list JD.int
         |> JD.andThen
-            (\l ->
-                case l of
-                    [ a, b, c, d ] ->
-                        JD.succeed { start = { row = a, column = b }, end = { row = c, column = d } }
+            (fromList >> fromResult)
 
-                    _ ->
-                        JD.fail "Invalid range"
-            )
+
+fromList : List Int -> Result String Range
+fromList input =
+    case input of
+        [ a, b, c, d ] ->
+            Ok
+                { start = { row = a, column = b }
+                , end = { row = c, column = d }
+                }
+
+        _ ->
+            Err "Invalid input list"
 
 
 encode : Range -> Value

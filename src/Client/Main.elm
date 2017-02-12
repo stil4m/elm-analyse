@@ -1,11 +1,9 @@
-module Client.Main exposing (..)
+module Client.Main exposing (main)
 
 import Client.App.Models as App
 import Client.App.App as App
-import Html exposing (div, node)
-import Html.Attributes exposing (href, rel)
+import Html exposing (div)
 import CssFrameworks
-import CssFrameworks.BootstrapThemes.Sandstone
 import CssFrameworks.Bootstrap
 import Navigation
 
@@ -25,11 +23,5 @@ view : App.Model -> Html.Html App.Msg
 view model =
     div []
         [ App.view model
-          -- , node "link"
-          --     [ href "https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/3.3.7+1/css/sb-admin-2.min.css"
-          --     , rel "stylesheet"
-          --     ]
-          --     []
-          -- , CssFrameworks.toStyleNode CssFrameworks.BootstrapThemes.Sandstone.sandstoneTheme
         , CssFrameworks.toStyleNode CssFrameworks.Bootstrap.bootstrap
         ]

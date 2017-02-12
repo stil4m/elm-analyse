@@ -2,7 +2,7 @@ module Analyser.Dependencies exposing (Version, Dependency, deserialise, seriali
 
 import Dict exposing (Dict)
 import AST.Types as AST
-import Interfaces.Interface as Interface
+import Analyser.Interface as Interface
 import Json.Encode as JE exposing (Value)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))

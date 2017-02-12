@@ -1,4 +1,4 @@
-module AST.Util exposing (fileExposingList, fileModuleName, rangeFromInts, getParenthesized, isOperatorApplication, isLambda, isIf, isCase, moduleExposingList, patternModuleNames)
+module AST.Util exposing (fileExposingList, fileModuleName, getParenthesized, isOperatorApplication, isLambda, isIf, isCase, moduleExposingList, patternModuleNames)
 
 import AST.Types
     exposing
@@ -62,11 +62,6 @@ fileModuleName file =
 
         NoModule ->
             Nothing
-
-
-rangeFromInts : ( Int, Int, Int, Int ) -> Range
-rangeFromInts ( x, y, z, a ) =
-    { start = { row = x, column = y }, end = { row = z, column = a } }
 
 
 isLambda : Expression -> Bool

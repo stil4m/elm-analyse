@@ -1,7 +1,6 @@
 module Tests exposing (..)
 
-import Interfaces.InterfaceTest as InterfaceTest
-import Interfaces.DependencyTests as DependencyTests
+import Analyser.InterfaceTest as InterfaceTest
 import Analyser.PostProcessingTests as PostProcessingTests
 import Test exposing (Test)
 import Parser.Tests as ParserTests
@@ -35,7 +34,6 @@ all =
         , Analyser.Checks.NoImportAllTests.all
         , Analyser.Checks.NotExposeAllTests.all
         , InterfaceTest.all
-        , DependencyTests.all
         , PostProcessingTests.all
         , ParserTests.all
         ]

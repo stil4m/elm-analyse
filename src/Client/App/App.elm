@@ -8,11 +8,7 @@ import Client.DashBoard.DashBoard as DashBoard
 import Tuple2
 import WebSocket as WS
 import Navigation exposing (Location)
-
-
-endpoint : Location -> String
-endpoint { host } =
-    "ws://" ++ host ++ "/control"
+import Client.Socket exposing (controlAddress)
 
 
 subscriptions : Model -> Sub Msg
@@ -21,7 +17,7 @@ subscriptions model =
         [ case model.content of
             DashBoardContent sub ->
                 DashBoard.subscriptions model.location sub |> Sub.map DashBoardMsg
-        , WS.keepAlive (endpoint model.location)
+        , WS.keepAlive (controlAddress model.location)
         ]
 
 
@@ -52,7 +48,7 @@ update msg model =
 
         Refresh ->
             ( model
-            , WS.send (endpoint model.location) "reload"
+            , WS.send (controlAddress model.location) "reload"
             )
 
         DashBoardMsg subMsg ->

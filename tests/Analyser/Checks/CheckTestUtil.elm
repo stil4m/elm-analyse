@@ -2,7 +2,7 @@ module Analyser.Checks.CheckTestUtil exposing (..)
 
 import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData)
-import Interfaces.Interface as Interface
+import Analyser.Interface as Interface
 import AST.Util
 import Analyser.Types exposing (..)
 import Parser.Parser

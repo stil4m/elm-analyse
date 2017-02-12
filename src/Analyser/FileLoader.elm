@@ -3,7 +3,7 @@ port module Analyser.FileLoader exposing (Msg, init, subscriptions, update)
 import Analyser.Types exposing (FileContent, FileLoad, LoadedFile, LoadedFileData)
 import AST.Types
 import AST.Util as Util
-import Interfaces.Interface as Interface
+import Analyser.Interface as Interface
 import Parser.Parser as Parser
 import Json.Encode
 import Json.Decode

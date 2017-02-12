@@ -11,7 +11,7 @@ module Analyser.Types
         )
 
 import AST.Types as AST
-import Interfaces.Interface as Interface
+import Analyser.Interface as Interface
 import Dict exposing (Dict)
 
 

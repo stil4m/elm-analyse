@@ -1,7 +1,7 @@
-module Interfaces.InterfaceTest exposing (..)
+module Analyser.InterfaceTest exposing (..)
 
 import Expect
-import Interfaces.Interface as Interface exposing (ExposedInterface(..))
+import Analyser.Interface as Interface exposing (ExposedInterface(..))
 import Parser.Parser as Parser
 import AST.Types as AST
 import Test exposing (..)

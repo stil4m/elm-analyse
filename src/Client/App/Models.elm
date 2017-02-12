@@ -1,4 +1,9 @@
-module Client.App.Models exposing (..)
+module Client.App.Models
+    exposing
+        ( Msg(DashBoardMsg, Refresh, OnLocation)
+        , Model
+        , Content(DashBoardContent)
+        )
 
 import Client.DashBoard.DashBoard as DashBoard
 import Navigation exposing (Location)

@@ -14,7 +14,7 @@ import AST.Types
         )
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Interfaces.Interface as Interface
+import Analyser.Interface as Interface
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel, UnusedImportedVariable), newMessage)
 import Dict exposing (Dict)
 import Inspector exposing (defaultConfig, Action(Inner, Pre, Post))

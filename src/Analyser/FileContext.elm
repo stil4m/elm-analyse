@@ -2,7 +2,7 @@ module Analyser.FileContext exposing (FileContext, create)
 
 import AST.Types as AST
 import Analyser.Types exposing (LoadedSourceFile, LoadedSourceFiles)
-import Interfaces.Interface exposing (Interface)
+import Analyser.Interface exposing (Interface)
 import Maybe exposing (Maybe(Just, Nothing))
 import Analyser.OperatorTable as OperatorTable
 import Analyser.PostProcessing as PostProcessing
@@ -39,6 +39,6 @@ create sourceFiles dependencies ( fileContent, target ) =
                         , ast = PostProcessing.postProcess operatorTable l.ast
                         , path = fileContent.path
                         , content = fileContent.content |> Maybe.withDefault ""
-                        , interface = Interfaces.Interface.build l.ast
+                        , interface = Analyser.Interface.build l.ast
                         , sha1 = Maybe.withDefault "" fileContent.sha1
                         }

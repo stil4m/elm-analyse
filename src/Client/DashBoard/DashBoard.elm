@@ -13,6 +13,7 @@ import Analyser.Messages.Util as Messages
 import Html.Attributes exposing (class, style)
 import Tuple2
 import Navigation exposing (Location)
+import Client.Socket exposing (dashboardAddress)
 
 
 type alias Model =
@@ -28,15 +29,10 @@ type Msg
     | ActiveMessageDialogMsg ActiveMessageDialog.Msg
 
 
-socketAddress : Location -> String
-socketAddress { host } =
-    "ws://" ++ host ++ "/dashboard"
-
-
 subscriptions : Location -> Model -> Sub Msg
 subscriptions location _ =
     Sub.batch
-        [ WS.listen (socketAddress location) (JD.decodeString State.decodeState >> NewMsg)
+        [ WS.listen (dashboardAddress location) (JD.decodeString State.decodeState >> NewMsg)
         , Time.every (Time.second * 10) (always Tick)
         ]
 
@@ -55,7 +51,7 @@ update location msg model =
     case msg of
         Tick ->
             ( model
-            , WS.send (socketAddress location) "ping"
+            , WS.send (dashboardAddress location) "ping"
             )
 
         NewMsg x ->

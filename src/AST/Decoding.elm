@@ -1,412 +1,419 @@
 module AST.Decoding exposing (decode, decodeInfix)
 
-import AST.Ranges as Ranges
+import AST.Ranges as Ranges exposing (Range)
 import AST.Types exposing (..)
-import Json.Decode as JD exposing (Decoder)
+import Json.Decode as JD exposing (Decoder, field, list, string, map, map2, map3, succeed, maybe, lazy, int, bool, andThen, float, fail)
 import Json.Decode.Extra exposing ((|:))
 import Util.Json exposing (decodeTyped)
 
 
+rangeField : Decoder Range
+rangeField =
+    field "range" Ranges.decode
+
+
+nameField : Decoder String
+nameField =
+    field "name" string
+
+
 decode : Decoder File
 decode =
-    JD.succeed File
-        |: JD.field "moduleDefinition" decodeModule
-        |: JD.field "imports" (JD.list decodeImport)
-        |: JD.field "declarations" (JD.list decodeDeclaration)
+    succeed File
+        |: field "moduleDefinition" decodeModule
+        |: field "imports" (list decodeImport)
+        |: field "declarations" (list decodeDeclaration)
 
 
 decodeModule : Decoder Module
 decodeModule =
     decodeTyped
-        [ ( "normal", decodeDefaultModuleData |> JD.map NormalModule )
-        , ( "port", decodeDefaultModuleData |> JD.map PortModule )
-        , ( "effect", decodeEffectModuleData |> JD.map EffectModule )
-        , ( "nomodule", JD.succeed NoModule )
+        [ ( "normal", decodeDefaultModuleData |> map NormalModule )
+        , ( "port", decodeDefaultModuleData |> map PortModule )
+        , ( "effect", decodeEffectModuleData |> map EffectModule )
+        , ( "nomodule", succeed NoModule )
         ]
 
 
 decodeDefaultModuleData : Decoder DefaultModuleData
 decodeDefaultModuleData =
-    JD.succeed DefaultModuleData
-        |: JD.field "moduleName" decodeModuleName
-        |: JD.field "exposingList" (decodeExposingList decodeExpose)
+    succeed DefaultModuleData
+        |: field "moduleName" decodeModuleName
+        |: field "exposingList" (decodeExposingList decodeExpose)
 
 
 decodeEffectModuleData : Decoder EffectModuleData
 decodeEffectModuleData =
-    JD.succeed EffectModuleData
-        |: JD.field "moduleName" decodeModuleName
-        |: JD.field "exposingList" (decodeExposingList decodeExpose)
-        |: JD.field "command" (JD.maybe JD.string)
-        |: JD.field "subscription" (JD.maybe JD.string)
+    succeed EffectModuleData
+        |: field "moduleName" decodeModuleName
+        |: field "exposingList" (decodeExposingList decodeExpose)
+        |: field "command" (maybe string)
+        |: field "subscription" (maybe string)
 
 
 decodeModuleName : Decoder ModuleName
 decodeModuleName =
-    JD.list JD.string
+    list string
 
 
 decodeExpose : Decoder Expose
 decodeExpose =
     decodeTyped
-        [ ( "infix", JD.map2 InfixExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
-        , ( "function", JD.map2 FunctionExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
-        , ( "typeOrAlias", JD.map2 TypeOrAliasExpose (JD.field "name" JD.string) (JD.field "range" Ranges.decode) )
-        , ( "typeexpose", JD.map TypeExpose decodeExposedType )
+        [ ( "infix", map2 InfixExpose (nameField) (rangeField) )
+        , ( "function", map2 FunctionExpose (nameField) (rangeField) )
+        , ( "typeOrAlias", map2 TypeOrAliasExpose (nameField) (rangeField) )
+        , ( "typeexpose", map TypeExpose decodeExposedType )
         ]
 
 
 decodeExposedType : Decoder ExposedType
 decodeExposedType =
-    JD.succeed ExposedType
-        |: JD.field "name" JD.string
-        |: JD.field "inner" (decodeExposingList decodeValueConstructorExpose)
-        |: JD.field "range" Ranges.decode
+    succeed ExposedType
+        |: nameField
+        |: field "inner" (decodeExposingList decodeValueConstructorExpose)
+        |: rangeField
 
 
 decodeValueConstructorExpose : Decoder ValueConstructorExpose
 decodeValueConstructorExpose =
-    JD.succeed (,)
-        |: JD.field "name" JD.string
-        |: JD.field "range" Ranges.decode
+    succeed (,)
+        |: nameField
+        |: rangeField
 
 
 decodeExposingList : Decoder a -> Decoder (Exposure a)
 decodeExposingList x =
-    JD.lazy
+    lazy
         (\() ->
             decodeTyped
-                [ ( "none", (JD.succeed None) )
-                , ( "all", Ranges.decode |> JD.map All )
-                , ( "explicit", JD.list x |> JD.map Explicit )
+                [ ( "none", (succeed None) )
+                , ( "all", Ranges.decode |> map All )
+                , ( "explicit", list x |> map Explicit )
                 ]
         )
 
 
 decodeImport : Decoder Import
 decodeImport =
-    JD.succeed Import
-        |: JD.field "moduleName" decodeModuleName
-        |: JD.field "moduleAlias" (JD.maybe decodeModuleName)
-        |: JD.field "exposingList" (decodeExposingList decodeExpose)
-        |: JD.field "range" Ranges.decode
+    succeed Import
+        |: field "moduleName" decodeModuleName
+        |: field "moduleAlias" (maybe decodeModuleName)
+        |: field "exposingList" (decodeExposingList decodeExpose)
+        |: rangeField
 
 
 decodeDeclaration : Decoder Declaration
 decodeDeclaration =
-    JD.lazy
+    lazy
         (\() ->
             decodeTyped
-                [ ( "function", decodeFunction |> JD.map FuncDecl )
-                , ( "typeAlias", decodeTypeAlias |> JD.map AliasDecl )
-                , ( "typedecl", decodeType |> JD.map TypeDecl )
-                , ( "port", decodeSignature |> JD.map PortDeclaration )
-                , ( "infix", decodeInfix |> JD.map InfixDeclaration )
-                , ( "destrucutring", decodeDestructuring |> JD.map DestructuringDeclaration )
+                [ ( "function", decodeFunction |> map FuncDecl )
+                , ( "typeAlias", decodeTypeAlias |> map AliasDecl )
+                , ( "typedecl", decodeType |> map TypeDecl )
+                , ( "port", decodeSignature |> map PortDeclaration )
+                , ( "infix", decodeInfix |> map InfixDeclaration )
+                , ( "destrucutring", decodeDestructuring |> map DestructuringDeclaration )
                 ]
         )
 
 
 decodeInfix : Decoder Infix
 decodeInfix =
-    JD.succeed Infix
-        |: JD.field "direction" decodeInfixDirection
-        |: JD.field "precedence" JD.int
-        |: JD.field "operator" JD.string
+    succeed Infix
+        |: field "direction" decodeInfixDirection
+        |: field "precedence" int
+        |: field "operator" string
 
 
 decodeDestructuring : Decoder Destructuring
 decodeDestructuring =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed Destructuring
-                |: JD.field "pattern" decodePattern
-                |: JD.field "expression" decodeExpression
+            succeed Destructuring
+                |: field "pattern" decodePattern
+                |: field "expression" decodeExpression
         )
 
 
 decodeType : Decoder Type
 decodeType =
-    JD.succeed Type
-        |: JD.field "name" JD.string
-        |: JD.field "generics" (JD.list JD.string)
-        |: JD.field "constructors" (JD.list decodeValueConstructor)
+    succeed Type
+        |: nameField
+        |: field "generics" (list string)
+        |: field "constructors" (list decodeValueConstructor)
 
 
 decodeValueConstructor : Decoder ValueConstructor
 decodeValueConstructor =
-    JD.succeed ValueConstructor
-        |: JD.field "name" JD.string
-        |: JD.field "arguments" (JD.list decodeTypeReference)
-        |: JD.field "range" Ranges.decode
+    succeed ValueConstructor
+        |: nameField
+        |: field "arguments" (list decodeTypeReference)
+        |: rangeField
 
 
 decodeTypeAlias : Decoder TypeAlias
 decodeTypeAlias =
-    JD.succeed TypeAlias
-        |: JD.field "name" JD.string
-        |: JD.field "generics" (JD.list JD.string)
-        |: JD.field "typeReference" decodeTypeReference
-        |: JD.field "range" Ranges.decode
+    succeed TypeAlias
+        |: nameField
+        |: field "generics" (list string)
+        |: field "typeReference" decodeTypeReference
+        |: rangeField
 
 
 decodeFunction : Decoder Function
 decodeFunction =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed Function
-                |: JD.field "documentation" (JD.maybe JD.string)
-                |: JD.field "signature" (JD.maybe decodeSignature)
-                |: JD.field "declaration" decodeFunctionDeclaration
+            succeed Function
+                |: field "documentation" (maybe string)
+                |: field "signature" (maybe decodeSignature)
+                |: field "declaration" decodeFunctionDeclaration
         )
 
 
 decodeSignature : Decoder FunctionSignature
 decodeSignature =
-    JD.succeed FunctionSignature
-        |: JD.field "operatorDefinition" JD.bool
-        |: JD.field "name" JD.string
-        |: JD.field "typeReference" decodeTypeReference
+    succeed FunctionSignature
+        |: field "operatorDefinition" bool
+        |: nameField
+        |: field "typeReference" decodeTypeReference
 
 
 decodeTypeReference : Decoder TypeReference
 decodeTypeReference =
-    JD.lazy
+    lazy
         (\() ->
             decodeTyped
-                [ ( "generic", JD.string |> JD.map GenericType )
-                , ( "typed", JD.map3 Typed (JD.field "moduleName" decodeModuleName) (JD.field "name" JD.string) (JD.field "args" <| JD.list decodeTypeArg) )
-                , ( "unit", JD.succeed Unit )
-                , ( "tupled", JD.list decodeTypeReference |> JD.map Tupled )
-                , ( "function", JD.map2 FunctionTypeReference (JD.field "left" decodeTypeReference) (JD.field "right" decodeTypeReference) )
-                , ( "record", decodeRecordDefinition |> JD.map Record )
-                , ( "genericRecord", JD.map2 GenericRecord (JD.field "name" JD.string) (JD.field "values" decodeRecordDefinition) )
+                [ ( "generic", string |> map GenericType )
+                , ( "typed", map3 Typed (field "moduleName" decodeModuleName) (nameField) (field "args" <| list decodeTypeArg) )
+                , ( "unit", succeed Unit )
+                , ( "tupled", list decodeTypeReference |> map Tupled )
+                , ( "function", map2 FunctionTypeReference (field "left" decodeTypeReference) (field "right" decodeTypeReference) )
+                , ( "record", decodeRecordDefinition |> map Record )
+                , ( "genericRecord", map2 GenericRecord (nameField) (field "values" decodeRecordDefinition) )
                 ]
         )
 
 
 decodeRecordDefinition : Decoder RecordDefinition
 decodeRecordDefinition =
-    JD.lazy
-        (\() ->
-            JD.list decodeRecordField
-        )
+    lazy (\() -> list decodeRecordField)
 
 
 decodeRecordField : Decoder RecordField
 decodeRecordField =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed (,)
-                |: JD.field "name" JD.string
-                |: JD.field "typeReference" decodeTypeReference
+            succeed (,)
+                |: nameField
+                |: field "typeReference" decodeTypeReference
         )
 
 
 decodeTypeArg : Decoder TypeArg
 decodeTypeArg =
-    JD.lazy
+    lazy
         (\() ->
             decodeTyped
-                [ ( "generic", JD.string |> JD.map Generic )
-                , ( "concrete", decodeTypeReference |> JD.map Concrete )
+                [ ( "generic", string |> map Generic )
+                , ( "concrete", decodeTypeReference |> map Concrete )
                 ]
         )
 
 
 decodeFunctionDeclaration : Decoder FunctionDeclaration
 decodeFunctionDeclaration =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed FunctionDeclaration
-                |: JD.field "operatorDefinition" JD.bool
-                |: JD.field "name" decodeVariablePointer
-                |: JD.field "arguments" (JD.list decodePattern)
-                |: JD.field "expression" decodeExpression
+            succeed FunctionDeclaration
+                |: field "operatorDefinition" bool
+                |: field "name" decodeVariablePointer
+                |: field "arguments" (list decodePattern)
+                |: field "expression" decodeExpression
         )
 
 
 decodeVariablePointer : Decoder VariablePointer
 decodeVariablePointer =
-    JD.succeed VariablePointer
-        |: JD.field "value" JD.string
-        |: JD.field "range" Ranges.decode
+    succeed VariablePointer
+        |: field "value" string
+        |: rangeField
 
 
 decodeChar : Decoder Char
 decodeChar =
-    JD.string
-        |> JD.andThen
+    string
+        |> andThen
             (\s ->
                 case String.uncons s of
                     Just ( c, _ ) ->
-                        JD.succeed c
+                        succeed c
 
                     Nothing ->
-                        JD.fail "Not a char"
+                        fail "Not a char"
             )
 
 
 decodePattern : Decoder Pattern
 decodePattern =
-    JD.lazy
+    lazy
         (\() ->
             decodeTyped
-                [ ( "all", JD.succeed AllPattern )
-                , ( "unit", JD.succeed UnitPattern )
-                , ( "char", decodeChar |> JD.map CharPattern )
-                , ( "string", JD.string |> JD.map StringPattern )
-                , ( "int", JD.int |> JD.map IntPattern )
-                , ( "float", JD.float |> JD.map FloatPattern )
-                , ( "tuple", JD.list decodePattern |> JD.map TuplePattern )
-                , ( "record", JD.list decodeVariablePointer |> JD.map RecordPattern )
-                , ( "uncons", JD.map2 UnConsPattern (JD.field "left" decodePattern) (JD.field "right" decodePattern) )
-                , ( "list", JD.list decodePattern |> JD.map ListPattern )
-                , ( "var", decodeVariablePointer |> JD.map VarPattern )
-                , ( "named", JD.map2 NamedPattern (JD.field "qualified" decodeQualifiedNameRef) (JD.field "patterns" (JD.list decodePattern)) )
-                , ( "qualifiedName", JD.map QualifiedNamePattern decodeQualifiedNameRef )
-                , ( "as", JD.map2 AsPattern (JD.field "pattern" decodePattern) (JD.field "name" decodeVariablePointer) )
-                , ( "parentisized", JD.map ParentisizedPattern decodePattern )
+                [ ( "all", succeed AllPattern )
+                , ( "unit", succeed UnitPattern )
+                , ( "char", decodeChar |> map CharPattern )
+                , ( "string", string |> map StringPattern )
+                , ( "int", int |> map IntPattern )
+                , ( "float", float |> map FloatPattern )
+                , ( "tuple", list decodePattern |> map TuplePattern )
+                , ( "record", list decodeVariablePointer |> map RecordPattern )
+                , ( "uncons", map2 UnConsPattern (field "left" decodePattern) (field "right" decodePattern) )
+                , ( "list", list decodePattern |> map ListPattern )
+                , ( "var", decodeVariablePointer |> map VarPattern )
+                , ( "named", map2 NamedPattern (field "qualified" decodeQualifiedNameRef) (field "patterns" (list decodePattern)) )
+                , ( "qualifiedName", map QualifiedNamePattern decodeQualifiedNameRef )
+                , ( "as", map2 AsPattern (field "pattern" decodePattern) (field "name" decodeVariablePointer) )
+                , ( "parentisized", map ParentisizedPattern decodePattern )
                 ]
         )
 
 
 decodeQualifiedNameRef : Decoder QualifiedNameRef
 decodeQualifiedNameRef =
-    JD.succeed QualifiedNameRef
-        |: JD.field "moduleName" decodeModuleName
-        |: JD.field "name" JD.string
-        |: JD.field "range" Ranges.decode
+    succeed QualifiedNameRef
+        |: field "moduleName" decodeModuleName
+        |: nameField
+        |: rangeField
 
 
 decodeExpression : Decoder Expression
 decodeExpression =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed (,)
-                |: JD.field "range" Ranges.decode
-                |: JD.field "inner" decodeInnerExpression
+            succeed (,)
+                |: rangeField
+                |: field "inner" decodeInnerExpression
         )
 
 
 decodeInnerExpression : Decoder InnerExpression
 decodeInnerExpression =
-    JD.lazy
+    lazy
         (\() ->
             decodeTyped
-                [ ( "unit", JD.succeed UnitExpr )
-                , ( "application", JD.list decodeExpression |> JD.map Application )
-                , ( "operatorapplication", decodeOperatorApplication |> JD.map OperatorApplicationExpression )
-                , ( "functionOrValue", JD.string |> JD.map FunctionOrValue )
-                , ( "ifBlock", JD.map3 IfBlock (JD.field "clause" decodeExpression) (JD.field "then" decodeExpression) (JD.field "else" decodeExpression) )
-                , ( "prefixoperator", JD.string |> JD.map PrefixOperator )
-                , ( "operator", JD.string |> JD.map Operator )
-                , ( "integer", JD.int |> JD.map Integer )
-                , ( "float", JD.float |> JD.map Floatable )
-                , ( "literal", JD.string |> JD.map Literal )
-                , ( "charLiteral", decodeChar |> JD.map CharLiteral )
-                , ( "tupled", JD.list decodeExpression |> JD.map TupledExpression )
-                , ( "list", JD.list decodeExpression |> JD.map ListExpr )
-                , ( "parenthesized", decodeExpression |> JD.map ParenthesizedExpression )
-                , ( "let", decodeLetBlock |> JD.map LetExpression )
-                , ( "case", decodeCaseBlock |> JD.map CaseExpression )
-                , ( "lambda", decodeLambda |> JD.map LambdaExpression )
-                , ( "qualified", JD.map2 QualifiedExpr (JD.field "moduleName" decodeModuleName) (JD.field "name" JD.string) )
-                , ( "recordAccess", JD.map2 RecordAccess (JD.field "expression" decodeExpression) (JD.field "name" JD.string) )
-                , ( "recordAccessFunction", JD.string |> JD.map RecordAccessFunction )
-                , ( "record", JD.list decodeRecordSetter |> JD.map RecordExpr )
-                , ( "recordUpdate", decodeRecordUpdate |> JD.map RecordUpdateExpression )
-                , ( "glsl", JD.string |> JD.map GLSLExpression )
+                [ ( "unit", succeed UnitExpr )
+                , ( "application", list decodeExpression |> map Application )
+                , ( "operatorapplication", decodeOperatorApplication |> map OperatorApplicationExpression )
+                , ( "functionOrValue", string |> map FunctionOrValue )
+                , ( "ifBlock", map3 IfBlock (field "clause" decodeExpression) (field "then" decodeExpression) (field "else" decodeExpression) )
+                , ( "prefixoperator", string |> map PrefixOperator )
+                , ( "operator", string |> map Operator )
+                , ( "integer", int |> map Integer )
+                , ( "float", float |> map Floatable )
+                , ( "literal", string |> map Literal )
+                , ( "charLiteral", decodeChar |> map CharLiteral )
+                , ( "tupled", list decodeExpression |> map TupledExpression )
+                , ( "list", list decodeExpression |> map ListExpr )
+                , ( "parenthesized", decodeExpression |> map ParenthesizedExpression )
+                , ( "let", decodeLetBlock |> map LetExpression )
+                , ( "case", decodeCaseBlock |> map CaseExpression )
+                , ( "lambda", decodeLambda |> map LambdaExpression )
+                , ( "qualified", map2 QualifiedExpr (field "moduleName" decodeModuleName) (nameField) )
+                , ( "recordAccess", map2 RecordAccess (field "expression" decodeExpression) (nameField) )
+                , ( "recordAccessFunction", string |> map RecordAccessFunction )
+                , ( "record", list decodeRecordSetter |> map RecordExpr )
+                , ( "recordUpdate", decodeRecordUpdate |> map RecordUpdateExpression )
+                , ( "glsl", string |> map GLSLExpression )
                 ]
         )
 
 
 decodeRecordUpdate : Decoder RecordUpdate
 decodeRecordUpdate =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed RecordUpdate
-                |: JD.field "name" JD.string
-                |: JD.field "updates" (JD.list decodeRecordSetter)
+            succeed RecordUpdate
+                |: nameField
+                |: field "updates" (list decodeRecordSetter)
         )
 
 
 decodeRecordSetter : Decoder RecordSetter
 decodeRecordSetter =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed (,)
-                |: JD.field "field" JD.string
-                |: JD.field "expression" decodeExpression
+            succeed (,)
+                |: field "field" string
+                |: field "expression" decodeExpression
         )
 
 
 decodeLambda : Decoder Lambda
 decodeLambda =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed Lambda
-                |: JD.field "patterns" (JD.list decodePattern)
-                |: JD.field "expression" decodeExpression
+            succeed Lambda
+                |: field "patterns" (list decodePattern)
+                |: field "expression" decodeExpression
         )
 
 
 decodeCaseBlock : Decoder CaseBlock
 decodeCaseBlock =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed CaseBlock
-                |: JD.field "expression" decodeExpression
-                |: JD.field "cases" (JD.list decodeCase)
+            succeed CaseBlock
+                |: field "expression" decodeExpression
+                |: field "cases" (list decodeCase)
         )
 
 
 decodeCase : Decoder Case
 decodeCase =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed (,)
-                |: JD.field "pattern" decodePattern
-                |: JD.field "expression" decodeExpression
+            succeed (,)
+                |: field "pattern" decodePattern
+                |: field "expression" decodeExpression
         )
 
 
 decodeLetBlock : Decoder LetBlock
 decodeLetBlock =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed LetBlock
-                |: JD.field "declarations" (JD.list decodeDeclaration)
-                |: JD.field "expression" decodeExpression
+            succeed LetBlock
+                |: field "declarations" (list decodeDeclaration)
+                |: field "expression" decodeExpression
         )
 
 
 decodeOperatorApplication : Decoder OperatorApplication
 decodeOperatorApplication =
-    JD.lazy
+    lazy
         (\() ->
-            JD.succeed OperatorApplication
-                |: JD.field "operator" JD.string
-                |: JD.field "direction" decodeInfixDirection
-                |: JD.field "left" decodeExpression
-                |: JD.field "left" decodeExpression
+            succeed OperatorApplication
+                |: field "operator" string
+                |: field "direction" decodeInfixDirection
+                |: field "left" decodeExpression
+                |: field "right" decodeExpression
         )
 
 
 decodeInfixDirection : Decoder InfixDirection
 decodeInfixDirection =
-    JD.string
-        |> JD.andThen
+    string
+        |> andThen
             (\v ->
                 case v of
                     "left" ->
-                        JD.succeed Left
+                        succeed Left
 
                     "right" ->
-                        JD.succeed Right
+                        succeed Right
 
                     _ ->
-                        JD.fail "Invlalid direction"
+                        fail "Invlalid direction"
             )
 
 

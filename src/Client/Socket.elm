@@ -1,8 +1,13 @@
-module Client.Socket exposing (..)
+module Client.Socket exposing (controlAddress, dashboardAddress)
 
 import Navigation exposing (Location)
 
 
-controlEndpoint : Location -> String
-controlEndpoint { host } =
+controlAddress : Location -> String
+controlAddress { host } =
     "ws://" ++ host ++ "/control"
+
+
+dashboardAddress : Location -> String
+dashboardAddress { host } =
+    "ws://" ++ host ++ "/dashboard"

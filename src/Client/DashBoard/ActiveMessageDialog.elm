@@ -1,4 +1,4 @@
-module Client.DashBoard.ActiveMessageDialog exposing (..)
+module Client.DashBoard.ActiveMessageDialog exposing (Model, Msg, show, init, update, view)
 
 import AST.Ranges exposing (Range)
 import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens))
@@ -80,7 +80,7 @@ update location msg model =
             model
                 |> Maybe.map
                     (\y ->
-                        ( hide (Just y), WS.send (Socket.controlEndpoint location) ("fix:" ++ toString y.message.id) )
+                        ( hide (Just y), WS.send (Socket.controlAddress location) ("fix:" ++ toString y.message.id) )
                     )
                 |> Maybe.withDefault ( model, Cmd.none )
 
