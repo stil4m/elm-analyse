@@ -73,10 +73,15 @@ module.exports = function(app, config, directory) {
         files.forEach(file => {
             fs.writeFile(file[0], file[1], function(err) {
                 console.log("Written file", file[0], "...");
-                cp.execSync(config.elmFormatPath + ' --yes ' + file[0], {
-                    stdio: []
-                });
-                console.log("Formatted file", file[0]);
+                try {
+                    cp.execSync(config.elmFormatPath + ' --yes ' + file[0], {
+                        stdio: []
+                    });
+                    console.log("Formatted file", file[0]);
+                } catch (e) {
+                    console.log("Could not formatted file", file[0]);
+                }
+
             })
         })
 
