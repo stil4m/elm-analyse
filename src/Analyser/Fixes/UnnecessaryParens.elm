@@ -29,7 +29,7 @@ fixContent { start, end } content =
         endCharLoc =
             if end.column <= -2 then
                 { end
-                    | column = content |> String.split "\n" |> List.drop (end.row) |> List.head |> Maybe.withDefault "" |> String.length
+                    | column = content |> String.split "\n" |> List.drop (end.row - 1) |> List.head |> Maybe.withDefault "" |> String.length |> flip (-) 2
                     , row = end.row - 1
                 }
             else
