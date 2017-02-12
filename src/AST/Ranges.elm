@@ -1,4 +1,4 @@
-module AST.Ranges exposing (Location, Range, rangeToString, getRange, emptyRange, encode, decode, orderByStart)
+module AST.Ranges exposing (Location, Range, rangeToString, getRange, emptyRange, encode, decode, orderByStart, containsRange)
 
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE exposing (Value)
@@ -94,3 +94,18 @@ sortLocations =
 locationToString : Location -> String
 locationToString { row, column } =
     "(" ++ toString row ++ "," ++ toString column ++ ")"
+
+
+containsRange : Range -> Range -> Bool
+containsRange a b =
+    isGte a.start b.start && isGte b.end a.end
+
+
+isGte : Location -> Location -> Bool
+isGte a b =
+    if a.row > b.row then
+        True
+    else if a.row < b.row then
+        False
+    else
+        a.column >= b.column

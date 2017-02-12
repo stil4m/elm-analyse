@@ -3,17 +3,19 @@ module Analyser.Fixes.UnnecessaryParens exposing (fix)
 import Analyser.Messages.Types exposing (MessageData(UnnecessaryParens))
 import AST.Ranges exposing (Range, Location)
 import Tuple2
+import Tuple3
 import List.Extra as List
+import AST.Types exposing (File)
 
 
-fix : List ( String, String ) -> MessageData -> List ( String, String )
+fix : List ( String, String, File ) -> MessageData -> List ( String, String )
 fix input messageData =
     case messageData of
         UnnecessaryParens fileName range ->
             input
-                |> List.filter (Tuple.first >> (==) fileName)
+                |> List.filter (Tuple3.first >> (==) fileName)
                 |> List.head
-                |> Maybe.map (Tuple2.mapSecond (fixContent range) >> List.singleton)
+                |> Maybe.map (Tuple3.init >> Tuple2.mapSecond (fixContent range) >> List.singleton)
                 |> Maybe.withDefault []
 
         _ ->

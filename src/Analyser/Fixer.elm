@@ -1,9 +1,16 @@
 port module Analyser.Fixer exposing (..)
 
-import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens))
+import Analyser.Messages.Types
+    exposing
+        ( Message
+        , MessageData(UnnecessaryParens, UnusedImportedVariable)
+        )
 import Analyser.State as State exposing (State)
 import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
+import Analyser.Fixes.UnusedImportedVariable as UnusedImportedVariableFixer
 import Tuple3
+import Parser.Parser as Parser
+import AST.Types exposing (File)
 
 
 port storeFiles : List ( String, String ) -> Cmd msg
@@ -45,7 +52,7 @@ type alias Model =
 
 
 type alias FixCall =
-    List ( String, String ) -> MessageData -> List ( String, String )
+    List ( String, String, File ) -> MessageData -> List ( String, String )
 
 
 init : Int -> State -> Maybe ( Model, Cmd Msg, State )
@@ -75,8 +82,16 @@ update msg model =
                 )
             else
                 let
+                    -- TODO If parse failed?
+                    fixData =
+                        reference
+                            |> List.filterMap
+                                (\( sha1, path, content ) ->
+                                    Parser.parse content |> Maybe.map ((,,) path content)
+                                )
+
                     changedFiles =
-                        model.fixer (List.map Tuple3.tail reference) model.message.data
+                        model.fixer fixData model.message.data
                 in
                     ( { model | touchedFiles = List.map Tuple.first changedFiles }
                     , storeFiles changedFiles
@@ -98,6 +113,9 @@ getFixer m =
     case m.data of
         UnnecessaryParens _ _ ->
             Just UnnecessaryParensFixer.fix
+
+        UnusedImportedVariable _ _ _ ->
+            Just UnusedImportedVariableFixer.fix
 
         _ ->
             Nothing

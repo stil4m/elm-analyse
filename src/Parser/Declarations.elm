@@ -63,10 +63,7 @@ function =
 
 infixDeclaration : Parser State Declaration
 infixDeclaration =
-    lazy
-        (\() ->
-            InfixDeclaration <$> Infix.infixDefinition
-        )
+    lazy (\() -> InfixDeclaration <$> Infix.infixDefinition)
 
 
 destructuringDeclaration : Parser State Declaration
