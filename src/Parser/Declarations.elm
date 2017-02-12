@@ -10,10 +10,11 @@ import Parser.Modules exposing (moduleDefinition)
 import Parser.Patterns exposing (pattern, declarablePattern)
 import Parser.Tokens exposing (portToken, prefixOperatorToken, multiLineStringLiteral, caseToken, characterLiteral, ofToken, stringLiteral, typeName, thenToken, infixOperatorToken, functionName, ifToken, elseToken)
 import Parser.TypeReference exposing (typeReference)
-import AST.Types exposing (State, File, Module(NoModule), Declaration(AliasDecl, FuncDecl, TypeDecl, InfixDeclaration, DestructuringDeclaration, PortDeclaration), Destructuring, Function, FunctionSignature, FunctionDeclaration, Pattern, Expression, InnerExpression(..), RecordUpdate, Lambda, Case, CaseBlock, LetBlock, Cases, pushIndent, popIndent)
+import AST.Types exposing (File, Module(NoModule), Declaration(AliasDecl, FuncDecl, TypeDecl, InfixDeclaration, DestructuringDeclaration, PortDeclaration), Destructuring, Function, FunctionSignature, FunctionDeclaration, Pattern, Expression, InnerExpression(..), RecordUpdate, Lambda, Case, CaseBlock, LetBlock, Cases)
 import Parser.Typings exposing (typeDeclaration)
 import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer, withRange)
 import Parser.Whitespace exposing (manySpaces)
+import Parser.State exposing (State, pushIndent, popIndent)
 
 
 file : Parser State File

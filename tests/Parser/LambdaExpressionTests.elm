@@ -6,6 +6,7 @@ import Parser.Declarations as Parser exposing (..)
 import AST.Types as Types exposing (..)
 import AST.Ranges exposing (..)
 import Test exposing (..)
+import Parser.State exposing (emptyState)
 
 
 all : Test

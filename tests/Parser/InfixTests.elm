@@ -5,6 +5,7 @@ import Expect
 import AST.Types as Types exposing (..)
 import Test exposing (..)
 import Parser.Infix as Infix exposing (..)
+import Parser.State exposing (emptyState)
 
 
 all : Test

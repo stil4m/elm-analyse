@@ -2,9 +2,10 @@ module Parser.Util exposing (withRange, asPointer, unstrictIndentWhitespace, exa
 
 import Combine exposing (Parser, ParseLocation, succeed, withLocation, many1, many, sequence, maybe, withState, or, (>>=), (<$>), (<*>), (<*), (*>))
 import Parser.Comments exposing (multilineComment, singleLineComment)
-import AST.Types exposing (State, VariablePointer, currentIndent)
+import AST.Types exposing (VariablePointer)
 import AST.Ranges exposing (Range, Location)
 import Parser.Whitespace exposing (many1Spaces, manySpaces, nSpaces, realNewLine)
+import Parser.State exposing (State, currentIndent)
 
 
 asPointerLocation : ParseLocation -> Location
@@ -99,13 +100,14 @@ moreThanIndentWhitespace =
     withState
         (\state ->
             or
-                ((List.concat >> String.concat)
+                (String.concat
                     <$> many1
-                            (sequence
-                                [ manySpaces
-                                , commentSequence
-                                , newLineWithIndentPlus state
-                                ]
+                            (String.concat
+                                <$> sequence
+                                        [ manySpaces
+                                        , commentSequence
+                                        , newLineWithIndentPlus state
+                                        ]
                             )
                 )
                 (succeed (++)

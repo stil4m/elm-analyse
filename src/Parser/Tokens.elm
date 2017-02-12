@@ -162,14 +162,6 @@ characterLiteral =
 
 stringLiteral : Parser s String
 stringLiteral =
-    -- (char '"')
-    --     *> (String.fromList
-    --             <$> many
-    --                     (or escapedChar
-    --                         (noneOf [ '"' ])
-    --                     )
-    --        )
-    --     <* (char '"')
     char '"'
         *> (String.concat
                 <$> many

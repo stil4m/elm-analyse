@@ -1,6 +1,5 @@
 module Parser.FileTests exposing (..)
 
-import AST.Types as Types exposing (..)
 import AST.Decoding
 import AST.Encoding
 import Expect
@@ -10,6 +9,7 @@ import Parser.CombineTestUtil exposing (..)
 import Parser.Declarations as Parser exposing (..)
 import Parser.Samples as Samples
 import Test exposing (..)
+import Parser.State exposing (emptyState)
 
 
 all : Test

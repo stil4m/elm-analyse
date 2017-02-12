@@ -1,15 +1,12 @@
 module Parser.DeclarationsTests exposing (..)
 
-import Combine exposing ((*>), Parser)
 import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
-import Parser.Imports exposing (importDefinition)
-import Parser.Modules exposing (moduleDefinition)
 import AST.Types as Types exposing (..)
 import AST.Ranges exposing (emptyRange)
-import Parser.Util exposing (exactIndentWhitespace)
 import Test exposing (..)
+import Parser.State exposing (State, emptyState)
 
 
 all : Test
@@ -317,8 +314,3 @@ all =
                             }
                         )
         ]
-
-
-moduleAndImport : Parser Types.State Types.Import
-moduleAndImport =
-    (moduleDefinition *> exactIndentWhitespace *> importDefinition)

@@ -3,6 +3,7 @@ module Parser.CombineTestUtil exposing (..)
 import Combine exposing (..)
 import AST.Types exposing (..)
 import AST.Ranges exposing (emptyRange, Range)
+import Parser.State exposing (State, emptyState)
 import Tuple2
 
 

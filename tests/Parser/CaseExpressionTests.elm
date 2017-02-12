@@ -7,6 +7,7 @@ import AST.Types as Types exposing (..)
 import AST.Ranges exposing (emptyRange)
 import Test exposing (..)
 import Tuple2
+import Parser.State exposing (emptyState)
 
 
 all : Test

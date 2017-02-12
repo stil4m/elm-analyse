@@ -3,8 +3,9 @@ module Parser.Typings exposing (typeDeclaration, typeAlias)
 import Combine exposing (Parser, string, sepBy, many, succeed, (<*>), (*>), (<*))
 import Parser.Tokens exposing (functionName, typeName)
 import Parser.TypeReference exposing (typeReference)
-import AST.Types exposing (State, Type, ValueConstructor, TypeAlias)
+import AST.Types exposing (Type, ValueConstructor, TypeAlias)
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed, withRange)
+import Parser.State exposing (State)
 
 
 typeDeclaration : Parser State Type

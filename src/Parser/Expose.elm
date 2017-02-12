@@ -1,10 +1,11 @@
 module Parser.Expose exposing (exposeDefinition, infixExpose, typeExpose, exposingListInner, definitionExpose, exposable)
 
-import AST.Types exposing (State, Expression, ExposedType, Exposure(None, All, Explicit), ValueConstructorExpose, Expose(InfixExpose, TypeExpose, TypeOrAliasExpose, FunctionExpose))
+import AST.Types exposing (Expression, ExposedType, Exposure(None, All, Explicit), ValueConstructorExpose, Expose(InfixExpose, TypeExpose, TypeOrAliasExpose, FunctionExpose))
 import Combine exposing ((*>), (<$), (<$>), (<*>), Parser, choice, maybe, or, parens, sepBy, string, succeed, while)
 import Combine.Char exposing (char)
 import Parser.Tokens exposing (exposingToken, functionName, typeName)
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed, withRange)
+import Parser.State exposing (State)
 
 
 exposeDefinition : Parser State a -> Parser State (Exposure a)
