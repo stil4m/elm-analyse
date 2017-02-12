@@ -15,6 +15,7 @@ type alias FileContext =
     , ast : AST.File
     , content : String
     , path : String
+    , sha1 : String
     }
 
 
@@ -39,4 +40,5 @@ create sourceFiles dependencies ( fileContent, target ) =
                         , path = fileContent.path
                         , content = fileContent.content |> Maybe.withDefault ""
                         , interface = Interfaces.Interface.build l.ast
+                        , sha1 = Maybe.withDefault "" fileContent.sha1
                         }

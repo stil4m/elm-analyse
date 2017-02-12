@@ -28,7 +28,7 @@ import AST.Types
 import AST.Ranges exposing (Range)
 import AST.Util exposing (getParenthesized, isOperatorApplication, isLambda, isIf, isCase)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (MessageData(UnnecessaryParens))
+import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens))
 import Inspector exposing (Action(Post), defaultConfig)
 import Maybe.Extra as Maybe
 import List.Extra as List
@@ -43,7 +43,7 @@ rangetoTuple x =
     ( x.start.row, x.start.column, x.end.row, x.end.column )
 
 
-scan : FileContext -> List MessageData
+scan : FileContext -> List Message
 scan fileContext =
     let
         x : Context
@@ -56,6 +56,7 @@ scan fileContext =
         x
             |> List.uniqueBy rangetoTuple
             |> List.map (UnnecessaryParens fileContext.path)
+            |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
 
 
 onExpression : Expression -> Context -> Context

@@ -1,7 +1,7 @@
 module Inspection exposing (run)
 
 import Analyser.FileContext as FileContext
-import Analyser.Messages.Types exposing (MessageData(UnformattedFile))
+import Analyser.Messages.Types exposing (Message, MessageData(UnformattedFile))
 import Analyser.Types exposing (LoadedSourceFiles)
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.NotExposeAll as NotExposeAll
@@ -18,7 +18,7 @@ import Analyser.Checks.UnusedImports as UnusedImports
 import Analyser.Dependencies exposing (Dependency)
 
 
-run : LoadedSourceFiles -> List Dependency -> List MessageData
+run : LoadedSourceFiles -> List Dependency -> List Message
 run sources deps =
     let
         checks =
@@ -40,7 +40,17 @@ run sources deps =
             sources
                 |> List.map Tuple.first
                 |> List.filter (not << .formatted)
-                |> List.map (.path >> UnformattedFile)
+                |> List.map
+                    (\source ->
+                        { id = 0
+                        , files =
+                            [ ( Maybe.withDefault "" source.sha1
+                              , source.path
+                              )
+                            ]
+                        , data = UnformattedFile source.path
+                        }
+                    )
 
         inspectionMessages =
             sources

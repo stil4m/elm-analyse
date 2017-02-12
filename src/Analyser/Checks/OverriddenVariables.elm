@@ -3,7 +3,7 @@ module Analyser.Checks.OverriddenVariables exposing (scan)
 import AST.Types exposing (File, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (MessageData(RedefineVariable))
+import Analyser.Messages.Types exposing (Message, MessageData(RedefineVariable))
 import Dict exposing (Dict)
 import Inspector exposing (Action(Inner), defaultConfig)
 import Analyser.Checks.Variables exposing (getImportsVars, patternToVars)
@@ -17,7 +17,7 @@ type alias Redefine =
     ( String, Range, Range )
 
 
-scan : FileContext -> List MessageData
+scan : FileContext -> List Message
 scan fileContext =
     let
         topLevels : Dict String Range
@@ -37,6 +37,7 @@ scan fileContext =
             ( [], topLevels )
             |> Tuple.first
             |> List.map (\( n, r1, r2 ) -> RedefineVariable fileContext.path n r1 r2)
+            |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
 
 
 visitWithVariablePointers : List VariablePointer -> (Context -> Context) -> Context -> Context

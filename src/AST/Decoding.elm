@@ -28,7 +28,7 @@ decodeModule =
 decodeDefaultModuleData : Decoder DefaultModuleData
 decodeDefaultModuleData =
     JD.succeed DefaultModuleData
-        |: JD.field "moduleName" decodeModuleName
+        |: (JD.field "moduleName" decodeModuleName)
         |: JD.field "exposingList" (decodeExposingList decodeExpose)
 
 

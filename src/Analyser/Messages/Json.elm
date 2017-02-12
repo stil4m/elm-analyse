@@ -1,11 +1,11 @@
-module Analyser.Messages.Json exposing (encodeMessageData, decodeMessageData)
+module Analyser.Messages.Json exposing (encodeMessage, decodeMessage)
 
 import AST.Types as AST
 import Util.Json exposing (encodeTyped, decodeTyped)
 import Json.Encode as JE
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
-import Analyser.Messages.Types exposing (MessageData(..))
+import Analyser.Messages.Types exposing (Message, MessageData(..))
 import AST.Ranges as Ranges exposing (Range)
 
 
@@ -47,11 +47,25 @@ fileField =
     JD.field "file" JD.string
 
 
+decodeMessage : Decoder Message
+decodeMessage =
+    JD.succeed Message
+        |: JD.field "id" JD.int
+        |: JD.field "files" (JD.list decodeMessageFile)
+        |: JD.field "data" decodeMessageData
+
+
+decodeMessageFile : Decoder ( String, String )
+decodeMessageFile =
+    JD.succeed (,)
+        |: JD.field "sha1" JD.string
+        |: JD.field "path" JD.string
+
+
 decodeMessageData : Decoder MessageData
 decodeMessageData =
     decodeTyped
         [ ( "UnreadableSourceFile", JD.string |> JD.map UnreadableSourceFile )
-        , ( "UnreadableDependencyFile", JD.map2 UnreadableDependencyFile (JD.field "file" JD.string) (JD.field "dependency" JD.string) )
         , ( "UnusedVariable", decodeFileVarNameAndRange UnusedVariable )
         , ( "UnusedTopLevel", decodeFileVarNameAndRange UnusedTopLevel )
         , ( "ExposeAll", decodeFileAndRange ExposeAll )
@@ -81,131 +95,143 @@ decodeMessageData =
         ]
 
 
-encodeMessageData : MessageData -> String
-encodeMessageData m =
+encodeMessage : Message -> String
+encodeMessage m =
     JE.encode 0 <|
-        case m of
-            UnreadableSourceFile s ->
-                encodeTyped "UnreadableSourceFile" (JE.string s)
+        JE.object
+            [ ( "id", JE.int m.id )
+            , ( "files"
+              , JE.list <|
+                    List.map
+                        (\( s, p ) ->
+                            JE.object
+                                [ ( "path", JE.string p )
+                                , ( "sha1", JE.string s )
+                                ]
+                        )
+                        m.files
+              )
+            , ( "data", encodeMessageData m.data )
+            ]
 
-            UnreadableDependencyFile file dependency ->
-                encodeTyped "UnreadableDependencyFile" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "dependency", JE.string dependency )
-                        ]
 
-            UnusedVariable file varName range ->
-                encodeTyped "UnusedVariable" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "varName", JE.string varName )
-                        , ( "range", Ranges.encode range )
-                        ]
+encodeMessageData : MessageData -> JE.Value
+encodeMessageData m =
+    case m of
+        UnreadableSourceFile s ->
+            encodeTyped "UnreadableSourceFile" (JE.string s)
 
-            UnusedTopLevel file varName range ->
-                encodeTyped "UnusedTopLevel" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "varName", JE.string varName )
-                        , ( "range", Ranges.encode range )
-                        ]
+        UnusedVariable file varName range ->
+            encodeTyped "UnusedVariable" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "varName", JE.string varName )
+                    , ( "range", Ranges.encode range )
+                    ]
 
-            ExposeAll file range ->
-                encodeTyped "ExposeAll" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "range", Ranges.encode range )
-                        ]
+        UnusedTopLevel file varName range ->
+            encodeTyped "UnusedTopLevel" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "varName", JE.string varName )
+                    , ( "range", Ranges.encode range )
+                    ]
 
-            ImportAll file moduleName range ->
-                encodeTyped "ImportAll" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "moduleName", JE.list <| List.map JE.string moduleName )
-                        , ( "range", Ranges.encode range )
-                        ]
+        ExposeAll file range ->
+            encodeTyped "ExposeAll" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "range", Ranges.encode range )
+                    ]
 
-            NoTopLevelSignature file varName range ->
-                encodeTyped "NoTopLevelSignature" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "varName", JE.string varName )
-                        , ( "range", Ranges.encode range )
-                        ]
+        ImportAll file moduleName range ->
+            encodeTyped "ImportAll" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "moduleName", JE.list <| List.map JE.string moduleName )
+                    , ( "range", Ranges.encode range )
+                    ]
 
-            UnnecessaryParens file range ->
-                encodeTyped "UnnecessaryParens" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "range", Ranges.encode range )
-                        ]
+        NoTopLevelSignature file varName range ->
+            encodeTyped "NoTopLevelSignature" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "varName", JE.string varName )
+                    , ( "range", Ranges.encode range )
+                    ]
 
-            DebugLog file range ->
-                encodeTyped "DebugLog" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "range", Ranges.encode range )
-                        ]
+        UnnecessaryParens file range ->
+            encodeTyped "UnnecessaryParens" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "range", Ranges.encode range )
+                    ]
 
-            DebugCrash file range ->
-                encodeTyped "DebugCrash" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "range", Ranges.encode range )
-                        ]
+        DebugLog file range ->
+            encodeTyped "DebugLog" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "range", Ranges.encode range )
+                    ]
 
-            UnformattedFile file ->
-                encodeTyped "UnformattedFile" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        ]
+        DebugCrash file range ->
+            encodeTyped "DebugCrash" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "range", Ranges.encode range )
+                    ]
 
-            DuplicateImport file moduleName ranges ->
-                encodeTyped "DuplicateImport" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "moduleName", JE.list <| List.map JE.string moduleName )
-                        , ( "ranges", JE.list <| List.map Ranges.encode ranges )
-                        ]
+        UnformattedFile file ->
+            encodeTyped "UnformattedFile" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    ]
 
-            UnusedAlias file varName range ->
-                encodeTyped "UnusedAlias" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "varName", JE.string varName )
-                        , ( "range", Ranges.encode range )
-                        ]
+        DuplicateImport file moduleName ranges ->
+            encodeTyped "DuplicateImport" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "moduleName", JE.list <| List.map JE.string moduleName )
+                    , ( "ranges", JE.list <| List.map Ranges.encode ranges )
+                    ]
 
-            RedefineVariable file varName range1 range2 ->
-                encodeTyped "RedefineVariable" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "varName", JE.string varName )
-                        , ( "range1", Ranges.encode range1 )
-                        , ( "range2", Ranges.encode range2 )
-                        ]
+        UnusedAlias file varName range ->
+            encodeTyped "UnusedAlias" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "varName", JE.string varName )
+                    , ( "range", Ranges.encode range )
+                    ]
 
-            NoUnurriedPrefix file varName range ->
-                encodeTyped "NoUnurriedPrefix" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "varName", JE.string varName )
-                        , ( "range", Ranges.encode range )
-                        ]
+        RedefineVariable file varName range1 range2 ->
+            encodeTyped "RedefineVariable" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "varName", JE.string varName )
+                    , ( "range1", Ranges.encode range1 )
+                    , ( "range2", Ranges.encode range2 )
+                    ]
 
-            UnusedImportAlias file moduleName range ->
-                encodeTyped "UnusedImportAlias" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "moduleName", JE.list <| List.map JE.string moduleName )
-                        , ( "range", Ranges.encode range )
-                        ]
+        NoUnurriedPrefix file varName range ->
+            encodeTyped "NoUnurriedPrefix" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "varName", JE.string varName )
+                    , ( "range", Ranges.encode range )
+                    ]
 
-            UnusedImport file moduleName range ->
-                encodeTyped "UnusedImport" <|
-                    JE.object
-                        [ ( "file", JE.string file )
-                        , ( "moduleName", JE.list <| List.map JE.string moduleName )
-                        , ( "range", Ranges.encode range )
-                        ]
+        UnusedImportAlias file moduleName range ->
+            encodeTyped "UnusedImportAlias" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "moduleName", JE.list <| List.map JE.string moduleName )
+                    , ( "range", Ranges.encode range )
+                    ]
+
+        UnusedImport file moduleName range ->
+            encodeTyped "UnusedImport" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "moduleName", JE.list <| List.map JE.string moduleName )
+                    , ( "range", Ranges.encode range )
+                    ]

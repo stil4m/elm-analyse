@@ -4,14 +4,18 @@ import Analyser.Messages.Types exposing (..)
 import AST.Ranges exposing (Range, rangeToString)
 
 
+type alias CanFix =
+    Bool
+
+
 type alias MessageInfo =
-    ( String, GetFiles, List Range )
+    ( String, GetFiles, List Range, CanFix )
 
 
 asString : MessageData -> String
 asString m =
     let
-        ( f, _, _ ) =
+        ( f, _, _, _ ) =
             getMessageInfo m
     in
         f
@@ -20,7 +24,7 @@ asString m =
 getFiles : MessageData -> List String
 getFiles m =
     let
-        ( _, f, _ ) =
+        ( _, f, _, _ ) =
             getMessageInfo m
     in
         f m
@@ -29,10 +33,19 @@ getFiles m =
 getRanges : MessageData -> List Range
 getRanges m =
     let
-        ( _, _, r ) =
+        ( _, _, r, _ ) =
             getMessageInfo m
     in
         r
+
+
+canFix : MessageData -> Bool
+canFix m =
+    let
+        ( _, _, _, result ) =
+            getMessageInfo m
+    in
+        result
 
 
 getMessageInfo : MessageData -> MessageInfo
@@ -43,6 +56,7 @@ getMessageInfo m =
                 [ "Unused top level definition `", varName, "` in file \"", fileName, "\" at ", rangeToString range ]
             , (always [ fileName ])
             , [ range ]
+            , True
             )
 
         UnusedVariable fileName varName range ->
@@ -56,6 +70,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range ]
+            , True
             )
 
         UnreadableSourceFile fileName ->
@@ -63,17 +78,7 @@ getMessageInfo m =
                 [ "Could not parse source file: ", fileName ]
             , (always [ fileName ])
             , []
-            )
-
-        UnreadableDependencyFile dependency fileName ->
-            ( String.concat
-                [ "Could not parse file in dependency"
-                , dependency
-                , ": "
-                , fileName
-                ]
-            , (always [ fileName ])
-            , []
+            , True
             )
 
         ExposeAll fileName range ->
@@ -85,6 +90,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range ]
+            , False
             )
 
         ImportAll fileName moduleName range ->
@@ -98,6 +104,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range ]
+            , False
             )
 
         NoTopLevelSignature fileName varName range ->
@@ -111,6 +118,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range ]
+            , False
             )
 
         UnnecessaryParens fileName range ->
@@ -122,6 +130,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range ]
+            , True
             )
 
         DebugLog fileName range ->
@@ -133,6 +142,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range ]
+            , True
             )
 
         DebugCrash fileName range ->
@@ -144,6 +154,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range ]
+            , True
             )
 
         UnformattedFile fileName ->
@@ -154,6 +165,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , []
+            , True
             )
 
         DuplicateImport fileName moduleName ranges ->
@@ -168,6 +180,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , ranges
+            , True
             )
 
         UnusedImportAlias fileName moduleName range ->
@@ -181,6 +194,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range ]
+            , True
             )
 
         UnusedImport fileName moduleName range ->
@@ -194,6 +208,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range ]
+            , True
             )
 
         UnusedAlias fileName name range ->
@@ -207,6 +222,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range ]
+            , True
             )
 
         NoUnurriedPrefix fileName operator range ->
@@ -220,6 +236,7 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range ]
+            , False
             )
 
         RedefineVariable fileName name range1 range2 ->
@@ -235,4 +252,5 @@ getMessageInfo m =
                 ]
             , (always [ fileName ])
             , [ range1, range2 ]
+            , False
             )

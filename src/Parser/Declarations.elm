@@ -24,7 +24,7 @@ file =
                     importParser =
                         case modDef of
                             NoModule ->
-                                maybe exactIndentWhitespace *> sepBy exactIndentWhitespace importDefinition
+                                (maybe exactIndentWhitespace) *> sepBy exactIndentWhitespace importDefinition
 
                             _ ->
                                 (many (exactIndentWhitespace *> importDefinition))

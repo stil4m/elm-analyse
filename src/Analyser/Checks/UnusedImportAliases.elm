@@ -4,7 +4,7 @@ import AST.Ranges exposing (Range)
 import AST.Types exposing (Case, Pattern, Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
 import AST.Util as Util
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (MessageData(UnusedImportAlias))
+import Analyser.Messages.Types exposing (Message, MessageData(UnusedImportAlias))
 import Dict exposing (Dict)
 import Inspector exposing (Action(Post), defaultConfig)
 import Tuple2
@@ -14,7 +14,7 @@ type alias Context =
     Dict ModuleName ( Range, Int )
 
 
-scan : FileContext -> List MessageData
+scan : FileContext -> List Message
 scan fileContext =
     let
         aliases : Context
@@ -36,6 +36,7 @@ scan fileContext =
             |> List.filter (Tuple.second >> Tuple.second >> (==) 0)
             |> List.map (Tuple2.mapSecond Tuple.first)
             |> List.map (uncurry (UnusedImportAlias fileContext.path))
+            |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
 
 
 markUsage : ModuleName -> Context -> Context

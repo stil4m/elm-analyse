@@ -3,7 +3,7 @@ module Analyser.Checks.DuplicateImports exposing (scan)
 import AST.Types exposing (InnerExpression, ModuleName, Import)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (MessageData(DuplicateImport))
+import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImport))
 import Inspector exposing (Action(Post, Skip), defaultConfig)
 import Dict exposing (Dict)
 
@@ -12,7 +12,7 @@ type alias Context =
     Dict ModuleName (List Range)
 
 
-scan : FileContext -> List MessageData
+scan : FileContext -> List Message
 scan fileContext =
     Inspector.inspect
         { defaultConfig
@@ -24,6 +24,7 @@ scan fileContext =
         |> Dict.filter (always (hasLength ((<) 1)))
         |> Dict.toList
         |> List.map (uncurry (DuplicateImport fileContext.path))
+        |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
 
 
 hasLength : (Int -> Bool) -> List a -> Bool

@@ -1,7 +1,7 @@
 module Analyser exposing (main)
 
 import Analyser.InterfaceLoadingStage as InterfaceLoadingStage
-import Analyser.Messages.Types exposing (MessageData)
+import Analyser.Messages.Types exposing (Message)
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import AnalyserPorts
 import Platform exposing (programWithFlags)
@@ -26,20 +26,27 @@ type Msg
     | SourceLoadingStageMsg SourceLoadingStage.Msg
     | Now Time
     | Reset
+    | OnFixMessage Int
 
 
 type alias Model =
     { dependencies : List Dependency
     , flags : Flags
-    , messages : List MessageData
+    , messages : List Message
     , stage : Stage
+    , idCount : Int
+    , tasks : List Task
     }
+
+
+type Task
+    = FixMessage Int
 
 
 type Stage
     = InterfaceLoadingStage InterfaceLoadingStage.Model
     | SourceLoadingStage SourceLoadingStage.Model (List Dependency)
-    | Finished (List MessageData)
+    | Finished (List Message)
 
 
 main : Program Flags Model Msg
@@ -49,14 +56,25 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
+    reset
+        { flags = flags
+        , stage = Finished []
+        , messages = []
+        , dependencies = []
+        , idCount = 0
+        , tasks = []
+        }
+
+
+reset : Model -> ( Model, Cmd Msg )
+reset ({ flags } as model) =
     let
         ( stage, cmds ) =
             InterfaceLoadingStage.init flags.interfaceFiles
     in
-        ( { flags = flags
-          , stage = InterfaceLoadingStage stage
-          , messages = []
-          , dependencies = []
+        ( { model
+            | stage = InterfaceLoadingStage stage
+            , dependencies = []
           }
         , Cmd.map InterfaceLoadingStageMsg cmds
         )
@@ -65,8 +83,13 @@ init flags =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.stage ) of
+        ( OnFixMessage messageId, _ ) ->
+            ( { model | tasks = model.tasks ++ [ Debug.log "YEAH" <| FixMessage messageId ] }
+            , Cmd.none
+            )
+
         ( Reset, _ ) ->
-            init model.flags
+            reset model
 
         ( InterfaceLoadingStageMsg x, InterfaceLoadingStage stage ) ->
             let
@@ -98,19 +121,34 @@ update msg model =
             let
                 ( newStage, cmds ) =
                     SourceLoadingStage.update x stage
+
+                messages =
+                    Inspection.run (SourceLoadingStage.parsedFiles newStage) loadedDependencies
+
+                messagesWithId =
+                    List.indexedMap (\n message -> { message | id = n + model.idCount }) messages
             in
                 if SourceLoadingStage.isDone newStage then
-                    { model | stage = Finished <| Inspection.run (SourceLoadingStage.parsedFiles newStage) loadedDependencies } ! [ Time.now |> Task.perform Now ]
+                    ( { model
+                        | stage = Finished <| messagesWithId
+                        , idCount = model.idCount + List.length messages
+                      }
+                    , Time.now |> Task.perform Now
+                    )
                 else
                     ( { model | stage = SourceLoadingStage newStage loadedDependencies }
                     , Cmd.map SourceLoadingStageMsg cmds
                     )
 
-        ( _, Finished messages ) ->
-            model
-                ! [ AnalyserPorts.sendMessagesAsStrings messages
-                  , AnalyserPorts.sendMessagesAsJson messages
-                  ]
+        ( message, Finished messages ) ->
+            let
+                _ =
+                    Debug.log "Message " message
+            in
+                model
+                    ! [ AnalyserPorts.sendMessagesAsStrings messages
+                      , AnalyserPorts.sendMessagesAsJson messages
+                      ]
 
         _ ->
             model ! []
@@ -120,6 +158,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ AnalyserPorts.onReset (always Reset)
+        , AnalyserPorts.onFixMessage OnFixMessage
         , case model.stage of
             InterfaceLoadingStage stage ->
                 InterfaceLoadingStage.subscriptions stage |> Sub.map InterfaceLoadingStageMsg

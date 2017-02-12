@@ -1,6 +1,7 @@
 module Client.App.App exposing (init, view, update, subscriptions)
 
 import Html exposing (Html, div)
+import Html.Attributes exposing (id)
 import Client.App.Menu
 import Client.App.Models exposing (Model, Content(DashBoardContent), Msg(..))
 import Client.DashBoard.DashBoard as DashBoard
@@ -35,9 +36,11 @@ view : Model -> Html.Html Msg
 view m =
     div []
         [ Client.App.Menu.view
-        , case m.content of
-            DashBoardContent subModel ->
-                DashBoard.view subModel |> Html.map DashBoardMsg
+        , div [ id "page-wrapper" ]
+            [ case m.content of
+                DashBoardContent subModel ->
+                    DashBoard.view subModel |> Html.map DashBoardMsg
+            ]
         ]
 
 

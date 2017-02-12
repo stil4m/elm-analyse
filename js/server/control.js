@@ -2,7 +2,15 @@ module.exports = function(app, elm, expressWs) {
 
     app.ws('/control', function(ws, req) {
         ws.on('message', function(msg) {
-          elm.ports.onReset.send(true);
+          if (msg === 'reload') {
+              elm.ports.onReset.send(true);
+          } else if (msg.match(/^fix:\d+$/)) {
+            const messageId = parseInt(msg.replace('fix:',''));
+            elm.ports.onFixMessage.send(messageId);
+          } else {
+            console.log("Unknown message for control:", msg);
+          }
+
         });
     });
 

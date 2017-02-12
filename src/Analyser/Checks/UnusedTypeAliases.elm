@@ -3,7 +3,7 @@ module Analyser.Checks.UnusedTypeAliases exposing (scan)
 import AST.Ranges exposing (Range)
 import AST.Types exposing (FunctionSignature, TypeAlias, TypeReference(Typed))
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (MessageData(UnusedAlias))
+import Analyser.Messages.Types exposing (Message, MessageData(UnusedAlias))
 import Dict exposing (Dict)
 import Inspector exposing (Action(Post), defaultConfig)
 import Interfaces.Interface exposing (doesExposeAlias)
@@ -15,7 +15,7 @@ type alias Context =
     Dict String ( String, Range, Int )
 
 
-scan : FileContext -> List MessageData
+scan : FileContext -> List Message
 scan fileContext =
     let
         collectedAliased : Context
@@ -37,6 +37,7 @@ scan fileContext =
             |> List.filter (Tuple.first >> flip doesExposeAlias fileContext.interface >> not)
             |> List.map (Tuple2.mapSecond Tuple3.second)
             |> List.map (uncurry (UnusedAlias fileContext.path))
+            |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
 
 
 markTypeAlias : String -> Context -> Context

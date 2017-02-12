@@ -3,7 +3,7 @@ module Analyser.Checks.NoSignature exposing (scan)
 import AST.Types exposing (Function)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (MessageData(NoTopLevelSignature))
+import Analyser.Messages.Types exposing (Message, MessageData(NoTopLevelSignature))
 import Inspector exposing (defaultConfig, Action(Inner, Skip))
 
 
@@ -11,7 +11,7 @@ type alias ExposeAllContext =
     List ( String, Range )
 
 
-scan : FileContext -> List MessageData
+scan : FileContext -> List Message
 scan fileContext =
     let
         x : ExposeAllContext
@@ -24,7 +24,9 @@ scan fileContext =
                 fileContext.ast
                 []
     in
-        x |> List.map (uncurry (NoTopLevelSignature fileContext.path))
+        x
+            |> List.map (uncurry (NoTopLevelSignature fileContext.path))
+            |> List.map (Message 0 [ ( fileContext.sha1, fileContext.path ) ])
 
 
 onFunction : (ExposeAllContext -> ExposeAllContext) -> Function -> ExposeAllContext -> ExposeAllContext

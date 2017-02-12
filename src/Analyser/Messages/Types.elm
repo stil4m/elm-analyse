@@ -4,9 +4,15 @@ import AST.Ranges exposing (Range)
 import AST.Types as AST
 
 
+type alias Message =
+    { id : Int
+    , files : List ( Sha1, FileName )
+    , data : MessageData
+    }
+
+
 type MessageData
     = UnreadableSourceFile FileName
-    | UnreadableDependencyFile FileName String
     | UnusedVariable FileName String Range
     | UnusedTopLevel FileName String Range
     | ExposeAll FileName Range
@@ -22,6 +28,10 @@ type MessageData
     | NoUnurriedPrefix FileName String Range
     | UnusedImportAlias FileName AST.ModuleName Range
     | UnusedImport FileName AST.ModuleName Range
+
+
+type alias Sha1 =
+    String
 
 
 type alias FileName =

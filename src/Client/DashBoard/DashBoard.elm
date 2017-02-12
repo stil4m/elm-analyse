@@ -8,7 +8,7 @@ import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
 import Time
 import WebSocket as WS
-import Analyser.Messages.Types exposing (MessageData)
+import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
 import Html.Attributes exposing (class, style)
 import Tuple2
@@ -24,7 +24,7 @@ type alias Model =
 type Msg
     = NewMsg (Result String State)
     | Tick
-    | Focus MessageData
+    | Focus Message
     | ActiveMessageDialogMsg ActiveMessageDialog.Msg
 
 
@@ -76,9 +76,9 @@ update location msg model =
                 |> Tuple2.mapSecond (Cmd.map ActiveMessageDialogMsg)
 
         ActiveMessageDialogMsg x ->
-            ( { model | active = ActiveMessageDialog.update x model.active }
-            , Cmd.none
-            )
+            ActiveMessageDialog.update location x model.active
+                |> Tuple2.mapFirst (\x -> { model | active = x })
+                |> Tuple2.mapSecond (Cmd.map ActiveMessageDialogMsg)
 
 
 view : Model -> Html Msg
@@ -89,7 +89,10 @@ view m =
                 text "Loading..."
 
             RD.Success state ->
-                viewState state
+                if state.loading then
+                    text "Loading..."
+                else
+                    viewState state
 
             RD.Failure e ->
                 div []
@@ -117,7 +120,7 @@ viewState state =
         ]
 
 
-viewMessage : Int -> MessageData -> Html Msg
+viewMessage : Int -> Message -> Html Msg
 viewMessage n x =
     li
         [ style
@@ -131,12 +134,18 @@ viewMessage n x =
         [ div [ style [ ( "display", "table-row" ) ] ]
             [ a
                 [ onClick (Focus x)
-                , style [ ( "cursor", "pointer" ), ( "display", "table-cell" ), ( "padding-right", "20px" ), ( "font-size", "200%" ), ( "vertical-align", "middle" ) ]
+                , style
+                    [ ( "cursor", "pointer" )
+                    , ( "display", "table-cell" )
+                    , ( "padding-right", "20px" )
+                    , ( "font-size", "200%" )
+                    , ( "vertical-align", "middle" )
+                    ]
                 ]
                 [ strong []
                     [ text <| (++) "#" <| toString <| n + 1 ]
                 ]
             , span [ style [ ( "display", "table-cell" ) ] ]
-                [ text <| Messages.asString x ]
+                [ text <| Messages.asString x.data ]
             ]
         ]

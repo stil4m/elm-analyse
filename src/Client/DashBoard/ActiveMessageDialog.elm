@@ -1,13 +1,17 @@
 module Client.DashBoard.ActiveMessageDialog exposing (..)
 
 import AST.Ranges exposing (Range)
-import Analyser.Messages.Types exposing (MessageData)
+import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens))
 import Analyser.Messages.Util as Messages
 import Dialog exposing (Config)
-import Html exposing (div, pre, text, Html, span, h3)
-import Html.Attributes exposing (style)
+import Html exposing (Html, div, h3, pre, span, text, button, i)
+import Html.Attributes exposing (style, class, id)
+import Html.Events exposing (onClick)
 import Http exposing (Error)
 import RemoteData as RD exposing (RemoteData)
+import WebSocket as WS
+import Navigation exposing (Location)
+import Client.Socket as Socket
 
 
 type alias Model =
@@ -15,7 +19,7 @@ type alias Model =
 
 
 type alias State =
-    { message : MessageData
+    { message : Message
     , ranges : List Range
     , codeBlock : RemoteData Error String
     }
@@ -24,19 +28,21 @@ type alias State =
 type Msg
     = Close
     | OnFile (Result Error String)
+    | Fix
+    | NoOp
 
 
-show : MessageData -> Model -> ( Model, Cmd Msg )
+show : Message -> Model -> ( Model, Cmd Msg )
 show m _ =
     ( Just
         { message = m
-        , ranges = Messages.getRanges m
+        , ranges = Messages.getRanges m.data
         , codeBlock = RD.Loading
         }
     , Http.request
         { method = "GET"
         , headers = []
-        , url = "http://localhost:3000/file?file=" ++ (String.join "," <| List.map Http.encodeUri (Messages.getFiles m))
+        , url = "http://localhost:3000/file?file=" ++ (String.join "," <| List.map Http.encodeUri (Messages.getFiles m.data))
         , body = Http.emptyBody
         , expect = Http.expectString
         , timeout = Nothing
@@ -56,15 +62,27 @@ init =
     Nothing
 
 
-update : Msg -> Model -> Model
-update msg model =
+update : Location -> Msg -> Model -> ( Model, Cmd Msg )
+update location msg model =
     case msg of
+        NoOp ->
+            ( model, Cmd.none )
+
         Close ->
-            hide model
+            ( hide model, Cmd.none )
 
         OnFile x ->
             model
                 |> Maybe.map (\y -> { y | codeBlock = RD.fromResult x })
+                |> flip (,) Cmd.none
+
+        Fix ->
+            model
+                |> Maybe.map
+                    (\y ->
+                        ( Just y, WS.send (Socket.controlEndpoint location) ("fix:" ++ toString y.message.id) )
+                    )
+                |> Maybe.withDefault ( model, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -80,8 +98,32 @@ dialogConfig state =
     , containerClass = Just "message-dialog"
     , header = Just dialogHeader
     , body = Just <| dialogBody state
-    , footer = Nothing
+    , footer = footer state
     }
+
+
+footer : State -> Maybe (Html Msg)
+footer state =
+    if not (Messages.canFix state.message.data) then
+        Nothing
+    else
+        Just (fixableFooter state.message)
+
+
+fixableFooter : Message -> Html Msg
+fixableFooter message =
+    case message.data of
+        UnnecessaryParens _ _ ->
+            div []
+                [ button
+                    [ class "btn btn-success"
+                    , onClick Fix
+                    ]
+                    [ text "Remove and format" ]
+                ]
+
+        _ ->
+            i [] [ text "Fix has to be implemented. Pull requests are welcome." ]
 
 
 dialogBody : State -> Html Msg
@@ -94,14 +136,19 @@ dialogBody state =
             div [] [ text "Loading..." ]
 
         RD.Success x ->
-            div []
-                [ div []
-                    (List.map (renderRange x) state.ranges)
-                , text <| Messages.asString state.message
-                ]
+            viewWithFileContent state x
 
         RD.Failure _ ->
             div [] [ text "Something went wrong." ]
+
+
+viewWithFileContent : State -> String -> Html msg
+viewWithFileContent state x =
+    div []
+        [ div []
+            (List.map (renderRange x) state.ranges)
+        , text <| Messages.asString state.message.data
+        ]
 
 
 renderRange : String -> Range -> Html msg
@@ -201,7 +248,7 @@ renderRange content range =
     in
         pre []
             [ preText |> text
-            , span [ style [ ( "color", "white" ), ( "background", "red" ) ] ] [ text highlighedSection ]
+            , span [ id "highlight", style [ ( "color", "white" ), ( "background", "red" ) ] ] [ text highlighedSection ]
             , span [ style [ ( "color", "" ), ( "background", "" ) ] ] [ text postLineText ]
             , span [ style [ ( "color", "" ), ( "background", "" ) ] ] [ text postLines ]
             ]
