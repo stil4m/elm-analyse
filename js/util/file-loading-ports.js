@@ -68,8 +68,6 @@ module.exports = function(app, config, directory) {
     });
 
     app.ports.storeFiles.subscribe(function(files) {
-        console.log("TODO store files");
-        console.log(files[0][0]);
         files.forEach(file => {
             fs.writeFile(file[0], file[1], function(err) {
                 console.log("Written file", file[0], "...");

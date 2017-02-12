@@ -27,7 +27,13 @@ fixContent { start, end } content =
             getCharAtLocation start content
 
         endCharLoc =
-            { end | column = end.column - 1 }
+            if end.column <= -2 then
+                { end
+                    | column = content |> String.split "\n" |> List.drop (end.row) |> List.head |> Maybe.withDefault "" |> String.length
+                    , row = end.row - 1
+                }
+            else
+                { end | column = end.column - 1 }
 
         endChar =
             getCharAtLocation endCharLoc content
@@ -57,7 +63,7 @@ replaceLocationWith loc x input =
                 ]
     in
         rows
-            |> List.updateIfIndex ((==) (loc.row)) lineUpdater
+            |> List.updateIfIndex ((==) loc.row) lineUpdater
             |> String.join "\n"
 
 

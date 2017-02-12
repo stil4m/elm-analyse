@@ -60,7 +60,7 @@ nextTask state =
 
 addFixToQueue : Int -> State -> State
 addFixToQueue m s =
-    { s | queue = s.queue ++ [ (m) ] }
+    { s | queue = s.queue ++ [ m ] }
 
 
 finishWithNewMessages : List Message -> State -> State
