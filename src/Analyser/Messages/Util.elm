@@ -12,6 +12,26 @@ type alias MessageInfo =
     ( String, GetFiles, List Range, CanFix )
 
 
+blockForShas : List String -> Message -> Message
+blockForShas shas message =
+    let
+        shouldBlock =
+            List.any (flip List.member shas) (List.map Tuple.first message.files)
+    in
+        if shouldBlock then
+            { message | status = Blocked }
+        else
+            message
+
+
+markFixing : Int -> Message -> Message
+markFixing x message =
+    if message.id == x then
+        { message | status = Fixing }
+    else
+        message
+
+
 asString : MessageData -> String
 asString m =
     let

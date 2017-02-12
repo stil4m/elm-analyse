@@ -32,6 +32,7 @@ newMessage =
 type MessageStatus
     = Outdated
     | Blocked
+    | Fixing
     | Applicable
 
 

@@ -70,6 +70,9 @@ decodeMessageStatus =
                 "applicable" ->
                     JD.succeed Applicable
 
+                "fixing" ->
+                    JD.succeed Fixing
+
                 _ ->
                     JD.fail ("Expecected message status, but got: " ++ x)
         )
@@ -153,6 +156,9 @@ encodeMessageStatus m =
 
             Blocked ->
                 "blocked"
+
+            Fixing ->
+                "fixing"
 
 
 encodeMessageData : MessageData -> JE.Value

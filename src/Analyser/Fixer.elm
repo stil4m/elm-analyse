@@ -9,6 +9,9 @@ import Tuple3
 port storeFiles : List ( String, String ) -> Cmd msg
 
 
+port onStoredFiles : (Bool -> msg) -> Sub msg
+
+
 port loadFileContentWithShas : List String -> Cmd msg
 
 
@@ -23,17 +26,21 @@ type alias FileTriple =
 
 
 type alias FixResult =
-    { success : Bool, message : String }
+    { success : Bool
+    , message : String
+    }
 
 
 type Msg
     = LoadedFileContent (List FileTriple)
+    | Stored Bool
 
 
 type alias Model =
     { message : Message
     , fixer : FixCall
     , done : Bool
+    , touchedFiles : List String
     }
 
 
@@ -51,9 +58,9 @@ initWithMessage message state =
     getFixer message
         |> Maybe.map
             (\fixer ->
-                ( { message = message, fixer = fixer, done = False }
+                ( { message = message, fixer = fixer, done = False, touchedFiles = [] }
                 , loadFileContentWithShas (List.map Tuple.second message.files)
-                , state
+                , (State.startFixing message state)
                 )
             )
 
@@ -62,24 +69,28 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         LoadedFileContent reference ->
-            let
-                isEqual =
-                    (List.sortBy Tuple.first (List.map Tuple3.init reference) == List.sortBy Tuple.first model.message.files)
-            in
-                if not isEqual then
-                    ( { model | done = True }
-                    , sendFixResult { success = False, message = "Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages." }
+            if not (fileHashesEqual reference model.message) then
+                ( { model | done = True }
+                , sendFixResult { success = False, message = "Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages." }
+                )
+            else
+                let
+                    changedFiles =
+                        model.fixer (List.map Tuple3.tail reference) model.message.data
+                in
+                    ( { model | touchedFiles = List.map Tuple.first changedFiles }
+                    , storeFiles changedFiles
                     )
-                else
-                    let
-                        changedFiles =
-                            model.fixer (List.map Tuple3.tail reference) model.message.data
-                    in
-                        ( { model
-                            | done = True
-                          }
-                        , storeFiles changedFiles
-                        )
+
+        Stored x ->
+            ( { model | done = True }
+            , Cmd.none
+            )
+
+
+fileHashesEqual : List FileTriple -> Message -> Bool
+fileHashesEqual reference message =
+    List.sortBy Tuple.first (List.map Tuple3.init reference) == List.sortBy Tuple.first message.files
 
 
 getFixer : Message -> Maybe FixCall
@@ -94,4 +105,7 @@ getFixer m =
 
 subscriptions : Model -> Sub Msg
 subscriptions m =
-    onFileContentWithShas LoadedFileContent
+    Sub.batch
+        [ onFileContentWithShas LoadedFileContent
+        , onStoredFiles Stored
+        ]

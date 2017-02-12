@@ -68,21 +68,26 @@ module.exports = function(app, config, directory) {
     });
 
     app.ports.storeFiles.subscribe(function(files) {
-        files.forEach(file => {
-            fs.writeFile(file[0], file[1], function(err) {
-                console.log("Written file", file[0], "...");
-                try {
-                    cp.execSync(config.elmFormatPath + ' --yes ' + file[0], {
-                        stdio: []
-                    });
-                    console.log("Formatted file", file[0]);
-                } catch (e) {
-                    console.log("Could not formatted file", file[0]);
-                }
-
-            })
-        })
-
+        var promises = files.map(file => {
+            return new Promise(function(accept) {
+                fs.writeFile(file[0], file[1], function(err) {
+                    console.log("Written file", file[0], "...");
+                    try {
+                        cp.execSync(config.elmFormatPath + ' --yes ' + file[0], {
+                            stdio: []
+                        });
+                        console.log("Formatted file", file[0]);
+                        accept();
+                    } catch (e) {
+                        console.log("Could not formatted file", file[0]);
+                        accept();
+                    }
+                })
+            });
+        });
+        Promise.all(promises).then(function() {
+          app.ports.onStoredFiles.send(true);
+        });
     });
 
 }

@@ -80,7 +80,7 @@ update location msg model =
             model
                 |> Maybe.map
                     (\y ->
-                        ( Just y, WS.send (Socket.controlEndpoint location) ("fix:" ++ toString y.message.id) )
+                        ( hide (Just y), WS.send (Socket.controlEndpoint location) ("fix:" ++ toString y.message.id) )
                     )
                 |> Maybe.withDefault ( model, Cmd.none )
 

@@ -39,7 +39,7 @@ type alias Model =
 
 type Stage
     = InterfaceLoadingStage InterfaceLoadingStage.Model
-    | SourceLoadingStage SourceLoadingStage.Model (List Dependency)
+    | SourceLoadingStage SourceLoadingStage.Model
     | FixerStage Fixer.Model
     | Finished
 
@@ -72,6 +72,7 @@ reset ({ flags } as model) =
           }
         , Cmd.map InterfaceLoadingStageMsg cmds
         )
+            |> doSendState
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -96,8 +97,8 @@ update msg model =
 
         SourceLoadingStageMsg x ->
             case model.stage of
-                SourceLoadingStage stage loadedDependencies ->
-                    onSourceLoadingStageMsg x stage loadedDependencies model
+                SourceLoadingStage stage ->
+                    onSourceLoadingStageMsg x stage model
 
                 _ ->
                     ( model
@@ -122,13 +123,23 @@ onFixerMsg x stage model =
     in
         if newFixerModel.done then
             --TODO What to do with the checking and the state
-            ( { model | stage = Finished }
-            , fixerCmds
-            )
+            startSourceLoading newFixerModel.touchedFiles
+                ( model, fixerCmds )
         else
             ( { model | stage = FixerStage newFixerModel }
             , fixerCmds
             )
+
+
+startSourceLoading : List String -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+startSourceLoading files ( model, cmds ) =
+    let
+        ( nextStage, sourceCmds ) =
+            SourceLoadingStage.init files
+    in
+        ( { model | stage = SourceLoadingStage nextStage }
+        , Cmd.batch [ Cmd.map SourceLoadingStageMsg sourceCmds, cmds ]
+        )
 
 
 handleNextStep : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -145,18 +156,20 @@ handleNextStep (( model, cmds ) as input) =
                             input
 
                         Just ( fixerModel, fixerCmds, newState2 ) ->
-                            ( { model
-                                | state = newState2
-                                , stage = FixerStage fixerModel
-                              }
-                            , Cmd.batch
-                                [ cmds
-                                , Cmd.map FixerMsg fixerCmds
-                                ]
+                            ( { model | state = newState2, stage = FixerStage fixerModel }
+                            , Cmd.batch [ cmds, Cmd.map FixerMsg fixerCmds ]
                             )
+                                |> doSendState
 
         _ ->
             input
+
+
+doSendState : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+doSendState ( model, cmds ) =
+    ( model
+    , Cmd.batch [ cmds, AnalyserPorts.sendStateAsJson model.state ]
+    )
 
 
 onInterfaceLoadingStageMsg : InterfaceLoadingStage.Msg -> InterfaceLoadingStage.Model -> Model -> ( Model, Cmd Msg )
@@ -166,56 +179,46 @@ onInterfaceLoadingStageMsg x stage model =
             InterfaceLoadingStage.update x stage
     in
         if InterfaceLoadingStage.isDone newStage then
-            let
-                ( nextStage, sourceCmds ) =
-                    (SourceLoadingStage.init model.flags.sourceFiles)
-
-                loadedDependencies =
-                    InterfaceLoadingStage.getDependencies newStage
-            in
-                ( { model
-                    | stage = SourceLoadingStage nextStage loadedDependencies
-                  }
-                , Cmd.batch
-                    [ Cmd.map SourceLoadingStageMsg sourceCmds
-                    , Cmd.map InterfaceLoadingStageMsg cmds
-                    ]
-                )
+            ( { model | dependencies = InterfaceLoadingStage.getDependencies newStage }
+            , Cmd.map InterfaceLoadingStageMsg cmds
+            )
+                |> startSourceLoading model.flags.sourceFiles
         else
             ( { model | stage = InterfaceLoadingStage newStage }
             , Cmd.map InterfaceLoadingStageMsg cmds
             )
 
 
-onSourceLoadingStageMsg : SourceLoadingStage.Msg -> SourceLoadingStage.Model -> List Dependency -> Model -> ( Model, Cmd Msg )
-onSourceLoadingStageMsg x stage loadedDependencies model =
+onSourceLoadingStageMsg : SourceLoadingStage.Msg -> SourceLoadingStage.Model -> Model -> ( Model, Cmd Msg )
+onSourceLoadingStageMsg x stage model =
     let
         ( newStage, cmds ) =
             SourceLoadingStage.update x stage
-
-        messages =
-            Inspection.run (SourceLoadingStage.parsedFiles newStage) loadedDependencies
-
-        newState =
-            State.finishWithNewMessages messages model.state
-
-        newModel =
-            { model
-                | stage = Finished
-                , state = newState
-            }
     in
         if SourceLoadingStage.isDone newStage then
-            ( newModel
-            , Cmd.batch
-                [ AnalyserPorts.sendMessagesAsStrings newState.messages
-                , AnalyserPorts.sendMessagesAsJson newState.messages
-                , AnalyserPorts.sendStateAsJson newState
-                ]
-            )
-                |> handleNextStep
+            let
+                messages =
+                    Inspection.run (SourceLoadingStage.parsedFiles newStage) model.dependencies
+
+                newState =
+                    State.finishWithNewMessages messages model.state
+
+                newModel =
+                    { model
+                        | stage = Finished
+                        , state = newState
+                    }
+            in
+                ( newModel
+                , Cmd.batch
+                    [ AnalyserPorts.sendMessagesAsStrings newState.messages
+                    , AnalyserPorts.sendMessagesAsJson newState.messages
+                    , AnalyserPorts.sendStateAsJson newState
+                    ]
+                )
+                    |> handleNextStep
         else
-            ( { model | stage = SourceLoadingStage newStage loadedDependencies }
+            ( { model | stage = SourceLoadingStage newStage }
             , Cmd.map SourceLoadingStageMsg cmds
             )
 
@@ -229,7 +232,7 @@ subscriptions model =
             InterfaceLoadingStage stage ->
                 InterfaceLoadingStage.subscriptions stage |> Sub.map InterfaceLoadingStageMsg
 
-            SourceLoadingStage stage _ ->
+            SourceLoadingStage stage ->
                 SourceLoadingStage.subscriptions stage |> Sub.map SourceLoadingStageMsg
 
             Finished ->

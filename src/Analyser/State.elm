@@ -1,7 +1,8 @@
 module Analyser.State exposing (..)
 
-import Analyser.Messages.Types exposing (Message, MessageId)
+import Analyser.Messages.Types exposing (Message, MessageId, MessageStatus(Applicable))
 import Analyser.Messages.Json exposing (encodeMessage, decodeMessage)
+import Analyser.Messages.Util exposing (blockForShas, markFixing)
 import Json.Encode as JE exposing (Value)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
@@ -21,6 +22,7 @@ type alias Task =
 
 type Status
     = Initialising
+    | Fixing
     | Idle
 
 
@@ -41,6 +43,9 @@ isBusy s =
 
         Initialising ->
             True
+
+        Fixing ->
+            False
 
 
 getMessage : MessageId -> State -> Maybe Message
@@ -63,14 +68,30 @@ addFixToQueue m s =
     { s | queue = s.queue ++ [ m ] }
 
 
+startFixing : Message -> State -> State
+startFixing message state =
+    { state
+        | status = Fixing
+        , messages =
+            state.messages
+                |> List.map (blockForShas (List.map Tuple.first message.files))
+                |> List.map (markFixing message.id)
+    }
+
+
 finishWithNewMessages : List Message -> State -> State
 finishWithNewMessages messages s =
     let
+        --TODO, Can we miss something here?
+        untouchedMessages =
+            s.messages
+                |> List.filter (.status >> (==) Applicable)
+
         messagesWithId =
             List.indexedMap (\n message -> { message | id = n + s.idCount }) messages
     in
         { s
-            | messages = messagesWithId
+            | messages = untouchedMessages ++ messagesWithId
             , status = Idle
             , idCount = s.idCount + List.length messages
         }
@@ -106,6 +127,9 @@ decodeStatus =
                 "idle" ->
                     JD.succeed Idle
 
+                "fixing" ->
+                    JD.succeed Fixing
+
                 _ ->
                     JD.fail ("Could not decode status. got: " ++ x)
         )
@@ -120,3 +144,6 @@ encodeStatus s =
 
         Idle ->
             JE.string "idle"
+
+        Fixing ->
+            JE.string "fixing"
