@@ -54,7 +54,7 @@ show m _ =
 
 hide : Model -> Model
 hide =
-    (always Nothing)
+    always Nothing
 
 
 init : Model
@@ -176,7 +176,7 @@ renderRange content range =
                 range.end.row
 
         endsOnLineEnding =
-            (range.end.row /= endRow)
+            range.end.row /= endRow
 
         target =
             lines

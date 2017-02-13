@@ -422,7 +422,7 @@ floatableExpression =
 
 ifBlockExpression : Parser State InnerExpression
 ifBlockExpression =
-    (ifToken
+    ifToken
         *> lazy
             (\() ->
                 succeed IfBlock
@@ -430,7 +430,6 @@ ifBlockExpression =
                     <*> (thenToken *> trimmed expression)
                     <*> (elseToken *> moreThanIndentWhitespace *> expression)
             )
-    )
 
 
 prefixOperatorExpression : Parser State InnerExpression

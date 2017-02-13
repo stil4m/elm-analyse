@@ -196,7 +196,7 @@ visitExpressionInner : Visitor context -> context -> Expression -> Expression
 visitExpressionInner visitor context ( r, expression ) =
     let
         subVisit =
-            (visitExpression visitor context)
+            visitExpression visitor context
     in
         (,) r <|
             case expression of

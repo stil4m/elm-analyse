@@ -106,7 +106,7 @@ update msg model =
                             |> Dict.fromList
 
                     dependency =
-                        (Dependency model.name model.version interfaces)
+                        Dependency model.name model.version interfaces
                 in
                     if not <| List.all isLoaded loadedFiles then
                         ( { model | result = Just (Err "Could not load all dependency files") }
