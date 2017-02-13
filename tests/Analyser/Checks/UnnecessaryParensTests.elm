@@ -2,7 +2,7 @@ module Analyser.Checks.UnnecessaryParensTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
-import Analyser.Messages.Types  exposing (..)
+import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 
@@ -281,6 +281,19 @@ foo =
     )
 
 
+parensAroundTopLevelApplication : ( String, String, List MessageData )
+parensAroundTopLevelApplication =
+    ( "parensAroundTopLevelApplication"
+    , """module Bar exposing (..)
+
+foo =
+    (f a b)
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 3 }, end = { row = 5, column = -1 } }
+      ]
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnnecessaryParensTests"
@@ -305,4 +318,5 @@ all =
         , parensFirstArgumentApplicationWithRecordAccess
         , allowParensForIfStatementOnLHS
         , allowParensForCaseOnLHS
+        , parensAroundTopLevelApplication
         ]

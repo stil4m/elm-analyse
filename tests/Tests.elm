@@ -23,19 +23,19 @@ all : Test
 all =
     Test.concat
         [ Analyser.Fixes.UnusedImportedVariableTests.all
-          -- , Analyser.Checks.UnusedImportsTests.all
-          -- , Analyser.Checks.UnusedImportAliasesTests.all
-          -- , Analyser.Checks.NoUncurriedPrefixTests.all
-          -- , Analyser.Checks.UnusedVariableTests.all
-          -- , Analyser.Checks.OverriddenVariablesTests.all
-          -- , Analyser.Checks.UnnecessaryParensTests.all
-          -- , Analyser.Checks.DuplicateImportsTests.all
-          -- , Analyser.Checks.NoDebugTests.all
-          -- , Analyser.Checks.UnusedTypeAliasesTests.all
-          -- , Analyser.Checks.NoSignatureTests.all
-          -- , Analyser.Checks.NoImportAllTests.all
-          -- , Analyser.Checks.NotExposeAllTests.all
-          -- , InterfaceTest.all
-          -- , PostProcessingTests.all
-          -- , ParserTests.all
+        , Analyser.Checks.UnusedImportsTests.all
+        , Analyser.Checks.UnusedImportAliasesTests.all
+        , Analyser.Checks.NoUncurriedPrefixTests.all
+        , Analyser.Checks.UnusedVariableTests.all
+        , Analyser.Checks.OverriddenVariablesTests.all
+        , Analyser.Checks.UnnecessaryParensTests.all
+        , Analyser.Checks.DuplicateImportsTests.all
+        , Analyser.Checks.NoDebugTests.all
+        , Analyser.Checks.UnusedTypeAliasesTests.all
+        , Analyser.Checks.NoSignatureTests.all
+        , Analyser.Checks.NoImportAllTests.all
+        , Analyser.Checks.NotExposeAllTests.all
+        , InterfaceTest.all
+        , PostProcessingTests.all
+        , ParserTests.all
         ]

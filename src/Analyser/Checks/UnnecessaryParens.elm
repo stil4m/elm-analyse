@@ -21,6 +21,7 @@ import AST.Types
             , RecordAccess
             , CaseExpression
             )
+        , Function
         , CaseBlock
         , File
         , OperatorApplication
@@ -49,7 +50,7 @@ scan fileContext =
         x : Context
         x =
             Inspector.inspect
-                { defaultConfig | onExpression = Post onExpression }
+                { defaultConfig | onExpression = Post onExpression, onFunction = Post onFunction }
                 fileContext.ast
                 []
     in
@@ -57,6 +58,16 @@ scan fileContext =
             |> List.uniqueBy rangetoTuple
             |> List.map (UnnecessaryParens fileContext.path)
             |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+
+
+onFunction : Function -> Context -> Context
+onFunction function context =
+    case function.declaration.expression of
+        ( range, ParenthesizedExpression _ ) ->
+            range :: context
+
+        _ ->
+            context
 
 
 onExpression : Expression -> Context -> Context
