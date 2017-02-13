@@ -92,7 +92,6 @@ loadedFileFromContent fileContent =
         case fileContent.content of
             Just content ->
                 (Parser.parse content
-                    |> Debug.log "AST"
                     |> Maybe.map loadedInterfaceForFile
                     |> Maybe.withDefault Analyser.Types.Failed
                 )
