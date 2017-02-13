@@ -16,7 +16,7 @@ naiveStringifyImport imp =
     String.concat <|
         [ "import "
         , String.join "." imp.moduleName
-        , Maybe.withDefault "" <| Maybe.map (String.join "." >> ((++) " as ")) imp.moduleAlias
+        , Maybe.withDefault "" <| Maybe.map (String.join "." >> (++) " as ") imp.moduleAlias
         , stringifyExposingList imp.exposingList
         ]
 

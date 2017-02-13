@@ -59,9 +59,9 @@ decodeModuleName =
 decodeExpose : Decoder Expose
 decodeExpose =
     decodeTyped
-        [ ( "infix", map2 InfixExpose (nameField) (rangeField) )
-        , ( "function", map2 FunctionExpose (nameField) (rangeField) )
-        , ( "typeOrAlias", map2 TypeOrAliasExpose (nameField) (rangeField) )
+        [ ( "infix", map2 InfixExpose nameField rangeField )
+        , ( "function", map2 FunctionExpose nameField rangeField )
+        , ( "typeOrAlias", map2 TypeOrAliasExpose nameField rangeField )
         , ( "typeexpose", map TypeExpose decodeExposedType )
         ]
 
@@ -185,12 +185,12 @@ decodeTypeReference =
         (\() ->
             decodeTyped
                 [ ( "generic", string |> map GenericType )
-                , ( "typed", map3 Typed (field "moduleName" decodeModuleName) (nameField) (field "args" <| list decodeTypeArg) )
+                , ( "typed", map3 Typed (field "moduleName" decodeModuleName) nameField (field "args" <| list decodeTypeArg) )
                 , ( "unit", succeed Unit )
                 , ( "tupled", list decodeTypeReference |> map Tupled )
                 , ( "function", map2 FunctionTypeReference (field "left" decodeTypeReference) (field "right" decodeTypeReference) )
                 , ( "record", decodeRecordDefinition |> map Record )
-                , ( "genericRecord", map2 GenericRecord (nameField) (field "values" decodeRecordDefinition) )
+                , ( "genericRecord", map2 GenericRecord nameField (field "values" decodeRecordDefinition) )
                 ]
         )
 
@@ -318,8 +318,8 @@ decodeInnerExpression =
                 , ( "let", decodeLetBlock |> map LetExpression )
                 , ( "case", decodeCaseBlock |> map CaseExpression )
                 , ( "lambda", decodeLambda |> map LambdaExpression )
-                , ( "qualified", map2 QualifiedExpr (field "moduleName" decodeModuleName) (nameField) )
-                , ( "recordAccess", map2 RecordAccess (field "expression" decodeExpression) (nameField) )
+                , ( "qualified", map2 QualifiedExpr (field "moduleName" decodeModuleName) nameField )
+                , ( "recordAccess", map2 RecordAccess (field "expression" decodeExpression) nameField )
                 , ( "recordAccessFunction", string |> map RecordAccessFunction )
                 , ( "record", list decodeRecordSetter |> map RecordExpr )
                 , ( "recordUpdate", decodeRecordUpdate |> map RecordUpdateExpression )
