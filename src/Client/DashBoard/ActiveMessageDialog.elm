@@ -1,4 +1,4 @@
-module Client.DashBoard.ActiveMessageDialog exposing (Model, Msg, show, init, update, view)
+module Client.DashBoard.ActiveMessageDialog exposing (Model, Msg, show, init, update, view, subscriptions)
 
 import AST.Ranges exposing (Range)
 import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens, UnusedImportedVariable))
@@ -12,6 +12,7 @@ import RemoteData as RD exposing (RemoteData)
 import WebSocket as WS
 import Navigation exposing (Location)
 import Client.Socket as Socket
+import Keyboard
 
 
 type alias Model =
@@ -30,6 +31,7 @@ type Msg
     | OnFile (Result Error String)
     | Fix
     | NoOp
+    | OnEscape Bool
 
 
 show : Message -> Model -> ( Model, Cmd Msg )
@@ -62,6 +64,16 @@ init =
     Nothing
 
 
+subscriptions : Model -> Sub Msg
+subscriptions x =
+    case x of
+        Just _ ->
+            Keyboard.downs ((==) 27 >> OnEscape)
+
+        Nothing ->
+            Sub.none
+
+
 update : Location -> Msg -> Model -> ( Model, Cmd Msg )
 update location msg model =
     case msg of
@@ -83,6 +95,12 @@ update location msg model =
                         ( hide (Just y), WS.send (Socket.controlAddress location) ("fix:" ++ toString y.message.id) )
                     )
                 |> Maybe.withDefault ( model, Cmd.none )
+
+        OnEscape x ->
+            if (Debug.log "X" x) then
+                ( hide model, Cmd.none )
+            else
+                ( model, Cmd.none )
 
 
 view : Model -> Html Msg

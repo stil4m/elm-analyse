@@ -30,10 +30,11 @@ type Msg
 
 
 subscriptions : Location -> Model -> Sub Msg
-subscriptions location _ =
+subscriptions location model =
     Sub.batch
         [ WS.listen (dashboardAddress location) (JD.decodeString State.decodeState >> NewMsg)
         , Time.every (Time.second * 10) (always Tick)
+        , ActiveMessageDialog.subscriptions model.active |> Sub.map ActiveMessageDialogMsg
         ]
 
 
