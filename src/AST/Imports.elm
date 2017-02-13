@@ -150,11 +150,6 @@ removeRangeFromExpose range expose =
                     { exposedType | constructors = removeRangeFromConstructors range exposedType.constructors }
 
 
-removeRangeFromExposedType : Range -> ExposedType -> ExposedType
-removeRangeFromExposedType range exposedType =
-    { exposedType | constructors = removeRangeFromConstructors range exposedType.constructors }
-
-
 removeRangeFromConstructors : Range -> Exposure ValueConstructorExpose -> Exposure ValueConstructorExpose
 removeRangeFromConstructors range exp =
     case exp of

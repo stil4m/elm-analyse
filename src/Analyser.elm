@@ -122,9 +122,13 @@ onFixerMsg x stage model =
                 |> Tuple2.mapSecond (Cmd.map FixerMsg)
     in
         if newFixerModel.done then
-            --TODO What to do with the checking and the state
-            startSourceLoading newFixerModel.touchedFiles
-                ( model, fixerCmds )
+            let
+                _ =
+                    Debug.log "Touched files: " newFixerModel.touchedFiles
+            in
+                --TODO What to do with the checking and the state
+                startSourceLoading newFixerModel.touchedFiles
+                    ( model, fixerCmds )
         else
             ( { model | stage = FixerStage newFixerModel }
             , fixerCmds
