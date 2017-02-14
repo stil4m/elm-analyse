@@ -4,8 +4,8 @@ import Analyser.Messages.Types exposing (MessageData(UnnecessaryParens))
 import AST.Ranges exposing (Range, Location)
 import Tuple2
 import Tuple3
-import List.Extra as List
 import AST.Types exposing (File)
+import Analyser.Fixes.FileContent as FileContent
 
 
 fix : List ( String, String, File ) -> MessageData -> List ( String, String )
@@ -26,7 +26,7 @@ fixContent : Range -> String -> String
 fixContent { start, end } content =
     let
         startChar =
-            getCharAtLocation start content
+            FileContent.getCharAtLocation start content
 
         endCharLoc =
             if end.column <= -2 then
@@ -38,41 +38,13 @@ fixContent { start, end } content =
                 { end | column = end.column - 1 }
 
         endChar =
-            getCharAtLocation endCharLoc content
+            FileContent.getCharAtLocation endCharLoc content
     in
         case ( startChar, endChar ) of
             ( Just "(", Just ")" ) ->
                 content
-                    |> replaceLocationWith start " "
-                    |> replaceLocationWith endCharLoc ""
+                    |> FileContent.replaceLocationWith start " "
+                    |> FileContent.replaceLocationWith endCharLoc ""
 
             _ ->
                 content
-
-
-replaceLocationWith : Location -> String -> String -> String
-replaceLocationWith loc x input =
-    let
-        rows =
-            input
-                |> String.split "\n"
-
-        lineUpdater target =
-            String.concat
-                [ String.left (loc.column + 1) target
-                , x
-                , String.dropLeft (loc.column + 2) target
-                ]
-    in
-        rows
-            |> List.updateIfIndex ((==) loc.row) lineUpdater
-            |> String.join "\n"
-
-
-getCharAtLocation : Location -> String -> Maybe String
-getCharAtLocation loc input =
-    input
-        |> String.split "\n"
-        |> List.drop loc.row
-        |> List.head
-        |> Maybe.map (String.dropLeft (loc.column + 1) >> String.left 1)
