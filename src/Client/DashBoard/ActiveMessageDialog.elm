@@ -1,7 +1,7 @@
 module Client.DashBoard.ActiveMessageDialog exposing (Model, Msg, show, init, update, view, subscriptions)
 
 import AST.Ranges exposing (Range)
-import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile))
+import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile, UnusedImportAlias))
 import Analyser.Messages.Util as Messages
 import Dialog exposing (Config)
 import Html exposing (Html, div, h3, pre, span, text, button, i)
@@ -156,6 +156,15 @@ fixableFooter message =
                     , onClick Fix
                     ]
                     [ text "Format" ]
+                ]
+
+        UnusedImportAlias _ moduleName _ ->
+            div []
+                [ button
+                    [ class "btn btn-success"
+                    , onClick Fix
+                    ]
+                    [ text <| "Remove alias '" ++ String.join "." moduleName ++ "' and format" ]
                 ]
 
         _ ->

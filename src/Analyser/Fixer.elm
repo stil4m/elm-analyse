@@ -3,12 +3,13 @@ port module Analyser.Fixer exposing (..)
 import Analyser.Messages.Types
     exposing
         ( Message
-        , MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile)
+        , MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile, UnusedImportAlias)
         )
 import Analyser.Messages.Util as Messages
 import Analyser.State as State exposing (State)
 import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
 import Analyser.Fixes.UnusedImportedVariable as UnusedImportedVariableFixer
+import Analyser.Fixes.UnusedImportAlias as UnusedImportAliasFixer
 import Tuple3
 import Parser.Parser as Parser
 import AST.Types exposing (File)
@@ -124,6 +125,9 @@ getFixer m =
 
         UnformattedFile _ ->
             Just (\x y -> List.map Tuple3.init x)
+
+        UnusedImportAlias _ _ _ ->
+            Just UnusedImportAliasFixer.fix
 
         _ ->
             Nothing
