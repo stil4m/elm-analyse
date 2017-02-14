@@ -93,6 +93,7 @@ decodeMessageData =
         , ( "UnusedVariable", decodeFileVarNameAndRange UnusedVariable )
         , ( "UnusedTopLevel", decodeFileVarNameAndRange UnusedTopLevel )
         , ( "UnusedImportedVariable", decodeFileVarNameAndRange UnusedImportedVariable )
+        , ( "UnusedPatternVariable", decodeFileVarNameAndRange UnusedPatternVariable )
         , ( "ExposeAll", decodeFileAndRange ExposeAll )
         , ( "ImportAll", decodeFileModuleNameAndRange ImportAll )
         , ( "NoTopLevelSignature", decodeFileVarNameAndRange NoTopLevelSignature )
@@ -186,6 +187,14 @@ encodeMessageData m =
 
         UnusedImportedVariable file varName range ->
             encodeTyped "UnusedImportedVariable" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "varName", JE.string varName )
+                    , ( "range", Ranges.encode range )
+                    ]
+
+        UnusedPatternVariable file varName range ->
+            encodeTyped "UnusedPatternVariable" <|
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )

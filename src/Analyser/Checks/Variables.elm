@@ -1,4 +1,4 @@
-module Analyser.Checks.Variables exposing (VariableType(Imported, Defined), getTopLevels, getDeclarationsVars, getImportsVars, patternToVars, patternToUsedVars)
+module Analyser.Checks.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, withoutTopLevel, getDeclarationsVars, getImportsVars, patternToVars, patternToUsedVars)
 
 import AST.Ranges exposing (Range, emptyRange)
 import AST.Types exposing (Declaration(..), Expose(..), Exposure(..), File, Import, Pattern(..), QualifiedNameRef, VariablePointer)
@@ -6,7 +6,23 @@ import AST.Types exposing (Declaration(..), Expose(..), Exposure(..), File, Impo
 
 type VariableType
     = Imported
+    | Pattern
     | Defined
+    | TopLevel
+
+
+withoutTopLevel : List ( VariablePointer, VariableType ) -> List ( VariablePointer, VariableType )
+withoutTopLevel =
+    let
+        f (( pointer, variableType ) as pair) =
+            case variableType of
+                TopLevel ->
+                    ( pointer, Defined )
+
+                _ ->
+                    pair
+    in
+        List.map f
 
 
 getTopLevels : File -> List ( VariablePointer, VariableType )
@@ -74,21 +90,21 @@ getDeclarationVars : Declaration -> List ( VariablePointer, VariableType )
 getDeclarationVars decl =
     case decl of
         FuncDecl f ->
-            [ ( f.declaration.name, Defined ) ]
+            [ ( f.declaration.name, TopLevel ) ]
 
         AliasDecl _ ->
             []
 
         TypeDecl t ->
-            (List.map (\{ name, range } -> ( { value = name, range = range }, Defined )) t.constructors)
+            (List.map (\{ name, range } -> ( { value = name, range = range }, TopLevel )) t.constructors)
 
         PortDeclaration p ->
             --TODO Range + Test
-            [ ( { value = p.name, range = emptyRange }, Defined ) ]
+            [ ( { value = p.name, range = emptyRange }, TopLevel ) ]
 
         InfixDeclaration i ->
             --TODO Range + Test
-            [ ( { value = i.operator, range = emptyRange }, Defined ) ]
+            [ ( { value = i.operator, range = emptyRange }, TopLevel ) ]
 
         DestructuringDeclaration destructuring ->
             patternToVars destructuring.pattern
@@ -152,49 +168,64 @@ patternToUsedVars p =
 
 
 patternToVars : Pattern -> List ( VariablePointer, VariableType )
-patternToVars p =
-    case p of
-        TuplePattern t ->
-            List.concatMap patternToVars t
+patternToVars =
+    patternToVarInner True
 
-        RecordPattern r ->
-            List.map (flip (,) Defined) r
 
-        UnConsPattern l r ->
-            patternToVars l ++ patternToVars r
+patternToVarInner : Bool -> Pattern -> List ( VariablePointer, VariableType )
+patternToVarInner isFirst p =
+    let
+        recur =
+            (patternToVarInner False)
+    in
+        case p of
+            TuplePattern t ->
+                List.concatMap recur t
 
-        ListPattern l ->
-            List.concatMap patternToVars l
+            RecordPattern r ->
+                List.map (flip (,) Pattern) r
 
-        VarPattern x ->
-            [ ( x, Defined ) ]
+            UnConsPattern l r ->
+                recur l ++ recur r
 
-        NamedPattern _ args ->
-            List.concatMap patternToVars args
+            ListPattern l ->
+                List.concatMap recur l
 
-        AsPattern sub name ->
-            ( name, Defined ) :: patternToVars sub
+            VarPattern x ->
+                [ ( x
+                  , if isFirst then
+                        Defined
+                    else
+                        Pattern
+                  )
+                ]
 
-        ParentisizedPattern sub ->
-            patternToVars sub
+            NamedPattern _ args ->
+                List.concatMap recur args
 
-        QualifiedNamePattern _ ->
-            []
+            AsPattern sub name ->
+                ( name, Pattern ) :: recur sub
 
-        AllPattern ->
-            []
+            ParentisizedPattern sub ->
+                recur sub
 
-        UnitPattern ->
-            []
+            QualifiedNamePattern _ ->
+                []
 
-        CharPattern _ ->
-            []
+            AllPattern ->
+                []
 
-        StringPattern _ ->
-            []
+            UnitPattern ->
+                []
 
-        IntPattern _ ->
-            []
+            CharPattern _ ->
+                []
 
-        FloatPattern _ ->
-            []
+            StringPattern _ ->
+                []
+
+            IntPattern _ ->
+                []
+
+            FloatPattern _ ->
+                []

@@ -41,6 +41,7 @@ type MessageData
     | UnusedVariable FileName String Range
     | UnusedTopLevel FileName String Range
     | UnusedImportedVariable FileName String Range
+    | UnusedPatternVariable FileName String Range
     | ExposeAll FileName Range
     | ImportAll FileName AST.ModuleName Range
     | NoTopLevelSignature FileName String Range

@@ -15,10 +15,10 @@ import AST.Types
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Interface as Interface
-import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel, UnusedImportedVariable), newMessage)
+import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel, UnusedImportedVariable, UnusedPatternVariable), newMessage)
 import Dict exposing (Dict)
 import Inspector exposing (defaultConfig, Action(Inner, Pre, Post))
-import Analyser.Checks.Variables exposing (VariableType(Imported, Defined), getTopLevels, patternToVars, getDeclarationsVars, patternToUsedVars)
+import Analyser.Checks.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, patternToVars, getDeclarationsVars, patternToUsedVars, withoutTopLevel)
 import Tuple3
 
 
@@ -63,7 +63,7 @@ scan fileContext =
             x.poppedScopes
                 |> List.concatMap Dict.toList
                 |> onlyUnused
-                |> List.map (\( x, ( _, t, y ) ) -> UnusedVariable fileContext.path x y)
+                |> List.map (\( x, ( _, t, y ) ) -> forVariableType fileContext t x y)
                 |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
         unusedTopLevels =
@@ -75,18 +75,26 @@ scan fileContext =
                 |> onlyUnused
                 |> List.filter (filterByModuleType fileContext)
                 |> List.filter (Tuple.first >> flip Interface.doesExposeFunction fileContext.interface >> not)
-                |> List.map
-                    (\( x, ( _, t, y ) ) ->
-                        case t of
-                            Imported ->
-                                UnusedImportedVariable fileContext.path x y
-
-                            Defined ->
-                                UnusedTopLevel fileContext.path x y
-                    )
+                |> List.map (\( x, ( _, t, y ) ) -> forVariableType fileContext t x y)
                 |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
     in
         unusedVariables ++ unusedTopLevels
+
+
+forVariableType : FileContext -> VariableType -> String -> Range -> MessageData
+forVariableType fileContext variableType =
+    case variableType of
+        Imported ->
+            UnusedImportedVariable fileContext.path
+
+        TopLevel ->
+            UnusedTopLevel fileContext.path
+
+        Defined ->
+            UnusedVariable fileContext.path
+
+        Pattern ->
+            UnusedPatternVariable fileContext.path
 
 
 filterByModuleType : FileContext -> ( String, ( Int, VariableType, Range ) ) -> Bool
@@ -244,7 +252,7 @@ onLambda f lambda context =
 onLetBlock : (UsedVariableContext -> UsedVariableContext) -> LetBlock -> UsedVariableContext -> UsedVariableContext
 onLetBlock f letBlock context =
     letBlock.declarations
-        |> getDeclarationsVars
+        |> (getDeclarationsVars >> withoutTopLevel)
         |> flip pushScope context
         |> f
         |> popScope

@@ -107,6 +107,20 @@ getMessageInfo m =
             , True
             )
 
+        UnusedPatternVariable fileName varName range ->
+            ( String.concat
+                [ "Unused variable `"
+                , varName
+                , "` inside pattern in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , (always [ fileName ])
+            , [ range ]
+            , True
+            )
+
         UnreadableSourceFile fileName ->
             ( String.concat
                 [ "Could not parse source file: ", fileName ]
