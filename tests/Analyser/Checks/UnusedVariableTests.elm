@@ -6,7 +6,7 @@ import Analyser.Types exposing (..)
 import Dict exposing (Dict)
 import Test exposing (..)
 import Analyser.Messages.Types exposing (..)
-import Analyser.Checks.CheckTestUtil exposing (getMessages)
+import Analyser.Checks.CheckTestUtil
 
 
 table : OperatorTable

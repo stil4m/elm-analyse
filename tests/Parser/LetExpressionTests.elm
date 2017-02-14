@@ -1,11 +1,11 @@
 module Parser.LetExpressionTests exposing (..)
 
-import Combine exposing ((*>), string, whitespace)
+import Combine exposing ((*>), string)
 import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
 import Parser.Tokens exposing (functionName)
-import AST.Types as Types exposing (..)
+import AST.Types exposing (..)
 import Test exposing (..)
 import AST.Ranges exposing (emptyRange)
 import Parser.State exposing (emptyState, pushIndent)

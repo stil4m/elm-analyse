@@ -2,7 +2,7 @@ module AST.Decoding exposing (decode, decodeInfix)
 
 import AST.Ranges as Ranges exposing (Range)
 import AST.Types exposing (..)
-import Json.Decode as JD exposing (Decoder, field, list, string, map, map2, map3, succeed, maybe, lazy, int, bool, andThen, float, fail)
+import Json.Decode exposing (Decoder, field, list, string, map, map2, map3, succeed, maybe, lazy, int, bool, andThen, float, fail)
 import Json.Decode.Extra exposing ((|:))
 import Util.Json exposing (decodeTyped)
 

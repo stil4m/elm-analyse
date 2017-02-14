@@ -2,7 +2,7 @@ module Parser.PatternTests exposing (..)
 
 import Parser.CombineTestUtil exposing (..)
 import Expect
-import AST.Types as Types exposing (..)
+import AST.Types exposing (..)
 import AST.Ranges exposing (emptyRange)
 import Test exposing (..)
 import Parser.Patterns as Parser exposing (..)
