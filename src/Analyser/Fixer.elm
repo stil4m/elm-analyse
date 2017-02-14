@@ -47,6 +47,7 @@ type alias Model =
     { message : Message
     , fixer : FixCall
     , done : Bool
+    , success : Bool
     , touchedFiles : List String
     }
 
@@ -65,7 +66,7 @@ initWithMessage message state =
     getFixer message
         |> Maybe.map
             (\fixer ->
-                ( { message = message, fixer = fixer, done = False, touchedFiles = [] }
+                ( { message = message, fixer = fixer, done = False, success = True, touchedFiles = [] }
                 , loadFileContentWithShas (List.map Tuple.second message.files)
                 , (State.startFixing message state)
                 )
@@ -77,7 +78,7 @@ update msg model =
     case msg of
         LoadedFileContent reference ->
             if not (fileHashesEqual reference model.message) then
-                ( { model | done = True }
+                ( { model | done = True, success = False }
                 , sendFixResult { success = False, message = "Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages." }
                 )
             else

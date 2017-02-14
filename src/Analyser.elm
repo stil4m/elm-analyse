@@ -9,6 +9,7 @@ import Analyser.Dependencies exposing (Dependency, Version)
 import Analyser.State as State exposing (State)
 import Analyser.Fixer as Fixer
 import Tuple2
+import Analyser.Messages.Util as Messages
 
 
 type alias Flags =
@@ -122,12 +123,12 @@ onFixerMsg x stage model =
                 |> Tuple2.mapSecond (Cmd.map FixerMsg)
     in
         if newFixerModel.done then
-            let
-                _ =
-                    Debug.log "Touched files: " newFixerModel.touchedFiles
-            in
+            if newFixerModel.success then
                 --TODO What to do with the checking and the state
                 startSourceLoading newFixerModel.touchedFiles
+                    ( model, fixerCmds )
+            else
+                startSourceLoading (Messages.getFiles newFixerModel.message.data)
                     ( model, fixerCmds )
         else
             ( { model | stage = FixerStage newFixerModel }
@@ -138,11 +139,21 @@ onFixerMsg x stage model =
 startSourceLoading : List String -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 startSourceLoading files ( model, cmds ) =
     let
-        ( nextStage, sourceCmds ) =
-            SourceLoadingStage.init files
+        _ =
+            Debug.log "StartSourceLoading" "!"
+
+        ( nextStage, stageCmds ) =
+            case files of
+                [] ->
+                    ( Finished, Cmd.none )
+
+                files_ ->
+                    SourceLoadingStage.init files_
+                        |> Tuple2.mapFirst SourceLoadingStage
+                        |> Tuple.mapSecond (Cmd.map SourceLoadingStageMsg)
     in
-        ( { model | stage = SourceLoadingStage nextStage }
-        , Cmd.batch [ Cmd.map SourceLoadingStageMsg sourceCmds, cmds ]
+        ( { model | stage = nextStage }
+        , Cmd.batch [ stageCmds, cmds ]
         )
 
 
