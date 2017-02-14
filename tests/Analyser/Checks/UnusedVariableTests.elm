@@ -270,6 +270,22 @@ foo x =
     )
 
 
+unusedInCasePatternAsSingle : ( String, String, List MessageData )
+unusedInCasePatternAsSingle =
+    ( "unusedInCasePatternAsSingle"
+    , """module Foo exposing (foo)
+
+
+foo x =
+  case x of
+    y ->
+      1
+"""
+    , [ UnusedPatternVariable "./foo.elm" "y" { start = { row = 5, column = 3 }, end = { row = 5, column = 4 } }
+      ]
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedVariable"
@@ -292,4 +308,5 @@ all =
         , usedImportedVariableAsOpaque
         , exposeOperator
         , unusedInCasePattern
+        , unusedInCasePatternAsSingle
         ]

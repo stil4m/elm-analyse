@@ -1,4 +1,4 @@
-module Analyser.Checks.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, withoutTopLevel, getDeclarationsVars, getImportsVars, patternToVars, patternToUsedVars)
+module Analyser.Checks.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, withoutTopLevel, getDeclarationsVars, getImportsVars, patternToVars, patternToVarInner, patternToUsedVars)
 
 import AST.Ranges exposing (Range, emptyRange)
 import AST.Types exposing (Declaration(..), Expose(..), Exposure(..), File, Import, Pattern(..), QualifiedNameRef, VariablePointer)
