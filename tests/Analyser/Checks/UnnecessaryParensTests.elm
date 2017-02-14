@@ -294,6 +294,19 @@ foo =
     )
 
 
+parensInTuple : ( String, String, List MessageData )
+parensInTuple =
+    ( "parensInTuple"
+    , """module Bar exposing (..)
+
+foo = ( ("price"), (Location 0 0) )
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 2, column = 16 } }
+      , UnnecessaryParens "./foo.elm" { start = { row = 2, column = 18 }, end = { row = 2, column = 32 } }
+      ]
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnnecessaryParensTests"
@@ -319,4 +332,5 @@ all =
         , allowParensForIfStatementOnLHS
         , allowParensForCaseOnLHS
         , parensAroundTopLevelApplication
+        , parensInTuple
         ]

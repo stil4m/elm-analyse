@@ -94,8 +94,18 @@ onExpression ( range, expression ) context =
         RecordUpdateExpression recordUpdate ->
             onRecord recordUpdate.updates context
 
+        TupledExpression x ->
+            onTuple x context
+
         _ ->
             context
+
+
+onTuple : List Expression -> Context -> Context
+onTuple exprs context =
+    List.filterMap getParenthesized exprs
+        |> List.map Tuple.first
+        |> flip (++) context
 
 
 onRecord : List ( String, Expression ) -> Context -> Context
