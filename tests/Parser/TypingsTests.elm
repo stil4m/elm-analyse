@@ -19,7 +19,7 @@ all =
                         (Just <|
                             { name = "Foo"
                             , generics = []
-                            , typeReference = Record ([ ( "color", Typed [] "String" [] ) ])
+                            , typeReference = Record [ ( "color", Typed [] "String" [] ) ]
                             , range = emptyRange
                             }
                         )
@@ -31,7 +31,7 @@ all =
                         (Just <|
                             { name = "Foo"
                             , generics = [ "a" ]
-                            , typeReference = Record ([ ( "some", GenericType "a" ) ])
+                            , typeReference = Record [ ( "some", GenericType "a" ) ]
                             , range = emptyRange
                             }
                         )

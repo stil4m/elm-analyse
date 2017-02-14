@@ -17,16 +17,15 @@ all =
                     |> Maybe.map noRangeImport
                     |> Expect.equal
                         (Just
-                            ({ moduleName = [ "Foo" ]
-                             , moduleAlias = Nothing
-                             , exposingList =
+                            { moduleName = [ "Foo" ]
+                            , moduleAlias = Nothing
+                            , exposingList =
                                 Explicit
                                     [ TypeOrAliasExpose "Model" emptyRange
                                     , TypeExpose (ExposedType "Msg" (All emptyRange) emptyRange)
                                     ]
-                             , range = emptyRange
-                             }
-                            )
+                            , range = emptyRange
+                            }
                         )
         , test "import with explicits 2" <|
             \() ->
@@ -34,12 +33,11 @@ all =
                     |> Maybe.map noRangeImport
                     |> Expect.equal
                         (Just
-                            ({ moduleName = [ "Html" ]
-                             , moduleAlias = Nothing
-                             , exposingList = Explicit [ FunctionExpose "text" emptyRange ]
-                             , range = emptyRange
-                             }
-                            )
+                            { moduleName = [ "Html" ]
+                            , moduleAlias = Nothing
+                            , exposingList = Explicit [ FunctionExpose "text" emptyRange ]
+                            , range = emptyRange
+                            }
                         )
         , test "import minimal" <|
             \() ->
@@ -47,12 +45,11 @@ all =
                     |> Maybe.map noRangeImport
                     |> Expect.equal
                         (Just
-                            ({ moduleName = [ "Foo" ]
-                             , moduleAlias = Nothing
-                             , exposingList = None
-                             , range = emptyRange
-                             }
-                            )
+                            { moduleName = [ "Foo" ]
+                            , moduleAlias = Nothing
+                            , exposingList = None
+                            , range = emptyRange
+                            }
                         )
         , test "import with alias" <|
             \() ->
@@ -60,11 +57,10 @@ all =
                     |> Maybe.map noRangeImport
                     |> Expect.equal
                         (Just
-                            ({ moduleName = [ "Foo" ]
-                             , moduleAlias = Just ([ "Bar" ])
-                             , exposingList = None
-                             , range = emptyRange
-                             }
-                            )
+                            { moduleName = [ "Foo" ]
+                            , moduleAlias = Just [ "Bar" ]
+                            , exposingList = None
+                            , range = emptyRange
+                            }
                         )
         ]

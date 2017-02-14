@@ -48,7 +48,7 @@ all =
                     |> Maybe.map (List.map noRangeDeclaration)
                     |> Expect.equal
                         (Just
-                            ([ FuncDecl
+                            [ FuncDecl
                                 { documentation = Nothing
                                 , signature = Nothing
                                 , declaration =
@@ -58,7 +58,7 @@ all =
                                     , expression = emptyRanged <| FunctionOrValue "bar"
                                     }
                                 }
-                             , FuncDecl
+                            , FuncDecl
                                 { documentation = Nothing
                                 , signature = Nothing
                                 , declaration =
@@ -68,8 +68,7 @@ all =
                                     , expression = emptyRanged <| FunctionOrValue "doe"
                                     }
                                 }
-                             ]
-                            )
+                            ]
                         )
         , test "correct let with indent" <|
             \() ->
@@ -130,7 +129,7 @@ all =
                     |> Expect.equal
                         (Just
                             (ListExpr
-                                ([ emptyRanged <|
+                                [ emptyRanged <|
                                     LetExpression
                                         { declarations =
                                             [ FuncDecl
@@ -146,8 +145,7 @@ all =
                                             ]
                                         , expression = emptyRanged <| FunctionOrValue "bar"
                                         }
-                                 ]
-                                )
+                                ]
                             )
                         )
         , test "some let" <|
@@ -159,10 +157,9 @@ all =
                         (Just
                             (LetExpression
                                 { declarations =
-                                    ([ DestructuringDeclaration { pattern = AllPattern, expression = (emptyRanged <| FunctionOrValue "b") }
-                                     ]
-                                    )
-                                , expression = (emptyRanged <| FunctionOrValue "z")
+                                    [ DestructuringDeclaration { pattern = AllPattern, expression = emptyRanged <| FunctionOrValue "b" }
+                                    ]
+                                , expression = emptyRanged <| FunctionOrValue "z"
                                 }
                             )
                         )
@@ -184,7 +181,7 @@ all =
                                             , arguments = []
                                             , expression =
                                                 emptyRanged <|
-                                                    Application ([ emptyRanged <| QualifiedExpr [ "String" ] "length", emptyRanged <| FunctionOrValue "s" ])
+                                                    Application [ emptyRanged <| QualifiedExpr [ "String" ] "length", emptyRanged <| FunctionOrValue "s" ]
                                             }
                                         }
                                     ]

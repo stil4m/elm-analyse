@@ -168,7 +168,10 @@ handleNextStep (( model, cmds ) as input) =
                 Just ( newState, taskId ) ->
                     case Fixer.init taskId newState of
                         Nothing ->
-                            input
+                            --TODO Log something here
+                            ( { model | state = newState }
+                            , Cmd.none
+                            )
 
                         Just ( fixerModel, fixerCmds, newState2 ) ->
                             ( { model | state = newState2, stage = FixerStage fixerModel }

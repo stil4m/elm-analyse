@@ -87,7 +87,7 @@ all =
                     |> Expect.equal
                         (Just
                             (CaseExpression
-                                { expression = (emptyRanged <| FunctionOrValue "f")
+                                { expression = emptyRanged <| FunctionOrValue "f"
                                 , cases =
                                     [ ( NamedPattern (QualifiedNameRef [] "True" emptyRange) []
                                       , emptyRanged <| Integer 1
@@ -111,7 +111,7 @@ all =
                     |> Expect.equal
                         (Just
                             (CaseExpression
-                                { expression = (emptyRanged <| FunctionOrValue "msg")
+                                { expression = emptyRanged <| FunctionOrValue "msg"
                                 , cases =
                                     [ ( NamedPattern (QualifiedNameRef [] "Increment" emptyRange) []
                                       , emptyRanged <|

@@ -19,25 +19,32 @@ toInterface name input inter =
 all : Test.Test
 all =
     describe "Interface.InterfaceTest"
-        [ (toInterface "exposeAll" exposeAllSample)
-            [ Alias ("X")
+        [ toInterface "exposeAll"
+            exposeAllSample
+            [ Alias "X"
             , Type ( "Color", [ "Red", "Blue" ] )
             , Function "foo"
             , Operator { direction = AST.Left, operator = "?>", precedence = 5 }
             , Operator { direction = AST.Right, operator = "<&", precedence = 3 }
             ]
-        , (toInterface "exposeOparatorSample" exposeOparatorSample)
+        , toInterface "exposeOparatorSample"
+            exposeOparatorSample
             [ Operator { direction = AST.Right, operator = "<&", precedence = 3 } ]
-        , (toInterface "exposeFunctionSample" exposeFunctionSample)
+        , toInterface "exposeFunctionSample"
+            exposeFunctionSample
             [ Function "foo" ]
-        , (toInterface "exposeTypeNoneSample" exposeTypeNoneSample)
+        , toInterface "exposeTypeNoneSample"
+            exposeTypeNoneSample
             [ Type ( "Color", [] ) ]
-        , (toInterface "exposeTypeSubSetSample" exposeTypeSubSetSample)
+        , toInterface "exposeTypeSubSetSample"
+            exposeTypeSubSetSample
             [ Type ( "Color", [ "Blue" ] ) ]
-        , (toInterface "exposeTypeAllSample" exposeTypeAllSample)
+        , toInterface "exposeTypeAllSample"
+            exposeTypeAllSample
             [ Type ( "Color", [ "Red", "Blue" ] ) ]
-        , (toInterface "exposeTypeAliasSample" exposeTypeAliasSample)
-            [ Alias ("X") ]
+        , toInterface "exposeTypeAliasSample"
+            exposeTypeAliasSample
+            [ Alias "X" ]
         ]
 
 

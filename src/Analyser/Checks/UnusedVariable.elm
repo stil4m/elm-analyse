@@ -183,7 +183,7 @@ flagVariable k l =
             if List.member k masked then
                 ( masked, x ) :: xs
             else if Dict.member k x then
-                ( masked, (Dict.update k (Maybe.map (Tuple3.mapFirst ((+) 1))) x) ) :: xs
+                ( masked, Dict.update k (Maybe.map (Tuple3.mapFirst ((+) 1))) x ) :: xs
             else
                 ( masked, x ) :: flagVariable k xs
 

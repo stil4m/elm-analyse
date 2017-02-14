@@ -13,11 +13,7 @@ module.exports = function(config) {
 
     const Elm = require('./backend-elm');
     var app = Elm.Analyser.worker(input);
-    // app.ports.messagesAsJson.subscribe(function(x) {
-    //   console.log("JSON Messages:")
-    //   console.log("---------")
-    //   x.forEach(y => console.log(y));
-    // });
+    
     app.ports.sendMessages.subscribe(function(x) {
         console.log("Messages:")
         console.log("---------")

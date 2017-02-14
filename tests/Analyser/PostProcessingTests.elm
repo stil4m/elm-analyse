@@ -6,7 +6,7 @@ import Analyser.PostProcessing as PostProcessing
 import Analyser.Types exposing (..)
 import Dict exposing (Dict)
 import Expect
-import Parser.CombineTestUtil exposing (noRangeDeclaration, noRangeExpression)
+import Parser.CombineTestUtil exposing (noRangeDeclaration)
 import Parser.Parser
 import Test exposing (..)
 
@@ -53,26 +53,24 @@ all =
                                                 ( emptyRange
                                                 , ParenthesizedExpression
                                                     ( emptyRange
-                                                    , (OperatorApplicationExpression
+                                                    , OperatorApplicationExpression
                                                         { operator = "+"
                                                         , direction = Left
                                                         , left = ( emptyRange, FunctionOrValue "x" )
                                                         , right = ( emptyRange, Integer 1 )
                                                         }
-                                                      )
                                                     )
                                                 )
                                             , right =
                                                 ( emptyRange
                                                 , ParenthesizedExpression
                                                     ( emptyRange
-                                                    , (OperatorApplicationExpression
+                                                    , OperatorApplicationExpression
                                                         { operator = "*"
                                                         , direction = Left
                                                         , left = ( emptyRange, Integer 2 )
                                                         , right = ( emptyRange, FunctionOrValue "y" )
                                                         }
-                                                      )
                                                     )
                                                 )
                                             }

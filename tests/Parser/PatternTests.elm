@@ -37,10 +37,9 @@ all =
                     |> Expect.equal
                         (Just
                             (TuplePattern
-                                ([ NamedPattern (QualifiedNameRef [] "X" emptyRange)
-                                    ([ VarPattern { value = "x", range = emptyRange } ])
-                                 ]
-                                )
+                                [ NamedPattern (QualifiedNameRef [] "X" emptyRange)
+                                    [ VarPattern { value = "x", range = emptyRange } ]
+                                ]
                             )
                         )
         , test "parentiszed pattern" <|
@@ -51,10 +50,9 @@ all =
                         (Just
                             ((UnConsPattern
                                 (TuplePattern
-                                    ([ NamedPattern (QualifiedNameRef [] "X" emptyRange)
-                                        ([ VarPattern { value = "x", range = emptyRange } ])
-                                     ]
-                                    )
+                                    [ NamedPattern (QualifiedNameRef [] "X" emptyRange)
+                                        [ VarPattern { value = "x", range = emptyRange } ]
+                                    ]
                                 )
                                 (VarPattern { value = "xs", range = emptyRange })
                              )
@@ -92,10 +90,9 @@ all =
                     |> Expect.equal
                         (Just
                             (RecordPattern
-                                ([ { value = "a", range = emptyRange }
-                                 , { value = "b", range = emptyRange }
-                                 ]
-                                )
+                                [ { value = "a", range = emptyRange }
+                                , { value = "b", range = emptyRange }
+                                ]
                             )
                         )
         , test "named pattern" <|
@@ -163,14 +160,12 @@ all =
                     |> Expect.equal
                         (Just
                             (TuplePattern
-                                ([ NamedPattern (QualifiedNameRef [] "Index" emptyRange)
-                                    ([ AsPattern (VarPattern { value = "irec", range = emptyRange })
+                                [ NamedPattern (QualifiedNameRef [] "Index" emptyRange)
+                                    [ AsPattern (VarPattern { value = "irec", range = emptyRange })
                                         { value = "index", range = emptyRange }
-                                     ]
-                                    )
-                                 , VarPattern { value = "docVector", range = emptyRange }
-                                 ]
-                                )
+                                    ]
+                                , VarPattern { value = "docVector", range = emptyRange }
+                                ]
                             )
                         )
         , test "complex pattern 2" <|

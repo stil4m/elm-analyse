@@ -74,10 +74,9 @@ all =
                             , expression =
                                 emptyRanged <|
                                     Application
-                                        ([ emptyRanged <| FunctionOrValue "flip"
-                                         , emptyRanged <| QualifiedExpr [ "Maybe" ] "andThen"
-                                         ]
-                                        )
+                                        [ emptyRanged <| FunctionOrValue "flip"
+                                        , emptyRanged <| QualifiedExpr [ "Maybe" ] "andThen"
+                                        ]
                             }
                         )
         , test "function declaration with args" <|
@@ -92,11 +91,10 @@ all =
                             , expression =
                                 emptyRanged <|
                                     Application
-                                        ([ emptyRanged <| FunctionOrValue "x"
-                                         , emptyRanged <| Operator "+"
-                                         , emptyRanged <| Integer 1
-                                         ]
-                                        )
+                                        [ emptyRanged <| FunctionOrValue "x"
+                                        , emptyRanged <| Operator "+"
+                                        , emptyRanged <| Integer 1
+                                        ]
                             }
                         )
         , test "some signature" <|
@@ -161,16 +159,14 @@ all =
                             , expression =
                                 emptyRanged <|
                                     Application
-                                        ([ emptyRanged <| FunctionOrValue "beginnerProgram"
-                                         , emptyRanged <|
+                                        [ emptyRanged <| FunctionOrValue "beginnerProgram"
+                                        , emptyRanged <|
                                             RecordExpr
-                                                ([ ( "model", emptyRanged <| Integer 0 )
-                                                 , ( "view", emptyRanged <| FunctionOrValue "view" )
-                                                 , ( "update", emptyRanged <| FunctionOrValue "update" )
-                                                 ]
-                                                )
-                                         ]
-                                        )
+                                                [ ( "model", emptyRanged <| Integer 0 )
+                                                , ( "view", emptyRanged <| FunctionOrValue "view" )
+                                                , ( "update", emptyRanged <| FunctionOrValue "update" )
+                                                ]
+                                        ]
                             }
                         )
         , test "update function" <|
@@ -190,20 +186,18 @@ all =
                                             [ ( NamedPattern (QualifiedNameRef [] "Increment" emptyRange) []
                                               , emptyRanged <|
                                                     Application
-                                                        ([ emptyRanged <| FunctionOrValue "model"
-                                                         , emptyRanged <| Operator "+"
-                                                         , emptyRanged <| Integer 1
-                                                         ]
-                                                        )
+                                                        [ emptyRanged <| FunctionOrValue "model"
+                                                        , emptyRanged <| Operator "+"
+                                                        , emptyRanged <| Integer 1
+                                                        ]
                                               )
                                             , ( NamedPattern (QualifiedNameRef [] "Decrement" emptyRange) []
                                               , emptyRanged <|
                                                     Application
-                                                        ([ emptyRanged <| FunctionOrValue "model"
-                                                         , emptyRanged <| Operator "-"
-                                                         , emptyRanged <| Integer 1
-                                                         ]
-                                                        )
+                                                        [ emptyRanged <| FunctionOrValue "model"
+                                                        , emptyRanged <| Operator "-"
+                                                        , emptyRanged <| Integer 1
+                                                        ]
                                               )
                                             ]
                                         }
@@ -218,10 +212,9 @@ all =
                                 { operatorDefinition = False
                                 , name = "parseResponse"
                                 , typeReference =
-                                    (FunctionTypeReference
+                                    FunctionTypeReference
                                         (Tupled [ Typed [] "String" [], Typed [] "String" [] ])
                                         (Typed [] "Cmd" [ Generic "msg" ])
-                                    )
                                 }
                             )
                         )
@@ -253,10 +246,9 @@ all =
                                 { operatorDefinition = False
                                 , name = "scroll"
                                 , typeReference =
-                                    (FunctionTypeReference
+                                    FunctionTypeReference
                                         (FunctionTypeReference (Typed [] "Move" []) (GenericType "msg"))
-                                        (Typed [] "Sub" ([ Generic "msg" ]))
-                                    )
+                                        (Typed [] "Sub" [ Generic "msg" ])
                                 }
                         )
         , test "Destructuring declaration" <|
@@ -267,7 +259,7 @@ all =
                         (Just <|
                             DestructuringDeclaration
                                 { pattern = AllPattern
-                                , expression = emptyRanged <| (FunctionOrValue "b")
+                                , expression = emptyRanged <| FunctionOrValue "b"
                                 }
                         )
         , test "declaration" <|
@@ -282,10 +274,9 @@ all =
                             , expression =
                                 emptyRanged <|
                                     Application
-                                        ([ emptyRanged <| FunctionOrValue "text"
-                                         , emptyRanged <| Literal "Hello, World!"
-                                         ]
-                                        )
+                                        [ emptyRanged <| FunctionOrValue "text"
+                                        , emptyRanged <| Literal "Hello, World!"
+                                        ]
                             }
                         )
         , test "function" <|
@@ -306,10 +297,9 @@ all =
                                 , expression =
                                     emptyRanged <|
                                         Application
-                                            ([ emptyRanged <| FunctionOrValue "text"
-                                             , emptyRanged <| Literal "Hello, World!"
-                                             ]
-                                            )
+                                            [ emptyRanged <| FunctionOrValue "text"
+                                            , emptyRanged <| Literal "Hello, World!"
+                                            ]
                                 }
                             }
                         )

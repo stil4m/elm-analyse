@@ -176,7 +176,7 @@ patternToVarInner : Bool -> Pattern -> List ( VariablePointer, VariableType )
 patternToVarInner isFirst p =
     let
         recur =
-            (patternToVarInner False)
+            patternToVarInner False
     in
         case p of
             TuplePattern t ->

@@ -2,7 +2,7 @@ module Analyser.Checks.UnusedImportsTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImports as UnusedImports
-import Analyser.Messages.Types  exposing (..)
+import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 

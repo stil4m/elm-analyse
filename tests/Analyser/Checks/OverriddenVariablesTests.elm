@@ -1,8 +1,8 @@
 module Analyser.Checks.OverriddenVariablesTests exposing (..)
 
-import Analyser.Checks.CheckTestUtil as CTU exposing (getMessages)
+import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.OverriddenVariables as OverriddenVariables
-import Analyser.Messages.Types  exposing (MessageData(RedefineVariable))
+import Analyser.Messages.Types exposing (MessageData(RedefineVariable))
 import Test exposing (..)
 
 

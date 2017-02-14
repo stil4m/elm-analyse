@@ -2,7 +2,7 @@ module Analyser.Checks.NoDebugTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NoDebug as NoDebug
-import Analyser.Messages.Types  exposing (..)
+import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 

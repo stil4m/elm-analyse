@@ -86,7 +86,7 @@ decodeExposingList x =
     lazy
         (\() ->
             decodeTyped
-                [ ( "none", (succeed None) )
+                [ ( "none", succeed None )
                 , ( "all", Ranges.decode |> map All )
                 , ( "explicit", list x |> map Explicit )
                 ]

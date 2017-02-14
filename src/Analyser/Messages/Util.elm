@@ -74,7 +74,7 @@ getMessageInfo m =
         UnusedTopLevel fileName varName range ->
             ( String.concat
                 [ "Unused top level definition `", varName, "` in file \"", fileName, "\" at ", rangeToString range ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , True
             )
@@ -88,7 +88,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , True
             )
@@ -102,7 +102,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , True
             )
@@ -116,7 +116,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , True
             )
@@ -124,7 +124,7 @@ getMessageInfo m =
         UnreadableSourceFile fileName ->
             ( String.concat
                 [ "Could not parse source file: ", fileName ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , []
             , True
             )
@@ -136,7 +136,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , False
             )
@@ -150,7 +150,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , False
             )
@@ -164,7 +164,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , False
             )
@@ -176,7 +176,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , True
             )
@@ -188,7 +188,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , True
             )
@@ -200,7 +200,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , True
             )
@@ -211,7 +211,7 @@ getMessageInfo m =
                 , fileName
                 , "\""
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , []
             , True
             )
@@ -226,7 +226,7 @@ getMessageInfo m =
                 , String.join " | " (List.map rangeToString ranges)
                 , " ]"
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , ranges
             , True
             )
@@ -240,7 +240,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , True
             )
@@ -254,7 +254,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , True
             )
@@ -268,7 +268,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , True
             )
@@ -282,7 +282,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range ]
             , False
             )
@@ -298,7 +298,7 @@ getMessageInfo m =
                 , " and "
                 , rangeToString range2
                 ]
-            , (always [ fileName ])
+            , always [ fileName ]
             , [ range1, range2 ]
             , False
             )

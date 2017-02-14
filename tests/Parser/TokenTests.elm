@@ -8,12 +8,12 @@ import Parser.CombineTestUtil exposing (..)
 
 longString : String
 longString =
-    "\"" ++ (String.repeat (5 * 10 ^ 5) "a") ++ "\""
+    "\"" ++ String.repeat (5 * 10 ^ 5) "a" ++ "\""
 
 
 longMultiLineString : String
 longMultiLineString =
-    "\"\"\"" ++ (String.repeat (5 * 10 ^ 5) "a") ++ "\"\"\""
+    "\"\"\"" ++ String.repeat (5 * 10 ^ 5) "a" ++ "\"\"\""
 
 
 all : Test

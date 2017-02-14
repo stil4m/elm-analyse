@@ -109,11 +109,10 @@ all =
                     |> Expect.equal
                         (Just
                             (Application
-                                ([ emptyRanged <| RecordExpr ([ ( "key", emptyRanged <| FunctionOrValue "value" ) ])
-                                 , emptyRanged <| Operator "!"
-                                 , emptyRanged <| ListExpr []
-                                 ]
-                                )
+                                [ emptyRanged <| RecordExpr [ ( "key", emptyRanged <| FunctionOrValue "value" ) ]
+                                , emptyRanged <| Operator "!"
+                                , emptyRanged <| ListExpr []
+                                ]
                             )
                         )
         , test "ifBlockExpression" <|

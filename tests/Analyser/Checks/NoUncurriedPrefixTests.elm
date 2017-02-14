@@ -2,7 +2,7 @@ module Analyser.Checks.NoUncurriedPrefixTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
-import Analyser.Messages.Types  exposing (..)
+import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 

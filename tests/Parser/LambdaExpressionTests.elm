@@ -20,7 +20,7 @@ all =
                         (Just
                             (LambdaExpression
                                 { args = [ UnitPattern ]
-                                , expression = (emptyRanged <| FunctionOrValue "foo")
+                                , expression = emptyRanged <| FunctionOrValue "foo"
                                 }
                             )
                         )
@@ -41,11 +41,10 @@ all =
                                 , expression =
                                     emptyRanged <|
                                         Application
-                                            ([ emptyRanged <| FunctionOrValue "a"
-                                             , emptyRanged <| Operator "+"
-                                             , emptyRanged <| FunctionOrValue "b"
-                                             ]
-                                            )
+                                            [ emptyRanged <| FunctionOrValue "a"
+                                            , emptyRanged <| Operator "+"
+                                            , emptyRanged <| FunctionOrValue "b"
+                                            ]
                                 }
                             )
                         )
@@ -58,15 +57,14 @@ all =
                             (LambdaExpression
                                 { args =
                                     [ TuplePattern
-                                        ([ VarPattern
+                                        [ VarPattern
                                             { value = "a"
                                             , range = emptyRange
                                             }
-                                         , VarPattern { value = "b", range = emptyRange }
-                                         ]
-                                        )
+                                        , VarPattern { value = "b", range = emptyRange }
+                                        ]
                                     ]
-                                , expression = emptyRanged <| Application ([ emptyRanged <| FunctionOrValue "a", emptyRanged <| Operator "+", emptyRanged <| FunctionOrValue "b" ])
+                                , expression = emptyRanged <| Application [ emptyRanged <| FunctionOrValue "a", emptyRanged <| Operator "+", emptyRanged <| FunctionOrValue "b" ]
                                 }
                             )
                         )

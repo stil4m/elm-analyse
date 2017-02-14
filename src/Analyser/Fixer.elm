@@ -3,8 +3,9 @@ port module Analyser.Fixer exposing (..)
 import Analyser.Messages.Types
     exposing
         ( Message
-        , MessageData(UnnecessaryParens, UnusedImportedVariable)
+        , MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile)
         )
+import Analyser.Messages.Util as Messages
 import Analyser.State as State exposing (State)
 import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
 import Analyser.Fixes.UnusedImportedVariable as UnusedImportedVariableFixer
@@ -68,7 +69,7 @@ initWithMessage message state =
             (\fixer ->
                 ( { message = message, fixer = fixer, done = False, success = True, touchedFiles = [] }
                 , loadFileContentWithShas (List.map Tuple.second message.files)
-                , (State.startFixing message state)
+                , State.startFixing message state
                 )
             )
 
@@ -100,7 +101,10 @@ update msg model =
 
         Stored x ->
             ( { model | done = True }
-            , Cmd.none
+            , sendFixResult
+                { success = True
+                , message = "Fixed message: " ++ Messages.asString model.message.data
+                }
             )
 
 
@@ -117,6 +121,9 @@ getFixer m =
 
         UnusedImportedVariable _ _ _ ->
             Just UnusedImportedVariableFixer.fix
+
+        UnformattedFile _ ->
+            Just (\x y -> List.map Tuple3.init x)
 
         _ ->
             Nothing

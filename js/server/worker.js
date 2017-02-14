@@ -11,9 +11,7 @@ module.exports =function worker(config) {
   var app = Elm.Analyser.worker(input);
 
   app.ports.sendMessages.subscribe(function(x) {
-      console.log("Messages:");
-      console.log("---------");
-      x.forEach(y => console.log(y));
+      console.log("Found " + x.length + " message(s)");
   });
 
   fileLoadingPorts(app, config, process.cwd());

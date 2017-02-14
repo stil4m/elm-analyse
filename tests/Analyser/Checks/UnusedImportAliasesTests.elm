@@ -2,7 +2,7 @@ module Analyser.Checks.UnusedImportAliasesTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
-import Analyser.Messages.Types  exposing (..)
+import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 

@@ -2,7 +2,7 @@ module Analyser.Checks.NoImportAllTests exposing (..)
 
 import Analyser.Checks.NoImportAll as NoImportAll
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Messages.Types  exposing (..)
+import Analyser.Messages.Types exposing (..)
 import Expect
 import Test exposing (..)
 
@@ -57,16 +57,15 @@ all =
             \() ->
                 CTU.getMessages importAll NoImportAll.scan
                     |> Expect.equal
-                        (Just ([ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } } ]))
+                        (Just [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } } ])
         , test "importAllMultiple" <|
             \() ->
                 CTU.getMessages importAllMultiple NoImportAll.scan
                     |> Expect.equal
                         (Just
-                            ([ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
-                             , ImportAll "./foo.elm" [ "Baz" ] { start = { row = 3, column = 20 }, end = { row = 3, column = 22 } }
-                             ]
-                            )
+                            [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
+                            , ImportAll "./foo.elm" [ "Baz" ] { start = { row = 3, column = 20 }, end = { row = 3, column = 22 } }
+                            ]
                         )
         , test "importStrict" <|
             \() ->
@@ -76,7 +75,7 @@ all =
         , test "importAllConstructors" <|
             \() ->
                 CTU.getMessages importAllConstructors NoImportAll.scan
-                    |> Expect.equal (Just ([ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 24 }, end = { row = 2, column = 26 } } ]))
+                    |> Expect.equal (Just [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 24 }, end = { row = 2, column = 26 } } ])
         , test "importConstructorsStrict" <|
             \() ->
                 CTU.getMessages importConstructorsStrict NoImportAll.scan
