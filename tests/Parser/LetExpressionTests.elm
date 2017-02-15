@@ -157,7 +157,7 @@ all =
                         (Just
                             (LetExpression
                                 { declarations =
-                                    [ DestructuringDeclaration { pattern = AllPattern, expression = emptyRanged <| FunctionOrValue "b" }
+                                    [ DestructuringDeclaration { pattern = AllPattern emptyRange, expression = emptyRanged <| FunctionOrValue "b" }
                                     ]
                                 , expression = emptyRanged <| FunctionOrValue "z"
                                 }

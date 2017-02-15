@@ -117,28 +117,28 @@ getParenthesized ( r, e ) =
 patternModuleNames : Pattern -> List ModuleName
 patternModuleNames p =
     case p of
-        TuplePattern xs ->
+        TuplePattern xs _ ->
             (List.concatMap patternModuleNames xs)
 
-        RecordPattern _ ->
+        RecordPattern _ _ ->
             []
 
-        UnConsPattern left right ->
+        UnConsPattern left right _ ->
             patternModuleNames left ++ patternModuleNames right
 
-        ListPattern xs ->
+        ListPattern xs _ ->
             (List.concatMap patternModuleNames xs)
 
-        NamedPattern qualifiedNameRef subPatterns ->
+        NamedPattern qualifiedNameRef subPatterns _ ->
             qualifiedNameRef.moduleName :: List.concatMap patternModuleNames subPatterns
 
-        QualifiedNamePattern qualifiedNameRef ->
+        QualifiedNamePattern qualifiedNameRef _ ->
             [ qualifiedNameRef.moduleName ]
 
-        AsPattern inner _ ->
+        AsPattern inner _ _ ->
             patternModuleNames inner
 
-        ParentisizedPattern inner ->
+        ParentisizedPattern inner _ ->
             patternModuleNames inner
 
         _ ->

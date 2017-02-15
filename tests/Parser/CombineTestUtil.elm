@@ -97,50 +97,50 @@ noRangeExposingList x =
 noRangePattern : Pattern -> Pattern
 noRangePattern p =
     case p of
-        QualifiedNamePattern x ->
-            QualifiedNamePattern <| unRange x
+        QualifiedNamePattern x _ ->
+            QualifiedNamePattern x emptyRange
 
-        RecordPattern ls ->
-            RecordPattern <| List.map unRange ls
+        RecordPattern ls _ ->
+            RecordPattern (List.map unRange ls) emptyRange
 
-        VarPattern x ->
-            VarPattern <| unRange x
+        VarPattern x _ ->
+            VarPattern x emptyRange
 
-        NamedPattern x y ->
-            NamedPattern (unRange x) (List.map noRangePattern y)
+        NamedPattern x y _ ->
+            NamedPattern x (List.map noRangePattern y) emptyRange
 
-        ParentisizedPattern x ->
-            ParentisizedPattern <| noRangePattern x
+        ParentisizedPattern x _ ->
+            ParentisizedPattern (noRangePattern x) emptyRange
 
-        AsPattern x y ->
-            AsPattern (noRangePattern x) (unRange y)
+        AsPattern x y _ ->
+            AsPattern (noRangePattern x) (unRange y) emptyRange
 
-        UnConsPattern x y ->
-            UnConsPattern (noRangePattern x) (noRangePattern y)
+        UnConsPattern x y _ ->
+            UnConsPattern (noRangePattern x) (noRangePattern y) emptyRange
 
-        CharPattern _ ->
-            p
+        CharPattern c _ ->
+            CharPattern c emptyRange
 
-        StringPattern _ ->
-            p
+        StringPattern s _ ->
+            StringPattern s emptyRange
 
-        FloatPattern _ ->
-            p
+        FloatPattern f _ ->
+            FloatPattern f emptyRange
 
-        IntPattern _ ->
-            p
+        IntPattern i _ ->
+            IntPattern i emptyRange
 
-        AllPattern ->
-            AllPattern
+        AllPattern _ ->
+            AllPattern emptyRange
 
-        UnitPattern ->
-            UnitPattern
+        UnitPattern _ ->
+            UnitPattern emptyRange
 
-        ListPattern x ->
-            List.map noRangePattern x |> ListPattern
+        ListPattern x _ ->
+            ListPattern (List.map noRangePattern x) emptyRange
 
-        TuplePattern x ->
-            List.map noRangePattern x |> TuplePattern
+        TuplePattern x _ ->
+            TuplePattern (List.map noRangePattern x) emptyRange
 
 
 unRange : { a | range : Range } -> { a | range : Range }

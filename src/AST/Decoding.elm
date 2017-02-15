@@ -2,9 +2,27 @@ module AST.Decoding exposing (decode, decodeInfix)
 
 import AST.Ranges as Ranges exposing (Range)
 import AST.Types exposing (..)
-import Json.Decode exposing (Decoder, field, list, string, map, map2, map3, succeed, maybe, lazy, int, bool, andThen, float, fail)
+import Json.Decode exposing (Decoder, field, list, string, map, map2, map3, succeed, maybe, lazy, int, bool, andThen, float, fail, at)
 import Json.Decode.Extra exposing ((|:))
 import Util.Json exposing (decodeTyped)
+
+
+decodeTypedWithRange : List ( String, Decoder (Range -> a) ) -> Decoder a
+decodeTypedWithRange opts =
+    lazy
+        (\() ->
+            field "type" string
+                |> andThen
+                    (\t ->
+                        case List.filter (Tuple.first >> (==) t) opts |> List.head of
+                            Just m ->
+                                (field (Tuple.first m) <| Tuple.second m)
+                                    |: (at [ Tuple.first m, "range" ] Ranges.decode)
+
+                            Nothing ->
+                                fail ("No decoder for type: " ++ t)
+                    )
+        )
 
 
 rangeField : Decoder Range
@@ -258,22 +276,22 @@ decodePattern : Decoder Pattern
 decodePattern =
     lazy
         (\() ->
-            decodeTyped
+            decodeTypedWithRange
                 [ ( "all", succeed AllPattern )
                 , ( "unit", succeed UnitPattern )
-                , ( "char", decodeChar |> map CharPattern )
-                , ( "string", string |> map StringPattern )
-                , ( "int", int |> map IntPattern )
-                , ( "float", float |> map FloatPattern )
-                , ( "tuple", list decodePattern |> map TuplePattern )
-                , ( "record", list decodeVariablePointer |> map RecordPattern )
+                , ( "char", field "value" decodeChar |> map CharPattern )
+                , ( "string", field "value" string |> map StringPattern )
+                , ( "int", field "value" int |> map IntPattern )
+                , ( "float", field "value" float |> map FloatPattern )
+                , ( "tuple", field "value" (list decodePattern) |> map TuplePattern )
+                , ( "record", field "value" (list decodeVariablePointer) |> map RecordPattern )
                 , ( "uncons", map2 UnConsPattern (field "left" decodePattern) (field "right" decodePattern) )
-                , ( "list", list decodePattern |> map ListPattern )
-                , ( "var", decodeVariablePointer |> map VarPattern )
+                , ( "list", field "value" (list decodePattern) |> map ListPattern )
+                , ( "var", field "value" string |> map VarPattern )
                 , ( "named", map2 NamedPattern (field "qualified" decodeQualifiedNameRef) (field "patterns" (list decodePattern)) )
-                , ( "qualifiedName", map QualifiedNamePattern decodeQualifiedNameRef )
+                , ( "qualifiedName", map QualifiedNamePattern (field "value" decodeQualifiedNameRef) )
                 , ( "as", map2 AsPattern (field "pattern" decodePattern) (field "name" decodeVariablePointer) )
-                , ( "parentisized", map ParentisizedPattern decodePattern )
+                , ( "parentisized", map ParentisizedPattern (field "value" decodePattern) )
                 ]
         )
 
@@ -283,7 +301,6 @@ decodeQualifiedNameRef =
     succeed QualifiedNameRef
         |: field "moduleName" decodeModuleName
         |: nameField
-        |: rangeField
 
 
 decodeExpression : Decoder Expression

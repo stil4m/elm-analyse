@@ -28,7 +28,7 @@ all =
                     |> Maybe.map (((Tuple2.mapSecond noRangeExpression >> Tuple2.mapFirst noRangePattern)))
                     |> Expect.equal
                         (Just
-                            ( NamedPattern (QualifiedNameRef [] "True" emptyRange) []
+                            ( NamedPattern (QualifiedNameRef [] "True") [] emptyRange
                             , emptyRanged <| Integer 1
                             )
                         )
@@ -38,17 +38,17 @@ all =
                     |> Maybe.map (((Tuple2.mapSecond noRangeExpression >> Tuple2.mapFirst noRangePattern)))
                     |> Expect.equal
                         (Just
-                            ( NamedPattern (QualifiedNameRef [ "Foo" ] "Bar" emptyRange) []
+                            ( NamedPattern (QualifiedNameRef [ "Foo" ] "Bar") [] emptyRange
                             , emptyRanged <| Integer 1
                             )
                         )
         , test "caseStatement no spacing" <|
             \() ->
                 parseFullStringState emptyState "32->Backspace" Parser.caseStatement
-                    |> Maybe.map ((Tuple2.mapSecond noRangeExpression))
+                    |> Maybe.map (((Tuple2.mapSecond noRangeExpression >> Tuple2.mapFirst noRangePattern)))
                     |> Expect.equal
                         (Just
-                            ( IntPattern 32
+                            ( IntPattern 32 emptyRange
                             , emptyRanged <| FunctionOrValue "Backspace"
                             )
                         )
@@ -62,7 +62,7 @@ all =
                     |> Maybe.map (Tuple2.mapSecond noRangeExpression >> Tuple2.mapFirst noRangePattern)
                     |> Expect.equal
                         (Just
-                            ( NamedPattern (QualifiedNameRef [] "True" emptyRange) []
+                            ( NamedPattern (QualifiedNameRef [] "True") [] emptyRange
                             , emptyRanged <| Integer 1
                             )
                         )
@@ -72,10 +72,10 @@ all =
                     |> Maybe.map (List.map (Tuple2.mapSecond noRangeExpression >> Tuple2.mapFirst noRangePattern))
                     |> Expect.equal
                         (Just
-                            [ ( NamedPattern (QualifiedNameRef [] "True" emptyRange) []
+                            [ ( NamedPattern (QualifiedNameRef [] "True") [] emptyRange
                               , emptyRanged <| Integer 1
                               )
-                            , ( NamedPattern (QualifiedNameRef [] "False" emptyRange) []
+                            , ( NamedPattern (QualifiedNameRef [] "False") [] emptyRange
                               , emptyRanged <| Integer 2
                               )
                             ]
@@ -89,10 +89,10 @@ all =
                             (CaseExpression
                                 { expression = emptyRanged <| FunctionOrValue "f"
                                 , cases =
-                                    [ ( NamedPattern (QualifiedNameRef [] "True" emptyRange) []
+                                    [ ( NamedPattern (QualifiedNameRef [] "True") [] emptyRange
                                       , emptyRanged <| Integer 1
                                       )
-                                    , ( NamedPattern (QualifiedNameRef [] "False" emptyRange) []
+                                    , ( NamedPattern (QualifiedNameRef [] "False") [] emptyRange
                                       , emptyRanged <| Integer 2
                                       )
                                     ]
@@ -113,7 +113,7 @@ all =
                             (CaseExpression
                                 { expression = emptyRanged <| FunctionOrValue "msg"
                                 , cases =
-                                    [ ( NamedPattern (QualifiedNameRef [] "Increment" emptyRange) []
+                                    [ ( NamedPattern (QualifiedNameRef [] "Increment") [] emptyRange
                                       , emptyRanged <|
                                             Application
                                                 [ emptyRanged <| FunctionOrValue "model"
@@ -121,7 +121,7 @@ all =
                                                 , emptyRanged <| Integer 1
                                                 ]
                                       )
-                                    , ( NamedPattern (QualifiedNameRef [] "Decrement" emptyRange) []
+                                    , ( NamedPattern (QualifiedNameRef [] "Decrement") [] emptyRange
                                       , emptyRanged <|
                                             Application
                                                 [ emptyRanged <| FunctionOrValue "model"

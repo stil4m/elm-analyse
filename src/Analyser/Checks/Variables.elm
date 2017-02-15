@@ -110,8 +110,8 @@ getDeclarationVars decl =
             patternToVars destructuring.pattern
 
 
-qualifiedNameUsedVars : QualifiedNameRef -> List VariablePointer
-qualifiedNameUsedVars { moduleName, name, range } =
+qualifiedNameUsedVars : QualifiedNameRef -> Range -> List VariablePointer
+qualifiedNameUsedVars { moduleName, name } range =
     if moduleName == [] then
         [ { value = name, range = range } ]
     else
@@ -121,49 +121,49 @@ qualifiedNameUsedVars { moduleName, name, range } =
 patternToUsedVars : Pattern -> List VariablePointer
 patternToUsedVars p =
     case p of
-        TuplePattern t ->
+        TuplePattern t _ ->
             List.concatMap patternToUsedVars t
 
-        RecordPattern r ->
+        RecordPattern r _ ->
             r
 
-        UnConsPattern l r ->
+        UnConsPattern l r _ ->
             patternToUsedVars l ++ patternToUsedVars r
 
-        ListPattern l ->
+        ListPattern l _ ->
             List.concatMap patternToUsedVars l
 
-        VarPattern x ->
-            [ x ]
+        VarPattern x range ->
+            [ VariablePointer x range ]
 
-        NamedPattern qualifiedNameRef args ->
-            qualifiedNameUsedVars qualifiedNameRef ++ List.concatMap patternToUsedVars args
+        NamedPattern qualifiedNameRef args range ->
+            qualifiedNameUsedVars qualifiedNameRef range ++ List.concatMap patternToUsedVars args
 
-        AsPattern sub name ->
+        AsPattern sub name _ ->
             name :: patternToUsedVars sub
 
-        ParentisizedPattern sub ->
+        ParentisizedPattern sub _ ->
             patternToUsedVars sub
 
-        QualifiedNamePattern x ->
-            qualifiedNameUsedVars x
+        QualifiedNamePattern x range ->
+            qualifiedNameUsedVars x range
 
-        AllPattern ->
+        AllPattern _ ->
             []
 
-        UnitPattern ->
+        UnitPattern _ ->
             []
 
-        CharPattern _ ->
+        CharPattern _ _ ->
             []
 
-        StringPattern _ ->
+        StringPattern _ _ ->
             []
 
-        IntPattern _ ->
+        IntPattern _ _ ->
             []
 
-        FloatPattern _ ->
+        FloatPattern _ _ ->
             []
 
 
@@ -179,20 +179,20 @@ patternToVarInner isFirst p =
             patternToVarInner False
     in
         case p of
-            TuplePattern t ->
+            TuplePattern t _ ->
                 List.concatMap recur t
 
-            RecordPattern r ->
+            RecordPattern r _ ->
                 List.map (flip (,) Pattern) r
 
-            UnConsPattern l r ->
+            UnConsPattern l r _ ->
                 recur l ++ recur r
 
-            ListPattern l ->
+            ListPattern l _ ->
                 List.concatMap recur l
 
-            VarPattern x ->
-                [ ( x
+            VarPattern x r ->
+                [ ( ({ value = x, range = r })
                   , if isFirst then
                         Defined
                     else
@@ -200,32 +200,32 @@ patternToVarInner isFirst p =
                   )
                 ]
 
-            NamedPattern _ args ->
+            NamedPattern _ args _ ->
                 List.concatMap recur args
 
-            AsPattern sub name ->
+            AsPattern sub name _ ->
                 ( name, Pattern ) :: recur sub
 
-            ParentisizedPattern sub ->
+            ParentisizedPattern sub _ ->
                 recur sub
 
-            QualifiedNamePattern _ ->
+            QualifiedNamePattern _ _ ->
                 []
 
-            AllPattern ->
+            AllPattern _ ->
                 []
 
-            UnitPattern ->
+            UnitPattern _ ->
                 []
 
-            CharPattern _ ->
+            CharPattern _ _ ->
                 []
 
-            StringPattern _ ->
+            StringPattern _ _ ->
                 []
 
-            IntPattern _ ->
+            IntPattern _ _ ->
                 []
 
-            FloatPattern _ ->
+            FloatPattern _ _ ->
                 []

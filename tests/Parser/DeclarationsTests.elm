@@ -87,7 +87,7 @@ all =
                         (Just
                             { operatorDefinition = False
                             , name = { value = "inc", range = emptyRange }
-                            , arguments = [ VarPattern { value = "x", range = emptyRange } ]
+                            , arguments = [ VarPattern "x" emptyRange ]
                             , expression =
                                 emptyRanged <|
                                     Application
@@ -177,13 +177,13 @@ all =
                         (Just
                             { operatorDefinition = False
                             , name = { value = "update", range = emptyRange }
-                            , arguments = [ VarPattern { value = "msg", range = emptyRange }, VarPattern { value = "model", range = emptyRange } ]
+                            , arguments = [ VarPattern "msg" emptyRange, VarPattern "model" emptyRange ]
                             , expression =
                                 emptyRanged <|
                                     CaseExpression
                                         { expression = emptyRanged <| FunctionOrValue "msg"
                                         , cases =
-                                            [ ( NamedPattern (QualifiedNameRef [] "Increment" emptyRange) []
+                                            [ ( NamedPattern (QualifiedNameRef [] "Increment") [] emptyRange
                                               , emptyRanged <|
                                                     Application
                                                         [ emptyRanged <| FunctionOrValue "model"
@@ -191,7 +191,7 @@ all =
                                                         , emptyRanged <| Integer 1
                                                         ]
                                               )
-                                            , ( NamedPattern (QualifiedNameRef [] "Decrement" emptyRange) []
+                                            , ( NamedPattern (QualifiedNameRef [] "Decrement") [] emptyRange
                                               , emptyRanged <|
                                                     Application
                                                         [ emptyRanged <| FunctionOrValue "model"
@@ -258,7 +258,7 @@ all =
                     |> Expect.equal
                         (Just <|
                             DestructuringDeclaration
-                                { pattern = AllPattern
+                                { pattern = AllPattern emptyRange
                                 , expression = emptyRanged <| FunctionOrValue "b"
                                 }
                         )

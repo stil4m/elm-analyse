@@ -18,12 +18,14 @@ import Analyser.Checks.UnusedImportAliasesTests
 import Analyser.Checks.UnusedImportsTests
 import Analyser.Fixes.UnusedImportedVariableTests
 import Analyser.Fixes.UnusedImportAliasTests
+import Analyser.Fixes.PatternOptimizerTests
 
 
 all : Test
 all =
     Test.concat
-        [ Analyser.Fixes.UnusedImportedVariableTests.all
+        [ Analyser.Fixes.PatternOptimizerTests.all
+        , Analyser.Fixes.UnusedImportedVariableTests.all
         , Analyser.Fixes.UnusedImportAliasTests.all
         , Analyser.Checks.UnusedImportsTests.all
         , Analyser.Checks.UnusedImportAliasesTests.all

@@ -68,27 +68,26 @@ type alias DocumentationComment =
 
 
 type Pattern
-    = AllPattern
-    | UnitPattern
-    | CharPattern Char
-    | StringPattern String
-    | IntPattern Int
-    | FloatPattern Float
-    | TuplePattern (List Pattern)
-    | RecordPattern (List VariablePointer)
-    | UnConsPattern Pattern Pattern
-    | ListPattern (List Pattern)
-    | VarPattern VariablePointer
-    | NamedPattern QualifiedNameRef (List Pattern)
-    | QualifiedNamePattern QualifiedNameRef
-    | AsPattern Pattern VariablePointer
-    | ParentisizedPattern Pattern
+    = AllPattern Range
+    | UnitPattern Range
+    | CharPattern Char Range
+    | StringPattern String Range
+    | IntPattern Int Range
+    | FloatPattern Float Range
+    | TuplePattern (List Pattern) Range
+    | RecordPattern (List VariablePointer) Range
+    | UnConsPattern Pattern Pattern Range
+    | ListPattern (List Pattern) Range
+    | VarPattern String Range
+    | NamedPattern QualifiedNameRef (List Pattern) Range
+    | QualifiedNamePattern QualifiedNameRef Range
+    | AsPattern Pattern VariablePointer Range
+    | ParentisizedPattern Pattern Range
 
 
 type alias QualifiedNameRef =
     { moduleName : List String
     , name : String
-    , range : Range
     }
 
 

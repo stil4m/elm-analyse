@@ -79,10 +79,11 @@ listPattern : Parser State Pattern
 listPattern =
     lazy
         (\() ->
-            between
-                (string "[")
-                (string "]")
-                (ListPattern <$> sepBy (string ",") (trimmed pattern))
+            withRange <|
+                between
+                    (string "[")
+                    (string "]")
+                    (ListPattern <$> sepBy (string ",") (trimmed pattern))
         )
 
 
@@ -90,40 +91,42 @@ unConsPattern : Parser State Pattern
 unConsPattern =
     lazy
         (\() ->
-            succeed UnConsPattern
-                <*> nonConsPattern
-                <*> (trimmed (string "::") *> pattern)
+            withRange <|
+                succeed UnConsPattern
+                    <*> nonConsPattern
+                    <*> (trimmed (string "::") *> pattern)
         )
 
 
 charPattern : Parser State Pattern
 charPattern =
-    lazy (\() -> CharPattern <$> characterLiteral)
+    lazy (\() -> withRange <| (CharPattern <$> characterLiteral))
 
 
 stringPattern : Parser State Pattern
 stringPattern =
-    lazy (\() -> StringPattern <$> stringLiteral)
+    lazy (\() -> withRange <| (StringPattern <$> stringLiteral))
 
 
 intPattern : Parser State Pattern
 intPattern =
-    lazy (\() -> IntPattern <$> Combine.Num.int)
+    lazy (\() -> withRange (IntPattern <$> Combine.Num.int))
 
 
 floatPattern : Parser State Pattern
 floatPattern =
-    lazy (\() -> FloatPattern <$> Combine.Num.float)
+    lazy (\() -> withRange (FloatPattern <$> Combine.Num.float))
 
 
 asPattern : Parser State Pattern
 asPattern =
     lazy
         (\() ->
-            (succeed AsPattern
-                <*> (maybe moreThanIndentWhitespace *> nonAsPattern)
-                <*> (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> asPointer functionName)
-            )
+            withRange <|
+                (succeed AsPattern
+                    <*> (maybe moreThanIndentWhitespace *> nonAsPattern)
+                    <*> (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> asPointer functionName)
+                )
         )
 
 
@@ -131,7 +134,7 @@ tuplePattern : Parser State Pattern
 tuplePattern =
     lazy
         (\() ->
-            TuplePattern <$> parens (sepBy1 (string ",") (trimmed pattern))
+            withRange (TuplePattern <$> parens (sepBy1 (string ",") (trimmed pattern)))
         )
 
 
@@ -139,47 +142,50 @@ recordPattern : Parser State Pattern
 recordPattern =
     lazy
         (\() ->
-            RecordPattern
-                <$> between
-                        (string "{" *> maybe moreThanIndentWhitespace)
-                        (maybe moreThanIndentWhitespace *> string "}")
-                        (sepBy1 (string ",") (trimmed (asPointer functionName)))
+            withRange
+                (RecordPattern
+                    <$> between
+                            (string "{" *> maybe moreThanIndentWhitespace)
+                            (maybe moreThanIndentWhitespace *> string "}")
+                            (sepBy1 (string ",") (trimmed (asPointer functionName)))
+                )
         )
 
 
 varPattern : Parser State Pattern
 varPattern =
-    lazy (\() -> VarPattern <$> asPointer functionName)
+    lazy (\() -> withRange (VarPattern <$> functionName))
 
 
 qualifiedNameRef : Parser State QualifiedNameRef
 qualifiedNameRef =
-    withRange <|
-        succeed QualifiedNameRef
-            <*> many (typeName <* string ".")
-            <*> typeName
+    succeed QualifiedNameRef
+        <*> many (typeName <* string ".")
+        <*> typeName
 
 
 qualifiedNamePattern : Parser State Pattern
 qualifiedNamePattern =
-    QualifiedNamePattern <$> qualifiedNameRef
+    withRange (QualifiedNamePattern <$> qualifiedNameRef)
 
 
 namedPattern : Parser State Pattern
 namedPattern =
     lazy
         (\() ->
-            succeed NamedPattern
-                <*> qualifiedNameRef
-                <*> many (moreThanIndentWhitespace *> or qualifiedNamePattern nonNamedPattern)
+            withRange
+                (succeed NamedPattern
+                    <*> qualifiedNameRef
+                    <*> many (moreThanIndentWhitespace *> or qualifiedNamePattern nonNamedPattern)
+                )
         )
 
 
 allPattern : Parser State Pattern
 allPattern =
-    lazy (\() -> AllPattern <$ string "_")
+    lazy (\() -> withRange (AllPattern <$ string "_"))
 
 
 unitPattern : Parser State Pattern
 unitPattern =
-    lazy (\() -> UnitPattern <$ string "()")
+    lazy (\() -> withRange (UnitPattern <$ string "()"))

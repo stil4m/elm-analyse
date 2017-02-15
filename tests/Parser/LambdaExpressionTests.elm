@@ -19,7 +19,7 @@ all =
                     |> Expect.equal
                         (Just
                             (LambdaExpression
-                                { args = [ UnitPattern ]
+                                { args = [ UnitPattern emptyRange ]
                                 , expression = emptyRanged <| FunctionOrValue "foo"
                                 }
                             )
@@ -32,11 +32,8 @@ all =
                         (Just
                             (LambdaExpression
                                 { args =
-                                    [ VarPattern
-                                        { value = "a"
-                                        , range = emptyRange
-                                        }
-                                    , VarPattern { value = "b", range = emptyRange }
+                                    [ VarPattern "a" emptyRange
+                                    , VarPattern "b" emptyRange
                                     ]
                                 , expression =
                                     emptyRanged <|
@@ -57,12 +54,10 @@ all =
                             (LambdaExpression
                                 { args =
                                     [ TuplePattern
-                                        [ VarPattern
-                                            { value = "a"
-                                            , range = emptyRange
-                                            }
-                                        , VarPattern { value = "b", range = emptyRange }
+                                        [ VarPattern "a" emptyRange
+                                        , VarPattern "b" emptyRange
                                         ]
+                                        emptyRange
                                     ]
                                 , expression = emptyRanged <| Application [ emptyRanged <| FunctionOrValue "a", emptyRanged <| Operator "+", emptyRanged <| FunctionOrValue "b" ]
                                 }
