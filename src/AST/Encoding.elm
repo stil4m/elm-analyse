@@ -350,7 +350,7 @@ encodePattern pattern =
         TuplePattern patterns r ->
             encodeTyped "tuple"
                 (JE.object
-                    [ ( "value", (asList encodePattern patterns) )
+                    [ ( "value", asList encodePattern patterns )
                     , ( "range", Ranges.encode r )
                     ]
                 )
@@ -358,7 +358,7 @@ encodePattern pattern =
         RecordPattern pointers r ->
             encodeTyped "record"
                 (JE.object
-                    [ ( "value", (asList encodeVariablePointer pointers) )
+                    [ ( "value", asList encodeVariablePointer pointers )
                     , ( "range", Ranges.encode r )
                     ]
                 )
@@ -375,7 +375,7 @@ encodePattern pattern =
         ListPattern patterns r ->
             encodeTyped "list"
                 (JE.object
-                    [ ( "value", (asList encodePattern patterns) )
+                    [ ( "value", asList encodePattern patterns )
                     , ( "range", Ranges.encode r )
                     ]
                 )
@@ -398,11 +398,10 @@ encodePattern pattern =
 
         QualifiedNamePattern qualifiedNameRef r ->
             encodeTyped "qualifiedName" <|
-                (JE.object
+                JE.object
                     [ ( "value", encodeQualifiedNameRef qualifiedNameRef )
                     , ( "range", Ranges.encode r )
                     ]
-                )
 
         AsPattern destructured variablePointer r ->
             encodeTyped "as" <|
@@ -415,7 +414,7 @@ encodePattern pattern =
         ParentisizedPattern p1 r ->
             encodeTyped "parentisized"
                 (JE.object
-                    [ ( "value", (encodePattern p1) )
+                    [ ( "value", encodePattern p1 )
                     , ( "range", Ranges.encode r )
                     ]
                 )

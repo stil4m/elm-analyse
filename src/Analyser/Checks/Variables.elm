@@ -192,7 +192,7 @@ patternToVarInner isFirst p =
                 List.concatMap recur l
 
             VarPattern x r ->
-                [ ( ({ value = x, range = r })
+                [ ( { value = x, range = r }
                   , if isFirst then
                         Defined
                     else

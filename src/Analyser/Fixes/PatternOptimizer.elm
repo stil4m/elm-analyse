@@ -121,7 +121,7 @@ optimize range pattern =
             if range == r then
                 AllPattern emptyRange
             else
-                (ParentisizedPattern (optimize range inner) r)
+                ParentisizedPattern (optimize range inner) r
 
 
 patternRange : Pattern -> Range
