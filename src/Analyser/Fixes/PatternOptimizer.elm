@@ -29,32 +29,11 @@ isAllPattern p =
 
 optimize : Range -> Pattern -> Pattern
 optimize range pattern =
-    case pattern of
-        VarPattern _ r ->
-            replaceWithAllIfRangeMatches pattern range r
-
-        AllPattern _ ->
-            pattern
-
-        UnitPattern r ->
-            replaceWithAllIfRangeMatches pattern range r
-
-        CharPattern _ r ->
-            replaceWithAllIfRangeMatches pattern range r
-
-        StringPattern _ r ->
-            replaceWithAllIfRangeMatches pattern range r
-
-        IntPattern _ r ->
-            replaceWithAllIfRangeMatches pattern range r
-
-        FloatPattern _ r ->
-            replaceWithAllIfRangeMatches pattern range r
-
-        TuplePattern xs r ->
-            if r == range then
-                AllPattern emptyRange
-            else
+    if patternRange pattern == range then
+        AllPattern emptyRange
+    else
+        case pattern of
+            TuplePattern xs r ->
                 let
                     cleaned =
                         List.map (optimize range) xs
@@ -64,10 +43,7 @@ optimize range pattern =
                     else
                         TuplePattern cleaned r
 
-        RecordPattern inner r ->
-            if r == range then
-                AllPattern emptyRange
-            else
+            RecordPattern inner r ->
                 let
                     cleaned =
                         List.filter (.range >> (/=) range) inner
@@ -79,16 +55,10 @@ optimize range pattern =
                         xs ->
                             RecordPattern xs r
 
-        UnConsPattern left right r ->
-            if r == range then
-                AllPattern emptyRange
-            else
+            UnConsPattern left right r ->
                 UnConsPattern (optimize range left) (optimize range right) r
 
-        ListPattern xs r ->
-            if r == range then
-                AllPattern emptyRange
-            else
+            ListPattern xs r ->
                 let
                     cleaned =
                         List.map (optimize range) xs
@@ -98,30 +68,46 @@ optimize range pattern =
                     else
                         ListPattern cleaned r
 
-        NamedPattern qnr inner r ->
-            NamedPattern qnr (List.map (optimize range) inner) r
+            NamedPattern qnr inner r ->
+                NamedPattern qnr (List.map (optimize range) inner) r
 
-        QualifiedNamePattern _ r ->
-            replaceWithAllIfRangeMatches pattern range r
+            QualifiedNamePattern _ r ->
+                replaceWithAllIfRangeMatches pattern range r
 
-        AsPattern subPattern asPointer r ->
-            if r == range then
-                AllPattern emptyRange
-            else if asPointer.range == range then
-                subPattern
-            else
-                case optimize range subPattern of
-                    AllPattern _ ->
-                        VarPattern asPointer.value asPointer.range
+            AsPattern subPattern asPointer r ->
+                if asPointer.range == range then
+                    subPattern
+                else
+                    case optimize range subPattern of
+                        AllPattern _ ->
+                            VarPattern asPointer.value asPointer.range
 
-                    other ->
-                        AsPattern other asPointer r
+                        other ->
+                            AsPattern other asPointer r
 
-        ParentisizedPattern inner r ->
-            if range == r then
-                AllPattern emptyRange
-            else
+            ParentisizedPattern inner r ->
                 ParentisizedPattern (optimize range inner) r
+
+            VarPattern _ r ->
+                pattern
+
+            AllPattern _ ->
+                pattern
+
+            UnitPattern r ->
+                pattern
+
+            CharPattern _ r ->
+                pattern
+
+            StringPattern _ r ->
+                pattern
+
+            IntPattern _ r ->
+                pattern
+
+            FloatPattern _ r ->
+                pattern
 
 
 patternRange : Pattern -> Range
