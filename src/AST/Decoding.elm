@@ -17,7 +17,7 @@ decodeTypedWithRange opts =
                         case List.filter (Tuple.first >> (==) t) opts |> List.head of
                             Just m ->
                                 (field (Tuple.first m) <| Tuple.second m)
-                                    |: (at [ Tuple.first m, "range" ] Ranges.decode)
+                                    |: at [ Tuple.first m, "range" ] Ranges.decode
 
                             Nothing ->
                                 fail ("No decoder for type: " ++ t)
