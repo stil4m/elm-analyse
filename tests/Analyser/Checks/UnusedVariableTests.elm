@@ -286,6 +286,51 @@ foo x =
     )
 
 
+unusedButDestructuredWithSameNameInList : ( String, String, List MessageData )
+unusedButDestructuredWithSameNameInList =
+    ( "unusedButDestructuredWithSameNameInList"
+    , """module Foo exposing (foo)
+
+foo x y=
+  case x of
+    [y] ->
+      y
+"""
+    , [ UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+      ]
+    )
+
+
+unusedButDestructuredWithSameNameInTuple : ( String, String, List MessageData )
+unusedButDestructuredWithSameNameInTuple =
+    ( "unusedButDestructuredWithSameNameInTuple"
+    , """module Foo exposing (foo)
+
+foo x y=
+  case x of
+    (y,_) ->
+      y
+"""
+    , [ UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+      ]
+    )
+
+
+unusedButDestructuredWithSameNameInRecord : ( String, String, List MessageData )
+unusedButDestructuredWithSameNameInRecord =
+    ( "unusedButDestructuredWithSameNameInRecord"
+    , """module Foo exposing (foo)
+
+foo x y=
+  case x of
+    {y} ->
+      y
+"""
+    , [ UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+      ]
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedVariable"
@@ -309,4 +354,7 @@ all =
         , exposeOperator
         , unusedInCasePattern
         , unusedInCasePatternAsSingle
+        , unusedButDestructuredWithSameNameInList
+        , unusedButDestructuredWithSameNameInTuple
+        , unusedButDestructuredWithSameNameInRecord
         ]

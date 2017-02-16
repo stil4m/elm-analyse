@@ -125,7 +125,7 @@ patternToUsedVars p =
             List.concatMap patternToUsedVars t
 
         RecordPattern r _ ->
-            r
+            []
 
         UnConsPattern l r _ ->
             patternToUsedVars l ++ patternToUsedVars r
@@ -134,7 +134,7 @@ patternToUsedVars p =
             List.concatMap patternToUsedVars l
 
         VarPattern x range ->
-            [ VariablePointer x range ]
+            []
 
         NamedPattern qualifiedNameRef args range ->
             qualifiedNameUsedVars qualifiedNameRef range ++ List.concatMap patternToUsedVars args
