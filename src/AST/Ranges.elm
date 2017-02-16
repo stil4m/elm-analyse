@@ -96,6 +96,8 @@ locationToString { row, column } =
     "(" ++ toString row ++ "," ++ toString column ++ ")"
 
 
+{-| Checks if the second range is the overhauling range on the first range
+-}
 containsRange : Range -> Range -> Bool
 containsRange a b =
     isGte a.start b.start && isGte b.end a.end

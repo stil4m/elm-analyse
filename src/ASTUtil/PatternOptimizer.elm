@@ -1,4 +1,4 @@
-module Analyser.Fixes.PatternOptimizer exposing (optimize)
+module ASTUtil.PatternOptimizer exposing (optimize, patternRange)
 
 import AST.Types exposing (Pattern(..))
 import AST.Ranges exposing (Range)
@@ -110,6 +110,8 @@ optimize range pattern =
                 pattern
 
 
+{-| TODO Should be moved to different file
+-}
 patternRange : Pattern -> Range
 patternRange p =
     case p of

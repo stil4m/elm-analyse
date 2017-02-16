@@ -1,8 +1,8 @@
-module Analyser.Fixes.PatternOptimizerTests exposing (all)
+module ASTUtil.PatternOptimizerTests exposing (all)
 
 import AST.Ranges exposing (emptyRange)
 import AST.Types exposing (..)
-import Analyser.Fixes.PatternOptimizer exposing (optimize)
+import ASTUtil.PatternOptimizer exposing (optimize)
 import Expect
 import Test exposing (..)
 

@@ -3,13 +3,14 @@ port module Analyser.Fixer exposing (..)
 import Analyser.Messages.Types
     exposing
         ( Message
-        , MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile, UnusedImportAlias)
+        , MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile, UnusedImportAlias, UnusedPatternVariable)
         )
 import Analyser.Messages.Util as Messages
 import Analyser.State as State exposing (State)
 import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
 import Analyser.Fixes.UnusedImportedVariable as UnusedImportedVariableFixer
 import Analyser.Fixes.UnusedImportAlias as UnusedImportAliasFixer
+import Analyser.Fixes.UnusedPatternVariable as UnusedPatternVariableFixer
 import Tuple3
 import Parser.Parser as Parser
 import AST.Types exposing (File)
@@ -116,6 +117,7 @@ fileHashesEqual reference message =
 
 getFixer : Message -> Maybe FixCall
 getFixer m =
+    -- TODO Rewrite this
     case m.data of
         UnnecessaryParens _ _ ->
             Just UnnecessaryParensFixer.fix
@@ -128,6 +130,9 @@ getFixer m =
 
         UnusedImportAlias _ _ _ ->
             Just UnusedImportAliasFixer.fix
+
+        UnusedPatternVariable _ _ _ ->
+            Just UnusedPatternVariableFixer.fix
 
         _ ->
             Nothing
