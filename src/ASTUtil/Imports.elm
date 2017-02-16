@@ -1,14 +1,22 @@
-module AST.Imports exposing (naiveStringifyImport, removeRangeFromImport)
+module ASTUtil.Imports exposing (findImport, naiveStringifyImport, removeRangeFromImport)
 
 import AST.Types
     exposing
-        ( Import
+        ( File
+        , Import
         , Exposure(None, All, Explicit)
         , ValueConstructorExpose
         , Expose(InfixExpose, FunctionExpose, TypeOrAliasExpose, TypeExpose)
         , ExposedType
         )
-import AST.Ranges exposing (Range)
+import AST.Ranges as Ranges exposing (Range)
+
+
+findImport : File -> Range -> Maybe Import
+findImport ast range =
+    ast.imports
+        |> List.filter (.range >> Ranges.containsRange range)
+        |> List.head
 
 
 naiveStringifyImport : Import -> String

@@ -18,7 +18,7 @@ import Analyser.Interface as Interface
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel, UnusedImportedVariable, UnusedPatternVariable), newMessage)
 import Dict exposing (Dict)
 import Inspector exposing (defaultConfig, Action(Inner, Pre, Post))
-import Analyser.Checks.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, patternToVars, patternToVarInner, getDeclarationsVars, patternToUsedVars, withoutTopLevel)
+import ASTUtil.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, patternToVars, patternToVarsInner, getDeclarationsVars, patternToUsedVars, withoutTopLevel)
 import Tuple3
 
 
@@ -266,7 +266,7 @@ onCase f caze context =
 
         postContext =
             Tuple.first caze
-                |> patternToVarInner False
+                |> patternToVarsInner False
                 |> flip pushScope context
                 |> f
                 |> popScope

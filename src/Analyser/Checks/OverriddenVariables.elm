@@ -2,11 +2,11 @@ module Analyser.Checks.OverriddenVariables exposing (scan)
 
 import AST.Types exposing (File, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName)
 import AST.Ranges exposing (Range)
+import ASTUtil.Variables exposing (getImportsVars, patternToVars)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(RedefineVariable), newMessage)
 import Dict exposing (Dict)
 import Inspector exposing (Action(Inner), defaultConfig)
-import Analyser.Checks.Variables exposing (getImportsVars, patternToVars)
 
 
 type alias Context =

@@ -331,6 +331,21 @@ foo x y=
     )
 
 
+unusedButDestructuredWithSameNameInAs : ( String, String, List MessageData )
+unusedButDestructuredWithSameNameInAs =
+    ( "unusedButDestructuredWithSameNameInAs"
+    , """module Foo exposing (foo)
+
+foo x y=
+  case x of
+    ((1,2) as y) ->
+      y
+"""
+    , [ UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+      ]
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedVariable"
@@ -357,4 +372,5 @@ all =
         , unusedButDestructuredWithSameNameInList
         , unusedButDestructuredWithSameNameInTuple
         , unusedButDestructuredWithSameNameInRecord
+        , unusedButDestructuredWithSameNameInAs
         ]

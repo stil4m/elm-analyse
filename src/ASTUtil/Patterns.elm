@@ -1,6 +1,6 @@
-module ASTUtil.Patterns exposing (..)
+module ASTUtil.Patterns exposing (patternAsString, findParentPattern)
 
-import AST.Types exposing (File, Pattern(..), Function, Case)
+import AST.Types exposing (File, Pattern(..), Function, Case, VariablePointer, QualifiedNameRef)
 import AST.Ranges as Ranges exposing (Range)
 import ASTUtil.PatternOptimizer as PatternOptimizer
 import Maybe.Extra as Maybe

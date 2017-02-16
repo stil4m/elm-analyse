@@ -1,4 +1,4 @@
-module Analyser.Checks.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, withoutTopLevel, getDeclarationsVars, getImportsVars, patternToVars, patternToVarInner, patternToUsedVars)
+module ASTUtil.Variables exposing (..)
 
 import AST.Ranges exposing (Range, emptyRange)
 import AST.Types exposing (Declaration(..), Expose(..), Exposure(..), File, Import, Pattern(..), QualifiedNameRef, VariablePointer)
@@ -110,22 +110,11 @@ getDeclarationVars decl =
             patternToVars destructuring.pattern
 
 
-qualifiedNameUsedVars : QualifiedNameRef -> Range -> List VariablePointer
-qualifiedNameUsedVars { moduleName, name } range =
-    if moduleName == [] then
-        [ { value = name, range = range } ]
-    else
-        []
-
-
 patternToUsedVars : Pattern -> List VariablePointer
 patternToUsedVars p =
     case p of
         TuplePattern t _ ->
             List.concatMap patternToUsedVars t
-
-        RecordPattern r _ ->
-            []
 
         UnConsPattern l r _ ->
             patternToUsedVars l ++ patternToUsedVars r
@@ -133,20 +122,23 @@ patternToUsedVars p =
         ListPattern l _ ->
             List.concatMap patternToUsedVars l
 
-        VarPattern x range ->
-            []
-
         NamedPattern qualifiedNameRef args range ->
             qualifiedNameUsedVars qualifiedNameRef range ++ List.concatMap patternToUsedVars args
 
-        AsPattern sub name _ ->
-            name :: patternToUsedVars sub
+        AsPattern sub _ _ ->
+            patternToUsedVars sub
 
         ParentisizedPattern sub _ ->
             patternToUsedVars sub
 
         QualifiedNamePattern x range ->
             qualifiedNameUsedVars x range
+
+        RecordPattern _ _ ->
+            []
+
+        VarPattern _ _ ->
+            []
 
         AllPattern _ ->
             []
@@ -167,16 +159,24 @@ patternToUsedVars p =
             []
 
 
+qualifiedNameUsedVars : QualifiedNameRef -> Range -> List VariablePointer
+qualifiedNameUsedVars { moduleName, name } range =
+    if moduleName == [] then
+        [ { value = name, range = range } ]
+    else
+        []
+
+
 patternToVars : Pattern -> List ( VariablePointer, VariableType )
 patternToVars =
-    patternToVarInner True
+    patternToVarsInner True
 
 
-patternToVarInner : Bool -> Pattern -> List ( VariablePointer, VariableType )
-patternToVarInner isFirst p =
+patternToVarsInner : Bool -> Pattern -> List ( VariablePointer, VariableType )
+patternToVarsInner isFirst p =
     let
         recur =
-            patternToVarInner False
+            patternToVarsInner False
     in
         case p of
             TuplePattern t _ ->

@@ -3,7 +3,7 @@ module Analyser.Fixes.UnusedImportedVariable exposing (fix)
 import Analyser.Messages.Types exposing (MessageData(UnusedImportedVariable))
 import AST.Types exposing (File, Import, Exposure, ValueConstructorExpose, Expose, ExposedType)
 import AST.Ranges as Ranges exposing (Range)
-import AST.Imports
+import ASTUtil.Imports as Imports
 import Analyser.Fixes.FileContent as FileContent
 
 
@@ -26,12 +26,12 @@ removeImport : ( String, String, File ) -> String -> Range -> List ( String, Str
 removeImport ( fileName, content, ast ) varName range =
     let
         maybeImport =
-            findImport ast range
+            Imports.findImport ast range
     in
         case maybeImport of
             Just imp ->
                 [ ( fileName
-                  , writeNewImport imp.range (AST.Imports.removeRangeFromImport range imp) content
+                  , writeNewImport imp.range (Imports.removeRangeFromImport range imp) content
                   )
                 ]
 
@@ -43,12 +43,5 @@ writeNewImport : Range -> Import -> String -> String
 writeNewImport r imp i =
     FileContent.replaceLines
         ( r.start.row, r.end.row )
-        (AST.Imports.naiveStringifyImport imp)
+        (Imports.naiveStringifyImport imp)
         i
-
-
-findImport : File -> Range -> Maybe Import
-findImport ast range =
-    ast.imports
-        |> List.filter (.range >> Ranges.containsRange range)
-        |> List.head
