@@ -36,7 +36,7 @@ stringifyExposingList exp =
                     [] ->
                         ""
 
-                    x ->
+                    _ ->
                         let
                             --TODO
                             areOnDifferentLines =
@@ -82,7 +82,7 @@ stringifyExposedType { name, constructors } =
                     [] ->
                         ""
 
-                    x ->
+                    _ ->
                         let
                             --TODO
                             areOnDifferentLines =

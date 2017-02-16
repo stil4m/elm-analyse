@@ -88,25 +88,25 @@ optimize range pattern =
             ParentisizedPattern inner r ->
                 ParentisizedPattern (optimize range inner) r
 
-            VarPattern _ r ->
+            VarPattern _ _ ->
                 pattern
 
             AllPattern _ ->
                 pattern
 
-            UnitPattern r ->
+            UnitPattern _ ->
                 pattern
 
-            CharPattern _ r ->
+            CharPattern _ _ ->
                 pattern
 
-            StringPattern _ r ->
+            StringPattern _ _ ->
                 pattern
 
-            IntPattern _ r ->
+            IntPattern _ _ ->
                 pattern
 
-            FloatPattern _ r ->
+            FloatPattern _ _ ->
                 pattern
 
 

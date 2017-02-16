@@ -34,7 +34,7 @@ replaceRangeWith range x input =
 
         rowPostPartTakeFn =
             if range.end.column <= -2 then
-                (always "")
+                always ""
             else
                 String.dropLeft (range.end.column + 2)
 
@@ -48,7 +48,7 @@ replaceRangeWith range x input =
             List.drop (afterRows + 1) rows
 
         rowPostPart =
-            List.drop (afterRows) rows
+            List.drop afterRows rows
                 |> List.head
                 |> Maybe.map rowPostPartTakeFn
                 |> Maybe.withDefault ""

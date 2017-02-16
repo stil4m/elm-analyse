@@ -101,7 +101,7 @@ update msg model =
                     , storeFiles changedFiles
                     )
 
-        Stored x ->
+        Stored _ ->
             ( { model | done = True }
             , sendFixResult
                 { success = True

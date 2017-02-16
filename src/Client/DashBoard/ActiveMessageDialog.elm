@@ -149,7 +149,7 @@ fixableFooter message =
                     [ text ("Remove '" ++ varName ++ "' from import list and format") ]
                 ]
 
-        UnformattedFile fileName ->
+        UnformattedFile _ ->
             div []
                 [ button
                     [ class "btn btn-success"

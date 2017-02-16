@@ -10,7 +10,7 @@ import Analyser.Fixes.FileContent as FileContent
 fix : List ( String, String, File ) -> MessageData -> List ( String, String )
 fix input messageData =
     case messageData of
-        UnusedImportAlias fileName moduleName range ->
+        UnusedImportAlias _ moduleName range ->
             case List.head input of
                 Nothing ->
                     []

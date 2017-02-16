@@ -1,7 +1,7 @@
 module Analyser.Fixes.UnusedPatternVariable exposing (canFix, fix)
 
 import Analyser.Fixes.FileContent as FileContent
-import AST.Ranges as Ranges exposing (Range)
+import AST.Ranges exposing (Range)
 import AST.Types exposing (File, Pattern, Function, Case)
 import Analyser.Messages.Types exposing (MessageData(UnusedPatternVariable))
 import ASTUtil.PatternOptimizer as PatternOptimizer
@@ -21,7 +21,7 @@ canFix message =
 fix : List ( String, String, File ) -> MessageData -> List ( String, String )
 fix input messageData =
     case messageData of
-        UnusedPatternVariable fileName value range ->
+        UnusedPatternVariable _ value range ->
             case List.head input of
                 Nothing ->
                     []
