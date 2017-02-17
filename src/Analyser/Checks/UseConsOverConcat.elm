@@ -26,7 +26,7 @@ scan fileContext =
 onExpression : Expression -> Context -> Context
 onExpression ( r, inner ) context =
     case inner of
-        OperatorApplication "++" _ ( _, ListExpr [ _ ] ) ( _, ListExpr y ) ->
+        OperatorApplication "++" _ ( _, ListExpr [ _ ] ) ( _, ListExpr _ ) ->
             r :: context
 
         _ ->

@@ -35,7 +35,7 @@ fix input messageData =
 
 fixPattern : ( String, String, File ) -> String -> Range -> List ( String, String )
 fixPattern ( fileName, content, ast ) varName range =
-    case Patterns.findParentPattern ast range of
+    case Debug.log "Parent Pattern" <| Patterns.findParentPattern ast range of
         Just parentPattern ->
             [ ( fileName
               , FileContent.replaceRangeWith

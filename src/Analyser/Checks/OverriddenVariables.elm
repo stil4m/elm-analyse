@@ -23,7 +23,7 @@ scan fileContext =
         topLevels : Dict String Range
         topLevels =
             getImportsVars fileContext.ast.imports
-                |> List.map (\( x, t ) -> ( x.value, x.range ))
+                |> List.map (\( x, _ ) -> ( x.value, x.range ))
                 |> Dict.fromList
     in
         Inspector.inspect

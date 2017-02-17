@@ -90,7 +90,7 @@ update msg model =
                     fixData =
                         reference
                             |> List.filterMap
-                                (\( sha1, path, content ) ->
+                                (\( _, path, content ) ->
                                     Parser.parse content |> Maybe.map ((,,) path content)
                                 )
 
