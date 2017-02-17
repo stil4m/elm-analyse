@@ -90,9 +90,19 @@ update msg model =
                     changedFiles =
                         model.fixer.fix fixData model.message.data
                 in
-                    ( { model | touchedFiles = List.map Tuple.first changedFiles }
-                    , storeFiles changedFiles
-                    )
+                    case changedFiles of
+                        Ok patched ->
+                            ( { model | touchedFiles = List.map Tuple.first patched }
+                            , storeFiles patched
+                            )
+
+                        Err e ->
+                            ( { model | done = True, success = False }
+                            , sendFixResult
+                                { success = False
+                                , message = e
+                                }
+                            )
 
         Stored _ ->
             ( { model | done = True }

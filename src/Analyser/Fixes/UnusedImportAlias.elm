@@ -23,32 +23,33 @@ canFix message =
             False
 
 
-fix : List ( String, String, File ) -> MessageData -> List ( String, String )
+fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
 fix input messageData =
     case messageData of
         UnusedImportAlias _ moduleName range ->
             case List.head input of
                 Nothing ->
-                    []
+                    Err "No input for fixer UnusedImportAlias"
 
                 Just triple ->
                     updateImport triple moduleName range
 
         _ ->
-            []
+            Err "Invalid message data for fixer UnusedImportAlias"
 
 
-updateImport : ( String, String, File ) -> ModuleName -> Range -> List ( String, String )
+updateImport : ( String, String, File ) -> ModuleName -> Range -> Result String (List ( String, String ))
 updateImport ( fileName, content, ast ) moduleName range =
     case Imports.findImportWithRange ast range of
         Just imp ->
-            [ ( fileName
-              , writeNewImport imp.range { imp | moduleAlias = Nothing } content
-              )
-            ]
+            Ok
+                [ ( fileName
+                  , writeNewImport imp.range { imp | moduleAlias = Nothing } content
+                  )
+                ]
 
         Nothing ->
-            []
+            Err "Could not locate import for the target range"
 
 
 writeNewImport : Range -> Import -> String -> String

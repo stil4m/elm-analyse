@@ -24,32 +24,33 @@ canFix message =
             False
 
 
-fix : List ( String, String, File ) -> MessageData -> List ( String, String )
+fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
 fix input messageData =
     case messageData of
         UnusedPatternVariable _ value range ->
             case List.head input of
                 Nothing ->
-                    []
+                    Err "No input for fixer UnusedPatternVariable"
 
                 Just triple ->
                     fixPattern triple value range
 
         _ ->
-            []
+            Err "Invalid message data for fixer UnusedPatternVariable"
 
 
-fixPattern : ( String, String, File ) -> String -> Range -> List ( String, String )
+fixPattern : ( String, String, File ) -> String -> Range -> Result String (List ( String, String ))
 fixPattern ( fileName, content, ast ) varName range =
-    case Debug.log "Parent Pattern" <| Patterns.findParentPattern ast range of
+    case Patterns.findParentPattern ast range of
         Just parentPattern ->
-            [ ( fileName
-              , FileContent.replaceRangeWith
-                    (PatternOptimizer.patternRange parentPattern)
-                    (Patterns.patternAsString (PatternOptimizer.optimize range parentPattern))
-                    content
-              )
-            ]
+            Ok
+                [ ( fileName
+                  , FileContent.replaceRangeWith
+                        (PatternOptimizer.patternRange parentPattern)
+                        (Patterns.patternAsString (PatternOptimizer.optimize range parentPattern))
+                        content
+                  )
+                ]
 
         Nothing ->
-            []
+            Err "Could not find location to replace unused variable in pattern"

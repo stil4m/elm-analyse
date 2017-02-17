@@ -6,5 +6,5 @@ import Analyser.Messages.Types exposing (MessageData)
 
 type alias Fixer =
     { canFix : MessageData -> Bool
-    , fix : List ( String, String, File ) -> MessageData -> List ( String, String )
+    , fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
     }

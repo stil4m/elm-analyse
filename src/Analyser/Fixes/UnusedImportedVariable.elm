@@ -23,36 +23,33 @@ canFix message =
             False
 
 
-fix : List ( String, String, File ) -> MessageData -> List ( String, String )
+fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
 fix input messageData =
     case messageData of
         UnusedImportedVariable _ varName range ->
             case List.head input of
                 Nothing ->
-                    []
+                    Err "No input for fixer UnusedImportedVariable"
 
                 Just triple ->
                     removeImport triple varName range
 
         _ ->
-            []
+            Err "Invalid message data for fixer UnusedImportedVariable"
 
 
-removeImport : ( String, String, File ) -> String -> Range -> List ( String, String )
+removeImport : ( String, String, File ) -> String -> Range -> Result String (List ( String, String ))
 removeImport ( fileName, content, ast ) varName range =
-    let
-        maybeImport =
-            Imports.findImportWithRange ast range
-    in
-        case maybeImport of
-            Just imp ->
+    case Imports.findImportWithRange ast range of
+        Just imp ->
+            Ok
                 [ ( fileName
                   , writeNewImport imp.range (Imports.removeRangeFromImport range imp) content
                   )
                 ]
 
-            Nothing ->
-                []
+        Nothing ->
+            Err "Could not locate import for the target range"
 
 
 writeNewImport : Range -> Import -> String -> String

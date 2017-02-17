@@ -2,7 +2,6 @@ module Analyser.Fixes.UnnecessaryParens exposing (fixer)
 
 import Analyser.Messages.Types exposing (MessageData(UnnecessaryParens))
 import AST.Ranges exposing (Range, Location)
-import Tuple2
 import Tuple3
 import AST.Types exposing (File)
 import Analyser.Fixes.FileContent as FileContent
@@ -24,22 +23,23 @@ canFix message =
             False
 
 
-fix : List ( String, String, File ) -> MessageData -> List ( String, String )
+fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
 fix input messageData =
     case messageData of
         UnnecessaryParens fileName range ->
             input
                 |> List.filter (Tuple3.first >> (==) fileName)
                 |> List.head
-                |> Maybe.map (Tuple3.init >> Tuple2.mapSecond (fixContent range) >> List.singleton)
-                |> Maybe.withDefault []
+                |> Maybe.map (Tuple3.init >> (fixContent range))
+                |> Maybe.map (Result.map List.singleton)
+                |> Maybe.withDefault (Err "Could not find the right file to replace the unnecessary parens")
 
         _ ->
-            []
+            Err "Invalid message data for fixer UnnecessaryParens"
 
 
-fixContent : Range -> String -> String
-fixContent { start, end } content =
+fixContent : Range -> ( String, String ) -> Result String ( String, String )
+fixContent { start, end } ( fileName, content ) =
     let
         startChar =
             FileContent.getCharAtLocation start content
@@ -61,6 +61,8 @@ fixContent { start, end } content =
                 content
                     |> FileContent.replaceLocationWith start " "
                     |> FileContent.replaceLocationWith endCharLoc ""
+                    |> (,) fileName
+                    |> Ok
 
             _ ->
-                content
+                Err "Could not locate parens to replace"

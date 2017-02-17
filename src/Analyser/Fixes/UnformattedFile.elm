@@ -21,11 +21,11 @@ canFix message =
             False
 
 
-fix : List ( String, String, File ) -> MessageData -> List ( String, String )
+fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
 fix input messageData =
     case messageData of
         UnformattedFile _ ->
-            List.map Tuple3.init input
+            Ok (List.map Tuple3.init input)
 
         _ ->
-            []
+            Err "Invalid message data for fixer UnformattedFile"
