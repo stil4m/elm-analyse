@@ -10,7 +10,6 @@ import Analyser.Fixes.UnusedPatternVariable as UnusedPatternVariableFixer
 import Analyser.Fixes.UnformattedFile as UnformattedFileFixer
 import Tuple3
 import Parser.Parser as Parser
-import AST.Types exposing (File)
 import Analyser.Fixes.Base exposing (Fixer)
 
 
