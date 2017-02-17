@@ -128,7 +128,7 @@ recordPatternTests =
 listPatternTests : Test
 listPatternTests =
     describe "ListPattern"
-        [ test "full underscored list to underscore" <|
+        [ test "full underscored should not be changed to a list to underscore" <|
             \() ->
                 let
                     targetRange =
@@ -143,7 +143,13 @@ listPatternTests =
                         ]
                         otherRange
                         |> optimize targetRange
-                        |> Expect.equal (AllPattern emptyRange)
+                        |> Expect.equal
+                            (ListPattern
+                                [ AllPattern emptyRange
+                                , AllPattern otherRange
+                                ]
+                                otherRange
+                            )
         , test "partially underscored list to underscore" <|
             \() ->
                 let

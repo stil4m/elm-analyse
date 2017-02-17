@@ -59,14 +59,7 @@ optimize range pattern =
                 UnConsPattern (optimize range left) (optimize range right) r
 
             ListPattern xs r ->
-                let
-                    cleaned =
-                        List.map (optimize range) xs
-                in
-                    if List.all isAllPattern cleaned then
-                        AllPattern emptyRange
-                    else
-                        ListPattern cleaned r
+                ListPattern (List.map (optimize range) xs) r
 
             NamedPattern qnr inner r ->
                 NamedPattern qnr (List.map (optimize range) inner) r

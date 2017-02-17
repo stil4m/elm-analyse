@@ -120,7 +120,7 @@ moreThanIndentWhitespace =
 newLineWithSomeIndent : Parser State String
 newLineWithSomeIndent =
     String.concat
-        <$> (many1 (String.concat <$> sequence [ realNewLine, manySpaces ]))
+        <$> many1 (String.concat <$> sequence [ realNewLine, manySpaces ])
 
 
 newLineWithIndentExact : State -> Parser State String

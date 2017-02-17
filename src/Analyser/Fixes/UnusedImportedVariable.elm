@@ -2,7 +2,7 @@ module Analyser.Fixes.UnusedImportedVariable exposing (fix)
 
 import Analyser.Messages.Types exposing (MessageData(UnusedImportedVariable))
 import AST.Types exposing (File, Import, Exposure, ValueConstructorExpose, Expose, ExposedType)
-import AST.Ranges as Ranges exposing (Range)
+import AST.Ranges exposing (Range)
 import ASTUtil.Imports as Imports
 import Analyser.Fixes.FileContent as FileContent
 
