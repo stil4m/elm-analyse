@@ -3,7 +3,7 @@ module Analyser.Fixes.UnusedImportAliasTests exposing (all)
 import Test exposing (Test, describe, test)
 import Expect
 import Parser.Parser as Parser
-import Analyser.Fixes.UnusedImportAlias as Fixer
+import Analyser.Fixes.UnusedImportAlias as Fixer exposing (fixer)
 import Analyser.Messages.Types exposing (MessageData(UnusedImportAlias))
 
 
@@ -31,12 +31,12 @@ foo = bar 1
                 in
                     case Parser.parse input of
                         Just x ->
-                            Fixer.fix [ ( "./foo.elm", input, x ) ]
+                            fixer.fix [ ( "./foo.elm", input, x ) ]
                                 (UnusedImportAlias "./foo.elm"
                                     [ "Bar" ]
                                     { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
                                 )
-                                |> Expect.equal [ ( "./foo.elm", output ) ]
+                                |> Expect.equal (Ok [ ( "./foo.elm", output ) ])
 
                         Nothing ->
                             Expect.equal True False

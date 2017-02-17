@@ -3,7 +3,7 @@ module Analyser.Fixes.UnusedImportedVariableTests exposing (all)
 import Test exposing (Test, describe, test)
 import Expect
 import Parser.Parser as Parser
-import Analyser.Fixes.UnusedImportedVariable as Fixer
+import Analyser.Fixes.UnusedImportedVariable as Fixer exposing (fixer)
 import Analyser.Messages.Types exposing (MessageData(UnusedImportedVariable))
 
 
@@ -31,12 +31,12 @@ foo = bar 1
                 in
                     case Parser.parse input of
                         Just x ->
-                            Fixer.fix [ ( "./foo.elm", input, x ) ]
+                            fixer.fix [ ( "./foo.elm", input, x ) ]
                                 (UnusedImportedVariable "./foo.elm"
                                     "other"
                                     { start = { row = 2, column = 25 }, end = { row = 2, column = 30 } }
                                 )
-                                |> Expect.equal [ ( "./foo.elm", output ) ]
+                                |> Expect.equal (Ok [ ( "./foo.elm", output ) ])
 
                         Nothing ->
                             Expect.equal True False
