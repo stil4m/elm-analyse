@@ -1,9 +1,9 @@
-module Inspector exposing (Action(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
+module Inspector exposing (Order(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
 import AST.Types exposing (File, Import, ValueConstructor, InfixDirection, Type, TypeAlias, TypeReference(..), TypeArg(Concrete, Generic), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate)
 
 
-type Action context x
+type Order context x
     = Skip
     | Continue
     | Pre (x -> context -> context)
@@ -12,21 +12,21 @@ type Action context x
 
 
 type alias Config context =
-    { onFile : Action context File
-    , onImport : Action context Import
-    , onFunction : Action context Function
-    , onFunctionSignature : Action context FunctionSignature
-    , onTypeAlias : Action context TypeAlias
-    , onDestructuring : Action context Destructuring
-    , onExpression : Action context Expression
-    , onOperatorApplication : Action context ( String, InfixDirection, Expression, Expression )
-    , onTypeReference : Action context TypeReference
-    , onLambda : Action context Lambda
-    , onLetBlock : Action context LetBlock
-    , onCase : Action context Case
-    , onFunctionOrValue : Action context String
-    , onRecordAccess : Action context ( Expression, String )
-    , onRecordUpdate : Action context RecordUpdate
+    { onFile : Order context File
+    , onImport : Order context Import
+    , onFunction : Order context Function
+    , onFunctionSignature : Order context FunctionSignature
+    , onTypeAlias : Order context TypeAlias
+    , onDestructuring : Order context Destructuring
+    , onExpression : Order context Expression
+    , onOperatorApplication : Order context ( String, InfixDirection, Expression, Expression )
+    , onTypeReference : Order context TypeReference
+    , onLambda : Order context Lambda
+    , onLetBlock : Order context LetBlock
+    , onCase : Order context Case
+    , onFunctionOrValue : Order context String
+    , onRecordAccess : Order context ( Expression, String )
+    , onRecordUpdate : Order context RecordUpdate
     }
 
 
@@ -50,7 +50,7 @@ defaultConfig =
     }
 
 
-actionLambda : Action config x -> (config -> config) -> x -> config -> config
+actionLambda : Order config x -> (config -> config) -> x -> config -> config
 actionLambda act =
     case act of
         Skip ->

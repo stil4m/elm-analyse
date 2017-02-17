@@ -4,7 +4,7 @@ import AST.Types exposing (InnerExpression, ModuleName, Import)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImport), newMessage)
-import Inspector exposing (Action(Post, Skip), defaultConfig)
+import Inspector exposing (Order(Post, Skip), defaultConfig)
 import Dict exposing (Dict)
 
 

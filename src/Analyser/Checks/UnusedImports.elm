@@ -5,7 +5,7 @@ import AST.Types exposing (Case, Exposure(None), Expression, InnerExpression(Qua
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedImport), newMessage)
 import Dict exposing (Dict)
-import Inspector exposing (Action(Post), defaultConfig)
+import Inspector exposing (Order(Post), defaultConfig)
 import Tuple2
 import AST.Util as Util
 

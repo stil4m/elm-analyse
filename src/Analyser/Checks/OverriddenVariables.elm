@@ -6,7 +6,7 @@ import ASTUtil.Variables exposing (getImportsVars, patternToVars)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(RedefineVariable), newMessage)
 import Dict exposing (Dict)
-import Inspector exposing (Action(Inner), defaultConfig)
+import Inspector exposing (Order(Inner), defaultConfig)
 
 
 type alias Context =

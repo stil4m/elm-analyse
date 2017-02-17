@@ -4,7 +4,7 @@ import AST.Types exposing (Function)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(NoTopLevelSignature), newMessage)
-import Inspector exposing (defaultConfig, Action(Inner, Skip))
+import Inspector exposing (defaultConfig, Order(Inner, Skip))
 
 
 type alias ExposeAllContext =

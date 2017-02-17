@@ -30,7 +30,7 @@ import AST.Ranges exposing (Range)
 import AST.Util exposing (getParenthesized, isOperatorApplication, isLambda, isIf, isCase)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens), newMessage)
-import Inspector exposing (Action(Post), defaultConfig)
+import Inspector exposing (Order(Post), defaultConfig)
 import Maybe.Extra as Maybe
 import List.Extra as List
 
