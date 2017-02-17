@@ -320,7 +320,7 @@ decodeInnerExpression =
             decodeTyped
                 [ ( "unit", succeed UnitExpr )
                 , ( "application", list decodeExpression |> map Application )
-                , ( "operatorapplication", decodeOperatorApplication |> map OperatorApplicationExpression )
+                , ( "operatorapplication", decodeOperatorApplication )
                 , ( "functionOrValue", string |> map FunctionOrValue )
                 , ( "ifBlock", map3 IfBlock (field "clause" decodeExpression) (field "then" decodeExpression) (field "else" decodeExpression) )
                 , ( "prefixoperator", string |> map PrefixOperator )
@@ -405,7 +405,7 @@ decodeLetBlock =
         )
 
 
-decodeOperatorApplication : Decoder OperatorApplication
+decodeOperatorApplication : Decoder InnerExpression
 decodeOperatorApplication =
     lazy
         (\() ->

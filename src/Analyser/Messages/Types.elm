@@ -55,6 +55,7 @@ type MessageData
     | NoUnurriedPrefix FileName String Range
     | UnusedImportAlias FileName AST.ModuleName Range
     | UnusedImport FileName AST.ModuleName Range
+    | UseConsOverConcat FileName Range
 
 
 type alias GetFiles =

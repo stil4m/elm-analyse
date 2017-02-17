@@ -48,11 +48,10 @@ Add the `-s` option for the server mode. This can be viewed in the browser. To c
 | UnusedImports | Imports that have no meaning should be removed. | TODO |
 | UnusedTypeAlias | When you defined an type alias, but you do not use it in any signature or expose it, then it is just filling up space. It is better to remove it. | TODO |
 | UnusedVariable | There are a lot of cases of variables that are unused. Functions that are imported, unused defined functions, unused variables of defined functions, unused variables in patterns. These are all noise and might imply some refactoring. | :white_check_mark: :heavy_exclamation_mark: |
-
+| UseConsOverConcat | If you concatenate two lists, but the right hand side is a single element list, then you should use the cons operator. | TODO |
 ## Scheduled Checks
 
 * Exceeded line length
-* Use `::` operator when appending a single element list to another list instead of `++`.
 * Unnecessary `List.concat` when concatenating only fixed size lists.
 * Record type aliases should be formatted multiline when exceeding `N` fields.
 * Functions where 'too much' happens.

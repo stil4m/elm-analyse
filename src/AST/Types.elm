@@ -128,7 +128,7 @@ type alias Expression =
 type InnerExpression
     = UnitExpr
     | Application (List Expression)
-    | OperatorApplicationExpression OperatorApplication
+    | OperatorApplication String InfixDirection Expression Expression
     | FunctionOrValue String
     | IfBlock Expression Expression Expression
     | PrefixOperator String
@@ -149,14 +149,6 @@ type InnerExpression
     | RecordAccessFunction String
     | RecordUpdateExpression RecordUpdate
     | GLSLExpression String
-
-
-type alias OperatorApplication =
-    { operator : String
-    , direction : InfixDirection
-    , left : Expression
-    , right : Expression
-    }
 
 
 type alias RecordUpdate =

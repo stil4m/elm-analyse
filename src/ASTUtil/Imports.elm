@@ -1,4 +1,4 @@
-module ASTUtil.Imports exposing (findImport, naiveStringifyImport, removeRangeFromImport)
+module ASTUtil.Imports exposing (findImportWithRange, naiveStringifyImport, removeRangeFromImport)
 
 import AST.Types
     exposing
@@ -12,8 +12,11 @@ import AST.Types
 import AST.Ranges as Ranges exposing (Range)
 
 
-findImport : File -> Range -> Maybe Import
-findImport ast range =
+{-|
+  Will look for an import within the file that includes a range. Will return a `Nothing` when no such import exists.
+-}
+findImportWithRange : File -> Range -> Maybe Import
+findImportWithRange ast range =
     ast.imports
         |> List.filter (.range >> Ranges.containsRange range)
         |> List.head

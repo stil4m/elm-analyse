@@ -302,3 +302,15 @@ getMessageInfo m =
             , [ range1, range2 ]
             , False
             )
+
+        UseConsOverConcat fileName range ->
+            ( String.concat
+                [ "Use `::` instead of `++` in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , always [ fileName ]
+            , [ range ]
+            , True
+            )

@@ -6,7 +6,7 @@ import AST.Types
         , InnerExpression
             ( ListExpr
             , ParenthesizedExpression
-            , OperatorApplicationExpression
+            , OperatorApplication
             , FunctionOrValue
             , Integer
             , TupledExpression
@@ -21,10 +21,10 @@ import AST.Types
             , RecordAccess
             , CaseExpression
             )
+        , InfixDirection
         , Function
         , CaseBlock
         , File
-        , OperatorApplication
         )
 import AST.Ranges exposing (Range)
 import AST.Util exposing (getParenthesized, isOperatorApplication, isLambda, isIf, isCase)
@@ -76,8 +76,8 @@ onExpression ( range, expression ) context =
         ParenthesizedExpression inner ->
             onParenthesizedExpression range inner context
 
-        OperatorApplicationExpression inner ->
-            onOperatorApplicationExpression inner context
+        OperatorApplication op dir left right ->
+            onOperatorApplication ( op, dir, left, right ) context
 
         Application parts ->
             onApplication parts context
@@ -144,8 +144,8 @@ onApplication parts context =
         |> Maybe.withDefault context
 
 
-onOperatorApplicationExpression : OperatorApplication -> Context -> Context
-onOperatorApplicationExpression oparatorApplication context =
+onOperatorApplication : ( String, InfixDirection, Expression, Expression ) -> Context -> Context
+onOperatorApplication ( _, _, left, right ) context =
     let
         fixHandSide f =
             getParenthesized
@@ -153,8 +153,8 @@ onOperatorApplicationExpression oparatorApplication context =
                 >> Maybe.filter (Tuple.second >> f)
                 >> Maybe.map Tuple.first
     in
-        [ fixHandSide allowedOnLHS oparatorApplication.left
-        , fixHandSide (always True) oparatorApplication.right
+        [ fixHandSide allowedOnLHS left
+        , fixHandSide (always True) right
         ]
             |> List.filterMap identity
             |> flip (++) context

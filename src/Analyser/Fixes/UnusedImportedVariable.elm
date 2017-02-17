@@ -26,7 +26,7 @@ removeImport : ( String, String, File ) -> String -> Range -> List ( String, Str
 removeImport ( fileName, content, ast ) varName range =
     let
         maybeImport =
-            Imports.findImport ast range
+            Imports.findImportWithRange ast range
     in
         case maybeImport of
             Just imp ->

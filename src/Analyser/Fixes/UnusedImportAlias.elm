@@ -24,7 +24,7 @@ fix input messageData =
 
 updateImport : ( String, String, File ) -> ModuleName -> Range -> List ( String, String )
 updateImport ( fileName, content, ast ) moduleName range =
-    case Imports.findImport ast range of
+    case Imports.findImportWithRange ast range of
         Just imp ->
             [ ( fileName
               , writeNewImport imp.range { imp | moduleAlias = Nothing } content

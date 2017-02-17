@@ -8,7 +8,7 @@ import AST.Types
         ( File
         , RecordUpdate
         , Expression
-        , InnerExpression(Application, Operator, OperatorApplicationExpression, RecordExpr, IfBlock, TupledExpression, ParenthesizedExpression, LetExpression, CaseExpression, LambdaExpression, ListExpr, RecordUpdateExpression)
+        , InnerExpression(Application, Operator, OperatorApplication, RecordExpr, IfBlock, TupledExpression, ParenthesizedExpression, LetExpression, CaseExpression, LambdaExpression, ListExpr, RecordUpdateExpression)
         , Function
         , InfixDirection(Left)
         , Infix
@@ -75,12 +75,11 @@ fixApplication operators expressions =
                 findNextSplit ops exps
                     |> Maybe.map
                         (\( p, infix, s ) ->
-                            OperatorApplicationExpression
-                                { operator = infix.operator
-                                , direction = infix.direction
-                                , left = ( getRange <| List.map Tuple.first p, divideAndConquer p )
-                                , right = ( getRange <| List.map Tuple.first s, divideAndConquer s )
-                                }
+                            OperatorApplication
+                                infix.operator
+                                infix.direction
+                                ( getRange <| List.map Tuple.first p, divideAndConquer p )
+                                ( getRange <| List.map Tuple.first s, divideAndConquer s )
                         )
                     |> Maybe.withDefault (fixExprs exps)
     in
@@ -205,12 +204,11 @@ visitExpressionInner visitor context ( r, expression ) =
                         |> List.map subVisit
                         |> Application
 
-                OperatorApplicationExpression operatorApplication ->
-                    OperatorApplicationExpression
-                        { operatorApplication
-                            | left = subVisit operatorApplication.left
-                            , right = subVisit operatorApplication.right
-                        }
+                OperatorApplication op dir left right ->
+                    OperatorApplication op
+                        dir
+                        (subVisit left)
+                        (subVisit right)
 
                 IfBlock e1 e2 e3 ->
                     IfBlock (subVisit e1) (subVisit e2) (subVisit e3)

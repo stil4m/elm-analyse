@@ -46,34 +46,27 @@ all =
                                     , arguments = []
                                     , expression =
                                         ( emptyRange
-                                        , OperatorApplicationExpression
-                                            { operator = "*"
-                                            , direction = Left
-                                            , left =
+                                        , OperatorApplication
+                                            "*"
+                                            Left
+                                            ( emptyRange
+                                            , ParenthesizedExpression
                                                 ( emptyRange
-                                                , ParenthesizedExpression
-                                                    ( emptyRange
-                                                    , OperatorApplicationExpression
-                                                        { operator = "+"
-                                                        , direction = Left
-                                                        , left = ( emptyRange, FunctionOrValue "x" )
-                                                        , right = ( emptyRange, Integer 1 )
-                                                        }
-                                                    )
+                                                , OperatorApplication "+"
+                                                    Left
+                                                    ( emptyRange, FunctionOrValue "x" )
+                                                    ( emptyRange, Integer 1 )
                                                 )
-                                            , right =
+                                            )
+                                            ( emptyRange
+                                            , ParenthesizedExpression
                                                 ( emptyRange
-                                                , ParenthesizedExpression
-                                                    ( emptyRange
-                                                    , OperatorApplicationExpression
-                                                        { operator = "*"
-                                                        , direction = Left
-                                                        , left = ( emptyRange, Integer 2 )
-                                                        , right = ( emptyRange, FunctionOrValue "y" )
-                                                        }
-                                                    )
+                                                , OperatorApplication "*"
+                                                    Left
+                                                    ( emptyRange, Integer 2 )
+                                                    ( emptyRange, FunctionOrValue "y" )
                                                 )
-                                            }
+                                            )
                                         )
                                     }
                                 }

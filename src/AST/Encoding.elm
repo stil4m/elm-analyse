@@ -440,8 +440,8 @@ encodeExpression ( range, inner ) =
                 Application l ->
                     encodeTyped "application" (asList encodeExpression l)
 
-                OperatorApplicationExpression operatorApplication ->
-                    encodeTyped "operatorapplication" (encodeOperatorApplication operatorApplication)
+                OperatorApplication op dir left right ->
+                    encodeTyped "operatorapplication" (encodeOperatorApplication op dir left right)
 
                 FunctionOrValue x ->
                     encodeTyped "functionOrValue" (string x)
@@ -567,8 +567,8 @@ encodeLetBlock { declarations, expression } =
         ]
 
 
-encodeOperatorApplication : OperatorApplication -> Value
-encodeOperatorApplication { operator, direction, left, right } =
+encodeOperatorApplication : String -> InfixDirection -> Expression -> Expression -> Value
+encodeOperatorApplication operator direction left right =
     object
         [ ( "operator", string operator )
         , ( "direction", encodeInfixDirection direction )

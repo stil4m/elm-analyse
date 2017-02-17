@@ -11,7 +11,7 @@ import AST.Types
         , Expose
         , Expression
         , Pattern(TuplePattern, RecordPattern, UnConsPattern, ListPattern, NamedPattern, QualifiedNamePattern, AsPattern, ParentisizedPattern)
-        , InnerExpression(OperatorApplicationExpression, ParenthesizedExpression, LambdaExpression, IfBlock, CaseExpression)
+        , InnerExpression(OperatorApplication, ParenthesizedExpression, LambdaExpression, IfBlock, CaseExpression)
         )
 import AST.Ranges exposing (Range)
 
@@ -97,7 +97,7 @@ isCase ( _, e ) =
 isOperatorApplication : Expression -> Bool
 isOperatorApplication ( _, e ) =
     case e of
-        OperatorApplicationExpression _ ->
+        OperatorApplication _ _ _ _ ->
             True
 
         _ ->

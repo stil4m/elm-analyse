@@ -139,9 +139,6 @@ onFixerMsg x stage model =
 startSourceLoading : List String -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 startSourceLoading files ( model, cmds ) =
     let
-        _ =
-            Debug.log "StartSourceLoading" "!"
-
         ( nextStage, stageCmds ) =
             case files of
                 [] ->

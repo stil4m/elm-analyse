@@ -1,6 +1,6 @@
 module Inspector exposing (Action(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
-import AST.Types exposing (File, Import, ValueConstructor, Type, TypeAlias, TypeReference(..), TypeArg(Concrete, Generic), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate, OperatorApplication)
+import AST.Types exposing (File, Import, ValueConstructor, InfixDirection, Type, TypeAlias, TypeReference(..), TypeArg(Concrete, Generic), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate)
 
 
 type Action context x
@@ -19,7 +19,7 @@ type alias Config context =
     , onTypeAlias : Action context TypeAlias
     , onDestructuring : Action context Destructuring
     , onExpression : Action context Expression
-    , onOperatorApplication : Action context OperatorApplication
+    , onOperatorApplication : Action context ( String, InfixDirection, Expression, Expression )
     , onTypeReference : Action context TypeReference
     , onLambda : Action context Lambda
     , onLetBlock : Action context LetBlock
@@ -268,10 +268,10 @@ inspectInnerExpression config expression context =
         Application expressionList ->
             List.foldl (inspectExpression config) context expressionList
 
-        OperatorApplicationExpression operatorApplication ->
+        OperatorApplication op dir left right ->
             actionLambda config.onOperatorApplication
-                (flip (List.foldl (inspectExpression config)) [ operatorApplication.left, operatorApplication.right ])
-                operatorApplication
+                (flip (List.foldl (inspectExpression config)) [ left, right ])
+                ( op, dir, left, right )
                 context
 
         IfBlock e1 e2 e3 ->

@@ -97,7 +97,7 @@ update location msg model =
                 |> Maybe.withDefault ( model, Cmd.none )
 
         OnEscape x ->
-            if Debug.log "X" x then
+            if x then
                 ( hide model, Cmd.none )
             else
                 ( model, Cmd.none )

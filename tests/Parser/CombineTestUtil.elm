@@ -233,8 +233,8 @@ noRangeInnerExpression inner =
         Application xs ->
             Application <| List.map noRangeExpression xs
 
-        OperatorApplicationExpression app ->
-            OperatorApplicationExpression { app | left = noRangeExpression app.left, right = noRangeExpression app.right }
+        OperatorApplication op dir left right ->
+            OperatorApplication op dir (noRangeExpression left) (noRangeExpression right)
 
         ListExpr xs ->
             ListExpr <| List.map noRangeExpression xs

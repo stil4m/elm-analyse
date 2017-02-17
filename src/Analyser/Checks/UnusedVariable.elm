@@ -9,7 +9,8 @@ import AST.Types
         , Function
         , VariablePointer
         , Case
-        , OperatorApplication
+        , InfixDirection
+        , Expression
         , Module(EffectModule)
         )
 import AST.Ranges exposing (Range)
@@ -203,9 +204,9 @@ onRecordUpdate recordUpdate context =
     addUsedVariable recordUpdate.name context
 
 
-onOperatorAppliction : OperatorApplication -> UsedVariableContext -> UsedVariableContext
-onOperatorAppliction operatorApplication context =
-    addUsedVariable operatorApplication.operator context
+onOperatorAppliction : ( String, InfixDirection, Expression, Expression ) -> UsedVariableContext -> UsedVariableContext
+onOperatorAppliction ( op, _, _, _ ) context =
+    addUsedVariable op context
 
 
 onFile : File -> UsedVariableContext -> UsedVariableContext

@@ -42,7 +42,7 @@ unstrictIndentWhitespace =
                 (sequence
                     [ manySpaces
                     , Maybe.withDefault "" <$> maybe someComment
-                    , String.concat <$> many1 newLineWithSomeIndent
+                    , newLineWithSomeIndent
                     ]
                 )
 
@@ -56,7 +56,7 @@ exactIndentWhitespace =
                         (sequence
                             [ manySpaces
                             , Maybe.withDefault "" <$> maybe someComment
-                            , String.concat <$> many1 (newLineWithIndentExact state)
+                            , newLineWithIndentExact state
                             ]
                         )
         )
@@ -120,16 +120,7 @@ moreThanIndentWhitespace =
 newLineWithSomeIndent : Parser State String
 newLineWithSomeIndent =
     String.concat
-        <$> sequence
-                [ realNewLine
-                , String.concat
-                    <$> many
-                            (succeed (++)
-                                <*> manySpaces
-                                <*> realNewLine
-                            )
-                , manySpaces
-                ]
+        <$> (many1 (String.concat <$> sequence [ realNewLine, manySpaces ]))
 
 
 newLineWithIndentExact : State -> Parser State String
