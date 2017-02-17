@@ -1,19 +1,17 @@
-port module Analyser.Fixer exposing (..)
+port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, update, subscriptions)
 
-import Analyser.Messages.Types
-    exposing
-        ( Message
-        , MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile, UnusedImportAlias, UnusedPatternVariable)
-        )
+import Analyser.Messages.Types exposing (Message, MessageData)
 import Analyser.Messages.Util as Messages
 import Analyser.State as State exposing (State)
 import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
 import Analyser.Fixes.UnusedImportedVariable as UnusedImportedVariableFixer
 import Analyser.Fixes.UnusedImportAlias as UnusedImportAliasFixer
 import Analyser.Fixes.UnusedPatternVariable as UnusedPatternVariableFixer
+import Analyser.Fixes.UnformattedFile as UnformattedFileFixer
 import Tuple3
 import Parser.Parser as Parser
 import AST.Types exposing (File)
+import Analyser.Fixes.Base exposing (Fixer)
 
 
 port storeFiles : List ( String, String ) -> Cmd msg
@@ -48,15 +46,11 @@ type Msg
 
 type alias Model =
     { message : Message
-    , fixer : FixCall
+    , fixer : Fixer
     , done : Bool
     , success : Bool
     , touchedFiles : List String
     }
-
-
-type alias FixCall =
-    List ( String, String, File ) -> MessageData -> List ( String, String )
 
 
 init : Int -> State -> Maybe ( Model, Cmd Msg, State )
@@ -95,7 +89,7 @@ update msg model =
                                 )
 
                     changedFiles =
-                        model.fixer fixData model.message.data
+                        model.fixer.fix fixData model.message.data
                 in
                     ( { model | touchedFiles = List.map Tuple.first changedFiles }
                     , storeFiles changedFiles
@@ -115,27 +109,20 @@ fileHashesEqual reference message =
     List.sortBy Tuple.first (List.map Tuple3.init reference) == List.sortBy Tuple.first message.files
 
 
-getFixer : Message -> Maybe FixCall
+getFixer : Message -> Maybe Fixer
 getFixer m =
-    -- TODO Rewrite this
-    case m.data of
-        UnnecessaryParens _ _ ->
-            Just UnnecessaryParensFixer.fix
+    List.filter (\x -> x.canFix m.data) fixers
+        |> List.head
 
-        UnusedImportedVariable _ _ _ ->
-            Just UnusedImportedVariableFixer.fix
 
-        UnformattedFile _ ->
-            Just (\x y -> List.map Tuple3.init x)
-
-        UnusedImportAlias _ _ _ ->
-            Just UnusedImportAliasFixer.fix
-
-        UnusedPatternVariable _ _ _ ->
-            Just UnusedPatternVariableFixer.fix
-
-        _ ->
-            Nothing
+fixers : List Fixer
+fixers =
+    [ UnnecessaryParensFixer.fixer
+    , UnusedImportedVariableFixer.fixer
+    , UnusedImportAliasFixer.fixer
+    , UnusedPatternVariableFixer.fixer
+    , UnformattedFileFixer.fixer
+    ]
 
 
 subscriptions : Model -> Sub Msg

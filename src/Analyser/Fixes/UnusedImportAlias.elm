@@ -1,10 +1,26 @@
-module Analyser.Fixes.UnusedImportAlias exposing (fix)
+module Analyser.Fixes.UnusedImportAlias exposing (fixer)
 
 import Analyser.Messages.Types exposing (MessageData(UnusedImportAlias))
 import AST.Types exposing (ModuleName, File, Import, Exposure, ValueConstructorExpose, Expose, ExposedType)
 import AST.Ranges exposing (Range)
 import ASTUtil.Imports as Imports
 import Analyser.Fixes.FileContent as FileContent
+import Analyser.Fixes.Base exposing (Fixer)
+
+
+fixer : Fixer
+fixer =
+    Fixer canFix fix
+
+
+canFix : MessageData -> Bool
+canFix message =
+    case message of
+        UnusedImportAlias _ _ _ ->
+            True
+
+        _ ->
+            False
 
 
 fix : List ( String, String, File ) -> MessageData -> List ( String, String )

@@ -1,4 +1,4 @@
-module Analyser.Fixes.UnusedPatternVariable exposing (canFix, fix)
+module Analyser.Fixes.UnusedPatternVariable exposing (fixer)
 
 import Analyser.Fixes.FileContent as FileContent
 import AST.Ranges exposing (Range)
@@ -6,6 +6,12 @@ import AST.Types exposing (File, Pattern, Function, Case)
 import Analyser.Messages.Types exposing (MessageData(UnusedPatternVariable))
 import ASTUtil.PatternOptimizer as PatternOptimizer
 import ASTUtil.Patterns as Patterns
+import Analyser.Fixes.Base exposing (Fixer)
+
+
+fixer : Fixer
+fixer =
+    Fixer canFix fix
 
 
 canFix : MessageData -> Bool
