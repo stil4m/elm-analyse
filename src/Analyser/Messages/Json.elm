@@ -1,12 +1,12 @@
 module Analyser.Messages.Json exposing (serialiseMessage, encodeMessage, decodeMessage)
 
+import AST.Ranges as Ranges exposing (Range)
 import AST.Types as AST
-import Util.Json exposing (encodeTyped, decodeTyped)
-import Json.Encode as JE
+import Analyser.Messages.Types exposing (Message, MessageData(..), MessageStatus(..))
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
-import Analyser.Messages.Types exposing (Message, MessageData(..), MessageStatus(..))
-import AST.Ranges as Ranges exposing (Range)
+import Json.Encode as JE
+import Util.Json exposing (decodeTyped, encodeTyped)
 
 
 decodeFileVarNameAndRange : (String -> String -> Range -> MessageData) -> Decoder MessageData
@@ -118,6 +118,7 @@ decodeMessageData =
         , ( "NoUnurriedPrefix", decodeFileVarNameAndRange NoUnurriedPrefix )
         , ( "UnusedImportAlias", decodeFileModuleNameAndRange UnusedImportAlias )
         , ( "UnusedImport", decodeFileModuleNameAndRange UnusedImport )
+        , ( "UseConsOverConcat", decodeFileAndRange UseConsOverConcat )
         ]
 
 
@@ -297,5 +298,12 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "moduleName", JE.list <| List.map JE.string moduleName )
+                    , ( "range", Ranges.encode range )
+                    ]
+
+        UseConsOverConcat file range ->
+            encodeTyped "UseConsOverConcat" <|
+                JE.object
+                    [ ( "file", JE.string file )
                     , ( "range", Ranges.encode range )
                     ]
