@@ -1,6 +1,6 @@
 module Inspection exposing (run)
 
-import Analyser.Files.FileContext as FileContext
+import Analyser.FileContext as FileContext
 import Analyser.Messages.Types exposing (Message, MessageData(UnformattedFile), newMessage)
 import Analyser.Files.Types exposing (Dependency, LoadedSourceFiles)
 import Analyser.Checks.UnusedVariable as UnusedVariable

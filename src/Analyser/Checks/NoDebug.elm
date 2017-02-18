@@ -2,7 +2,7 @@ module Analyser.Checks.NoDebug exposing (scan)
 
 import AST.Types exposing (Expression, InnerExpression(QualifiedExpr))
 import AST.Ranges exposing (Range)
-import Analyser.Files.FileContext exposing (FileContext)
+import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DebugLog, DebugCrash), newMessage)
 import Inspector exposing (Order(Post), defaultConfig)
 

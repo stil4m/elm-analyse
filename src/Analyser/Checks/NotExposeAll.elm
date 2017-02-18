@@ -3,7 +3,7 @@ module Analyser.Checks.NotExposeAll exposing (scan)
 import AST.Types exposing (Exposure(All, None, Explicit), Expose(TypeExpose), File)
 import AST.Ranges exposing (Range)
 import AST.Util
-import Analyser.Files.FileContext exposing (FileContext)
+import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(ExposeAll), newMessage)
 import Inspector exposing (defaultConfig, Order(Inner))
 

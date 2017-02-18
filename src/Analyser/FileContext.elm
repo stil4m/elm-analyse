@@ -1,4 +1,4 @@
-module Analyser.Files.FileContext exposing (FileContext, create)
+module Analyser.FileContext exposing (FileContext, create)
 
 import AST.Types as AST
 import Analyser.Files.Types exposing (Dependency, Interface, LoadedSourceFile, LoadedSourceFiles, FileLoad(Failed, Loaded))

@@ -1,6 +1,6 @@
 module Analyser.Checks.CheckTestUtil exposing (..)
 
-import Analyser.Files.FileContext as FileContext exposing (FileContext)
+import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.Files.Interface as Interface
 import Analyser.Messages.Types exposing (Message, MessageData)
 import AST.Util
