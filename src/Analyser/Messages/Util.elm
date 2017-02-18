@@ -273,7 +273,7 @@ getMessageInfo m =
             , True
             )
 
-        NoUnurriedPrefix fileName operator range ->
+        NoUncurriedPrefix fileName operator range ->
             ( String.concat
                 [ "Prefix notation for `"
                 , operator

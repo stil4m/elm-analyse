@@ -13,7 +13,7 @@ prefixAsApplicationWithTwoArgs =
 
 foo = (+) 1 2
 """
-    , [ NoUnurriedPrefix "./foo.elm" "+" { start = { row = 2, column = 5 }, end = { row = 2, column = 8 } }
+    , [ NoUncurriedPrefix "./foo.elm" "+" { start = { row = 2, column = 5 }, end = { row = 2, column = 8 } }
       ]
     )
 

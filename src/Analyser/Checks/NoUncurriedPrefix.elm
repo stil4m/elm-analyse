@@ -2,7 +2,7 @@ module Analyser.Checks.NoUncurriedPrefix exposing (scan)
 
 import AST.Types exposing (InnerExpression(Application, PrefixOperator), Expression)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(NoUnurriedPrefix), newMessage)
+import Analyser.Messages.Types exposing (Message, MessageData(NoUncurriedPrefix), newMessage)
 import Inspector exposing (Order(Post), defaultConfig)
 import AST.Ranges exposing (Range)
 
@@ -19,7 +19,7 @@ scan fileContext =
         }
         fileContext.ast
         []
-        |> List.map (uncurry (NoUnurriedPrefix fileContext.path))
+        |> List.map (uncurry (NoUncurriedPrefix fileContext.path))
         |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 

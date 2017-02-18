@@ -60,7 +60,7 @@ TODO
 | NoImportAll | This check will look for imports that expose all functions from a module `(..)`. When other people read your code, it would be nice if the origin of a used function can be traced back to the providing module. |  |
 | NoSignature | This check will look for function declarations without a signature. We want our readers to understand our code. Adding a signature is a part of this. This check will **skip** definitions in let statements. |  |
 | NoExposeAll | This check will look for modules that expose all their definitions. This is not a best practice. You want to be clear about the API that a module defined. | |
-| NoUnurriedPrefix | It is unneeded to use an operator in prefix notation when you apply both arguments directly. This check will look for these kind of usages | TODO [#5](https://github.com/stil4m/elm-analyse/issues/5) |
+| NoUncurriedPrefix | It is unneeded to use an operator in prefix notation when you apply both arguments directly. This check will look for these kind of usages | TODO [#5](https://github.com/stil4m/elm-analyse/issues/5) |
 | OverriddenVariables | You should not redefine a variable in a new lexical scope. This is confusing and may lead to bugs. | |
 | UnnecessaryParens | If you want parenthesis, then you might want to look into Lisp. It is good to know when you do not need them in Elm and this check will let you know. This check follows this [discussion](https://github.com/avh4/elm-format/issues/262) from `elm-format`. | :white_check_mark: |
 | UnusedImportAliases | Sometimes you defined an alias for an import (`import Foo as F`), but it turns out you never use it. This check shows where you have unused import aliases. | :white_check_mark: |

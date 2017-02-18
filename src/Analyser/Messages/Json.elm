@@ -115,7 +115,7 @@ decodeMessageData =
                 |: JD.field "range1" Ranges.decode
                 |: JD.field "range2" Ranges.decode
           )
-        , ( "NoUnurriedPrefix", decodeFileVarNameAndRange NoUnurriedPrefix )
+        , ( "NoUncurriedPrefix", decodeFileVarNameAndRange NoUncurriedPrefix )
         , ( "UnusedImportAlias", decodeFileModuleNameAndRange UnusedImportAlias )
         , ( "UnusedImport", decodeFileModuleNameAndRange UnusedImport )
         , ( "UseConsOverConcat", decodeFileAndRange UseConsOverConcat )
@@ -277,8 +277,8 @@ encodeMessageData m =
                     , ( "range2", Ranges.encode range2 )
                     ]
 
-        NoUnurriedPrefix file varName range ->
-            encodeTyped "NoUnurriedPrefix" <|
+        NoUncurriedPrefix file varName range ->
+            encodeTyped "NoUncurriedPrefix" <|
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )

@@ -52,7 +52,7 @@ type MessageData
     | DuplicateImport FileName AST.ModuleName (List Range)
     | UnusedAlias FileName String Range
     | RedefineVariable FileName String Range Range
-    | NoUnurriedPrefix FileName String Range
+    | NoUncurriedPrefix FileName String Range
     | UnusedImportAlias FileName AST.ModuleName Range
     | UnusedImport FileName AST.ModuleName Range
     | UseConsOverConcat FileName Range
