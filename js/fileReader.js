@@ -71,7 +71,7 @@ module.exports = function(config) {
                 const fullPath = cache.elmCachePathForSha(checksum);
                 return {
                     success: true,
-                    path: real,
+                    path: path,
                     sha1: checksum,
                     content: fs.readFileSync(fullPath).toString(),
                     formatted: isFormatted(fullPath),
