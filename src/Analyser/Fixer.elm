@@ -1,4 +1,4 @@
-port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, update, subscriptions)
+port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, isDone, succeeded, touchedFiles, message, update, subscriptions)
 
 import Analyser.Messages.Types exposing (Message, MessageData)
 import Analyser.Messages.Util as Messages
@@ -43,13 +43,14 @@ type Msg
     | Stored Bool
 
 
-type alias Model =
-    { message : Message
-    , fixer : Fixer
-    , done : Bool
-    , success : Bool
-    , touchedFiles : List String
-    }
+type Model
+    = Model
+        { message : Message
+        , fixer : Fixer
+        , done : Bool
+        , success : Bool
+        , touchedFiles : List String
+        }
 
 
 init : Int -> State -> Maybe ( Model, Cmd Msg, State )
@@ -62,19 +63,39 @@ initWithMessage message state =
     getFixer message
         |> Maybe.map
             (\fixer ->
-                ( { message = message, fixer = fixer, done = False, success = True, touchedFiles = [] }
+                ( Model { message = message, fixer = fixer, done = False, success = True, touchedFiles = [] }
                 , loadFileContentWithShas (List.map Tuple.second message.files)
                 , State.startFixing message state
                 )
             )
 
 
+isDone : Model -> Bool
+isDone (Model m) =
+    m.done
+
+
+succeeded : Model -> Bool
+succeeded (Model m) =
+    m.success
+
+
+touchedFiles : Model -> List String
+touchedFiles (Model m) =
+    m.touchedFiles
+
+
+message : Model -> Message
+message (Model m) =
+    m.message
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg (Model model) =
     case msg of
         LoadedFileContent reference ->
             if not (fileHashesEqual reference model.message) then
-                ( { model | done = True, success = False }
+                ( Model { model | done = True, success = False }
                 , sendFixResult { success = False, message = "Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages." }
                 )
             else
@@ -92,12 +113,12 @@ update msg model =
                 in
                     case changedFiles of
                         Ok patched ->
-                            ( { model | touchedFiles = List.map Tuple.first patched }
+                            ( Model { model | touchedFiles = List.map Tuple.first patched }
                             , storeFiles patched
                             )
 
                         Err e ->
-                            ( { model | done = True, success = False }
+                            ( Model { model | done = True, success = False }
                             , sendFixResult
                                 { success = False
                                 , message = e
@@ -105,7 +126,7 @@ update msg model =
                             )
 
         Stored _ ->
-            ( { model | done = True }
+            ( Model { model | done = True }
             , sendFixResult
                 { success = True
                 , message = "Fixed message: " ++ Messages.asString model.message.data

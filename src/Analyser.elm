@@ -122,13 +122,14 @@ onFixerMsg x stage model =
             Fixer.update x stage
                 |> Tuple2.mapSecond (Cmd.map FixerMsg)
     in
-        if newFixerModel.done then
-            if newFixerModel.success then
+        if Fixer.isDone newFixerModel then
+            if Fixer.succeeded newFixerModel then
                 --TODO What to do with the checking and the state
-                startSourceLoading newFixerModel.touchedFiles
+                startSourceLoading
+                    (Fixer.touchedFiles newFixerModel)
                     ( model, fixerCmds )
             else
-                startSourceLoading (Messages.getFiles newFixerModel.message.data)
+                startSourceLoading (Messages.getFiles (Fixer.message newFixerModel).data)
                     ( model, fixerCmds )
         else
             ( { model | stage = FixerStage newFixerModel }
