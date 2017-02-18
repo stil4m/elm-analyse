@@ -11,6 +11,7 @@ type alias File =
     { moduleDefinition : Module
     , imports : List Import
     , declarations : List Declaration
+    , comments : List ( String, Range )
     }
 
 

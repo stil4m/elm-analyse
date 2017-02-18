@@ -41,6 +41,14 @@ decode =
         |: field "moduleDefinition" decodeModule
         |: field "imports" (list decodeImport)
         |: field "declarations" (list decodeDeclaration)
+        |: field "comments" (list decodeComment)
+
+
+decodeComment : Decoder ( String, Range )
+decodeComment =
+    succeed (,)
+        |: field "text" string
+        |: field "range" Ranges.decode
 
 
 decodeModule : Decoder Module

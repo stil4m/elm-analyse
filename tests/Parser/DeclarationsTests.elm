@@ -234,6 +234,7 @@ all =
                                   }
                                 ]
                             , declarations = []
+                            , comments = []
                             }
                         )
         , test "port declaration" <|

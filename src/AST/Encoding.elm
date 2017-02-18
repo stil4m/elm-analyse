@@ -22,11 +22,20 @@ rangeField r =
 
 
 encode : File -> Value
-encode { moduleDefinition, imports, declarations } =
+encode { moduleDefinition, imports, declarations, comments } =
     object
         [ ( "moduleDefinition", encodeModule moduleDefinition )
         , ( "imports", asList encodeImport imports )
         , ( "declarations", asList encodeDeclaration declarations )
+        , ( "comments", asList encodeComment comments )
+        ]
+
+
+encodeComment : ( String, Range ) -> Value
+encodeComment ( text, range ) =
+    object
+        [ ( "text", string text )
+        , rangeField range
         ]
 
 

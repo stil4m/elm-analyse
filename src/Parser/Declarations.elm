@@ -1,6 +1,6 @@
 module Parser.Declarations exposing (file, signature, declaration, function, functionDeclaration, expression, letBlock, letBody, caseBlock, caseStatement, caseStatements)
 
-import Combine exposing (maybe, (*>), (>>=), (<*), (<$), (<$>), sepBy, many, succeed, Parser, string, choice, lookAhead, or, withLocation, parens, modifyState, count, between, fail, (<*>), lazy, many1, sepBy1)
+import Combine exposing (maybe, (*>), (>>=), (<*), (<$), (<$>), sepBy, many, succeed, Parser, string, choice, lookAhead, or, withLocation, parens, modifyState, count, between, fail, (<*>), lazy, many1, sepBy1, withState)
 import Combine.Char exposing (anyChar)
 import Combine.Num
 import List.Extra as List
@@ -14,7 +14,7 @@ import AST.Types exposing (File, Module(NoModule), Declaration(AliasDecl, FuncDe
 import Parser.Typings exposing (typeDeclaration)
 import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer)
 import Parser.Whitespace exposing (manySpaces)
-import Parser.State exposing (State, pushIndent, popIndent)
+import Parser.State as State exposing (State, pushIndent, popIndent)
 import Parser.Ranges exposing (withRange)
 
 
@@ -34,6 +34,7 @@ file =
                     succeed (File modDef)
                         <*> importParser
                         <*> (many (exactIndentWhitespace *> declaration) <* maybe exactIndentWhitespace <* manySpaces)
+                        <*> withState (State.getComments >> succeed)
 
 
 declaration : Parser State Declaration
