@@ -26,20 +26,20 @@ canFix message =
 fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
 fix input messageData =
     case messageData of
-        UnusedImportedVariable _ varName range ->
+        UnusedImportedVariable _ _ range ->
             case List.head input of
                 Nothing ->
                     Err "No input for fixer UnusedImportedVariable"
 
                 Just triple ->
-                    removeImport triple varName range
+                    removeImport triple range
 
         _ ->
             Err "Invalid message data for fixer UnusedImportedVariable"
 
 
-removeImport : ( String, String, File ) -> String -> Range -> Result String (List ( String, String ))
-removeImport ( fileName, content, ast ) varName range =
+removeImport : ( String, String, File ) -> Range -> Result String (List ( String, String ))
+removeImport ( fileName, content, ast ) range =
     case Imports.findImportWithRange ast range of
         Just imp ->
             Ok

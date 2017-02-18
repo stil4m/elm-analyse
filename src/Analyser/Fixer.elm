@@ -156,7 +156,7 @@ fixers =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions m =
+subscriptions _ =
     Sub.batch
         [ onFileContentWithShas LoadedFileContent
         , onStoredFiles Stored

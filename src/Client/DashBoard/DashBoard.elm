@@ -77,8 +77,8 @@ update location msg model =
                 |> Tuple2.mapFirst (\x -> { model | active = x })
                 |> Tuple2.mapSecond (Cmd.map ActiveMessageDialogMsg)
 
-        ActiveMessageDialogMsg x ->
-            ActiveMessageDialog.update location x model.active
+        ActiveMessageDialogMsg subMsg ->
+            ActiveMessageDialog.update location subMsg model.active
                 |> Tuple2.mapFirst (\x -> { model | active = x })
                 |> Tuple2.mapSecond (Cmd.map ActiveMessageDialogMsg)
 

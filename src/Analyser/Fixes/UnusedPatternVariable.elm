@@ -27,20 +27,20 @@ canFix message =
 fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
 fix input messageData =
     case messageData of
-        UnusedPatternVariable _ value range ->
+        UnusedPatternVariable _ _ range ->
             case List.head input of
                 Nothing ->
                     Err "No input for fixer UnusedPatternVariable"
 
                 Just triple ->
-                    fixPattern triple value range
+                    fixPattern triple range
 
         _ ->
             Err "Invalid message data for fixer UnusedPatternVariable"
 
 
-fixPattern : ( String, String, File ) -> String -> Range -> Result String (List ( String, String ))
-fixPattern ( fileName, content, ast ) varName range =
+fixPattern : ( String, String, File ) -> Range -> Result String (List ( String, String ))
+fixPattern ( fileName, content, ast ) range =
     case Patterns.findParentPattern ast range of
         Just parentPattern ->
             Ok

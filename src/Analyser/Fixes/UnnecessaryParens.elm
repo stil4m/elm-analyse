@@ -30,7 +30,7 @@ fix input messageData =
             input
                 |> List.filter (Tuple3.first >> (==) fileName)
                 |> List.head
-                |> Maybe.map (Tuple3.init >> (fixContent range))
+                |> Maybe.map (Tuple3.init >> fixContent range)
                 |> Maybe.map (Result.map List.singleton)
                 |> Maybe.withDefault (Err "Could not find the right file to replace the unnecessary parens")
 

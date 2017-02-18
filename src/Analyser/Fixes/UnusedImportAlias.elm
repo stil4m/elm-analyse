@@ -26,20 +26,20 @@ canFix message =
 fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
 fix input messageData =
     case messageData of
-        UnusedImportAlias _ moduleName range ->
+        UnusedImportAlias _ _ range ->
             case List.head input of
                 Nothing ->
                     Err "No input for fixer UnusedImportAlias"
 
                 Just triple ->
-                    updateImport triple moduleName range
+                    updateImport triple range
 
         _ ->
             Err "Invalid message data for fixer UnusedImportAlias"
 
 
-updateImport : ( String, String, File ) -> ModuleName -> Range -> Result String (List ( String, String ))
-updateImport ( fileName, content, ast ) moduleName range =
+updateImport : ( String, String, File ) -> Range -> Result String (List ( String, String ))
+updateImport ( fileName, content, ast ) range =
     case Imports.findImportWithRange ast range of
         Just imp ->
             Ok
