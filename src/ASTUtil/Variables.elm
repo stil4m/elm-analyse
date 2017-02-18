@@ -128,7 +128,7 @@ patternToUsedVars p =
         AsPattern sub _ _ ->
             patternToUsedVars sub
 
-        ParentisizedPattern sub _ ->
+        ParenthesizedPattern sub _ ->
             patternToUsedVars sub
 
         QualifiedNamePattern x range ->
@@ -206,7 +206,7 @@ patternToVarsInner isFirst p =
             AsPattern sub name _ ->
                 ( name, Pattern ) :: recur sub
 
-            ParentisizedPattern sub _ ->
+            ParenthesizedPattern sub _ ->
                 recur sub
 
             QualifiedNamePattern _ _ ->

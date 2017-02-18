@@ -82,7 +82,7 @@ type Pattern
     | NamedPattern QualifiedNameRef (List Pattern) Range
     | QualifiedNamePattern QualifiedNameRef Range
     | AsPattern Pattern VariablePointer Range
-    | ParentisizedPattern Pattern Range
+    | ParenthesizedPattern Pattern Range
 
 
 type alias QualifiedNameRef =

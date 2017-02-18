@@ -109,8 +109,8 @@ noRangePattern p =
         NamedPattern x y _ ->
             NamedPattern x (List.map noRangePattern y) emptyRange
 
-        ParentisizedPattern x _ ->
-            ParentisizedPattern (noRangePattern x) emptyRange
+        ParenthesizedPattern x _ ->
+            ParenthesizedPattern (noRangePattern x) emptyRange
 
         AsPattern x y _ ->
             AsPattern (noRangePattern x) (unRange y) emptyRange

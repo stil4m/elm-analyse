@@ -64,7 +64,7 @@ patternAsString pattern =
         AST.Types.AsPattern inner asName _ ->
             patternAsString inner ++ " as " ++ asName.value
 
-        AST.Types.ParentisizedPattern inner _ ->
+        AST.Types.ParenthesizedPattern inner _ ->
             "(" ++ patternAsString inner ++ ")"
 
 

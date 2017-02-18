@@ -291,7 +291,7 @@ decodePattern =
                 , ( "named", map2 NamedPattern (field "qualified" decodeQualifiedNameRef) (field "patterns" (list decodePattern)) )
                 , ( "qualifiedName", map QualifiedNamePattern (field "value" decodeQualifiedNameRef) )
                 , ( "as", map2 AsPattern (field "pattern" decodePattern) (field "name" decodeVariablePointer) )
-                , ( "parentisized", map ParentisizedPattern (field "value" decodePattern) )
+                , ( "parentisized", map ParenthesizedPattern (field "value" decodePattern) )
                 ]
         )
 

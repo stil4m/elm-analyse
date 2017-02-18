@@ -411,7 +411,7 @@ encodePattern pattern =
                     , ( "range", Ranges.encode r )
                     ]
 
-        ParentisizedPattern p1 r ->
+        ParenthesizedPattern p1 r ->
             encodeTyped "parentisized"
                 (JE.object
                     [ ( "value", encodePattern p1 )

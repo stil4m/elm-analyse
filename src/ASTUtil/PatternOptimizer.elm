@@ -78,8 +78,8 @@ optimize range pattern =
                         other ->
                             AsPattern other asPointer r
 
-            ParentisizedPattern inner r ->
-                ParentisizedPattern (optimize range inner) r
+            ParenthesizedPattern inner r ->
+                ParenthesizedPattern (optimize range inner) r
 
             VarPattern _ _ ->
                 pattern
@@ -150,5 +150,5 @@ patternRange p =
         AsPattern _ _ r ->
             r
 
-        ParentisizedPattern _ r ->
+        ParenthesizedPattern _ r ->
             r

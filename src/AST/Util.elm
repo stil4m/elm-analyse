@@ -10,7 +10,7 @@ import AST.Types
         , ModuleName
         , Expose
         , Expression
-        , Pattern(TuplePattern, RecordPattern, UnConsPattern, ListPattern, NamedPattern, QualifiedNamePattern, AsPattern, ParentisizedPattern)
+        , Pattern(TuplePattern, RecordPattern, UnConsPattern, ListPattern, NamedPattern, QualifiedNamePattern, AsPattern, ParenthesizedPattern)
         , InnerExpression(OperatorApplication, ParenthesizedExpression, LambdaExpression, IfBlock, CaseExpression)
         )
 import AST.Ranges exposing (Range)
@@ -138,7 +138,7 @@ patternModuleNames p =
         AsPattern inner _ _ ->
             patternModuleNames inner
 
-        ParentisizedPattern inner _ ->
+        ParenthesizedPattern inner _ ->
             patternModuleNames inner
 
         _ ->
