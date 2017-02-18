@@ -1,15 +1,15 @@
-port module Analyser.FileLoader exposing (Msg, init, subscriptions, update)
+port module Analyser.Files.FileLoader exposing (Msg, init, subscriptions, update)
 
-import Analyser.Types exposing (FileContent, FileLoad, LoadedFile, LoadedFileData)
 import AST.Types
 import AST.Util as Util
-import Analyser.Interface as Interface
-import Parser.Parser as Parser
+import AST.Encoding
+import AST.Decoding
+import Analyser.Files.Types exposing (FileContent, FileLoad(Loaded, Failed), LoadedFile, LoadedFileData)
+import Analyser.Files.Interface as Interface
 import Json.Encode
 import Json.Decode
-import AST.Encoding
+import Parser.Parser as Parser
 import Result
-import AST.Decoding
 
 
 port loadFile : String -> Cmd msg
@@ -42,7 +42,7 @@ subscriptions =
 isLoaded : FileLoad -> Maybe LoadedFileData
 isLoaded x =
     case x of
-        Analyser.Types.Loaded y ->
+        Loaded y ->
             Just y
 
         _ ->
@@ -70,7 +70,7 @@ update msg =
 
 loadedInterfaceForFile : AST.Types.File -> FileLoad
 loadedInterfaceForFile file =
-    Analyser.Types.Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
+    Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
 
 
 onInputLoadingInterface : FileContent -> ( FileLoad, RefeshedAST )
@@ -87,14 +87,14 @@ loadedFileFromContent fileContent =
     let
         loadedInterfaceForFile : AST.Types.File -> FileLoad
         loadedInterfaceForFile file =
-            Analyser.Types.Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
+            Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
     in
         case fileContent.content of
             Just content ->
                 (Parser.parse content
                     |> Maybe.map loadedInterfaceForFile
-                    |> Maybe.withDefault Analyser.Types.Failed
+                    |> Maybe.withDefault Failed
                 )
 
             Nothing ->
-                Analyser.Types.Failed
+                Failed

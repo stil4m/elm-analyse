@@ -14,8 +14,8 @@ import AST.Types
         , Module(EffectModule)
         )
 import AST.Ranges exposing (Range)
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Interface as Interface
+import Analyser.Files.FileContext exposing (FileContext)
+import Analyser.Files.Interface as Interface
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel, UnusedImportedVariable, UnusedPatternVariable), newMessage)
 import Dict exposing (Dict)
 import Inspector exposing (defaultConfig, Order(Inner, Pre, Post))

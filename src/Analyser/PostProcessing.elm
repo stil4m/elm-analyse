@@ -15,7 +15,7 @@ import AST.Types
         , Declaration(FuncDecl)
         , FunctionDeclaration
         )
-import Analyser.Types exposing (OperatorTable)
+import Analyser.Files.Types exposing (OperatorTable)
 import List.Extra as List
 import Tuple2
 

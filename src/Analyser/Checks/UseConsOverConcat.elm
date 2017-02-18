@@ -2,7 +2,7 @@ module Analyser.Checks.UseConsOverConcat exposing (scan)
 
 import AST.Types exposing (File, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName, Expression, InnerExpression(OperatorApplication, ListExpr))
 import AST.Ranges exposing (Range)
-import Analyser.FileContext exposing (FileContext)
+import Analyser.Files.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UseConsOverConcat), newMessage)
 import Inspector exposing (Order(Post), defaultConfig)
 

@@ -3,7 +3,7 @@ module Analyser.PostProcessingTests exposing (..)
 import AST.Ranges exposing (emptyRange)
 import AST.Types exposing (..)
 import Analyser.PostProcessing as PostProcessing
-import Analyser.Types exposing (..)
+import Analyser.Files.Types exposing (..)
 import Dict exposing (Dict)
 import Expect
 import Parser.CombineTestUtil exposing (noRangeDeclaration)

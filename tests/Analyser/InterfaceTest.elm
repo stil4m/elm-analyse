@@ -1,13 +1,14 @@
 module Analyser.InterfaceTest exposing (..)
 
 import Expect
-import Analyser.Interface as Interface exposing (ExposedInterface(..))
+import Analyser.Files.Interface as Interface
+import Analyser.Files.Types exposing (Interface, ExposedInterface(..))
 import Parser.Parser as Parser
 import AST.Types as AST
 import Test exposing (..)
 
 
-toInterface : String -> String -> Interface.Interface -> Test
+toInterface : String -> String -> Interface -> Test
 toInterface name input inter =
     test name <|
         \() ->

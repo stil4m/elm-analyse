@@ -1,7 +1,7 @@
 module Analyser.InterfaceLoadingStage exposing (Model, Msg, init, isDone, getDependencies, update, subscriptions)
 
-import Analyser.DependencyLoader as DependencyLoader
-import Analyser.Dependencies exposing (Dependency, Version)
+import Analyser.Files.DependencyLoader as DependencyLoader
+import Analyser.Files.Types exposing (Dependency, Version)
 import Dict exposing (Dict)
 import Tuple2
 

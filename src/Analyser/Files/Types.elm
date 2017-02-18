@@ -1,6 +1,8 @@
-module Analyser.Types
+module Analyser.Files.Types
     exposing
-        ( LoadedSourceFiles
+        ( Dependency
+        , Version
+        , LoadedSourceFiles
         , LoadedSourceFile
         , FileLoad(Failed, Loaded)
         , LoadedFile
@@ -8,11 +10,34 @@ module Analyser.Types
         , OperatorTable
         , FileContent
         , LoadedFileData
+        , Interface
+        , ExposedInterface(Function, Type, Alias, Operator)
         )
 
 import AST.Types as AST
-import Analyser.Interface as Interface
 import Dict exposing (Dict)
+
+
+type alias Version =
+    String
+
+
+type alias Dependency =
+    { name : String
+    , version : Version
+    , interfaces : Dict AST.ModuleName Interface
+    }
+
+
+type alias Interface =
+    List ExposedInterface
+
+
+type ExposedInterface
+    = Function String
+    | Type ( String, List String )
+    | Alias String
+    | Operator AST.Infix
 
 
 type alias LoadedSourceFiles =
@@ -33,14 +58,14 @@ type FileLoad
 
 
 type alias LoadedFileData =
-    { interface : Interface.Interface
+    { interface : Interface
     , moduleName : Maybe AST.ModuleName
     , ast : AST.File
     }
 
 
 type alias ModuleIndex =
-    Dict AST.ModuleName Interface.Interface
+    Dict AST.ModuleName Interface
 
 
 type alias OperatorTable =

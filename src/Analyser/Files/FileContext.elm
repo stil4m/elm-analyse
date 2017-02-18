@@ -1,12 +1,11 @@
-module Analyser.FileContext exposing (FileContext, create)
+module Analyser.Files.FileContext exposing (FileContext, create)
 
 import AST.Types as AST
-import Analyser.Types exposing (LoadedSourceFile, LoadedSourceFiles)
-import Analyser.Interface exposing (Interface)
+import Analyser.Files.Types exposing (Dependency, Interface, LoadedSourceFile, LoadedSourceFiles, FileLoad(Failed, Loaded))
+import Analyser.Files.Interface as Interface
 import Maybe exposing (Maybe(Just, Nothing))
 import Analyser.OperatorTable as OperatorTable
 import Analyser.PostProcessing as PostProcessing
-import Analyser.Dependencies exposing (Dependency)
 
 
 type alias FileContext =
@@ -26,10 +25,10 @@ create sourceFiles dependencies ( fileContent, target ) =
             OperatorTable.buildModuleIndex sourceFiles dependencies
     in
         case target of
-            Analyser.Types.Failed ->
+            Failed ->
                 Nothing
 
-            Analyser.Types.Loaded l ->
+            Loaded l ->
                 Just <|
                     let
                         operatorTable =
@@ -39,6 +38,6 @@ create sourceFiles dependencies ( fileContent, target ) =
                         , ast = PostProcessing.postProcess operatorTable l.ast
                         , path = fileContent.path
                         , content = fileContent.content |> Maybe.withDefault ""
-                        , interface = Analyser.Interface.build l.ast
+                        , interface = Interface.build l.ast
                         , sha1 = Maybe.withDefault "" fileContent.sha1
                         }

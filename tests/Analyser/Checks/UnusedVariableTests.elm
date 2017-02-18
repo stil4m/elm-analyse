@@ -2,7 +2,7 @@ module Analyser.Checks.UnusedVariableTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedVariable as UnusedVariable
-import Analyser.Types exposing (..)
+import Analyser.Files.Types exposing (..)
 import Dict exposing (Dict)
 import Test exposing (..)
 import Analyser.Messages.Types exposing (..)

@@ -2,11 +2,11 @@ module Analyser.Checks.UnusedTypeAliases exposing (scan)
 
 import AST.Ranges exposing (Range)
 import AST.Types exposing (FunctionSignature, TypeAlias, TypeReference(Typed))
-import Analyser.FileContext exposing (FileContext)
+import Analyser.Files.FileContext exposing (FileContext)
+import Analyser.Files.Interface exposing (doesExposeAlias)
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedAlias), newMessage)
 import Dict exposing (Dict)
 import Inspector exposing (Order(Post), defaultConfig)
-import Analyser.Interface exposing (doesExposeAlias)
 import Tuple2
 import Tuple3
 

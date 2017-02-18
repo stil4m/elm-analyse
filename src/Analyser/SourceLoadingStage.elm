@@ -1,8 +1,8 @@
 module Analyser.SourceLoadingStage exposing (init, update, isDone, parsedFiles, Model, Msg, subscriptions)
 
-import Analyser.Types exposing (FileContent, FileLoad, LoadedFile)
+import Analyser.Files.Types exposing (FileContent, FileLoad, LoadedFile, LoadedSourceFiles)
+import Analyser.Files.FileLoader as FileLoader
 import List.Extra
-import Analyser.FileLoader as FileLoader
 
 
 type Model
@@ -35,7 +35,7 @@ isDone (Model model) =
     model.filesToLoad == Nothing
 
 
-parsedFiles : Model -> Analyser.Types.LoadedSourceFiles
+parsedFiles : Model -> LoadedSourceFiles
 parsedFiles (Model model) =
     model.parsedFiles
 

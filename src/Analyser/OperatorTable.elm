@@ -1,11 +1,10 @@
 module Analyser.OperatorTable exposing (build, buildModuleIndex)
 
 import AST.Types as AST exposing (Import, InfixDirection, ModuleName, Infix)
-import Analyser.Types exposing (FileLoad, LoadedSourceFiles, LoadedSourceFile, ModuleIndex, OperatorTable)
+import Analyser.Files.Types exposing (Dependency, Interface, FileLoad(Loaded), LoadedSourceFiles, LoadedSourceFile, ModuleIndex, OperatorTable)
+import Analyser.Files.Interface as Interface
 import Dict exposing (Dict)
-import Analyser.Interface as Interface exposing (Interface)
 import Parser.Parser
-import Analyser.Dependencies exposing (Dependency)
 
 
 buildModuleIndex : LoadedSourceFiles -> List Dependency -> ModuleIndex
@@ -15,10 +14,10 @@ buildModuleIndex sourceFiles dependencies =
         |> Dict.fromList
 
 
-fromFileLoad : Analyser.Types.FileLoad -> Maybe ( ModuleName, Interface )
+fromFileLoad : FileLoad -> Maybe ( ModuleName, Interface )
 fromFileLoad fl =
     case fl of
-        Analyser.Types.Loaded l ->
+        Loaded l ->
             l.moduleName |> Maybe.map (flip (,) l.interface)
 
         _ ->

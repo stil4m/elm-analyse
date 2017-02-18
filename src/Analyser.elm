@@ -5,7 +5,7 @@ import Analyser.SourceLoadingStage as SourceLoadingStage
 import AnalyserPorts
 import Platform exposing (programWithFlags)
 import Inspection
-import Analyser.Dependencies exposing (Dependency, Version)
+import Analyser.Files.Types exposing (Dependency, Version)
 import Analyser.State as State exposing (State)
 import Analyser.Fixer as Fixer
 import Tuple2

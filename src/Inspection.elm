@@ -1,8 +1,8 @@
 module Inspection exposing (run)
 
-import Analyser.FileContext as FileContext
+import Analyser.Files.FileContext as FileContext
 import Analyser.Messages.Types exposing (Message, MessageData(UnformattedFile), newMessage)
-import Analyser.Types exposing (LoadedSourceFiles)
+import Analyser.Files.Types exposing (Dependency, LoadedSourceFiles)
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.NotExposeAll as NotExposeAll
 import Analyser.Checks.NoImportAll as NoImportAll
@@ -15,7 +15,6 @@ import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
 import Analyser.Checks.UnusedImports as UnusedImports
-import Analyser.Dependencies exposing (Dependency)
 
 
 run : LoadedSourceFiles -> List Dependency -> List Message
