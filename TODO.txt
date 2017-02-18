@@ -1,2 +1,0 @@
-- Unused parens LHS for lambda
-- Do not mark (Tuple.first newFileContent).sha1 as unn. parens.
