@@ -3,6 +3,7 @@ module Analyser.Checks.UnnecessaryParens exposing (scan)
 import AST.Types
     exposing
         ( Expression
+        , Lambda
         , InnerExpression
             ( ListExpr
             , ParenthesizedExpression
@@ -20,6 +21,7 @@ import AST.Types
             , RecordAccessFunction
             , RecordAccess
             , CaseExpression
+            , QualifiedExpr
             )
         , InfixDirection
         , Function
@@ -50,7 +52,7 @@ scan fileContext =
         x : Context
         x =
             Inspector.inspect
-                { defaultConfig | onExpression = Post onExpression, onFunction = Post onFunction }
+                { defaultConfig | onExpression = Post onExpression, onFunction = Post onFunction, onLambda = Post onLambda }
                 fileContext.ast
                 []
     in
@@ -63,6 +65,16 @@ scan fileContext =
 onFunction : Function -> Context -> Context
 onFunction function context =
     case function.declaration.expression of
+        ( range, ParenthesizedExpression _ ) ->
+            range :: context
+
+        _ ->
+            context
+
+
+onLambda : Lambda -> Context -> Context
+onLambda lambda context =
+    case lambda.expression of
         ( range, ParenthesizedExpression _ ) ->
             range :: context
 
@@ -203,6 +215,9 @@ onParenthesizedExpression range expression context =
             range :: context
 
         Literal _ ->
+            range :: context
+
+        QualifiedExpr _ _ ->
             range :: context
 
         _ ->

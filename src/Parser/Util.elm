@@ -62,14 +62,14 @@ exactIndentWhitespace =
         )
 
 
-multiLineCommentWithTrailingSpaces : Parser s String
+multiLineCommentWithTrailingSpaces : Parser State String
 multiLineCommentWithTrailingSpaces =
     succeed (++)
         <*> multilineComment
         <*> manySpaces
 
 
-someComment : Parser a String
+someComment : Parser State String
 someComment =
     or singleLineComment
         multiLineCommentWithTrailingSpaces

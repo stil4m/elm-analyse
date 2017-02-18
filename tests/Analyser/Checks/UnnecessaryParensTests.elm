@@ -307,6 +307,37 @@ foo = ( ("price"), (Location 0 0) )
     )
 
 
+parensInLambdaExpressionWithQualifiedExpression : ( String, String, List MessageData )
+parensInLambdaExpressionWithQualifiedExpression =
+    ( "parensInLambdaExpressionWithQualifiedExpression"
+    , """module Bar exposing (..)
+
+foo =
+    bar
+        (\\() ->
+            (String.concat)
+        )
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 5, column = 11 }, end = { row = 6, column = -2 } }
+      ]
+    )
+
+
+parensInLambdaExpressionWithQualifiedExpressionWithArgs : ( String, String, List MessageData )
+parensInLambdaExpressionWithQualifiedExpressionWithArgs =
+    ( "parensInLambdaExpressionWithQualifiedExpressionWithArgs"
+    , """module Bar exposing (..)
+
+foo =
+    bar
+        (\\() ->
+            (String.concat 1)
+        )
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 5, column = 11 }, end = { row = 6, column = -2 } } ]
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnnecessaryParensTests"
@@ -333,4 +364,6 @@ all =
         , allowParensForCaseOnLHS
         , parensAroundTopLevelApplication
         , parensInTuple
+        , parensInLambdaExpressionWithQualifiedExpression
+        , parensInLambdaExpressionWithQualifiedExpressionWithArgs
         ]

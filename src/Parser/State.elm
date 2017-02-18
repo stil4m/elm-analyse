@@ -2,24 +2,27 @@ module Parser.State exposing (State, emptyState, currentIndent, popIndent, pushI
 
 
 type State
-    = State (List Int)
+    = State
+        { indents : List Int
+        , comments : List String
+        }
 
 
 emptyState : State
 emptyState =
-    State []
+    State { indents = [], comments = [] }
 
 
 currentIndent : State -> Int
-currentIndent (State xs) =
-    List.head xs |> Maybe.withDefault 0
+currentIndent (State { indents }) =
+    List.head indents |> Maybe.withDefault 0
 
 
 popIndent : State -> State
 popIndent (State s) =
-    State <| List.drop 1 s
+    State { s | indents = List.drop 1 s.indents }
 
 
 pushIndent : Int -> State -> State
 pushIndent x (State s) =
-    State (x :: s)
+    State { s | indents = x :: s.indents }

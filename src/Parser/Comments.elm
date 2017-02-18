@@ -1,4 +1,4 @@
-module Parser.Comments exposing (singleLineComment, multilineComment, documentationComment)
+module Parser.Comments exposing (singleLineComment, multilineComment)
 
 import Combine exposing (Parser, string, lazy, sequence, (<$>), manyTill, succeed, (<*>), (>>=), lookAhead, count)
 import Combine.Char exposing (anyChar)
@@ -6,23 +6,14 @@ import Parser.Whitespace exposing (untilNewlineToken)
 import Parser.State exposing (State)
 
 
-documentationComment : Parser State String
-documentationComment =
-    String.concat
-        <$> sequence
-                [ string "{-|"
-                , String.fromList <$> manyTill anyChar (string "-}")
-                ]
-
-
-singleLineComment : Parser s String
+singleLineComment : Parser State String
 singleLineComment =
     succeed (++)
         <*> string "--"
         <*> untilNewlineToken
 
 
-multilineComment : Parser a String
+multilineComment : Parser State String
 multilineComment =
     lazy
         (\() ->
