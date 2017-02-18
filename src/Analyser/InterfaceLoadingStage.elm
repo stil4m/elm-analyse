@@ -22,7 +22,7 @@ type alias State =
 
 getDependencies : Model -> List Dependency
 getDependencies (Model state) =
-    state.loadedDependencies |> List.filterMap (Result.toMaybe)
+    state.loadedDependencies |> List.filterMap Result.toMaybe
 
 
 init : List ( String, Version ) -> ( Model, Cmd Msg )

@@ -71,7 +71,7 @@ scan fileContext =
             x.activeScopes
                 |> List.head
                 |> Maybe.map Tuple.second
-                |> Maybe.withDefault (Dict.empty)
+                |> Maybe.withDefault Dict.empty
                 |> Dict.toList
                 |> onlyUnused
                 |> List.filter (filterByModuleType fileContext)

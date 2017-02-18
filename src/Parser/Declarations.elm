@@ -175,7 +175,7 @@ promoteToApplicationExpression expr =
         (\() ->
             rangedExpression <|
                 succeed (\rest -> Application (expr :: rest))
-                    <*> lazy (\() -> (many1 (maybe moreThanIndentWhitespace *> expressionNotApplication)))
+                    <*> lazy (\() -> many1 (maybe moreThanIndentWhitespace *> expressionNotApplication))
         )
 
 
@@ -295,7 +295,7 @@ recordUpdateExpression : Parser State InnerExpression
 recordUpdateExpression =
     lazy
         (\() ->
-            (between (string "{")
+            between (string "{")
                 (string "}")
                 (RecordUpdateExpression
                     <$> (succeed RecordUpdate
@@ -303,7 +303,6 @@ recordUpdateExpression =
                             <*> (string "|" *> recordFields True)
                         )
                 )
-            )
         )
 
 
@@ -387,7 +386,7 @@ letBlock : Parser State (List Declaration)
 letBlock =
     lazy
         (\() ->
-            ((string "let" *> moreThanIndentWhitespace)
+            (string "let" *> moreThanIndentWhitespace)
                 *> withIndentedState letBody
                 <* (choice
                         [ unstrictIndentWhitespace
@@ -395,7 +394,6 @@ letBlock =
                         ]
                         *> string "in"
                    )
-            )
         )
 
 
@@ -403,10 +401,9 @@ letExpression : Parser State InnerExpression
 letExpression =
     lazy
         (\() ->
-            (succeed (\decls -> LetBlock decls >> LetExpression)
+            succeed (\decls -> LetBlock decls >> LetExpression)
                 <*> withIndentedState2 letBlock
                 <*> (moreThanIndentWhitespace *> expression)
-            )
         )
 
 

@@ -61,7 +61,7 @@ update msg =
                     if store then
                         ( fileContent.sha1, isLoaded fileLoad )
                             |> uncurry (Maybe.map2 (\a b -> storeAstForSha ( a, Json.Encode.encode 0 (AST.Encoding.encode b.ast) )))
-                            |> Maybe.withDefault (Cmd.none)
+                            |> Maybe.withDefault Cmd.none
                     else
                         Cmd.none
             in

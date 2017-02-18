@@ -17,7 +17,7 @@ multilineComment : Parser State String
 multilineComment =
     lazy
         (\() ->
-            (String.concat
+            String.concat
                 <$> sequence
                         [ (string "{-")
                         , String.concat
@@ -32,5 +32,4 @@ multilineComment =
                                     (string "-}")
                         , succeed "-}"
                         ]
-            )
         )

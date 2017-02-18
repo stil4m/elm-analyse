@@ -43,7 +43,7 @@ encodeModule m =
             encodeTyped "effect" (encodeEffectModuleData d)
 
         NoModule ->
-            encodeTyped "nomodule" (JE.null)
+            encodeTyped "nomodule" JE.null
 
 
 encodeEffectModuleData : EffectModuleData -> Value
@@ -242,7 +242,7 @@ encodeTypeReference typeReference =
                     ]
 
         Unit ->
-            encodeTyped "unit" (JE.null)
+            encodeTyped "unit" JE.null
 
         Tupled t ->
             encodeTyped "tupled" (asList encodeTypeReference t)
