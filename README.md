@@ -1,5 +1,16 @@
 # Elm Analyse
 
+A tool that allows you analyse your [Elm](http://elm-lang.org/) code and identifies deficiencies and best practices.
+
+## Preview
+
+<img src="https://github.com/stil4m/elm-analyse/raw/master/images/dashboard.png">
+<img src="https://github.com/stil4m/elm-analyse/raw/master/images/single-message.png">
+<img src="https://github.com/stil4m/elm-analyse/raw/master/images/terminal-output.png">
+
+
+
+---
 ## Usage
 
 ### Prerequisites
