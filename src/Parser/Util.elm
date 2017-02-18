@@ -1,38 +1,16 @@
-module Parser.Util exposing (withRange, asPointer, unstrictIndentWhitespace, exactIndentWhitespace, moreThanIndentWhitespace, trimmed, commentSequence, multiLineCommentWithTrailingSpaces)
+module Parser.Util exposing (asPointer, unstrictIndentWhitespace, exactIndentWhitespace, moreThanIndentWhitespace, trimmed, commentSequence, multiLineCommentWithTrailingSpaces)
 
 import Combine exposing (Parser, ParseLocation, succeed, withLocation, many1, many, sequence, maybe, withState, or, (>>=), (<$>), (<*>), (<*), (*>))
 import Parser.Comments exposing (multilineComment, singleLineComment)
 import AST.Types exposing (VariablePointer)
-import AST.Ranges exposing (Range, Location)
 import Parser.Whitespace exposing (many1Spaces, manySpaces, nSpaces, realNewLine)
 import Parser.State exposing (State, currentIndent)
-
-
-asPointerLocation : ParseLocation -> Location
-asPointerLocation { line, column } =
-    { row = line, column = column }
+import Parser.Ranges exposing (withRange)
 
 
 asPointer : Parser State String -> Parser State VariablePointer
 asPointer p =
     withRange (VariablePointer <$> p)
-
-
-withRange : Parser State (Range -> a) -> Parser State a
-withRange p =
-    withLocation
-        (\start ->
-            p
-                >>= \pResult ->
-                        withLocation
-                            (\end ->
-                                succeed <|
-                                    pResult
-                                        { start = asPointerLocation start
-                                        , end = asPointerLocation end
-                                        }
-                            )
-        )
 
 
 unstrictIndentWhitespace : Parser State String

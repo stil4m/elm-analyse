@@ -1,10 +1,12 @@
-module Parser.State exposing (State, emptyState, currentIndent, popIndent, pushIndent)
+module Parser.State exposing (State, emptyState, currentIndent, popIndent, pushIndent, addComment)
+
+import AST.Ranges exposing (Range)
 
 
 type State
     = State
         { indents : List Int
-        , comments : List String
+        , comments : List ( String, Range )
         }
 
 
@@ -26,3 +28,8 @@ popIndent (State s) =
 pushIndent : Int -> State -> State
 pushIndent x (State s) =
     State { s | indents = x :: s.indents }
+
+
+addComment : ( String, Range ) -> State -> State
+addComment pair (State s) =
+    State { s | comments = pair :: s.comments }

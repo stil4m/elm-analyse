@@ -4,8 +4,9 @@ import AST.Types exposing (Expression, ExposedType, Exposure(None, All, Explicit
 import Combine exposing ((*>), (<$), (<$>), (<*>), Parser, choice, maybe, or, parens, sepBy, string, succeed, while)
 import Combine.Char exposing (char)
 import Parser.Tokens exposing (exposingToken, functionName, typeName)
-import Parser.Util exposing (moreThanIndentWhitespace, trimmed, withRange)
+import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
 import Parser.State exposing (State)
+import Parser.Ranges exposing (withRange)
 
 
 exposeDefinition : Parser State a -> Parser State (Exposure a)

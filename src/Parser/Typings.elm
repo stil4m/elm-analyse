@@ -4,8 +4,9 @@ import Combine exposing (Parser, string, sepBy, many, succeed, (<*>), (*>), (<*)
 import Parser.Tokens exposing (functionName, typeName)
 import Parser.TypeReference exposing (typeReference)
 import AST.Types exposing (Type, ValueConstructor, TypeAlias)
-import Parser.Util exposing (moreThanIndentWhitespace, trimmed, withRange)
+import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
 import Parser.State exposing (State)
+import Parser.Ranges exposing (withRange)
 
 
 typeDeclaration : Parser State Type

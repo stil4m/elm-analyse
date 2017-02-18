@@ -12,9 +12,10 @@ import Parser.Tokens exposing (portToken, prefixOperatorToken, multiLineStringLi
 import Parser.TypeReference exposing (typeReference)
 import AST.Types exposing (File, Module(NoModule), Declaration(AliasDecl, FuncDecl, TypeDecl, InfixDeclaration, DestructuringDeclaration, PortDeclaration), Destructuring, Function, FunctionSignature, FunctionDeclaration, Pattern, Expression, InnerExpression(..), RecordUpdate, Lambda, Case, CaseBlock, LetBlock, Cases)
 import Parser.Typings exposing (typeDeclaration)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer, withRange)
+import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer)
 import Parser.Whitespace exposing (manySpaces)
 import Parser.State exposing (State, pushIndent, popIndent)
+import Parser.Ranges exposing (withRange)
 
 
 file : Parser State File
