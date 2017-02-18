@@ -17,6 +17,16 @@ parseFullStringState state s p =
             Nothing
 
 
+parseStateToMaybe : State -> String -> Parser State b -> Maybe ( b, State )
+parseStateToMaybe state s p =
+    case Combine.runParser (p <* Combine.end) state s of
+        Ok ( x, _, r ) ->
+            Just ( r, x )
+
+        _ ->
+            Nothing
+
+
 parseFullStringWithNullState : String -> Parser State b -> Maybe b
 parseFullStringWithNullState s p =
     case Combine.runParser (p <* Combine.end) emptyState s of

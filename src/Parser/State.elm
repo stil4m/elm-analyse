@@ -1,4 +1,4 @@
-module Parser.State exposing (State, emptyState, currentIndent, popIndent, pushIndent, addComment)
+module Parser.State exposing (State, emptyState, currentIndent, popIndent, pushIndent, addComment, getComments)
 
 import AST.Ranges exposing (Range)
 
@@ -33,3 +33,8 @@ pushIndent x (State s) =
 addComment : ( String, Range ) -> State -> State
 addComment pair (State s) =
     State { s | comments = pair :: s.comments }
+
+
+getComments : State -> List ( String, Range )
+getComments (State s) =
+    s.comments

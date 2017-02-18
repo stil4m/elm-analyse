@@ -1,9 +1,10 @@
 module Parser.CommentTest exposing (..)
 
-import Parser.Comments as Parser
-import Test exposing (..)
 import Expect
 import Parser.CombineTestUtil exposing (..)
+import Parser.Comments as Parser
+import Parser.State as State exposing (emptyState)
+import Test exposing (..)
 
 
 all : Test
@@ -11,16 +12,28 @@ all =
     describe "ModuleTests"
         [ test "singleLineComment" <|
             \() ->
-                parseFullStringWithNullState "--bar" Parser.singleLineComment
+                parseStateToMaybe emptyState "--bar" Parser.singleLineComment
+                    |> Maybe.map Tuple.first
                     |> Expect.equal (Just "--bar")
+        , test "singleLineComment state" <|
+            \() ->
+                parseStateToMaybe emptyState "--bar" Parser.singleLineComment
+                    |> Maybe.map (Tuple.second >> State.getComments)
+                    |> Expect.equal (Just [ ( "--bar", { start = { row = 1, column = 0 }, end = { row = 1, column = 5 } } ) ])
         , test "singleLineComment does not include new line" <|
             \() ->
                 parseFullStringWithNullState "--bar\n" Parser.singleLineComment
                     |> Expect.equal Nothing
         , test "multilineComment" <|
             \() ->
-                parseFullStringWithNullState "{-foo\nbar-}" Parser.multilineComment
+                parseStateToMaybe emptyState "{-foo\nbar-}" Parser.multilineComment
+                    |> Maybe.map Tuple.first
                     |> Expect.equal (Just "{-foo\nbar-}")
+        , test "multilineComment" <|
+            \() ->
+                parseStateToMaybe emptyState "{-foo\nbar-}" Parser.multilineComment
+                    |> Maybe.map (Tuple.second >> State.getComments)
+                    |> Expect.equal (Just [ ( "{-foo\nbar-}", { start = { row = 1, column = 0 }, end = { row = 2, column = 5 } } ) ])
         , test "nested multilineComment only open" <|
             \() ->
                 parseFullStringWithNullState "{- {- -}" Parser.multilineComment
