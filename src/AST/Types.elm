@@ -214,6 +214,8 @@ type alias ValueConstructor =
     }
 
 
+{-| TODO REMOVE THIS
+-}
 type TypeArg
     = Generic String
     | Concrete TypeReference
