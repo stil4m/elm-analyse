@@ -56,6 +56,8 @@ type MessageData
     | UnusedImportAlias FileName AST.ModuleName Range
     | UnusedImport FileName AST.ModuleName Range
     | UseConsOverConcat FileName Range
+    | DropConcatOfLists FileName Range
+    | DropConsOfItemAndList FileName Range
 
 
 type alias GetFiles =

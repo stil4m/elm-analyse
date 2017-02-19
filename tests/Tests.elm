@@ -20,13 +20,13 @@ import Analyser.Fixes.UnusedImportedVariableTests
 import Analyser.Fixes.UnusedImportAliasTests
 import ASTUtil.PatternOptimizerTests
 import Analyser.Fixes.FileContentTests
-import Analyser.Checks.UseConsOverConcatTests
+import Analyser.Checks.ListOperatorsTests
 
 
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.UseConsOverConcatTests.all
+        [ Analyser.Checks.ListOperatorsTests.all
         , ASTUtil.PatternOptimizerTests.all
         , Analyser.Fixes.FileContentTests.all
         , Analyser.Fixes.UnusedImportedVariableTests.all

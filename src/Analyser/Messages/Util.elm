@@ -314,3 +314,27 @@ getMessageInfo m =
             , [ range ]
             , True
             )
+
+        DropConcatOfLists fileName range ->
+            ( String.concat
+                [ "Joining two literal lists with `++`, but instead you can just join the lists. \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , always [ fileName ]
+            , [ range ]
+            , True
+            )
+
+        DropConsOfItemAndList fileName range ->
+            ( String.concat
+                [ "Adding an item to the front of a literal list, but instead you can just put it in the list. \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , always [ fileName ]
+            , [ range ]
+            , True
+            )

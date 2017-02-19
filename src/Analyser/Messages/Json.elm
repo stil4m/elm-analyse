@@ -119,6 +119,8 @@ decodeMessageData =
         , ( "UnusedImportAlias", decodeFileModuleNameAndRange UnusedImportAlias )
         , ( "UnusedImport", decodeFileModuleNameAndRange UnusedImport )
         , ( "UseConsOverConcat", decodeFileAndRange UseConsOverConcat )
+        , ( "DropConcatOfLists", decodeFileAndRange DropConcatOfLists )
+        , ( "DropConsOfItemAndList", decodeFileAndRange DropConsOfItemAndList )
         ]
 
 
@@ -303,6 +305,20 @@ encodeMessageData m =
 
         UseConsOverConcat file range ->
             encodeTyped "UseConsOverConcat" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "range", Ranges.encode range )
+                    ]
+
+        DropConcatOfLists file range ->
+            encodeTyped "DropConcatOfLists" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "range", Ranges.encode range )
+                    ]
+
+        DropConsOfItemAndList file range ->
+            encodeTyped "DropConsOfItemAndList" <|
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "range", Ranges.encode range )
