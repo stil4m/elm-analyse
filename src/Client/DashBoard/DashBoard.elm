@@ -3,14 +3,13 @@ module Client.DashBoard.DashBoard exposing (Model, Msg, subscriptions, init, upd
 import Analyser.State as State exposing (State)
 import Client.DashBoard.ActiveMessageDialog as ActiveMessageDialog
 import Html exposing (Html, div, text, span, h3, ul, li, a, strong)
-import Html.Events exposing (onClick)
 import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
 import Time
 import WebSocket as WS
 import Analyser.Messages.Types exposing (Message, MessageStatus(Fixing))
 import Analyser.Messages.Util as Messages
-import Html.Attributes exposing (style)
+import Client.Messages as M
 import Tuple2
 import Navigation exposing (Location)
 import Client.Socket exposing (dashboardAddress)
@@ -38,12 +37,12 @@ subscriptions location model =
         ]
 
 
-init : ( Model, Cmd Msg )
-init =
+init : Location -> ( Model, Cmd Msg )
+init location =
     ( { messages = RD.Loading
       , active = ActiveMessageDialog.init
       }
-    , Cmd.none
+    , WS.send (dashboardAddress location) "ping"
     )
 
 
@@ -112,48 +111,5 @@ viewState : State -> Html Msg
 viewState state =
     div []
         [ h3 [] [ text "Messages" ]
-        , ul
-            [ style
-                [ ( "list-style", "none" )
-                , ( "padding", "0" )
-                ]
-            ]
-            (List.indexedMap viewMessage state.messages)
-        ]
-
-
-viewMessage : Int -> Message -> Html Msg
-viewMessage n x =
-    li
-        [ style
-            [ ( "margin", "10px" )
-            , ( "padding", "10px" )
-            , ( "border", "1px solid #ccc" )
-            , ( "border-radius", "3px" )
-            , ( "backgound", "1px solid #eee" )
-            , ( "opacity"
-              , if x.status == Fixing then
-                    ".5"
-                else
-                    "1.0"
-              )
-            ]
-        ]
-        [ div [ style [ ( "display", "table-row" ) ] ]
-            [ a
-                [ onClick (Focus x)
-                , style
-                    [ ( "cursor", "pointer" )
-                    , ( "display", "table-cell" )
-                    , ( "padding-right", "20px" )
-                    , ( "font-size", "200%" )
-                    , ( "vertical-align", "middle" )
-                    ]
-                ]
-                [ strong []
-                    [ text <| (++) "#" <| toString <| n + 1 ]
-                ]
-            , span [ style [ ( "display", "table-cell" ) ] ]
-                [ text <| Messages.asString x.data ]
-            ]
+        , M.viewAll Focus state.messages
         ]

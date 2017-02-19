@@ -45,7 +45,7 @@ module.exports = function(config) {
 
                 accept({
                     success: true,
-                    path: realPath,
+                    path: path,
                     sha1: checksum,
                     content: normalized,
                     formatted: formatted,

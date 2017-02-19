@@ -4,10 +4,11 @@ import Html exposing (Html, nav, div, ul, i, li, a, button, form, text)
 import Html.Attributes exposing (class, href, type_, style, attribute)
 import Client.App.Models exposing (Msg(Refresh))
 import Html.Events exposing (onClick)
+import Navigation exposing (Location)
 
 
-view : Html Msg
-view =
+view : Location -> Html Msg
+view l =
     nav [ class "navbar navbar-default navbar-static-top", attribute "role" "navigation", style [ ( "margin-bottom", "0" ) ] ]
         [ div [ class "navbar-header" ]
             [ a
@@ -23,11 +24,25 @@ view =
         , div [ class "navbar-default sidebar", attribute "role" "navigation" ]
             [ div [ class "sidebar-nav" ]
                 [ ul [ class "nav in" ]
-                    [ li [ class "active" ]
-                        [ a [ href "" ]
-                            [ i [ class "fa fa-dashboard fa-fw" ] [], text " Dashboard" ]
-                        ]
+                    [ menuItem l "#dashboard" "Dashboard" "dashboard"
+                    , menuItem l "#tree" "Tree" "files-o"
                     ]
                 ]
             ]
+        ]
+
+
+isActiveClass : Location -> String -> String
+isActiveClass l s =
+    if s == l.hash || (l.hash == "" && s == "#dashboard") then
+        "active"
+    else
+        ""
+
+
+menuItem : Location -> String -> String -> String -> Html msg
+menuItem location path name icon =
+    li [ class (isActiveClass location path) ]
+        [ a [ href path ]
+            [ i [ class ("fa fa-" ++ icon ++ " fa-fw") ] [], text " ", text name ]
         ]
