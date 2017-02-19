@@ -7,14 +7,14 @@ import AST.Ranges exposing (Range)
 range : Expose -> Range
 range e =
     case e of
-        InfixExpose _ range ->
-            range
+        InfixExpose _ r ->
+            r
 
-        FunctionExpose _ range ->
-            range
+        FunctionExpose _ r ->
+            r
 
-        TypeOrAliasExpose _ range ->
-            range
+        TypeOrAliasExpose _ r ->
+            r
 
-        TypeExpose { range } ->
-            range
+        TypeExpose typeExpose ->
+            typeExpose.range

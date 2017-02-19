@@ -107,7 +107,7 @@ writeExposureExpose x =
 
             Explicit exposeList ->
                 parensComma <|
-                    List.map (\x -> ( ASTUtil.Expose.range x, writeExpose x )) exposeList
+                    List.map (\item -> ( ASTUtil.Expose.range item, writeExpose item )) exposeList
         ]
 
 
@@ -344,6 +344,11 @@ writeExpression ( range, inner ) =
     let
         recurRangeHelper =
             \( x, y ) -> ( x, writeExpression ( x, y ) )
+
+        writeRecordSetter ( name, expr ) =
+            ( Tuple.first expr
+            , spaced [ string name, string "=", writeExpression expr ]
+            )
     in
         case inner of
             UnitExpr ->
@@ -409,8 +414,8 @@ writeExpression ( range, inner ) =
             TupledExpression t ->
                 sepByComma (List.map recurRangeHelper t)
 
-            ParenthesizedExpression inner ->
-                join [ string "(", writeExpression inner, string ")" ]
+            ParenthesizedExpression x ->
+                join [ string "(", writeExpression x, string ")" ]
 
             LetExpression letBlock ->
                 breaked
@@ -445,16 +450,10 @@ writeExpression ( range, inner ) =
                     ]
 
             RecordExpr setters ->
-                let
-                    writeRecordSetter ( name, expr ) =
-                        ( Tuple.first expr
-                        , spaced [ string name, string "=", writeExpression expr ]
-                        )
-                in
-                    bracesComma (List.map writeRecordSetter setters)
+                bracesComma (List.map writeRecordSetter setters)
 
-            ListExpr inner ->
-                bracketsComma (List.map recurRangeHelper inner)
+            ListExpr xs ->
+                bracketsComma (List.map recurRangeHelper xs)
 
             QualifiedExpr moduleName name ->
                 join [ writeModuleName moduleName, string name ]
@@ -466,19 +465,13 @@ writeExpression ( range, inner ) =
                 join [ string ".", string s ]
 
             RecordUpdateExpression { name, updates } ->
-                let
-                    writeRecordSetter ( name, expr ) =
-                        ( Tuple.first expr
-                        , spaced [ string name, string "=", writeExpression expr ]
-                        )
-                in
-                    spaced
-                        [ string "{"
-                        , string name
-                        , string "|"
-                        , sepByComma (List.map writeRecordSetter updates)
-                        , string "}"
-                        ]
+                spaced
+                    [ string "{"
+                    , string name
+                    , string "|"
+                    , sepByComma (List.map writeRecordSetter updates)
+                    , string "}"
+                    ]
 
             GLSLExpression s ->
                 join
@@ -533,11 +526,11 @@ writePattern p =
         QualifiedNamePattern qnr _ ->
             writeQualifiedNameRef qnr
 
-        AsPattern p asName _ ->
-            spaced [ writePattern p, string "as", string asName.value ]
+        AsPattern innerPattern asName _ ->
+            spaced [ writePattern innerPattern, string "as", string asName.value ]
 
-        ParenthesizedPattern p _ ->
-            spaced [ string "(", writePattern p, string ")" ]
+        ParenthesizedPattern innerPattern _ ->
+            spaced [ string "(", writePattern innerPattern, string ")" ]
 
 
 writeQualifiedNameRef : QualifiedNameRef -> Writer
