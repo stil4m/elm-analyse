@@ -1,6 +1,6 @@
 module Parser.Util exposing (asPointer, unstrictIndentWhitespace, exactIndentWhitespace, moreThanIndentWhitespace, trimmed, commentSequence, multiLineCommentWithTrailingSpaces)
 
-import Combine exposing (Parser, ParseLocation, succeed, withLocation, many1, many, sequence, maybe, withState, or, (>>=), (<$>), (<*>), (<*), (*>))
+import Combine exposing (Parser, ParseLocation, succeed, many1, many, sequence, maybe, withState, or, (>>=), (<$>), (<*>), (<*), (*>))
 import Parser.Comments exposing (multilineComment, singleLineComment)
 import AST.Types exposing (VariablePointer)
 import Parser.Whitespace exposing (many1Spaces, manySpaces, nSpaces, realNewLine)

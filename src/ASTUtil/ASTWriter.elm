@@ -148,7 +148,7 @@ writeImport { moduleName, moduleAlias, exposingList } =
     spaced
         [ string "import"
         , writeModuleName moduleName
-        , maybe (Maybe.map (writeModuleName >> (\x -> spaced [ string "as", x ])) moduleAlias)
+        , maybe (Maybe.map (writeModuleName >> \x -> spaced [ string "as", x ]) moduleAlias)
         , writeExposureExpose exposingList
         ]
 
@@ -342,8 +342,8 @@ writeTypeArg t =
 writeExpression : Expression -> Writer
 writeExpression ( range, inner ) =
     let
-        recurRangeHelper xs =
-            (\( x, y ) -> ( x, writeExpression ( x, y ) )) xs
+        recurRangeHelper =
+            \( x, y ) -> ( x, writeExpression ( x, y ) )
     in
         case inner of
             UnitExpr ->

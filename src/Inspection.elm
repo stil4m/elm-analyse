@@ -15,6 +15,7 @@ import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
 import Analyser.Checks.UnusedImports as UnusedImports
+import Analyser.Checks.ListOperators as ListOperators
 
 
 run : LoadedSourceFiles -> List Dependency -> List Message
@@ -33,6 +34,7 @@ run sources deps =
             , NoUncurriedPrefix.scan
             , UnusedImportAliases.scan
             , UnusedImports.scan
+            , ListOperators.scan
             ]
 
         fileMessages =

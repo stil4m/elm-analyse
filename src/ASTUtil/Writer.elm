@@ -37,7 +37,7 @@ writeIndented indent w =
 
                 seperator =
                     if differentLines then
-                        "\n" ++ (asIndent indent) ++ sep
+                        "\n" ++ asIndent indent ++ sep
                     else
                         sep
             in

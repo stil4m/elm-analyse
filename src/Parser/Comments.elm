@@ -3,10 +3,9 @@ module Parser.Comments exposing (singleLineComment, multilineComment)
 import Combine exposing (Parser, string, lazy, sequence, (<$>), manyTill, succeed, (<$>), (<*>), (*>), (>>=), lookAhead, count, modifyState)
 import Combine.Char exposing (anyChar)
 import Parser.Whitespace exposing (untilNewlineToken)
-import Parser.State exposing (State)
+import Parser.State exposing (State, addComment)
 import AST.Ranges exposing (Range)
 import Parser.Ranges exposing (withRange)
-import Parser.State exposing (addComment)
 
 
 addCommentToState : Parser State ( String, Range ) -> Parser State String

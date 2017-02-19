@@ -44,7 +44,7 @@ show m _ =
     , Http.request
         { method = "GET"
         , headers = []
-        , url = "http://localhost:3000/file?file=" ++ (String.join "," <| List.map Http.encodeUri (Messages.getFiles m.data))
+        , url = "/file?file=" ++ (String.join "," <| List.map Http.encodeUri (Messages.getFiles m.data))
         , body = Http.emptyBody
         , expect = Http.expectString
         , timeout = Nothing
