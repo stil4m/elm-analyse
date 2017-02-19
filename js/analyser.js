@@ -13,7 +13,7 @@ module.exports = function(config) {
 
     const Elm = require('./backend-elm');
     var app = Elm.Analyser.worker(input);
-    
+
     app.ports.sendMessages.subscribe(function(x) {
         console.log("Messages:")
         console.log("---------")

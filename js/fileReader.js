@@ -56,13 +56,8 @@ module.exports = function(config) {
     }
 
     function readFile(directory, path, cb) {
-        console.log("Load file", path, "...")
-        var real;
-        if (!path.startsWith('/')) {
-          real = path.replace(".", directory);
-        } else {
-          real =  path;
-        }
+        console.log("Load file", path, "...");
+        var real = directory + "/" + path;
 
         sums.checksum(fs.createReadStream(real)).then(function(checkSumResult) {
             const checksum = checkSumResult.sum
