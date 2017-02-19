@@ -67,7 +67,7 @@ writeIndented indent w =
 
 startOnDifferentLines : List Range -> Bool
 startOnDifferentLines xs =
-    List.length xs /= List.length (List.unique (List.map (.start >> .row) xs))
+    List.length (List.unique (List.map (.start >> .row) xs)) > 1
 
 
 indent : Int -> Writer -> Writer

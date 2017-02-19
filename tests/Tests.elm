@@ -21,13 +21,13 @@ import Analyser.Fixes.UnusedImportAliasTests
 import ASTUtil.PatternOptimizerTests
 import Analyser.Fixes.FileContentTests
 import Analyser.Checks.ListOperatorsTests
+import ASTUtil.WriterTests
 
 
 all : Test
 all =
     Test.concat
         [ Analyser.Checks.ListOperatorsTests.all
-        , ASTUtil.PatternOptimizerTests.all
         , Analyser.Fixes.FileContentTests.all
         , Analyser.Fixes.UnusedImportedVariableTests.all
         , Analyser.Fixes.UnusedImportAliasTests.all
@@ -46,4 +46,6 @@ all =
         , InterfaceTest.all
         , PostProcessingTests.all
         , ParserTests.all
+        , ASTUtil.PatternOptimizerTests.all
+        , ASTUtil.WriterTests.all
         ]
