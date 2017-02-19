@@ -50,13 +50,13 @@ writeIndented indent w =
 
         Breaked items ->
             --TODO INDENT
-            String.join "\n" (List.map (writeIndented indent) items)
+            String.join ("\n" ++ asIndent indent) (List.map (writeIndented indent) items)
 
         Str s ->
             s
 
         Indent n next ->
-            writeIndented (n + indent) next
+            asIndent (n + indent) ++ writeIndented (n + indent) next
 
         Spaced items ->
             String.join " " (List.map (writeIndented indent) items)

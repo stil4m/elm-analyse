@@ -26,4 +26,8 @@ all =
                         ]
                     )
                     |> Expect.equal "(x\n, y)"
+        , test "indented breaked" <|
+            \() ->
+                Writer.write (indent 2 (breaked [ string "a", string "b" ]))
+                    |> Expect.equal "  a\n  b"
         ]
