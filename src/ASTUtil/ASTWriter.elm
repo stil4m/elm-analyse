@@ -6,6 +6,11 @@ import ASTUtil.Writer exposing (..)
 import ASTUtil.Expose
 
 
+write : Writer -> String
+write =
+    ASTUtil.Writer.write
+
+
 writeFile : File -> Writer
 writeFile file =
     breaked

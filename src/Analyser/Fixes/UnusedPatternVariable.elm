@@ -6,6 +6,7 @@ import AST.Types exposing (File, Pattern, Function, Case)
 import Analyser.Messages.Types exposing (MessageData(UnusedPatternVariable))
 import ASTUtil.PatternOptimizer as PatternOptimizer
 import ASTUtil.Patterns as Patterns
+import ASTUtil.ASTWriter as ASTWriter
 import Analyser.Fixes.Base exposing (Fixer)
 
 
@@ -47,7 +48,9 @@ fixPattern ( fileName, content, ast ) range =
                 [ ( fileName
                   , FileContent.replaceRangeWith
                         (PatternOptimizer.patternRange parentPattern)
-                        (Patterns.patternAsString (PatternOptimizer.optimize range parentPattern))
+                        (ASTWriter.writePattern (PatternOptimizer.optimize range parentPattern)
+                            |> ASTWriter.write
+                        )
                         content
                   )
                 ]
