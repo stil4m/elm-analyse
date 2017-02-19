@@ -29,7 +29,10 @@ onExpression ( _, expression ) context =
         Application xs ->
             case xs of
                 [ ( r, PrefixOperator x ), _, _ ] ->
-                    ( x, r ) :: context
+                    if String.startsWith ",," x then
+                        context
+                    else
+                        ( x, r ) :: context
 
                 _ ->
                     context
