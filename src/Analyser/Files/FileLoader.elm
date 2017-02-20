@@ -10,6 +10,7 @@ import Json.Encode
 import Json.Decode
 import Parser.Parser as Parser
 import Result
+import Maybe.Extra as Maybe
 
 
 port loadFile : String -> Cmd msg
@@ -79,7 +80,8 @@ onInputLoadingInterface fileContent =
         |> Maybe.andThen (Json.Decode.decodeString AST.Decoding.decode >> Result.toMaybe)
         |> Maybe.map loadedInterfaceForFile
         |> Maybe.map (flip (,) False)
-        |> Maybe.withDefault ( loadedFileFromContent fileContent, True )
+        |> Maybe.orElseLazy (\() -> Just ( loadedFileFromContent fileContent, True ))
+        |> Maybe.withDefault ( Failed, False )
 
 
 loadedFileFromContent : FileContent -> FileLoad

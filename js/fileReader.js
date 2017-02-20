@@ -7,6 +7,7 @@ const cache = require('./util/cache');
 const sums = require('sums');
 
 module.exports = function(config) {
+
     function isFormatted(path) {
         try {
             cp.execSync(config.elmFormatPath + ' --validate ' + path, {

@@ -5,19 +5,30 @@ const cp = require('child_process');
 const cache = require('./cache');
 
 module.exports = function(app, config, directory) {
+
     const fileReader = require('../fileReader')(config);
-    app.ports.storeAstForSha.subscribe(function(x) {
+
+    function checkedSubscribe(key, f) {
+        if (app.ports[k]) {
+            app.ports[k].subscribe(f);
+        } else {
+            console.log('Port ', k, ' is not defined');
+        }
+    }
+
+    checkedSubscribe('storeAstForSha', function(x) {
         const sha1 = x[0];
         const content = x[1];
         cache.storeShaJson(sha1, content);
-    })
-    app.ports.loadFile.subscribe(function(x) {
+    });
+
+    checkedSubscribe('loadFile', function(x) {
         fileReader(directory, x, function(result) {
             app.ports.fileContent.send(result);
         });
     });
 
-    app.ports.loadRawDependency.subscribe(function(x) {
+    checkedSubscribe('loadRawDependency', function(x) {
         var dependency = x[0];
         var version = x[1];
         cache.readDependencyJson(dependency, version, function(err, content) {
@@ -30,11 +41,12 @@ module.exports = function(app, config, directory) {
         });
     });
 
-    app.ports.storeRawDependency.subscribe(function(x) {
+
+    checkedSubscribe('storeRawDependency', function(x) {
         cache.storeDependencyJson(x[0], x[1], x[2]);
     });
 
-    app.ports.loadDependencyFiles.subscribe(function(dep) {
+    checkedSubscribe('loadDependencyFiles', function(dep) {
         var depName = dep[0];
         var version = dep[1];
         var result = fileGatherer.getDependencyFiles(directory, depName, version);
@@ -54,7 +66,7 @@ module.exports = function(app, config, directory) {
         reduceTargets();
     });
 
-    app.ports.loadFileContentWithShas.subscribe(function(files) {
+    checkedSubscribe('loadFileContentWithShas', function(files) {
         console.log("Files", files);
         const promises = files.map(fileName => new Promise(function(accept) {
             fileReader(directory, fileName, accept);
@@ -67,7 +79,7 @@ module.exports = function(app, config, directory) {
         });
     });
 
-    app.ports.storeFiles.subscribe(function(files) {
+    checkedSubscribe('storeFiles', function(files) {
         var promises = files.map(file => {
             return new Promise(function(accept) {
                 fs.writeFile(file[0], file[1], function(err) {
@@ -86,7 +98,7 @@ module.exports = function(app, config, directory) {
             });
         });
         Promise.all(promises).then(function() {
-          app.ports.onStoredFiles.send(true);
+            app.ports.onStoredFiles.send(true);
         });
     });
 
