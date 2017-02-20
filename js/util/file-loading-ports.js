@@ -9,10 +9,10 @@ module.exports = function(app, config, directory) {
     const fileReader = require('../fileReader')(config);
 
     function checkedSubscribe(key, f) {
-        if (app.ports[k]) {
-            app.ports[k].subscribe(f);
+        if (app.ports[key]) {
+            app.ports[key].subscribe(f);
         } else {
-            console.log('Port ', k, ' is not defined');
+            console.log('Port ', key, ' is not defined');
         }
     }
 
