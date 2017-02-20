@@ -245,7 +245,6 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ AnalyserPorts.onReset (always Reset)
-        , ContextLoader.onLoadedContext OnContext
         , AnalyserPorts.onFixMessage OnFixMessage
         , case model.stage of
             ContextLoadingStage ->

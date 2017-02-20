@@ -58,6 +58,11 @@ init ( name, version ) =
     )
 
 
+getDependency : Model -> ( String, Version )
+getDependency m =
+    ( m.name, m.version )
+
+
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
