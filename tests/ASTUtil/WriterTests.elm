@@ -1,6 +1,7 @@
 module ASTUtil.WriterTests exposing (all)
 
 import ASTUtil.Writer as Writer exposing (..)
+import ASTUtil.ASTWriter as ASTWriter exposing (..)
 import Test exposing (Test, test, describe)
 import Expect
 
@@ -30,4 +31,12 @@ all =
             \() ->
                 Writer.write (indent 2 (breaked [ string "a", string "b" ]))
                     |> Expect.equal "  a\n  b"
+        , test "qualified name without module" <|
+            \() ->
+                Writer.write (ASTWriter.writeQualifiedNameRef { moduleName = [], name = "Foo" })
+                    |> Expect.equal "Foo"
+        , test "qualified name with module" <|
+            \() ->
+                Writer.write (ASTWriter.writeQualifiedNameRef { moduleName = [ "Bar", "Baz" ], name = "Foo" })
+                    |> Expect.equal "Bar.Baz.Foo"
         ]

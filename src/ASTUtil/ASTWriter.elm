@@ -535,8 +535,13 @@ writePattern p =
 
 writeQualifiedNameRef : QualifiedNameRef -> Writer
 writeQualifiedNameRef { moduleName, name } =
-    join
-        [ writeModuleName moduleName
-        , string "."
-        , string name
-        ]
+    case moduleName of
+        [] ->
+            string name
+
+        _ ->
+            join
+                [ writeModuleName moduleName
+                , string "."
+                , string name
+                ]
