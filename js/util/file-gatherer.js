@@ -6,26 +6,31 @@ const find = require('find');
 function targetFilesForPathAndPackage(directory, path, pack) {
     const packTargetDirs = pack['source-directories'];
     const targetFiles = _.uniq(_.flatten(packTargetDirs.map(x => {
+        const exists = fs.existsSync(path + '/' + x);
+        if (!exists) {
+            return []
+        }
+
         return find.fileSync(/\.elm$/, path + '/' + x)
             .filter(x => {
                 return x.replace(path, '')
                     .indexOf('elm-stuff') === -1 && (x.length > 0)
             });
     }))).map(function(s) {
-      const sParts = s.split('/');
-      const dirParts = directory.split('/');
+        const sParts = s.split('/');
+        const dirParts = directory.split('/');
 
-      while (sParts.length > 0 && dirParts.length > 0) {
-        if (sParts[0] == dirParts[0]) {
-          sParts.shift();
-          dirParts.shift();
-        } else {
-          break;
+        while (sParts.length > 0 && dirParts.length > 0) {
+            if (sParts[0] == dirParts[0]) {
+                sParts.shift();
+                dirParts.shift();
+            } else {
+                break;
+            }
         }
-      }
 
-      const result = dirParts.map(_ => "../").join() + sParts.join('/') ;
-      return result;
+        const result = dirParts.map(_ => "../").join() + sParts.join('/');
+        return result;
     });
     return targetFiles;
 }
