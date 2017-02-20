@@ -3,19 +3,14 @@ module Analyser exposing (main)
 import Analyser.InterfaceLoadingStage as InterfaceLoadingStage
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import AnalyserPorts
-import Platform exposing (programWithFlags)
+import Platform exposing (program)
 import Inspection
 import Analyser.Files.Types exposing (Dependency, Version)
 import Analyser.State as State exposing (State)
 import Analyser.Fixer as Fixer
 import Tuple2
 import Analyser.Messages.Util as Messages
-
-
-type alias Flags =
-    { interfaceFiles : List ( String, Version )
-    , sourceFiles : InputFiles
-    }
+import Analyser.ContextLoader as ContextLoader exposing (Context)
 
 
 type alias InputFiles =
@@ -23,7 +18,8 @@ type alias InputFiles =
 
 
 type Msg
-    = InterfaceLoadingStageMsg InterfaceLoadingStage.Msg
+    = OnContext Context
+    | InterfaceLoadingStageMsg InterfaceLoadingStage.Msg
     | SourceLoadingStageMsg SourceLoadingStage.Msg
     | Reset
     | OnFixMessage Int
@@ -32,28 +28,29 @@ type Msg
 
 type alias Model =
     { dependencies : List Dependency
-    , flags : Flags
+    , context : Context
     , stage : Stage
     , state : State
     }
 
 
 type Stage
-    = InterfaceLoadingStage InterfaceLoadingStage.Model
+    = ContextLoadingStage
+    | InterfaceLoadingStage InterfaceLoadingStage.Model
     | SourceLoadingStage SourceLoadingStage.Model
     | FixerStage Fixer.Model
     | Finished
 
 
-main : Program Flags Model Msg
+main : Program Never Model Msg
 main =
-    programWithFlags { init = init, update = update, subscriptions = subscriptions }
+    program { init = init, update = update, subscriptions = subscriptions }
 
 
-init : Flags -> ( Model, Cmd Msg )
-init flags =
+init : ( Model, Cmd Msg )
+init =
     reset
-        { flags = flags
+        { context = ContextLoader.emptyContext
         , stage = Finished
         , dependencies = []
         , state = State.initialState
@@ -61,19 +58,11 @@ init flags =
 
 
 reset : Model -> ( Model, Cmd Msg )
-reset ({ flags } as model) =
-    let
-        ( stage, cmds ) =
-            InterfaceLoadingStage.init flags.interfaceFiles
-    in
-        ( { model
-            | stage = InterfaceLoadingStage stage
-            , state = State.initialState
-            , dependencies = []
-          }
-        , Cmd.map InterfaceLoadingStageMsg cmds
-        )
-            |> doSendState
+reset model =
+    ( { model | stage = ContextLoadingStage, state = State.initialState, dependencies = [] }
+    , ContextLoader.loadContext ()
+    )
+        |> doSendState
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -87,6 +76,19 @@ update msg model =
 
         Reset ->
             reset model
+
+        OnContext context ->
+            let
+                ( stage, cmds ) =
+                    InterfaceLoadingStage.init context.interfaceFiles
+            in
+                ( { model
+                    | context = context
+                    , stage = InterfaceLoadingStage stage
+                  }
+                , Cmd.map InterfaceLoadingStageMsg cmds
+                )
+                    |> doSendState
 
         InterfaceLoadingStageMsg x ->
             case model.stage of
@@ -198,7 +200,7 @@ onInterfaceLoadingStageMsg x stage model =
             ( { model | dependencies = InterfaceLoadingStage.getDependencies newStage }
             , Cmd.map InterfaceLoadingStageMsg cmds
             )
-                |> startSourceLoading model.flags.sourceFiles
+                |> startSourceLoading model.context.sourceFiles
         else
             ( { model | stage = InterfaceLoadingStage newStage }
             , Cmd.map InterfaceLoadingStageMsg cmds
@@ -243,8 +245,12 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ AnalyserPorts.onReset (always Reset)
+        , ContextLoader.onLoadedContext OnContext
         , AnalyserPorts.onFixMessage OnFixMessage
         , case model.stage of
+            ContextLoadingStage ->
+                ContextLoader.onLoadedContext OnContext
+
             InterfaceLoadingStage stage ->
                 InterfaceLoadingStage.subscriptions stage |> Sub.map InterfaceLoadingStageMsg
 

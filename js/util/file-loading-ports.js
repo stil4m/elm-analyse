@@ -16,6 +16,11 @@ module.exports = function(app, config, directory) {
         }
     }
 
+    checkedSubscribe('loadContext', function(x) {
+        const input = fileGatherer.gather(directory);
+        app.ports.onLoadedContext.send(input);
+    });
+
     checkedSubscribe('storeAstForSha', function(x) {
         const sha1 = x[0];
         const content = x[1];
