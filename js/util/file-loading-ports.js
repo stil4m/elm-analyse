@@ -57,22 +57,18 @@ module.exports = function(app, config, directory) {
         var result = fileGatherer.getDependencyFiles(directory, depName, version);
         var targets = [];
 
-        //TODO Something with promises
-        function reduceTargets() {
-            if (targets.length == result.length) {
-                app.ports.onDependencyFiles.send([depName, version, targets]);
-                return;
-            }
-            fileReader(directory, result[targets.length], function(y) {
-                targets.push(y);
-                reduceTargets();
-            });
-        }
-        reduceTargets();
+        const promises = result.map(fileName => new Promise(function(accept) {
+            fileReader(directory, fileName, accept)
+        }));
+        Promise.all(promises).then(function(targets) {
+            app.ports.onDependencyFiles.send([depName, version, targets]);
+        }, function(e) {
+            console.log("Error when loading files for loadDependencyFiles:", dep);
+            console.log(e);
+        });
     });
 
     checkedSubscribe('loadFileContentWithShas', function(files) {
-        console.log("Files", files);
         const promises = files.map(fileName => new Promise(function(accept) {
             fileReader(directory, fileName, accept);
         }))

@@ -1,12 +1,10 @@
-module Parser.Declarations exposing (file, signature, declaration, function, functionDeclaration, expression, letBlock, letBody, caseBlock, caseStatement, caseStatements)
+module Parser.Declarations exposing (signature, declaration, function, functionDeclaration, expression, letBlock, letBody, caseBlock, caseStatement, caseStatements)
 
 import Combine exposing (maybe, (*>), (>>=), (<*), (<$), (<$>), sepBy, many, succeed, Parser, string, choice, lookAhead, or, withLocation, parens, modifyState, count, between, fail, (<*>), lazy, many1, sepBy1, withState)
 import Combine.Char exposing (anyChar)
 import Combine.Num
 import List.Extra as List
-import Parser.Imports exposing (importDefinition)
 import Parser.Infix as Infix
-import Parser.Modules exposing (moduleDefinition)
 import Parser.Patterns exposing (pattern, declarablePattern)
 import Parser.Tokens exposing (portToken, prefixOperatorToken, multiLineStringLiteral, caseToken, characterLiteral, ofToken, stringLiteral, typeName, thenToken, infixOperatorToken, functionName, ifToken, elseToken)
 import Parser.TypeReference exposing (typeReference)
@@ -16,25 +14,6 @@ import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, tr
 import Parser.Whitespace exposing (manySpaces)
 import Parser.State as State exposing (State, pushIndent, popIndent)
 import Parser.Ranges exposing (withRange)
-
-
-file : Parser State File
-file =
-    (maybe exactIndentWhitespace *> moduleDefinition)
-        >>= \modDef ->
-                let
-                    importParser =
-                        case modDef of
-                            NoModule ->
-                                maybe exactIndentWhitespace *> sepBy exactIndentWhitespace importDefinition
-
-                            _ ->
-                                (many (exactIndentWhitespace *> importDefinition))
-                in
-                    succeed (File modDef)
-                        <*> importParser
-                        <*> (many (exactIndentWhitespace *> declaration) <* maybe exactIndentWhitespace <* manySpaces)
-                        <*> withState (State.getComments >> succeed)
 
 
 declaration : Parser State Declaration

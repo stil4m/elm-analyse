@@ -7,7 +7,9 @@ import Json.Decode
 import Json.Encode
 import Parser.CombineTestUtil exposing (..)
 import Parser.Declarations as Parser exposing (..)
+import Parser.File as Parser exposing (file)
 import Parser.Samples as Samples
+import Parser.Parser as Parser
 import Test exposing (..)
 import Parser.State exposing (emptyState)
 

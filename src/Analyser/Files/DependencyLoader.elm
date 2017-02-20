@@ -9,6 +9,7 @@ import Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
 import Json.Decode
 import Parser.Parser as Parser
 import Result
+import Maybe.Extra as Maybe
 import Dict
 
 
@@ -147,7 +148,8 @@ onInputLoadingInterface fileContent =
     fileContent.ast
         |> Maybe.andThen (Json.Decode.decodeString AST.Decoding.decode >> Result.toMaybe)
         |> Maybe.map loadedInterfaceForFile
-        |> Maybe.withDefault (loadedFileFromContent fileContent)
+        |> Maybe.orElseLazy (\() -> Just (loadedFileFromContent fileContent))
+        |> Maybe.withDefault (Failed)
 
 
 loadedFileFromContent : FileContent -> FileLoad

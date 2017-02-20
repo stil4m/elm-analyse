@@ -3,6 +3,7 @@ module Parser.DeclarationsTests exposing (..)
 import Parser.CombineTestUtil exposing (..)
 import Expect
 import Parser.Declarations as Parser exposing (..)
+import Parser.File as Parser exposing (file)
 import AST.Types as Types exposing (..)
 import AST.Ranges exposing (emptyRange)
 import Test exposing (..)
