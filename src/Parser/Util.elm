@@ -1,7 +1,7 @@
 module Parser.Util exposing (asPointer, unstrictIndentWhitespace, exactIndentWhitespace, moreThanIndentWhitespace, trimmed, commentSequence, multiLineCommentWithTrailingSpaces)
 
 import AST.Types exposing (VariablePointer)
-import Combine exposing ((*>), (<$>), (<*), mapError, (<*>), (>>=), choice, map, regex, ParseLocation, Parser, lookAhead, many, many1, maybe, or, sequence, succeed, withState)
+import Combine exposing ((*>), (<$>), (<*), mapError, (<*>), (>>=), choice, fail, map, regex, ParseLocation, Parser, lookAhead, many, many1, maybe, or, sequence, succeed, withState)
 import Parser.Comments exposing (multilineComment, singleLineComment)
 import Parser.Ranges exposing (withRange)
 import Parser.State exposing (State, currentIndent)
@@ -31,10 +31,7 @@ exactIndentWhitespace =
     withState
         (\state ->
             choice
-                [ (regex ("( *\\n)+ {" ++ toString (currentIndent state) ++ "}"))
-                    <* (lookAhead (regex "[a-zA-Z0-9\\(\\+/*\\|\\>]"))
-                  -- |> map (Debug.log "S?")
-                  -- |> (mapError <| Debug.log ("E?"))
+                [ ((regex ("( *\\n)+ {" ++ toString (currentIndent state) ++ "}")) <* (lookAhead (regex "[a-zA-Z0-9\\(\\+/*\\|\\>]")))
                 , (List.concat >> String.concat)
                     <$> many1
                             (sequence
@@ -87,21 +84,20 @@ moreThanIndentWhitespace =
             choice
                 [ (regex ("(( *\\n)+ {" ++ toString (currentIndent state) ++ "} +| +)"))
                     <* (lookAhead (regex "[a-zA-Z0-9\\(\\+/*\\|\\>]"))
-                , or
-                    (String.concat
-                        <$> many1
-                                (String.concat
-                                    <$> sequence
-                                            [ manySpaces
-                                            , commentSequence
-                                            , newLineWithIndentPlus state
-                                            ]
-                                )
-                    )
-                    (succeed (++)
-                        <*> many1Spaces
-                        <*> (Maybe.withDefault "" <$> maybe someComment)
-                    )
+                , (String.concat
+                    <$> many1
+                            (String.concat
+                                <$> sequence
+                                        [ manySpaces
+                                        , commentSequence
+                                        , newLineWithIndentPlus state
+                                        ]
+                            )
+                  )
+                , (succeed (++)
+                    <*> many1Spaces
+                    <*> (Maybe.withDefault "" <$> maybe someComment)
+                  )
                 ]
         )
 
