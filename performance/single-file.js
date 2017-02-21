@@ -4,7 +4,7 @@ const path = process.argv[2];
 const content = fs.readFileSync(path).toString();
 const Elm = require('./generated/SingleFileRead');
 const app = Elm.SingleFileRead.worker();
-const counter = 100;
+const counter = 200;
 
 var results = [];
 var before;
@@ -19,7 +19,10 @@ app.ports.parsed.subscribe(function(_) {
   console.log("Tick");
   results.push(after-before);
   if (results.length >= counter) {
-    const average = results.reduce((x, y) => x + y, 0) / counter;
+    var step =  (counter/10);
+    const part = results.slice (step, step * 9);
+    const average = part.reduce((x, y) => x + y, 0) / part.length;
+    results.sort((b,a) => b - a);
     console.log(results);
     console.log(average);
     return;
