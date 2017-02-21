@@ -38,7 +38,6 @@ function targetFilesForPathAndPackage(directory, path, pack) {
 function dependencyFiles(directory, dep, version) {
     const depPath = directory + "/elm-stuff/packages/" + dep + "/" + version;
     const depPackageFile = require(depPath + '/elm-package.json');
-
     const unfilteredTargetFiles = targetFilesForPathAndPackage(directory, depPath, depPackageFile);
 
     const exposedModules = depPackageFile['exposed-modules'].map(x => '/' + x.replace('.', '/') + '.elm');
@@ -53,8 +52,14 @@ function gather(directory) {
     const targetDirs = packageFile['source-directories'];
     const dependencies = Object.keys(packageFile['dependencies']);
 
-    //TODO Missing Exact Dep
-    var interfaceFiles = dependencies.map(x => [x, exactDeps[x]]);
+    var interfaceFiles = dependencies
+        .filter(x => exactDeps[x])
+        .map(x => [x, exactDeps[x]]);
+
+    dependencies.filter(x => !exactDeps[x]).forEach(x => {
+        console.log('Missing dependency `' + x + '`. Maybe run elm-package to update the dependencies.');
+    });
+
     const input = {
         interfaceFiles: interfaceFiles,
         sourceFiles: targetFilesForPathAndPackage(directory, directory, packageFile)
