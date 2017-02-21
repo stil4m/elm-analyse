@@ -11,6 +11,26 @@ import Parser.State as State exposing (State, pushIndent, popIndent)
 import AST.Ranges exposing (Range)
 
 
+-- file : Parser State File
+-- file =
+--     (maybe exactIndentWhitespace *> moduleDefinition)
+--         >>= \modDef ->
+--                 let
+--                     importParser =
+--                         case modDef of
+--                             NoModule ->
+--                                 maybe exactIndentWhitespace *> sepBy exactIndentWhitespace importDefinition
+--
+--                             _ ->
+--                                 (many (exactIndentWhitespace *> importDefinition))
+--                 in
+--                     succeed (File modDef)
+--                         <*> importParser
+--                         <*> (many (exactIndentWhitespace *> declaration) <* maybe exactIndentWhitespace <* manySpaces)
+--                         <*> withState (State.getComments >> succeed)
+--
+
+
 file : Parser State File
 file =
     succeed File

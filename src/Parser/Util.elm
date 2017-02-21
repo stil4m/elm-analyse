@@ -1,11 +1,11 @@
 module Parser.Util exposing (asPointer, unstrictIndentWhitespace, exactIndentWhitespace, moreThanIndentWhitespace, trimmed, commentSequence, multiLineCommentWithTrailingSpaces)
 
-import Combine exposing (Parser, ParseLocation, succeed, many1, many, sequence, maybe, withState, or, (>>=), (<$>), (<*>), (<*), (*>))
-import Parser.Comments exposing (multilineComment, singleLineComment)
 import AST.Types exposing (VariablePointer)
-import Parser.Whitespace exposing (many1Spaces, manySpaces, nSpaces, realNewLine)
-import Parser.State exposing (State, currentIndent)
+import Combine exposing ((*>), (<$>), (<*), mapError, (<*>), (>>=), choice, map, regex, ParseLocation, Parser, lookAhead, many, many1, maybe, or, sequence, succeed, withState)
+import Parser.Comments exposing (multilineComment, singleLineComment)
 import Parser.Ranges exposing (withRange)
+import Parser.State exposing (State, currentIndent)
+import Parser.Whitespace exposing (many1Spaces, manySpaces, nSpaces, realNewLine)
 
 
 asPointer : Parser State String -> Parser State VariablePointer
@@ -15,6 +15,7 @@ asPointer p =
 
 unstrictIndentWhitespace : Parser State String
 unstrictIndentWhitespace =
+    -- or ((regex "(\\n\\t )+" |> map (Debug.log "T") |> mapError (Debug.log "E")) <* (lookAhead (regex "[a-zA-Z0-9]")) |> map (Debug.log "S"))
     (List.concat >> String.concat)
         <$> many1
                 (sequence
@@ -29,14 +30,20 @@ exactIndentWhitespace : Parser State String
 exactIndentWhitespace =
     withState
         (\state ->
-            (List.concat >> String.concat)
-                <$> many1
-                        (sequence
-                            [ manySpaces
-                            , Maybe.withDefault "" <$> maybe someComment
-                            , newLineWithIndentExact state
-                            ]
-                        )
+            choice
+                [ (regex ("( *\\n)+ {" ++ toString (currentIndent state) ++ "}"))
+                    <* (lookAhead (regex "[a-zA-Z0-9\\(\\+/*\\|\\>]"))
+                  -- |> map (Debug.log "S?")
+                  -- |> (mapError <| Debug.log ("E?"))
+                , (List.concat >> String.concat)
+                    <$> many1
+                            (sequence
+                                [ manySpaces
+                                , Maybe.withDefault "" <$> maybe someComment
+                                , newLineWithIndentExact state
+                                ]
+                            )
+                ]
         )
 
 
@@ -77,21 +84,25 @@ moreThanIndentWhitespace : Parser State String
 moreThanIndentWhitespace =
     withState
         (\state ->
-            or
-                (String.concat
-                    <$> many1
-                            (String.concat
-                                <$> sequence
-                                        [ manySpaces
-                                        , commentSequence
-                                        , newLineWithIndentPlus state
-                                        ]
-                            )
-                )
-                (succeed (++)
-                    <*> many1Spaces
-                    <*> (Maybe.withDefault "" <$> maybe someComment)
-                )
+            choice
+                [ (regex ("(( *\\n)+ {" ++ toString (currentIndent state) ++ "} +| +)"))
+                    <* (lookAhead (regex "[a-zA-Z0-9\\(\\+/*\\|\\>]"))
+                , or
+                    (String.concat
+                        <$> many1
+                                (String.concat
+                                    <$> sequence
+                                            [ manySpaces
+                                            , commentSequence
+                                            , newLineWithIndentPlus state
+                                            ]
+                                )
+                    )
+                    (succeed (++)
+                        <*> many1Spaces
+                        <*> (Maybe.withDefault "" <$> maybe someComment)
+                    )
+                ]
         )
 
 
