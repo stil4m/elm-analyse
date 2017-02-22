@@ -216,6 +216,17 @@ getMessageInfo m =
             , True
             )
 
+        FileLoadFailed fileName ->
+            ( String.concat
+                [ "Could not load file \""
+                , fileName
+                , "\""
+                ]
+            , always [ fileName ]
+            , []
+            , True
+            )
+
         DuplicateImport fileName moduleName ranges ->
             ( String.concat
                 [ "Duplicate import for module `"

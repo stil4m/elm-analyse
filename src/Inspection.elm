@@ -1,7 +1,7 @@
 module Inspection exposing (run)
 
 import Analyser.FileContext as FileContext
-import Analyser.Messages.Types exposing (Message, MessageData(UnformattedFile), newMessage)
+import Analyser.Messages.Types exposing (Message, MessageData(FileLoadFailed, UnformattedFile), newMessage)
 import Analyser.Files.Types exposing (Dependency, LoadedSourceFiles)
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.NotExposeAll as NotExposeAll
@@ -16,6 +16,7 @@ import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
 import Analyser.Checks.UnusedImports as UnusedImports
 import Analyser.Checks.ListOperators as ListOperators
+import Analyser.Util
 
 
 run : LoadedSourceFiles -> List Dependency -> List Message
@@ -37,8 +38,25 @@ run sources deps =
             , ListOperators.scan
             ]
 
+        ( validSources, invalidSources ) =
+            List.partition (Tuple.second >> Analyser.Util.isLoaded)
+                sources
+
+        failedMessages =
+            invalidSources
+                |> List.map Tuple.first
+                |> List.map
+                    (\source ->
+                        newMessage
+                            [ ( Maybe.withDefault "" source.sha1
+                              , source.path
+                              )
+                            ]
+                            (FileLoadFailed source.path)
+                    )
+
         fileMessages =
-            sources
+            validSources
                 |> List.map Tuple.first
                 |> List.filter (not << .formatted)
                 |> List.map
@@ -57,6 +75,6 @@ run sources deps =
                 |> List.concatMap (\x -> List.concatMap ((|>) x) checks)
 
         messages =
-            List.concat [ inspectionMessages, fileMessages ]
+            List.concat [ failedMessages, fileMessages, inspectionMessages ]
     in
         messages

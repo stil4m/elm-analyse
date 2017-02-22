@@ -11,6 +11,7 @@ import Parser.Parser as Parser
 import Result
 import Maybe.Extra as Maybe
 import Dict
+import Analyser.Util
 
 
 port loadRawDependency : ( String, Version ) -> Cmd msg
@@ -102,7 +103,7 @@ update msg model =
                     interfaces =
                         loadedFiles
                             |> List.filterMap
-                                (withLoaded
+                                (Analyser.Util.withLoaded
                                     >> Maybe.andThen
                                         (\z ->
                                             Util.fileModuleName z.ast
@@ -114,7 +115,7 @@ update msg model =
                     dependency =
                         Dependency model.name model.version interfaces
                 in
-                    if not <| List.all isLoaded loadedFiles then
+                    if not <| List.all Analyser.Util.isLoaded loadedFiles then
                         ( { model | result = Just (Err "Could not load all dependency files") }
                         , Cmd.none
                         )
@@ -126,21 +127,6 @@ update msg model =
                             , serialiseDependency dependency
                             )
                         )
-
-
-isLoaded : FileLoad -> Bool
-isLoaded =
-    not << (==) Nothing << withLoaded
-
-
-withLoaded : FileLoad -> Maybe LoadedFileData
-withLoaded x =
-    case x of
-        Loaded y ->
-            Just y
-
-        _ ->
-            Nothing
 
 
 loadedInterfaceForFile : AST.Types.File -> FileLoad

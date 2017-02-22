@@ -101,6 +101,7 @@ decodeMessageData =
         , ( "DebugLog", decodeFileAndRange DebugLog )
         , ( "DebugCrash", decodeFileAndRange DebugCrash )
         , ( "UnformattedFile", JD.map UnformattedFile fileField )
+        , ( "FileLoadFailed", JD.map FileLoadFailed fileField )
         , ( "DuplicateImport"
           , JD.succeed DuplicateImport
                 |: fileField
@@ -250,6 +251,12 @@ encodeMessageData m =
 
         UnformattedFile file ->
             encodeTyped "UnformattedFile" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    ]
+
+        FileLoadFailed file ->
+            encodeTyped "FileLoadFailed" <|
                 JE.object
                     [ ( "file", JE.string file )
                     ]

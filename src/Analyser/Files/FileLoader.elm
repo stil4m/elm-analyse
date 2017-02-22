@@ -11,6 +11,7 @@ import Json.Decode
 import Parser.Parser as Parser
 import Result
 import Maybe.Extra as Maybe
+import Analyser.Util
 
 
 port loadFile : String -> Cmd msg
@@ -40,16 +41,6 @@ subscriptions =
     fileContent OnFileContent
 
 
-isLoaded : FileLoad -> Maybe LoadedFileData
-isLoaded x =
-    case x of
-        Loaded y ->
-            Just y
-
-        _ ->
-            Nothing
-
-
 update : Msg -> ( LoadedFile, Cmd a )
 update msg =
     case msg of
@@ -60,7 +51,7 @@ update msg =
 
                 cmd =
                     if store then
-                        ( fileContent.sha1, isLoaded fileLoad )
+                        ( fileContent.sha1, Analyser.Util.withLoaded fileLoad )
                             |> uncurry (Maybe.map2 (\a b -> storeAstForSha ( a, Json.Encode.encode 0 (AST.Encoding.encode b.ast) )))
                             |> Maybe.withDefault Cmd.none
                     else
