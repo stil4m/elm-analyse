@@ -17,6 +17,7 @@ import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
 import Analyser.Checks.UnusedImports as UnusedImports
 import Analyser.Checks.ListOperators as ListOperators
 import Analyser.Checks.LineLength as LineLength
+import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
 import Analyser.Util
 
 
@@ -38,6 +39,7 @@ run sources deps =
             , UnusedImports.scan
             , ListOperators.scan
             , LineLength.scan
+            , UnnecessaryListConcat.scan
             ]
 
         ( validSources, invalidSources ) =

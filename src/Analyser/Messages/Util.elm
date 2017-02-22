@@ -345,7 +345,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , always [ fileName ]
+            , always (List.concat [ [ fileName ], [] ])
             , [ range ]
             , True
             )
@@ -361,4 +361,16 @@ getMessageInfo m =
             , always [ fileName ]
             , ranges
             , False
+            )
+
+        Analyser.Messages.Types.UnnecessaryListConcat fileName range ->
+            ( String.concat
+                [ "Better merge the arguments of `List.concat` to a single list in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , always [ fileName ]
+            , [ range ]
+            , True
             )

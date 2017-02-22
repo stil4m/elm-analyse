@@ -9,11 +9,12 @@ import Parser.Patterns exposing (pattern, declarablePattern)
 import Parser.Tokens exposing (portToken, prefixOperatorToken, multiLineStringLiteral, caseToken, characterLiteral, ofToken, stringLiteral, typeName, thenToken, infixOperatorToken, functionName, ifToken, elseToken)
 import Parser.TypeReference exposing (typeReference)
 import AST.Types exposing (File, Module, Declaration(AliasDecl, FuncDecl, TypeDecl, InfixDeclaration, DestructuringDeclaration, PortDeclaration), Destructuring, Function, FunctionSignature, FunctionDeclaration, Pattern, Expression, InnerExpression(..), RecordUpdate, Lambda, Case, CaseBlock, LetBlock, Cases)
+import AST.Ranges exposing (Range)
 import Parser.Typings exposing (typeDeclaration)
 import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer)
 import Parser.Whitespace exposing (manySpaces)
 import Parser.State exposing (State, pushIndent, popIndent)
-import Parser.Ranges exposing (withRange)
+import Parser.Ranges exposing (withRange, withRangeCustomStart)
 
 
 declaration : Parser State Declaration
@@ -102,6 +103,11 @@ rangedExpression p =
     withRange <| (flip (,) <$> p)
 
 
+rangedExpressionWithStart : Range -> Parser State InnerExpression -> Parser State Expression
+rangedExpressionWithStart r p =
+    withRangeCustomStart r <| (flip (,) <$> p)
+
+
 expressionNotApplication : Parser State Expression
 expressionNotApplication =
     lazy
@@ -154,7 +160,7 @@ promoteToApplicationExpression : Expression -> Parser State Expression
 promoteToApplicationExpression expr =
     lazy
         (\() ->
-            rangedExpression <|
+            rangedExpressionWithStart (Tuple.first expr) <|
                 succeed (\rest -> Application (expr :: rest))
                     <*> lazy (\() -> many1 (maybe moreThanIndentWhitespace *> expressionNotApplication))
         )

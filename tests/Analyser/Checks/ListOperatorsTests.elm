@@ -15,7 +15,7 @@ foo : Int
 foo =
     [1] ++ [3, 4]
 """
-    , [ DropConcatOfLists "./foo.elm" { start = { row = 4, column = 6 }, end = { row = 6, column = -1 } }
+    , [ DropConcatOfLists "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 6, column = -1 } }
       ]
     )
 
@@ -42,7 +42,7 @@ foo : Int
 foo =
     [1, 2] ++ [3, 4]
 """
-    , [ DropConcatOfLists "./foo.elm" { start = { row = 4, column = 9 }, end = { row = 6, column = -1 } }
+    , [ DropConcatOfLists "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 6, column = -1 } }
       ]
     )
 
@@ -56,7 +56,7 @@ foo : Int
 foo =
     [1] ++ bar
 """
-    , [ UseConsOverConcat "./foo.elm" { start = { row = 4, column = 6 }, end = { row = 6, column = -1 } }
+    , [ UseConsOverConcat "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 6, column = -1 } }
       ]
     )
 
@@ -70,14 +70,14 @@ foo : Int
 foo =
     1 :: [2 , 3]
 """
-    , [ DropConsOfItemAndList "./foo.elm" { start = { row = 4, column = 4 }, end = { row = 6, column = -1 } }
+    , [ DropConsOfItemAndList "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 6, column = -1 } }
       ]
     )
 
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.NoDebugTests"
+    CTU.build "Analyser.Checks.ListOperators"
         ListOperators.scan
         [ couldUseCons
         , noOptimisation

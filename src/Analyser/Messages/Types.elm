@@ -59,6 +59,7 @@ type MessageData
     | UseConsOverConcat FileName Range
     | DropConcatOfLists FileName Range
     | DropConsOfItemAndList FileName Range
+    | UnnecessaryListConcat FileName Range
     | LineLengthExceeded FileName (List Range)
 
 
