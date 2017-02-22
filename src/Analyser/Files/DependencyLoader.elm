@@ -154,7 +154,7 @@ onInputLoadingInterface fileContent =
         |> Maybe.andThen (Json.Decode.decodeString AST.Decoding.decode >> Result.toMaybe)
         |> Maybe.map loadedInterfaceForFile
         |> Maybe.orElseLazy (\() -> Just (loadedFileFromContent fileContent))
-        |> Maybe.withDefault (Failed)
+        |> Maybe.withDefault Failed
 
 
 loadedFileFromContent : FileContent -> FileLoad

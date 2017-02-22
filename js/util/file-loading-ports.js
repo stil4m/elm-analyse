@@ -18,7 +18,9 @@ module.exports = function(app, config, directory) {
 
     checkedSubscribe('loadContext', function(x) {
         const input = fileGatherer.gather(directory);
-        app.ports.onLoadedContext.send(input);
+        setTimeout(function() {
+            app.ports.onLoadedContext.send(input);
+        }, 5);
     });
 
     checkedSubscribe('storeAstForSha', function(x) {

@@ -63,7 +63,7 @@ loadNextDependency (( Model m, cmds ) as input) =
 subscriptions : Model -> Sub Msg
 subscriptions (Model model) =
     model.activeLoader
-        |> Maybe.map (DependencyLoader.subscriptions >> Sub.map (DependencyLoaderMsg))
+        |> Maybe.map (DependencyLoader.subscriptions >> Sub.map DependencyLoaderMsg)
         |> Maybe.withDefault Sub.none
 
 

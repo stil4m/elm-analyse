@@ -2,12 +2,12 @@ module Client.DashBoard.DashBoard exposing (Model, Msg, subscriptions, init, upd
 
 import Analyser.State as State exposing (State)
 import Client.DashBoard.ActiveMessageDialog as ActiveMessageDialog
-import Html exposing (Html, div, text, span, h3, ul, li, a, strong)
+import Html exposing (Html, div, text, span, h3)
 import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
 import Time
 import WebSocket as WS
-import Analyser.Messages.Types exposing (Message, MessageStatus(Fixing))
+import Analyser.Messages.Types exposing (Message, MessageStatus)
 import Analyser.Messages.Util as Messages
 import Client.Messages as M
 import Tuple2

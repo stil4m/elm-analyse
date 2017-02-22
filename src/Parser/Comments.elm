@@ -11,7 +11,7 @@ import Parser.Ranges exposing (withRange)
 addCommentToState : Parser State ( String, Range ) -> Parser State ()
 addCommentToState p =
     p
-        >>= \(( value, _ ) as pair) ->
+        >>= \pair ->
                 modifyState (addComment pair) *> succeed ()
 
 
@@ -35,7 +35,7 @@ multilineCommentInner : Parser State String
 multilineCommentInner =
     lazy
         (\() ->
-            (String.concat
+            String.concat
                 <$> sequence
                         [ (string "{-")
                         , String.concat
@@ -50,7 +50,6 @@ multilineCommentInner =
                                     (string "-}")
                         , succeed "-}"
                         ]
-            )
         )
 
 

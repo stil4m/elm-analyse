@@ -56,27 +56,11 @@ nonNamedPattern : Parser State RangelessPattern
 nonNamedPattern =
     lazy
         (\() ->
-            (choice
+            choice
                 [ declarablePatternRangeless
                 , asPattern
                 , variablePattern
                 ]
-            )
-        )
-
-
-nonConsPattern : Parser State Pattern
-nonConsPattern =
-    lazy
-        (\() ->
-            withRange
-                (choice
-                    [ declarablePatternRangeless
-                    , asPattern
-                    , variablePattern
-                    , namedPattern
-                    ]
-                )
         )
 
 
@@ -84,12 +68,11 @@ nonAsPattern : Parser State RangelessPattern
 nonAsPattern =
     lazy
         (\() ->
-            (choice
+            choice
                 [ declarablePatternRangeless
                 , variablePattern
                 , namedPattern
                 ]
-            )
         )
 
 
@@ -112,52 +95,41 @@ listPattern =
         )
 
 
-unConsPattern : Parser State RangelessPattern
-unConsPattern =
-    lazy
-        (\() ->
-            succeed UnConsPattern
-                <*> nonConsPattern
-                <*> (trimmed (string "::") *> pattern)
-        )
-
-
 unConsPattern2 : Pattern -> Parser State RangelessPattern
 unConsPattern2 p =
     lazy
         (\() ->
-            (UnConsPattern p) <$> (trimmed (string "::") *> pattern)
+            UnConsPattern p <$> (trimmed (string "::") *> pattern)
         )
 
 
 charPattern : Parser State RangelessPattern
 charPattern =
-    lazy (\() -> (CharPattern <$> characterLiteral))
+    lazy (\() -> CharPattern <$> characterLiteral)
 
 
 stringPattern : Parser State RangelessPattern
 stringPattern =
-    lazy (\() -> (StringPattern <$> stringLiteral))
+    lazy (\() -> StringPattern <$> stringLiteral)
 
 
 intPattern : Parser State RangelessPattern
 intPattern =
-    lazy (\() -> (IntPattern <$> Combine.Num.int))
+    lazy (\() -> IntPattern <$> Combine.Num.int)
 
 
 floatPattern : Parser State RangelessPattern
 floatPattern =
-    lazy (\() -> (FloatPattern <$> Combine.Num.float))
+    lazy (\() -> FloatPattern <$> Combine.Num.float)
 
 
 asPattern : Parser State RangelessPattern
 asPattern =
     lazy
         (\() ->
-            (succeed AsPattern
-                <*> (maybe moreThanIndentWhitespace *> (withRange nonAsPattern))
+            succeed AsPattern
+                <*> (maybe moreThanIndentWhitespace *> withRange nonAsPattern)
                 <*> (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> asPointer functionName)
-            )
         )
 
 
@@ -165,9 +137,8 @@ asPattern2 : Pattern -> Parser State RangelessPattern
 asPattern2 p =
     lazy
         (\() ->
-            (AsPattern p
+            AsPattern p
                 <$> (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> asPointer functionName)
-            )
         )
 
 
@@ -175,7 +146,7 @@ tuplePattern : Parser State RangelessPattern
 tuplePattern =
     lazy
         (\() ->
-            (TuplePattern <$> parens (sepBy1 (string ",") (trimmed pattern)))
+            TuplePattern <$> parens (sepBy1 (string ",") (trimmed pattern))
         )
 
 
@@ -183,18 +154,17 @@ recordPattern : Parser State RangelessPattern
 recordPattern =
     lazy
         (\() ->
-            (RecordPattern
+            RecordPattern
                 <$> between
                         (string "{" *> maybe moreThanIndentWhitespace)
                         (maybe moreThanIndentWhitespace *> string "}")
                         (sepBy1 (string ",") (trimmed (asPointer functionName)))
-            )
         )
 
 
 varPattern : Parser State RangelessPattern
 varPattern =
-    lazy (\() -> (VarPattern <$> functionName))
+    lazy (\() -> VarPattern <$> functionName)
 
 
 qualifiedNameRef : Parser State QualifiedNameRef
@@ -206,25 +176,24 @@ qualifiedNameRef =
 
 qualifiedNamePattern : Parser State RangelessPattern
 qualifiedNamePattern =
-    (QualifiedNamePattern <$> qualifiedNameRef)
+    QualifiedNamePattern <$> qualifiedNameRef
 
 
 namedPattern : Parser State RangelessPattern
 namedPattern =
     lazy
         (\() ->
-            (succeed NamedPattern
+            succeed NamedPattern
                 <*> qualifiedNameRef
-                <*> many (moreThanIndentWhitespace *> (withRange (or qualifiedNamePattern nonNamedPattern)))
-            )
+                <*> many (moreThanIndentWhitespace *> withRange (or qualifiedNamePattern nonNamedPattern))
         )
 
 
 allPattern : Parser State RangelessPattern
 allPattern =
-    lazy (\() -> (AllPattern <$ string "_"))
+    lazy (\() -> AllPattern <$ string "_")
 
 
 unitPattern : Parser State RangelessPattern
 unitPattern =
-    lazy (\() -> (UnitPattern <$ string "()"))
+    lazy (\() -> UnitPattern <$ string "()")

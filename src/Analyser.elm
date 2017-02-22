@@ -75,7 +75,7 @@ update msg model =
                 |> handleNextStep
 
         Reset ->
-            reset model
+            init
 
         OnContext context ->
             let

@@ -1,13 +1,13 @@
 module Parser.File exposing (file)
 
-import Combine exposing (maybe, (*>), (>>=), (<*), (<$), (<$>), sepBy, many, succeed, Parser, string, choice, lookAhead, or, withLocation, parens, modifyState, count, between, fail, (<*>), lazy, many1, sepBy1, withState)
+import Combine exposing (maybe, (*>), (>>=), (<*), (<$), (<$>), sepBy, succeed, Parser, (<*>), withState)
 import Parser.Imports exposing (importDefinition)
 import Parser.Modules exposing (moduleDefinition)
 import Parser.Declarations exposing (declaration)
-import AST.Types exposing (File, Module(NoModule), Declaration(AliasDecl, FuncDecl, TypeDecl, InfixDeclaration, DestructuringDeclaration, PortDeclaration), Destructuring, Function, FunctionSignature, FunctionDeclaration, Pattern, Expression, InnerExpression(..), RecordUpdate, Lambda, Case, CaseBlock, LetBlock, Cases)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer)
+import AST.Types exposing (File, Module, Declaration, Destructuring, Function, FunctionSignature, FunctionDeclaration, Pattern, Expression, InnerExpression(..), RecordUpdate, Lambda, Case, CaseBlock, LetBlock, Cases)
+import Parser.Util exposing (exactIndentWhitespace)
 import Parser.Whitespace exposing (manySpaces)
-import Parser.State as State exposing (State, pushIndent, popIndent)
+import Parser.State as State exposing (State)
 import AST.Ranges exposing (Range)
 
 
@@ -27,4 +27,4 @@ collectComments =
 
 fileDeclarations : Parser State (List Declaration)
 fileDeclarations =
-    (sepBy exactIndentWhitespace declaration <* maybe exactIndentWhitespace <* manySpaces)
+    sepBy exactIndentWhitespace declaration <* maybe exactIndentWhitespace <* manySpaces

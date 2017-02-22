@@ -1,6 +1,6 @@
 module Parser.TypeReference exposing (typeReference)
 
-import Combine exposing (choice, lazy, Parser, parens, map, sepBy, (>>=), (<*>), succeed, (*>), string, maybe, many1, (<$>), sepBy, between, many, (<*), or, whitespace)
+import Combine exposing (choice, lazy, Parser, parens, map, sepBy, (>>=), (<*>), succeed, (*>), string, maybe, (<$>), sepBy, between, many, (<*), or, whitespace)
 import Parser.Tokens exposing (functionName, typeName)
 import AST.Types exposing (TypeReference(FunctionTypeReference, Unit, Tupled, GenericType, GenericRecord, Record, Typed), RecordField, RecordDefinition, TypeArg(Generic, Concrete))
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
@@ -27,10 +27,9 @@ typeReference =
     lazy
         (\() ->
             typeReferenceNoFn
-                >>= (\typeRef ->
+                >>= \typeRef ->
                         or (FunctionTypeReference typeRef <$> (trimmed (string "->") *> typeReference))
                             (succeed typeRef)
-                    )
         )
 
 

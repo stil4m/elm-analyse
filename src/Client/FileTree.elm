@@ -1,8 +1,8 @@
 module Client.FileTree exposing (Model, Msg, init, subscriptions, update, view)
 
 import Navigation exposing (Location)
-import Html exposing (Html, text, ul, span, li, div, a)
-import Html.Attributes exposing (href, class, style)
+import Html exposing (Html, text, span, div, a)
+import Html.Attributes exposing (class, style)
 import Html.Events exposing (onClick)
 import Json.Decode as JD exposing (string, list)
 import Analyser.State as State exposing (State)
@@ -108,7 +108,7 @@ update location msg model =
 view : Model -> Html Msg
 view m =
     let
-        allowFile ( x, mess ) =
+        allowFile ( _, mess ) =
             if m.hideGoodFiles then
                 List.length mess > 0
             else
