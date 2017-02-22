@@ -18,11 +18,16 @@ module.exports = function(app, config, directory) {
 
     checkedSubscribe('loadContext', function(x) {
         const input = fileGatherer.gather(directory);
-        const configuration = fs.readFileSync('./elm-analyse.json').toString();
+        var configuration;
+        try {
+            configuration = fs.readFileSync('./elm-analyse.json').toString();
+        } catch (e) {
+            configuration = "";
+        }
         const data = {
-          sourceFiles : input.sourceFiles,
-          interfaceFiles : input.interfaceFiles,
-          configuration : configuration
+            sourceFiles: input.sourceFiles,
+            interfaceFiles: input.interfaceFiles,
+            configuration: configuration
         };
 
         setTimeout(function() {

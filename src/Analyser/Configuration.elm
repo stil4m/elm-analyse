@@ -39,16 +39,21 @@ mergeWithDefaults { checks } =
 
 fromString : String -> ( Configuration, List String )
 fromString input =
-    case JD.decodeString decodeConfiguration input of
-        Err e ->
-            ( defaultConfiguration
-            , [ "Failed to decode defined configuration due to: " ++ e ++ ". Falling back to default configuration" ]
-            )
+    if input == "" then
+        ( defaultConfiguration
+        , [ "No configuration provided. Using default configuration." ]
+        )
+    else
+        case JD.decodeString decodeConfiguration input of
+            Err e ->
+                ( defaultConfiguration
+                , [ "Failed to decode defined configuration due to: " ++ e ++ ". Falling back to default configuration" ]
+                )
 
-        Ok x ->
-            ( mergeWithDefaults x
-            , []
-            )
+            Ok x ->
+                ( mergeWithDefaults x
+                , []
+                )
 
 
 decodeConfiguration : Decoder Configuration
