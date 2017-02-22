@@ -1,4 +1,4 @@
-module Analyser.Checks.UnusedImportAliases exposing (scan)
+module Analyser.Checks.UnusedImportAliases exposing (checker)
 
 import AST.Ranges exposing (Range)
 import AST.Types exposing (Case, Pattern, Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
@@ -8,14 +8,23 @@ import Analyser.Messages.Types exposing (Message, MessageData(UnusedImportAlias)
 import Dict exposing (Dict)
 import Inspector exposing (Order(Post), defaultConfig)
 import Tuple2
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+
+
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "UnusedImportAlias" ]
+    }
 
 
 type alias Context =
     Dict ModuleName ( Range, Int )
 
 
-scan : FileContext -> List Message
-scan fileContext =
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
     let
         aliases : Context
         aliases =

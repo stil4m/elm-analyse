@@ -6,6 +6,7 @@ import Analyser.Files.Types exposing (Dependency, Version)
 type alias Context =
     { interfaceFiles : List ( String, Version )
     , sourceFiles : List String
+    , configuration : String
     }
 
 
@@ -17,4 +18,4 @@ port onLoadedContext : (Context -> msg) -> Sub msg
 
 emptyContext : Context
 emptyContext =
-    { interfaceFiles = [], sourceFiles = [] }
+    { interfaceFiles = [], sourceFiles = [], configuration = "" }

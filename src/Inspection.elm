@@ -18,29 +18,36 @@ import Analyser.Checks.UnusedImports as UnusedImports
 import Analyser.Checks.ListOperators as ListOperators
 import Analyser.Checks.LineLength as LineLength
 import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Util
+import Analyser.Configuration exposing (Configuration)
 
 
-run : LoadedSourceFiles -> List Dependency -> List Message
-run sources deps =
+checkers : List Checker
+checkers =
+    [ UnusedVariable.checker
+    , NotExposeAll.checker
+    , NoImportAll.checker
+    , NoSignature.checker
+    , UnnecessaryParens.checker
+    , NoDebug.checker
+    , DuplicateImports.checker
+    , UnusedTypeAliases.checker
+    , OverriddenVariables.checker
+    , NoUncurriedPrefix.checker
+    , UnusedImportAliases.checker
+    , UnusedImports.checker
+    , ListOperators.checker
+    , LineLength.checker
+    , UnnecessaryListConcat.checker
+    ]
+
+
+run : LoadedSourceFiles -> List Dependency -> Configuration -> List Message
+run sources deps configuration =
     let
-        checks =
-            [ UnusedVariable.scan
-            , NotExposeAll.scan
-            , NoImportAll.scan
-            , NoSignature.scan
-            , UnnecessaryParens.scan
-            , NoDebug.scan
-            , DuplicateImports.scan
-            , UnusedTypeAliases.scan
-            , OverriddenVariables.scan
-            , NoUncurriedPrefix.scan
-            , UnusedImportAliases.scan
-            , UnusedImports.scan
-            , ListOperators.scan
-            , LineLength.scan
-            , UnnecessaryListConcat.scan
-            ]
+        enabledChecks =
+            List.filter (\x -> x.shouldCheck configuration) checkers
 
         ( validSources, invalidSources ) =
             List.partition (Tuple.second >> Analyser.Util.isLoaded)
@@ -76,7 +83,7 @@ run sources deps =
         inspectionMessages =
             sources
                 |> List.filterMap (FileContext.create sources deps)
-                |> List.concatMap (\x -> List.concatMap ((|>) x) checks)
+                |> List.concatMap (\x -> List.concatMap (\c -> c.check x configuration) enabledChecks)
 
         messages =
             List.concat [ failedMessages, fileMessages, inspectionMessages ]

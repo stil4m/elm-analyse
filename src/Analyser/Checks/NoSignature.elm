@@ -1,35 +1,32 @@
-module Analyser.Checks.NoSignature exposing (scan)
+module Analyser.Checks.NoSignature exposing (checker)
 
-import AST.Types exposing (Function)
 import AST.Ranges exposing (Range)
+import AST.Types exposing (Function)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(NoTopLevelSignature), newMessage)
-import Inspector exposing (defaultConfig, Order(Inner, Skip))
+import Inspector exposing (Order(Inner, Skip), defaultConfig)
 
 
-type alias ExposeAllContext =
-    List ( String, Range )
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "NoTopLevelSignature" ]
+    }
 
 
-scan : FileContext -> List Message
-scan fileContext =
-    let
-        x : ExposeAllContext
-        x =
-            Inspector.inspect
-                { defaultConfig
-                    | onFunction = Inner onFunction
-                    , onDestructuring = Skip
-                }
-                fileContext.ast
-                []
-    in
-        x
-            |> List.map (uncurry (NoTopLevelSignature fileContext.path))
-            |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
+    Inspector.inspect
+        { defaultConfig | onFunction = Inner onFunction, onDestructuring = Skip }
+        fileContext.ast
+        []
+        |> List.map (uncurry (NoTopLevelSignature fileContext.path))
+        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
-onFunction : (ExposeAllContext -> ExposeAllContext) -> Function -> ExposeAllContext -> ExposeAllContext
+onFunction : (List ( String, Range ) -> List ( String, Range )) -> Function -> List ( String, Range ) -> List ( String, Range )
 onFunction _ function context =
     case function.signature of
         Nothing ->

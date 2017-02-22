@@ -18,8 +18,15 @@ module.exports = function(app, config, directory) {
 
     checkedSubscribe('loadContext', function(x) {
         const input = fileGatherer.gather(directory);
+        const configuration = fs.readFileSync('./elm-analyse.json').toString();
+        const data = {
+          sourceFiles : input.sourceFiles,
+          interfaceFiles : input.interfaceFiles,
+          configuration : configuration
+        };
+
         setTimeout(function() {
-            app.ports.onLoadedContext.send(input);
+            app.ports.onLoadedContext.send(data);
         }, 5);
     });
 

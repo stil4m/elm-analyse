@@ -1,10 +1,19 @@
-module Analyser.Checks.NoDebug exposing (scan)
+module Analyser.Checks.NoDebug exposing (checker)
 
 import AST.Types exposing (Expression, InnerExpression(QualifiedExpr))
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DebugLog, DebugCrash), newMessage)
 import Inspector exposing (Order(Post), defaultConfig)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+
+
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "DebugLog", "DebugCrash" ]
+    }
 
 
 type DebugType
@@ -16,8 +25,8 @@ type alias Context =
     List ( DebugType, Range )
 
 
-scan : FileContext -> List Message
-scan fileContext =
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
     Inspector.inspect
         { defaultConfig | onExpression = Post onExpression }
         fileContext.ast

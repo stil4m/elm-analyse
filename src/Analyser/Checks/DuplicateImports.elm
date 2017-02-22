@@ -1,4 +1,4 @@
-module Analyser.Checks.DuplicateImports exposing (scan)
+module Analyser.Checks.DuplicateImports exposing (checker)
 
 import AST.Types exposing (InnerExpression, ModuleName, Import)
 import AST.Ranges exposing (Range)
@@ -6,14 +6,23 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImport), newMessage)
 import Inspector exposing (Order(Post, Skip), defaultConfig)
 import Dict exposing (Dict)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+
+
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "DuplicateImport" ]
+    }
 
 
 type alias Context =
     Dict ModuleName (List Range)
 
 
-scan : FileContext -> List Message
-scan fileContext =
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
     Inspector.inspect
         { defaultConfig
             | onImport = Post onImport

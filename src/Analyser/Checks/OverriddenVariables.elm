@@ -1,4 +1,4 @@
-module Analyser.Checks.OverriddenVariables exposing (scan)
+module Analyser.Checks.OverriddenVariables exposing (checker)
 
 import AST.Types exposing (File, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName)
 import AST.Ranges exposing (Range)
@@ -7,6 +7,15 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(RedefineVariable), newMessage)
 import Dict exposing (Dict)
 import Inspector exposing (Order(Inner), defaultConfig)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+
+
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "RedefineVariable" ]
+    }
 
 
 type alias Context =
@@ -17,8 +26,8 @@ type alias Redefine =
     ( String, Range, Range )
 
 
-scan : FileContext -> List Message
-scan fileContext =
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
     let
         topLevels : Dict String Range
         topLevels =

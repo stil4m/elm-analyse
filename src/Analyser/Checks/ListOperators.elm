@@ -1,10 +1,19 @@
-module Analyser.Checks.ListOperators exposing (scan)
+module Analyser.Checks.ListOperators exposing (checker)
 
 import AST.Types exposing (File, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName, Expression, InnerExpression(OperatorApplication, ListExpr))
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UseConsOverConcat, DropConcatOfLists, DropConsOfItemAndList), newMessage)
 import Inspector exposing (Order(Post), defaultConfig)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+
+
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "DropConcatOfLists", "DropConsOfItemAndList", "UseConsOverConcat" ]
+    }
 
 
 type alias Context =
@@ -17,8 +26,8 @@ type Deficiency
     | UseCons
 
 
-scan : FileContext -> List Message
-scan fileContext =
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
     Inspector.inspect
         { defaultConfig
             | onExpression = Post onExpression

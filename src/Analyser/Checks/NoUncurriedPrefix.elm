@@ -1,18 +1,27 @@
-module Analyser.Checks.NoUncurriedPrefix exposing (scan)
+module Analyser.Checks.NoUncurriedPrefix exposing (checker)
 
 import AST.Types exposing (InnerExpression(Application, PrefixOperator), Expression)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(NoUncurriedPrefix), newMessage)
 import Inspector exposing (Order(Post), defaultConfig)
 import AST.Ranges exposing (Range)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+
+
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "NoUncurriedPrefix" ]
+    }
 
 
 type alias Context =
     List ( String, Range )
 
 
-scan : FileContext -> List Message
-scan fileContext =
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
     Inspector.inspect
         { defaultConfig
             | onExpression = Post onExpression

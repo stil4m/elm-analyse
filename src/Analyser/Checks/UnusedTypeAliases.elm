@@ -1,4 +1,4 @@
-module Analyser.Checks.UnusedTypeAliases exposing (scan)
+module Analyser.Checks.UnusedTypeAliases exposing (checker)
 
 import AST.Ranges exposing (Range)
 import AST.Types exposing (FunctionSignature, TypeAlias, TypeReference(Typed))
@@ -9,14 +9,23 @@ import Dict exposing (Dict)
 import Inspector exposing (Order(Post), defaultConfig)
 import Tuple2
 import Tuple3
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+
+
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "UnusedAlias" ]
+    }
 
 
 type alias Context =
     Dict String ( String, Range, Int )
 
 
-scan : FileContext -> List Message
-scan fileContext =
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
     let
         collectedAliased : Context
         collectedAliased =

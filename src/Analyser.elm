@@ -11,6 +11,7 @@ import Analyser.Fixer as Fixer
 import Tuple2
 import Analyser.Messages.Util as Messages
 import Analyser.ContextLoader as ContextLoader exposing (Context)
+import Analyser.Configuration as Configuration exposing (Configuration)
 
 
 type alias InputFiles =
@@ -29,6 +30,7 @@ type Msg
 type alias Model =
     { dependencies : List Dependency
     , context : Context
+    , configuration : Configuration
     , stage : Stage
     , state : State
     }
@@ -52,6 +54,7 @@ init =
     reset
         { context = ContextLoader.emptyContext
         , stage = Finished
+        , configuration = Configuration.defaultConfiguration
         , dependencies = []
         , state = State.initialState
         }
@@ -79,11 +82,16 @@ update msg model =
 
         OnContext context ->
             let
+                ( configuration, messages ) =
+                    Configuration.fromString context.configuration
+                        |> Debug.log "Conf"
+
                 ( stage, cmds ) =
                     InterfaceLoadingStage.init context.interfaceFiles
             in
                 ( { model
                     | context = context
+                    , configuration = configuration
                     , stage = InterfaceLoadingStage stage
                   }
                 , Cmd.map InterfaceLoadingStageMsg cmds
@@ -216,7 +224,7 @@ onSourceLoadingStageMsg x stage model =
         if SourceLoadingStage.isDone newStage then
             let
                 messages =
-                    Inspection.run (SourceLoadingStage.parsedFiles newStage) model.dependencies
+                    Inspection.run (SourceLoadingStage.parsedFiles newStage) model.dependencies model.configuration
 
                 newState =
                     State.finishWithNewMessages messages model.state

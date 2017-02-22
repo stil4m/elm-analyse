@@ -1,4 +1,4 @@
-module Analyser.Checks.UnnecessaryParens exposing (scan)
+module Analyser.Checks.UnnecessaryParens exposing (checker)
 
 import AST.Types
     exposing
@@ -35,6 +35,15 @@ import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens)
 import Inspector exposing (Order(Post), defaultConfig)
 import Maybe.Extra as Maybe
 import List.Extra as List
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+
+
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "UnnecessaryParens" ]
+    }
 
 
 type alias Context =
@@ -46,8 +55,8 @@ rangetoTuple x =
     ( x.start.row, x.start.column, x.end.row, x.end.column )
 
 
-scan : FileContext -> List Message
-scan fileContext =
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
     let
         x : Context
         x =

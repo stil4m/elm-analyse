@@ -1,4 +1,4 @@
-module Analyser.Checks.UnusedVariable exposing (scan)
+module Analyser.Checks.UnusedVariable exposing (checker)
 
 import AST.Types
     exposing
@@ -21,6 +21,15 @@ import Dict exposing (Dict)
 import Inspector exposing (defaultConfig, Order(Inner, Pre, Post))
 import ASTUtil.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, patternToVars, patternToVarsInner, getDeclarationsVars, patternToUsedVars, withoutTopLevel)
 import Tuple3
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+
+
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "UnusedImportedVariable", "UnusedTopLevel", "UnusedVariable", "UnusedPatternVariable" ]
+    }
 
 
 type alias Scope =
@@ -37,8 +46,8 @@ type alias UsedVariableContext =
     }
 
 
-scan : FileContext -> List Message
-scan fileContext =
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
     let
         x : UsedVariableContext
         x =

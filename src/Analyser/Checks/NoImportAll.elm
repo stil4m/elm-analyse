@@ -1,18 +1,27 @@
-module Analyser.Checks.NoImportAll exposing (scan)
+module Analyser.Checks.NoImportAll exposing (checker)
 
 import AST.Types exposing (Import, Exposure(All, None, Explicit), ModuleName, Expose(TypeExpose))
 import AST.Ranges as Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(ImportAll), newMessage)
 import Inspector exposing (defaultConfig, Order(Post))
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+
+
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "ImportAll" ]
+    }
 
 
 type alias ExposeAllContext =
     List ( ModuleName, Range )
 
 
-scan : FileContext -> List Message
-scan fileContext =
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
     Inspector.inspect
         { defaultConfig | onImport = Post onImport }
         fileContext.ast

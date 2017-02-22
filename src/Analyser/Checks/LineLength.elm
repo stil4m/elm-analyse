@@ -1,11 +1,20 @@
-module Analyser.Checks.LineLength exposing (scan)
+module Analyser.Checks.LineLength exposing (checker)
 
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(LineLengthExceeded), newMessage)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 
 
-scan : FileContext -> List Message
-scan fileContext =
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "LineLengthExceeded" ]
+    }
+
+
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuration =
     let
         longLineRanges =
             String.split "\n" fileContext.content

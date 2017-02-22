@@ -1,4 +1,4 @@
-module Analyser.Checks.NotExposeAll exposing (scan)
+module Analyser.Checks.NotExposeAll exposing (checker)
 
 import AST.Types exposing (Exposure(All, None, Explicit), Expose(TypeExpose), File)
 import AST.Ranges exposing (Range)
@@ -6,14 +6,23 @@ import AST.Util
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(ExposeAll), newMessage)
 import Inspector exposing (defaultConfig, Order(Inner))
+import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+
+
+checker : Checker
+checker =
+    { check = scan
+    , shouldCheck = keyBasedChecker [ "ExposeAll" ]
+    }
 
 
 type alias ExposeAllContext =
     List Range
 
 
-scan : FileContext -> List Message
-scan fileContext =
+scan : FileContext -> Configuration -> List Message
+scan fileContext configuraton =
     let
         x : ExposeAllContext
         x =
