@@ -8,7 +8,20 @@ import AST.Types
         ( File
         , RecordUpdate
         , Expression
-        , InnerExpression(Application, Operator, OperatorApplication, RecordExpr, IfBlock, TupledExpression, ParenthesizedExpression, LetExpression, CaseExpression, LambdaExpression, ListExpr, RecordUpdateExpression)
+        , InnerExpression
+            ( Application
+            , Operator
+            , OperatorApplication
+            , RecordExpr
+            , IfBlock
+            , TupledExpression
+            , ParenthesizedExpression
+            , LetExpression
+            , CaseExpression
+            , LambdaExpression
+            , ListExpr
+            , RecordUpdateExpression
+            )
         , Function
         , InfixDirection(Left)
         , Infix

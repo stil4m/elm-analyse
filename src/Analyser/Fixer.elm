@@ -96,7 +96,10 @@ update msg (Model model) =
         LoadedFileContent reference ->
             if not (fileHashesEqual reference model.message) then
                 ( Model { model | done = True, success = False }
-                , sendFixResult { success = False, message = "Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages." }
+                , sendFixResult
+                    { success = False
+                    , message = "Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages."
+                    }
                 )
             else
                 let

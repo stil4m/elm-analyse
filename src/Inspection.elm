@@ -16,6 +16,7 @@ import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
 import Analyser.Checks.UnusedImports as UnusedImports
 import Analyser.Checks.ListOperators as ListOperators
+import Analyser.Checks.LineLength as LineLength
 import Analyser.Util
 
 
@@ -36,6 +37,7 @@ run sources deps =
             , UnusedImportAliases.scan
             , UnusedImports.scan
             , ListOperators.scan
+            , LineLength.scan
             ]
 
         ( validSources, invalidSources ) =

@@ -52,10 +52,19 @@ effectWhereClauses =
 
 effectModuleDefinition : Parser State Module
 effectModuleDefinition =
-    succeed (\name whereClauses exp -> EffectModule { moduleName = name, exposingList = exp, command = whereClauses.command, subscription = whereClauses.subscription })
-        <*> (string "effect" *> moreThanIndentWhitespace *> moduleToken *> moreThanIndentWhitespace *> moduleName)
-        <*> (moreThanIndentWhitespace *> effectWhereClauses)
-        <*> exposeDefinition exposable
+    let
+        createEffectModule name whereClauses exp =
+            EffectModule
+                { moduleName = name
+                , exposingList = exp
+                , command = whereClauses.command
+                , subscription = whereClauses.subscription
+                }
+    in
+        succeed createEffectModule
+            <*> (string "effect" *> moreThanIndentWhitespace *> moduleToken *> moreThanIndentWhitespace *> moduleName)
+            <*> (moreThanIndentWhitespace *> effectWhereClauses)
+            <*> exposeDefinition exposable
 
 
 normalModuleDefinition : Parser State Module

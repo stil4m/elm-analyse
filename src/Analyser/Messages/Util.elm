@@ -349,3 +349,16 @@ getMessageInfo m =
             , [ range ]
             , True
             )
+
+        LineLengthExceeded fileName ranges ->
+            ( String.concat
+                [ "Line length exceeded on "
+                , toString (List.length ranges)
+                , " line(s) in file \""
+                , fileName
+                , "\"."
+                ]
+            , always [ fileName ]
+            , ranges
+            , False
+            )

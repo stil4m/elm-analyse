@@ -116,6 +116,11 @@ decodeMessageData =
                 |: JD.field "range1" Ranges.decode
                 |: JD.field "range2" Ranges.decode
           )
+        , ( "LineLengthExceeded"
+          , JD.succeed LineLengthExceeded
+                |: fileField
+                |: JD.field "ranges" (JD.list Ranges.decode)
+          )
         , ( "NoUncurriedPrefix", decodeFileVarNameAndRange NoUncurriedPrefix )
         , ( "UnusedImportAlias", decodeFileModuleNameAndRange UnusedImportAlias )
         , ( "UnusedImport", decodeFileModuleNameAndRange UnusedImport )
@@ -329,4 +334,11 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "range", Ranges.encode range )
+                    ]
+
+        LineLengthExceeded file ranges ->
+            encodeTyped "LineLengthExceeded" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "ranges", JE.list (List.map Ranges.encode ranges) )
                     ]

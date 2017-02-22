@@ -187,7 +187,8 @@ dialogBody state =
             div [] []
 
         RD.Loading ->
-            div [] [ text "Loading..." ]
+            div []
+                [ text "Loading..." ]
 
         RD.Success x ->
             viewWithFileContent state x
@@ -198,7 +199,7 @@ dialogBody state =
 
 viewWithFileContent : State -> String -> Html msg
 viewWithFileContent state x =
-    div []
+    div [ style [ ( "max-height", "400px" ), ( "overflow", "scroll" ) ] ]
         [ div []
             (List.map (renderRange x) state.ranges)
         , text <| Messages.asString state.message.data
