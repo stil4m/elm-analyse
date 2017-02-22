@@ -3,8 +3,7 @@
 A tool that allows you analyse your [Elm](http://elm-lang.org/) code and identifies deficiencies and best practices.
 
 <img src="https://ci.appveyor.com/api/projects/status/github/stil4m/elm-analyse?retina=true" height="24">
-
-
+<img src="https://travis-ci.org/stil4m/elm-analyse.svg?branch=master" height="24">
 
 ## Preview
 
