@@ -1,38 +1,50 @@
 module Parser.Patterns exposing (pattern, declarablePattern)
 
-import Combine exposing (Parser, choice, lazy, between, string, sepBy, sepBy1, succeed, maybe, parens, many, or, (<$>), (<$), (<*), (<*>), (*>))
+import Combine exposing (Parser, choice, lazy, between, string, sepBy, sepBy1, succeed, maybe, parens, many, or, (<$>), (<$), (<*), (<*>), (*>), (>>=))
 import Combine.Num
 import Parser.Tokens exposing (characterLiteral, stringLiteral, asToken, functionName, typeName)
 import AST.Types exposing (Pattern(ListPattern, UnConsPattern, CharPattern, StringPattern, IntPattern, FloatPattern, AsPattern, TuplePattern, RecordPattern, VarPattern, NamedPattern, QualifiedNamePattern, AllPattern, UnitPattern), QualifiedNameRef)
 import AST.Ranges exposing (Range)
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed, asPointer)
 import Parser.State exposing (State)
-import Parser.Ranges exposing (withRange)
+import Parser.Ranges exposing (withRange, withRangeTuple, withRangeCustomStart)
 
 
 type alias RangelessPattern =
     Range -> Pattern
 
 
+declarablePattern : Parser State Pattern
+declarablePattern =
+    lazy (\() -> withRange declarablePatternRangeless)
+
+
 pattern : Parser State Pattern
 pattern =
     lazy
         (\() ->
-            withRange
+            withRangeTuple
                 (choice
-                    [ unConsPattern
-                    , asPattern
-                    , declarablePatternRangeless
+                    [ declarablePatternRangeless
                     , variablePattern
                     , namedPattern
                     ]
                 )
+                >>= promoteToCompositePattern
         )
 
 
-declarablePattern : Parser State Pattern
-declarablePattern =
-    lazy (\() -> withRange declarablePatternRangeless)
+promoteToCompositePattern : ( Range, Pattern ) -> Parser State Pattern
+promoteToCompositePattern ( range, x ) =
+    or
+        (withRangeCustomStart range
+            (choice
+                [ unConsPattern2 x
+                , asPattern2 x
+                ]
+            )
+        )
+        (succeed x)
 
 
 declarablePatternRangeless : Parser State RangelessPattern
@@ -110,6 +122,14 @@ unConsPattern =
         )
 
 
+unConsPattern2 : Pattern -> Parser State RangelessPattern
+unConsPattern2 p =
+    lazy
+        (\() ->
+            (UnConsPattern p) <$> (trimmed (string "::") *> pattern)
+        )
+
+
 charPattern : Parser State RangelessPattern
 charPattern =
     lazy (\() -> (CharPattern <$> characterLiteral))
@@ -137,6 +157,16 @@ asPattern =
             (succeed AsPattern
                 <*> (maybe moreThanIndentWhitespace *> (withRange nonAsPattern))
                 <*> (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> asPointer functionName)
+            )
+        )
+
+
+asPattern2 : Pattern -> Parser State RangelessPattern
+asPattern2 p =
+    lazy
+        (\() ->
+            (AsPattern p
+                <$> (moreThanIndentWhitespace *> asToken *> moreThanIndentWhitespace *> asPointer functionName)
             )
         )
 
