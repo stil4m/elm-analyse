@@ -11,7 +11,7 @@
         "email": "mstijlaart@gmail.com"
     },
     "scripts": {
-        "postinstall": "./node_modules/.bin/elm-package install -y && ./node_modules/.bin/gulp"
+        "postinstall": "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\""
     },
     "author": "Mats Stijlaart",
     "license": "ISC",
