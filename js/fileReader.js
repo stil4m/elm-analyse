@@ -1,6 +1,5 @@
 // Reference the module
 const normalizeNewline = require('normalize-newline');
-const sha1 = require('sha1');
 const fs = require('fs');
 const cp = require('child_process');
 const cache = require('./util/cache');
