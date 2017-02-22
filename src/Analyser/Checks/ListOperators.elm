@@ -5,7 +5,7 @@ import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UseConsOverConcat, DropConcatOfLists, DropConsOfItemAndList), newMessage)
 import Inspector exposing (Order(Post), defaultConfig)
-import Analyser.Configuration exposing (Configuration)
+import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 
 
@@ -34,23 +34,31 @@ scan fileContext configuration =
         }
         fileContext.ast
         []
-        |> List.map
-            (\( x, y ) ->
-                let
-                    messageConstructor =
-                        case x of
-                            DropConcat ->
-                                DropConcatOfLists
-
-                            DropCons ->
-                                DropConsOfItemAndList
-
-                            UseCons ->
-                                UseConsOverConcat
-                in
-                    messageConstructor fileContext.path y
-            )
+        |> List.filterMap (deficiencyToMessageData fileContext.path configuration)
         |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+
+
+deficiencyToMessageData : String -> Configuration -> ( Deficiency, Range ) -> Maybe MessageData
+deficiencyToMessageData path configuration ( deficiency, range ) =
+    Maybe.map (\messageConstructor -> messageConstructor path range) <|
+        case deficiency of
+            DropConcat ->
+                if Configuration.checkEnabled "DropConcatOfLists" configuration then
+                    Just DropConcatOfLists
+                else
+                    Nothing
+
+            DropCons ->
+                if Configuration.checkEnabled "DropConsOfItemAndList" configuration then
+                    Just DropConsOfItemAndList
+                else
+                    Nothing
+
+            UseCons ->
+                if Configuration.checkEnabled "UseConsOverConcat" configuration then
+                    Just UseConsOverConcat
+                else
+                    Nothing
 
 
 onExpression : Expression -> Context -> Context

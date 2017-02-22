@@ -5,7 +5,7 @@ import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DebugLog, DebugCrash), newMessage)
 import Inspector exposing (Order(Post), defaultConfig)
-import Analyser.Configuration exposing (Configuration)
+import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 
 
@@ -31,18 +31,24 @@ scan fileContext configuration =
         { defaultConfig | onExpression = Post onExpression }
         fileContext.ast
         []
-        |> List.map (asMessage fileContext.path)
+        |> List.filterMap (asMessage fileContext.path configuration)
         |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
-asMessage : String -> ( DebugType, Range ) -> MessageData
-asMessage path ( debugType, range ) =
+asMessage : String -> Configuration -> ( DebugType, Range ) -> Maybe MessageData
+asMessage path configuration ( debugType, range ) =
     case debugType of
         Log ->
-            DebugLog path range
+            if Configuration.checkEnabled "DebugLog" configuration then
+                Just (DebugLog path range)
+            else
+                Nothing
 
         Crash ->
-            DebugCrash path range
+            if Configuration.checkEnabled "DebugCrash" configuration then
+                DebugCrash path range
+            else
+                Nothing
 
 
 onExpression : Expression -> Context -> Context

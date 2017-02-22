@@ -21,7 +21,7 @@ import Dict exposing (Dict)
 import Inspector exposing (defaultConfig, Order(Inner, Pre, Post))
 import ASTUtil.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, patternToVars, patternToVarsInner, getDeclarationsVars, patternToUsedVars, withoutTopLevel)
 import Tuple3
-import Analyser.Configuration exposing (Configuration)
+import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 
 
@@ -73,7 +73,7 @@ scan fileContext configuration =
             x.poppedScopes
                 |> List.concatMap Dict.toList
                 |> onlyUnused
-                |> List.map (\( x, ( _, t, y ) ) -> forVariableType fileContext t x y)
+                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType fileContext.path configuration t x y)
                 |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
         unusedTopLevels =
@@ -85,26 +85,38 @@ scan fileContext configuration =
                 |> onlyUnused
                 |> List.filter (filterByModuleType fileContext)
                 |> List.filter (Tuple.first >> flip Interface.doesExposeFunction fileContext.interface >> not)
-                |> List.map (\( x, ( _, t, y ) ) -> forVariableType fileContext t x y)
+                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType fileContext.path configuration t x y)
                 |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
     in
         unusedVariables ++ unusedTopLevels
 
 
-forVariableType : FileContext -> VariableType -> String -> Range -> MessageData
-forVariableType fileContext variableType =
+forVariableType : String -> Configuration -> VariableType -> String -> Range -> Maybe MessageData
+forVariableType path configuration variableType variableName range =
     case variableType of
         Imported ->
-            UnusedImportedVariable fileContext.path
+            if Configuration.checkEnabled "UnusedImportedVariable" configuration then
+                Just (UnusedImportedVariable path variableName range)
+            else
+                Nothing
 
         TopLevel ->
-            UnusedTopLevel fileContext.path
+            if Configuration.checkEnabled "UnusedTopLevel" configuration then
+                Just (UnusedTopLevel path variableName range)
+            else
+                Nothing
 
         Defined ->
-            UnusedVariable fileContext.path
+            if Configuration.checkEnabled "UnusedVariable" configuration then
+                Just (UnusedVariable path variableName range)
+            else
+                Nothing
 
         Pattern ->
-            UnusedPatternVariable fileContext.path
+            if Configuration.checkEnabled "UnusedPatternVariable" configuration then
+                Just (UnusedPatternVariable path variableName range)
+            else
+                Nothing
 
 
 filterByModuleType : FileContext -> ( String, ( Int, VariableType, Range ) ) -> Bool

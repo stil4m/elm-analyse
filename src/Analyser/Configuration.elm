@@ -9,6 +9,12 @@ type alias Configuration =
     { checks : Dict String Bool }
 
 
+checkEnabled : String -> Configuration -> Bool
+checkEnabled k configuration =
+    Dict.get k configuration.checks
+        |> Maybe.withDefault True
+
+
 defaultChecks : Dict String Bool
 defaultChecks =
     Dict.fromList
