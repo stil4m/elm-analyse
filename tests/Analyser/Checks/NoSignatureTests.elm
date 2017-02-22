@@ -55,20 +55,20 @@ all =
     describe "Analyser.NotExposeAllTests"
         [ test "noSignature" <|
             \() ->
-                CTU.getMessages noSignature NoSignature.scan
+                CTU.getMessages noSignature NoSignature.checker
                     |> Expect.equal
                         (Just [ (NoTopLevelSignature "./foo.elm" "foo" { start = { row = 3, column = -1 }, end = { row = 3, column = 2 } }) ])
         , test "withSignature" <|
             \() ->
-                CTU.getMessages withSignature NoSignature.scan
+                CTU.getMessages withSignature NoSignature.checker
                     |> Expect.equal
                         (Just [])
         , test "noSignatureInLet" <|
             \() ->
-                CTU.getMessages noSignatureInLet NoSignature.scan
+                CTU.getMessages noSignatureInLet NoSignature.checker
                     |> Expect.equal (Just [])
         , test "noSignatureInLetForDestructure" <|
             \() ->
-                CTU.getMessages noSignatureInLetForDestructure NoSignature.scan
+                CTU.getMessages noSignatureInLetForDestructure NoSignature.checker
                     |> Expect.equal (Just [])
         ]

@@ -78,7 +78,7 @@ foo =
 all : Test
 all =
     CTU.build "Analyser.Checks.ListOperators"
-        ListOperators.scan
+        ListOperators.checker
         [ couldUseCons
         , noOptimisation
         , concatMultiElementList

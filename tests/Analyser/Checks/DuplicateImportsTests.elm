@@ -91,7 +91,7 @@ foo = 1
 all : Test
 all =
     CTU.build "Analyser.Checks.DuplicateImportsTests"
-        DuplicateImports.scan
+        DuplicateImports.checker
         [ goodImports
         , badImports
         , badImportsTripple

@@ -83,7 +83,7 @@ type alias Thing = { name : B.Name }
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedImportAliasesTests"
-        UnusedImportAliases.scan
+        UnusedImportAliases.checker
         [ noUsageForAlias
         , usedAsQualified
         , usedAsQualifiedInPattern

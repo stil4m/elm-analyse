@@ -349,7 +349,7 @@ foo x y=
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedVariable"
-        UnusedVariable.scan
+        UnusedVariable.checker
         [ withUnusedVariableInFunction
         , unusedInLetExpression
         , unusedFunction

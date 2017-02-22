@@ -58,7 +58,7 @@ foo =
 all : Test
 all =
     CTU.build "Analyser.Checks.UnnecessaryListConcat"
-        UnnecessaryListConcat.scan
+        UnnecessaryListConcat.checker
         [ couldMerge
         , couldMerge2
         , couldNotMerge

@@ -110,7 +110,7 @@ foo = 1
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedTypeAliasesTests"
-        UnusedTypeAliases.scan
+        UnusedTypeAliases.checker
         [ unusedButExposed
         , usedInSignature
         , usedAsFunction

@@ -55,12 +55,12 @@ all =
     describe "Analyser.NoImportAllTests"
         [ test "importAll" <|
             \() ->
-                CTU.getMessages importAll NoImportAll.scan
+                CTU.getMessages importAll NoImportAll.checker
                     |> Expect.equal
                         (Just [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } } ])
         , test "importAllMultiple" <|
             \() ->
-                CTU.getMessages importAllMultiple NoImportAll.scan
+                CTU.getMessages importAllMultiple NoImportAll.checker
                     |> Expect.equal
                         (Just
                             [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
@@ -69,15 +69,15 @@ all =
                         )
         , test "importStrict" <|
             \() ->
-                CTU.getMessages importStrict NoImportAll.scan
+                CTU.getMessages importStrict NoImportAll.checker
                     |> Expect.equal
                         (Just [])
         , test "importAllConstructors" <|
             \() ->
-                CTU.getMessages importAllConstructors NoImportAll.scan
+                CTU.getMessages importAllConstructors NoImportAll.checker
                     |> Expect.equal (Just [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 24 }, end = { row = 2, column = 26 } } ])
         , test "importConstructorsStrict" <|
             \() ->
-                CTU.getMessages importConstructorsStrict NoImportAll.scan
+                CTU.getMessages importConstructorsStrict NoImportAll.checker
                     |> Expect.equal (Just [])
         ]

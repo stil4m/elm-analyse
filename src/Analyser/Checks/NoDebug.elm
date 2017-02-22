@@ -46,7 +46,7 @@ asMessage path configuration ( debugType, range ) =
 
         Crash ->
             if Configuration.checkEnabled "DebugCrash" configuration then
-                DebugCrash path range
+                Just (DebugCrash path range)
             else
                 Nothing
 

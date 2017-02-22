@@ -113,7 +113,7 @@ foo = 1
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedImports"
-        UnusedImports.scan
+        UnusedImports.checker
         [ usedAsQualified
         , usedAsQualifiedInPattern
         , usedInTypeReference

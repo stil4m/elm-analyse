@@ -45,7 +45,7 @@ foo x = x
 all : Test
 all =
     CTU.build "Analyser.Checks.NoDebugTests"
-        NoDebug.scan
+        NoDebug.checker
         [ debugCrash
         , debugLog
         , noDebug

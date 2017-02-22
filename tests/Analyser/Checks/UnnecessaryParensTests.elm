@@ -341,7 +341,7 @@ foo =
 all : Test
 all =
     CTU.build "Analyser.Checks.UnnecessaryParensTests"
-        UnnecessaryParens.scan
+        UnnecessaryParens.checker
         [ parensBetweenOperators
         , parensForInfixCombinations
         , parensAroundSimpleValue

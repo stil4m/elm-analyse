@@ -44,22 +44,22 @@ all =
     describe "Analyser.NotExposeAllTests"
         [ test "exposingAll" <|
             \() ->
-                CTU.getMessages exposingAll NotExposeAll.scan
+                CTU.getMessages exposingAll NotExposeAll.checker
                     |> Expect.equal
                         (Just [ (ExposeAll "./foo.elm" { start = { row = 1, column = 21 }, end = { row = 1, column = 23 } }) ])
         , test "exposingStrict" <|
             \() ->
-                CTU.getMessages exposingStrict NotExposeAll.scan
+                CTU.getMessages exposingStrict NotExposeAll.checker
                     |> Expect.equal
                         (Just [])
         , test "exposingAllConstructors" <|
             \() ->
-                CTU.getMessages exposingAllConstructors NotExposeAll.scan
+                CTU.getMessages exposingAllConstructors NotExposeAll.checker
                     |> Expect.equal
                         (Just [ (ExposeAll "./foo.elm" { start = { row = 1, column = 27 }, end = { row = 1, column = 29 } }) ])
         , test "exposingStrictConstructors" <|
             \() ->
-                CTU.getMessages exposingStrictConstructors NotExposeAll.scan
+                CTU.getMessages exposingStrictConstructors NotExposeAll.checker
                     |> Expect.equal
                         (Just [])
         ]
