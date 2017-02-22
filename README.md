@@ -68,7 +68,8 @@ TODO
 | UnusedTypeAlias | When you defined an type alias, but you do not use it in any signature or expose it, then it is just filling up space. It is better to remove it. | TODO [#5](https://github.com/stil4m/elm-analyse/issues/5) |
 | UnusedVariable | There are a lot of cases of variables that are unused. Functions that are imported, unused defined functions, unused variables of defined functions, unused variables in patterns. These are all noise and might imply some refactoring. | :white_check_mark: :heavy_exclamation_mark: |
 | UseConsOverConcat | If you concatenate two lists, but the right hand side is a single element list, then you should use the cons operator. | TODO [#5](https://github.com/stil4m/elm-analyse/issues/5) |
-
+| DropConcatOfLists | If you concatenate two lists (`[...] ++ [...]`), then you can merge them into one list. | TODO [#5](https://github.com/stil4m/elm-analyse/issues/5) |
+| DropConsOfItemAndList | If you cons an item to a literal list (`x :x [1, 2, 3]`), then you can just put the item into the list. | TODO [#5](https://github.com/stil4m/elm-analyse/issues/5) |
 ---
 
 ## Scheduled Checks
