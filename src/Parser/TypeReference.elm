@@ -1,6 +1,6 @@
 module Parser.TypeReference exposing (typeReference)
 
-import Combine exposing (choice, lazy, Parser, parens, map, sepBy, (<*>), succeed, (*>), string, maybe, many1, (<$>), sepBy, between, many, (<*), or, whitespace)
+import Combine exposing (choice, lazy, Parser, parens, map, sepBy, (>>=), (<*>), succeed, (*>), string, maybe, many1, (<$>), sepBy, between, many, (<*), or, whitespace)
 import Parser.Tokens exposing (functionName, typeName)
 import AST.Types exposing (TypeReference(FunctionTypeReference, Unit, Tupled, GenericType, GenericRecord, Record, Typed), RecordField, RecordDefinition, TypeArg(Generic, Concrete))
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
@@ -14,14 +14,23 @@ typeReferenceNoFn =
         (\() ->
             choice
                 [ parensTypeReference
-                  -- , unitTypeReference
-                  -- , tupledTypeReference
                 , typedTypeReference
                 , recordTypeReference
                 , genericRecordTypeReference
                 , genericTypeReference
-                  -- , parens (trimmed typeReference)
                 ]
+        )
+
+
+typeReference : Parser State TypeReference
+typeReference =
+    lazy
+        (\() ->
+            typeReferenceNoFn
+                >>= (\typeRef ->
+                        or (FunctionTypeReference typeRef <$> (trimmed (string "->") *> typeReference))
+                            (succeed typeRef)
+                    )
         )
 
 
@@ -30,55 +39,21 @@ parensTypeReference =
     lazy
         (\() ->
             parens (maybe moreThanIndentWhitespace *> sepBy (string ",") (trimmed typeReference))
-                |> map
-                    (\x ->
-                        case x of
-                            [] ->
-                                Unit
-
-                            [ x ] ->
-                                x
-
-                            xs ->
-                                Tupled xs
-                    )
+                |> map asTypeReference
         )
 
 
-typeReference : Parser State TypeReference
-typeReference =
-    lazy
-        (\() ->
-            choice
-                [ functionTypeReference
-                , typeReferenceNoFn
-                ]
-        )
+asTypeReference : List TypeReference -> TypeReference
+asTypeReference x =
+    case x of
+        [] ->
+            Unit
 
+        [ x ] ->
+            x
 
-functionTypeReference : Parser State TypeReference
-functionTypeReference =
-    succeed FunctionTypeReference
-        <*> typeReferenceNoFn
-        <*> (trimmed (string "->") *> typeReference)
-
-
-
--- unitTypeReference : Parser State TypeReference
--- unitTypeReference =
---     always Unit <$> (string "(" *> maybe moreThanIndentWhitespace *> string ")")
---
--- tupledTypeReference : Parser State TypeReference
--- tupledTypeReference =
---     lazy
---         (\() ->
---             Tupled
---                 <$> parens
---                         (succeed (::)
---                             <*> trimmed typeReference
---                             <*> many1 (string "," *> trimmed typeReference)
---                         )
---         )
+        xs ->
+            Tupled xs
 
 
 genericTypeReference : Parser State TypeReference
