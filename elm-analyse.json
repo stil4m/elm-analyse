@@ -1,5 +1,6 @@
 {
   "checks" : {
-    "ExposeAll": false
+    "ExposeAll": false,
+    "ImportAll": false
   }
 }

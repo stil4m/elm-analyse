@@ -12,7 +12,7 @@ type alias Configuration =
 defaultChecks : Dict String Bool
 defaultChecks =
     Dict.fromList
-        [ ( "ImportAll", False ) ]
+        []
 
 
 defaultConfiguration : Configuration
