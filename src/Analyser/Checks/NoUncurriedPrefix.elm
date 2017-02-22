@@ -21,7 +21,7 @@ type alias Context =
 
 
 scan : FileContext -> Configuration -> List Message
-scan fileContext configuration =
+scan fileContext _ =
     Inspector.inspect
         { defaultConfig
             | onExpression = Post onExpression

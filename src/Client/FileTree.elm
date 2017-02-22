@@ -58,25 +58,25 @@ subscriptions location model =
     Sub.batch
         [ WS.listen (dashboardAddress location) (JD.decodeString State.decodeState >> NewState)
         , Time.every (Time.second * 10) (always Tick)
+        , MessageList.subscriptions model.messageList |> Sub.map MessageListMsg
         ]
 
 
 updateFileIndex : Model -> Model
-updateFileIndex m =
+updateFileIndex model =
     let
         messagesForFile file state =
             state.messages
                 |> List.filter
-                    (\m ->
-                        List.map Tuple.second m.files
+                    (\messages ->
+                        List.map Tuple.second messages.files
                             |> List.member file
                     )
-                |> Debug.log "Ms"
 
         buildTree state tree =
             List.map (\file -> ( file, messagesForFile file state )) tree
     in
-        { m | fileIndex = Maybe.map2 buildTree m.state m.tree }
+        { model | fileIndex = Maybe.map2 buildTree model.state model.tree }
 
 
 updateMessageList : Model -> Model
@@ -120,23 +120,16 @@ update location msg model =
 
 messagesForSelectedFile : Model -> List Message
 messagesForSelectedFile m =
-    let
-        allowFile ( _, mess ) =
-            if m.hideGoodFiles then
-                List.length mess > 0
-            else
-                True
-    in
-        case m.fileIndex of
-            Just fileIndex ->
-                fileIndex
-                    |> List.filter (Tuple.first >> Just >> (==) m.selectedFile)
-                    |> List.head
-                    |> Maybe.map Tuple.second
-                    |> Maybe.withDefault []
+    case m.fileIndex of
+        Just fileIndex ->
+            fileIndex
+                |> List.filter (Tuple.first >> Just >> (==) m.selectedFile)
+                |> List.head
+                |> Maybe.map Tuple.second
+                |> Maybe.withDefault []
 
-            _ ->
-                []
+        _ ->
+            []
 
 
 view : Model -> Html Msg

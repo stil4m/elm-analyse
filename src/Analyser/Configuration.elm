@@ -29,9 +29,9 @@ defaultConfiguration =
 withDefaultChecks : Dict String Bool -> Dict String Bool
 withDefaultChecks x =
     Dict.merge
-        (Dict.insert)
-        (\k a b result -> Dict.insert k b result)
-        (Dict.insert)
+        Dict.insert
+        (\k _ b result -> Dict.insert k b result)
+        Dict.insert
         defaultChecks
         x
         Dict.empty
@@ -65,7 +65,7 @@ fromString input =
 decodeConfiguration : Decoder Configuration
 decodeConfiguration =
     succeed Configuration
-        |: (field "checks" decodeChecks)
+        |: field "checks" decodeChecks
 
 
 decodeChecks : Decoder (Dict String Bool)

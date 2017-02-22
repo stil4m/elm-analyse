@@ -1,6 +1,6 @@
 const fileReader = require('../fileReader');
 const fileLoadingPorts = require('../util/file-loading-ports')
-const loggingPorts = require('./util/logging-ports');
+const loggingPorts = require('../util/logging-ports');
 const fs = require('fs');
 
 module.exports = function worker(config) {

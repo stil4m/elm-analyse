@@ -30,7 +30,7 @@ subscriptions location model =
     Sub.batch
         [ WS.listen (dashboardAddress location) (JD.decodeString State.decodeState >> NewMsg)
         , Time.every (Time.second * 10) (always Tick)
-        , MessageList.subscriptions location model.messageList |> Sub.map MessageListMsg
+        , MessageList.subscriptions model.messageList |> Sub.map MessageListMsg
         ]
 
 

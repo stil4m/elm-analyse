@@ -17,7 +17,7 @@ checker =
 
 
 scan : FileContext -> Configuration -> List Message
-scan fileContext configuration =
+scan fileContext _ =
     Inspector.inspect
         { defaultConfig | onFunction = Inner onFunction, onDestructuring = Skip }
         fileContext.ast

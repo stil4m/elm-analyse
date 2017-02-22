@@ -24,7 +24,7 @@ type alias Context =
 
 
 scan : FileContext -> Configuration -> List Message
-scan fileContext configuration =
+scan fileContext _ =
     let
         aliases : Context
         aliases =

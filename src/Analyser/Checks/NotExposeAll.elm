@@ -22,7 +22,7 @@ type alias ExposeAllContext =
 
 
 scan : FileContext -> Configuration -> List Message
-scan fileContext configuraton =
+scan fileContext _ =
     let
         x : ExposeAllContext
         x =

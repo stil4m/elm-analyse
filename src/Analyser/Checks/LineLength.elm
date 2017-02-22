@@ -14,7 +14,7 @@ checker =
 
 
 scan : FileContext -> Configuration -> List Message
-scan fileContext configuration =
+scan fileContext _ =
     let
         longLineRanges =
             String.split "\n" fileContext.content

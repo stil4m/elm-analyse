@@ -48,8 +48,8 @@ asTypeReference x =
         [] ->
             Unit
 
-        [ x ] ->
-            x
+        [ item ] ->
+            item
 
         xs ->
             Tupled xs

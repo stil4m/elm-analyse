@@ -21,7 +21,7 @@ type alias ExposeAllContext =
 
 
 scan : FileContext -> Configuration -> List Message
-scan fileContext configuration =
+scan fileContext _ =
     Inspector.inspect
         { defaultConfig | onImport = Post onImport }
         fileContext.ast

@@ -15,8 +15,13 @@ import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Logging as Logging
 
 
-type alias InputFiles =
-    List String
+type alias Model =
+    { dependencies : List Dependency
+    , context : Context
+    , configuration : Configuration
+    , stage : Stage
+    , state : State
+    }
 
 
 type Msg
@@ -26,15 +31,6 @@ type Msg
     | Reset
     | OnFixMessage Int
     | FixerMsg Fixer.Msg
-
-
-type alias Model =
-    { dependencies : List Dependency
-    , context : Context
-    , configuration : Configuration
-    , stage : Stage
-    , state : State
-    }
 
 
 type Stage
@@ -96,7 +92,7 @@ update msg model =
                   }
                 , Cmd.batch <|
                     Cmd.map InterfaceLoadingStageMsg cmds
-                        :: (List.map ((,) "INFO" >> Logging.log) messages)
+                        :: List.map ((,) "INFO" >> Logging.log) messages
                 )
                     |> doSendState
 

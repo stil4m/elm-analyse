@@ -39,4 +39,4 @@ withRange p =
 
 withRangeTuple : Parser State (Range -> a) -> Parser State ( Range, a )
 withRangeTuple p =
-    (withRange (succeed (\pv r -> ( r, pv r )) <*> p))
+    withRange (succeed (\pv r -> ( r, pv r )) <*> p)

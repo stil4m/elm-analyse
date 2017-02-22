@@ -2,6 +2,7 @@ module Client.MessageList exposing (..)
 
 import Client.DashBoard.ActiveMessageDialog as ActiveMessageDialog
 import Html exposing (Html, div, text)
+import Html.Attributes exposing (class)
 import Analyser.Messages.Types exposing (Message, MessageStatus)
 import Client.Messages as M
 import Tuple2
@@ -21,7 +22,7 @@ type Msg
 
 init : List Message -> Model
 init m =
-    Model m (ActiveMessageDialog.init)
+    Model m ActiveMessageDialog.init
 
 
 withMessages : List Message -> Model -> Model
@@ -46,11 +47,14 @@ update location msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ M.viewAll Focus model.messages
+        [ if List.isEmpty model.messages then
+            div [ class "alert alert-success" ] [ text "No messages" ]
+          else
+            M.viewAll Focus model.messages
         , ActiveMessageDialog.view model.active |> Html.map ActiveMessageDialogMsg
         ]
 
 
-subscriptions : Location -> Model -> Sub Msg
-subscriptions location model =
+subscriptions : Model -> Sub Msg
+subscriptions model =
     ActiveMessageDialog.subscriptions model.active |> Sub.map ActiveMessageDialogMsg

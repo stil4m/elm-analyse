@@ -56,7 +56,7 @@ rangetoTuple x =
 
 
 scan : FileContext -> Configuration -> List Message
-scan fileContext configuration =
+scan fileContext _ =
     let
         x : Context
         x =

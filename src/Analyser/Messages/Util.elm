@@ -345,7 +345,7 @@ getMessageInfo m =
                 , "\" at "
                 , rangeToString range
                 ]
-            , always (List.concat [ [ fileName ], [] ])
+            , always [ fileName ]
             , [ range ]
             , True
             )
