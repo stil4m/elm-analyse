@@ -1,31 +1,28 @@
 module Client.DashBoard.DashBoard exposing (Model, Msg, subscriptions, init, update, view)
 
 import Analyser.State as State exposing (State)
-import Client.DashBoard.ActiveMessageDialog as ActiveMessageDialog
 import Html exposing (Html, div, text, span, h3)
 import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
 import Time
 import WebSocket as WS
-import Analyser.Messages.Types exposing (Message, MessageStatus)
 import Analyser.Messages.Util as Messages
-import Client.Messages as M
 import Tuple2
 import Navigation exposing (Location)
 import Client.Socket exposing (dashboardAddress)
+import Client.MessageList as MessageList
 
 
 type alias Model =
-    { messages : RemoteData String State
-    , active : ActiveMessageDialog.Model
+    { state : RemoteData String State
+    , messageList : MessageList.Model
     }
 
 
 type Msg
     = NewMsg (Result String State)
     | Tick
-    | Focus Message
-    | ActiveMessageDialogMsg ActiveMessageDialog.Msg
+    | MessageListMsg MessageList.Msg
 
 
 subscriptions : Location -> Model -> Sub Msg
@@ -33,14 +30,14 @@ subscriptions location model =
     Sub.batch
         [ WS.listen (dashboardAddress location) (JD.decodeString State.decodeState >> NewMsg)
         , Time.every (Time.second * 10) (always Tick)
-        , ActiveMessageDialog.subscriptions model.active |> Sub.map ActiveMessageDialogMsg
+        , MessageList.subscriptions location model.messageList |> Sub.map MessageListMsg
         ]
 
 
 init : Location -> ( Model, Cmd Msg )
 init location =
-    ( { messages = RD.Loading
-      , active = ActiveMessageDialog.init
+    ( { state = RD.Loading
+      , messageList = MessageList.init []
       }
     , WS.send (dashboardAddress location) "ping"
     )
@@ -62,30 +59,28 @@ update location msg model =
         NewMsg x ->
             case x of
                 Ok o ->
-                    ( { model | messages = RD.Success o |> RD.map sortMessages }
+                    ( { model
+                        | state = RD.Success (sortMessages o)
+                        , messageList = MessageList.withMessages (sortMessages o).messages model.messageList
+                      }
                     , Cmd.none
                     )
 
                 Err e ->
-                    ( { model | messages = RD.Failure e }
+                    ( { model | state = RD.Failure e }
                     , Cmd.none
                     )
 
-        Focus m ->
-            ActiveMessageDialog.show m model.active
-                |> Tuple2.mapFirst (\x -> { model | active = x })
-                |> Tuple2.mapSecond (Cmd.map ActiveMessageDialogMsg)
-
-        ActiveMessageDialogMsg subMsg ->
-            ActiveMessageDialog.update location subMsg model.active
-                |> Tuple2.mapFirst (\x -> { model | active = x })
-                |> Tuple2.mapSecond (Cmd.map ActiveMessageDialogMsg)
+        MessageListMsg subMsg ->
+            MessageList.update location subMsg model.messageList
+                |> Tuple2.mapFirst (\x -> { model | messageList = x })
+                |> Tuple2.mapSecond (Cmd.map MessageListMsg)
 
 
 view : Model -> Html Msg
 view m =
     div []
-        [ case m.messages of
+        [ case m.state of
             RD.Loading ->
                 text "Loading..."
 
@@ -93,7 +88,10 @@ view m =
                 if State.isBusy state then
                     text "Loading..."
                 else
-                    viewState state
+                    div []
+                        [ h3 [] [ text "Messages" ]
+                        , MessageList.view m.messageList |> Html.map MessageListMsg
+                        ]
 
             RD.Failure e ->
                 div []
@@ -103,13 +101,4 @@ view m =
 
             RD.NotAsked ->
                 span [] []
-        , ActiveMessageDialog.view m.active |> Html.map ActiveMessageDialogMsg
-        ]
-
-
-viewState : State -> Html Msg
-viewState state =
-    div []
-        [ h3 [] [ text "Messages" ]
-        , M.viewAll Focus state.messages
         ]

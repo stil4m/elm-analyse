@@ -11,7 +11,8 @@ import Http
 import WebSocket as WS
 import Client.Socket exposing (dashboardAddress)
 import Time
-import Client.Messages as M
+import Client.MessageList as MessageList
+import Tuple2
 
 
 type alias Model =
@@ -20,6 +21,7 @@ type alias Model =
     , state : Maybe State
     , fileIndex : Maybe FileIndex
     , selectedFile : Maybe String
+    , messageList : MessageList.Model
     }
 
 
@@ -29,15 +31,21 @@ type alias FileIndex =
 
 type Msg
     = OnFileTree (Result Http.Error (List String))
+    | MessageListMsg MessageList.Msg
     | NewState (Result String State)
-    | Focus Message
     | OnSelectFile String
     | Tick
 
 
 init : Location -> ( Model, Cmd Msg )
 init location =
-    ( { tree = Nothing, hideGoodFiles = True, state = Nothing, fileIndex = Nothing, selectedFile = Nothing }
+    ( { tree = Nothing
+      , hideGoodFiles = True
+      , state = Nothing
+      , fileIndex = Nothing
+      , selectedFile = Nothing
+      , messageList = MessageList.init []
+      }
     , Cmd.batch
         [ Http.get "/tree" (list string) |> Http.send OnFileTree
         , WS.send (dashboardAddress location) "ping"
@@ -71,6 +79,11 @@ updateFileIndex m =
         { m | fileIndex = Maybe.map2 buildTree m.state m.tree }
 
 
+updateMessageList : Model -> Model
+updateMessageList m =
+    { m | messageList = MessageList.withMessages (messagesForSelectedFile m) m.messageList }
+
+
 update : Location -> Msg -> Model -> ( Model, Cmd Msg )
 update location msg model =
     case msg of
@@ -87,7 +100,7 @@ update location msg model =
                     )
 
         NewState s ->
-            ( { model | state = Result.toMaybe s } |> updateFileIndex
+            ( { model | state = Result.toMaybe s } |> updateFileIndex |> updateMessageList
             , Cmd.none
             )
 
@@ -97,12 +110,33 @@ update location msg model =
             )
 
         OnSelectFile x ->
-            ( { model | selectedFile = Just x }, Cmd.none )
+            ( { model | selectedFile = Just x } |> updateMessageList, Cmd.none )
 
-        Focus _ ->
-            ( model
-            , Cmd.none
-            )
+        MessageListMsg subMsg ->
+            MessageList.update location subMsg model.messageList
+                |> Tuple2.mapFirst (\x -> { model | messageList = x })
+                |> Tuple2.mapSecond (Cmd.map MessageListMsg)
+
+
+messagesForSelectedFile : Model -> List Message
+messagesForSelectedFile m =
+    let
+        allowFile ( _, mess ) =
+            if m.hideGoodFiles then
+                List.length mess > 0
+            else
+                True
+    in
+        case m.fileIndex of
+            Just fileIndex ->
+                fileIndex
+                    |> List.filter (Tuple.first >> Just >> (==) m.selectedFile)
+                    |> List.head
+                    |> Maybe.map Tuple.second
+                    |> Maybe.withDefault []
+
+            _ ->
+                []
 
 
 view : Model -> Html Msg
@@ -132,13 +166,7 @@ view m =
                             )
                         ]
                     , div [ class "col-md-6 col-sm-6" ]
-                        [ div [ class "list-group" ]
-                            [ fileIndex
-                                |> List.filter (Tuple.first >> Just >> (==) m.selectedFile)
-                                |> List.head
-                                |> Maybe.map (Tuple.second >> M.viewAll Focus)
-                                |> Maybe.withDefault (div [] [])
-                            ]
+                        [ MessageList.view m.messageList |> Html.map MessageListMsg
                         ]
                     ]
 

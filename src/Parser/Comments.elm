@@ -10,9 +10,7 @@ import Parser.Ranges exposing (withRange)
 
 addCommentToState : Parser State ( String, Range ) -> Parser State ()
 addCommentToState p =
-    p
-        >>= \pair ->
-                modifyState (addComment pair) *> succeed ()
+    p >>= \pair -> modifyState (addComment pair) *> succeed ()
 
 
 parseComment : Parser State String -> Parser State ()
