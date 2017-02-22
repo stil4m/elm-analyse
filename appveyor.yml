@@ -13,4 +13,6 @@ install:
 test_script:
   - node --version
   - npm --version
+  - ./node_modules/.bin/elm-test
 
+build: off
