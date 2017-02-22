@@ -78,6 +78,8 @@ TODO
 
 ## Scheduled Checks
 
+See #10.
+
 * Exceeded line length
 * Unnecessary `List.concat` when concatenating only fixed size lists.
 * Record type aliases should be formatted multiline when exceeding `N` fields.
