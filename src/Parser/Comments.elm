@@ -8,21 +8,21 @@ import AST.Ranges exposing (Range)
 import Parser.Ranges exposing (withRange)
 
 
-addCommentToState : Parser State ( String, Range ) -> Parser State String
+addCommentToState : Parser State ( String, Range ) -> Parser State ()
 addCommentToState p =
     p
         >>= \(( value, _ ) as pair) ->
-                modifyState (addComment pair) *> succeed value
+                modifyState (addComment pair) *> succeed ()
 
 
-parseComment : Parser State String -> Parser State String
+parseComment : Parser State String -> Parser State ()
 parseComment commentParser =
     withRange
         ((,) <$> commentParser)
         |> addCommentToState
 
 
-singleLineComment : Parser State String
+singleLineComment : Parser State ()
 singleLineComment =
     parseComment
         (succeed (++)
@@ -31,25 +31,29 @@ singleLineComment =
         )
 
 
-multilineComment : Parser State String
-multilineComment =
+multilineCommentInner : Parser State String
+multilineCommentInner =
     lazy
         (\() ->
-            parseComment
-                (String.concat
-                    <$> sequence
-                            [ (string "{-")
-                            , String.concat
-                                <$> manyTill
-                                        (lookAhead (count 2 anyChar)
-                                            >>= \x ->
-                                                    if x == [ '{', '-' ] then
-                                                        multilineComment
-                                                    else
-                                                        String.fromChar <$> anyChar
-                                        )
-                                        (string "-}")
-                            , succeed "-}"
-                            ]
-                )
+            (String.concat
+                <$> sequence
+                        [ (string "{-")
+                        , String.concat
+                            <$> manyTill
+                                    (lookAhead (count 2 anyChar)
+                                        >>= \x ->
+                                                if x == [ '{', '-' ] then
+                                                    multilineCommentInner
+                                                else
+                                                    String.fromChar <$> anyChar
+                                    )
+                                    (string "-}")
+                        , succeed "-}"
+                        ]
+            )
         )
+
+
+multilineComment : Parser State ()
+multilineComment =
+    lazy (\() -> parseComment multilineCommentInner)

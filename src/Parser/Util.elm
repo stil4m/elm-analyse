@@ -1,7 +1,7 @@
 module Parser.Util exposing (asPointer, unstrictIndentWhitespace, exactIndentWhitespace, moreThanIndentWhitespace, trimmed, commentSequence, multiLineCommentWithTrailingSpaces)
 
 import AST.Types exposing (VariablePointer)
-import Combine exposing ((*>), (<$>), (<*), mapError, (<*>), (>>=), choice, fail, map, regex, ParseLocation, Parser, lookAhead, many, many1, maybe, or, sequence, succeed, withState)
+import Combine exposing ((*>), (<$>), (<*), mapError, (<*>), (>>=), (<$), choice, fail, map, regex, ParseLocation, Parser, lookAhead, many, many1, maybe, or, sequence, succeed, withState)
 import Parser.Comments exposing (multilineComment, singleLineComment)
 import Parser.Ranges exposing (withRange)
 import Parser.State exposing (State, currentIndent)
@@ -13,63 +13,40 @@ asPointer p =
     withRange (VariablePointer <$> p)
 
 
-unstrictIndentWhitespace : Parser State String
+unstrictIndentWhitespace : Parser State (List String)
 unstrictIndentWhitespace =
-    -- or ((regex "(\\n\\t )+" |> map (Debug.log "T") |> mapError (Debug.log "E")) <* (lookAhead (regex "[a-zA-Z0-9]")) |> map (Debug.log "S"))
-    (List.concat >> String.concat)
-        <$> many1
-                (sequence
-                    [ manySpaces
-                    , Maybe.withDefault "" <$> maybe someComment
-                    , newLineWithSomeIndent
-                    ]
-                )
+    many1 (manySpaces <* maybe someComment <* newLineWithSomeIndent)
 
 
-exactIndentWhitespace : Parser State String
+exactIndentWhitespace : Parser State ()
 exactIndentWhitespace =
     withState
         (\state ->
             choice
-                [ ((regex ("( *\\n)+ {" ++ toString (currentIndent state) ++ "}")) <* (lookAhead (regex "[a-zA-Z0-9\\(\\+/*\\|\\>]")))
-                , (List.concat >> String.concat)
-                    <$> many1
-                            (sequence
-                                [ manySpaces
-                                , Maybe.withDefault "" <$> maybe someComment
-                                , newLineWithIndentExact state
-                                ]
-                            )
+                [ () <$ ((regex ("( *\\n)+ {" ++ toString (currentIndent state) ++ "}")) <* (lookAhead (regex "[a-zA-Z0-9\\(\\+/*\\|\\>]")))
+                , () <$ many1 (manySpaces *> maybe someComment *> newLineWithIndentExact state)
                 ]
         )
 
 
-multiLineCommentWithTrailingSpaces : Parser State String
+multiLineCommentWithTrailingSpaces : Parser State ()
 multiLineCommentWithTrailingSpaces =
-    succeed (++)
-        <*> multilineComment
-        <*> manySpaces
+    multilineComment <* manySpaces
 
 
-someComment : Parser State String
+someComment : Parser State ()
 someComment =
     or singleLineComment
         multiLineCommentWithTrailingSpaces
 
 
-commentSequence : Parser State String
+commentSequence : Parser State ()
 commentSequence =
-    String.concat
-        <$> many
-                (or someComment
-                    (String.concat
-                        <$> sequence
-                                [ realNewLine
-                                , manySpaces
-                                , someComment
-                                ]
-                    )
-                )
+    ()
+        <$ many
+            (or someComment
+                (realNewLine *> manySpaces *> someComment)
+            )
 
 
 trimmed : Parser State x -> Parser State x
@@ -77,66 +54,43 @@ trimmed x =
     maybe moreThanIndentWhitespace *> x <* maybe moreThanIndentWhitespace
 
 
-moreThanIndentWhitespace : Parser State String
+moreThanIndentWhitespace : Parser State ()
 moreThanIndentWhitespace =
     withState
         (\state ->
             choice
-                [ (regex ("(( *\\n)+ {" ++ toString (currentIndent state) ++ "} +| +)"))
-                    <* (lookAhead (regex "[a-zA-Z0-9\\(\\+/*\\|\\>]"))
-                , (String.concat
-                    <$> many1
-                            (String.concat
-                                <$> sequence
-                                        [ manySpaces
-                                        , commentSequence
-                                        , newLineWithIndentPlus state
-                                        ]
-                            )
-                  )
-                , (succeed (++)
-                    <*> many1Spaces
-                    <*> (Maybe.withDefault "" <$> maybe someComment)
-                  )
+                [ ()
+                    <$ ((regex ("(( *\\n)+ {" ++ toString (currentIndent state) ++ "} +| +)"))
+                            <* (lookAhead (regex "[a-zA-Z0-9\\(\\+/*\\|\\>]"))
+                       )
+                , ()
+                    <$ many1
+                        (manySpaces
+                            *> commentSequence
+                            *> newLineWithIndentPlus state
+                        )
+                , () <$ many1Spaces <* (maybe someComment)
                 ]
         )
 
 
-newLineWithSomeIndent : Parser State String
+newLineWithSomeIndent : Parser State (List String)
 newLineWithSomeIndent =
-    String.concat
-        <$> many1 (String.concat <$> sequence [ realNewLine, manySpaces ])
+    many1 (realNewLine <* manySpaces)
 
 
 newLineWithIndentExact : State -> Parser State String
 newLineWithIndentExact state =
-    String.concat
-        <$> sequence
-                [ realNewLine
-                , String.concat
-                    <$> many
-                            (succeed (++)
-                                <*> manySpaces
-                                <*> realNewLine
-                            )
-                , nSpaces (currentIndent state)
-                ]
+    realNewLine
+        *> many (manySpaces *> realNewLine)
+        *> nSpaces (currentIndent state)
 
 
-newLineWithIndentPlus : State -> Parser State String
+newLineWithIndentPlus : State -> Parser State (List String)
 newLineWithIndentPlus state =
-    String.concat
-        <$> many1
-                (String.concat
-                    <$> sequence
-                            [ realNewLine
-                            , String.concat
-                                <$> many
-                                        (succeed (++)
-                                            <*> manySpaces
-                                            <*> realNewLine
-                                        )
-                            , nSpaces (currentIndent state)
-                            , many1Spaces
-                            ]
-                )
+    many1
+        (realNewLine
+            *> many (manySpaces *> realNewLine)
+            *> nSpaces (currentIndent state)
+            *> many1Spaces
+        )

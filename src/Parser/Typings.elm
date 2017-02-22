@@ -45,11 +45,11 @@ genericList =
     many (moreThanIndentWhitespace *> functionName)
 
 
-typePrefix : Parser State String
+typePrefix : Parser State ()
 typePrefix =
     string "type" *> moreThanIndentWhitespace
 
 
-typeAliasPrefix : Parser State String
+typeAliasPrefix : Parser State ()
 typeAliasPrefix =
     typePrefix *> string "alias" *> moreThanIndentWhitespace

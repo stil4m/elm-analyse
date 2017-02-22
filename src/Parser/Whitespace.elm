@@ -1,12 +1,13 @@
 module Parser.Whitespace exposing (nSpaces, manySpaces, many1Spaces, realNewLine, untilNewlineToken)
 
-import Combine exposing (count, (<$>), regex, Parser)
+import Combine exposing (count, (<$>), regex, (<$), Parser)
 import Combine.Char exposing (char)
 
 
 nSpaces : Int -> Parser s String
 nSpaces x =
-    String.fromList <$> count x (char ' ')
+    -- count x (char ' ')
+    (regex (" {" ++ toString x ++ "}"))
 
 
 manySpaces : Parser s String

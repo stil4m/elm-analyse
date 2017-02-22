@@ -371,7 +371,7 @@ letBlock =
                 *> withIndentedState letBody
                 <* (choice
                         [ unstrictIndentWhitespace
-                        , manySpaces
+                        , List.singleton <$> manySpaces
                         ]
                         *> string "in"
                    )
