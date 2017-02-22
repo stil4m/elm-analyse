@@ -12,6 +12,7 @@ import Tuple2
 import Analyser.Messages.Util as Messages
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.Configuration as Configuration exposing (Configuration)
+import Analyser.Logging as Logging
 
 
 type alias InputFiles =
@@ -84,7 +85,6 @@ update msg model =
             let
                 ( configuration, messages ) =
                     Configuration.fromString context.configuration
-                        |> Debug.log "Conf"
 
                 ( stage, cmds ) =
                     InterfaceLoadingStage.init context.interfaceFiles
@@ -94,7 +94,9 @@ update msg model =
                     , configuration = configuration
                     , stage = InterfaceLoadingStage stage
                   }
-                , Cmd.map InterfaceLoadingStageMsg cmds
+                , Cmd.batch <|
+                    Cmd.map InterfaceLoadingStageMsg cmds
+                        :: (List.map ((,) "INFO" >> Logging.log) messages)
                 )
                     |> doSendState
 
