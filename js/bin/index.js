@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-var minimist = require("minimist");
+const minimist = require("minimist");
+const fs =require('fs');
 
 var args = minimist(process.argv.slice(2), {
     alias: {
@@ -22,6 +23,13 @@ var args = minimist(process.argv.slice(2), {
         console.log("TODO: Do help")
         return;
     }
+
+    const packageFileExists = fs.existsSync('./elm-package.json');
+    if (!packageFileExists) {
+      console.log("There is no elm-package.json file in this directory. elm-analyse will only work in directories where such a file is located.");
+      return;
+    }
+
 
     if (args.serve) {
         var server = require('../server/app.js');
