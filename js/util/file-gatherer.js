@@ -2,6 +2,7 @@ const fs = require('fs');
 const cp = require('child_process');
 const _ = require('lodash');
 const find = require('find');
+const _path = require('path');
 
 function targetFilesForPathAndPackage(directory, path, pack) {
     const packTargetDirs = pack['source-directories'];
@@ -17,8 +18,8 @@ function targetFilesForPathAndPackage(directory, path, pack) {
                     .indexOf('elm-stuff') === -1 && (x.length > 0)
             });
     }))).map(function(s) {
-        const sParts = s.split('/');
-        const dirParts = directory.split('/');
+        const sParts = s.split(_path.sep);
+        const dirParts = directory.split(_path.sep);
 
         while (sParts.length > 0 && dirParts.length > 0) {
             if (sParts[0] == dirParts[0]) {
