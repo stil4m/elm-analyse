@@ -6,7 +6,6 @@ import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
 import Time
 import WebSocket as WS
-import Analyser.Messages.Util as Messages
 import Tuple2
 import Navigation exposing (Location)
 import Client.Socket exposing (dashboardAddress)

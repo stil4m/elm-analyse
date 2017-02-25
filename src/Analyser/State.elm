@@ -2,7 +2,7 @@ module Analyser.State exposing (..)
 
 import Analyser.Messages.Types exposing (Message, MessageId, MessageStatus(Applicable))
 import Analyser.Messages.Json exposing (encodeMessage, decodeMessage)
-import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing, getFiles)
+import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing)
 import Json.Encode as JE exposing (Value)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
