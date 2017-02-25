@@ -80,9 +80,30 @@ Add the `-s` option for the server mode. This can be viewed in the browser. To c
 | DropConsOfItemAndList | If you cons an item to a literal list (`x :x [1, 2, 3]`), then you can just put the item into the list. | TODO [#5](https://github.com/stil4m/elm-analyse/issues/5) |
 ---
 
+## Analysis Configuration
+
+At this moment you can configure the checks that are included in the analysis by disabling or enabling them in a configuration file.
+
+By default all checks are enabled. To disable checks, add an `elm-analyse.json` file to the root of the Elm project (besides the `elm-package.json`).
+
+An example configuration to disable the `UnusedTypeAlias` check is presented below.
+
+```
+{
+  "checks" : {
+    "UnusedTypeAlias": false
+  }
+}
+```
+
+> Note: In the future different checks will be configurable. Please make suggestions for these configurations via issues.
+
+The keys in the `checks` configuration match the keys in the [Supported Checks](#supported-checks) section.
+
+
 ## Scheduled Checks
 
-See #10.
+See [#10](https://github.com/stil4m/elm-analyse/issues/10).
 
 * Exceeded line length
 * Unnecessary `List.concat` when concatenating only fixed size lists.
