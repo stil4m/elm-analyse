@@ -1,6 +1,6 @@
-module Analyser.Checks.NoSignatureTests exposing (..)
+module Analyser.Checks.NoTopLevelSignatureTests exposing (..)
 
-import Analyser.Checks.NoSignature as NoSignature
+import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Messages.Types exposing (..)
 import Expect
@@ -52,23 +52,23 @@ foo = 1
 
 all : Test
 all =
-    describe "Analyser.NotExposeAllTests"
+    describe "Analyser.ExposeAllTests"
         [ test "noSignature" <|
             \() ->
-                CTU.getMessages noSignature NoSignature.checker
+                CTU.getMessages noSignature NoTopLevelSignature.checker
                     |> Expect.equal
                         (Just [ (NoTopLevelSignature "./foo.elm" "foo" { start = { row = 3, column = -1 }, end = { row = 3, column = 2 } }) ])
         , test "withSignature" <|
             \() ->
-                CTU.getMessages withSignature NoSignature.checker
+                CTU.getMessages withSignature NoTopLevelSignature.checker
                     |> Expect.equal
                         (Just [])
         , test "noSignatureInLet" <|
             \() ->
-                CTU.getMessages noSignatureInLet NoSignature.checker
+                CTU.getMessages noSignatureInLet NoTopLevelSignature.checker
                     |> Expect.equal (Just [])
         , test "noSignatureInLetForDestructure" <|
             \() ->
-                CTU.getMessages noSignatureInLetForDestructure NoSignature.checker
+                CTU.getMessages noSignatureInLetForDestructure NoTopLevelSignature.checker
                     |> Expect.equal (Just [])
         ]

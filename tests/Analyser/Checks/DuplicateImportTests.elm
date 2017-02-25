@@ -1,7 +1,7 @@
-module Analyser.Checks.DuplicateImportsTests exposing (..)
+module Analyser.Checks.DuplicateImportTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Checks.DuplicateImports as DuplicateImports
+import Analyser.Checks.DuplicateImport as DuplicateImport
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
@@ -90,8 +90,8 @@ foo = 1
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.DuplicateImportsTests"
-        DuplicateImports.checker
+    CTU.build "Analyser.Checks.DuplicateImportTests"
+        DuplicateImport.checker
         [ goodImports
         , badImports
         , badImportsTripple

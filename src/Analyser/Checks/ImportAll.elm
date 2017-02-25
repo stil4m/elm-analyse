@@ -1,4 +1,4 @@
-module Analyser.Checks.NoImportAll exposing (checker)
+module Analyser.Checks.ImportAll exposing (checker)
 
 import AST.Types exposing (Import, Exposure(All, None, Explicit), ModuleName, Expose(TypeExpose))
 import AST.Ranges as Ranges exposing (Range)

@@ -4,12 +4,12 @@ import Analyser.FileContext as FileContext
 import Analyser.Messages.Types exposing (Message, MessageData(FileLoadFailed, UnformattedFile), newMessage)
 import Analyser.Files.Types exposing (Dependency, LoadedSourceFiles)
 import Analyser.Checks.UnusedVariable as UnusedVariable
-import Analyser.Checks.NotExposeAll as NotExposeAll
-import Analyser.Checks.NoImportAll as NoImportAll
-import Analyser.Checks.NoSignature as NoSignature
+import Analyser.Checks.ExposeAll as ExposeAll
+import Analyser.Checks.ImportAll as ImportAll
+import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 import Analyser.Checks.NoDebug as NoDebug
-import Analyser.Checks.DuplicateImports as DuplicateImports
+import Analyser.Checks.DuplicateImport as DuplicateImport
 import Analyser.Checks.UnusedTypeAliases as UnusedTypeAliases
 import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
@@ -26,12 +26,12 @@ import Analyser.Configuration exposing (Configuration)
 checkers : List Checker
 checkers =
     [ UnusedVariable.checker
-    , NotExposeAll.checker
-    , NoImportAll.checker
-    , NoSignature.checker
+    , ExposeAll.checker
+    , ImportAll.checker
+    , NoTopLevelSignature.checker
     , UnnecessaryParens.checker
     , NoDebug.checker
-    , DuplicateImports.checker
+    , DuplicateImport.checker
     , UnusedTypeAliases.checker
     , OverriddenVariables.checker
     , NoUncurriedPrefix.checker

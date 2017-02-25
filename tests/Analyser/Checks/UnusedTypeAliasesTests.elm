@@ -93,16 +93,16 @@ type Patch
     )
 
 
-unusedAlias : ( String, String, List MessageData )
-unusedAlias =
-    ( "unusedAlias"
+unusedTypeAlias : ( String, String, List MessageData )
+unusedTypeAlias =
+    ( "unusedTypeAlias"
     , """module Foo exposing (foo)
 
 type alias Person = { name : String, age : Int}
 
 foo = 1
 """
-    , [ UnusedAlias "./foo.elm" "Person" { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+    , [ UnusedTypeAlias "./foo.elm" "Person" { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -117,5 +117,5 @@ all =
         , usedInPort
         , usedAliasInRecord
         , usedAliasInType
-        , unusedAlias
+        , unusedTypeAlias
         ]

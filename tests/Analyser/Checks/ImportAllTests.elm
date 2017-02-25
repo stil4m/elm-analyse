@@ -1,6 +1,6 @@
-module Analyser.Checks.NoImportAllTests exposing (..)
+module Analyser.Checks.ImportAllTests exposing (..)
 
-import Analyser.Checks.NoImportAll as NoImportAll
+import Analyser.Checks.ImportAll as ImportAll
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Messages.Types exposing (..)
 import Expect
@@ -52,15 +52,15 @@ import Foo exposing (Bar(Baz))
 
 all : Test
 all =
-    describe "Analyser.NoImportAllTests"
+    describe "Analyser.ImportAllTests"
         [ test "importAll" <|
             \() ->
-                CTU.getMessages importAll NoImportAll.checker
+                CTU.getMessages importAll ImportAll.checker
                     |> Expect.equal
                         (Just [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } } ])
         , test "importAllMultiple" <|
             \() ->
-                CTU.getMessages importAllMultiple NoImportAll.checker
+                CTU.getMessages importAllMultiple ImportAll.checker
                     |> Expect.equal
                         (Just
                             [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
@@ -69,15 +69,15 @@ all =
                         )
         , test "importStrict" <|
             \() ->
-                CTU.getMessages importStrict NoImportAll.checker
+                CTU.getMessages importStrict ImportAll.checker
                     |> Expect.equal
                         (Just [])
         , test "importAllConstructors" <|
             \() ->
-                CTU.getMessages importAllConstructors NoImportAll.checker
+                CTU.getMessages importAllConstructors ImportAll.checker
                     |> Expect.equal (Just [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 24 }, end = { row = 2, column = 26 } } ])
         , test "importConstructorsStrict" <|
             \() ->
-                CTU.getMessages importConstructorsStrict NoImportAll.checker
+                CTU.getMessages importConstructorsStrict ImportAll.checker
                     |> Expect.equal (Just [])
         ]

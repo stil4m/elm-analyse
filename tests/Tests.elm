@@ -4,13 +4,13 @@ import Analyser.InterfaceTest as InterfaceTest
 import Analyser.PostProcessingTests as PostProcessingTests
 import Test exposing (Test)
 import Parser.Tests as ParserTests
-import Analyser.Checks.NoSignatureTests
+import Analyser.Checks.NoTopLevelSignatureTests
 import Analyser.Checks.UnusedVariableTests
-import Analyser.Checks.NotExposeAllTests
-import Analyser.Checks.NoImportAllTests
+import Analyser.Checks.ExposeAllTests
+import Analyser.Checks.ImportAllTests
 import Analyser.Checks.UnnecessaryParensTests
 import Analyser.Checks.NoDebugTests
-import Analyser.Checks.DuplicateImportsTests
+import Analyser.Checks.DuplicateImportTests
 import Analyser.Checks.UnusedTypeAliasesTests
 import Analyser.Checks.OverriddenVariablesTests
 import Analyser.Checks.NoUncurriedPrefixTests
@@ -38,12 +38,12 @@ all =
         , Analyser.Checks.UnusedVariableTests.all
         , Analyser.Checks.OverriddenVariablesTests.all
         , Analyser.Checks.UnnecessaryParensTests.all
-        , Analyser.Checks.DuplicateImportsTests.all
+        , Analyser.Checks.DuplicateImportTests.all
         , Analyser.Checks.NoDebugTests.all
         , Analyser.Checks.UnusedTypeAliasesTests.all
-        , Analyser.Checks.NoSignatureTests.all
-        , Analyser.Checks.NoImportAllTests.all
-        , Analyser.Checks.NotExposeAllTests.all
+        , Analyser.Checks.NoTopLevelSignatureTests.all
+        , Analyser.Checks.ImportAllTests.all
+        , Analyser.Checks.ExposeAllTests.all
         , Analyser.Checks.UnnecessaryListConcatTests.all
         , InterfaceTest.all
         , PostProcessingTests.all

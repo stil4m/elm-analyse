@@ -1,4 +1,4 @@
-module Analyser.Checks.NoSignature exposing (checker)
+module Analyser.Checks.NoTopLevelSignature exposing (checker)
 
 import AST.Ranges exposing (Range)
 import AST.Types exposing (Function)

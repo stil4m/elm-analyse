@@ -1,4 +1,4 @@
-module Analyser.Checks.DuplicateImports exposing (checker)
+module Analyser.Checks.DuplicateImport exposing (checker)
 
 import AST.Types exposing (InnerExpression, ModuleName, Import)
 import AST.Ranges exposing (Range)

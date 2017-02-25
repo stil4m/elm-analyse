@@ -108,7 +108,7 @@ decodeMessageData =
                 |: moduleNameField
                 |: JD.field "ranges" (JD.list Ranges.decode)
           )
-        , ( "UnusedAlias", decodeFileVarNameAndRange UnusedAlias )
+        , ( "UnusedTypeAlias", decodeFileVarNameAndRange UnusedTypeAlias )
         , ( "RedefineVariable"
           , JD.succeed RedefineVariable
                 |: fileField
@@ -275,8 +275,8 @@ encodeMessageData m =
                     , ( "ranges", JE.list <| List.map Ranges.encode ranges )
                     ]
 
-        UnusedAlias file varName range ->
-            encodeTyped "UnusedAlias" <|
+        UnusedTypeAlias file varName range ->
+            encodeTyped "UnusedTypeAlias" <|
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )

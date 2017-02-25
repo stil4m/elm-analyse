@@ -1,4 +1,4 @@
-module Analyser.Checks.NotExposeAll exposing (checker)
+module Analyser.Checks.ExposeAll exposing (checker)
 
 import AST.Types exposing (Exposure(All, None, Explicit), Expose(TypeExpose), File)
 import AST.Ranges exposing (Range)

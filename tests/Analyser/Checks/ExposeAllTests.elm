@@ -1,6 +1,6 @@
-module Analyser.Checks.NotExposeAllTests exposing (..)
+module Analyser.Checks.ExposeAllTests exposing (..)
 
-import Analyser.Checks.NotExposeAll as NotExposeAll
+import Analyser.Checks.ExposeAll as ExposeAll
 import Expect
 import Test exposing (..)
 import Analyser.Messages.Types exposing (..)
@@ -41,25 +41,25 @@ type Color = Blue | Red
 
 all : Test
 all =
-    describe "Analyser.NotExposeAllTests"
+    describe "Analyser.ExposeAllTests"
         [ test "exposingAll" <|
             \() ->
-                CTU.getMessages exposingAll NotExposeAll.checker
+                CTU.getMessages exposingAll ExposeAll.checker
                     |> Expect.equal
                         (Just [ (ExposeAll "./foo.elm" { start = { row = 1, column = 21 }, end = { row = 1, column = 23 } }) ])
         , test "exposingStrict" <|
             \() ->
-                CTU.getMessages exposingStrict NotExposeAll.checker
+                CTU.getMessages exposingStrict ExposeAll.checker
                     |> Expect.equal
                         (Just [])
         , test "exposingAllConstructors" <|
             \() ->
-                CTU.getMessages exposingAllConstructors NotExposeAll.checker
+                CTU.getMessages exposingAllConstructors ExposeAll.checker
                     |> Expect.equal
                         (Just [ (ExposeAll "./foo.elm" { start = { row = 1, column = 27 }, end = { row = 1, column = 29 } }) ])
         , test "exposingStrictConstructors" <|
             \() ->
-                CTU.getMessages exposingStrictConstructors NotExposeAll.checker
+                CTU.getMessages exposingStrictConstructors ExposeAll.checker
                     |> Expect.equal
                         (Just [])
         ]

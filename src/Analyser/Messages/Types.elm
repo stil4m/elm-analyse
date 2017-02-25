@@ -51,7 +51,7 @@ type MessageData
     | UnformattedFile FileName
     | FileLoadFailed FileName
     | DuplicateImport FileName AST.ModuleName (List Range)
-    | UnusedAlias FileName String Range
+    | UnusedTypeAlias FileName String Range
     | RedefineVariable FileName String Range Range
     | NoUncurriedPrefix FileName String Range
     | UnusedImportAlias FileName AST.ModuleName Range

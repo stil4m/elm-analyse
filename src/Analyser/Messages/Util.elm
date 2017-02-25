@@ -287,7 +287,7 @@ getMessageInfo m =
             , True
             )
 
-        UnusedAlias fileName name range ->
+        UnusedTypeAlias fileName name range ->
             ( String.concat
                 [ "Type alias `"
                 , name
