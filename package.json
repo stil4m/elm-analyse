@@ -1,6 +1,6 @@
 {
     "name": "elm-analyse",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "description": "A tool that allows you analyse your Elm code and identifies deficiencies and best practices.",
     "repository": {
         "type": "git",
@@ -11,7 +11,7 @@
         "email": "mstijlaart@gmail.com"
     },
     "scripts": {
-        "postinstall": "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\""
+        "build": "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\""
     },
     "author": "Mats Stijlaart",
     "license": "MIT",

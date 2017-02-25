@@ -3,6 +3,4 @@ elm.js
 tmp
 node_modules
 /cache
-/js/backend-elm.js
-/js/public/client-elm.js
 /performance/generated
