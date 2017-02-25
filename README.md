@@ -63,27 +63,27 @@ Add the `-s` option for the server mode. This can be viewed in the browser. To c
 
 | Check         | Description   |
 | ------------- | ------------- |
-| DuplicateImport | This check will look for imports that are defined twice. The Elm compiler will not fail on this, but it is better to merge these two imports into one. |
 | DebugLog | This check will look if a `Debug.log` is used within the code. This is nice for development, but you do not want to ship this code to package users or your endusers. |
 | DebugCrash | This check will look if a `Debug.crash` is used within the code. You may not want to ship this to your end users. |
-| LineLengthExceeded | This check will mark files that contain lines that exceed over 150 characters (#18 allows configuring this variable). |
-| ImportAll | This check will look for imports that expose all functions from a module `(..)`. When other people read your code, it would be nice if the origin of a used function can be traced back to the providing module. |
-| NoTopLevelSignature | This check will look for function declarations without a signature. We want our readers to understand our code. Adding a signature is a part of this. This check will **skip** definitions in let statements. |
+| DropConcatOfLists | If you concatenate two lists (`[...] ++ [...]`), then you can merge them into one list. |
+| DropConsOfItemAndList | If you cons an item to a literal list (`x :x [1, 2, 3]`), then you can just put the item into the list. |
+| DuplicateImport | This check will look for imports that are defined twice. The Elm compiler will not fail on this, but it is better to merge these two imports into one. |
 | ExposeAll | This check will look for modules that expose all their definitions. This is not a best practice. You want to be clear about the API that a module defined. |
+| ImportAll | This check will look for imports that expose all functions from a module `(..)`. When other people read your code, it would be nice if the origin of a used function can be traced back to the providing module. |
+| LineLengthExceeded | This check will mark files that contain lines that exceed over 150 characters (#18 allows configuring this variable). |
+| NoTopLevelSignature | This check will look for function declarations without a signature. We want our readers to understand our code. Adding a signature is a part of this. This check will **skip** definitions in let statements. |
 | NoUncurriedPrefix | It is unneeded to use an operator in prefix notation when you apply both arguments directly. This check will look for these kind of usages |
 | RedefineVariable | You should not redefine a variable in a new lexical scope. This is confusing and may lead to bugs. |
 | UnnecessaryListConcat | Yu should not use `List.concat` to concatenate literal lists. Just join the lists together. |
 | UnnecessaryParens | If you want parenthesis, then you might want to look into Lisp. It is good to know when you do not need them in Elm and this check will let you know. This check follows this [discussion](https://github.com/avh4/elm-format/issues/262) from `elm-format`. |
-| UnusedImportAlias | Sometimes you defined an alias for an import (`import Foo as F`), but it turns out you never use it. This check shows where you have unused import aliases. |
 | UnusedImport | Imports that have no meaning should be removed. |
-| UnusedTypeAlias | When you defined an type alias, but you do not use it in any signature or expose it, then it is just filling up space. It is better to remove it. |
+| UnusedImportAlias | Sometimes you defined an alias for an import (`import Foo as F`), but it turns out you never use it. This check shows where you have unused import aliases. |
 | UnusedImportedVariable | When a function is imported from a module but unused, it is better to remove it. |
-| UnusedTopLevel | Functions that are unused in a module and not exported are dead code. These should be removed. |
-| UnusedVariable | Variables that are not used could be removed or marked as `_` to avoid unnecessary noise. |
 | UnusedPatternVariable | Variables in pattern matching that are unused should be replaced with `_` to avoid unnecessary noice. |
+| UnusedTopLevel | Functions that are unused in a module and not exported are dead code. These should be removed. |
+| UnusedTypeAlias | When you defined an type alias, but you do not use it in any signature or expose it, then it is just filling up space. It is better to remove it. |
+| UnusedVariable | Variables that are not used could be removed or marked as `_` to avoid unnecessary noise. |
 | UseConsOverConcat | If you concatenate two lists, but the right hand side is a single element list, then you should use the cons operator. |
-| DropConcatOfLists | If you concatenate two lists (`[...] ++ [...]`), then you can merge them into one list. |
-| DropConsOfItemAndList | If you cons an item to a literal list (`x :x [1, 2, 3]`), then you can just put the item into the list. |
 
 ---
 
