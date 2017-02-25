@@ -20,8 +20,17 @@ var args = minimist(process.argv.slice(2), {
         elmFormatPath: elmFormatPath,
     }
     if (args.help) {
-        console.log("TODO: Do help")
-        return;
+      console.log("Usages:");
+      console.log("  $ elm-analyse")
+      console.log("    # Analyse the project and log messages to the console\n")
+      console.log("  $ elm-analyse -s");
+      console.log("    # Analyse the project and start a server. Allows inspection of messages through a browser (Default: http://localhost:3000).\n");
+      console.log("Options: ")
+      console.log("   --help, -h          Print the help output.");
+      console.log("   --serve, -s         Enable server mode. Disabled by default.");
+      console.log("   --port, -p          The port on which the server should listen. Defaults to 3000.");
+      console.log("   --elm-format-path   Path to elm-format. Defaults to `elm-format`.");
+      process.exit(1);
     }
 
     const packageFileExists = fs.existsSync('./elm-package.json');
