@@ -1,10 +1,10 @@
 {
     "name": "elm-analyse",
     "version": "0.1.0",
-    "description": "Analyser for Elm packages",
+    "description": "A tool that allows you analyse your Elm code and identifies deficiencies and best practices.",
     "repository": {
         "type": "git",
-        "url": "github.com/substack/node-browserify"
+        "url": "github.com/stil4m/elm-analyse"
     },
     "bugs": {
         "url": "https://github.com/stil4m/elm-analyse/issues",
@@ -14,10 +14,15 @@
         "postinstall": "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\""
     },
     "author": "Mats Stijlaart",
-    "license": "ISC",
+    "license": "MIT",
     "bin": {
         "elm-analyse": "js/bin/index.js"
     },
+    "keywords" : [
+        "elm",
+        "ast",
+        "lint"
+    ],
     "dependencies": {
         "elm": "0.18.0",
         "elm-test": "0.18.2",
