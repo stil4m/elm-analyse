@@ -1,5 +1,8 @@
 # elm-analyse changelog
 
+## 0.1.4 (2017-02-25)
+
+* [#19](https://github.com/stil4m/elm-analyse/issues/19) "Unused imported variable": Destructured Single Type Union in let-statement
 
 ## 0.1.3 (2017-02-25)
 

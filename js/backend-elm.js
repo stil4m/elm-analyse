@@ -21730,24 +21730,38 @@ var _user$project$Analyser_Checks_UnusedVariable$onOperatorAppliction = F2(
 		var _p5 = _p4;
 		return A2(_user$project$Analyser_Checks_UnusedVariable$addUsedVariable, _p5._0, context);
 	});
+var _user$project$Analyser_Checks_UnusedVariable$onDestructuring = F2(
+	function (_p6, context) {
+		var _p7 = _p6;
+		return A3(
+			_elm_lang$core$List$foldl,
+			_user$project$Analyser_Checks_UnusedVariable$addUsedVariable,
+			context,
+			A2(
+				_elm_lang$core$List$map,
+				function (_) {
+					return _.value;
+				},
+				_user$project$ASTUtil_Variables$patternToUsedVars(_p7.pattern)));
+	});
 var _user$project$Analyser_Checks_UnusedVariable$maskVariable = F2(
 	function (k, context) {
 		return _elm_lang$core$Native_Utils.update(
 			context,
 			{
 				activeScopes: function () {
-					var _p6 = context.activeScopes;
-					if (_p6.ctor === '[]') {
+					var _p8 = context.activeScopes;
+					if (_p8.ctor === '[]') {
 						return {ctor: '[]'};
 					} else {
 						return {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: {ctor: '::', _0: k, _1: _p6._0._0},
-								_1: _p6._0._1
+								_0: {ctor: '::', _0: k, _1: _p8._0._0},
+								_1: _p8._0._1
 							},
-							_1: _p6._1
+							_1: _p8._1
 						};
 					}
 				}()
@@ -21759,8 +21773,8 @@ var _user$project$Analyser_Checks_UnusedVariable$unMaskVariable = F2(
 			context,
 			{
 				activeScopes: function () {
-					var _p7 = context.activeScopes;
-					if (_p7.ctor === '[]') {
+					var _p9 = context.activeScopes;
+					if (_p9.ctor === '[]') {
 						return {ctor: '[]'};
 					} else {
 						return {
@@ -21773,10 +21787,10 @@ var _user$project$Analyser_Checks_UnusedVariable$unMaskVariable = F2(
 										function (x, y) {
 											return !_elm_lang$core$Native_Utils.eq(x, y);
 										})(k),
-									_p7._0._0),
-								_1: _p7._0._1
+									_p9._0._0),
+								_1: _p9._0._1
 							},
-							_1: _p7._1
+							_1: _p9._1
 						};
 					}
 				}()
@@ -21796,10 +21810,10 @@ var _user$project$Analyser_Checks_UnusedVariable$popScope = function (x) {
 				x.poppedScopes,
 				A2(
 					_elm_lang$core$Maybe$map,
-					function (_p8) {
-						var _p9 = _p8;
-						var _p10 = _p9._1;
-						return _elm_lang$core$Dict$isEmpty(_p10) ? x.poppedScopes : {ctor: '::', _0: _p10, _1: x.poppedScopes};
+					function (_p10) {
+						var _p11 = _p10;
+						var _p12 = _p11._1;
+						return _elm_lang$core$Dict$isEmpty(_p12) ? x.poppedScopes : {ctor: '::', _0: _p12, _1: x.poppedScopes};
 					},
 					_elm_lang$core$List$head(x.activeScopes)))
 		});
@@ -21815,13 +21829,13 @@ var _user$project$Analyser_Checks_UnusedVariable$pushScope = F2(
 			_elm_lang$core$Dict$fromList(
 				A2(
 					_elm_lang$core$List$map,
-					function (_p11) {
-						var _p12 = _p11;
-						var _p13 = _p12._0;
+					function (_p13) {
+						var _p14 = _p13;
+						var _p15 = _p14._0;
 						return {
 							ctor: '_Tuple2',
-							_0: _p13.value,
-							_1: {ctor: '_Tuple3', _0: 0, _1: _p12._1, _2: _p13.range}
+							_0: _p15.value,
+							_1: {ctor: '_Tuple3', _0: 0, _1: _p14._1, _2: _p15.range}
 						};
 					},
 					vars)));
@@ -21880,9 +21894,9 @@ var _user$project$Analyser_Checks_UnusedVariable$onLetBlock = F3(
 					_elm_lang$core$Basics$flip,
 					_user$project$Analyser_Checks_UnusedVariable$pushScope,
 					context,
-					function (_p14) {
+					function (_p16) {
 						return _user$project$ASTUtil_Variables$withoutTopLevel(
-							_user$project$ASTUtil_Variables$getDeclarationsVars(_p14));
+							_user$project$ASTUtil_Variables$getDeclarationsVars(_p16));
 					}(letBlock.declarations))));
 	});
 var _user$project$Analyser_Checks_UnusedVariable$onCase = F3(
@@ -21906,11 +21920,11 @@ var _user$project$Analyser_Checks_UnusedVariable$onCase = F3(
 				_elm_lang$core$Tuple$first(caze)));
 		return A3(_elm_lang$core$List$foldl, _user$project$Analyser_Checks_UnusedVariable$addUsedVariable, postContext, used);
 	});
-var _user$project$Analyser_Checks_UnusedVariable$filterForEffectModule = function (_p15) {
-	var _p16 = _p15;
+var _user$project$Analyser_Checks_UnusedVariable$filterForEffectModule = function (_p17) {
+	var _p18 = _p17;
 	return !A2(
 		_elm_lang$core$List$member,
-		_p16._0,
+		_p18._0,
 		{
 			ctor: '::',
 			_0: 'init',
@@ -21934,8 +21948,8 @@ var _user$project$Analyser_Checks_UnusedVariable$filterForEffectModule = functio
 		});
 };
 var _user$project$Analyser_Checks_UnusedVariable$filterByModuleType = function (fileContext) {
-	var _p17 = fileContext.ast.moduleDefinition;
-	if (_p17.ctor === 'EffectModule') {
+	var _p19 = fileContext.ast.moduleDefinition;
+	if (_p19.ctor === 'EffectModule') {
 		return _user$project$Analyser_Checks_UnusedVariable$filterForEffectModule;
 	} else {
 		return _elm_lang$core$Basics$always(true);
@@ -21943,8 +21957,8 @@ var _user$project$Analyser_Checks_UnusedVariable$filterByModuleType = function (
 };
 var _user$project$Analyser_Checks_UnusedVariable$forVariableType = F5(
 	function (path, configuration, variableType, variableName, range) {
-		var _p18 = variableType;
-		switch (_p18.ctor) {
+		var _p20 = variableType;
+		switch (_p20.ctor) {
 			case 'Imported':
 				return A2(_user$project$Analyser_Configuration$checkEnabled, 'UnusedImportedVariable', configuration) ? _elm_lang$core$Maybe$Just(
 					A3(_user$project$Analyser_Messages_Types$UnusedImportedVariable, path, variableName, range)) : _elm_lang$core$Maybe$Nothing;
@@ -21962,7 +21976,7 @@ var _user$project$Analyser_Checks_UnusedVariable$forVariableType = F5(
 var _user$project$Analyser_Checks_UnusedVariable$scan = F2(
 	function (fileContext, configuration) {
 		var onlyUnused = _elm_lang$core$List$filter(
-			function (_p19) {
+			function (_p21) {
 				return A2(
 					F2(
 						function (x, y) {
@@ -21970,7 +21984,7 @@ var _user$project$Analyser_Checks_UnusedVariable$scan = F2(
 						}),
 					0,
 					_Fresheyeball$elm_tuple_extra$Tuple3$first(
-						_elm_lang$core$Tuple$second(_p19)));
+						_elm_lang$core$Tuple$second(_p21)));
 			});
 		var x = A3(
 			_user$project$Inspector$inspect,
@@ -21983,6 +21997,7 @@ var _user$project$Analyser_Checks_UnusedVariable$scan = F2(
 					onLambda: _user$project$Inspector$Inner(_user$project$Analyser_Checks_UnusedVariable$onLambda),
 					onCase: _user$project$Inspector$Inner(_user$project$Analyser_Checks_UnusedVariable$onCase),
 					onOperatorApplication: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedVariable$onOperatorAppliction),
+					onDestructuring: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedVariable$onDestructuring),
 					onFunctionOrValue: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedVariable$onFunctionOrValue),
 					onRecordUpdate: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedVariable$onRecordUpdate)
 				}),
@@ -21998,9 +22013,9 @@ var _user$project$Analyser_Checks_UnusedVariable$scan = F2(
 				}),
 			A2(
 				_elm_lang$core$List$filterMap,
-				function (_p20) {
-					var _p21 = _p20;
-					return A5(_user$project$Analyser_Checks_UnusedVariable$forVariableType, fileContext.path, configuration, _p21._1._1, _p21._0, _p21._1._2);
+				function (_p22) {
+					var _p23 = _p22;
+					return A5(_user$project$Analyser_Checks_UnusedVariable$forVariableType, fileContext.path, configuration, _p23._1._1, _p23._0, _p23._1._2);
 				},
 				onlyUnused(
 					A2(_elm_lang$core$List$concatMap, _elm_lang$core$Dict$toList, x.poppedScopes))));
@@ -22014,18 +22029,18 @@ var _user$project$Analyser_Checks_UnusedVariable$scan = F2(
 				}),
 			A2(
 				_elm_lang$core$List$filterMap,
-				function (_p22) {
-					var _p23 = _p22;
-					return A5(_user$project$Analyser_Checks_UnusedVariable$forVariableType, fileContext.path, configuration, _p23._1._1, _p23._0, _p23._1._2);
+				function (_p24) {
+					var _p25 = _p24;
+					return A5(_user$project$Analyser_Checks_UnusedVariable$forVariableType, fileContext.path, configuration, _p25._1._1, _p25._0, _p25._1._2);
 				},
 				A2(
 					_elm_lang$core$List$filter,
-					function (_p24) {
+					function (_p26) {
 						return !A3(
 							_elm_lang$core$Basics$flip,
 							_user$project$Analyser_Files_Interface$doesExposeFunction,
 							fileContext.$interface,
-							_elm_lang$core$Tuple$first(_p24));
+							_elm_lang$core$Tuple$first(_p26));
 					},
 					A2(
 						_elm_lang$core$List$filter,
