@@ -63,8 +63,8 @@ Add the `-s` option for the server mode. This can be viewed in the browser. To c
 
 | Check         | Description   |
 | ------------- | ------------- |
-| DebugLog | This check will look if a `Debug.log` is used within the code. This is nice for development, but you do not want to ship this code to package users or your endusers. |
 | DebugCrash | This check will look if a `Debug.crash` is used within the code. You may not want to ship this to your end users. |
+| DebugLog | This check will look if a `Debug.log` is used within the code. This is nice for development, but you do not want to ship this code to package users or your endusers. |
 | DropConcatOfLists | If you concatenate two lists (`[...] ++ [...]`), then you can merge them into one list. |
 | DropConsOfItemAndList | If you cons an item to a literal list (`x :x [1, 2, 3]`), then you can just put the item into the list. |
 | DuplicateImport | This check will look for imports that are defined twice. The Elm compiler will not fail on this, but it is better to merge these two imports into one. |
