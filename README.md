@@ -26,20 +26,10 @@ elm  0.18.x
 elm-format (a version that is compatible with the source code you wish to analyse)
 ```
 
-### Setup
-
-Run the following scripts after the initial clone
+### Install
 
 ```
-npm install
-npm link
-```
-
-To update run:
-
-```
-git pull
-npm install
+npm install -g elm-analyse
 ```
 
 ### Run
