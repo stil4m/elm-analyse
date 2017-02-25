@@ -346,6 +346,23 @@ foo x y=
     )
 
 
+usedInDestructuringLet : ( String, String, List MessageData )
+usedInDestructuringLet =
+    ( "usedInDestructuringLet"
+    , """module Foo exposing (..)
+
+import Some exposing (Bar(Bar))
+
+x =
+  let
+    (Bar 1) = some
+  in
+    1
+    """
+    , []
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedVariable"
@@ -373,4 +390,5 @@ all =
         , unusedButDestructuredWithSameNameInTuple
         , unusedButDestructuredWithSameNameInRecord
         , unusedButDestructuredWithSameNameInAs
+        , usedInDestructuringLet
         ]

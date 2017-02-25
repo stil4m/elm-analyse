@@ -12,6 +12,7 @@ import AST.Types
         , InfixDirection
         , Expression
         , Module(EffectModule)
+        , Destructuring
         )
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
@@ -59,6 +60,7 @@ scan fileContext configuration =
                     , onLambda = Inner onLambda
                     , onCase = Inner onCase
                     , onOperatorApplication = Post onOperatorAppliction
+                    , onDestructuring = Post onDestructuring
                     , onFunctionOrValue = Post onFunctionOrValue
                     , onRecordUpdate = Post onRecordUpdate
                 }
@@ -278,6 +280,13 @@ onLetBlock f letBlock context =
         |> flip pushScope context
         |> f
         |> popScope
+
+
+onDestructuring : Destructuring -> UsedVariableContext -> UsedVariableContext
+onDestructuring { pattern } context =
+    List.foldl addUsedVariable
+        context
+        (List.map .value (patternToUsedVars pattern))
 
 
 onCase : (UsedVariableContext -> UsedVariableContext) -> Case -> UsedVariableContext -> UsedVariableContext
