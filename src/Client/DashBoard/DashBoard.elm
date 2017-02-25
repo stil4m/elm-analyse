@@ -43,11 +43,6 @@ init location =
     )
 
 
-sortMessages : State -> State
-sortMessages state =
-    { state | messages = List.sortBy (.data >> Messages.getFiles >> List.head >> Maybe.withDefault "") state.messages }
-
-
 update : Location -> Msg -> Model -> ( Model, Cmd Msg )
 update location msg model =
     case msg of
@@ -60,8 +55,8 @@ update location msg model =
             case x of
                 Ok o ->
                     ( { model
-                        | state = RD.Success (sortMessages o)
-                        , messageList = MessageList.withMessages (sortMessages o).messages model.messageList
+                        | state = RD.Success o
+                        , messageList = MessageList.withMessages o.messages model.messageList
                       }
                     , Cmd.none
                     )

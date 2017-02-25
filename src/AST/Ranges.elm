@@ -1,4 +1,4 @@
-module AST.Ranges exposing (Location, Range, rangeToString, getRange, emptyRange, encode, decode, orderByStart, containsRange)
+module AST.Ranges exposing (Location, Range, rangeToString, getRange, emptyRange, encode, decode, orderByStart, containsRange, compareRangeStarts)
 
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE exposing (Value)
@@ -72,6 +72,11 @@ getRange ranges =
 emptyRange : Range
 emptyRange =
     { start = { row = 0, column = 0 }, end = { row = 0, column = 0 } }
+
+
+compareRangeStarts : Range -> Range -> Order
+compareRangeStarts a b =
+    compareLocations a.start b.start
 
 
 compareLocations : Location -> Location -> Order

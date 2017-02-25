@@ -1,7 +1,7 @@
 module Analyser.Messages.Util exposing (..)
 
 import Analyser.Messages.Types exposing (..)
-import AST.Ranges exposing (Range, rangeToString)
+import AST.Ranges as Ranges exposing (Range, rangeToString)
 
 
 type alias CanFix =
@@ -39,6 +39,23 @@ asString m =
             getMessageInfo m
     in
         f
+
+
+compareMessage : Message -> Message -> Order
+compareMessage a b =
+    let
+        aFile =
+            getFiles a.data |> List.head |> Maybe.withDefault ""
+
+        bFile =
+            getFiles a.data |> List.head |> Maybe.withDefault ""
+    in
+        if aFile == bFile then
+            Ranges.compareRangeStarts
+                (getRanges a.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
+                (getRanges b.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
+        else
+            compare aFile bFile
 
 
 getFiles : MessageData -> List String

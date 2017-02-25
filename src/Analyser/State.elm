@@ -2,7 +2,7 @@ module Analyser.State exposing (..)
 
 import Analyser.Messages.Types exposing (Message, MessageId, MessageStatus(Applicable))
 import Analyser.Messages.Json exposing (encodeMessage, decodeMessage)
-import Analyser.Messages.Util exposing (blockForShas, markFixing)
+import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing, getFiles)
 import Json.Encode as JE exposing (Value)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
@@ -79,6 +79,11 @@ startFixing message state =
     }
 
 
+sortMessages : State -> State
+sortMessages state =
+    { state | messages = List.sortWith Messages.compareMessage state.messages }
+
+
 finishWithNewMessages : List Message -> State -> State
 finishWithNewMessages messages s =
     let
@@ -95,6 +100,7 @@ finishWithNewMessages messages s =
             , status = Idle
             , idCount = s.idCount + List.length messages
         }
+            |> sortMessages
 
 
 decodeState : Decoder State
