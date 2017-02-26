@@ -35,7 +35,7 @@ npm install -g elm-analyse
 
 ### Run
 
-Change directory to the target elm project to analyser and run `elm-analyser`.
+Change directory to the target elm project to analyser and run `elm-analyse`.
 
 Add the `-s` option for the server mode. This can be viewed in the browser. To change the port use `-p XXXX`
 
