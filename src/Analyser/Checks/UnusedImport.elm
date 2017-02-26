@@ -1,4 +1,4 @@
-module Analyser.Checks.UnusedImports exposing (checker)
+module Analyser.Checks.UnusedImport exposing (checker)
 
 import AST.Ranges exposing (Range)
 import AST.Types exposing (Case, Exposure(None), Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))

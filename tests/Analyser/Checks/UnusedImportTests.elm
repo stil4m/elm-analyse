@@ -1,7 +1,7 @@
-module Analyser.Checks.UnusedImportsTests exposing (..)
+module Analyser.Checks.UnusedImportTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Checks.UnusedImports as UnusedImports
+import Analyser.Checks.UnusedImport as UnusedImport
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
@@ -112,8 +112,8 @@ foo = 1
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.UnusedImports"
-        UnusedImports.checker
+    CTU.build "Analyser.Checks.UnusedImport"
+        UnusedImport.checker
         [ usedAsQualified
         , usedAsQualifiedInPattern
         , usedInTypeReference

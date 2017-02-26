@@ -14,7 +14,7 @@ import Analyser.Checks.UnusedTypeAliases as UnusedTypeAliases
 import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
-import Analyser.Checks.UnusedImports as UnusedImports
+import Analyser.Checks.UnusedImport as UnusedImport
 import Analyser.Checks.ListOperators as ListOperators
 import Analyser.Checks.LineLength as LineLength
 import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
@@ -36,7 +36,7 @@ checkers =
     , OverriddenVariables.checker
     , NoUncurriedPrefix.checker
     , UnusedImportAliases.checker
-    , UnusedImports.checker
+    , UnusedImport.checker
     , ListOperators.checker
     , LineLength.checker
     , UnnecessaryListConcat.checker

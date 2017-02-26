@@ -1,4 +1,4 @@
-module Tests exposing (..)
+module Tests exposing (all)
 
 import Analyser.InterfaceTest as InterfaceTest
 import Analyser.PostProcessingTests as PostProcessingTests
@@ -15,7 +15,7 @@ import Analyser.Checks.UnusedTypeAliasesTests
 import Analyser.Checks.OverriddenVariablesTests
 import Analyser.Checks.NoUncurriedPrefixTests
 import Analyser.Checks.UnusedImportAliasesTests
-import Analyser.Checks.UnusedImportsTests
+import Analyser.Checks.UnusedImportTests
 import Analyser.Fixes.UnusedImportedVariableTests
 import Analyser.Fixes.UnusedImportAliasTests
 import ASTUtil.PatternOptimizerTests
@@ -24,17 +24,19 @@ import Analyser.Checks.ListOperatorsTests
 import Analyser.Checks.UnnecessaryListConcatTests
 import ASTUtil.WriterTests
 import Analyser.Fixes.UnnecessaryParensTests
+import Analyser.Fixes.UnusedImportTests
 
 
 all : Test
 all =
     Test.concat
-        [ Analyser.Fixes.UnnecessaryParensTests.all
-        , Analyser.Checks.ListOperatorsTests.all
+        [ Analyser.Checks.ListOperatorsTests.all
         , Analyser.Fixes.FileContentTests.all
         , Analyser.Fixes.UnusedImportedVariableTests.all
         , Analyser.Fixes.UnusedImportAliasTests.all
-        , Analyser.Checks.UnusedImportsTests.all
+        , Analyser.Fixes.UnnecessaryParensTests.all
+        , Analyser.Fixes.UnusedImportTests.all
+        , Analyser.Checks.UnusedImportTests.all
         , Analyser.Checks.UnusedImportAliasesTests.all
         , Analyser.Checks.NoUncurriedPrefixTests.all
         , Analyser.Checks.UnusedVariableTests.all
