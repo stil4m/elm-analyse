@@ -8,7 +8,8 @@ import Parser.File exposing (file)
 
 parse : String -> Maybe File
 parse input =
-    case Combine.runParser (file <* Combine.end) emptyState input of
+    -- A single line is added for unfinished ranges produced by `parser-combinators` on the last line.
+    case Combine.runParser (file <* Combine.end) emptyState (input ++ "\n") of
         Ok ( _, _, r ) ->
             Just r
 

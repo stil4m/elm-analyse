@@ -44,18 +44,32 @@ fixContent { start, end } ( fileName, content ) =
         startChar =
             FileContent.getCharAtLocation start content
 
+        lines =
+            content
+                |> String.split "\n"
+
         endCharLoc =
             if end.column <= -2 then
                 { end
                     | column =
-                        content
-                            |> String.split "\n"
+                        lines
                             |> List.drop (end.row - 1)
                             |> List.head
                             |> Maybe.withDefault ""
                             |> String.length
                             |> flip (-) 2
                     , row = end.row - 1
+                }
+            else if end.column == -1 then
+                { end
+                    | column =
+                        lines
+                            |> List.drop (end.row - 2)
+                            |> List.head
+                            |> Maybe.withDefault ""
+                            |> String.length
+                            |> flip (-) 2
+                    , row = end.row - 2
                 }
             else
                 { end | column = end.column - 1 }

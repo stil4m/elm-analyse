@@ -42,9 +42,9 @@ view (Model _ file) =
         [ CssFrameworks.toStyleNode CssFrameworks.Bootstrap.bootstrap
         , div [ class "container" ]
             [ div [ class "row" ]
-                [ div [ class "col-md-6" ]
+                [ div [ class "col-md-6 col-sm-6" ]
                     [ textarea [ onInput ChangeInput, rows 40, cols 80 ] [] ]
-                , div [ class "col-md-6" ]
+                , div [ class "col-md-6 col-sm-6" ]
                     [ pre [] [ file |> Maybe.map (encode >> JE.encode 2) |> Maybe.withDefault "" |> text ] ]
                 ]
             ]

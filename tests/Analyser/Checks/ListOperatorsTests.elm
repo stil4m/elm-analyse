@@ -15,7 +15,7 @@ foo : Int
 foo =
     [1] ++ [3, 4]
 """
-    , [ DropConcatOfLists "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 6, column = -1 } }
+    , [ DropConcatOfLists "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 5, column = -2 } }
       ]
     )
 
@@ -42,7 +42,7 @@ foo : Int
 foo =
     [1, 2] ++ [3, 4]
 """
-    , [ DropConcatOfLists "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 6, column = -1 } }
+    , [ DropConcatOfLists "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 5, column = -2 } }
       ]
     )
 
@@ -56,7 +56,7 @@ foo : Int
 foo =
     [1] ++ bar
 """
-    , [ UseConsOverConcat "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 6, column = -1 } }
+    , [ UseConsOverConcat "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 5, column = -2 } }
       ]
     )
 
@@ -70,7 +70,7 @@ foo : Int
 foo =
     1 :: [2 , 3]
 """
-    , [ DropConsOfItemAndList "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 6, column = -1 } }
+    , [ DropConsOfItemAndList "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 5, column = -2 } }
       ]
     )
 
