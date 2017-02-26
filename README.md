@@ -33,6 +33,12 @@ elm-format (a version that is compatible with the source code you wish to analys
 npm install -g elm-analyse
 ```
 
+or if using `yarn`:
+
+```
+yarn add elm-analyse
+```
+
 ### Run
 
 Change directory to the target elm project to analyser and run `elm-analyse`.
