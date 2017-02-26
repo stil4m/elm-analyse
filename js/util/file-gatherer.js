@@ -14,8 +14,10 @@ function targetFilesForPathAndPackage(directory, path, pack) {
 
         return find.fileSync(/\.elm$/, path + '/' + x)
             .filter(x => {
-                return x.replace(path, '')
-                    .indexOf('elm-stuff') === -1 && (x.length > 0)
+                const relativePath = x.replace(path, '')
+                return relativePath.indexOf('elm-stuff') === -1
+                      && relativePath.indexOf('node_modules') === -1
+                      && (x.length > 0)
             });
     }))).map(function(s) {
         const sParts = s.split(_path.sep);
