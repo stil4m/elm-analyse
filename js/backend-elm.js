@@ -17986,7 +17986,7 @@ var _user$project$Parser_Parser$parse = function (input) {
 		_elm_community$parser_combinators$Combine$runParser,
 		A2(_elm_community$parser_combinators$Combine_ops['<*'], _user$project$Parser_File$file, _elm_community$parser_combinators$Combine$end),
 		_user$project$Parser_State$emptyState,
-		input);
+		A2(_elm_lang$core$Basics_ops['++'], input, '\n'));
 	if ((_p0.ctor === 'Ok') && (_p0._0.ctor === '_Tuple3')) {
 		return _elm_lang$core$Maybe$Just(_p0._0._2);
 	} else {
@@ -23169,7 +23169,7 @@ var _user$project$Analyser_Checks_UnusedImportAliases$checker = {
 		})
 };
 
-var _user$project$Analyser_Checks_UnusedImports$onImport = F2(
+var _user$project$Analyser_Checks_UnusedImport$onImport = F2(
 	function (imp, context) {
 		return (_elm_lang$core$Native_Utils.eq(imp.moduleAlias, _elm_lang$core$Maybe$Nothing) && _elm_lang$core$Native_Utils.eq(imp.exposingList, _user$project$AST_Types$None)) ? A3(
 			_elm_lang$core$Dict$insert,
@@ -23177,7 +23177,7 @@ var _user$project$Analyser_Checks_UnusedImports$onImport = F2(
 			{ctor: '_Tuple2', _0: imp.range, _1: 0},
 			context) : context;
 	});
-var _user$project$Analyser_Checks_UnusedImports$markUsage = F2(
+var _user$project$Analyser_Checks_UnusedImport$markUsage = F2(
 	function (key, context) {
 		return A3(
 			_elm_lang$core$Dict$update,
@@ -23190,41 +23190,41 @@ var _user$project$Analyser_Checks_UnusedImports$markUsage = F2(
 						})(1))),
 			context);
 	});
-var _user$project$Analyser_Checks_UnusedImports$onTypeReference = F2(
+var _user$project$Analyser_Checks_UnusedImport$onTypeReference = F2(
 	function (typeReference, context) {
 		var _p0 = typeReference;
 		if (_p0.ctor === 'Typed') {
-			return A2(_user$project$Analyser_Checks_UnusedImports$markUsage, _p0._0, context);
+			return A2(_user$project$Analyser_Checks_UnusedImport$markUsage, _p0._0, context);
 		} else {
 			return context;
 		}
 	});
-var _user$project$Analyser_Checks_UnusedImports$onExpression = F2(
+var _user$project$Analyser_Checks_UnusedImport$onExpression = F2(
 	function (expr, context) {
 		var _p1 = _elm_lang$core$Tuple$second(expr);
 		if (_p1.ctor === 'QualifiedExpr') {
-			return A2(_user$project$Analyser_Checks_UnusedImports$markUsage, _p1._0, context);
+			return A2(_user$project$Analyser_Checks_UnusedImport$markUsage, _p1._0, context);
 		} else {
 			return context;
 		}
 	});
-var _user$project$Analyser_Checks_UnusedImports$onCase = F2(
+var _user$project$Analyser_Checks_UnusedImport$onCase = F2(
 	function (_p2, context) {
 		var _p3 = _p2;
 		return A3(
 			_elm_lang$core$List$foldl,
-			_user$project$Analyser_Checks_UnusedImports$markUsage,
+			_user$project$Analyser_Checks_UnusedImport$markUsage,
 			context,
 			_user$project$AST_Util$patternModuleNames(_p3._0));
 	});
-var _user$project$Analyser_Checks_UnusedImports$scan = F2(
+var _user$project$Analyser_Checks_UnusedImport$scan = F2(
 	function (fileContext, _p4) {
 		var aliases = A3(
 			_user$project$Inspector$inspect,
 			_elm_lang$core$Native_Utils.update(
 				_user$project$Inspector$defaultConfig,
 				{
-					onImport: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedImports$onImport)
+					onImport: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedImport$onImport)
 				}),
 			fileContext.ast,
 			_elm_lang$core$Dict$empty);
@@ -23261,15 +23261,15 @@ var _user$project$Analyser_Checks_UnusedImports$scan = F2(
 								_elm_lang$core$Native_Utils.update(
 									_user$project$Inspector$defaultConfig,
 									{
-										onTypeReference: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedImports$onTypeReference),
-										onExpression: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedImports$onExpression),
-										onCase: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedImports$onCase)
+										onTypeReference: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedImport$onTypeReference),
+										onExpression: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedImport$onExpression),
+										onCase: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedImport$onCase)
 									}),
 								fileContext.ast,
 								aliases))))));
 	});
-var _user$project$Analyser_Checks_UnusedImports$checker = {
-	check: _user$project$Analyser_Checks_UnusedImports$scan,
+var _user$project$Analyser_Checks_UnusedImport$checker = {
+	check: _user$project$Analyser_Checks_UnusedImport$scan,
 	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
 		{
 			ctor: '::',
@@ -23549,7 +23549,7 @@ var _user$project$Inspection$checkers = {
 											_0: _user$project$Analyser_Checks_UnusedImportAliases$checker,
 											_1: {
 												ctor: '::',
-												_0: _user$project$Analyser_Checks_UnusedImports$checker,
+												_0: _user$project$Analyser_Checks_UnusedImport$checker,
 												_1: {
 													ctor: '::',
 													_0: _user$project$Analyser_Checks_ListOperators$checker,
@@ -23803,6 +23803,7 @@ var _user$project$Analyser_Fixes_UnnecessaryParens$fixContent = F2(
 		var _p6 = _p2.end;
 		var _p3 = _p0;
 		var _p5 = _p3._1;
+		var lines = A2(_elm_lang$core$String$split, '\n', _p5);
 		var endCharLoc = (_elm_lang$core$Native_Utils.cmp(_p6.column, -2) < 1) ? _elm_lang$core$Native_Utils.update(
 			_p6,
 			{
@@ -23818,14 +23819,28 @@ var _user$project$Analyser_Fixes_UnnecessaryParens$fixContent = F2(
 							_elm_lang$core$Maybe$withDefault,
 							'',
 							_elm_lang$core$List$head(
-								A2(
-									_elm_lang$core$List$drop,
-									_p6.row - 1,
-									A2(_elm_lang$core$String$split, '\n', _p5)))))),
+								A2(_elm_lang$core$List$drop, _p6.row - 1, lines))))),
 				row: _p6.row - 1
+			}) : (_elm_lang$core$Native_Utils.eq(_p6.column, -1) ? _elm_lang$core$Native_Utils.update(
+			_p6,
+			{
+				column: A3(
+					_elm_lang$core$Basics$flip,
+					F2(
+						function (x, y) {
+							return x - y;
+						}),
+					2,
+					_elm_lang$core$String$length(
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							'',
+							_elm_lang$core$List$head(
+								A2(_elm_lang$core$List$drop, _p6.row - 2, lines))))),
+				row: _p6.row - 2
 			}) : _elm_lang$core$Native_Utils.update(
 			_p6,
-			{column: _p6.column - 1});
+			{column: _p6.column - 1}));
 		var endChar = A2(_user$project$Analyser_Fixes_FileContent$getCharAtLocation, endCharLoc, _p5);
 		var startChar = A2(_user$project$Analyser_Fixes_FileContent$getCharAtLocation, _p7, _p5);
 		var _p4 = {ctor: '_Tuple2', _0: startChar, _1: endChar};
