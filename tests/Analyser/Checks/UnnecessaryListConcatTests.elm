@@ -14,7 +14,7 @@ couldMerge =
 foo =
     List.concat [ [1], [2] ]
 """
-    , [ UnnecessaryListConcat "./foo.elm" { start = { row = 3, column = 3 }, end = { row = 5, column = -1 } }
+    , [ UnnecessaryListConcat "./foo.elm" { start = { row = 3, column = 3 }, end = { row = 4, column = -2 } }
       ]
     )
 

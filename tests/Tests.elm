@@ -23,12 +23,14 @@ import Analyser.Fixes.FileContentTests
 import Analyser.Checks.ListOperatorsTests
 import Analyser.Checks.UnnecessaryListConcatTests
 import ASTUtil.WriterTests
+import Analyser.Fixes.UnnecessaryParensTests
 
 
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.ListOperatorsTests.all
+        [ Analyser.Fixes.UnnecessaryParensTests.all
+        , Analyser.Checks.ListOperatorsTests.all
         , Analyser.Fixes.FileContentTests.all
         , Analyser.Fixes.UnusedImportedVariableTests.all
         , Analyser.Fixes.UnusedImportAliasTests.all

@@ -46,7 +46,7 @@ john = ("John")
 
 jon = (john)
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 10, column = 5 }, end = { row = 12, column = -1 } }
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 10, column = 5 }, end = { row = 11, column = -2 } }
       , UnnecessaryParens "./foo.elm" { start = { row = 8, column = 6 }, end = { row = 9, column = -2 } }
       , UnnecessaryParens "./foo.elm" { start = { row = 6, column = 5 }, end = { row = 7, column = -2 } }
       , UnnecessaryParens "./foo.elm" { start = { row = 4, column = 5 }, end = { row = 5, column = -2 } }
@@ -133,7 +133,7 @@ foo x =
 """
     , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 4 }, end = { row = 3, column = 9 } }
       , UnnecessaryParens "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 5, column = -2 } }
-      , UnnecessaryParens "./foo.elm" { start = { row = 6, column = 3 }, end = { row = 8, column = -1 } }
+      , UnnecessaryParens "./foo.elm" { start = { row = 6, column = 3 }, end = { row = 7, column = -2 } }
       ]
     )
 
@@ -145,7 +145,7 @@ parensAroundListExpression =
 
 foo x = ([x])
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 4, column = -1 } }
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -157,7 +157,7 @@ parensAroundTupleExpression =
 
 foo x = ((x, 1))
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 4, column = -1 } }
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -169,7 +169,7 @@ parensAroundRecordExpression =
 
 foo x = ({name = x})
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 4, column = -1 } }
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -181,7 +181,7 @@ parensAroundRecordUpdateExpression =
 
 foo x = ({ x | name = "Foo"})
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 4, column = -1 } }
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -222,7 +222,7 @@ parensAroundRecordAccess =
 
 foo x = (x.name.first)
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 4, column = -1 } }
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -289,7 +289,7 @@ parensAroundTopLevelApplication =
 foo =
     (f a b)
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 3 }, end = { row = 5, column = -1 } }
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 3 }, end = { row = 4, column = -2 } }
       ]
     )
 
