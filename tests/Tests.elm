@@ -25,12 +25,14 @@ import Analyser.Checks.UnnecessaryListConcatTests
 import ASTUtil.WriterTests
 import Analyser.Fixes.UnnecessaryParensTests
 import Analyser.Fixes.UnusedImportTests
+import Analyser.Checks.MultiLineRecordFormattingTests
 
 
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.ListOperatorsTests.all
+        [ Analyser.Checks.MultiLineRecordFormattingTests.all
+        , Analyser.Checks.ListOperatorsTests.all
         , Analyser.Fixes.FileContentTests.all
         , Analyser.Fixes.UnusedImportedVariableTests.all
         , Analyser.Fixes.UnusedImportAliasTests.all
