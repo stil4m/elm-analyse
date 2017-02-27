@@ -283,27 +283,27 @@ writeDestructuring { pattern, expression } =
 writeTypeReference : TypeReference -> Writer
 writeTypeReference typeReference =
     case typeReference of
-        GenericType s ->
+        GenericType s r ->
             string s
 
-        Typed moduleName k args ->
+        Typed moduleName k args r ->
             spaced
                 [ join [ writeModuleName moduleName, string k ]
                 , spaced (List.map writeTypeArg args)
                 ]
 
-        Unit ->
+        Unit r ->
             string "()"
 
-        Tupled xs ->
+        Tupled xs r ->
             parensComma
                 (List.map (\x -> ( emptyRange, writeTypeReference x )) xs)
 
-        Record xs ->
+        Record xs r ->
             bracesComma
                 (List.map (\x -> ( emptyRange, writeRecordField x )) xs)
 
-        GenericRecord name fields ->
+        GenericRecord name fields r ->
             spaced
                 [ string "{"
                 , string name
@@ -312,7 +312,7 @@ writeTypeReference typeReference =
                 , string "}"
                 ]
 
-        FunctionTypeReference left right ->
+        FunctionTypeReference left right r ->
             spaced
                 [ writeTypeReference left
                 , string "->"

@@ -222,13 +222,13 @@ type TypeArg
 
 
 type TypeReference
-    = GenericType String
-    | Typed ModuleName String (List TypeArg)
-    | Unit
-    | Tupled (List TypeReference)
-    | Record RecordDefinition
-    | GenericRecord String RecordDefinition
-    | FunctionTypeReference TypeReference TypeReference
+    = GenericType String Range
+    | Typed ModuleName String (List TypeArg) Range
+    | Unit Range
+    | Tupled (List TypeReference) Range
+    | Record RecordDefinition Range
+    | GenericRecord String RecordDefinition Range
+    | FunctionTypeReference TypeReference TypeReference Range
 
 
 type alias RecordDefinition =

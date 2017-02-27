@@ -202,13 +202,59 @@ noRangeDeclaration decl =
         TypeDecl d ->
             TypeDecl <| noRangeTypeDeclaration d
 
+        PortDeclaration d ->
+            PortDeclaration (noRangeSignature d)
+
         _ ->
             decl
 
 
 noRangeTypeAlias : TypeAlias -> TypeAlias
-noRangeTypeAlias =
-    unRange
+noRangeTypeAlias typeAlias =
+    unRange { typeAlias | typeReference = noRangeTypeReference typeAlias.typeReference }
+
+
+noRangeTypeReference : TypeReference -> TypeReference
+noRangeTypeReference typeReference =
+    case typeReference of
+        GenericType x _ ->
+            GenericType x emptyRange
+
+        Typed a b c _ ->
+            Typed a b (List.map noRangeTypeArg c) emptyRange
+
+        Unit _ ->
+            Unit emptyRange
+
+        Tupled a _ ->
+            Tupled (List.map noRangeTypeReference a) emptyRange
+
+        Record a _ ->
+            Record (List.map noRangeRecordField a) emptyRange
+
+        GenericRecord a b _ ->
+            GenericRecord a (List.map noRangeRecordField b) emptyRange
+
+        FunctionTypeReference a b _ ->
+            FunctionTypeReference
+                (noRangeTypeReference a)
+                (noRangeTypeReference b)
+                emptyRange
+
+
+noRangeTypeArg : TypeArg -> TypeArg
+noRangeTypeArg typeArg =
+    case typeArg of
+        Generic s ->
+            Generic s
+
+        Concrete t ->
+            Concrete (noRangeTypeReference t)
+
+
+noRangeRecordField : RecordField -> RecordField
+noRangeRecordField =
+    Tuple.mapSecond noRangeTypeReference
 
 
 noRangeTypeDeclaration : Type -> Type
@@ -218,14 +264,20 @@ noRangeTypeDeclaration x =
 
 noRangeValueConstructor : ValueConstructor -> ValueConstructor
 noRangeValueConstructor valueConstructor =
-    unRange valueConstructor
+    unRange ({ valueConstructor | arguments = List.map noRangeTypeReference valueConstructor.arguments })
 
 
 noRangeFunction : Function -> Function
 noRangeFunction f =
     { f
         | declaration = noRangeFunctionDeclaration f.declaration
+        , signature = Maybe.map noRangeSignature f.signature
     }
+
+
+noRangeSignature : FunctionSignature -> FunctionSignature
+noRangeSignature signature =
+    { signature | typeReference = noRangeTypeReference signature.typeReference }
 
 
 noRangeFunctionDeclaration : FunctionDeclaration -> FunctionDeclaration

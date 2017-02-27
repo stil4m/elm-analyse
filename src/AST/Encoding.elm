@@ -239,38 +239,55 @@ encodeSignature { operatorDefinition, name, typeReference } =
 encodeTypeReference : TypeReference -> Value
 encodeTypeReference typeReference =
     case typeReference of
-        GenericType name ->
-            encodeTyped "generic" (string name)
+        GenericType name r ->
+            encodeTyped "generic" <|
+                object
+                    [ ( "value", (string name) )
+                    , rangeField r
+                    ]
 
-        Typed moduleName name args ->
+        Typed moduleName name args r ->
             encodeTyped "typed" <|
                 object
                     [ ( "moduleName", encodeModuleName moduleName )
-                    , (nameField name)
+                    , nameField name
                     , ( "args", asList encodeTypeArg args )
+                    , rangeField r
                     ]
 
-        Unit ->
-            encodeTyped "unit" JE.null
+        Unit r ->
+            encodeTyped "unit" <|
+                object
+                    [ rangeField r ]
 
-        Tupled t ->
-            encodeTyped "tupled" (asList encodeTypeReference t)
+        Tupled t r ->
+            encodeTyped "tupled" <|
+                object
+                    [ ( "values", (asList encodeTypeReference t) )
+                    , rangeField r
+                    ]
 
-        FunctionTypeReference left right ->
+        FunctionTypeReference left right r ->
             encodeTyped "function" <|
                 object
                     [ ( "left", encodeTypeReference left )
                     , ( "right", encodeTypeReference right )
+                    , rangeField r
                     ]
 
-        Record recordDefinition ->
-            encodeTyped "record" (encodeRecordDefinition recordDefinition)
+        Record recordDefinition r ->
+            encodeTyped "record" <|
+                object
+                    [ ( "value", (encodeRecordDefinition recordDefinition) )
+                    , rangeField r
+                    ]
 
-        GenericRecord name recordDefinition ->
+        GenericRecord name recordDefinition r ->
             encodeTyped "genericRecord" <|
                 object
                     [ (nameField name)
                     , ( "values", encodeRecordDefinition recordDefinition )
+                    , rangeField r
                     ]
 
 

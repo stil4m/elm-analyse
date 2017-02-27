@@ -66,7 +66,7 @@ onImport imp context =
 onTypeReference : TypeReference -> Context -> Context
 onTypeReference typeReference context =
     case typeReference of
-        Typed moduleName _ _ ->
+        Typed moduleName _ _ _ ->
             markUsage moduleName context
 
         _ ->
