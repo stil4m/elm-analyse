@@ -2,7 +2,7 @@ module AST.Decoding exposing (decode, decodeInfix)
 
 import AST.Ranges as Ranges exposing (Range)
 import AST.Types exposing (..)
-import Json.Decode exposing (Decoder, field, list, string, map, map2, map3, map4, succeed, maybe, lazy, int, bool, andThen, float, fail, at)
+import Json.Decode exposing (Decoder, field, list, string, map, map2, map3, map4, succeed, lazy, int, bool, andThen, float, fail, at, nullable)
 import Json.Decode.Extra exposing ((|:))
 import Util.Json exposing (decodeTyped)
 
@@ -73,8 +73,8 @@ decodeEffectModuleData =
     succeed EffectModuleData
         |: field "moduleName" decodeModuleName
         |: field "exposingList" (decodeExposingList decodeExpose)
-        |: field "command" (maybe string)
-        |: field "subscription" (maybe string)
+        |: field "command" (nullable string)
+        |: field "subscription" (nullable string)
 
 
 decodeModuleName : Decoder ModuleName
@@ -123,7 +123,7 @@ decodeImport : Decoder Import
 decodeImport =
     succeed Import
         |: field "moduleName" decodeModuleName
-        |: field "moduleAlias" (maybe decodeModuleName)
+        |: field "moduleAlias" (nullable decodeModuleName)
         |: field "exposingList" (decodeExposingList decodeExpose)
         |: rangeField
 
@@ -191,8 +191,8 @@ decodeFunction =
     lazy
         (\() ->
             succeed Function
-                |: field "documentation" (maybe string)
-                |: field "signature" (maybe decodeSignature)
+                |: field "documentation" (nullable string)
+                |: field "signature" (nullable decodeSignature)
                 |: field "declaration" decodeFunctionDeclaration
         )
 
