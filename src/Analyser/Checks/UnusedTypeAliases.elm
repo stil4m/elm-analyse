@@ -57,7 +57,7 @@ markTypeAlias key context =
 onTypeReference : TypeReference -> Context -> Context
 onTypeReference typeReference context =
     case typeReference of
-        Typed [] x _ ->
+        Typed [] x _ _ ->
             markTypeAlias x context
 
         _ ->

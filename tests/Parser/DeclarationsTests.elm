@@ -16,40 +16,45 @@ all =
         [ test "normal signature" <|
             \() ->
                 parseFullStringWithNullState "foo : Int" Parser.signature
+                    |> Maybe.map noRangeSignature
                     |> Expect.equal
                         (Just
                             { operatorDefinition = False
                             , name = "foo"
-                            , typeReference = Types.Typed [] "Int" []
+                            , typeReference = Types.Typed [] "Int" [] emptyRange
                             }
                         )
         , test "no spacing signature" <|
             \() ->
                 parseFullStringWithNullState "foo:Int" Parser.signature
+                    |> Maybe.map noRangeSignature
                     |> Expect.equal
                         (Just
                             { operatorDefinition = False
                             , name = "foo"
-                            , typeReference = Types.Typed [] "Int" []
+                            , typeReference = Types.Typed [] "Int" [] emptyRange
                             }
                         )
         , test "on newline signature with wrong indent " <|
             \() ->
                 parseFullStringWithNullState "foo :\nInt" Parser.signature
+                    |> Maybe.map noRangeSignature
                     |> Expect.equal Nothing
         , test "on newline signature with good indent" <|
             \() ->
                 parseFullStringWithNullState "foo :\n Int" Parser.signature
+                    |> Maybe.map noRangeSignature
                     |> Expect.equal
                         (Just
                             { operatorDefinition = False
                             , name = "foo"
-                            , typeReference = Types.Typed [] "Int" []
+                            , typeReference = Types.Typed [] "Int" [] emptyRange
                             }
                         )
         , test "on newline signature with colon on start of line" <|
             \() ->
                 parseFullStringWithNullState "foo\n:\n Int" Parser.signature
+                    |> Maybe.map noRangeSignature
                     |> Expect.equal Nothing
         , test "function declaration" <|
             \() ->
@@ -101,6 +106,7 @@ all =
         , test "some signature" <|
             \() ->
                 parseFullStringWithNullState "bar : List ( Int , Maybe m )" Parser.signature
+                    |> Maybe.map noRangeSignature
                     |> Expect.equal
                         (Just
                             { operatorDefinition = False
@@ -110,11 +116,13 @@ all =
                                     "List"
                                     [ Concrete
                                         (Tupled
-                                            [ Typed [] "Int" []
-                                            , Typed [] "Maybe" [ Generic "m" ]
+                                            [ Typed [] "Int" [] emptyRange
+                                            , Typed [] "Maybe" [ Generic "m" ] emptyRange
                                             ]
+                                            emptyRange
                                         )
                                     ]
+                                    emptyRange
                             }
                         )
         , test "function declaration with let" <|
@@ -207,6 +215,7 @@ all =
         , test "port declaration" <|
             \() ->
                 parseFullStringWithNullState "port parseResponse : ( String, String ) -> Cmd msg" Parser.declaration
+                    |> Maybe.map noRangeDeclaration
                     |> Expect.equal
                         (Just
                             (PortDeclaration
@@ -214,8 +223,14 @@ all =
                                 , name = "parseResponse"
                                 , typeReference =
                                     FunctionTypeReference
-                                        (Tupled [ Typed [] "String" [], Typed [] "String" [] ])
-                                        (Typed [] "Cmd" [ Generic "msg" ])
+                                        (Tupled
+                                            [ Typed [] "String" [] emptyRange
+                                            , Typed [] "String" [] emptyRange
+                                            ]
+                                            emptyRange
+                                        )
+                                        (Typed [] "Cmd" [ Generic "msg" ] emptyRange)
+                                        emptyRange
                                 }
                             )
                         )
@@ -249,8 +264,12 @@ all =
                                 , name = "scroll"
                                 , typeReference =
                                     FunctionTypeReference
-                                        (FunctionTypeReference (Typed [] "Move" []) (GenericType "msg"))
-                                        (Typed [] "Sub" [ Generic "msg" ])
+                                        (FunctionTypeReference (Typed [] "Move" [] emptyRange)
+                                            (GenericType "msg" emptyRange)
+                                            emptyRange
+                                        )
+                                        (Typed [] "Sub" [ Generic "msg" ] emptyRange)
+                                        emptyRange
                                 }
                         )
         , test "Destructuring declaration" <|

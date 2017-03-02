@@ -61,6 +61,7 @@ type MessageData
     | DropConsOfItemAndList FileName Range
     | UnnecessaryListConcat FileName Range
     | LineLengthExceeded FileName (List Range)
+    | MultiLineRecordFormatting FileName Range
 
 
 type alias GetFiles =

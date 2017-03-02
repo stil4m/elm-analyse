@@ -301,6 +301,18 @@ getMessageInfo m =
             , True
             )
 
+        MultiLineRecordFormatting fileName range ->
+            ( String.concat
+                [ "Record should be formatted over multiple lines in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , always [ fileName ]
+            , [ range ]
+            , True
+            )
+
         NoUncurriedPrefix fileName operator range ->
             ( String.concat
                 [ "Prefix notation for `"

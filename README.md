@@ -68,6 +68,7 @@ Add the `-s` option for the server mode. This can be viewed in the browser. To c
 | ExposeAll | This check will look for modules that expose all their definitions. This is not a best practice. You want to be clear about the API that a module defined. |
 | ImportAll | This check will look for imports that expose all functions from a module `(..)`. When other people read your code, it would be nice if the origin of a used function can be traced back to the providing module. |
 | LineLengthExceeded | This check will mark files that contain lines that exceed over 150 characters (#18 allows configuring this variable). |
+| MultiLineRecordFormatting | This check will if records in type aliases are formatted on multiple lines if the type alias has multiple fields. |
 | NoTopLevelSignature | This check will look for function declarations without a signature. We want our readers to understand our code. Adding a signature is a part of this. This check will **skip** definitions in let statements. |
 | NoUncurriedPrefix | It is unneeded to use an operator in prefix notation when you apply both arguments directly. This check will look for these kind of usages |
 | RedefineVariable | You should not redefine a variable in a new lexical scope. This is confusing and may lead to bugs. |
@@ -109,9 +110,7 @@ The keys in the `checks` configuration match the keys in the [Supported Checks](
 
 See [#10](https://github.com/stil4m/elm-analyse/issues/10).
 
-* Exceeded line length
 * Unnecessary `List.concat` when concatenating only fixed size lists.
-* Record type aliases should be formatted multiline when exceeding `N` fields.
 * Functions where 'too much' happens.
 * Function should be moved to another module for better encapsulation.
 * Undocumented function that is exposed by module.
