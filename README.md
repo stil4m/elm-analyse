@@ -106,6 +106,25 @@ An example configuration to disable the `UnusedTypeAlias` check is presented bel
 
 The keys in the `checks` configuration match the keys in the [Supported Checks](#supported-checks) section.
 
+### Check Specific configuration
+
+Check specific configuration can be added to the `elm-analyse.json` file in the following manner:
+
+```
+{
+  ...
+  "<CheckName>" : {
+    "<property>": <value>
+  }.
+  ...
+}
+```
+
+The configurable options are:
+
+| Check | Property | Description | Default value |
+| ---- | ---- | ---- | ---- |
+| `LineLengthExceeded` | `threshold` | Defines the maximum line length | `150` |
 
 ## Scheduled Checks
 
