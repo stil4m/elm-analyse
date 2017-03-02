@@ -1,5 +1,9 @@
 # elm-analyse changelog
 
+## 0.2.0 (2017-03-02)
+
+* [Issue #24](https://github.com/stil4m/elm-analyse/issues/24) Record type aliases should be formatted multiline when exceeding N fields
+* [Issue #25](https://github.com/stil4m/elm-analyse/issues/25) Add version command for CLI
 
 ## 0.1.5 (2017-02-26)
 

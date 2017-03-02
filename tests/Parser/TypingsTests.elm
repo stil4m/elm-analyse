@@ -19,7 +19,7 @@ all =
                         (Just <|
                             { name = "Foo"
                             , generics = []
-                            , typeReference = Record [ ( "color", Typed [] "String" [] ) ]
+                            , typeReference = Record [ ( "color", Typed [] "String" [] emptyRange ) ] emptyRange
                             , range = emptyRange
                             }
                         )
@@ -31,7 +31,7 @@ all =
                         (Just <|
                             { name = "Foo"
                             , generics = [ "a" ]
-                            , typeReference = Record [ ( "some", GenericType "a" ) ]
+                            , typeReference = Record [ ( "some", GenericType "a" emptyRange ) ] emptyRange
                             , range = emptyRange
                             }
                         )
@@ -45,7 +45,7 @@ all =
                             , generics = []
                             , constructors =
                                 [ { name = "Blue"
-                                  , arguments = [ Typed [] "String" [] ]
+                                  , arguments = [ Typed [] "String" [] emptyRange ]
                                   , range = emptyRange
                                   }
                                 , { name = "Red"
@@ -69,7 +69,7 @@ all =
                             , generics = [ "a" ]
                             , constructors =
                                 [ { name = "Just"
-                                  , arguments = [ GenericType "a" ]
+                                  , arguments = [ GenericType "a" emptyRange ]
                                   , range = emptyRange
                                   }
                                 , { name = "Nothing", arguments = [], range = emptyRange }

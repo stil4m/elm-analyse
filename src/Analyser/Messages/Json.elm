@@ -100,6 +100,7 @@ decodeMessageData =
         , ( "UnnecessaryParens", decodeFileAndRange UnnecessaryParens )
         , ( "DebugLog", decodeFileAndRange DebugLog )
         , ( "DebugCrash", decodeFileAndRange DebugCrash )
+        , ( "MultiLineRecordFormatting", decodeFileAndRange MultiLineRecordFormatting )
         , ( "UnformattedFile", JD.map UnformattedFile fileField )
         , ( "FileLoadFailed", JD.map FileLoadFailed fileField )
         , ( "DuplicateImport"
@@ -236,6 +237,13 @@ encodeMessageData m =
 
         UnnecessaryParens file range ->
             encodeTyped "UnnecessaryParens" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "range", Ranges.encode range )
+                    ]
+
+        MultiLineRecordFormatting file range ->
+            encodeTyped "MultiLineRecordFormatting" <|
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "range", Ranges.encode range )

@@ -2,7 +2,7 @@ module AST.Decoding exposing (decode, decodeInfix)
 
 import AST.Ranges as Ranges exposing (Range)
 import AST.Types exposing (..)
-import Json.Decode exposing (Decoder, field, list, string, map, map2, map3, succeed, maybe, lazy, int, bool, andThen, float, fail, at)
+import Json.Decode exposing (Decoder, field, list, string, map, map2, map3, map4, succeed, maybe, lazy, int, bool, andThen, float, fail, at)
 import Json.Decode.Extra exposing ((|:))
 import Util.Json exposing (decodeTyped)
 
@@ -210,13 +210,29 @@ decodeTypeReference =
     lazy
         (\() ->
             decodeTyped
-                [ ( "generic", string |> map GenericType )
-                , ( "typed", map3 Typed (field "moduleName" decodeModuleName) nameField (field "args" <| list decodeTypeArg) )
-                , ( "unit", succeed Unit )
-                , ( "tupled", list decodeTypeReference |> map Tupled )
-                , ( "function", map2 FunctionTypeReference (field "left" decodeTypeReference) (field "right" decodeTypeReference) )
-                , ( "record", decodeRecordDefinition |> map Record )
-                , ( "genericRecord", map2 GenericRecord nameField (field "values" decodeRecordDefinition) )
+                [ ( "generic", map2 GenericType (field "value" string) rangeField )
+                , ( "typed"
+                  , map4 Typed
+                        (field "moduleName" decodeModuleName)
+                        nameField
+                        (field "args" <| list decodeTypeArg)
+                        rangeField
+                  )
+                , ( "unit", map Unit rangeField )
+                , ( "tupled", map2 Tupled (field "values" (list decodeTypeReference)) rangeField )
+                , ( "function"
+                  , map3 FunctionTypeReference
+                        (field "left" decodeTypeReference)
+                        (field "right" decodeTypeReference)
+                        rangeField
+                  )
+                , ( "record", map2 Record (field "value" decodeRecordDefinition) rangeField )
+                , ( "genericRecord"
+                  , map3 GenericRecord
+                        nameField
+                        (field "values" decodeRecordDefinition)
+                        rangeField
+                  )
                 ]
         )
 

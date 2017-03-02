@@ -3,22 +3,25 @@ module Parser.TypeReference exposing (typeReference)
 import Combine exposing (choice, lazy, Parser, parens, map, sepBy, (>>=), (<*>), succeed, (*>), string, maybe, (<$>), sepBy, between, many, (<*), or, whitespace)
 import Parser.Tokens exposing (functionName, typeName)
 import AST.Types exposing (TypeReference(FunctionTypeReference, Unit, Tupled, GenericType, GenericRecord, Record, Typed), RecordField, RecordDefinition, TypeArg(Generic, Concrete))
+import AST.Ranges exposing (Range)
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
 import Parser.Whitespace exposing (realNewLine)
 import Parser.State exposing (State)
+import Parser.Ranges exposing (withRange)
 
 
 typeReferenceNoFn : Parser State TypeReference
 typeReferenceNoFn =
     lazy
         (\() ->
-            choice
-                [ parensTypeReference
-                , typedTypeReference
-                , recordTypeReference
-                , genericRecordTypeReference
-                , genericTypeReference
-                ]
+            withRange <|
+                choice
+                    [ parensTypeReference
+                    , typedTypeReference
+                    , recordTypeReference
+                    , genericRecordTypeReference
+                    , genericTypeReference
+                    ]
         )
 
 
@@ -26,14 +29,15 @@ typeReference : Parser State TypeReference
 typeReference =
     lazy
         (\() ->
-            typeReferenceNoFn
-                >>= \typeRef ->
-                        or (FunctionTypeReference typeRef <$> (trimmed (string "->") *> typeReference))
-                            (succeed typeRef)
+            withRange <|
+                typeReferenceNoFn
+                    >>= \typeRef ->
+                            or (FunctionTypeReference typeRef <$> (trimmed (string "->") *> typeReference))
+                                (succeed (always typeRef))
         )
 
 
-parensTypeReference : Parser State TypeReference
+parensTypeReference : Parser State (Range -> TypeReference)
 parensTypeReference =
     lazy
         (\() ->
@@ -42,20 +46,20 @@ parensTypeReference =
         )
 
 
-asTypeReference : List TypeReference -> TypeReference
+asTypeReference : List TypeReference -> (Range -> TypeReference)
 asTypeReference x =
     case x of
         [] ->
             Unit
 
         [ item ] ->
-            item
+            always item
 
         xs ->
             Tupled xs
 
 
-genericTypeReference : Parser State TypeReference
+genericTypeReference : Parser State (Range -> TypeReference)
 genericTypeReference =
     lazy (\() -> GenericType <$> functionName)
 
@@ -65,7 +69,7 @@ recordFieldsTypeReference =
     lazy (\() -> sepBy (string ",") (trimmed recordFieldDefinition))
 
 
-genericRecordTypeReference : Parser State TypeReference
+genericRecordTypeReference : Parser State (Range -> TypeReference)
 genericRecordTypeReference =
     lazy
         (\() ->
@@ -79,7 +83,7 @@ genericRecordTypeReference =
         )
 
 
-recordTypeReference : Parser State TypeReference
+recordTypeReference : Parser State (Range -> TypeReference)
 recordTypeReference =
     lazy
         (\() ->
@@ -100,7 +104,7 @@ recordFieldDefinition =
         )
 
 
-typedTypeReference : Parser State TypeReference
+typedTypeReference : Parser State (Range -> TypeReference)
 typedTypeReference =
     lazy
         (\() ->
