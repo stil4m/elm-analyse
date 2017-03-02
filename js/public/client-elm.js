@@ -11881,28 +11881,33 @@ var _user$project$AST_Types$Concrete = function (a) {
 var _user$project$AST_Types$Generic = function (a) {
 	return {ctor: 'Generic', _0: a};
 };
-var _user$project$AST_Types$FunctionTypeReference = F2(
-	function (a, b) {
-		return {ctor: 'FunctionTypeReference', _0: a, _1: b};
-	});
-var _user$project$AST_Types$GenericRecord = F2(
-	function (a, b) {
-		return {ctor: 'GenericRecord', _0: a, _1: b};
-	});
-var _user$project$AST_Types$Record = function (a) {
-	return {ctor: 'Record', _0: a};
-};
-var _user$project$AST_Types$Tupled = function (a) {
-	return {ctor: 'Tupled', _0: a};
-};
-var _user$project$AST_Types$Unit = {ctor: 'Unit'};
-var _user$project$AST_Types$Typed = F3(
+var _user$project$AST_Types$FunctionTypeReference = F3(
 	function (a, b, c) {
-		return {ctor: 'Typed', _0: a, _1: b, _2: c};
+		return {ctor: 'FunctionTypeReference', _0: a, _1: b, _2: c};
 	});
-var _user$project$AST_Types$GenericType = function (a) {
-	return {ctor: 'GenericType', _0: a};
+var _user$project$AST_Types$GenericRecord = F3(
+	function (a, b, c) {
+		return {ctor: 'GenericRecord', _0: a, _1: b, _2: c};
+	});
+var _user$project$AST_Types$Record = F2(
+	function (a, b) {
+		return {ctor: 'Record', _0: a, _1: b};
+	});
+var _user$project$AST_Types$Tupled = F2(
+	function (a, b) {
+		return {ctor: 'Tupled', _0: a, _1: b};
+	});
+var _user$project$AST_Types$Unit = function (a) {
+	return {ctor: 'Unit', _0: a};
 };
+var _user$project$AST_Types$Typed = F4(
+	function (a, b, c, d) {
+		return {ctor: 'Typed', _0: a, _1: b, _2: c, _3: d};
+	});
+var _user$project$AST_Types$GenericType = F2(
+	function (a, b) {
+		return {ctor: 'GenericType', _0: a, _1: b};
+	});
 var _user$project$AST_Types$Explicit = function (a) {
 	return {ctor: 'Explicit', _0: a};
 };
@@ -11935,6 +11940,10 @@ var _user$project$Analyser_Messages_Types$newMessage = A2(_user$project$Analyser
 var _user$project$Analyser_Messages_Types$Fixing = {ctor: 'Fixing'};
 var _user$project$Analyser_Messages_Types$Blocked = {ctor: 'Blocked'};
 var _user$project$Analyser_Messages_Types$Outdated = {ctor: 'Outdated'};
+var _user$project$Analyser_Messages_Types$MultiLineRecordFormatting = F2(
+	function (a, b) {
+		return {ctor: 'MultiLineRecordFormatting', _0: a, _1: b};
+	});
 var _user$project$Analyser_Messages_Types$LineLengthExceeded = F2(
 	function (a, b) {
 		return {ctor: 'LineLengthExceeded', _0: a, _1: b};
@@ -12296,6 +12305,28 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'UnnecessaryParens',
+				_elm_lang$core$Json_Encode$object(
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'file',
+							_1: _elm_lang$core$Json_Encode$string(_p0._0)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'range',
+								_1: _user$project$AST_Ranges$encode(_p0._1)
+							},
+							_1: {ctor: '[]'}
+						}
+					}));
+		case 'MultiLineRecordFormatting':
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'MultiLineRecordFormatting',
 				_elm_lang$core$Json_Encode$object(
 					{
 						ctor: '::',
@@ -12924,127 +12955,135 @@ var _user$project$Analyser_Messages_Json$decodeMessageData = _user$project$Util_
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'UnformattedFile',
-														_1: A2(_elm_lang$core$Json_Decode$map, _user$project$Analyser_Messages_Types$UnformattedFile, _user$project$Analyser_Messages_Json$fileField)
+														_0: 'MultiLineRecordFormatting',
+														_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$MultiLineRecordFormatting)
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'FileLoadFailed',
-															_1: A2(_elm_lang$core$Json_Decode$map, _user$project$Analyser_Messages_Types$FileLoadFailed, _user$project$Analyser_Messages_Json$fileField)
+															_0: 'UnformattedFile',
+															_1: A2(_elm_lang$core$Json_Decode$map, _user$project$Analyser_Messages_Types$UnformattedFile, _user$project$Analyser_Messages_Json$fileField)
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'DuplicateImport',
-																_1: A2(
-																	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																	A2(
-																		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																		A2(
-																			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																			_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$DuplicateImport),
-																			_user$project$Analyser_Messages_Json$fileField),
-																		_user$project$Analyser_Messages_Json$moduleNameField),
-																	A2(
-																		_elm_lang$core$Json_Decode$field,
-																		'ranges',
-																		_elm_lang$core$Json_Decode$list(_user$project$AST_Ranges$decode)))
+																_0: 'FileLoadFailed',
+																_1: A2(_elm_lang$core$Json_Decode$map, _user$project$Analyser_Messages_Types$FileLoadFailed, _user$project$Analyser_Messages_Json$fileField)
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'UnusedTypeAlias',
-																	_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$UnusedTypeAlias)
+																	_0: 'DuplicateImport',
+																	_1: A2(
+																		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																		A2(
+																			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																			A2(
+																				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																				_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$DuplicateImport),
+																				_user$project$Analyser_Messages_Json$fileField),
+																			_user$project$Analyser_Messages_Json$moduleNameField),
+																		A2(
+																			_elm_lang$core$Json_Decode$field,
+																			'ranges',
+																			_elm_lang$core$Json_Decode$list(_user$project$AST_Ranges$decode)))
 																},
 																_1: {
 																	ctor: '::',
 																	_0: {
 																		ctor: '_Tuple2',
-																		_0: 'RedefineVariable',
-																		_1: A2(
-																			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																			A2(
-																				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																				A2(
-																					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																					A2(
-																						_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																						_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$RedefineVariable),
-																						_user$project$Analyser_Messages_Json$fileField),
-																					_user$project$Analyser_Messages_Json$varNameField),
-																				A2(_elm_lang$core$Json_Decode$field, 'range1', _user$project$AST_Ranges$decode)),
-																			A2(_elm_lang$core$Json_Decode$field, 'range2', _user$project$AST_Ranges$decode))
+																		_0: 'UnusedTypeAlias',
+																		_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$UnusedTypeAlias)
 																	},
 																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'LineLengthExceeded',
+																			_0: 'RedefineVariable',
 																			_1: A2(
 																				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 																				A2(
 																					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																					_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$LineLengthExceeded),
-																					_user$project$Analyser_Messages_Json$fileField),
-																				A2(
-																					_elm_lang$core$Json_Decode$field,
-																					'ranges',
-																					_elm_lang$core$Json_Decode$list(_user$project$AST_Ranges$decode)))
+																					A2(
+																						_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																						A2(
+																							_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																							_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$RedefineVariable),
+																							_user$project$Analyser_Messages_Json$fileField),
+																						_user$project$Analyser_Messages_Json$varNameField),
+																					A2(_elm_lang$core$Json_Decode$field, 'range1', _user$project$AST_Ranges$decode)),
+																				A2(_elm_lang$core$Json_Decode$field, 'range2', _user$project$AST_Ranges$decode))
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'NoUncurriedPrefix',
-																				_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$NoUncurriedPrefix)
+																				_0: 'LineLengthExceeded',
+																				_1: A2(
+																					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																					A2(
+																						_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																						_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$LineLengthExceeded),
+																						_user$project$Analyser_Messages_Json$fileField),
+																					A2(
+																						_elm_lang$core$Json_Decode$field,
+																						'ranges',
+																						_elm_lang$core$Json_Decode$list(_user$project$AST_Ranges$decode)))
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'UnusedImportAlias',
-																					_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImportAlias)
+																					_0: 'NoUncurriedPrefix',
+																					_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$NoUncurriedPrefix)
 																				},
 																				_1: {
 																					ctor: '::',
 																					_0: {
 																						ctor: '_Tuple2',
-																						_0: 'UnusedImport',
-																						_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImport)
+																						_0: 'UnusedImportAlias',
+																						_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImportAlias)
 																					},
 																					_1: {
 																						ctor: '::',
 																						_0: {
 																							ctor: '_Tuple2',
-																							_0: 'UseConsOverConcat',
-																							_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UseConsOverConcat)
+																							_0: 'UnusedImport',
+																							_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImport)
 																						},
 																						_1: {
 																							ctor: '::',
 																							_0: {
 																								ctor: '_Tuple2',
-																								_0: 'DropConcatOfLists',
-																								_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConcatOfLists)
+																								_0: 'UseConsOverConcat',
+																								_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UseConsOverConcat)
 																							},
 																							_1: {
 																								ctor: '::',
 																								_0: {
 																									ctor: '_Tuple2',
-																									_0: 'DropConsOfItemAndList',
-																									_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConsOfItemAndList)
+																									_0: 'DropConcatOfLists',
+																									_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConcatOfLists)
 																								},
 																								_1: {
 																									ctor: '::',
 																									_0: {
 																										ctor: '_Tuple2',
-																										_0: 'UnnecessaryListConcat',
-																										_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UnnecessaryListConcat)
+																										_0: 'DropConsOfItemAndList',
+																										_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConsOfItemAndList)
 																									},
-																									_1: {ctor: '[]'}
+																									_1: {
+																										ctor: '::',
+																										_0: {
+																											ctor: '_Tuple2',
+																											_0: 'UnnecessaryListConcat',
+																											_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UnnecessaryListConcat)
+																										},
+																										_1: {ctor: '[]'}
+																									}
 																								}
 																							}
 																						}
@@ -13753,33 +13792,25 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'NoUncurriedPrefix':
-			var _p33 = _p0._2;
+		case 'MultiLineRecordFormatting':
+			var _p33 = _p0._1;
 			var _p32 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Prefix notation for `',
+						_0: 'Record should be formatted over multiple lines in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p0._1,
+							_0: _p32,
 							_1: {
 								ctor: '::',
-								_0: '` is unneeded in file \"',
+								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _p32,
-									_1: {
-										ctor: '::',
-										_0: '\" at ',
-										_1: {
-											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p33),
-											_1: {ctor: '[]'}
-										}
-									}
+									_0: _user$project$AST_Ranges$rangeToString(_p33),
+									_1: {ctor: '[]'}
 								}
 							}
 						}
@@ -13795,10 +13826,9 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 					_0: _p33,
 					_1: {ctor: '[]'}
 				},
-				_3: false
+				_3: true
 			};
-		case 'RedefineVariable':
-			var _p36 = _p0._3;
+		case 'NoUncurriedPrefix':
 			var _p35 = _p0._2;
 			var _p34 = _p0._0;
 			return {
@@ -13806,31 +13836,23 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Variable `',
+						_0: 'Prefix notation for `',
 						_1: {
 							ctor: '::',
 							_0: _p0._1,
 							_1: {
 								ctor: '::',
-								_0: '` is redefined in file \"',
+								_0: '` is unneeded in file \"',
 								_1: {
 									ctor: '::',
 									_0: _p34,
 									_1: {
 										ctor: '::',
-										_0: '\". At ',
+										_0: '\" at ',
 										_1: {
 											ctor: '::',
 											_0: _user$project$AST_Ranges$rangeToString(_p35),
-											_1: {
-												ctor: '::',
-												_0: ' and ',
-												_1: {
-													ctor: '::',
-													_0: _user$project$AST_Ranges$rangeToString(_p36),
-													_1: {ctor: '[]'}
-												}
-											}
+											_1: {ctor: '[]'}
 										}
 									}
 								}
@@ -13846,33 +13868,46 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_2: {
 					ctor: '::',
 					_0: _p35,
-					_1: {
-						ctor: '::',
-						_0: _p36,
-						_1: {ctor: '[]'}
-					}
+					_1: {ctor: '[]'}
 				},
 				_3: false
 			};
-		case 'UseConsOverConcat':
-			var _p38 = _p0._1;
-			var _p37 = _p0._0;
+		case 'RedefineVariable':
+			var _p38 = _p0._3;
+			var _p37 = _p0._2;
+			var _p36 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Use `::` instead of `++` in file \"',
+						_0: 'Variable `',
 						_1: {
 							ctor: '::',
-							_0: _p37,
+							_0: _p0._1,
 							_1: {
 								ctor: '::',
-								_0: '\" at ',
+								_0: '` is redefined in file \"',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p38),
-									_1: {ctor: '[]'}
+									_0: _p36,
+									_1: {
+										ctor: '::',
+										_0: '\". At ',
+										_1: {
+											ctor: '::',
+											_0: _user$project$AST_Ranges$rangeToString(_p37),
+											_1: {
+												ctor: '::',
+												_0: ' and ',
+												_1: {
+													ctor: '::',
+													_0: _user$project$AST_Ranges$rangeToString(_p38),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
 								}
 							}
 						}
@@ -13880,17 +13915,21 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p37,
+						_0: _p36,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p38,
-					_1: {ctor: '[]'}
+					_0: _p37,
+					_1: {
+						ctor: '::',
+						_0: _p38,
+						_1: {ctor: '[]'}
+					}
 				},
-				_3: true
+				_3: false
 			};
-		case 'DropConcatOfLists':
+		case 'UseConsOverConcat':
 			var _p40 = _p0._1;
 			var _p39 = _p0._0;
 			return {
@@ -13898,7 +13937,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Joining two literal lists with `++`, but instead you can just join the lists. \"',
+						_0: 'Use `::` instead of `++` in file \"',
 						_1: {
 							ctor: '::',
 							_0: _p39,
@@ -13926,7 +13965,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'DropConsOfItemAndList':
+		case 'DropConcatOfLists':
 			var _p42 = _p0._1;
 			var _p41 = _p0._0;
 			return {
@@ -13934,7 +13973,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Adding an item to the front of a literal list, but instead you can just put it in the list. \"',
+						_0: 'Joining two literal lists with `++`, but instead you can just join the lists. \"',
 						_1: {
 							ctor: '::',
 							_0: _p41,
@@ -13962,9 +14001,45 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'LineLengthExceeded':
+		case 'DropConsOfItemAndList':
 			var _p44 = _p0._1;
 			var _p43 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Adding an item to the front of a literal list, but instead you can just put it in the list. \"',
+						_1: {
+							ctor: '::',
+							_0: _p43,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$AST_Ranges$rangeToString(_p44),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p43,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p44,
+					_1: {ctor: '[]'}
+				},
+				_3: true
+			};
+		case 'LineLengthExceeded':
+			var _p46 = _p0._1;
+			var _p45 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -13974,13 +14049,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$core$Basics$toString(
-								_elm_lang$core$List$length(_p44)),
+								_elm_lang$core$List$length(_p46)),
 							_1: {
 								ctor: '::',
 								_0: ' line(s) in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p43,
+									_0: _p45,
 									_1: {
 										ctor: '::',
 										_0: '\".',
@@ -13993,15 +14068,15 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p43,
+						_0: _p45,
 						_1: {ctor: '[]'}
 					}),
-				_2: _p44,
+				_2: _p46,
 				_3: false
 			};
 		default:
-			var _p46 = _p0._1;
-			var _p45 = _p0._0;
+			var _p48 = _p0._1;
+			var _p47 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -14010,13 +14085,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Better merge the arguments of `List.concat` to a single list in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p45,
+							_0: _p47,
 							_1: {
 								ctor: '::',
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p46),
+									_0: _user$project$AST_Ranges$rangeToString(_p48),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -14025,12 +14100,12 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p45,
+						_0: _p47,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p46,
+					_0: _p48,
 					_1: {ctor: '[]'}
 				},
 				_3: true
@@ -14038,18 +14113,18 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 	}
 };
 var _user$project$Analyser_Messages_Util$canFix = function (m) {
-	var _p47 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var result = _p47._3;
+	var _p49 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var result = _p49._3;
 	return result;
 };
 var _user$project$Analyser_Messages_Util$getRanges = function (m) {
-	var _p48 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var r = _p48._2;
+	var _p50 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var r = _p50._2;
 	return r;
 };
 var _user$project$Analyser_Messages_Util$getFiles = function (m) {
-	var _p49 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p49._1;
+	var _p51 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p51._1;
 	return f(m);
 };
 var _user$project$Analyser_Messages_Util$compareMessage = F2(
@@ -14078,8 +14153,8 @@ var _user$project$Analyser_Messages_Util$compareMessage = F2(
 					_user$project$Analyser_Messages_Util$getRanges(b.data)))) : A2(_elm_lang$core$Basics$compare, aFile, bFile);
 	});
 var _user$project$Analyser_Messages_Util$asString = function (m) {
-	var _p50 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p50._0;
+	var _p52 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p52._0;
 	return f;
 };
 var _user$project$Analyser_Messages_Util$markFixing = F2(
