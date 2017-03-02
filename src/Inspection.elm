@@ -18,6 +18,7 @@ import Analyser.Checks.UnusedImport as UnusedImport
 import Analyser.Checks.ListOperators as ListOperators
 import Analyser.Checks.LineLength as LineLength
 import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
+import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Util
 import Analyser.Configuration exposing (Configuration)
@@ -40,6 +41,7 @@ checkers =
     , ListOperators.checker
     , LineLength.checker
     , UnnecessaryListConcat.checker
+    , MultiLineRecordFormatting.checker
     ]
 
 
