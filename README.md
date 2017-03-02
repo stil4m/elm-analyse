@@ -52,7 +52,8 @@ Add the `-s` option for the server mode. This can be viewed in the browser. To c
 | `--help or -h`          | Print the help output. |
 | `--serve or -s`         | Enable server mode. Disabled by default. |
 | `--port or -p`          | The port on which the server should listen. Defaults to 3000 (`--port=3000`). |
-| `--elm-format-path`  | Path to elm-format. Defaults to `elm-format`. |
+| `--elm-format-path`     | Path to elm-format. Defaults to `elm-format`. |
+| `--version` or `-v`     | Print version of software. |
 
 ---
 
