@@ -191,10 +191,17 @@ decodeFunction =
     lazy
         (\() ->
             succeed Function
-                |: field "documentation" (nullable string)
+                |: field "documentation" (nullable decodeDocumentation)
                 |: field "signature" (nullable decodeSignature)
                 |: field "declaration" decodeFunctionDeclaration
         )
+
+
+decodeDocumentation : Decoder DocumentationComment
+decodeDocumentation =
+    succeed (,)
+        |: field "value" string
+        |: rangeField
 
 
 decodeSignature : Decoder FunctionSignature
@@ -203,6 +210,7 @@ decodeSignature =
         |: field "operatorDefinition" bool
         |: nameField
         |: field "typeReference" decodeTypeReference
+        |: rangeField
 
 
 decodeTypeReference : Decoder TypeReference
