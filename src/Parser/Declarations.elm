@@ -67,10 +67,11 @@ portDeclaration =
 
 signature : Parser State FunctionSignature
 signature =
-    succeed FunctionSignature
-        <*> (lookAhead anyChar >>= \c -> succeed (c == '('))
-        <*> or functionName (parens prefixOperatorToken)
-        <*> (trimmed (string ":") *> maybe moreThanIndentWhitespace *> typeReference)
+    withRange <|
+        succeed FunctionSignature
+            <*> (lookAhead anyChar >>= \c -> succeed (c == '('))
+            <*> or functionName (parens prefixOperatorToken)
+            <*> (trimmed (string ":") *> maybe moreThanIndentWhitespace *> typeReference)
 
 
 functionDeclaration : Parser State FunctionDeclaration

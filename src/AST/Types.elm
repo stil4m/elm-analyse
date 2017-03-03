@@ -65,7 +65,7 @@ type alias Infix =
 
 
 type alias DocumentationComment =
-    String
+    ( String, Range )
 
 
 type Pattern
@@ -100,6 +100,7 @@ type alias FunctionSignature =
     { operatorDefinition : Bool
     , name : String
     , typeReference : TypeReference
+    , range : Range
     }
 
 

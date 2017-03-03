@@ -221,18 +221,27 @@ encodeTypeAlias { name, generics, typeReference, range } =
 encodeFunction : Function -> Value
 encodeFunction { documentation, signature, declaration } =
     object
-        [ ( "documentation", Maybe.map string documentation |> Maybe.withDefault JE.null )
+        [ ( "documentation", Maybe.map encodeDocumentation documentation |> Maybe.withDefault JE.null )
         , ( "signature", Maybe.map encodeSignature signature |> Maybe.withDefault JE.null )
         , ( "declaration", encodeFunctionDeclaration declaration )
         ]
 
 
+encodeDocumentation : DocumentationComment -> Value
+encodeDocumentation ( text, range ) =
+    object
+        [ ( "value", string text )
+        , rangeField range
+        ]
+
+
 encodeSignature : FunctionSignature -> Value
-encodeSignature { operatorDefinition, name, typeReference } =
+encodeSignature { operatorDefinition, name, typeReference, range } =
     object
         [ ( "operatorDefinition", JE.bool operatorDefinition )
         , (nameField name)
         , ( "typeReference", encodeTypeReference typeReference )
+        , rangeField range
         ]
 
 

@@ -278,6 +278,7 @@ noRangeFunction f =
 noRangeSignature : FunctionSignature -> FunctionSignature
 noRangeSignature signature =
     { signature | typeReference = noRangeTypeReference signature.typeReference }
+        |> unRange
 
 
 noRangeFunctionDeclaration : FunctionDeclaration -> FunctionDeclaration

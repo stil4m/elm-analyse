@@ -213,7 +213,7 @@ writeSignature signature =
 
 writeDocumentation : DocumentationComment -> Writer
 writeDocumentation =
-    string
+    Tuple.first >> string
 
 
 writeTypeAlias : TypeAlias -> Writer

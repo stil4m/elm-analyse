@@ -29,27 +29,32 @@ import AST.Types
         , FunctionDeclaration
         )
 import Analyser.Files.Types exposing (OperatorTable)
+import Analyser.PostProcessing.Documentation as Documentation
 import List.Extra as List
 import Tuple2
 
 
 postProcess : OperatorTable -> File -> File
 postProcess table file =
-    visit
-        { onExpression =
-            Just
-                (\context inner expression ->
-                    inner <|
-                        case expression of
-                            ( r, Application args ) ->
-                                ( r, fixApplication context args )
+    let
+        operatorFixed =
+            visit
+                { onExpression =
+                    Just
+                        (\context inner expression ->
+                            inner <|
+                                case expression of
+                                    ( r, Application args ) ->
+                                        ( r, fixApplication context args )
 
-                            _ ->
-                                expression
-                )
-        }
-        table
-        file
+                                    _ ->
+                                        expression
+                        )
+                }
+                table
+                file
+    in
+        Documentation.postProcess operatorFixed
 
 
 fixApplication : OperatorTable -> List Expression -> InnerExpression
