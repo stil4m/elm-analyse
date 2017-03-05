@@ -4,7 +4,9 @@ import AST.Ranges exposing (Range)
 
 
 type alias VariablePointer =
-    { value : String, range : Range }
+    { value : String
+    , range : Range
+    }
 
 
 type alias File =
@@ -61,7 +63,10 @@ type InfixDirection
 
 
 type alias Infix =
-    { direction : InfixDirection, precedence : Int, operator : String }
+    { direction : InfixDirection
+    , precedence : Int
+    , operator : String
+    }
 
 
 type alias DocumentationComment =

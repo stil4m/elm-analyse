@@ -251,7 +251,7 @@ encodeTypeReference typeReference =
         GenericType name r ->
             encodeTyped "generic" <|
                 object
-                    [ ( "value", (string name) )
+                    [ ( "value", string name )
                     , rangeField r
                     ]
 
@@ -272,7 +272,7 @@ encodeTypeReference typeReference =
         Tupled t r ->
             encodeTyped "tupled" <|
                 object
-                    [ ( "values", (asList encodeTypeReference t) )
+                    [ ( "values", asList encodeTypeReference t )
                     , rangeField r
                     ]
 
@@ -287,7 +287,7 @@ encodeTypeReference typeReference =
         Record recordDefinition r ->
             encodeTyped "record" <|
                 object
-                    [ ( "value", (encodeRecordDefinition recordDefinition) )
+                    [ ( "value", encodeRecordDefinition recordDefinition )
                     , rangeField r
                     ]
 
