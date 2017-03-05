@@ -199,7 +199,8 @@ type alias Cases =
 
 
 type alias TypeAlias =
-    { name : String
+    { documentation : Maybe DocumentationComment
+    , name : String
     , generics : List String
     , typeReference : TypeReference
     , range : Range

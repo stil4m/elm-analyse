@@ -209,9 +209,10 @@ encodeValueConstructor { name, arguments, range } =
 
 
 encodeTypeAlias : TypeAlias -> Value
-encodeTypeAlias { name, generics, typeReference, range } =
+encodeTypeAlias { documentation, name, generics, typeReference, range } =
     object
-        [ (nameField name)
+        [ ( "documentation", Maybe.map encodeDocumentation documentation |> Maybe.withDefault JE.null )
+        , (nameField name)
         , ( "generics", asList string generics )
         , ( "typeReference", encodeTypeReference typeReference )
         , (rangeField range)

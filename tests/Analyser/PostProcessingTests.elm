@@ -158,6 +158,36 @@ bar = 1
     )
 
 
+typeAliasWithDocumentation : ( String, String, File )
+typeAliasWithDocumentation =
+    ( "typeAliasWithDocumentation"
+    , """
+module Bar
+
+{-| The Doc -}
+type alias Foo
+   = { name : String }
+"""
+    , { moduleDefinition =
+            NormalModule
+                { moduleName = [ "Bar" ]
+                , exposingList = None
+                }
+      , imports = []
+      , declarations =
+            [ AliasDecl
+                { documentation = Just ( "{-| The Doc -}", { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } } )
+                , name = "Foo"
+                , generics = []
+                , typeReference = Record ([ ( "name", Typed [] "String" [] { start = { row = 5, column = 13 }, end = { row = 5, column = 20 } } ) ]) { start = { row = 5, column = 4 }, end = { row = 6, column = -2 } }
+                , range = { start = { row = 4, column = -1 }, end = { row = 6, column = -2 } }
+                }
+            ]
+      , comments = []
+      }
+    )
+
+
 postProcessInfixOperators : ( String, String, File )
 postProcessInfixOperators =
     ( "postProcessInfixOperators"
@@ -219,5 +249,6 @@ all =
             , functionWithSingleLineCommentAsDoc
             , functionWithMultiLineCommentAsDoc
             , postProcessInfixOperators
+            , typeAliasWithDocumentation
             ]
         )

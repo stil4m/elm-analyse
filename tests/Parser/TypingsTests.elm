@@ -17,7 +17,8 @@ all =
                     |> Maybe.map noRangeTypeAlias
                     |> Expect.equal
                         (Just <|
-                            { name = "Foo"
+                            { documentation = Nothing
+                            , name = "Foo"
                             , generics = []
                             , typeReference = Record [ ( "color", Typed [] "String" [] emptyRange ) ] emptyRange
                             , range = emptyRange
@@ -29,7 +30,8 @@ all =
                     |> Maybe.map noRangeTypeAlias
                     |> Expect.equal
                         (Just <|
-                            { name = "Foo"
+                            { documentation = Nothing
+                            , name = "Foo"
                             , generics = [ "a" ]
                             , typeReference = Record [ ( "some", GenericType "a" emptyRange ) ] emptyRange
                             , range = emptyRange

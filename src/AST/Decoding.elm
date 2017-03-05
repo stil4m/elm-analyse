@@ -180,6 +180,7 @@ decodeValueConstructor =
 decodeTypeAlias : Decoder TypeAlias
 decodeTypeAlias =
     succeed TypeAlias
+        |: field "documentation" (nullable decodeDocumentation)
         |: nameField
         |: field "generics" (list string)
         |: field "typeReference" decodeTypeReference
