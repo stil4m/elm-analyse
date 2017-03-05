@@ -1,31 +1,7 @@
 module Analyser.PostProcessing.Documentation exposing (postProcess)
 
 import AST.Ranges exposing (Range)
-import AST.Types
-    exposing
-        ( File
-        , RecordUpdate
-        , Expression
-        , InnerExpression
-            ( Application
-            , Operator
-            , OperatorApplication
-            , RecordExpr
-            , IfBlock
-            , TupledExpression
-            , ParenthesizedExpression
-            , LetExpression
-            , CaseExpression
-            , LambdaExpression
-            , ListExpr
-            , RecordUpdateExpression
-            )
-        , Function
-        , InfixDirection(Left)
-        , Infix
-        , Declaration(FuncDecl)
-        , FunctionDeclaration
-        )
+import AST.Types exposing (File, RecordUpdate, Expression, Function, InfixDirection, Infix, Declaration(FuncDecl), FunctionDeclaration)
 import Inspector exposing (Order(Post), defaultConfig)
 
 
@@ -40,9 +16,8 @@ postProcess file =
 onFunction : Function -> File -> File
 onFunction function file =
     let
-        ( docs, notDocs ) =
-            file.comments
-                |> List.partition (isFunctionDocumentation function)
+        docs =
+            List.filter (isFunctionDocumentation function) file.comments
     in
         case List.head docs of
             Just doc ->

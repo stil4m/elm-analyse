@@ -179,25 +179,25 @@ inspectTypeReference config typeReference context =
 inspectTypeReferenceInner : Config context -> TypeReference -> context -> context
 inspectTypeReferenceInner config typeRefence context =
     case typeRefence of
-        Typed _ _ typeArgs r ->
+        Typed _ _ typeArgs _ ->
             List.foldl (inspectTypeArg config) context typeArgs
 
-        Tupled typeReferences r ->
+        Tupled typeReferences _ ->
             List.foldl (inspectTypeReference config) context typeReferences
 
-        Record recordDefinition r ->
+        Record recordDefinition _ ->
             List.foldl (inspectTypeReference config) context (List.map Tuple.second recordDefinition)
 
-        GenericRecord _ recordDefinition r ->
+        GenericRecord _ recordDefinition _ ->
             List.foldl (inspectTypeReference config) context (List.map Tuple.second recordDefinition)
 
-        FunctionTypeReference left right r ->
+        FunctionTypeReference left right _ ->
             List.foldl (inspectTypeReference config) context [ left, right ]
 
-        Unit r ->
+        Unit _ ->
             context
 
-        GenericType _ r ->
+        GenericType _ _ ->
             context
 
 
