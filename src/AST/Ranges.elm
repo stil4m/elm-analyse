@@ -6,11 +6,15 @@ import Json.Decode.Extra exposing (fromResult)
 
 
 type alias Location =
-    { row : Int, column : Int }
+    { row : Int
+    , column : Int
+    }
 
 
 type alias Range =
-    { start : Location, end : Location }
+    { start : Location
+    , end : Location
+    }
 
 
 decode : Decoder Range

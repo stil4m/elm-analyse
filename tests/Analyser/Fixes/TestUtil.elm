@@ -9,7 +9,9 @@ import Analyser.Files.Interface as Interface
 import Analyser.Configuration as Configuration
 import AST.Util exposing (fileModuleName)
 import Parser.Parser as Parser
+import Analyser.PostProcessing as PostProcessing
 import Expect
+import Dict
 
 
 analyseAndFix : Checker -> Fixer -> String -> File -> Result String String
@@ -44,6 +46,7 @@ testFix name checker fixer triples =
                 test name <|
                     \() ->
                         Parser.parse input
+                            |> Maybe.map (PostProcessing.postProcess Dict.empty)
                             |> Result.fromMaybe "Parse Failed"
                             |> Result.andThen (analyseAndFix checker fixer input)
                             |> Expect.equal (Ok output)

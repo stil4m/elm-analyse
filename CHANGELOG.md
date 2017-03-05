@@ -1,5 +1,16 @@
 # elm-analyse changelog
 
+## 0.3.0 (2017-03-05)
+
+* [Issue #18](https://github.com/stil4m/elm-analyse/issues/18) Add documentation to function in post processing
+* [Issue #26](https://github.com/stil4m/elm-analyse/issues/26) Decoding of cached AST is too forgiving
+* [Issue #27](https://github.com/stil4m/elm-analyse/issues/27) Add max length configuration for LineLengthExceeded
+* [Issue #28](https://github.com/stil4m/elm-analyse/issues/28) Multiline unnecessary parens is not highlighted correctly
+* [Issue #29](https://github.com/stil4m/elm-analyse/issues/29) Remove TypeArg type from AST
+* [Issue #30](https://github.com/stil4m/elm-analyse/issues/30) Add documentation to type aliases
+* [Issue #31](https://github.com/stil4m/elm-analyse/issues/31) Autofixer for unused type alias
+* [Issue #32](https://github.com/stil4m/elm-analyse/issues/32) Unnecessary parens in list are not detected
+
 ## 0.2.0 (2017-03-02)
 
 * [Issue #24](https://github.com/stil4m/elm-analyse/issues/24) Record type aliases should be formatted multiline when exceeding N fields

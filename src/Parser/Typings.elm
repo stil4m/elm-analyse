@@ -34,7 +34,7 @@ valueConstructor =
 typeAlias : Parser State TypeAlias
 typeAlias =
     withRange <|
-        succeed TypeAlias
+        succeed (TypeAlias Nothing)
             <*> (typeAliasPrefix *> typeName)
             <*> genericList
             <*> (trimmed (string "=") *> typeReference)

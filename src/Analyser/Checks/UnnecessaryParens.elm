@@ -118,8 +118,18 @@ onExpression ( range, expression ) context =
         TupledExpression x ->
             onTuple x context
 
+        ListExpr x ->
+            onListExpr x context
+
         _ ->
             context
+
+
+onListExpr : List Expression -> Context -> Context
+onListExpr exprs context =
+    List.filterMap getParenthesized exprs
+        |> List.map Tuple.first
+        |> flip (++) context
 
 
 onTuple : List Expression -> Context -> Context
@@ -184,9 +194,9 @@ onOperatorApplication ( _, _, left, right ) context =
 allowedOnLHS : Expression -> Bool
 allowedOnLHS expr =
     List.all ((|>) expr)
-        [ (isLambda >> not)
-        , (isCase >> not)
-        , (isIf >> not)
+        [ isLambda >> not
+        , isCase >> not
+        , isIf >> not
         ]
 
 

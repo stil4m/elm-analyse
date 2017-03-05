@@ -213,7 +213,7 @@ writeSignature signature =
 
 writeDocumentation : DocumentationComment -> Writer
 writeDocumentation =
-    string
+    Tuple.first >> string
 
 
 writeTypeAlias : TypeAlias -> Writer
@@ -283,27 +283,27 @@ writeDestructuring { pattern, expression } =
 writeTypeReference : TypeReference -> Writer
 writeTypeReference typeReference =
     case typeReference of
-        GenericType s r ->
+        GenericType s _ ->
             string s
 
-        Typed moduleName k args r ->
+        Typed moduleName k args _ ->
             spaced
                 [ join [ writeModuleName moduleName, string k ]
-                , spaced (List.map writeTypeArg args)
+                , spaced (List.map writeTypeReference args)
                 ]
 
-        Unit r ->
+        Unit _ ->
             string "()"
 
-        Tupled xs r ->
+        Tupled xs _ ->
             parensComma
                 (List.map (\x -> ( emptyRange, writeTypeReference x )) xs)
 
-        Record xs r ->
+        Record xs _ ->
             bracesComma
                 (List.map (\x -> ( emptyRange, writeRecordField x )) xs)
 
-        GenericRecord name fields r ->
+        GenericRecord name fields _ ->
             spaced
                 [ string "{"
                 , string name
@@ -312,7 +312,7 @@ writeTypeReference typeReference =
                 , string "}"
                 ]
 
-        FunctionTypeReference left right r ->
+        FunctionTypeReference left right _ ->
             spaced
                 [ writeTypeReference left
                 , string "->"
@@ -327,16 +327,6 @@ writeRecordField ( name, ref ) =
         , string ":"
         , writeTypeReference ref
         ]
-
-
-writeTypeArg : TypeArg -> Writer
-writeTypeArg t =
-    case t of
-        Generic s ->
-            string s
-
-        Concrete x ->
-            writeTypeReference x
 
 
 writeExpression : Expression -> Writer

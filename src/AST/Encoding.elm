@@ -85,21 +85,21 @@ encodeExpose exp =
             encodeTyped "infix" <|
                 object
                     [ nameField x
-                    , (rangeField r)
+                    , rangeField r
                     ]
 
         FunctionExpose x r ->
             encodeTyped "function" <|
                 object
                     [ nameField x
-                    , (rangeField r)
+                    , rangeField r
                     ]
 
         TypeOrAliasExpose x r ->
             encodeTyped "typeOrAlias" <|
                 object
                     [ nameField x
-                    , (rangeField r)
+                    , rangeField r
                     ]
 
         TypeExpose exposedType ->
@@ -109,17 +109,17 @@ encodeExpose exp =
 encodeExposedType : ExposedType -> Value
 encodeExposedType { name, constructors, range } =
     object
-        [ (nameField name)
+        [ nameField name
         , ( "inner", encodeExposingList constructors encodeValueConstructorExpose )
-        , (rangeField range)
+        , rangeField range
         ]
 
 
 encodeValueConstructorExpose : ValueConstructorExpose -> Value
 encodeValueConstructorExpose ( name, range ) =
     object
-        [ (nameField name)
-        , (rangeField range)
+        [ nameField name
+        , rangeField range
         ]
 
 
@@ -146,7 +146,7 @@ encodeImport { moduleName, moduleAlias, exposingList, range } =
                 |> Maybe.withDefault JE.null
           )
         , ( "exposingList", encodeExposingList exposingList encodeExpose )
-        , (rangeField range)
+        , rangeField range
         ]
 
 
@@ -193,7 +193,7 @@ encodeDestructuring { pattern, expression } =
 encodeType : Type -> Value
 encodeType { name, generics, constructors } =
     object
-        [ (nameField name)
+        [ nameField name
         , ( "generics", asList string generics )
         , ( "constructors", asList encodeValueConstructor constructors )
         ]
@@ -202,37 +202,47 @@ encodeType { name, generics, constructors } =
 encodeValueConstructor : ValueConstructor -> Value
 encodeValueConstructor { name, arguments, range } =
     object
-        [ (nameField name)
+        [ nameField name
         , ( "arguments", asList encodeTypeReference arguments )
-        , (rangeField range)
+        , rangeField range
         ]
 
 
 encodeTypeAlias : TypeAlias -> Value
-encodeTypeAlias { name, generics, typeReference, range } =
+encodeTypeAlias { documentation, name, generics, typeReference, range } =
     object
-        [ (nameField name)
+        [ ( "documentation", Maybe.map encodeDocumentation documentation |> Maybe.withDefault JE.null )
+        , nameField name
         , ( "generics", asList string generics )
         , ( "typeReference", encodeTypeReference typeReference )
-        , (rangeField range)
+        , rangeField range
         ]
 
 
 encodeFunction : Function -> Value
 encodeFunction { documentation, signature, declaration } =
     object
-        [ ( "documentation", Maybe.map string documentation |> Maybe.withDefault JE.null )
+        [ ( "documentation", Maybe.map encodeDocumentation documentation |> Maybe.withDefault JE.null )
         , ( "signature", Maybe.map encodeSignature signature |> Maybe.withDefault JE.null )
         , ( "declaration", encodeFunctionDeclaration declaration )
         ]
 
 
+encodeDocumentation : DocumentationComment -> Value
+encodeDocumentation ( text, range ) =
+    object
+        [ ( "value", string text )
+        , rangeField range
+        ]
+
+
 encodeSignature : FunctionSignature -> Value
-encodeSignature { operatorDefinition, name, typeReference } =
+encodeSignature { operatorDefinition, name, typeReference, range } =
     object
         [ ( "operatorDefinition", JE.bool operatorDefinition )
-        , (nameField name)
+        , nameField name
         , ( "typeReference", encodeTypeReference typeReference )
+        , rangeField range
         ]
 
 
@@ -242,7 +252,7 @@ encodeTypeReference typeReference =
         GenericType name r ->
             encodeTyped "generic" <|
                 object
-                    [ ( "value", (string name) )
+                    [ ( "value", string name )
                     , rangeField r
                     ]
 
@@ -251,7 +261,7 @@ encodeTypeReference typeReference =
                 object
                     [ ( "moduleName", encodeModuleName moduleName )
                     , nameField name
-                    , ( "args", asList encodeTypeArg args )
+                    , ( "args", asList encodeTypeReference args )
                     , rangeField r
                     ]
 
@@ -263,7 +273,7 @@ encodeTypeReference typeReference =
         Tupled t r ->
             encodeTyped "tupled" <|
                 object
-                    [ ( "values", (asList encodeTypeReference t) )
+                    [ ( "values", asList encodeTypeReference t )
                     , rangeField r
                     ]
 
@@ -278,14 +288,14 @@ encodeTypeReference typeReference =
         Record recordDefinition r ->
             encodeTyped "record" <|
                 object
-                    [ ( "value", (encodeRecordDefinition recordDefinition) )
+                    [ ( "value", encodeRecordDefinition recordDefinition )
                     , rangeField r
                     ]
 
         GenericRecord name recordDefinition r ->
             encodeTyped "genericRecord" <|
                 object
-                    [ (nameField name)
+                    [ nameField name
                     , ( "values", encodeRecordDefinition recordDefinition )
                     , rangeField r
                     ]
@@ -299,19 +309,9 @@ encodeRecordDefinition =
 encodeRecordField : RecordField -> Value
 encodeRecordField ( name, ref ) =
     object
-        [ (nameField name)
+        [ nameField name
         , ( "typeReference", encodeTypeReference ref )
         ]
-
-
-encodeTypeArg : TypeArg -> Value
-encodeTypeArg typeArg =
-    case typeArg of
-        Generic name ->
-            encodeTyped "generic" (string name)
-
-        Concrete tr ->
-            encodeTyped "concrete" (encodeTypeReference tr)
 
 
 encodeFunctionDeclaration : FunctionDeclaration -> Value
@@ -328,7 +328,7 @@ encodeVariablePointer : VariablePointer -> Value
 encodeVariablePointer { value, range } =
     object
         [ ( "value", string value )
-        , (rangeField range)
+        , rangeField range
         ]
 
 
@@ -450,14 +450,14 @@ encodeQualifiedNameRef : QualifiedNameRef -> Value
 encodeQualifiedNameRef { moduleName, name } =
     object
         [ ( "moduleName", encodeModuleName moduleName )
-        , (nameField name)
+        , nameField name
         ]
 
 
 encodeExpression : Expression -> Value
 encodeExpression ( range, inner ) =
     object
-        [ (rangeField range)
+        [ rangeField range
         , ( "inner"
           , case inner of
                 UnitExpr ->
@@ -520,14 +520,14 @@ encodeExpression ( range, inner ) =
                     encodeTyped "qualified" <|
                         object
                             [ ( "moduleName", encodeModuleName moduleName )
-                            , (nameField name)
+                            , nameField name
                             ]
 
                 RecordAccess exp name ->
                     encodeTyped "recordAccess" <|
                         object
                             [ ( "expression", encodeExpression exp )
-                            , (nameField name)
+                            , nameField name
                             ]
 
                 RecordAccessFunction x ->
@@ -548,7 +548,7 @@ encodeExpression ( range, inner ) =
 encodeRecordUpdate : RecordUpdate -> Value
 encodeRecordUpdate { name, updates } =
     object
-        [ (nameField name)
+        [ nameField name
         , ( "updates", asList encodeRecordSetter updates )
         ]
 

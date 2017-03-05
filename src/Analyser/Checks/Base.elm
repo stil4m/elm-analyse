@@ -1,9 +1,8 @@
 module Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 
-import Analyser.Configuration exposing (Configuration)
+import Analyser.Configuration exposing (Configuration, checkEnabled)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message)
-import Dict
 
 
 type alias Checker =
@@ -13,5 +12,5 @@ type alias Checker =
 
 
 keyBasedChecker : List String -> Configuration -> Bool
-keyBasedChecker keys { checks } =
-    List.any (flip Dict.get checks >> Maybe.withDefault True) keys
+keyBasedChecker keys configuration =
+    List.any (flip checkEnabled configuration) keys

@@ -1,11 +1,11 @@
 module Client.DashBoard.ActiveMessageDialog exposing (Model, Msg, show, init, update, view, subscriptions)
 
 import AST.Ranges exposing (Range)
-import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile, UnusedImportAlias, UnusedPatternVariable))
+import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile, UnusedImportAlias, UnusedPatternVariable, UnusedTypeAlias))
 import Analyser.Messages.Util as Messages
 import Dialog exposing (Config)
-import Html exposing (Html, div, h3, pre, span, text, button, i)
-import Html.Attributes exposing (style, class, id)
+import Html exposing (Html, div, h3, text, button, i)
+import Html.Attributes exposing (style, class)
 import Html.Events exposing (onClick)
 import Http exposing (Error)
 import RemoteData as RD exposing (RemoteData)
@@ -13,6 +13,7 @@ import WebSocket as WS
 import Navigation exposing (Location)
 import Client.Socket as Socket
 import Keyboard
+import Client.Highlight as Highlight
 
 
 type alias Model =
@@ -167,6 +168,15 @@ fixableFooter message =
                     [ text <| "Remove alias '" ++ String.join "." moduleName ++ "' and format" ]
                 ]
 
+        UnusedTypeAlias _ aliasName _ ->
+            div []
+                [ button
+                    [ class "btn btn-success"
+                    , onClick Fix
+                    ]
+                    [ text <| "Remove type alias '" ++ aliasName ++ "' and format" ]
+                ]
+
         UnusedPatternVariable _ _ _ ->
             div []
                 [ button
@@ -201,112 +211,9 @@ viewWithFileContent : State -> String -> Html msg
 viewWithFileContent state x =
     div [ style [ ( "max-height", "400px" ), ( "overflow", "scroll" ) ] ]
         [ div []
-            (List.map (renderRange x) state.ranges)
+            (List.map (Highlight.highlightedPre x) state.ranges)
         , text <| Messages.asString state.message.data
         ]
-
-
-renderRange : String -> Range -> Html msg
-renderRange content range =
-    let
-        lines =
-            String.split "\n" content
-
-        startRow =
-            max 0 (range.start.row - 3)
-
-        endRow =
-            if range.end.column < 0 then
-                range.end.row - 1
-            else
-                range.end.row
-
-        endsOnLineEnding =
-            range.end.row /= endRow
-
-        target =
-            lines
-                |> List.drop startRow
-                |> List.take (endRow - range.start.row + 7)
-
-        preLines =
-            List.take (range.start.row - startRow) target
-
-        preLineText =
-            List.drop (range.start.row - startRow) target
-                |> List.head
-                |> Maybe.map (String.left <| range.start.column + 1)
-                |> Maybe.map List.singleton
-                |> Maybe.withDefault []
-
-        preText =
-            String.join "\n" (preLines ++ preLineText)
-
-        postLineText =
-            if endsOnLineEnding then
-                ""
-            else
-                List.drop (range.end.row - startRow) target
-                    |> List.head
-                    |> Maybe.map (String.dropLeft <| range.end.column + 1)
-                    |> Maybe.withDefault ""
-                    |> flip (++) "\n"
-
-        postLines =
-            (if endsOnLineEnding then
-                range.end.row - startRow
-             else
-                range.end.row - startRow + 1
-            )
-                |> flip List.drop target
-                |> String.join "\n"
-
-        highlightedRowsFull =
-            target
-                |> List.drop (range.start.row - startRow)
-                |> List.take (endRow - range.start.row + 1)
-
-        highlighedSection =
-            case highlightedRowsFull of
-                [] ->
-                    ""
-
-                [ x ] ->
-                    x
-                        |> (String.dropLeft <| range.start.column + 1)
-                        |> if range.end.row /= endRow then
-                            identity >> flip (++) "\n"
-                           else
-                            String.left (range.end.column - range.start.column)
-
-                _ ->
-                    let
-                        midHighlighedRows =
-                            highlightedRowsFull |> List.drop 1 |> List.take (List.length highlightedRowsFull - 1)
-
-                        firstHighlightedRow =
-                            highlightedRowsFull
-                                |> List.head
-                                |> Maybe.map (String.dropLeft <| range.start.column + 1)
-                                |> Maybe.map List.singleton
-                                |> Maybe.withDefault []
-
-                        lastHighlighedRow =
-                            highlightedRowsFull
-                                |> List.reverse
-                                |> List.head
-                                |> Maybe.map (String.left <| range.start.column + 1)
-                                |> Maybe.map List.singleton
-                                |> Maybe.withDefault []
-                    in
-                        String.join "\n" (firstHighlightedRow ++ midHighlighedRows ++ lastHighlighedRow)
-    in
-        pre []
-            [ preText |> text
-            , span [ id "highlight", style [ ( "color", "white" ), ( "background", "red" ) ] ] [ text highlighedSection ]
-            , span [ style [ ( "color", "" ), ( "background", "" ) ] ] [ text postLineText ]
-            , span [ style [ ( "color", "" ), ( "background", "" ) ] ] [ text postLines ]
-            ]
 
 
 dialogHeader : Html msg

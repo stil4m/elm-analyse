@@ -35,7 +35,7 @@ multilineCommentInner =
         (\() ->
             String.concat
                 <$> sequence
-                        [ (string "{-")
+                        [ string "{-"
                         , String.concat
                             <$> manyTill
                                     (lookAhead (count 2 anyChar)

@@ -1,6 +1,6 @@
 module Inspector exposing (Order(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
-import AST.Types exposing (File, Import, ValueConstructor, InfixDirection, Type, TypeAlias, TypeReference(..), TypeArg(Concrete, Generic), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate)
+import AST.Types exposing (File, Import, ValueConstructor, InfixDirection, Type, TypeAlias, TypeReference(..), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate)
 
 
 type Order context x
@@ -179,36 +179,26 @@ inspectTypeReference config typeReference context =
 inspectTypeReferenceInner : Config context -> TypeReference -> context -> context
 inspectTypeReferenceInner config typeRefence context =
     case typeRefence of
-        Typed _ _ typeArgs r ->
-            List.foldl (inspectTypeArg config) context typeArgs
+        Typed _ _ typeArgs _ ->
+            List.foldl (inspectTypeReference config) context typeArgs
 
-        Tupled typeReferences r ->
+        Tupled typeReferences _ ->
             List.foldl (inspectTypeReference config) context typeReferences
 
-        Record recordDefinition r ->
+        Record recordDefinition _ ->
             List.foldl (inspectTypeReference config) context (List.map Tuple.second recordDefinition)
 
-        GenericRecord _ recordDefinition r ->
+        GenericRecord _ recordDefinition _ ->
             List.foldl (inspectTypeReference config) context (List.map Tuple.second recordDefinition)
 
-        FunctionTypeReference left right r ->
+        FunctionTypeReference left right _ ->
             List.foldl (inspectTypeReference config) context [ left, right ]
 
-        Unit r ->
+        Unit _ ->
             context
 
-        GenericType _ r ->
+        GenericType _ _ ->
             context
-
-
-inspectTypeArg : Config context -> TypeArg -> context -> context
-inspectTypeArg config typeArg context =
-    case typeArg of
-        Generic _ ->
-            context
-
-        Concrete t ->
-            inspectTypeReference config t context
 
 
 inspectExpression : Config context -> Expression -> context -> context

@@ -11668,9 +11668,9 @@ var _user$project$AST_Types$QualifiedNameRef = F2(
 	function (a, b) {
 		return {moduleName: a, name: b};
 	});
-var _user$project$AST_Types$FunctionSignature = F3(
-	function (a, b, c) {
-		return {operatorDefinition: a, name: b, typeReference: c};
+var _user$project$AST_Types$FunctionSignature = F4(
+	function (a, b, c, d) {
+		return {operatorDefinition: a, name: b, typeReference: c, range: d};
 	});
 var _user$project$AST_Types$FunctionDeclaration = F4(
 	function (a, b, c, d) {
@@ -11696,9 +11696,9 @@ var _user$project$AST_Types$Lambda = F2(
 	function (a, b) {
 		return {args: a, expression: b};
 	});
-var _user$project$AST_Types$TypeAlias = F4(
-	function (a, b, c, d) {
-		return {name: a, generics: b, typeReference: c, range: d};
+var _user$project$AST_Types$TypeAlias = F5(
+	function (a, b, c, d, e) {
+		return {documentation: a, name: b, generics: c, typeReference: d, range: e};
 	});
 var _user$project$AST_Types$Type = F3(
 	function (a, b, c) {
@@ -11875,12 +11875,6 @@ var _user$project$AST_Types$Application = function (a) {
 	return {ctor: 'Application', _0: a};
 };
 var _user$project$AST_Types$UnitExpr = {ctor: 'UnitExpr'};
-var _user$project$AST_Types$Concrete = function (a) {
-	return {ctor: 'Concrete', _0: a};
-};
-var _user$project$AST_Types$Generic = function (a) {
-	return {ctor: 'Generic', _0: a};
-};
 var _user$project$AST_Types$FunctionTypeReference = F3(
 	function (a, b, c) {
 		return {ctor: 'FunctionTypeReference', _0: a, _1: b, _2: c};
@@ -14407,40 +14401,80 @@ var _user$project$Client_Socket$controlAddress = function (_p2) {
 		A2(_elm_lang$core$Basics_ops['++'], _p3.host, '/control'));
 };
 
-var _user$project$Client_DashBoard_ActiveMessageDialog$dialogHeader = A2(
-	_elm_lang$html$Html$h3,
-	{ctor: '[]'},
-	{
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('Message'),
-		_1: {ctor: '[]'}
-	});
-var _user$project$Client_DashBoard_ActiveMessageDialog$renderRange = F2(
-	function (content, range) {
+var _user$project$Client_Highlight$highlightedString = F2(
+	function (targetRows, range) {
 		var endRow = (_elm_lang$core$Native_Utils.cmp(range.end.column, 0) < 0) ? (range.end.row - 1) : range.end.row;
 		var endsOnLineEnding = !_elm_lang$core$Native_Utils.eq(range.end.row, endRow);
 		var startRow = A2(_elm_lang$core$Basics$max, 0, range.start.row - 3);
-		var lines = A2(_elm_lang$core$String$split, '\n', content);
-		var target = A2(
+		var highlightedRowsFull = A2(
 			_elm_lang$core$List$take,
-			(endRow - range.start.row) + 7,
-			A2(_elm_lang$core$List$drop, startRow, lines));
-		var preLines = A2(_elm_lang$core$List$take, range.start.row - startRow, target);
-		var preLineText = A2(
-			_elm_lang$core$Maybe$withDefault,
-			{ctor: '[]'},
-			A2(
-				_elm_lang$core$Maybe$map,
-				_elm_lang$core$List$singleton,
-				A2(
-					_elm_lang$core$Maybe$map,
-					_elm_lang$core$String$left(range.start.column + 1),
-					_elm_lang$core$List$head(
-						A2(_elm_lang$core$List$drop, range.start.row - startRow, target)))));
-		var preText = A2(
-			_elm_lang$core$String$join,
-			'\n',
-			A2(_elm_lang$core$Basics_ops['++'], preLines, preLineText));
+			(endRow - range.start.row) + 1,
+			A2(_elm_lang$core$List$drop, range.start.row - startRow, targetRows));
+		var _p0 = highlightedRowsFull;
+		if (_p0.ctor === '[]') {
+			return '';
+		} else {
+			if (_p0._1.ctor === '[]') {
+				return ((!_elm_lang$core$Native_Utils.eq(range.end.row, endRow)) ? function (_p1) {
+					return A3(
+						_elm_lang$core$Basics$flip,
+						F2(
+							function (x, y) {
+								return A2(_elm_lang$core$Basics_ops['++'], x, y);
+							}),
+						'\n',
+						_elm_lang$core$Basics$identity(_p1));
+				} : _elm_lang$core$String$left(range.end.column - range.start.column))(
+					_elm_lang$core$String$dropLeft(range.start.column + 1)(_p0._0));
+			} else {
+				var lastHighlighedRow = A2(
+					_elm_lang$core$Maybe$withDefault,
+					{ctor: '[]'},
+					A2(
+						_elm_lang$core$Maybe$map,
+						_elm_lang$core$List$singleton,
+						A2(
+							_elm_lang$core$Maybe$map,
+							endsOnLineEnding ? A2(
+								_elm_lang$core$Basics$flip,
+								F2(
+									function (x, y) {
+										return A2(_elm_lang$core$Basics_ops['++'], x, y);
+									}),
+								'\n') : _elm_lang$core$String$left(range.end.column + 1),
+							_elm_lang$core$List$head(
+								_elm_lang$core$List$reverse(highlightedRowsFull)))));
+				var firstHighlightedRow = A2(
+					_elm_lang$core$Maybe$withDefault,
+					{ctor: '[]'},
+					A2(
+						_elm_lang$core$Maybe$map,
+						_elm_lang$core$List$singleton,
+						A2(
+							_elm_lang$core$Maybe$map,
+							_elm_lang$core$String$dropLeft(range.start.column + 1),
+							_elm_lang$core$List$head(highlightedRowsFull))));
+				var midHighlighedRows = A2(
+					_elm_lang$core$List$take,
+					_elm_lang$core$List$length(highlightedRowsFull) - 2,
+					A2(_elm_lang$core$List$drop, 1, highlightedRowsFull));
+				return A2(
+					_elm_lang$core$String$join,
+					'\n',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						firstHighlightedRow,
+						A2(_elm_lang$core$Basics_ops['++'], midHighlighedRows, lastHighlighedRow)));
+			}
+		}
+	});
+var _user$project$Client_Highlight$afterHighlight = F2(
+	function (targetRows, _p2) {
+		var _p3 = _p2;
+		var _p4 = _p3.end;
+		var endRow = (_elm_lang$core$Native_Utils.cmp(_p4.column, 0) < 0) ? (_p4.row - 1) : _p4.row;
+		var endsOnLineEnding = !_elm_lang$core$Native_Utils.eq(_p4.row, endRow);
+		var startRow = A2(_elm_lang$core$Basics$max, 0, _p3.start.row - 3);
 		var postLineText = endsOnLineEnding ? '' : A3(
 			_elm_lang$core$Basics$flip,
 			F2(
@@ -14453,74 +14487,55 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$renderRange = F2(
 				'',
 				A2(
 					_elm_lang$core$Maybe$map,
-					_elm_lang$core$String$dropLeft(range.end.column + 1),
+					_elm_lang$core$String$dropLeft(_p4.column + 1),
 					_elm_lang$core$List$head(
-						A2(_elm_lang$core$List$drop, range.end.row - startRow, target)))));
+						A2(_elm_lang$core$List$drop, _p4.row - startRow, targetRows)))));
 		var postLines = A2(
 			_elm_lang$core$String$join,
 			'\n',
 			A3(
 				_elm_lang$core$Basics$flip,
 				_elm_lang$core$List$drop,
-				target,
-				endsOnLineEnding ? (range.end.row - startRow) : ((range.end.row - startRow) + 1)));
-		var highlightedRowsFull = A2(
+				targetRows,
+				endsOnLineEnding ? (_p4.row - startRow) : ((_p4.row - startRow) + 1)));
+		return A2(_elm_lang$core$Basics_ops['++'], postLineText, postLines);
+	});
+var _user$project$Client_Highlight$beforeHighlight = F2(
+	function (targetRows, _p5) {
+		var _p6 = _p5;
+		var _p7 = _p6.start;
+		var startRow = A2(_elm_lang$core$Basics$max, 0, _p7.row - 3);
+		var preLines = A2(_elm_lang$core$List$take, _p7.row - startRow, targetRows);
+		var preLineText = A2(
+			_elm_lang$core$Maybe$withDefault,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$Maybe$map,
+				_elm_lang$core$List$singleton,
+				A2(
+					_elm_lang$core$Maybe$map,
+					_elm_lang$core$String$left(_p7.column + 1),
+					_elm_lang$core$List$head(
+						A2(_elm_lang$core$List$drop, _p7.row - startRow, targetRows)))));
+		return A2(
+			_elm_lang$core$String$join,
+			'\n',
+			A2(_elm_lang$core$Basics_ops['++'], preLines, preLineText));
+	});
+var _user$project$Client_Highlight$highlightedPre = F2(
+	function (content, range) {
+		var endRow = (_elm_lang$core$Native_Utils.cmp(range.end.column, 0) < 0) ? (range.end.row - 1) : range.end.row;
+		var startRow = A2(_elm_lang$core$Basics$max, 0, range.start.row - 3);
+		var target = A2(
 			_elm_lang$core$List$take,
-			(endRow - range.start.row) + 1,
-			A2(_elm_lang$core$List$drop, range.start.row - startRow, target));
-		var highlighedSection = function () {
-			var _p0 = highlightedRowsFull;
-			if (_p0.ctor === '[]') {
-				return '';
-			} else {
-				if (_p0._1.ctor === '[]') {
-					return ((!_elm_lang$core$Native_Utils.eq(range.end.row, endRow)) ? function (_p1) {
-						return A3(
-							_elm_lang$core$Basics$flip,
-							F2(
-								function (x, y) {
-									return A2(_elm_lang$core$Basics_ops['++'], x, y);
-								}),
-							'\n',
-							_elm_lang$core$Basics$identity(_p1));
-					} : _elm_lang$core$String$left(range.end.column - range.start.column))(
-						_elm_lang$core$String$dropLeft(range.start.column + 1)(_p0._0));
-				} else {
-					var lastHighlighedRow = A2(
-						_elm_lang$core$Maybe$withDefault,
-						{ctor: '[]'},
-						A2(
-							_elm_lang$core$Maybe$map,
-							_elm_lang$core$List$singleton,
-							A2(
-								_elm_lang$core$Maybe$map,
-								_elm_lang$core$String$left(range.start.column + 1),
-								_elm_lang$core$List$head(
-									_elm_lang$core$List$reverse(highlightedRowsFull)))));
-					var firstHighlightedRow = A2(
-						_elm_lang$core$Maybe$withDefault,
-						{ctor: '[]'},
-						A2(
-							_elm_lang$core$Maybe$map,
-							_elm_lang$core$List$singleton,
-							A2(
-								_elm_lang$core$Maybe$map,
-								_elm_lang$core$String$dropLeft(range.start.column + 1),
-								_elm_lang$core$List$head(highlightedRowsFull))));
-					var midHighlighedRows = A2(
-						_elm_lang$core$List$take,
-						_elm_lang$core$List$length(highlightedRowsFull) - 1,
-						A2(_elm_lang$core$List$drop, 1, highlightedRowsFull));
-					return A2(
-						_elm_lang$core$String$join,
-						'\n',
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							firstHighlightedRow,
-							A2(_elm_lang$core$Basics_ops['++'], midHighlighedRows, lastHighlighedRow)));
-				}
-			}
-		}();
+			(endRow - range.start.row) + 7,
+			A2(
+				_elm_lang$core$List$drop,
+				startRow,
+				A2(_elm_lang$core$String$split, '\n', content)));
+		var preText = A2(_user$project$Client_Highlight$beforeHighlight, target, range);
+		var postText = A2(_user$project$Client_Highlight$afterHighlight, target, range);
+		var highlighedSection = A2(_user$project$Client_Highlight$highlightedString, target, range);
 		return A2(
 			_elm_lang$html$Html$pre,
 			{ctor: '[]'},
@@ -14556,55 +14571,20 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$renderRange = F2(
 						}),
 					_1: {
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$span,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$style(
-									{
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'color', _1: ''},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'background', _1: ''},
-											_1: {ctor: '[]'}
-										}
-									}),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(postLineText),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$span,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$style(
-										{
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'color', _1: ''},
-											_1: {
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'background', _1: ''},
-												_1: {ctor: '[]'}
-											}
-										}),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(postLines),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html$text(postText),
+						_1: {ctor: '[]'}
 					}
 				}
 			});
+	});
+
+var _user$project$Client_DashBoard_ActiveMessageDialog$dialogHeader = A2(
+	_elm_lang$html$Html$h3,
+	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html$text('Message'),
+		_1: {ctor: '[]'}
 	});
 var _user$project$Client_DashBoard_ActiveMessageDialog$viewWithFileContent = F2(
 	function (state, x) {
@@ -14631,7 +14611,7 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$viewWithFileContent = F2(
 					{ctor: '[]'},
 					A2(
 						_elm_lang$core$List$map,
-						_user$project$Client_DashBoard_ActiveMessageDialog$renderRange(x),
+						_user$project$Client_Highlight$highlightedPre(x),
 						state.ranges)),
 				_1: {
 					ctor: '::',
@@ -14642,8 +14622,8 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$viewWithFileContent = F2(
 			});
 	});
 var _user$project$Client_DashBoard_ActiveMessageDialog$dialogBody = function (state) {
-	var _p2 = state.codeBlock;
-	switch (_p2.ctor) {
+	var _p0 = state.codeBlock;
+	switch (_p0.ctor) {
 		case 'NotAsked':
 			return A2(
 				_elm_lang$html$Html$div,
@@ -14659,7 +14639,7 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$dialogBody = function (st
 					_1: {ctor: '[]'}
 				});
 		case 'Success':
-			return A2(_user$project$Client_DashBoard_ActiveMessageDialog$viewWithFileContent, state, _p2._0);
+			return A2(_user$project$Client_DashBoard_ActiveMessageDialog$viewWithFileContent, state, _p0._0);
 		default:
 			return A2(
 				_elm_lang$html$Html$div,
@@ -14675,8 +14655,8 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$init = _elm_lang$core$May
 var _user$project$Client_DashBoard_ActiveMessageDialog$hide = _elm_lang$core$Basics$always(_elm_lang$core$Maybe$Nothing);
 var _user$project$Client_DashBoard_ActiveMessageDialog$update = F3(
 	function (location, msg, model) {
-		var _p3 = msg;
-		switch (_p3.ctor) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Close':
@@ -14699,7 +14679,7 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$update = F3(
 							return _elm_lang$core$Native_Utils.update(
 								y,
 								{
-									codeBlock: _krisajenkins$remotedata$RemoteData$fromResult(_p3._0)
+									codeBlock: _krisajenkins$remotedata$RemoteData$fromResult(_p1._0)
 								});
 						},
 						model));
@@ -14725,7 +14705,7 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$update = F3(
 						},
 						model));
 			default:
-				return _p3._0 ? {
+				return _p1._0 ? {
 					ctor: '_Tuple2',
 					_0: _user$project$Client_DashBoard_ActiveMessageDialog$hide(model),
 					_1: _elm_lang$core$Platform_Cmd$none
@@ -14740,10 +14720,10 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$OnEscape = function (a) {
 	return {ctor: 'OnEscape', _0: a};
 };
 var _user$project$Client_DashBoard_ActiveMessageDialog$subscriptions = function (x) {
-	var _p4 = x;
-	if (_p4.ctor === 'Just') {
+	var _p2 = x;
+	if (_p2.ctor === 'Just') {
 		return _elm_lang$keyboard$Keyboard$downs(
-			function (_p5) {
+			function (_p3) {
 				return _user$project$Client_DashBoard_ActiveMessageDialog$OnEscape(
 					A2(
 						F2(
@@ -14751,7 +14731,7 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$subscriptions = function 
 								return _elm_lang$core$Native_Utils.eq(x, y);
 							}),
 						27,
-						_p5));
+						_p3));
 			});
 	} else {
 		return _elm_lang$core$Platform_Sub$none;
@@ -14760,8 +14740,8 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$subscriptions = function 
 var _user$project$Client_DashBoard_ActiveMessageDialog$NoOp = {ctor: 'NoOp'};
 var _user$project$Client_DashBoard_ActiveMessageDialog$Fix = {ctor: 'Fix'};
 var _user$project$Client_DashBoard_ActiveMessageDialog$fixableFooter = function (message) {
-	var _p6 = message.data;
-	switch (_p6.ctor) {
+	var _p4 = message.data;
+	switch (_p4.ctor) {
 		case 'UnnecessaryParens':
 			return A2(
 				_elm_lang$html$Html$div,
@@ -14809,7 +14789,7 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$fixableFooter = function 
 								A2(
 									_elm_lang$core$Basics_ops['++'],
 									'Remove \'',
-									A2(_elm_lang$core$Basics_ops['++'], _p6._1, '\' from import list and format'))),
+									A2(_elm_lang$core$Basics_ops['++'], _p4._1, '\' from import list and format'))),
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
@@ -14863,8 +14843,36 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$fixableFooter = function 
 									'Remove alias \'',
 									A2(
 										_elm_lang$core$Basics_ops['++'],
-										A2(_elm_lang$core$String$join, '.', _p6._1),
+										A2(_elm_lang$core$String$join, '.', _p4._1),
 										'\' and format'))),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				});
+		case 'UnusedTypeAlias':
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('btn btn-success'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$Client_DashBoard_ActiveMessageDialog$Fix),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Remove type alias \'',
+									A2(_elm_lang$core$Basics_ops['++'], _p4._1, '\' and format'))),
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
@@ -14912,7 +14920,7 @@ var _user$project$Client_DashBoard_ActiveMessageDialog$OnFile = function (a) {
 	return {ctor: 'OnFile', _0: a};
 };
 var _user$project$Client_DashBoard_ActiveMessageDialog$show = F2(
-	function (m, _p7) {
+	function (m, _p5) {
 		return {
 			ctor: '_Tuple2',
 			_0: _elm_lang$core$Maybe$Just(

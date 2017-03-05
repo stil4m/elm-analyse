@@ -166,7 +166,7 @@ stringLiteral =
         *> (String.concat
                 <$> many
                         (choice
-                            [ (regex "[^\\\\\\\"]+")
+                            [ regex "[^\\\\\\\"]+"
                             , String.fromChar <$> escapedChar
                             ]
                         )

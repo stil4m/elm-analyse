@@ -4,7 +4,9 @@ import AST.Ranges exposing (Range)
 
 
 type alias VariablePointer =
-    { value : String, range : Range }
+    { value : String
+    , range : Range
+    }
 
 
 type alias File =
@@ -61,11 +63,14 @@ type InfixDirection
 
 
 type alias Infix =
-    { direction : InfixDirection, precedence : Int, operator : String }
+    { direction : InfixDirection
+    , precedence : Int
+    , operator : String
+    }
 
 
 type alias DocumentationComment =
-    String
+    ( String, Range )
 
 
 type Pattern
@@ -100,6 +105,7 @@ type alias FunctionSignature =
     { operatorDefinition : Bool
     , name : String
     , typeReference : TypeReference
+    , range : Range
     }
 
 
@@ -193,7 +199,8 @@ type alias Cases =
 
 
 type alias TypeAlias =
-    { name : String
+    { documentation : Maybe DocumentationComment
+    , name : String
     , generics : List String
     , typeReference : TypeReference
     , range : Range
@@ -214,16 +221,9 @@ type alias ValueConstructor =
     }
 
 
-{-| TODO REMOVE THIS
--}
-type TypeArg
-    = Generic String
-    | Concrete TypeReference
-
-
 type TypeReference
     = GenericType String Range
-    | Typed ModuleName String (List TypeArg) Range
+    | Typed ModuleName String (List TypeReference) Range
     | Unit Range
     | Tupled (List TypeReference) Range
     | Record RecordDefinition Range

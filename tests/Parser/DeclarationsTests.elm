@@ -22,6 +22,7 @@ all =
                             { operatorDefinition = False
                             , name = "foo"
                             , typeReference = Types.Typed [] "Int" [] emptyRange
+                            , range = emptyRange
                             }
                         )
         , test "no spacing signature" <|
@@ -33,6 +34,7 @@ all =
                             { operatorDefinition = False
                             , name = "foo"
                             , typeReference = Types.Typed [] "Int" [] emptyRange
+                            , range = emptyRange
                             }
                         )
         , test "on newline signature with wrong indent " <|
@@ -49,6 +51,7 @@ all =
                             { operatorDefinition = False
                             , name = "foo"
                             , typeReference = Types.Typed [] "Int" [] emptyRange
+                            , range = emptyRange
                             }
                         )
         , test "on newline signature with colon on start of line" <|
@@ -114,15 +117,14 @@ all =
                             , typeReference =
                                 Typed []
                                     "List"
-                                    [ Concrete
-                                        (Tupled
-                                            [ Typed [] "Int" [] emptyRange
-                                            , Typed [] "Maybe" [ Generic "m" ] emptyRange
-                                            ]
-                                            emptyRange
-                                        )
+                                    [ Tupled
+                                        [ Typed [] "Int" [] emptyRange
+                                        , Typed [] "Maybe" [ GenericType "m" emptyRange ] emptyRange
+                                        ]
+                                        emptyRange
                                     ]
                                     emptyRange
+                            , range = emptyRange
                             }
                         )
         , test "function declaration with let" <|
@@ -229,8 +231,9 @@ all =
                                             ]
                                             emptyRange
                                         )
-                                        (Typed [] "Cmd" [ Generic "msg" ] emptyRange)
+                                        (Typed [] "Cmd" [ GenericType "msg" emptyRange ] emptyRange)
                                         emptyRange
+                                , range = emptyRange
                                 }
                             )
                         )
@@ -268,8 +271,9 @@ all =
                                             (GenericType "msg" emptyRange)
                                             emptyRange
                                         )
-                                        (Typed [] "Sub" [ Generic "msg" ] emptyRange)
+                                        (Typed [] "Sub" [ GenericType "msg" emptyRange ] emptyRange)
                                         emptyRange
+                                , range = emptyRange
                                 }
                         )
         , test "Destructuring declaration" <|

@@ -30,7 +30,7 @@ model =
 
 
 update : Msg -> Model -> Model
-update msg model =
+update msg _ =
     case msg of
         ChangeInput s ->
             Model s (Parser.parse s)

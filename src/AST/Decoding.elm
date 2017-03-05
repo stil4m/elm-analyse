@@ -2,7 +2,7 @@ module AST.Decoding exposing (decode, decodeInfix)
 
 import AST.Ranges as Ranges exposing (Range)
 import AST.Types exposing (..)
-import Json.Decode exposing (Decoder, field, list, string, map, map2, map3, map4, succeed, maybe, lazy, int, bool, andThen, float, fail, at)
+import Json.Decode exposing (Decoder, field, list, string, map, map2, map3, map4, succeed, lazy, int, bool, andThen, float, fail, at, nullable)
 import Json.Decode.Extra exposing ((|:))
 import Util.Json exposing (decodeTyped)
 
@@ -73,8 +73,8 @@ decodeEffectModuleData =
     succeed EffectModuleData
         |: field "moduleName" decodeModuleName
         |: field "exposingList" (decodeExposingList decodeExpose)
-        |: field "command" (maybe string)
-        |: field "subscription" (maybe string)
+        |: field "command" (nullable string)
+        |: field "subscription" (nullable string)
 
 
 decodeModuleName : Decoder ModuleName
@@ -123,7 +123,7 @@ decodeImport : Decoder Import
 decodeImport =
     succeed Import
         |: field "moduleName" decodeModuleName
-        |: field "moduleAlias" (maybe decodeModuleName)
+        |: field "moduleAlias" (nullable decodeModuleName)
         |: field "exposingList" (decodeExposingList decodeExpose)
         |: rangeField
 
@@ -180,6 +180,7 @@ decodeValueConstructor =
 decodeTypeAlias : Decoder TypeAlias
 decodeTypeAlias =
     succeed TypeAlias
+        |: field "documentation" (nullable decodeDocumentation)
         |: nameField
         |: field "generics" (list string)
         |: field "typeReference" decodeTypeReference
@@ -191,10 +192,17 @@ decodeFunction =
     lazy
         (\() ->
             succeed Function
-                |: field "documentation" (maybe string)
-                |: field "signature" (maybe decodeSignature)
+                |: field "documentation" (nullable decodeDocumentation)
+                |: field "signature" (nullable decodeSignature)
                 |: field "declaration" decodeFunctionDeclaration
         )
+
+
+decodeDocumentation : Decoder DocumentationComment
+decodeDocumentation =
+    succeed (,)
+        |: field "value" string
+        |: rangeField
 
 
 decodeSignature : Decoder FunctionSignature
@@ -203,6 +211,7 @@ decodeSignature =
         |: field "operatorDefinition" bool
         |: nameField
         |: field "typeReference" decodeTypeReference
+        |: rangeField
 
 
 decodeTypeReference : Decoder TypeReference
@@ -215,7 +224,7 @@ decodeTypeReference =
                   , map4 Typed
                         (field "moduleName" decodeModuleName)
                         nameField
-                        (field "args" <| list decodeTypeArg)
+                        (field "args" <| list decodeTypeReference)
                         rangeField
                   )
                 , ( "unit", map Unit rangeField )
@@ -249,17 +258,6 @@ decodeRecordField =
             succeed (,)
                 |: nameField
                 |: field "typeReference" decodeTypeReference
-        )
-
-
-decodeTypeArg : Decoder TypeArg
-decodeTypeArg =
-    lazy
-        (\() ->
-            decodeTyped
-                [ ( "generic", string |> map Generic )
-                , ( "concrete", decodeTypeReference |> map Concrete )
-                ]
         )
 
 

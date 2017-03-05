@@ -17,19 +17,21 @@ all =
                     |> Maybe.map noRangeTypeAlias
                     |> Expect.equal
                         (Just <|
-                            { name = "Foo"
+                            { documentation = Nothing
+                            , name = "Foo"
                             , generics = []
                             , typeReference = Record [ ( "color", Typed [] "String" [] emptyRange ) ] emptyRange
                             , range = emptyRange
                             }
                         )
-        , test "type alias with generic " <|
+        , test "type alias with GenericType " <|
             \() ->
                 parseFullStringWithNullState "type alias Foo a = {some : a }" Parser.typeAlias
                     |> Maybe.map noRangeTypeAlias
                     |> Expect.equal
                         (Just <|
-                            { name = "Foo"
+                            { documentation = Nothing
+                            , name = "Foo"
                             , generics = [ "a" ]
                             , typeReference = Record [ ( "some", GenericType "a" emptyRange ) ] emptyRange
                             , range = emptyRange
@@ -59,7 +61,7 @@ all =
                                 ]
                             }
                         )
-        , test "type with generic " <|
+        , test "type with GenericType " <|
             \() ->
                 parseFullStringWithNullState "type Maybe a = Just a | Nothing" Parser.typeDeclaration
                     |> Maybe.map noRangeTypeDeclaration
