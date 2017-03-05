@@ -9738,9 +9738,9 @@ var _user$project$AST_Types$QualifiedNameRef = F2(
 	function (a, b) {
 		return {moduleName: a, name: b};
 	});
-var _user$project$AST_Types$FunctionSignature = F3(
-	function (a, b, c) {
-		return {operatorDefinition: a, name: b, typeReference: c};
+var _user$project$AST_Types$FunctionSignature = F4(
+	function (a, b, c, d) {
+		return {operatorDefinition: a, name: b, typeReference: c, range: d};
 	});
 var _user$project$AST_Types$FunctionDeclaration = F4(
 	function (a, b, c, d) {
@@ -9766,9 +9766,9 @@ var _user$project$AST_Types$Lambda = F2(
 	function (a, b) {
 		return {args: a, expression: b};
 	});
-var _user$project$AST_Types$TypeAlias = F4(
-	function (a, b, c, d) {
-		return {name: a, generics: b, typeReference: c, range: d};
+var _user$project$AST_Types$TypeAlias = F5(
+	function (a, b, c, d, e) {
+		return {documentation: a, name: b, generics: c, typeReference: d, range: e};
 	});
 var _user$project$AST_Types$Type = F3(
 	function (a, b, c) {
@@ -9945,12 +9945,6 @@ var _user$project$AST_Types$Application = function (a) {
 	return {ctor: 'Application', _0: a};
 };
 var _user$project$AST_Types$UnitExpr = {ctor: 'UnitExpr'};
-var _user$project$AST_Types$Concrete = function (a) {
-	return {ctor: 'Concrete', _0: a};
-};
-var _user$project$AST_Types$Generic = function (a) {
-	return {ctor: 'Generic', _0: a};
-};
 var _user$project$AST_Types$FunctionTypeReference = F3(
 	function (a, b, c) {
 		return {ctor: 'FunctionTypeReference', _0: a, _1: b, _2: c};
@@ -10229,11 +10223,11 @@ var _user$project$AST_Decoding$decodeEffectModuleData = A2(
 		A2(
 			_elm_lang$core$Json_Decode$field,
 			'command',
-			_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string))),
+			_elm_lang$core$Json_Decode$nullable(_elm_lang$core$Json_Decode$string))),
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'subscription',
-		_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string)));
+		_elm_lang$core$Json_Decode$nullable(_elm_lang$core$Json_Decode$string)));
 var _user$project$AST_Decoding$decodeModule = _user$project$Util_Json$decodeTyped(
 	{
 		ctor: '::',
@@ -10281,11 +10275,22 @@ var _user$project$AST_Decoding$decodeImport = A2(
 			A2(
 				_elm_lang$core$Json_Decode$field,
 				'moduleAlias',
-				_elm_lang$core$Json_Decode$maybe(_user$project$AST_Decoding$decodeModuleName))),
+				_elm_lang$core$Json_Decode$nullable(_user$project$AST_Decoding$decodeModuleName))),
 		A2(
 			_elm_lang$core$Json_Decode$field,
 			'exposingList',
 			_user$project$AST_Decoding$decodeExposingList(_user$project$AST_Decoding$decodeExpose))),
+	_user$project$AST_Decoding$rangeField);
+var _user$project$AST_Decoding$decodeDocumentation = A2(
+	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+		_elm_lang$core$Json_Decode$succeed(
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				})),
+		A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$string)),
 	_user$project$AST_Decoding$rangeField);
 var _user$project$AST_Decoding$decodeTypeReference = _elm_lang$core$Json_Decode$lazy(
 	function (_p4) {
@@ -10315,7 +10320,7 @@ var _user$project$AST_Decoding$decodeTypeReference = _elm_lang$core$Json_Decode$
 							A2(
 								_elm_lang$core$Json_Decode$field,
 								'args',
-								_elm_lang$core$Json_Decode$list(_user$project$AST_Decoding$decodeTypeArg)),
+								_elm_lang$core$Json_Decode$list(_user$project$AST_Decoding$decodeTypeReference)),
 							_user$project$AST_Decoding$rangeField)
 					},
 					_1: {
@@ -10403,28 +10408,6 @@ var _user$project$AST_Decoding$decodeRecordField = _elm_lang$core$Json_Decode$la
 				_user$project$AST_Decoding$nameField),
 			A2(_elm_lang$core$Json_Decode$field, 'typeReference', _user$project$AST_Decoding$decodeTypeReference));
 	});
-var _user$project$AST_Decoding$decodeTypeArg = _elm_lang$core$Json_Decode$lazy(
-	function (_p10) {
-		var _p11 = _p10;
-		return _user$project$Util_Json$decodeTyped(
-			{
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'generic',
-					_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$Generic, _elm_lang$core$Json_Decode$string)
-				},
-				_1: {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'concrete',
-						_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$Concrete, _user$project$AST_Decoding$decodeTypeReference)
-					},
-					_1: {ctor: '[]'}
-				}
-			});
-	});
 var _user$project$AST_Decoding$decodeValueConstructor = A2(
 	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 	A2(
@@ -10462,7 +10445,13 @@ var _user$project$AST_Decoding$decodeTypeAlias = A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
 				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-				_elm_lang$core$Json_Decode$succeed(_user$project$AST_Types$TypeAlias),
+				A2(
+					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+					_elm_lang$core$Json_Decode$succeed(_user$project$AST_Types$TypeAlias),
+					A2(
+						_elm_lang$core$Json_Decode$field,
+						'documentation',
+						_elm_lang$core$Json_Decode$nullable(_user$project$AST_Decoding$decodeDocumentation))),
 				_user$project$AST_Decoding$nameField),
 			A2(
 				_elm_lang$core$Json_Decode$field,
@@ -10476,10 +10465,13 @@ var _user$project$AST_Decoding$decodeSignature = A2(
 		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 		A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-			_elm_lang$core$Json_Decode$succeed(_user$project$AST_Types$FunctionSignature),
-			A2(_elm_lang$core$Json_Decode$field, 'operatorDefinition', _elm_lang$core$Json_Decode$bool)),
-		_user$project$AST_Decoding$nameField),
-	A2(_elm_lang$core$Json_Decode$field, 'typeReference', _user$project$AST_Decoding$decodeTypeReference));
+			A2(
+				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+				_elm_lang$core$Json_Decode$succeed(_user$project$AST_Types$FunctionSignature),
+				A2(_elm_lang$core$Json_Decode$field, 'operatorDefinition', _elm_lang$core$Json_Decode$bool)),
+			_user$project$AST_Decoding$nameField),
+		A2(_elm_lang$core$Json_Decode$field, 'typeReference', _user$project$AST_Decoding$decodeTypeReference)),
+	_user$project$AST_Decoding$rangeField);
 var _user$project$AST_Decoding$decodeVariablePointer = A2(
 	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 	A2(
@@ -10489,37 +10481,37 @@ var _user$project$AST_Decoding$decodeVariablePointer = A2(
 	_user$project$AST_Decoding$rangeField);
 var _user$project$AST_Decoding$decodeTypedWithRange = function (opts) {
 	return _elm_lang$core$Json_Decode$lazy(
-		function (_p12) {
-			var _p13 = _p12;
+		function (_p10) {
+			var _p11 = _p10;
 			return A2(
 				_elm_lang$core$Json_Decode$andThen,
 				function (t) {
-					var _p15 = _elm_lang$core$List$head(
+					var _p13 = _elm_lang$core$List$head(
 						A2(
 							_elm_lang$core$List$filter,
-							function (_p14) {
+							function (_p12) {
 								return A2(
 									F2(
 										function (x, y) {
 											return _elm_lang$core$Native_Utils.eq(x, y);
 										}),
 									t,
-									_elm_lang$core$Tuple$first(_p14));
+									_elm_lang$core$Tuple$first(_p12));
 							},
 							opts));
-					if (_p15.ctor === 'Just') {
-						var _p16 = _p15._0;
+					if (_p13.ctor === 'Just') {
+						var _p14 = _p13._0;
 						return A2(
 							_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 							A2(
 								_elm_lang$core$Json_Decode$field,
-								_elm_lang$core$Tuple$first(_p16),
-								_elm_lang$core$Tuple$second(_p16)),
+								_elm_lang$core$Tuple$first(_p14),
+								_elm_lang$core$Tuple$second(_p14)),
 							A2(
 								_elm_lang$core$Json_Decode$at,
 								{
 									ctor: '::',
-									_0: _elm_lang$core$Tuple$first(_p16),
+									_0: _elm_lang$core$Tuple$first(_p14),
 									_1: {
 										ctor: '::',
 										_0: 'range',
@@ -10536,8 +10528,8 @@ var _user$project$AST_Decoding$decodeTypedWithRange = function (opts) {
 		});
 };
 var _user$project$AST_Decoding$decodePattern = _elm_lang$core$Json_Decode$lazy(
-	function (_p17) {
-		var _p18 = _p17;
+	function (_p15) {
+		var _p16 = _p15;
 		return _user$project$AST_Decoding$decodeTypedWithRange(
 			{
 				ctor: '::',
@@ -10716,8 +10708,8 @@ var _user$project$AST_Decoding$decodePattern = _elm_lang$core$Json_Decode$lazy(
 			});
 	});
 var _user$project$AST_Decoding$decodeCase = _elm_lang$core$Json_Decode$lazy(
-	function (_p19) {
-		var _p20 = _p19;
+	function (_p17) {
+		var _p18 = _p17;
 		return A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
@@ -10731,8 +10723,8 @@ var _user$project$AST_Decoding$decodeCase = _elm_lang$core$Json_Decode$lazy(
 			A2(_elm_lang$core$Json_Decode$field, 'expression', _user$project$AST_Decoding$decodeExpression));
 	});
 var _user$project$AST_Decoding$decodeExpression = _elm_lang$core$Json_Decode$lazy(
-	function (_p21) {
-		var _p22 = _p21;
+	function (_p19) {
+		var _p20 = _p19;
 		return A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
@@ -10746,8 +10738,8 @@ var _user$project$AST_Decoding$decodeExpression = _elm_lang$core$Json_Decode$laz
 			A2(_elm_lang$core$Json_Decode$field, 'inner', _user$project$AST_Decoding$decodeInnerExpression));
 	});
 var _user$project$AST_Decoding$decodeInnerExpression = _elm_lang$core$Json_Decode$lazy(
-	function (_p23) {
-		var _p24 = _p23;
+	function (_p21) {
+		var _p22 = _p21;
 		return _user$project$Util_Json$decodeTyped(
 			{
 				ctor: '::',
@@ -10957,8 +10949,8 @@ var _user$project$AST_Decoding$decodeInnerExpression = _elm_lang$core$Json_Decod
 			});
 	});
 var _user$project$AST_Decoding$decodeCaseBlock = _elm_lang$core$Json_Decode$lazy(
-	function (_p25) {
-		var _p26 = _p25;
+	function (_p23) {
+		var _p24 = _p23;
 		return A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
@@ -10971,8 +10963,8 @@ var _user$project$AST_Decoding$decodeCaseBlock = _elm_lang$core$Json_Decode$lazy
 				_elm_lang$core$Json_Decode$list(_user$project$AST_Decoding$decodeCase)));
 	});
 var _user$project$AST_Decoding$decodeLambda = _elm_lang$core$Json_Decode$lazy(
-	function (_p27) {
-		var _p28 = _p27;
+	function (_p25) {
+		var _p26 = _p25;
 		return A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
@@ -10985,8 +10977,8 @@ var _user$project$AST_Decoding$decodeLambda = _elm_lang$core$Json_Decode$lazy(
 			A2(_elm_lang$core$Json_Decode$field, 'expression', _user$project$AST_Decoding$decodeExpression));
 	});
 var _user$project$AST_Decoding$decodeLetBlock = _elm_lang$core$Json_Decode$lazy(
-	function (_p29) {
-		var _p30 = _p29;
+	function (_p27) {
+		var _p28 = _p27;
 		return A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
@@ -10999,8 +10991,8 @@ var _user$project$AST_Decoding$decodeLetBlock = _elm_lang$core$Json_Decode$lazy(
 			A2(_elm_lang$core$Json_Decode$field, 'expression', _user$project$AST_Decoding$decodeExpression));
 	});
 var _user$project$AST_Decoding$decodeDeclaration = _elm_lang$core$Json_Decode$lazy(
-	function (_p31) {
-		var _p32 = _p31;
+	function (_p29) {
+		var _p30 = _p29;
 		return _user$project$Util_Json$decodeTyped(
 			{
 				ctor: '::',
@@ -11053,8 +11045,8 @@ var _user$project$AST_Decoding$decodeDeclaration = _elm_lang$core$Json_Decode$la
 			});
 	});
 var _user$project$AST_Decoding$decodeDestructuring = _elm_lang$core$Json_Decode$lazy(
-	function (_p33) {
-		var _p34 = _p33;
+	function (_p31) {
+		var _p32 = _p31;
 		return A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
@@ -11064,8 +11056,8 @@ var _user$project$AST_Decoding$decodeDestructuring = _elm_lang$core$Json_Decode$
 			A2(_elm_lang$core$Json_Decode$field, 'expression', _user$project$AST_Decoding$decodeExpression));
 	});
 var _user$project$AST_Decoding$decodeFunction = _elm_lang$core$Json_Decode$lazy(
-	function (_p35) {
-		var _p36 = _p35;
+	function (_p33) {
+		var _p34 = _p33;
 		return A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
@@ -11076,16 +11068,16 @@ var _user$project$AST_Decoding$decodeFunction = _elm_lang$core$Json_Decode$lazy(
 					A2(
 						_elm_lang$core$Json_Decode$field,
 						'documentation',
-						_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string))),
+						_elm_lang$core$Json_Decode$nullable(_user$project$AST_Decoding$decodeDocumentation))),
 				A2(
 					_elm_lang$core$Json_Decode$field,
 					'signature',
-					_elm_lang$core$Json_Decode$maybe(_user$project$AST_Decoding$decodeSignature))),
+					_elm_lang$core$Json_Decode$nullable(_user$project$AST_Decoding$decodeSignature))),
 			A2(_elm_lang$core$Json_Decode$field, 'declaration', _user$project$AST_Decoding$decodeFunctionDeclaration));
 	});
 var _user$project$AST_Decoding$decodeFunctionDeclaration = _elm_lang$core$Json_Decode$lazy(
-	function (_p37) {
-		var _p38 = _p37;
+	function (_p35) {
+		var _p36 = _p35;
 		return A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
@@ -11104,8 +11096,8 @@ var _user$project$AST_Decoding$decodeFunctionDeclaration = _elm_lang$core$Json_D
 			A2(_elm_lang$core$Json_Decode$field, 'expression', _user$project$AST_Decoding$decodeExpression));
 	});
 var _user$project$AST_Decoding$decodeOperatorApplication = _elm_lang$core$Json_Decode$lazy(
-	function (_p39) {
-		var _p40 = _p39;
+	function (_p37) {
+		var _p38 = _p37;
 		return A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
@@ -11121,8 +11113,8 @@ var _user$project$AST_Decoding$decodeOperatorApplication = _elm_lang$core$Json_D
 			A2(_elm_lang$core$Json_Decode$field, 'right', _user$project$AST_Decoding$decodeExpression));
 	});
 var _user$project$AST_Decoding$decodeRecordSetter = _elm_lang$core$Json_Decode$lazy(
-	function (_p41) {
-		var _p42 = _p41;
+	function (_p39) {
+		var _p40 = _p39;
 		return A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
@@ -11136,8 +11128,8 @@ var _user$project$AST_Decoding$decodeRecordSetter = _elm_lang$core$Json_Decode$l
 			A2(_elm_lang$core$Json_Decode$field, 'expression', _user$project$AST_Decoding$decodeExpression));
 	});
 var _user$project$AST_Decoding$decodeRecordUpdate = _elm_lang$core$Json_Decode$lazy(
-	function (_p43) {
-		var _p44 = _p43;
+	function (_p41) {
+		var _p42 = _p41;
 		return A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
@@ -11236,7 +11228,7 @@ var _user$project$AST_Encoding$encodeComment = function (_p2) {
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeVariablePointer = function (_p4) {
+var _user$project$AST_Encoding$encodeDocumentation = function (_p4) {
 	var _p5 = _p4;
 	return _elm_lang$core$Json_Encode$object(
 		{
@@ -11244,11 +11236,28 @@ var _user$project$AST_Encoding$encodeVariablePointer = function (_p4) {
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'value',
-				_1: _elm_lang$core$Json_Encode$string(_p5.value)
+				_1: _elm_lang$core$Json_Encode$string(_p5._0)
 			},
 			_1: {
 				ctor: '::',
-				_0: _user$project$AST_Encoding$rangeField(_p5.range),
+				_0: _user$project$AST_Encoding$rangeField(_p5._1),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$AST_Encoding$encodeVariablePointer = function (_p6) {
+	var _p7 = _p6;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'value',
+				_1: _elm_lang$core$Json_Encode$string(_p7.value)
+			},
+			_1: {
+				ctor: '::',
+				_0: _user$project$AST_Encoding$rangeField(_p7.range),
 				_1: {ctor: '[]'}
 			}
 		});
@@ -11260,84 +11269,84 @@ var _user$project$AST_Encoding$nameField = function (x) {
 		_1: _elm_lang$core$Json_Encode$string(x)
 	};
 };
-var _user$project$AST_Encoding$encodeValueConstructorExpose = function (_p6) {
-	var _p7 = _p6;
+var _user$project$AST_Encoding$encodeValueConstructorExpose = function (_p8) {
+	var _p9 = _p8;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
-			_0: _user$project$AST_Encoding$nameField(_p7._0),
+			_0: _user$project$AST_Encoding$nameField(_p9._0),
 			_1: {
 				ctor: '::',
-				_0: _user$project$AST_Encoding$rangeField(_p7._1),
+				_0: _user$project$AST_Encoding$rangeField(_p9._1),
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeQualifiedNameRef = function (_p8) {
-	var _p9 = _p8;
+var _user$project$AST_Encoding$encodeQualifiedNameRef = function (_p10) {
+	var _p11 = _p10;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'moduleName',
-				_1: _user$project$AST_Encoding$encodeModuleName(_p9.moduleName)
+				_1: _user$project$AST_Encoding$encodeModuleName(_p11.moduleName)
 			},
 			_1: {
 				ctor: '::',
-				_0: _user$project$AST_Encoding$nameField(_p9.name),
+				_0: _user$project$AST_Encoding$nameField(_p11.name),
 				_1: {ctor: '[]'}
 			}
 		});
 };
 var _user$project$AST_Encoding$asList = function (f) {
-	return function (_p10) {
+	return function (_p12) {
 		return _elm_lang$core$Json_Encode$list(
-			A2(_elm_lang$core$List$map, f, _p10));
+			A2(_elm_lang$core$List$map, f, _p12));
 	};
 };
 var _user$project$AST_Encoding$encodeExposingList = F2(
 	function (exp, f) {
-		var _p11 = exp;
-		switch (_p11.ctor) {
+		var _p13 = exp;
+		switch (_p13.ctor) {
 			case 'None':
 				return A2(_user$project$Util_Json$encodeTyped, 'none', _elm_lang$core$Json_Encode$null);
 			case 'All':
 				return A2(
 					_user$project$Util_Json$encodeTyped,
 					'all',
-					_user$project$AST_Ranges$encode(_p11._0));
+					_user$project$AST_Ranges$encode(_p13._0));
 			default:
 				return A2(
 					_user$project$Util_Json$encodeTyped,
 					'explicit',
-					A2(_user$project$AST_Encoding$asList, f, _p11._0));
+					A2(_user$project$AST_Encoding$asList, f, _p13._0));
 		}
 	});
-var _user$project$AST_Encoding$encodeExposedType = function (_p12) {
-	var _p13 = _p12;
+var _user$project$AST_Encoding$encodeExposedType = function (_p14) {
+	var _p15 = _p14;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
-			_0: _user$project$AST_Encoding$nameField(_p13.name),
+			_0: _user$project$AST_Encoding$nameField(_p15.name),
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'inner',
-					_1: A2(_user$project$AST_Encoding$encodeExposingList, _p13.constructors, _user$project$AST_Encoding$encodeValueConstructorExpose)
+					_1: A2(_user$project$AST_Encoding$encodeExposingList, _p15.constructors, _user$project$AST_Encoding$encodeValueConstructorExpose)
 				},
 				_1: {
 					ctor: '::',
-					_0: _user$project$AST_Encoding$rangeField(_p13.range),
+					_0: _user$project$AST_Encoding$rangeField(_p15.range),
 					_1: {ctor: '[]'}
 				}
 			}
 		});
 };
 var _user$project$AST_Encoding$encodeExpose = function (exp) {
-	var _p14 = exp;
-	switch (_p14.ctor) {
+	var _p16 = exp;
+	switch (_p16.ctor) {
 		case 'InfixExpose':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
@@ -11345,10 +11354,10 @@ var _user$project$AST_Encoding$encodeExpose = function (exp) {
 				_elm_lang$core$Json_Encode$object(
 					{
 						ctor: '::',
-						_0: _user$project$AST_Encoding$nameField(_p14._0),
+						_0: _user$project$AST_Encoding$nameField(_p16._0),
 						_1: {
 							ctor: '::',
-							_0: _user$project$AST_Encoding$rangeField(_p14._1),
+							_0: _user$project$AST_Encoding$rangeField(_p16._1),
 							_1: {ctor: '[]'}
 						}
 					}));
@@ -11359,10 +11368,10 @@ var _user$project$AST_Encoding$encodeExpose = function (exp) {
 				_elm_lang$core$Json_Encode$object(
 					{
 						ctor: '::',
-						_0: _user$project$AST_Encoding$nameField(_p14._0),
+						_0: _user$project$AST_Encoding$nameField(_p16._0),
 						_1: {
 							ctor: '::',
-							_0: _user$project$AST_Encoding$rangeField(_p14._1),
+							_0: _user$project$AST_Encoding$rangeField(_p16._1),
 							_1: {ctor: '[]'}
 						}
 					}));
@@ -11373,10 +11382,10 @@ var _user$project$AST_Encoding$encodeExpose = function (exp) {
 				_elm_lang$core$Json_Encode$object(
 					{
 						ctor: '::',
-						_0: _user$project$AST_Encoding$nameField(_p14._0),
+						_0: _user$project$AST_Encoding$nameField(_p16._0),
 						_1: {
 							ctor: '::',
-							_0: _user$project$AST_Encoding$rangeField(_p14._1),
+							_0: _user$project$AST_Encoding$rangeField(_p16._1),
 							_1: {ctor: '[]'}
 						}
 					}));
@@ -11384,53 +11393,10 @@ var _user$project$AST_Encoding$encodeExpose = function (exp) {
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'typeexpose',
-				_user$project$AST_Encoding$encodeExposedType(_p14._0));
+				_user$project$AST_Encoding$encodeExposedType(_p16._0));
 	}
 };
-var _user$project$AST_Encoding$encodeEffectModuleData = function (_p15) {
-	var _p16 = _p15;
-	return _elm_lang$core$Json_Encode$object(
-		{
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'moduleName',
-				_1: _user$project$AST_Encoding$encodeModuleName(_p16.moduleName)
-			},
-			_1: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'exposingList',
-					_1: A2(_user$project$AST_Encoding$encodeExposingList, _p16.exposingList, _user$project$AST_Encoding$encodeExpose)
-				},
-				_1: {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'command',
-						_1: A2(
-							_elm_lang$core$Maybe$withDefault,
-							_elm_lang$core$Json_Encode$null,
-							A2(_elm_lang$core$Maybe$map, _elm_lang$core$Json_Encode$string, _p16.command))
-					},
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'subscription',
-							_1: A2(
-								_elm_lang$core$Maybe$withDefault,
-								_elm_lang$core$Json_Encode$null,
-								A2(_elm_lang$core$Maybe$map, _elm_lang$core$Json_Encode$string, _p16.subscription))
-						},
-						_1: {ctor: '[]'}
-					}
-				}
-			}
-		});
-};
-var _user$project$AST_Encoding$encodeDefaultModuleData = function (_p17) {
+var _user$project$AST_Encoding$encodeEffectModuleData = function (_p17) {
 	var _p18 = _p17;
 	return _elm_lang$core$Json_Encode$object(
 		{
@@ -11447,41 +11413,84 @@ var _user$project$AST_Encoding$encodeDefaultModuleData = function (_p17) {
 					_0: 'exposingList',
 					_1: A2(_user$project$AST_Encoding$encodeExposingList, _p18.exposingList, _user$project$AST_Encoding$encodeExpose)
 				},
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'command',
+						_1: A2(
+							_elm_lang$core$Maybe$withDefault,
+							_elm_lang$core$Json_Encode$null,
+							A2(_elm_lang$core$Maybe$map, _elm_lang$core$Json_Encode$string, _p18.command))
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'subscription',
+							_1: A2(
+								_elm_lang$core$Maybe$withDefault,
+								_elm_lang$core$Json_Encode$null,
+								A2(_elm_lang$core$Maybe$map, _elm_lang$core$Json_Encode$string, _p18.subscription))
+						},
+						_1: {ctor: '[]'}
+					}
+				}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeModule = function (m) {
-	var _p19 = m;
-	switch (_p19.ctor) {
-		case 'NormalModule':
-			return A2(
-				_user$project$Util_Json$encodeTyped,
-				'normal',
-				_user$project$AST_Encoding$encodeDefaultModuleData(_p19._0));
-		case 'PortModule':
-			return A2(
-				_user$project$Util_Json$encodeTyped,
-				'port',
-				_user$project$AST_Encoding$encodeDefaultModuleData(_p19._0));
-		case 'EffectModule':
-			return A2(
-				_user$project$Util_Json$encodeTyped,
-				'effect',
-				_user$project$AST_Encoding$encodeEffectModuleData(_p19._0));
-		default:
-			return A2(_user$project$Util_Json$encodeTyped, 'nomodule', _elm_lang$core$Json_Encode$null);
-	}
-};
-var _user$project$AST_Encoding$encodeImport = function (_p20) {
-	var _p21 = _p20;
+var _user$project$AST_Encoding$encodeDefaultModuleData = function (_p19) {
+	var _p20 = _p19;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'moduleName',
-				_1: _user$project$AST_Encoding$encodeModuleName(_p21.moduleName)
+				_1: _user$project$AST_Encoding$encodeModuleName(_p20.moduleName)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'exposingList',
+					_1: A2(_user$project$AST_Encoding$encodeExposingList, _p20.exposingList, _user$project$AST_Encoding$encodeExpose)
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$AST_Encoding$encodeModule = function (m) {
+	var _p21 = m;
+	switch (_p21.ctor) {
+		case 'NormalModule':
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'normal',
+				_user$project$AST_Encoding$encodeDefaultModuleData(_p21._0));
+		case 'PortModule':
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'port',
+				_user$project$AST_Encoding$encodeDefaultModuleData(_p21._0));
+		case 'EffectModule':
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'effect',
+				_user$project$AST_Encoding$encodeEffectModuleData(_p21._0));
+		default:
+			return A2(_user$project$Util_Json$encodeTyped, 'nomodule', _elm_lang$core$Json_Encode$null);
+	}
+};
+var _user$project$AST_Encoding$encodeImport = function (_p22) {
+	var _p23 = _p22;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'moduleName',
+				_1: _user$project$AST_Encoding$encodeModuleName(_p23.moduleName)
 			},
 			_1: {
 				ctor: '::',
@@ -11491,18 +11500,18 @@ var _user$project$AST_Encoding$encodeImport = function (_p20) {
 					_1: A2(
 						_elm_lang$core$Maybe$withDefault,
 						_elm_lang$core$Json_Encode$null,
-						A2(_elm_lang$core$Maybe$map, _user$project$AST_Encoding$encodeModuleName, _p21.moduleAlias))
+						A2(_elm_lang$core$Maybe$map, _user$project$AST_Encoding$encodeModuleName, _p23.moduleAlias))
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'exposingList',
-						_1: A2(_user$project$AST_Encoding$encodeExposingList, _p21.exposingList, _user$project$AST_Encoding$encodeExpose)
+						_1: A2(_user$project$AST_Encoding$encodeExposingList, _p23.exposingList, _user$project$AST_Encoding$encodeExpose)
 					},
 					_1: {
 						ctor: '::',
-						_0: _user$project$AST_Encoding$rangeField(_p21.range),
+						_0: _user$project$AST_Encoding$rangeField(_p23.range),
 						_1: {ctor: '[]'}
 					}
 				}
@@ -11510,8 +11519,8 @@ var _user$project$AST_Encoding$encodeImport = function (_p20) {
 		});
 };
 var _user$project$AST_Encoding$encodeTypeReference = function (typeReference) {
-	var _p22 = typeReference;
-	switch (_p22.ctor) {
+	var _p24 = typeReference;
+	switch (_p24.ctor) {
 		case 'GenericType':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
@@ -11522,11 +11531,11 @@ var _user$project$AST_Encoding$encodeTypeReference = function (typeReference) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'value',
-							_1: _elm_lang$core$Json_Encode$string(_p22._0)
+							_1: _elm_lang$core$Json_Encode$string(_p24._0)
 						},
 						_1: {
 							ctor: '::',
-							_0: _user$project$AST_Encoding$rangeField(_p22._1),
+							_0: _user$project$AST_Encoding$rangeField(_p24._1),
 							_1: {ctor: '[]'}
 						}
 					}));
@@ -11540,21 +11549,21 @@ var _user$project$AST_Encoding$encodeTypeReference = function (typeReference) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'moduleName',
-							_1: _user$project$AST_Encoding$encodeModuleName(_p22._0)
+							_1: _user$project$AST_Encoding$encodeModuleName(_p24._0)
 						},
 						_1: {
 							ctor: '::',
-							_0: _user$project$AST_Encoding$nameField(_p22._1),
+							_0: _user$project$AST_Encoding$nameField(_p24._1),
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'args',
-									_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeTypeArg, _p22._2)
+									_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeTypeReference, _p24._2)
 								},
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Encoding$rangeField(_p22._3),
+									_0: _user$project$AST_Encoding$rangeField(_p24._3),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -11567,7 +11576,7 @@ var _user$project$AST_Encoding$encodeTypeReference = function (typeReference) {
 				_elm_lang$core$Json_Encode$object(
 					{
 						ctor: '::',
-						_0: _user$project$AST_Encoding$rangeField(_p22._0),
+						_0: _user$project$AST_Encoding$rangeField(_p24._0),
 						_1: {ctor: '[]'}
 					}));
 		case 'Tupled':
@@ -11580,11 +11589,11 @@ var _user$project$AST_Encoding$encodeTypeReference = function (typeReference) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'values',
-							_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeTypeReference, _p22._0)
+							_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeTypeReference, _p24._0)
 						},
 						_1: {
 							ctor: '::',
-							_0: _user$project$AST_Encoding$rangeField(_p22._1),
+							_0: _user$project$AST_Encoding$rangeField(_p24._1),
 							_1: {ctor: '[]'}
 						}
 					}));
@@ -11598,18 +11607,18 @@ var _user$project$AST_Encoding$encodeTypeReference = function (typeReference) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'left',
-							_1: _user$project$AST_Encoding$encodeTypeReference(_p22._0)
+							_1: _user$project$AST_Encoding$encodeTypeReference(_p24._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'right',
-								_1: _user$project$AST_Encoding$encodeTypeReference(_p22._1)
+								_1: _user$project$AST_Encoding$encodeTypeReference(_p24._1)
 							},
 							_1: {
 								ctor: '::',
-								_0: _user$project$AST_Encoding$rangeField(_p22._2),
+								_0: _user$project$AST_Encoding$rangeField(_p24._2),
 								_1: {ctor: '[]'}
 							}
 						}
@@ -11624,11 +11633,11 @@ var _user$project$AST_Encoding$encodeTypeReference = function (typeReference) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'value',
-							_1: _user$project$AST_Encoding$encodeRecordDefinition(_p22._0)
+							_1: _user$project$AST_Encoding$encodeRecordDefinition(_p24._0)
 						},
 						_1: {
 							ctor: '::',
-							_0: _user$project$AST_Encoding$rangeField(_p22._1),
+							_0: _user$project$AST_Encoding$rangeField(_p24._1),
 							_1: {ctor: '[]'}
 						}
 					}));
@@ -11639,161 +11648,162 @@ var _user$project$AST_Encoding$encodeTypeReference = function (typeReference) {
 				_elm_lang$core$Json_Encode$object(
 					{
 						ctor: '::',
-						_0: _user$project$AST_Encoding$nameField(_p22._0),
+						_0: _user$project$AST_Encoding$nameField(_p24._0),
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'values',
-								_1: _user$project$AST_Encoding$encodeRecordDefinition(_p22._1)
+								_1: _user$project$AST_Encoding$encodeRecordDefinition(_p24._1)
 							},
 							_1: {
 								ctor: '::',
-								_0: _user$project$AST_Encoding$rangeField(_p22._2),
+								_0: _user$project$AST_Encoding$rangeField(_p24._2),
 								_1: {ctor: '[]'}
 							}
 						}
 					}));
 	}
 };
-var _user$project$AST_Encoding$encodeRecordDefinition = function (_p23) {
+var _user$project$AST_Encoding$encodeRecordDefinition = function (_p25) {
 	return _elm_lang$core$Json_Encode$list(
-		A2(_elm_lang$core$List$map, _user$project$AST_Encoding$encodeRecordField, _p23));
+		A2(_elm_lang$core$List$map, _user$project$AST_Encoding$encodeRecordField, _p25));
 };
-var _user$project$AST_Encoding$encodeRecordField = function (_p24) {
-	var _p25 = _p24;
+var _user$project$AST_Encoding$encodeRecordField = function (_p26) {
+	var _p27 = _p26;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
-			_0: _user$project$AST_Encoding$nameField(_p25._0),
+			_0: _user$project$AST_Encoding$nameField(_p27._0),
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'typeReference',
-					_1: _user$project$AST_Encoding$encodeTypeReference(_p25._1)
+					_1: _user$project$AST_Encoding$encodeTypeReference(_p27._1)
 				},
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeTypeArg = function (typeArg) {
-	var _p26 = typeArg;
-	if (_p26.ctor === 'Generic') {
-		return A2(
-			_user$project$Util_Json$encodeTyped,
-			'generic',
-			_elm_lang$core$Json_Encode$string(_p26._0));
-	} else {
-		return A2(
-			_user$project$Util_Json$encodeTyped,
-			'concrete',
-			_user$project$AST_Encoding$encodeTypeReference(_p26._0));
-	}
-};
-var _user$project$AST_Encoding$encodeValueConstructor = function (_p27) {
-	var _p28 = _p27;
+var _user$project$AST_Encoding$encodeValueConstructor = function (_p28) {
+	var _p29 = _p28;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
-			_0: _user$project$AST_Encoding$nameField(_p28.name),
+			_0: _user$project$AST_Encoding$nameField(_p29.name),
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'arguments',
-					_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeTypeReference, _p28.$arguments)
+					_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeTypeReference, _p29.$arguments)
 				},
 				_1: {
 					ctor: '::',
-					_0: _user$project$AST_Encoding$rangeField(_p28.range),
+					_0: _user$project$AST_Encoding$rangeField(_p29.range),
 					_1: {ctor: '[]'}
 				}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeType = function (_p29) {
-	var _p30 = _p29;
+var _user$project$AST_Encoding$encodeType = function (_p30) {
+	var _p31 = _p30;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
-			_0: _user$project$AST_Encoding$nameField(_p30.name),
+			_0: _user$project$AST_Encoding$nameField(_p31.name),
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'generics',
-					_1: A2(_user$project$AST_Encoding$asList, _elm_lang$core$Json_Encode$string, _p30.generics)
+					_1: A2(_user$project$AST_Encoding$asList, _elm_lang$core$Json_Encode$string, _p31.generics)
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'constructors',
-						_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeValueConstructor, _p30.constructors)
+						_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeValueConstructor, _p31.constructors)
 					},
 					_1: {ctor: '[]'}
 				}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeTypeAlias = function (_p31) {
-	var _p32 = _p31;
+var _user$project$AST_Encoding$encodeTypeAlias = function (_p32) {
+	var _p33 = _p32;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
-			_0: _user$project$AST_Encoding$nameField(_p32.name),
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'documentation',
+				_1: A2(
+					_elm_lang$core$Maybe$withDefault,
+					_elm_lang$core$Json_Encode$null,
+					A2(_elm_lang$core$Maybe$map, _user$project$AST_Encoding$encodeDocumentation, _p33.documentation))
+			},
 			_1: {
 				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'generics',
-					_1: A2(_user$project$AST_Encoding$asList, _elm_lang$core$Json_Encode$string, _p32.generics)
-				},
+				_0: _user$project$AST_Encoding$nameField(_p33.name),
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: 'typeReference',
-						_1: _user$project$AST_Encoding$encodeTypeReference(_p32.typeReference)
+						_0: 'generics',
+						_1: A2(_user$project$AST_Encoding$asList, _elm_lang$core$Json_Encode$string, _p33.generics)
 					},
 					_1: {
 						ctor: '::',
-						_0: _user$project$AST_Encoding$rangeField(_p32.range),
-						_1: {ctor: '[]'}
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'typeReference',
+							_1: _user$project$AST_Encoding$encodeTypeReference(_p33.typeReference)
+						},
+						_1: {
+							ctor: '::',
+							_0: _user$project$AST_Encoding$rangeField(_p33.range),
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeSignature = function (_p33) {
-	var _p34 = _p33;
+var _user$project$AST_Encoding$encodeSignature = function (_p34) {
+	var _p35 = _p34;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'operatorDefinition',
-				_1: _elm_lang$core$Json_Encode$bool(_p34.operatorDefinition)
+				_1: _elm_lang$core$Json_Encode$bool(_p35.operatorDefinition)
 			},
 			_1: {
 				ctor: '::',
-				_0: _user$project$AST_Encoding$nameField(_p34.name),
+				_0: _user$project$AST_Encoding$nameField(_p35.name),
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'typeReference',
-						_1: _user$project$AST_Encoding$encodeTypeReference(_p34.typeReference)
+						_1: _user$project$AST_Encoding$encodeTypeReference(_p35.typeReference)
 					},
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _user$project$AST_Encoding$rangeField(_p35.range),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
 };
 var _user$project$AST_Encoding$encodePattern = function (pattern) {
-	var _p35 = pattern;
-	switch (_p35.ctor) {
+	var _p36 = pattern;
+	switch (_p36.ctor) {
 		case 'AllPattern':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
@@ -11804,7 +11814,7 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'range',
-							_1: _user$project$AST_Ranges$encode(_p35._0)
+							_1: _user$project$AST_Ranges$encode(_p36._0)
 						},
 						_1: {ctor: '[]'}
 					}));
@@ -11818,7 +11828,7 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'range',
-							_1: _user$project$AST_Ranges$encode(_p35._0)
+							_1: _user$project$AST_Ranges$encode(_p36._0)
 						},
 						_1: {ctor: '[]'}
 					}));
@@ -11833,14 +11843,14 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 							ctor: '_Tuple2',
 							_0: 'value',
 							_1: _elm_lang$core$Json_Encode$string(
-								_elm_lang$core$String$fromChar(_p35._0))
+								_elm_lang$core$String$fromChar(_p36._0))
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _user$project$AST_Ranges$encode(_p35._1)
+								_1: _user$project$AST_Ranges$encode(_p36._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -11855,14 +11865,14 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'value',
-							_1: _elm_lang$core$Json_Encode$string(_p35._0)
+							_1: _elm_lang$core$Json_Encode$string(_p36._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _user$project$AST_Ranges$encode(_p35._1)
+								_1: _user$project$AST_Ranges$encode(_p36._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -11877,14 +11887,14 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'value',
-							_1: _elm_lang$core$Json_Encode$int(_p35._0)
+							_1: _elm_lang$core$Json_Encode$int(_p36._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _user$project$AST_Ranges$encode(_p35._1)
+								_1: _user$project$AST_Ranges$encode(_p36._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -11899,14 +11909,14 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'value',
-							_1: _elm_lang$core$Json_Encode$float(_p35._0)
+							_1: _elm_lang$core$Json_Encode$float(_p36._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _user$project$AST_Ranges$encode(_p35._1)
+								_1: _user$project$AST_Ranges$encode(_p36._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -11921,14 +11931,14 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'value',
-							_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodePattern, _p35._0)
+							_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodePattern, _p36._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _user$project$AST_Ranges$encode(_p35._1)
+								_1: _user$project$AST_Ranges$encode(_p36._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -11943,14 +11953,14 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'value',
-							_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeVariablePointer, _p35._0)
+							_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeVariablePointer, _p36._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _user$project$AST_Ranges$encode(_p35._1)
+								_1: _user$project$AST_Ranges$encode(_p36._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -11965,21 +11975,21 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'left',
-							_1: _user$project$AST_Encoding$encodePattern(_p35._0)
+							_1: _user$project$AST_Encoding$encodePattern(_p36._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'right',
-								_1: _user$project$AST_Encoding$encodePattern(_p35._1)
+								_1: _user$project$AST_Encoding$encodePattern(_p36._1)
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _user$project$AST_Ranges$encode(_p35._2)
+									_1: _user$project$AST_Ranges$encode(_p36._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -11995,14 +12005,14 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'value',
-							_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodePattern, _p35._0)
+							_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodePattern, _p36._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _user$project$AST_Ranges$encode(_p35._1)
+								_1: _user$project$AST_Ranges$encode(_p36._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -12017,14 +12027,14 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'value',
-							_1: _elm_lang$core$Json_Encode$string(_p35._0)
+							_1: _elm_lang$core$Json_Encode$string(_p36._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _user$project$AST_Ranges$encode(_p35._1)
+								_1: _user$project$AST_Ranges$encode(_p36._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -12039,21 +12049,21 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'qualified',
-							_1: _user$project$AST_Encoding$encodeQualifiedNameRef(_p35._0)
+							_1: _user$project$AST_Encoding$encodeQualifiedNameRef(_p36._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'patterns',
-								_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodePattern, _p35._1)
+								_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodePattern, _p36._1)
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _user$project$AST_Ranges$encode(_p35._2)
+									_1: _user$project$AST_Ranges$encode(_p36._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -12069,14 +12079,14 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'value',
-							_1: _user$project$AST_Encoding$encodeQualifiedNameRef(_p35._0)
+							_1: _user$project$AST_Encoding$encodeQualifiedNameRef(_p36._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _user$project$AST_Ranges$encode(_p35._1)
+								_1: _user$project$AST_Ranges$encode(_p36._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -12091,21 +12101,21 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'name',
-							_1: _user$project$AST_Encoding$encodeVariablePointer(_p35._1)
+							_1: _user$project$AST_Encoding$encodeVariablePointer(_p36._1)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'pattern',
-								_1: _user$project$AST_Encoding$encodePattern(_p35._0)
+								_1: _user$project$AST_Encoding$encodePattern(_p36._0)
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _user$project$AST_Ranges$encode(_p35._2)
+									_1: _user$project$AST_Ranges$encode(_p36._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -12121,128 +12131,128 @@ var _user$project$AST_Encoding$encodePattern = function (pattern) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'value',
-							_1: _user$project$AST_Encoding$encodePattern(_p35._0)
+							_1: _user$project$AST_Encoding$encodePattern(_p36._0)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _user$project$AST_Ranges$encode(_p35._1)
+								_1: _user$project$AST_Ranges$encode(_p36._1)
 							},
 							_1: {ctor: '[]'}
 						}
 					}));
 	}
 };
-var _user$project$AST_Encoding$encodeLetBlock = function (_p36) {
-	var _p37 = _p36;
+var _user$project$AST_Encoding$encodeLetBlock = function (_p37) {
+	var _p38 = _p37;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'declarations',
-				_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeDeclaration, _p37.declarations)
+				_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeDeclaration, _p38.declarations)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'expression',
-					_1: _user$project$AST_Encoding$encodeExpression(_p37.expression)
+					_1: _user$project$AST_Encoding$encodeExpression(_p38.expression)
 				},
 				_1: {ctor: '[]'}
 			}
 		});
 };
 var _user$project$AST_Encoding$encodeDeclaration = function (decl) {
-	var _p38 = decl;
-	switch (_p38.ctor) {
+	var _p39 = decl;
+	switch (_p39.ctor) {
 		case 'FuncDecl':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'function',
-				_user$project$AST_Encoding$encodeFunction(_p38._0));
+				_user$project$AST_Encoding$encodeFunction(_p39._0));
 		case 'AliasDecl':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'typeAlias',
-				_user$project$AST_Encoding$encodeTypeAlias(_p38._0));
+				_user$project$AST_Encoding$encodeTypeAlias(_p39._0));
 		case 'TypeDecl':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'typedecl',
-				_user$project$AST_Encoding$encodeType(_p38._0));
+				_user$project$AST_Encoding$encodeType(_p39._0));
 		case 'PortDeclaration':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'port',
-				_user$project$AST_Encoding$encodeSignature(_p38._0));
+				_user$project$AST_Encoding$encodeSignature(_p39._0));
 		case 'InfixDeclaration':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'infix',
-				_user$project$AST_Encoding$encodeInfix(_p38._0));
+				_user$project$AST_Encoding$encodeInfix(_p39._0));
 		default:
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'destrucutring',
-				_user$project$AST_Encoding$encodeDestructuring(_p38._0));
+				_user$project$AST_Encoding$encodeDestructuring(_p39._0));
 	}
 };
-var _user$project$AST_Encoding$encodeDestructuring = function (_p39) {
-	var _p40 = _p39;
+var _user$project$AST_Encoding$encodeDestructuring = function (_p40) {
+	var _p41 = _p40;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'pattern',
-				_1: _user$project$AST_Encoding$encodePattern(_p40.pattern)
+				_1: _user$project$AST_Encoding$encodePattern(_p41.pattern)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'expression',
-					_1: _user$project$AST_Encoding$encodeExpression(_p40.expression)
+					_1: _user$project$AST_Encoding$encodeExpression(_p41.expression)
 				},
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeExpression = function (_p41) {
-	var _p42 = _p41;
+var _user$project$AST_Encoding$encodeExpression = function (_p42) {
+	var _p43 = _p42;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
-			_0: _user$project$AST_Encoding$rangeField(_p42._0),
+			_0: _user$project$AST_Encoding$rangeField(_p43._0),
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'inner',
 					_1: function () {
-						var _p43 = _p42._1;
-						switch (_p43.ctor) {
+						var _p44 = _p43._1;
+						switch (_p44.ctor) {
 							case 'UnitExpr':
 								return A2(_user$project$Util_Json$encodeTyped, 'unit', _elm_lang$core$Json_Encode$null);
 							case 'Application':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'application',
-									A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeExpression, _p43._0));
+									A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeExpression, _p44._0));
 							case 'OperatorApplication':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'operatorapplication',
-									A4(_user$project$AST_Encoding$encodeOperatorApplication, _p43._0, _p43._1, _p43._2, _p43._3));
+									A4(_user$project$AST_Encoding$encodeOperatorApplication, _p44._0, _p44._1, _p44._2, _p44._3));
 							case 'FunctionOrValue':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'functionOrValue',
-									_elm_lang$core$Json_Encode$string(_p43._0));
+									_elm_lang$core$Json_Encode$string(_p44._0));
 							case 'IfBlock':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
@@ -12253,21 +12263,21 @@ var _user$project$AST_Encoding$encodeExpression = function (_p41) {
 											_0: {
 												ctor: '_Tuple2',
 												_0: 'clause',
-												_1: _user$project$AST_Encoding$encodeExpression(_p43._0)
+												_1: _user$project$AST_Encoding$encodeExpression(_p44._0)
 											},
 											_1: {
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
 													_0: 'then',
-													_1: _user$project$AST_Encoding$encodeExpression(_p43._1)
+													_1: _user$project$AST_Encoding$encodeExpression(_p44._1)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
 														_0: 'else',
-														_1: _user$project$AST_Encoding$encodeExpression(_p43._2)
+														_1: _user$project$AST_Encoding$encodeExpression(_p44._2)
 													},
 													_1: {ctor: '[]'}
 												}
@@ -12277,63 +12287,63 @@ var _user$project$AST_Encoding$encodeExpression = function (_p41) {
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'prefixoperator',
-									_elm_lang$core$Json_Encode$string(_p43._0));
+									_elm_lang$core$Json_Encode$string(_p44._0));
 							case 'Operator':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'operator',
-									_elm_lang$core$Json_Encode$string(_p43._0));
+									_elm_lang$core$Json_Encode$string(_p44._0));
 							case 'Integer':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'integer',
-									_elm_lang$core$Json_Encode$int(_p43._0));
+									_elm_lang$core$Json_Encode$int(_p44._0));
 							case 'Floatable':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'float',
-									_elm_lang$core$Json_Encode$float(_p43._0));
+									_elm_lang$core$Json_Encode$float(_p44._0));
 							case 'Literal':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'literal',
-									_elm_lang$core$Json_Encode$string(_p43._0));
+									_elm_lang$core$Json_Encode$string(_p44._0));
 							case 'CharLiteral':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'charLiteral',
 									_elm_lang$core$Json_Encode$string(
-										_elm_lang$core$String$fromChar(_p43._0)));
+										_elm_lang$core$String$fromChar(_p44._0)));
 							case 'TupledExpression':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'tupled',
-									A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeExpression, _p43._0));
+									A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeExpression, _p44._0));
 							case 'ListExpr':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'list',
-									A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeExpression, _p43._0));
+									A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeExpression, _p44._0));
 							case 'ParenthesizedExpression':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'parenthesized',
-									_user$project$AST_Encoding$encodeExpression(_p43._0));
+									_user$project$AST_Encoding$encodeExpression(_p44._0));
 							case 'LetExpression':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'let',
-									_user$project$AST_Encoding$encodeLetBlock(_p43._0));
+									_user$project$AST_Encoding$encodeLetBlock(_p44._0));
 							case 'CaseExpression':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'case',
-									_user$project$AST_Encoding$encodeCaseBlock(_p43._0));
+									_user$project$AST_Encoding$encodeCaseBlock(_p44._0));
 							case 'LambdaExpression':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'lambda',
-									_user$project$AST_Encoding$encodeLambda(_p43._0));
+									_user$project$AST_Encoding$encodeLambda(_p44._0));
 							case 'QualifiedExpr':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
@@ -12344,11 +12354,11 @@ var _user$project$AST_Encoding$encodeExpression = function (_p41) {
 											_0: {
 												ctor: '_Tuple2',
 												_0: 'moduleName',
-												_1: _user$project$AST_Encoding$encodeModuleName(_p43._0)
+												_1: _user$project$AST_Encoding$encodeModuleName(_p44._0)
 											},
 											_1: {
 												ctor: '::',
-												_0: _user$project$AST_Encoding$nameField(_p43._1),
+												_0: _user$project$AST_Encoding$nameField(_p44._1),
 												_1: {ctor: '[]'}
 											}
 										}));
@@ -12362,11 +12372,11 @@ var _user$project$AST_Encoding$encodeExpression = function (_p41) {
 											_0: {
 												ctor: '_Tuple2',
 												_0: 'expression',
-												_1: _user$project$AST_Encoding$encodeExpression(_p43._0)
+												_1: _user$project$AST_Encoding$encodeExpression(_p44._0)
 											},
 											_1: {
 												ctor: '::',
-												_0: _user$project$AST_Encoding$nameField(_p43._1),
+												_0: _user$project$AST_Encoding$nameField(_p44._1),
 												_1: {ctor: '[]'}
 											}
 										}));
@@ -12374,22 +12384,22 @@ var _user$project$AST_Encoding$encodeExpression = function (_p41) {
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'recordAccessFunction',
-									_elm_lang$core$Json_Encode$string(_p43._0));
+									_elm_lang$core$Json_Encode$string(_p44._0));
 							case 'RecordExpr':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'record',
-									A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeRecordSetter, _p43._0));
+									A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeRecordSetter, _p44._0));
 							case 'RecordUpdateExpression':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'recordUpdate',
-									_user$project$AST_Encoding$encodeRecordUpdate(_p43._0));
+									_user$project$AST_Encoding$encodeRecordUpdate(_p44._0));
 							default:
 								return A2(
 									_user$project$Util_Json$encodeTyped,
 									'glsl',
-									_elm_lang$core$Json_Encode$string(_p43._0));
+									_elm_lang$core$Json_Encode$string(_p44._0));
 						}
 					}()
 				},
@@ -12397,64 +12407,64 @@ var _user$project$AST_Encoding$encodeExpression = function (_p41) {
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeCaseBlock = function (_p44) {
-	var _p45 = _p44;
+var _user$project$AST_Encoding$encodeCaseBlock = function (_p45) {
+	var _p46 = _p45;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'cases',
-				_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeCase, _p45.cases)
+				_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeCase, _p46.cases)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'expression',
-					_1: _user$project$AST_Encoding$encodeExpression(_p45.expression)
+					_1: _user$project$AST_Encoding$encodeExpression(_p46.expression)
 				},
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeCase = function (_p46) {
-	var _p47 = _p46;
+var _user$project$AST_Encoding$encodeCase = function (_p47) {
+	var _p48 = _p47;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'pattern',
-				_1: _user$project$AST_Encoding$encodePattern(_p47._0)
+				_1: _user$project$AST_Encoding$encodePattern(_p48._0)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'expression',
-					_1: _user$project$AST_Encoding$encodeExpression(_p47._1)
+					_1: _user$project$AST_Encoding$encodeExpression(_p48._1)
 				},
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeLambda = function (_p48) {
-	var _p49 = _p48;
+var _user$project$AST_Encoding$encodeLambda = function (_p49) {
+	var _p50 = _p49;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'patterns',
-				_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodePattern, _p49.args)
+				_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodePattern, _p50.args)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'expression',
-					_1: _user$project$AST_Encoding$encodeExpression(_p49.expression)
+					_1: _user$project$AST_Encoding$encodeExpression(_p50.expression)
 				},
 				_1: {ctor: '[]'}
 			}
@@ -12497,46 +12507,46 @@ var _user$project$AST_Encoding$encodeOperatorApplication = F4(
 				}
 			});
 	});
-var _user$project$AST_Encoding$encodeRecordSetter = function (_p50) {
-	var _p51 = _p50;
+var _user$project$AST_Encoding$encodeRecordSetter = function (_p51) {
+	var _p52 = _p51;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'field',
-				_1: _elm_lang$core$Json_Encode$string(_p51._0)
+				_1: _elm_lang$core$Json_Encode$string(_p52._0)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'expression',
-					_1: _user$project$AST_Encoding$encodeExpression(_p51._1)
+					_1: _user$project$AST_Encoding$encodeExpression(_p52._1)
 				},
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeRecordUpdate = function (_p52) {
-	var _p53 = _p52;
+var _user$project$AST_Encoding$encodeRecordUpdate = function (_p53) {
+	var _p54 = _p53;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
-			_0: _user$project$AST_Encoding$nameField(_p53.name),
+			_0: _user$project$AST_Encoding$nameField(_p54.name),
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'updates',
-					_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeRecordSetter, _p53.updates)
+					_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeRecordSetter, _p54.updates)
 				},
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeFunction = function (_p54) {
-	var _p55 = _p54;
+var _user$project$AST_Encoding$encodeFunction = function (_p55) {
+	var _p56 = _p55;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
@@ -12546,7 +12556,7 @@ var _user$project$AST_Encoding$encodeFunction = function (_p54) {
 				_1: A2(
 					_elm_lang$core$Maybe$withDefault,
 					_elm_lang$core$Json_Encode$null,
-					A2(_elm_lang$core$Maybe$map, _elm_lang$core$Json_Encode$string, _p55.documentation))
+					A2(_elm_lang$core$Maybe$map, _user$project$AST_Encoding$encodeDocumentation, _p56.documentation))
 			},
 			_1: {
 				ctor: '::',
@@ -12556,50 +12566,50 @@ var _user$project$AST_Encoding$encodeFunction = function (_p54) {
 					_1: A2(
 						_elm_lang$core$Maybe$withDefault,
 						_elm_lang$core$Json_Encode$null,
-						A2(_elm_lang$core$Maybe$map, _user$project$AST_Encoding$encodeSignature, _p55.signature))
+						A2(_elm_lang$core$Maybe$map, _user$project$AST_Encoding$encodeSignature, _p56.signature))
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'declaration',
-						_1: _user$project$AST_Encoding$encodeFunctionDeclaration(_p55.declaration)
+						_1: _user$project$AST_Encoding$encodeFunctionDeclaration(_p56.declaration)
 					},
 					_1: {ctor: '[]'}
 				}
 			}
 		});
 };
-var _user$project$AST_Encoding$encodeFunctionDeclaration = function (_p56) {
-	var _p57 = _p56;
+var _user$project$AST_Encoding$encodeFunctionDeclaration = function (_p57) {
+	var _p58 = _p57;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'operatorDefinition',
-				_1: _elm_lang$core$Json_Encode$bool(_p57.operatorDefinition)
+				_1: _elm_lang$core$Json_Encode$bool(_p58.operatorDefinition)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'name',
-					_1: _user$project$AST_Encoding$encodeVariablePointer(_p57.name)
+					_1: _user$project$AST_Encoding$encodeVariablePointer(_p58.name)
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'arguments',
-						_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodePattern, _p57.$arguments)
+						_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodePattern, _p58.$arguments)
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'expression',
-							_1: _user$project$AST_Encoding$encodeExpression(_p57.expression)
+							_1: _user$project$AST_Encoding$encodeExpression(_p58.expression)
 						},
 						_1: {ctor: '[]'}
 					}
@@ -12607,36 +12617,36 @@ var _user$project$AST_Encoding$encodeFunctionDeclaration = function (_p56) {
 			}
 		});
 };
-var _user$project$AST_Encoding$encode = function (_p58) {
-	var _p59 = _p58;
+var _user$project$AST_Encoding$encode = function (_p59) {
+	var _p60 = _p59;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'moduleDefinition',
-				_1: _user$project$AST_Encoding$encodeModule(_p59.moduleDefinition)
+				_1: _user$project$AST_Encoding$encodeModule(_p60.moduleDefinition)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'imports',
-					_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeImport, _p59.imports)
+					_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeImport, _p60.imports)
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'declarations',
-						_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeDeclaration, _p59.declarations)
+						_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeDeclaration, _p60.declarations)
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'comments',
-							_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeComment, _p59.comments)
+							_1: A2(_user$project$AST_Encoding$asList, _user$project$AST_Encoding$encodeComment, _p60.comments)
 						},
 						_1: {ctor: '[]'}
 					}
@@ -12945,10 +12955,13 @@ var _user$project$ASTUtil_ASTWriter$writeInfix = function (_p0) {
 			}
 		});
 };
-var _user$project$ASTUtil_ASTWriter$writeDocumentation = _user$project$ASTUtil_Writer$string;
+var _user$project$ASTUtil_ASTWriter$writeDocumentation = function (_p3) {
+	return _user$project$ASTUtil_Writer$string(
+		_elm_lang$core$Tuple$first(_p3));
+};
 var _user$project$ASTUtil_ASTWriter$writeExposureValueConstructor = function (x) {
-	var _p3 = x;
-	switch (_p3.ctor) {
+	var _p4 = x;
+	switch (_p4.ctor) {
 		case 'None':
 			return _user$project$ASTUtil_Writer$epsilon;
 		case 'All':
@@ -12957,38 +12970,38 @@ var _user$project$ASTUtil_ASTWriter$writeExposureValueConstructor = function (x)
 			return _user$project$ASTUtil_Writer$parensComma(
 				A2(
 					_elm_lang$core$List$map,
-					function (_p4) {
-						var _p5 = _p4;
+					function (_p5) {
+						var _p6 = _p5;
 						return {
 							ctor: '_Tuple2',
-							_0: _p5._1,
-							_1: _user$project$ASTUtil_Writer$string(_p5._0)
+							_0: _p6._1,
+							_1: _user$project$ASTUtil_Writer$string(_p6._0)
 						};
 					},
-					_p3._0));
+					_p4._0));
 	}
 };
 var _user$project$ASTUtil_ASTWriter$writeExpose = function (exp) {
-	var _p6 = exp;
-	switch (_p6.ctor) {
+	var _p7 = exp;
+	switch (_p7.ctor) {
 		case 'InfixExpose':
 			return _user$project$ASTUtil_Writer$string(
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					'(',
-					A2(_elm_lang$core$Basics_ops['++'], _p6._0, ')')));
+					A2(_elm_lang$core$Basics_ops['++'], _p7._0, ')')));
 		case 'FunctionExpose':
-			return _user$project$ASTUtil_Writer$string(_p6._0);
+			return _user$project$ASTUtil_Writer$string(_p7._0);
 		case 'TypeOrAliasExpose':
-			return _user$project$ASTUtil_Writer$string(_p6._0);
+			return _user$project$ASTUtil_Writer$string(_p7._0);
 		default:
 			return _user$project$ASTUtil_Writer$spaced(
 				{
 					ctor: '::',
-					_0: _user$project$ASTUtil_Writer$string(_p6._0.name),
+					_0: _user$project$ASTUtil_Writer$string(_p7._0.name),
 					_1: {
 						ctor: '::',
-						_0: _user$project$ASTUtil_ASTWriter$writeExposureValueConstructor(_p6._0.constructors),
+						_0: _user$project$ASTUtil_ASTWriter$writeExposureValueConstructor(_p7._0.constructors),
 						_1: {ctor: '[]'}
 					}
 				});
@@ -13002,8 +13015,8 @@ var _user$project$ASTUtil_ASTWriter$writeExposureExpose = function (x) {
 			_1: {
 				ctor: '::',
 				_0: function () {
-					var _p7 = x;
-					switch (_p7.ctor) {
+					var _p8 = x;
+					switch (_p8.ctor) {
 						case 'None':
 							return _user$project$ASTUtil_Writer$epsilon;
 						case 'All':
@@ -13019,7 +13032,7 @@ var _user$project$ASTUtil_ASTWriter$writeExposureExpose = function (x) {
 											_1: _user$project$ASTUtil_ASTWriter$writeExpose(item)
 										};
 									},
-									_p7._0));
+									_p8._0));
 					}
 				}(),
 				_1: {ctor: '[]'}
@@ -13030,21 +13043,21 @@ var _user$project$ASTUtil_ASTWriter$writeModuleName = function (moduleName) {
 	return _user$project$ASTUtil_Writer$string(
 		A2(_elm_lang$core$String$join, '.', moduleName));
 };
-var _user$project$ASTUtil_ASTWriter$writeImport = function (_p8) {
-	var _p9 = _p8;
+var _user$project$ASTUtil_ASTWriter$writeImport = function (_p9) {
+	var _p10 = _p9;
 	return _user$project$ASTUtil_Writer$spaced(
 		{
 			ctor: '::',
 			_0: _user$project$ASTUtil_Writer$string('import'),
 			_1: {
 				ctor: '::',
-				_0: _user$project$ASTUtil_ASTWriter$writeModuleName(_p9.moduleName),
+				_0: _user$project$ASTUtil_ASTWriter$writeModuleName(_p10.moduleName),
 				_1: {
 					ctor: '::',
 					_0: _user$project$ASTUtil_Writer$maybe(
 						A2(
 							_elm_lang$core$Maybe$map,
-							function (_p10) {
+							function (_p11) {
 								return function (x) {
 									return _user$project$ASTUtil_Writer$spaced(
 										{
@@ -13057,12 +13070,12 @@ var _user$project$ASTUtil_ASTWriter$writeImport = function (_p8) {
 											}
 										});
 								}(
-									_user$project$ASTUtil_ASTWriter$writeModuleName(_p10));
+									_user$project$ASTUtil_ASTWriter$writeModuleName(_p11));
 							},
-							_p9.moduleAlias)),
+							_p10.moduleAlias)),
 					_1: {
 						ctor: '::',
-						_0: _user$project$ASTUtil_ASTWriter$writeExposureExpose(_p9.exposingList),
+						_0: _user$project$ASTUtil_ASTWriter$writeExposureExpose(_p10.exposingList),
 						_1: {ctor: '[]'}
 					}
 				}
@@ -13070,10 +13083,10 @@ var _user$project$ASTUtil_ASTWriter$writeImport = function (_p8) {
 		});
 };
 var _user$project$ASTUtil_ASTWriter$writeTypeReference = function (typeReference) {
-	var _p11 = typeReference;
-	switch (_p11.ctor) {
+	var _p12 = typeReference;
+	switch (_p12.ctor) {
 		case 'GenericType':
-			return _user$project$ASTUtil_Writer$string(_p11._0);
+			return _user$project$ASTUtil_Writer$string(_p12._0);
 		case 'Typed':
 			return _user$project$ASTUtil_Writer$spaced(
 				{
@@ -13081,17 +13094,17 @@ var _user$project$ASTUtil_ASTWriter$writeTypeReference = function (typeReference
 					_0: _user$project$ASTUtil_Writer$join(
 						{
 							ctor: '::',
-							_0: _user$project$ASTUtil_ASTWriter$writeModuleName(_p11._0),
+							_0: _user$project$ASTUtil_ASTWriter$writeModuleName(_p12._0),
 							_1: {
 								ctor: '::',
-								_0: _user$project$ASTUtil_Writer$string(_p11._1),
+								_0: _user$project$ASTUtil_Writer$string(_p12._1),
 								_1: {ctor: '[]'}
 							}
 						}),
 					_1: {
 						ctor: '::',
 						_0: _user$project$ASTUtil_Writer$spaced(
-							A2(_elm_lang$core$List$map, _user$project$ASTUtil_ASTWriter$writeTypeArg, _p11._2)),
+							A2(_elm_lang$core$List$map, _user$project$ASTUtil_ASTWriter$writeTypeReference, _p12._2)),
 						_1: {ctor: '[]'}
 					}
 				});
@@ -13108,7 +13121,7 @@ var _user$project$ASTUtil_ASTWriter$writeTypeReference = function (typeReference
 							_1: _user$project$ASTUtil_ASTWriter$writeTypeReference(x)
 						};
 					},
-					_p11._0));
+					_p12._0));
 		case 'Record':
 			return _user$project$ASTUtil_Writer$bracesComma(
 				A2(
@@ -13120,7 +13133,7 @@ var _user$project$ASTUtil_ASTWriter$writeTypeReference = function (typeReference
 							_1: _user$project$ASTUtil_ASTWriter$writeRecordField(x)
 						};
 					},
-					_p11._0));
+					_p12._0));
 		case 'GenericRecord':
 			return _user$project$ASTUtil_Writer$spaced(
 				{
@@ -13128,7 +13141,7 @@ var _user$project$ASTUtil_ASTWriter$writeTypeReference = function (typeReference
 					_0: _user$project$ASTUtil_Writer$string('{'),
 					_1: {
 						ctor: '::',
-						_0: _user$project$ASTUtil_Writer$string(_p11._0),
+						_0: _user$project$ASTUtil_Writer$string(_p12._0),
 						_1: {
 							ctor: '::',
 							_0: _user$project$ASTUtil_Writer$string('|'),
@@ -13144,7 +13157,7 @@ var _user$project$ASTUtil_ASTWriter$writeTypeReference = function (typeReference
 												_1: _user$project$ASTUtil_ASTWriter$writeRecordField(x)
 											};
 										},
-										_p11._1)),
+										_p12._1)),
 								_1: {
 									ctor: '::',
 									_0: _user$project$ASTUtil_Writer$string('}'),
@@ -13158,43 +13171,35 @@ var _user$project$ASTUtil_ASTWriter$writeTypeReference = function (typeReference
 			return _user$project$ASTUtil_Writer$spaced(
 				{
 					ctor: '::',
-					_0: _user$project$ASTUtil_ASTWriter$writeTypeReference(_p11._0),
+					_0: _user$project$ASTUtil_ASTWriter$writeTypeReference(_p12._0),
 					_1: {
 						ctor: '::',
 						_0: _user$project$ASTUtil_Writer$string('->'),
 						_1: {
 							ctor: '::',
-							_0: _user$project$ASTUtil_ASTWriter$writeTypeReference(_p11._1),
+							_0: _user$project$ASTUtil_ASTWriter$writeTypeReference(_p12._1),
 							_1: {ctor: '[]'}
 						}
 					}
 				});
 	}
 };
-var _user$project$ASTUtil_ASTWriter$writeRecordField = function (_p12) {
-	var _p13 = _p12;
+var _user$project$ASTUtil_ASTWriter$writeRecordField = function (_p13) {
+	var _p14 = _p13;
 	return _user$project$ASTUtil_Writer$spaced(
 		{
 			ctor: '::',
-			_0: _user$project$ASTUtil_Writer$string(_p13._0),
+			_0: _user$project$ASTUtil_Writer$string(_p14._0),
 			_1: {
 				ctor: '::',
 				_0: _user$project$ASTUtil_Writer$string(':'),
 				_1: {
 					ctor: '::',
-					_0: _user$project$ASTUtil_ASTWriter$writeTypeReference(_p13._1),
+					_0: _user$project$ASTUtil_ASTWriter$writeTypeReference(_p14._1),
 					_1: {ctor: '[]'}
 				}
 			}
 		});
-};
-var _user$project$ASTUtil_ASTWriter$writeTypeArg = function (t) {
-	var _p14 = t;
-	if (_p14.ctor === 'Generic') {
-		return _user$project$ASTUtil_Writer$string(_p14._0);
-	} else {
-		return _user$project$ASTUtil_ASTWriter$writeTypeReference(_p14._0);
-	}
 };
 var _user$project$ASTUtil_ASTWriter$writeSignature = function (signature) {
 	return _user$project$ASTUtil_Writer$spaced(
@@ -13508,8 +13513,8 @@ var _user$project$ASTUtil_ASTWriter$writeExpression = function (_p26) {
 					return _user$project$ASTUtil_Writer$epsilon;
 				} else {
 					if (_p35._1.ctor === '[]') {
-						var _v19 = _p35._0;
-						_p26 = _v19;
+						var _v18 = _p35._0;
+						_p26 = _v18;
 						continue writeExpression;
 					} else {
 						return _user$project$ASTUtil_Writer$spaced(
@@ -14527,7 +14532,7 @@ var _user$project$Inspector$inspectTypeReferenceInner = F3(
 			case 'Typed':
 				return A3(
 					_elm_lang$core$List$foldl,
-					_user$project$Inspector$inspectTypeArg(config),
+					_user$project$Inspector$inspectTypeReference(config),
 					context,
 					_p4._2);
 			case 'Tupled':
@@ -14566,15 +14571,6 @@ var _user$project$Inspector$inspectTypeReferenceInner = F3(
 				return context;
 			default:
 				return context;
-		}
-	});
-var _user$project$Inspector$inspectTypeArg = F3(
-	function (config, typeArg, context) {
-		var _p5 = typeArg;
-		if (_p5.ctor === 'Generic') {
-			return context;
-		} else {
-			return A3(_user$project$Inspector$inspectTypeReference, config, _p5._0, context);
 		}
 	});
 var _user$project$Inspector$inspectValueConstructor = F3(
@@ -14637,12 +14633,12 @@ var _user$project$Inspector$inspectExpression = F3(
 	});
 var _user$project$Inspector$inspectInnerExpression = F3(
 	function (config, expression, context) {
-		var _p6 = expression;
-		switch (_p6.ctor) {
+		var _p5 = expression;
+		switch (_p5.ctor) {
 			case 'UnitExpr':
 				return context;
 			case 'FunctionOrValue':
-				return A4(_user$project$Inspector$actionLambda, config.onFunctionOrValue, _elm_lang$core$Basics$identity, _p6._0, context);
+				return A4(_user$project$Inspector$actionLambda, config.onFunctionOrValue, _elm_lang$core$Basics$identity, _p5._0, context);
 			case 'PrefixOperator':
 				return context;
 			case 'Operator':
@@ -14658,12 +14654,12 @@ var _user$project$Inspector$inspectInnerExpression = F3(
 			case 'QualifiedExpr':
 				return context;
 			case 'RecordAccess':
-				var _p7 = _p6._0;
+				var _p6 = _p5._0;
 				return A4(
 					_user$project$Inspector$actionLambda,
 					config.onRecordAccess,
-					A2(_user$project$Inspector$inspectExpression, config, _p7),
-					{ctor: '_Tuple2', _0: _p7, _1: _p6._1},
+					A2(_user$project$Inspector$inspectExpression, config, _p6),
+					{ctor: '_Tuple2', _0: _p6, _1: _p5._1},
 					context);
 			case 'RecordAccessFunction':
 				return context;
@@ -14674,10 +14670,10 @@ var _user$project$Inspector$inspectInnerExpression = F3(
 					_elm_lang$core$List$foldl,
 					_user$project$Inspector$inspectExpression(config),
 					context,
-					_p6._0);
+					_p5._0);
 			case 'OperatorApplication':
-				var _p9 = _p6._3;
-				var _p8 = _p6._2;
+				var _p8 = _p5._3;
+				var _p7 = _p5._2;
 				return A4(
 					_user$project$Inspector$actionLambda,
 					config.onOperatorApplication,
@@ -14687,14 +14683,14 @@ var _user$project$Inspector$inspectInnerExpression = F3(
 							_user$project$Inspector$inspectExpression(config)),
 						{
 							ctor: '::',
-							_0: _p8,
+							_0: _p7,
 							_1: {
 								ctor: '::',
-								_0: _p9,
+								_0: _p8,
 								_1: {ctor: '[]'}
 							}
 						}),
-					{ctor: '_Tuple4', _0: _p6._0, _1: _p6._1, _2: _p8, _3: _p9},
+					{ctor: '_Tuple4', _0: _p5._0, _1: _p5._1, _2: _p7, _3: _p8},
 					context);
 			case 'IfBlock':
 				return A3(
@@ -14703,13 +14699,13 @@ var _user$project$Inspector$inspectInnerExpression = F3(
 					context,
 					{
 						ctor: '::',
-						_0: _p6._0,
+						_0: _p5._0,
 						_1: {
 							ctor: '::',
-							_0: _p6._1,
+							_0: _p5._1,
 							_1: {
 								ctor: '::',
-								_0: _p6._2,
+								_0: _p5._2,
 								_1: {ctor: '[]'}
 							}
 						}
@@ -14719,22 +14715,22 @@ var _user$project$Inspector$inspectInnerExpression = F3(
 					_elm_lang$core$List$foldl,
 					_user$project$Inspector$inspectExpression(config),
 					context,
-					_p6._0);
+					_p5._0);
 			case 'ParenthesizedExpression':
-				return A3(_user$project$Inspector$inspectExpression, config, _p6._0, context);
+				return A3(_user$project$Inspector$inspectExpression, config, _p5._0, context);
 			case 'LetExpression':
-				var _p11 = _p6._0;
-				var next = function (_p10) {
+				var _p10 = _p5._0;
+				var next = function (_p9) {
 					return A3(
 						_user$project$Inspector$inspectExpression,
 						config,
-						_p11.expression,
-						A3(_user$project$Inspector$inspectDeclarations, config, _p11.declarations, _p10));
+						_p10.expression,
+						A3(_user$project$Inspector$inspectDeclarations, config, _p10.declarations, _p9));
 				};
-				return A4(_user$project$Inspector$actionLambda, config.onLetBlock, next, _p11, context);
+				return A4(_user$project$Inspector$actionLambda, config.onLetBlock, next, _p10, context);
 			case 'CaseExpression':
-				var _p12 = _p6._0;
-				var context2 = A3(_user$project$Inspector$inspectExpression, config, _p12.expression, context);
+				var _p11 = _p5._0;
+				var context2 = A3(_user$project$Inspector$inspectExpression, config, _p11.expression, context);
 				var context3 = A3(
 					_elm_lang$core$List$foldl,
 					F2(
@@ -14742,22 +14738,22 @@ var _user$project$Inspector$inspectInnerExpression = F3(
 							return A3(_user$project$Inspector$inspectCase, config, a, b);
 						}),
 					context2,
-					_p12.cases);
+					_p11.cases);
 				return context3;
 			case 'LambdaExpression':
-				var _p13 = _p6._0;
+				var _p12 = _p5._0;
 				return A4(
 					_user$project$Inspector$actionLambda,
 					config.onLambda,
-					A2(_user$project$Inspector$inspectExpression, config, _p13.expression),
-					_p13,
+					A2(_user$project$Inspector$inspectExpression, config, _p12.expression),
+					_p12,
 					context);
 			case 'ListExpr':
 				return A3(
 					_elm_lang$core$List$foldl,
 					_user$project$Inspector$inspectExpression(config),
 					context,
-					_p6._0);
+					_p5._0);
 			case 'RecordExpr':
 				return A3(
 					_elm_lang$core$List$foldl,
@@ -14770,9 +14766,9 @@ var _user$project$Inspector$inspectInnerExpression = F3(
 								b);
 						}),
 					context,
-					_p6._0);
+					_p5._0);
 			default:
-				var _p14 = _p6._0;
+				var _p13 = _p5._0;
 				return A4(
 					_user$project$Inspector$actionLambda,
 					config.onRecordUpdate,
@@ -14788,9 +14784,9 @@ var _user$project$Inspector$inspectInnerExpression = F3(
 										b);
 								}),
 							c,
-							_p14.updates);
+							_p13.updates);
 					},
-					_p14,
+					_p13,
 					context);
 		}
 	});
@@ -14804,20 +14800,20 @@ var _user$project$Inspector$inspectDeclarations = F3(
 	});
 var _user$project$Inspector$inspectDeclaration = F3(
 	function (config, declaration, context) {
-		var _p15 = declaration;
-		switch (_p15.ctor) {
+		var _p14 = declaration;
+		switch (_p14.ctor) {
 			case 'FuncDecl':
-				return A3(_user$project$Inspector$inspectFunction, config, _p15._0, context);
+				return A3(_user$project$Inspector$inspectFunction, config, _p14._0, context);
 			case 'AliasDecl':
-				return A3(_user$project$Inspector$inspectTypeAlias, config, _p15._0, context);
+				return A3(_user$project$Inspector$inspectTypeAlias, config, _p14._0, context);
 			case 'TypeDecl':
-				return A3(_user$project$Inspector$inspectType, config, _p15._0, context);
+				return A3(_user$project$Inspector$inspectType, config, _p14._0, context);
 			case 'PortDeclaration':
-				return A3(_user$project$Inspector$inspectSignature, config, _p15._0, context);
+				return A3(_user$project$Inspector$inspectSignature, config, _p14._0, context);
 			case 'InfixDeclaration':
 				return context;
 			default:
-				return A3(_user$project$Inspector$inspectDestructuring, config, _p15._0, context);
+				return A3(_user$project$Inspector$inspectDestructuring, config, _p14._0, context);
 		}
 	});
 var _user$project$Inspector$inspectDestructuring = F3(
@@ -14834,7 +14830,7 @@ var _user$project$Inspector$inspectFunction = F3(
 		return A4(
 			_user$project$Inspector$actionLambda,
 			config.onFunction,
-			function (_p16) {
+			function (_p15) {
 				return A2(
 					_elm_lang$core$Maybe$withDefault,
 					_elm_lang$core$Basics$identity,
@@ -14842,7 +14838,7 @@ var _user$project$Inspector$inspectFunction = F3(
 						_elm_lang$core$Maybe$map,
 						_user$project$Inspector$inspectSignature(config),
 						$function.signature))(
-					A3(_user$project$Inspector$inspectExpression, config, $function.declaration.expression, _p16));
+					A3(_user$project$Inspector$inspectExpression, config, $function.declaration.expression, _p15));
 			},
 			$function,
 			context);
@@ -14852,12 +14848,12 @@ var _user$project$Inspector$inspect = F3(
 		return A4(
 			_user$project$Inspector$actionLambda,
 			config.onFile,
-			function (_p17) {
+			function (_p16) {
 				return A3(
 					_user$project$Inspector$inspectDeclarations,
 					config,
 					file.declarations,
-					A3(_user$project$Inspector$inspectImports, config, file.imports, _p17));
+					A3(_user$project$Inspector$inspectImports, config, file.imports, _p16));
 			},
 			file,
 			context);
@@ -17248,15 +17244,7 @@ var _user$project$Parser_TypeReference$typedTypeReference = _elm_community$parse
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
 						_user$project$Parser_Util$moreThanIndentWhitespace,
-						A2(_elm_community$parser_combinators$Combine$sepBy, _user$project$Parser_Util$moreThanIndentWhitespace, _user$project$Parser_TypeReference$typeArg)))));
-	});
-var _user$project$Parser_TypeReference$typeArg = _elm_community$parser_combinators$Combine$lazy(
-	function (_p19) {
-		var _p20 = _p19;
-		return A2(
-			_elm_community$parser_combinators$Combine$or,
-			A2(_elm_community$parser_combinators$Combine_ops['<$>'], _user$project$AST_Types$Generic, _user$project$Parser_Tokens$functionName),
-			A2(_elm_community$parser_combinators$Combine_ops['<$>'], _user$project$AST_Types$Concrete, _user$project$Parser_TypeReference$typeReferenceNoFn));
+						A2(_elm_community$parser_combinators$Combine$sepBy, _user$project$Parser_Util$moreThanIndentWhitespace, _user$project$Parser_TypeReference$typeReferenceNoFn)))));
 	});
 
 var _user$project$Parser_Typings$typePrefix = A2(
@@ -17279,7 +17267,8 @@ var _user$project$Parser_Typings$typeAlias = _user$project$Parser_Ranges$withRan
 			_elm_community$parser_combinators$Combine_ops['<*>'],
 			A2(
 				_elm_community$parser_combinators$Combine_ops['<*>'],
-				_elm_community$parser_combinators$Combine$succeed(_user$project$AST_Types$TypeAlias),
+				_elm_community$parser_combinators$Combine$succeed(
+					_user$project$AST_Types$TypeAlias(_elm_lang$core$Maybe$Nothing)),
 				A2(_elm_community$parser_combinators$Combine_ops['*>'], _user$project$Parser_Typings$typeAliasPrefix, _user$project$Parser_Tokens$typeName)),
 			_user$project$Parser_Typings$genericList),
 		A2(
@@ -17477,34 +17466,35 @@ var _user$project$Parser_Declarations$liftRecordAccess = function (e) {
 		_elm_community$parser_combinators$Combine$succeed(e));
 };
 var _user$project$Parser_Declarations$functionArgument = _user$project$Parser_Patterns$pattern;
-var _user$project$Parser_Declarations$signature = A2(
-	_elm_community$parser_combinators$Combine_ops['<*>'],
+var _user$project$Parser_Declarations$signature = _user$project$Parser_Ranges$withRange(
 	A2(
 		_elm_community$parser_combinators$Combine_ops['<*>'],
 		A2(
 			_elm_community$parser_combinators$Combine_ops['<*>'],
-			_elm_community$parser_combinators$Combine$succeed(_user$project$AST_Types$FunctionSignature),
 			A2(
-				_elm_community$parser_combinators$Combine_ops['>>='],
-				_elm_community$parser_combinators$Combine$lookAhead(_elm_community$parser_combinators$Combine_Char$anyChar),
-				function (c) {
-					return _elm_community$parser_combinators$Combine$succeed(
-						_elm_lang$core$Native_Utils.eq(
-							c,
-							_elm_lang$core$Native_Utils.chr('(')));
-				})),
-		A2(
-			_elm_community$parser_combinators$Combine$or,
-			_user$project$Parser_Tokens$functionName,
-			_elm_community$parser_combinators$Combine$parens(_user$project$Parser_Tokens$prefixOperatorToken))),
-	A2(
-		_elm_community$parser_combinators$Combine_ops['*>'],
+				_elm_community$parser_combinators$Combine_ops['<*>'],
+				_elm_community$parser_combinators$Combine$succeed(_user$project$AST_Types$FunctionSignature),
+				A2(
+					_elm_community$parser_combinators$Combine_ops['>>='],
+					_elm_community$parser_combinators$Combine$lookAhead(_elm_community$parser_combinators$Combine_Char$anyChar),
+					function (c) {
+						return _elm_community$parser_combinators$Combine$succeed(
+							_elm_lang$core$Native_Utils.eq(
+								c,
+								_elm_lang$core$Native_Utils.chr('(')));
+					})),
+			A2(
+				_elm_community$parser_combinators$Combine$or,
+				_user$project$Parser_Tokens$functionName,
+				_elm_community$parser_combinators$Combine$parens(_user$project$Parser_Tokens$prefixOperatorToken))),
 		A2(
 			_elm_community$parser_combinators$Combine_ops['*>'],
-			_user$project$Parser_Util$trimmed(
-				_elm_community$parser_combinators$Combine$string(':')),
-			_elm_community$parser_combinators$Combine$maybe(_user$project$Parser_Util$moreThanIndentWhitespace)),
-		_user$project$Parser_TypeReference$typeReference));
+			A2(
+				_elm_community$parser_combinators$Combine_ops['*>'],
+				_user$project$Parser_Util$trimmed(
+					_elm_community$parser_combinators$Combine$string(':')),
+				_elm_community$parser_combinators$Combine$maybe(_user$project$Parser_Util$moreThanIndentWhitespace)),
+			_user$project$Parser_TypeReference$typeReference)));
 var _user$project$Parser_Declarations$portDeclaration = A2(
 	_elm_community$parser_combinators$Combine_ops['*>'],
 	_user$project$Parser_Tokens$portToken,
@@ -21395,6 +21385,123 @@ var _user$project$Analyser_OperatorTable$buildModuleIndex = F2(
 					dependencies)));
 	});
 
+var _user$project$Analyser_PostProcessing_Documentation$isDocumentationForRange = F2(
+	function (range, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1._1;
+		if (A2(_elm_lang$core$String$startsWith, '{-|', _p1._0)) {
+			var functionStartRow = range.start.row;
+			return _elm_lang$core$Native_Utils.eq(_p2.end.row, functionStartRow) && _elm_lang$core$Native_Utils.eq(_p2.end.column, -2);
+		} else {
+			return false;
+		}
+	});
+var _user$project$Analyser_PostProcessing_Documentation$replaceFunction = F2(
+	function (f1, decl) {
+		var _p3 = decl;
+		if (_p3.ctor === 'FuncDecl') {
+			return _elm_lang$core$Native_Utils.eq(f1.declaration.name.range, _p3._0.declaration.name.range) ? _user$project$AST_Types$FuncDecl(f1) : decl;
+		} else {
+			return decl;
+		}
+	});
+var _user$project$Analyser_PostProcessing_Documentation$replaceTypeAlias = F2(
+	function (f1, decl) {
+		var _p4 = decl;
+		if (_p4.ctor === 'AliasDecl') {
+			return _elm_lang$core$Native_Utils.eq(f1.range, _p4._0.range) ? _user$project$AST_Types$AliasDecl(f1) : decl;
+		} else {
+			return decl;
+		}
+	});
+var _user$project$Analyser_PostProcessing_Documentation$onFunction = F2(
+	function ($function, file) {
+		var functionRange = A2(
+			_elm_lang$core$Maybe$withDefault,
+			$function.declaration.name.range,
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (_) {
+					return _.range;
+				},
+				$function.signature));
+		var docs = A2(
+			_elm_lang$core$List$filter,
+			_user$project$Analyser_PostProcessing_Documentation$isDocumentationForRange(functionRange),
+			file.comments);
+		var _p5 = _elm_lang$core$List$head(docs);
+		if (_p5.ctor === 'Just') {
+			var _p6 = _p5._0;
+			return _elm_lang$core$Native_Utils.update(
+				file,
+				{
+					comments: A2(
+						_elm_lang$core$List$filter,
+						F2(
+							function (x, y) {
+								return !_elm_lang$core$Native_Utils.eq(x, y);
+							})(_p6),
+						file.comments),
+					declarations: A2(
+						_elm_lang$core$List$map,
+						_user$project$Analyser_PostProcessing_Documentation$replaceFunction(
+							_elm_lang$core$Native_Utils.update(
+								$function,
+								{
+									documentation: _elm_lang$core$Maybe$Just(_p6)
+								})),
+						file.declarations)
+				});
+		} else {
+			return file;
+		}
+	});
+var _user$project$Analyser_PostProcessing_Documentation$onTypeAlias = F2(
+	function (typeAlias, file) {
+		var docs = A2(
+			_elm_lang$core$List$filter,
+			_user$project$Analyser_PostProcessing_Documentation$isDocumentationForRange(typeAlias.range),
+			file.comments);
+		var _p7 = _elm_lang$core$List$head(docs);
+		if (_p7.ctor === 'Just') {
+			var _p8 = _p7._0;
+			return _elm_lang$core$Native_Utils.update(
+				file,
+				{
+					comments: A2(
+						_elm_lang$core$List$filter,
+						F2(
+							function (x, y) {
+								return !_elm_lang$core$Native_Utils.eq(x, y);
+							})(_p8),
+						file.comments),
+					declarations: A2(
+						_elm_lang$core$List$map,
+						_user$project$Analyser_PostProcessing_Documentation$replaceTypeAlias(
+							_elm_lang$core$Native_Utils.update(
+								typeAlias,
+								{
+									documentation: _elm_lang$core$Maybe$Just(_p8)
+								})),
+						file.declarations)
+				});
+		} else {
+			return file;
+		}
+	});
+var _user$project$Analyser_PostProcessing_Documentation$postProcess = function (file) {
+	return A3(
+		_user$project$Inspector$inspect,
+		_elm_lang$core$Native_Utils.update(
+			_user$project$Inspector$defaultConfig,
+			{
+				onFunction: _user$project$Inspector$Post(_user$project$Analyser_PostProcessing_Documentation$onFunction),
+				onTypeAlias: _user$project$Inspector$Post(_user$project$Analyser_PostProcessing_Documentation$onTypeAlias)
+			}),
+		file,
+		file);
+};
+
 var _user$project$Analyser_PostProcessing$visitDeclarations = F3(
 	function (visitor, context, declarations) {
 		return A2(
@@ -21676,7 +21783,7 @@ var _user$project$Analyser_PostProcessing$fixApplication = F2(
 	});
 var _user$project$Analyser_PostProcessing$postProcess = F2(
 	function (table, file) {
-		return A3(
+		var operatorFixed = A3(
 			_user$project$Analyser_PostProcessing$visit,
 			{
 				onExpression: _elm_lang$core$Maybe$Just(
@@ -21699,6 +21806,7 @@ var _user$project$Analyser_PostProcessing$postProcess = F2(
 			},
 			table,
 			file);
+		return _user$project$Analyser_PostProcessing_Documentation$postProcess(operatorFixed);
 	});
 var _user$project$Analyser_PostProcessing$Visitor = function (a) {
 	return {onExpression: a};
@@ -21734,15 +21842,38 @@ var _user$project$Analyser_FileContext$FileContext = F6(
 	});
 
 var _user$project$Analyser_Configuration$decodeChecks = _elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$bool);
+var _user$project$Analyser_Configuration$checkPropertyAsInt = F3(
+	function (check, prop, _p0) {
+		var _p1 = _p0;
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			_elm_lang$core$Basics$identity,
+			_elm_lang$core$Result$toMaybe(
+				A2(
+					_elm_lang$core$Json_Decode$decodeString,
+					_elm_lang$core$Json_Decode$maybe(
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							{
+								ctor: '::',
+								_0: check,
+								_1: {
+									ctor: '::',
+									_0: prop,
+									_1: {ctor: '[]'}
+								}
+							},
+							_elm_lang$core$Json_Decode$int)),
+					_p1._0.raw)));
+	});
 var _user$project$Analyser_Configuration$defaultChecks = _elm_lang$core$Dict$fromList(
 	{ctor: '[]'});
-var _user$project$Analyser_Configuration$defaultConfiguration = {checks: _user$project$Analyser_Configuration$defaultChecks};
 var _user$project$Analyser_Configuration$withDefaultChecks = function (x) {
 	return A6(
 		_elm_lang$core$Dict$merge,
 		_elm_lang$core$Dict$insert,
 		F4(
-			function (k, _p0, b, result) {
+			function (k, _p2, b, result) {
 				return A3(_elm_lang$core$Dict$insert, k, b, result);
 			}),
 		_elm_lang$core$Dict$insert,
@@ -21750,26 +21881,59 @@ var _user$project$Analyser_Configuration$withDefaultChecks = function (x) {
 		x,
 		_elm_lang$core$Dict$empty);
 };
-var _user$project$Analyser_Configuration$mergeWithDefaults = function (_p1) {
-	var _p2 = _p1;
-	return {
-		checks: _user$project$Analyser_Configuration$withDefaultChecks(_p2.checks)
-	};
-};
 var _user$project$Analyser_Configuration$checkEnabled = F2(
-	function (k, configuration) {
+	function (k, _p3) {
+		var _p4 = _p3;
 		return A2(
 			_elm_lang$core$Maybe$withDefault,
 			true,
-			A2(_elm_lang$core$Dict$get, k, configuration.checks));
+			A2(_elm_lang$core$Dict$get, k, _p4._0.checks));
 	});
-var _user$project$Analyser_Configuration$Configuration = function (a) {
-	return {checks: a};
+var _user$project$Analyser_Configuration$ConfigurationInner = F2(
+	function (a, b) {
+		return {raw: a, checks: b};
+	});
+var _user$project$Analyser_Configuration$B = function (a) {
+	return {ctor: 'B', _0: a};
 };
-var _user$project$Analyser_Configuration$decodeConfiguration = A2(
-	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-	_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Configuration$Configuration),
-	A2(_elm_lang$core$Json_Decode$field, 'checks', _user$project$Analyser_Configuration$decodeChecks));
+var _user$project$Analyser_Configuration$S = function (a) {
+	return {ctor: 'S', _0: a};
+};
+var _user$project$Analyser_Configuration$I = function (a) {
+	return {ctor: 'I', _0: a};
+};
+var _user$project$Analyser_Configuration$Configuration = function (a) {
+	return {ctor: 'Configuration', _0: a};
+};
+var _user$project$Analyser_Configuration$defaultConfiguration = _user$project$Analyser_Configuration$Configuration(
+	{raw: '', checks: _user$project$Analyser_Configuration$defaultChecks});
+var _user$project$Analyser_Configuration$mergeWithDefaults = function (_p5) {
+	var _p6 = _p5;
+	return _user$project$Analyser_Configuration$Configuration(
+		{
+			raw: _p6._0.raw,
+			checks: _user$project$Analyser_Configuration$withDefaultChecks(_p6._0.checks)
+		});
+};
+var _user$project$Analyser_Configuration$decodeConfiguration = function (raw) {
+	return A2(
+		_elm_lang$core$Json_Decode$map,
+		_user$project$Analyser_Configuration$Configuration,
+		A2(
+			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+			_elm_lang$core$Json_Decode$succeed(
+				_user$project$Analyser_Configuration$ConfigurationInner(raw)),
+			_elm_lang$core$Json_Decode$oneOf(
+				{
+					ctor: '::',
+					_0: A2(_elm_lang$core$Json_Decode$field, 'checks', _user$project$Analyser_Configuration$decodeChecks),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Json_Decode$succeed(_elm_lang$core$Dict$empty),
+						_1: {ctor: '[]'}
+					}
+				})));
+};
 var _user$project$Analyser_Configuration$fromString = function (input) {
 	if (_elm_lang$core$Native_Utils.eq(input, '')) {
 		return {
@@ -21782,8 +21946,11 @@ var _user$project$Analyser_Configuration$fromString = function (input) {
 			}
 		};
 	} else {
-		var _p3 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Analyser_Configuration$decodeConfiguration, input);
-		if (_p3.ctor === 'Err') {
+		var _p7 = A2(
+			_elm_lang$core$Json_Decode$decodeString,
+			_user$project$Analyser_Configuration$decodeConfiguration(input),
+			input);
+		if (_p7.ctor === 'Err') {
 			return {
 				ctor: '_Tuple2',
 				_0: _user$project$Analyser_Configuration$defaultConfiguration,
@@ -21792,14 +21959,14 @@ var _user$project$Analyser_Configuration$fromString = function (input) {
 					_0: A2(
 						_elm_lang$core$Basics_ops['++'],
 						'Failed to decode defined configuration due to: ',
-						A2(_elm_lang$core$Basics_ops['++'], _p3._0, '. Falling back to default configuration')),
+						A2(_elm_lang$core$Basics_ops['++'], _p7._0, '. Falling back to default configuration')),
 					_1: {ctor: '[]'}
 				}
 			};
 		} else {
 			return {
 				ctor: '_Tuple2',
-				_0: _user$project$Analyser_Configuration$mergeWithDefaults(_p3._0),
+				_0: _user$project$Analyser_Configuration$mergeWithDefaults(_p7._0),
 				_1: {ctor: '[]'}
 			};
 		}
@@ -21807,16 +21974,10 @@ var _user$project$Analyser_Configuration$fromString = function (input) {
 };
 
 var _user$project$Analyser_Checks_Base$keyBasedChecker = F2(
-	function (keys, _p0) {
-		var _p1 = _p0;
+	function (keys, configuration) {
 		return A2(
 			_elm_lang$core$List$any,
-			function (_p2) {
-				return A2(
-					_elm_lang$core$Maybe$withDefault,
-					true,
-					A3(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, _p1.checks, _p2));
-			},
+			A2(_elm_lang$core$Basics$flip, _user$project$Analyser_Configuration$checkEnabled, configuration),
 			keys);
 	});
 var _user$project$Analyser_Checks_Base$Checker = F2(
@@ -22635,6 +22796,20 @@ var _user$project$Analyser_Checks_UnnecessaryParens$onTuple = F2(
 				_elm_lang$core$Tuple$first,
 				A2(_elm_lang$core$List$filterMap, _user$project$AST_Util$getParenthesized, exprs)));
 	});
+var _user$project$Analyser_Checks_UnnecessaryParens$onListExpr = F2(
+	function (exprs, context) {
+		return A3(
+			_elm_lang$core$Basics$flip,
+			F2(
+				function (x, y) {
+					return A2(_elm_lang$core$Basics_ops['++'], x, y);
+				}),
+			context,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$first,
+				A2(_elm_lang$core$List$filterMap, _user$project$AST_Util$getParenthesized, exprs)));
+	});
 var _user$project$Analyser_Checks_UnnecessaryParens$onExpression = F2(
 	function (_p12, context) {
 		var _p13 = _p12;
@@ -22659,6 +22834,8 @@ var _user$project$Analyser_Checks_UnnecessaryParens$onExpression = F2(
 				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onRecord, _p14._0.updates, context);
 			case 'TupledExpression':
 				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onTuple, _p14._0, context);
+			case 'ListExpr':
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onListExpr, _p14._0, context);
 			default:
 				return context;
 		}
@@ -22899,7 +23076,7 @@ var _user$project$Analyser_Checks_DuplicateImport$checker = {
 		})
 };
 
-var _user$project$Analyser_Checks_UnusedTypeAliases$onTypeAlias = F2(
+var _user$project$Analyser_Checks_UnusedTypeAlias$onTypeAlias = F2(
 	function (typeAlias, context) {
 		return A3(
 			_elm_lang$core$Dict$insert,
@@ -22907,7 +23084,7 @@ var _user$project$Analyser_Checks_UnusedTypeAliases$onTypeAlias = F2(
 			{ctor: '_Tuple3', _0: typeAlias.name, _1: typeAlias.range, _2: 0},
 			context);
 	});
-var _user$project$Analyser_Checks_UnusedTypeAliases$markTypeAlias = F2(
+var _user$project$Analyser_Checks_UnusedTypeAlias$markTypeAlias = F2(
 	function (key, context) {
 		return A3(
 			_elm_lang$core$Dict$update,
@@ -22920,24 +23097,24 @@ var _user$project$Analyser_Checks_UnusedTypeAliases$markTypeAlias = F2(
 						})(1))),
 			context);
 	});
-var _user$project$Analyser_Checks_UnusedTypeAliases$onTypeReference = F2(
+var _user$project$Analyser_Checks_UnusedTypeAlias$onTypeReference = F2(
 	function (typeReference, context) {
 		var _p0 = typeReference;
 		if ((_p0.ctor === 'Typed') && (_p0._0.ctor === '[]')) {
-			return A2(_user$project$Analyser_Checks_UnusedTypeAliases$markTypeAlias, _p0._1, context);
+			return A2(_user$project$Analyser_Checks_UnusedTypeAlias$markTypeAlias, _p0._1, context);
 		} else {
 			return context;
 		}
 	});
-var _user$project$Analyser_Checks_UnusedTypeAliases$onFunctionOrValue = _user$project$Analyser_Checks_UnusedTypeAliases$markTypeAlias;
-var _user$project$Analyser_Checks_UnusedTypeAliases$scan = F2(
+var _user$project$Analyser_Checks_UnusedTypeAlias$onFunctionOrValue = _user$project$Analyser_Checks_UnusedTypeAlias$markTypeAlias;
+var _user$project$Analyser_Checks_UnusedTypeAlias$scan = F2(
 	function (fileContext, _p1) {
 		var collectedAliased = A3(
 			_user$project$Inspector$inspect,
 			_elm_lang$core$Native_Utils.update(
 				_user$project$Inspector$defaultConfig,
 				{
-					onTypeAlias: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedTypeAliases$onTypeAlias)
+					onTypeAlias: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedTypeAlias$onTypeAlias)
 				}),
 			fileContext.ast,
 			_elm_lang$core$Dict$empty);
@@ -22983,14 +23160,14 @@ var _user$project$Analyser_Checks_UnusedTypeAliases$scan = F2(
 									_elm_lang$core$Native_Utils.update(
 										_user$project$Inspector$defaultConfig,
 										{
-											onTypeReference: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedTypeAliases$onTypeReference),
-											onFunctionOrValue: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedTypeAliases$onFunctionOrValue)
+											onTypeReference: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedTypeAlias$onTypeReference),
+											onFunctionOrValue: _user$project$Inspector$Post(_user$project$Analyser_Checks_UnusedTypeAlias$onFunctionOrValue)
 										}),
 									fileContext.ast,
 									collectedAliased)))))));
 	});
-var _user$project$Analyser_Checks_UnusedTypeAliases$checker = {
-	check: _user$project$Analyser_Checks_UnusedTypeAliases$scan,
+var _user$project$Analyser_Checks_UnusedTypeAlias$checker = {
+	check: _user$project$Analyser_Checks_UnusedTypeAlias$scan,
 	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
 		{
 			ctor: '::',
@@ -23545,44 +23722,48 @@ var _user$project$Analyser_Checks_ListOperators$checker = {
 };
 
 var _user$project$Analyser_Checks_LineLength$scan = F2(
-	function (fileContext, _p0) {
+	function (fileContext, configuration) {
+		var threshold = A2(
+			_elm_lang$core$Maybe$withDefault,
+			150,
+			A3(_user$project$Analyser_Configuration$checkPropertyAsInt, 'LineLengthExceeded', 'threshold', configuration));
 		var longLineRanges = A2(
 			_elm_lang$core$List$map,
-			function (_p1) {
-				var _p2 = _p1;
-				var _p3 = _p2._0;
+			function (_p0) {
+				var _p1 = _p0;
+				var _p2 = _p1._0;
 				return {
-					start: {row: _p3, column: -1},
-					end: {row: _p3 + 1, column: -2}
+					start: {row: _p2, column: -1},
+					end: {row: _p2 + 1, column: -2}
 				};
 			},
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p4) {
+				function (_p3) {
 					return !A2(
 						_elm_lang$core$String$startsWith,
 						'import',
-						_elm_lang$core$Tuple$second(_p4));
+						_elm_lang$core$Tuple$second(_p3));
 				},
 				A2(
 					_elm_lang$core$List$filter,
-					function (_p5) {
+					function (_p4) {
 						return !A2(
 							_elm_lang$core$String$startsWith,
 							'module',
-							_elm_lang$core$Tuple$second(_p5));
+							_elm_lang$core$Tuple$second(_p4));
 					},
 					A2(
 						_elm_lang$core$List$filter,
-						function (_p6) {
+						function (_p5) {
 							return A2(
 								F2(
 									function (x, y) {
 										return _elm_lang$core$Native_Utils.cmp(x, y) < 0;
 									}),
-								150,
+								threshold,
 								_elm_lang$core$String$length(
-									_elm_lang$core$Tuple$second(_p6)));
+									_elm_lang$core$Tuple$second(_p5)));
 						},
 						A2(
 							_elm_lang$core$List$indexedMap,
@@ -23667,74 +23848,66 @@ var _user$project$Analyser_Checks_UnnecessaryListConcat$checker = {
 };
 
 var _user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords = function (x) {
-	var findRecordsInTypedArgs = function (arg) {
-		var _p0 = arg;
-		if (_p0.ctor === 'Concrete') {
-			return _user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords(_p0._0);
-		} else {
-			return {ctor: '[]'};
-		}
-	};
-	var _p1 = x;
-	switch (_p1.ctor) {
+	var _p0 = x;
+	switch (_p0.ctor) {
 		case 'GenericType':
 			return {ctor: '[]'};
 		case 'Typed':
-			return A2(_elm_lang$core$List$concatMap, findRecordsInTypedArgs, _p1._2);
+			return A2(_elm_lang$core$List$concatMap, _user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords, _p0._2);
 		case 'Unit':
 			return {ctor: '[]'};
 		case 'Tupled':
-			return A2(_elm_lang$core$List$concatMap, _user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords, _p1._0);
+			return A2(_elm_lang$core$List$concatMap, _user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords, _p0._0);
 		case 'Record':
-			var _p3 = _p1._0;
+			var _p2 = _p0._0;
 			return {
 				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: _p1._1, _1: _p3},
+				_0: {ctor: '_Tuple2', _0: _p0._1, _1: _p2},
 				_1: A2(
 					_elm_lang$core$List$concatMap,
-					function (_p2) {
+					function (_p1) {
 						return _user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords(
-							_elm_lang$core$Tuple$second(_p2));
+							_elm_lang$core$Tuple$second(_p1));
 					},
-					_p3)
+					_p2)
 			};
 		case 'GenericRecord':
-			var _p5 = _p1._1;
+			var _p4 = _p0._1;
 			return {
 				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: _p1._2, _1: _p5},
+				_0: {ctor: '_Tuple2', _0: _p0._2, _1: _p4},
 				_1: A2(
 					_elm_lang$core$List$concatMap,
-					function (_p4) {
+					function (_p3) {
 						return _user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords(
-							_elm_lang$core$Tuple$second(_p4));
+							_elm_lang$core$Tuple$second(_p3));
 					},
-					_p5)
+					_p4)
 			};
 		default:
 			return A2(
 				_elm_lang$core$Basics_ops['++'],
-				_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords(_p1._0),
-				_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords(_p1._1));
+				_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords(_p0._0),
+				_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords(_p0._1));
 	}
 };
 var _user$project$Analyser_Checks_MultiLineRecordFormatting$typeReferenceRange = function (x) {
-	var _p6 = x;
-	switch (_p6.ctor) {
+	var _p5 = x;
+	switch (_p5.ctor) {
 		case 'GenericType':
-			return _p6._1;
+			return _p5._1;
 		case 'Typed':
-			return _p6._3;
+			return _p5._3;
 		case 'Unit':
-			return _p6._0;
+			return _p5._0;
 		case 'Tupled':
-			return _p6._1;
+			return _p5._1;
 		case 'Record':
-			return _p6._1;
+			return _p5._1;
 		case 'GenericRecord':
-			return _p6._2;
+			return _p5._2;
 		default:
-			return _p6._2;
+			return _p5._2;
 	}
 };
 var _user$project$Analyser_Checks_MultiLineRecordFormatting$onTypeAlias = F2(
@@ -23745,24 +23918,24 @@ var _user$project$Analyser_Checks_MultiLineRecordFormatting$onTypeAlias = F2(
 			context);
 	});
 var _user$project$Analyser_Checks_MultiLineRecordFormatting$firstTwo = function (def) {
-	var _p7 = def;
-	if ((_p7.ctor === '::') && (_p7._1.ctor === '::')) {
+	var _p6 = def;
+	if ((_p6.ctor === '::') && (_p6._1.ctor === '::')) {
 		return _elm_lang$core$Maybe$Just(
-			{ctor: '_Tuple2', _0: _p7._0, _1: _p7._1._0});
+			{ctor: '_Tuple2', _0: _p6._0, _1: _p6._1._0});
 	} else {
 		return _elm_lang$core$Maybe$Nothing;
 	}
 };
-var _user$project$Analyser_Checks_MultiLineRecordFormatting$fieldsOnSameLine = function (_p8) {
-	var _p9 = _p8;
+var _user$project$Analyser_Checks_MultiLineRecordFormatting$fieldsOnSameLine = function (_p7) {
+	var _p8 = _p7;
 	return _elm_lang$core$Native_Utils.eq(
 		_user$project$Analyser_Checks_MultiLineRecordFormatting$typeReferenceRange(
-			_elm_lang$core$Tuple$second(_p9._0)).start.row,
+			_elm_lang$core$Tuple$second(_p8._0)).start.row,
 		_user$project$Analyser_Checks_MultiLineRecordFormatting$typeReferenceRange(
-			_elm_lang$core$Tuple$second(_p9._1)).start.row);
+			_elm_lang$core$Tuple$second(_p8._1)).start.row);
 };
 var _user$project$Analyser_Checks_MultiLineRecordFormatting$scan = F2(
-	function (fileContext, _p10) {
+	function (fileContext, _p9) {
 		var threshold = 2;
 		return A2(
 			_elm_lang$core$List$map,
@@ -23774,33 +23947,33 @@ var _user$project$Analyser_Checks_MultiLineRecordFormatting$scan = F2(
 				}),
 			A2(
 				_elm_lang$core$List$map,
-				function (_p11) {
+				function (_p10) {
 					return A2(
 						_user$project$Analyser_Messages_Types$MultiLineRecordFormatting,
 						fileContext.path,
-						_elm_lang$core$Tuple$first(_p11));
+						_elm_lang$core$Tuple$first(_p10));
 				},
 				A2(
 					_elm_lang$core$List$filter,
-					function (_p12) {
+					function (_p11) {
 						return _user$project$Analyser_Checks_MultiLineRecordFormatting$fieldsOnSameLine(
-							_elm_lang$core$Tuple$second(_p12));
+							_elm_lang$core$Tuple$second(_p11));
 					},
 					A2(
 						_elm_lang$core$List$filterMap,
-						function (_p13) {
-							var _p14 = _p13;
+						function (_p12) {
+							var _p13 = _p12;
 							return A2(
 								_elm_lang$core$Maybe$map,
 								F2(
 									function (v0, v1) {
 										return {ctor: '_Tuple2', _0: v0, _1: v1};
-									})(_p14._0),
-								_user$project$Analyser_Checks_MultiLineRecordFormatting$firstTwo(_p14._1));
+									})(_p13._0),
+								_user$project$Analyser_Checks_MultiLineRecordFormatting$firstTwo(_p13._1));
 						},
 						A2(
 							_elm_lang$core$List$filter,
-							function (_p15) {
+							function (_p14) {
 								return A2(
 									F2(
 										function (x, y) {
@@ -23808,7 +23981,7 @@ var _user$project$Analyser_Checks_MultiLineRecordFormatting$scan = F2(
 										}),
 									threshold,
 									_elm_lang$core$List$length(
-										_elm_lang$core$Tuple$second(_p15)));
+										_elm_lang$core$Tuple$second(_p14)));
 							},
 							A3(
 								_user$project$Inspector$inspect,
@@ -23853,7 +24026,7 @@ var _user$project$Inspection$checkers = {
 							_0: _user$project$Analyser_Checks_DuplicateImport$checker,
 							_1: {
 								ctor: '::',
-								_0: _user$project$Analyser_Checks_UnusedTypeAliases$checker,
+								_0: _user$project$Analyser_Checks_UnusedTypeAlias$checker,
 								_1: {
 									ctor: '::',
 									_0: _user$project$Analyser_Checks_OverriddenVariables$checker,
@@ -24410,6 +24583,87 @@ var _user$project$Analyser_Fixes_UnformattedFile$canFix = function (message) {
 };
 var _user$project$Analyser_Fixes_UnformattedFile$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnformattedFile$canFix, _user$project$Analyser_Fixes_UnformattedFile$fix);
 
+var _user$project$Analyser_Fixes_UnusedTypeAlias$removeTypeAlias = F2(
+	function (typeAlias, content) {
+		var end = typeAlias.range.end;
+		var start = A2(
+			_elm_lang$core$Maybe$withDefault,
+			typeAlias.range.start,
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (_p0) {
+					return function (_) {
+						return _.start;
+					}(
+						_elm_lang$core$Tuple$second(_p0));
+				},
+				typeAlias.documentation));
+		return A3(
+			_user$project$Analyser_Fixes_FileContent$replaceRangeWith,
+			A2(_user$project$AST_Ranges$Range, start, end),
+			'',
+			content);
+	});
+var _user$project$Analyser_Fixes_UnusedTypeAlias$findTypeAlias = F2(
+	function (range, file) {
+		return _elm_lang$core$List$head(
+			A2(
+				_elm_lang$core$List$filterMap,
+				function (decl) {
+					var _p1 = decl;
+					if (_p1.ctor === 'AliasDecl') {
+						var _p2 = _p1._0;
+						return _elm_lang$core$Native_Utils.eq(_p2.range, range) ? _elm_lang$core$Maybe$Just(_p2) : _elm_lang$core$Maybe$Nothing;
+					} else {
+						return _elm_lang$core$Maybe$Nothing;
+					}
+				},
+				file.declarations));
+	});
+var _user$project$Analyser_Fixes_UnusedTypeAlias$findAndRemoveTypeAlias = F2(
+	function (_p3, range) {
+		var _p4 = _p3;
+		return A2(
+			_elm_lang$core$Maybe$map,
+			function (typeAlias) {
+				return {
+					ctor: '_Tuple2',
+					_0: _p4._0,
+					_1: A2(_user$project$Analyser_Fixes_UnusedTypeAlias$removeTypeAlias, typeAlias, _p4._1)
+				};
+			},
+			A2(_user$project$Analyser_Fixes_UnusedTypeAlias$findTypeAlias, range, _p4._2));
+	});
+var _user$project$Analyser_Fixes_UnusedTypeAlias$fix = F2(
+	function (input, messageData) {
+		var _p5 = messageData;
+		if (_p5.ctor === 'UnusedTypeAlias') {
+			var _p6 = _elm_lang$core$List$head(input);
+			if (_p6.ctor === 'Nothing') {
+				return _elm_lang$core$Result$Err('No input for fixer UnusedTypeAlias');
+			} else {
+				return A2(
+					_elm_lang$core$Result$fromMaybe,
+					'Could not find type alias',
+					A2(
+						_elm_lang$core$Maybe$map,
+						_elm_lang$core$List$singleton,
+						A2(_user$project$Analyser_Fixes_UnusedTypeAlias$findAndRemoveTypeAlias, _p6._0, _p5._2)));
+			}
+		} else {
+			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedTypeAlias');
+		}
+	});
+var _user$project$Analyser_Fixes_UnusedTypeAlias$canFix = function (message) {
+	var _p7 = message;
+	if (_p7.ctor === 'UnusedTypeAlias') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$Analyser_Fixes_UnusedTypeAlias$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnusedTypeAlias$canFix, _user$project$Analyser_Fixes_UnusedTypeAlias$fix);
+
 var _user$project$Analyser_Fixer$fixers = {
 	ctor: '::',
 	_0: _user$project$Analyser_Fixes_UnnecessaryParens$fixer,
@@ -24425,7 +24679,11 @@ var _user$project$Analyser_Fixer$fixers = {
 				_1: {
 					ctor: '::',
 					_0: _user$project$Analyser_Fixes_UnformattedFile$fixer,
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _user$project$Analyser_Fixes_UnusedTypeAlias$fixer,
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		}
@@ -24593,7 +24851,10 @@ var _user$project$Analyser_Fixer$update = F2(
 									}),
 								_p13._1,
 								_p14),
-							_user$project$Parser_Parser$parse(_p14));
+							A2(
+								_elm_lang$core$Maybe$map,
+								_user$project$Analyser_PostProcessing$postProcess(_elm_lang$core$Dict$empty),
+								_user$project$Parser_Parser$parse(_p14)));
 					},
 					_p17);
 				var changedFiles = A2(_p18.fixer.fix, fixData, _p18.message.data);

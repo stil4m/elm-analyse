@@ -150,6 +150,18 @@ foo x = ([x])
     )
 
 
+parensInListExpression : ( String, String, List MessageData )
+parensInListExpression =
+    ( "parensInListExpression"
+    , """module Bar exposing (..)
+
+foo x = [ (x 1) ]
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 9 }, end = { row = 2, column = 14 } }
+      ]
+    )
+
+
 parensAroundTupleExpression : ( String, String, List MessageData )
 parensAroundTupleExpression =
     ( "parensAroundTupleExpression"
@@ -352,6 +364,7 @@ all =
         , parensInCaseClause
         , parensInIfClause
         , parensAroundListExpression
+        , parensInListExpression
         , parensAroundTupleExpression
         , parensAroundRecordUpdateExpression
         , parensAroundRecordUpdateExpression

@@ -9,6 +9,7 @@
 * [Issue #29](https://github.com/stil4m/elm-analyse/issues/29) Remove TypeArg type from AST
 * [Issue #30](https://github.com/stil4m/elm-analyse/issues/30) Add documentation to type aliases
 * [Issue #31](https://github.com/stil4m/elm-analyse/issues/31) Autofixer for unused type alias
+* [Issue #32](https://github.com/stil4m/elm-analyse/issues/32) Unnecessary parens in list are not detected
 
 ## 0.2.0 (2017-03-02)
 

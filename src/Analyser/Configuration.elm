@@ -86,7 +86,7 @@ fromString input =
 decodeConfiguration : String -> Decoder Configuration
 decodeConfiguration raw =
     succeed (ConfigurationInner raw)
-        |: oneOf [ (field "checks" decodeChecks), succeed Dict.empty ]
+        |: oneOf [ field "checks" decodeChecks, succeed Dict.empty ]
         |> map Configuration
 
 
