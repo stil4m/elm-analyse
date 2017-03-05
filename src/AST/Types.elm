@@ -220,16 +220,9 @@ type alias ValueConstructor =
     }
 
 
-{-| TODO REMOVE THIS
--}
-type TypeArg
-    = Generic String
-    | Concrete TypeReference
-
-
 type TypeReference
     = GenericType String Range
-    | Typed ModuleName String (List TypeArg) Range
+    | Typed ModuleName String (List TypeReference) Range
     | Unit Range
     | Tupled (List TypeReference) Range
     | Record RecordDefinition Range

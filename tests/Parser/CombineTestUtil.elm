@@ -221,7 +221,7 @@ noRangeTypeReference typeReference =
             GenericType x emptyRange
 
         Typed a b c _ ->
-            Typed a b (List.map noRangeTypeArg c) emptyRange
+            Typed a b (List.map noRangeTypeReference c) emptyRange
 
         Unit _ ->
             Unit emptyRange
@@ -240,16 +240,6 @@ noRangeTypeReference typeReference =
                 (noRangeTypeReference a)
                 (noRangeTypeReference b)
                 emptyRange
-
-
-noRangeTypeArg : TypeArg -> TypeArg
-noRangeTypeArg typeArg =
-    case typeArg of
-        Generic s ->
-            Generic s
-
-        Concrete t ->
-            Concrete (noRangeTypeReference t)
 
 
 noRangeRecordField : RecordField -> RecordField

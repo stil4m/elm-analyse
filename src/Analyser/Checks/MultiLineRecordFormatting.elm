@@ -80,34 +80,25 @@ typeReferenceRange x =
 
 findRecords : TypeReference -> List ( Range, RecordDefinition )
 findRecords x =
-    let
-        findRecordsInTypedArgs arg =
-            case arg of
-                Concrete c ->
-                    findRecords c
+    case x of
+        GenericType _ _ ->
+            []
 
-                Generic _ ->
-                    []
-    in
-        case x of
-            GenericType _ _ ->
-                []
+        Typed _ _ args _ ->
+            List.concatMap findRecords args
 
-            Typed _ _ args _ ->
-                List.concatMap findRecordsInTypedArgs args
+        Unit _ ->
+            []
 
-            Unit _ ->
-                []
+        Tupled inner _ ->
+            List.concatMap findRecords inner
 
-            Tupled inner _ ->
-                List.concatMap findRecords inner
+        Record fields r ->
+            ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
 
-            Record fields r ->
-                ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
+        GenericRecord _ fields r ->
+            ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
 
-            GenericRecord _ fields r ->
-                ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
-
-            FunctionTypeReference left right _ ->
-                -- TODO: Think about if this makes sense
-                findRecords left ++ findRecords right
+        FunctionTypeReference left right _ ->
+            -- TODO: Think about if this makes sense
+            findRecords left ++ findRecords right

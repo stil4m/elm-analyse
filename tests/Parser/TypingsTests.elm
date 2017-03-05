@@ -23,7 +23,7 @@ all =
                             , range = emptyRange
                             }
                         )
-        , test "type alias with generic " <|
+        , test "type alias with GenericType " <|
             \() ->
                 parseFullStringWithNullState "type alias Foo a = {some : a }" Parser.typeAlias
                     |> Maybe.map noRangeTypeAlias
@@ -59,7 +59,7 @@ all =
                                 ]
                             }
                         )
-        , test "type with generic " <|
+        , test "type with GenericType " <|
             \() ->
                 parseFullStringWithNullState "type Maybe a = Just a | Nothing" Parser.typeDeclaration
                     |> Maybe.map noRangeTypeDeclaration

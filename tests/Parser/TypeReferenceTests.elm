@@ -39,7 +39,7 @@ all =
                         (Just
                             (Tupled
                                 [ Typed [] "Int" [] emptyRange
-                                , Typed [] "Maybe" [ Generic "m" ] emptyRange
+                                , Typed [] "Maybe" [ GenericType "m" emptyRange ] emptyRange
                                 ]
                                 emptyRange
                             )
@@ -62,9 +62,9 @@ all =
                         (Just <|
                             Typed []
                                 "Foo"
-                                [ Concrete <| Unit emptyRange
-                                , Generic "a"
-                                , Concrete (Typed [] "Bar" [] emptyRange)
+                                [ Unit emptyRange
+                                , GenericType "a" emptyRange
+                                , (Typed [] "Bar" [] emptyRange)
                                 ]
                                 emptyRange
                         )
@@ -76,9 +76,9 @@ all =
                         (Just <|
                             Typed []
                                 "Foo"
-                                [ Concrete <| Unit emptyRange
-                                , Generic "a"
-                                , Concrete (Typed [] "Bar" [] emptyRange)
+                                [ Unit emptyRange
+                                , GenericType "a" emptyRange
+                                , (Typed [] "Bar" [] emptyRange)
                                 ]
                                 emptyRange
                         )
@@ -224,5 +224,5 @@ all =
             \() ->
                 parseFullStringWithNullState "Maybe\n a" Parser.typeReference
                     |> Maybe.map noRangeTypeReference
-                    |> Expect.equal (Just (Typed [] "Maybe" [ Generic "a" ] emptyRange))
+                    |> Expect.equal (Just (Typed [] "Maybe" [ GenericType "a" emptyRange ] emptyRange))
         ]

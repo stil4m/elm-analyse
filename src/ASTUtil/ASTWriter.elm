@@ -289,7 +289,7 @@ writeTypeReference typeReference =
         Typed moduleName k args _ ->
             spaced
                 [ join [ writeModuleName moduleName, string k ]
-                , spaced (List.map writeTypeArg args)
+                , spaced (List.map writeTypeReference args)
                 ]
 
         Unit _ ->
@@ -327,16 +327,6 @@ writeRecordField ( name, ref ) =
         , string ":"
         , writeTypeReference ref
         ]
-
-
-writeTypeArg : TypeArg -> Writer
-writeTypeArg t =
-    case t of
-        Generic s ->
-            string s
-
-        Concrete x ->
-            writeTypeReference x
 
 
 writeExpression : Expression -> Writer

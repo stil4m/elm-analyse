@@ -260,7 +260,7 @@ encodeTypeReference typeReference =
                 object
                     [ ( "moduleName", encodeModuleName moduleName )
                     , nameField name
-                    , ( "args", asList encodeTypeArg args )
+                    , ( "args", asList encodeTypeReference args )
                     , rangeField r
                     ]
 
@@ -311,16 +311,6 @@ encodeRecordField ( name, ref ) =
         [ (nameField name)
         , ( "typeReference", encodeTypeReference ref )
         ]
-
-
-encodeTypeArg : TypeArg -> Value
-encodeTypeArg typeArg =
-    case typeArg of
-        Generic name ->
-            encodeTyped "generic" (string name)
-
-        Concrete tr ->
-            encodeTyped "concrete" (encodeTypeReference tr)
 
 
 encodeFunctionDeclaration : FunctionDeclaration -> Value

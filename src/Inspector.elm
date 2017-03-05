@@ -1,6 +1,6 @@
 module Inspector exposing (Order(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
-import AST.Types exposing (File, Import, ValueConstructor, InfixDirection, Type, TypeAlias, TypeReference(..), TypeArg(Concrete, Generic), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate)
+import AST.Types exposing (File, Import, ValueConstructor, InfixDirection, Type, TypeAlias, TypeReference(..), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate)
 
 
 type Order context x
@@ -180,7 +180,7 @@ inspectTypeReferenceInner : Config context -> TypeReference -> context -> contex
 inspectTypeReferenceInner config typeRefence context =
     case typeRefence of
         Typed _ _ typeArgs _ ->
-            List.foldl (inspectTypeArg config) context typeArgs
+            List.foldl (inspectTypeReference config) context typeArgs
 
         Tupled typeReferences _ ->
             List.foldl (inspectTypeReference config) context typeReferences
@@ -199,16 +199,6 @@ inspectTypeReferenceInner config typeRefence context =
 
         GenericType _ _ ->
             context
-
-
-inspectTypeArg : Config context -> TypeArg -> context -> context
-inspectTypeArg config typeArg context =
-    case typeArg of
-        Generic _ ->
-            context
-
-        Concrete t ->
-            inspectTypeReference config t context
 
 
 inspectExpression : Config context -> Expression -> context -> context

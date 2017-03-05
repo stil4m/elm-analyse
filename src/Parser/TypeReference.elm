@@ -2,7 +2,7 @@ module Parser.TypeReference exposing (typeReference)
 
 import Combine exposing (choice, lazy, Parser, parens, map, sepBy, (>>=), (<*>), succeed, (*>), string, maybe, (<$>), sepBy, between, many, (<*), or, whitespace)
 import Parser.Tokens exposing (functionName, typeName)
-import AST.Types exposing (TypeReference(FunctionTypeReference, Unit, Tupled, GenericType, GenericRecord, Record, Typed), RecordField, RecordDefinition, TypeArg(Generic, Concrete))
+import AST.Types exposing (TypeReference(FunctionTypeReference, Unit, Tupled, GenericType, GenericRecord, Record, Typed), RecordField, RecordDefinition)
 import AST.Ranges exposing (Range)
 import Parser.Util exposing (moreThanIndentWhitespace, trimmed)
 import Parser.Whitespace exposing (realNewLine)
@@ -111,15 +111,7 @@ typedTypeReference =
             succeed Typed
                 <*> many (typeName <* string ".")
                 <*> typeName
-                <*> (Maybe.withDefault [] <$> maybe (moreThanIndentWhitespace *> sepBy moreThanIndentWhitespace typeArg))
-        )
-
-
-typeArg : Parser State TypeArg
-typeArg =
-    lazy
-        (\() ->
-            or
-                (Generic <$> functionName)
-                (Concrete <$> typeReferenceNoFn)
+                <*> (Maybe.withDefault []
+                        <$> maybe (moreThanIndentWhitespace *> sepBy moreThanIndentWhitespace typeReferenceNoFn)
+                    )
         )

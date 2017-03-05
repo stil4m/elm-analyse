@@ -223,7 +223,7 @@ decodeTypeReference =
                   , map4 Typed
                         (field "moduleName" decodeModuleName)
                         nameField
-                        (field "args" <| list decodeTypeArg)
+                        (field "args" <| list decodeTypeReference)
                         rangeField
                   )
                 , ( "unit", map Unit rangeField )
@@ -257,17 +257,6 @@ decodeRecordField =
             succeed (,)
                 |: nameField
                 |: field "typeReference" decodeTypeReference
-        )
-
-
-decodeTypeArg : Decoder TypeArg
-decodeTypeArg =
-    lazy
-        (\() ->
-            decodeTyped
-                [ ( "generic", string |> map Generic )
-                , ( "concrete", decodeTypeReference |> map Concrete )
-                ]
         )
 
 

@@ -117,13 +117,11 @@ all =
                             , typeReference =
                                 Typed []
                                     "List"
-                                    [ Concrete
-                                        (Tupled
-                                            [ Typed [] "Int" [] emptyRange
-                                            , Typed [] "Maybe" [ Generic "m" ] emptyRange
-                                            ]
-                                            emptyRange
-                                        )
+                                    [ Tupled
+                                        [ Typed [] "Int" [] emptyRange
+                                        , Typed [] "Maybe" [ GenericType "m" emptyRange ] emptyRange
+                                        ]
+                                        emptyRange
                                     ]
                                     emptyRange
                             , range = emptyRange
@@ -233,7 +231,7 @@ all =
                                             ]
                                             emptyRange
                                         )
-                                        (Typed [] "Cmd" [ Generic "msg" ] emptyRange)
+                                        (Typed [] "Cmd" [ GenericType "msg" emptyRange ] emptyRange)
                                         emptyRange
                                 , range = emptyRange
                                 }
@@ -273,7 +271,7 @@ all =
                                             (GenericType "msg" emptyRange)
                                             emptyRange
                                         )
-                                        (Typed [] "Sub" [ Generic "msg" ] emptyRange)
+                                        (Typed [] "Sub" [ GenericType "msg" emptyRange ] emptyRange)
                                         emptyRange
                                 , range = emptyRange
                                 }
