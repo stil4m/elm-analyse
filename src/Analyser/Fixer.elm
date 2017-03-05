@@ -8,9 +8,12 @@ import Analyser.Fixes.UnusedImportedVariable as UnusedImportedVariableFixer
 import Analyser.Fixes.UnusedImportAlias as UnusedImportAliasFixer
 import Analyser.Fixes.UnusedPatternVariable as UnusedPatternVariableFixer
 import Analyser.Fixes.UnformattedFile as UnformattedFileFixer
+import Analyser.Fixes.UnusedTypeAlias as UnusedTypeAliasFixer
 import Tuple3
 import Parser.Parser as Parser
 import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.PostProcessing as PostProcessing
+import Dict
 
 
 port storeFiles : List ( String, String ) -> Cmd msg
@@ -108,7 +111,11 @@ update msg (Model model) =
                         reference
                             |> List.filterMap
                                 (\( _, path, content ) ->
-                                    Parser.parse content |> Maybe.map ((,,) path content)
+                                    Parser.parse content
+                                        -- TODO Should we inject the operator table?
+                                        |>
+                                            Maybe.map (PostProcessing.postProcess Dict.empty)
+                                        |> Maybe.map ((,,) path content)
                                 )
 
                     changedFiles =
@@ -155,6 +162,7 @@ fixers =
     , UnusedImportAliasFixer.fixer
     , UnusedPatternVariableFixer.fixer
     , UnformattedFileFixer.fixer
+    , UnusedTypeAliasFixer.fixer
     ]
 
 

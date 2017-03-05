@@ -11,7 +11,7 @@ import Analyser.Checks.ImportAllTests
 import Analyser.Checks.UnnecessaryParensTests
 import Analyser.Checks.NoDebugTests
 import Analyser.Checks.DuplicateImportTests
-import Analyser.Checks.UnusedTypeAliasesTests
+import Analyser.Checks.UnusedTypeAliasTests
 import Analyser.Checks.OverriddenVariablesTests
 import Analyser.Checks.NoUncurriedPrefixTests
 import Analyser.Checks.UnusedImportAliasesTests
@@ -25,13 +25,15 @@ import Analyser.Checks.UnnecessaryListConcatTests
 import ASTUtil.WriterTests
 import Analyser.Fixes.UnnecessaryParensTests
 import Analyser.Fixes.UnusedImportTests
+import Analyser.Fixes.UnusedTypeAliasTests
 import Analyser.Checks.MultiLineRecordFormattingTests
 
 
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.MultiLineRecordFormattingTests.all
+        [ Analyser.Fixes.UnusedTypeAliasTests.all
+        , Analyser.Checks.MultiLineRecordFormattingTests.all
         , Analyser.Checks.ListOperatorsTests.all
         , Analyser.Fixes.FileContentTests.all
         , Analyser.Fixes.UnusedImportedVariableTests.all
@@ -46,7 +48,7 @@ all =
         , Analyser.Checks.UnnecessaryParensTests.all
         , Analyser.Checks.DuplicateImportTests.all
         , Analyser.Checks.NoDebugTests.all
-        , Analyser.Checks.UnusedTypeAliasesTests.all
+        , Analyser.Checks.UnusedTypeAliasTests.all
         , Analyser.Checks.NoTopLevelSignatureTests.all
         , Analyser.Checks.ImportAllTests.all
         , Analyser.Checks.ExposeAllTests.all

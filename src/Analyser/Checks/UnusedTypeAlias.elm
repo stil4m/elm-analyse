@@ -1,4 +1,4 @@
-module Analyser.Checks.UnusedTypeAliases exposing (checker)
+module Analyser.Checks.UnusedTypeAlias exposing (checker)
 
 import AST.Ranges exposing (Range)
 import AST.Types exposing (FunctionSignature, TypeAlias, TypeReference(Typed))

@@ -10,7 +10,7 @@ import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 import Analyser.Checks.NoDebug as NoDebug
 import Analyser.Checks.DuplicateImport as DuplicateImport
-import Analyser.Checks.UnusedTypeAliases as UnusedTypeAliases
+import Analyser.Checks.UnusedTypeAlias as UnusedTypeAlias
 import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
@@ -33,7 +33,7 @@ checkers =
     , UnnecessaryParens.checker
     , NoDebug.checker
     , DuplicateImport.checker
-    , UnusedTypeAliases.checker
+    , UnusedTypeAlias.checker
     , OverriddenVariables.checker
     , NoUncurriedPrefix.checker
     , UnusedImportAliases.checker
