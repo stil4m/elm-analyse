@@ -1,5 +1,9 @@
 # elm-analyse changelog
 
+## 0.3.1 (2017-03-06)
+
+* [Issue #36](https://github.com/stil4m/elm-analyse/issues/36) Exit with error code when encountering issues. Thanks to [@felixLam](https://github.com/felixLam)
+
 ## 0.3.0 (2017-03-05)
 
 * [Issue #18](https://github.com/stil4m/elm-analyse/issues/18) Add documentation to function in post processing
@@ -19,7 +23,7 @@
 ## 0.1.5 (2017-02-26)
 
 * [Issue #16](https://github.com/stil4m/elm-analyse/issues/16) Bug: Auto-fixes on last line of file fail
-* [PR #21](https://github.com/stil4m/elm-analyse/pull/21) Fixes for typos in README. Thanks to @zwilias.
+* [PR #21](https://github.com/stil4m/elm-analyse/pull/21) Fixes for typos in README. Thanks to [@zwilias](https://github.com/zwilias).
 * [Issue #22](https://github.com/stil4m/elm-analyse/issues/22) Ignore `node_module` directory in file-gatherer
 * [Issue #23](https://github.com/stil4m/elm-analyse/issues/23) Add auto fixer for UnusedImport
 
