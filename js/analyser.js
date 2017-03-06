@@ -16,6 +16,10 @@ module.exports = function(config) {
         console.log("Messages:")
         console.log("---------")
         x.forEach(y => console.log(y));
+
+        if (x.length > 0) {
+            process.exit(1);
+        }
     });
 
     loggingPorts(app, config, directory);
