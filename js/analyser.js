@@ -13,11 +13,13 @@ module.exports = function(config) {
     var app = Elm.Analyser.worker();
 
     app.ports.sendMessages.subscribe(function(x) {
-        console.log("Messages:")
-        console.log("---------")
-        x.forEach(y => console.log(y));
+        if (x.length == 0) {
+            console.log("No messages. Everything seems ok!")
+        } else {
+            console.log("Messages:")
+            console.log("---------")
+            x.forEach(y => console.log(y));
 
-        if (x.length > 0) {
             process.exit(1);
         }
     });

@@ -12,7 +12,7 @@ import Tuple2
 import Analyser.Messages.Util as Messages
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.Configuration as Configuration exposing (Configuration)
-import Analyser.Logging as Logging
+import Logger
 
 
 type alias Model =
@@ -92,7 +92,7 @@ update msg model =
                   }
                 , Cmd.batch <|
                     Cmd.map InterfaceLoadingStageMsg cmds
-                        :: List.map ((,) "INFO" >> Logging.log) messages
+                        :: List.map Logger.info messages
                 )
                     |> doSendState
 
