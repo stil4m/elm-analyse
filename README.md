@@ -115,7 +115,7 @@ Check specific configuration can be added to the `elm-analyse.json` file in the 
   ...
   "<CheckName>" : {
     "<property>": <value>
-  }.
+  },
   ...
 }
 ```
@@ -125,6 +125,21 @@ The configurable options are:
 | Check | Property | Description | Default value |
 | ---- | ---- | ---- | ---- |
 | `LineLengthExceeded` | `threshold` | Defines the maximum line length | `150` |
+
+### Ignore Paths
+
+It is possible to exclude specific paths and files in the analysis with the following configuration in `elm-analyse.json`:
+
+```
+{
+  ...
+  "excludedPaths" : [
+    "src/Vendor",
+    "src/App/FileThatShouldNotBeInspected.elm"
+  ],
+  ...
+}
+```
 
 ## Scheduled Checks
 

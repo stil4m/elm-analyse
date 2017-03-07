@@ -21,7 +21,7 @@ import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
 import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Util
-import Analyser.Configuration exposing (Configuration)
+import Analyser.Configuration as Configuration exposing (Configuration)
 
 
 checkers : List Checker
@@ -51,9 +51,18 @@ run sources deps configuration =
         enabledChecks =
             List.filter (\x -> x.shouldCheck configuration) checkers
 
-        ( validSources, invalidSources ) =
-            List.partition (Tuple.second >> Analyser.Util.isLoaded)
+        includedSources =
+            List.filter
+                (Tuple.first
+                    >> .path
+                    >> flip Configuration.isPathExcluded configuration
+                    >> not
+                )
                 sources
+
+        ( validSources, invalidSources ) =
+            includedSources
+                |> List.partition (Tuple.second >> Analyser.Util.isLoaded)
 
         failedMessages =
             invalidSources
@@ -83,7 +92,7 @@ run sources deps configuration =
                     )
 
         inspectionMessages =
-            sources
+            includedSources
                 |> List.filterMap (FileContext.create sources deps)
                 |> List.concatMap (\x -> List.concatMap (\c -> c.check x configuration) enabledChecks)
 
