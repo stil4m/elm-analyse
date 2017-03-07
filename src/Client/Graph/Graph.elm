@@ -1,10 +1,10 @@
-module Client.DependencyGraph.DependencyGraph exposing (Model, Msg, subscriptions, init, update, view, withState)
+module Client.Graph.Graph exposing (Model, Msg, subscriptions, init, update, view, withState)
 
 import Graph.GraphViz as GraphViz
 import Analyser.State as State exposing (State)
 import Client.Socket exposing (dashboardAddress)
-import Html exposing (Html, a, div, span, text)
-import Json.Decode as JD exposing (list, string)
+import Html exposing (Html, div, text)
+import Json.Decode as JD
 import Navigation exposing (Location)
 import WebSocket as WS
 
@@ -19,7 +19,7 @@ type Msg
 
 
 subscriptions : Location -> Model -> Sub Msg
-subscriptions location model =
+subscriptions location _ =
     Sub.batch [ WS.listen (dashboardAddress location) (JD.decodeString State.decodeState >> NewState) ]
 
 
@@ -36,10 +36,10 @@ init location =
 
 
 update : Location -> Msg -> Model -> ( Model, Cmd Msg )
-update location msg model =
+update _ msg model =
     case msg of
         NewState state ->
-            (withState (Result.toMaybe state) model) ! []
+            withState (Result.toMaybe state) model ! []
 
 
 view : Model -> Html Msg

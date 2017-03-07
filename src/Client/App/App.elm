@@ -1,9 +1,9 @@
 module Client.App.App exposing (init, view, update, subscriptions)
 
 import Client.App.Menu
-import Client.App.Models exposing (Content(DashBoardContent, DependencyGraphContent, FileTreeContent), Model, Msg(..))
+import Client.App.Models exposing (Content(DashBoardContent, GraphContent, FileTreeContent), Model, Msg(..))
 import Client.DashBoard.DashBoard as DashBoard
-import Client.DependencyGraph.DependencyGraph as DependencyGraph
+import Client.Graph.Graph as Graph
 import Client.FileTree as FileTree
 import Client.Socket exposing (controlAddress)
 import Html exposing (Html, div)
@@ -20,8 +20,8 @@ subscriptions model =
             DashBoardContent sub ->
                 DashBoard.subscriptions model.location sub |> Sub.map DashBoardMsg
 
-            DependencyGraphContent sub ->
-                DependencyGraph.subscriptions model.location sub |> Sub.map DependencyGraphMsg
+            GraphContent sub ->
+                Graph.subscriptions model.location sub |> Sub.map GraphMsg
 
             FileTreeContent sub ->
                 FileTree.subscriptions model.location sub |> Sub.map FileTreeMsg
@@ -43,9 +43,9 @@ onLocation l =
                 |> Tuple2.mapSecond (Cmd.map FileTreeMsg)
 
         "#dependency-graph" ->
-            DependencyGraph.init l
-                |> Tuple2.mapFirst (\x -> { content = DependencyGraphContent x, location = l })
-                |> Tuple2.mapSecond (Cmd.map DependencyGraphMsg)
+            Graph.init l
+                |> Tuple2.mapFirst (\x -> { content = GraphContent x, location = l })
+                |> Tuple2.mapSecond (Cmd.map GraphMsg)
 
         _ ->
             DashBoard.init l
@@ -62,8 +62,8 @@ view m =
                 DashBoardContent subModel ->
                     DashBoard.view subModel |> Html.map DashBoardMsg
 
-                DependencyGraphContent subModel ->
-                    DependencyGraph.view subModel |> Html.map DependencyGraphMsg
+                GraphContent subModel ->
+                    Graph.view subModel |> Html.map GraphMsg
 
                 FileTreeContent subModel ->
                     FileTree.view subModel |> Html.map FileTreeMsg
@@ -85,8 +85,8 @@ update msg model =
         DashBoardMsg subMsg ->
             onDashBoardMsg subMsg model
 
-        DependencyGraphMsg subMsg ->
-            onDependencyGraphMsg subMsg model
+        GraphMsg subMsg ->
+            onGraphMsg subMsg model
 
         FileTreeMsg subMsg ->
             onFileTreeMsg subMsg model
@@ -116,13 +116,13 @@ onDashBoardMsg subMsg model =
             model ! []
 
 
-onDependencyGraphMsg : DependencyGraph.Msg -> Model -> ( Model, Cmd Msg )
-onDependencyGraphMsg subMsg model =
+onGraphMsg : Graph.Msg -> Model -> ( Model, Cmd Msg )
+onGraphMsg subMsg model =
     case model.content of
-        DependencyGraphContent subModel ->
-            DependencyGraph.update model.location subMsg subModel
-                |> Tuple2.mapFirst (\x -> { model | content = DependencyGraphContent x })
-                |> Tuple2.mapSecond (Cmd.map DependencyGraphMsg)
+        GraphContent subModel ->
+            Graph.update model.location subMsg subModel
+                |> Tuple2.mapFirst (\x -> { model | content = GraphContent x })
+                |> Tuple2.mapSecond (Cmd.map GraphMsg)
 
         _ ->
             model ! []

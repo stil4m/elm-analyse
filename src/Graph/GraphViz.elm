@@ -62,5 +62,5 @@ node node =
         ++ " [shape=box "
         ++ style node
         ++ " label=\""
-        ++ (String.join "." node.name)
+        ++ String.join "." node.name
         ++ "\"];"
