@@ -57,15 +57,15 @@ run sources deps configuration =
 
         failedMessages =
             invalidSources
-                |> List.map Tuple.first
+                |> List.filterMap (\( source, result ) -> Maybe.map ((,) source) (Analyser.Util.fileLoadError result))
                 |> List.map
-                    (\source ->
+                    (\( source, error ) ->
                         newMessage
                             [ ( Maybe.withDefault "" source.sha1
                               , source.path
                               )
                             ]
-                            (FileLoadFailed source.path)
+                            (FileLoadFailed source.path error)
                     )
 
         fileMessages =

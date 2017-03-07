@@ -114,8 +114,9 @@ update msg (Model model) =
                                     Parser.parse content
                                         -- TODO Should we inject the operator table?
                                         |>
-                                            Maybe.map (PostProcessing.postProcess Dict.empty)
-                                        |> Maybe.map ((,,) path content)
+                                            Result.map (PostProcessing.postProcess Dict.empty)
+                                        |> Result.map ((,,) path content)
+                                        |> Result.toMaybe
                                 )
 
                     changedFiles =

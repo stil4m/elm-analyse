@@ -13,6 +13,7 @@ import Maybe.Extra as Maybe
 import Dict
 import Analyser.Util
 import Logger
+import Result.Extra as Result
 
 
 port loadRawDependency : ( String, Version ) -> Cmd msg
@@ -144,7 +145,7 @@ onInputLoadingInterface fileContent =
         |> Maybe.andThen (Json.Decode.decodeString AST.Decoding.decode >> Result.toMaybe)
         |> Maybe.map loadedInterfaceForFile
         |> Maybe.orElseLazy (\() -> Just (loadedFileFromContent fileContent))
-        |> Maybe.withDefault Failed
+        |> Maybe.withDefault (Failed "Internal problem in the file loader. Please report an issue.")
 
 
 loadedFileFromContent : FileContent -> FileLoad
@@ -157,9 +158,10 @@ loadedFileFromContent fileContent =
         case fileContent.content of
             Just content ->
                 (Parser.parse content
-                    |> Maybe.map loadedInterfaceForFile
-                    |> Maybe.withDefault Failed
+                    |> Result.map loadedInterfaceForFile
+                    |> Result.mapError (List.head >> Maybe.withDefault "" >> Failed)
+                    |> Result.merge
                 )
 
             Nothing ->
-                Failed
+                Failed "No file content"

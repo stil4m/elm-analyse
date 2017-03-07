@@ -13,8 +13,8 @@ toInterface name input inter =
     test name <|
         \() ->
             Parser.parse input
-                |> Maybe.map Interface.build
-                |> Expect.equal (Just inter)
+                |> Result.map Interface.build
+                |> Expect.equal (Ok inter)
 
 
 all : Test.Test
