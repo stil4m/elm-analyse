@@ -18,6 +18,7 @@ type Configuration
 type alias ConfigurationInner =
     { raw : String
     , checks : Dict String Bool
+    , excludedPaths : List String
     }
 
 
@@ -25,6 +26,11 @@ checkEnabled : String -> Configuration -> Bool
 checkEnabled k (Configuration configuration) =
     Dict.get k configuration.checks
         |> Maybe.withDefault True
+
+
+isPathExcluded : String -> Configuration -> Bool
+isPathExcluded p (Configuration { excludedPaths }) =
+    List.any (flip String.startsWith p) excludedPaths
 
 
 defaultChecks : Dict String Bool
@@ -42,7 +48,7 @@ checkPropertyAsInt check prop (Configuration { raw }) =
 
 defaultConfiguration : Configuration
 defaultConfiguration =
-    Configuration { raw = "", checks = defaultChecks }
+    Configuration { raw = "", checks = defaultChecks, excludedPaths = [] }
 
 
 withDefaultChecks : Dict String Bool -> Dict String Bool
@@ -57,11 +63,8 @@ withDefaultChecks x =
 
 
 mergeWithDefaults : Configuration -> Configuration
-mergeWithDefaults (Configuration { raw, checks }) =
-    Configuration
-        { raw = raw
-        , checks = withDefaultChecks checks
-        }
+mergeWithDefaults (Configuration innerConfig) =
+    Configuration { innerConfig | checks = withDefaultChecks innerConfig.checks }
 
 
 fromString : String -> ( Configuration, List String )
@@ -87,6 +90,7 @@ decodeConfiguration : String -> Decoder Configuration
 decodeConfiguration raw =
     succeed (ConfigurationInner raw)
         |: oneOf [ field "checks" decodeChecks, succeed Dict.empty ]
+        |: oneOf [ field "excludedPaths" (list string), succeed [] ]
         |> map Configuration
 
 
