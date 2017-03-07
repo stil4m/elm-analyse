@@ -18,7 +18,7 @@ function storeDependencyJson(dependency, version, content) {
 }
 
 function elmCachePathForSha(sha) {
-    return './elm-stuff/elm-analyse/_shas/' + sha + '.elm'
+    return './elm-stuff/elm-analyse/_shas/' + sha + '.elma'
 }
 
 function astCachePathForSha(sha) {
