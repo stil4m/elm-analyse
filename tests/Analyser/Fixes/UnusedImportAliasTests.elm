@@ -30,7 +30,7 @@ foo = bar 1
 """
                 in
                     case Parser.parse input of
-                        Just x ->
+                        Ok x ->
                             fixer.fix [ ( "./foo.elm", input, x ) ]
                                 (UnusedImportAlias "./foo.elm"
                                     [ "Bar" ]
@@ -38,6 +38,6 @@ foo = bar 1
                                 )
                                 |> Expect.equal (Ok [ ( "./foo.elm", output ) ])
 
-                        Nothing ->
+                        Err _ ->
                             Expect.equal True False
         ]

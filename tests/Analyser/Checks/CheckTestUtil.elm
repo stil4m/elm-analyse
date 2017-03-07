@@ -20,7 +20,8 @@ fileContentFromInput input =
 getMessages : String -> Checker -> Maybe (List MessageData)
 getMessages input checker =
     Parser.Parser.parse input
-        |> Maybe.map (\file -> ( fileContentFromInput input, Loaded { interface = Interface.build file, ast = file, moduleName = AST.Util.fileModuleName file } ))
+        |> Result.map (\file -> ( fileContentFromInput input, Loaded { interface = Interface.build file, ast = file, moduleName = AST.Util.fileModuleName file } ))
+        |> Result.toMaybe
         |> Maybe.andThen (\file -> FileContext.create [ file ] [] file)
         |> Maybe.map (flip checker.check defaultConfiguration >> List.map .data)
 

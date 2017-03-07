@@ -87,5 +87,5 @@ import Platform.Sub exposing ( Sub )
 defaultImports : List AST.Import
 defaultImports =
     Parser.Parser.parse defaultImportString
-        |> Maybe.map .imports
-        |> Maybe.withDefault []
+        |> Result.map .imports
+        |> Result.withDefault []

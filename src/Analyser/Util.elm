@@ -1,11 +1,21 @@
-module Analyser.Util exposing (isLoaded, withLoaded)
+module Analyser.Util exposing (isLoaded, withLoaded, fileLoadError)
 
-import Analyser.Files.Types exposing (FileLoad(Loaded), LoadedFileData)
+import Analyser.Files.Types exposing (FileLoad(Failed, Loaded), LoadedFileData)
 
 
 isLoaded : FileLoad -> Bool
 isLoaded =
     not << (==) Nothing << withLoaded
+
+
+fileLoadError : FileLoad -> Maybe String
+fileLoadError x =
+    case x of
+        Failed e ->
+            Just e
+
+        _ ->
+            Nothing
 
 
 withLoaded : FileLoad -> Maybe LoadedFileData

@@ -38,8 +38,8 @@ update msg model =
         NewInput input ->
             ( model
             , Parser.Parser.parse input
-                |> Maybe.map (AST.Encoding.encode >> JE.encode 0)
-                |> Maybe.withDefault ""
+                |> Result.map (AST.Encoding.encode >> JE.encode 0)
+                |> Result.withDefault ""
                 |> parsed
             )
 
