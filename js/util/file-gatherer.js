@@ -60,7 +60,7 @@ function gather(directory) {
         .map(x => [x, exactDeps[x]]);
 
     dependencies.filter(x => !exactDeps[x]).forEach(x => {
-        console.log('Missing dependency `' + x + '`. Maybe run elm-package to update the dependencies.');
+        console.log('WARN: Missing dependency `' + x + '`. Maybe run elm-package to update the dependencies.');
     });
 
     const input = {

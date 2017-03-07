@@ -16,7 +16,7 @@ module.exports = function(app, elm, expressWs) {
 
 
     elm.ports.sendFixResult.subscribe(function(m) {
-        console.log('sendFixResult');
+        console.log('FixResult');
         console.log(m)
     });
 

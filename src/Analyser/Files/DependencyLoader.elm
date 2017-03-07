@@ -12,6 +12,7 @@ import Result
 import Maybe.Extra as Maybe
 import Dict
 import Analyser.Util
+import Logger
 
 
 port loadRawDependency : ( String, Version ) -> Cmd msg
@@ -55,7 +56,10 @@ init ( name, version ) =
       , parsed = []
       , result = Nothing
       }
-    , loadRawDependency ( name, version )
+    , Cmd.batch
+        [ loadRawDependency ( name, version )
+        , Logger.info ("Load dependency " ++ name ++ version)
+        ]
     )
 
 

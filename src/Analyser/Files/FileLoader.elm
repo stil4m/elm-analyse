@@ -12,6 +12,7 @@ import Parser.Parser as Parser
 import Result
 import Maybe.Extra as Maybe
 import Analyser.Util
+import Logger
 
 
 port loadFile : String -> Cmd msg
@@ -33,7 +34,10 @@ type alias RefeshedAST =
 
 init : String -> Cmd Msg
 init s =
-    loadFile s
+    Cmd.batch
+        [ loadFile s
+        , Logger.info ("Load file " ++ s ++ "...")
+        ]
 
 
 subscriptions : Sub Msg
