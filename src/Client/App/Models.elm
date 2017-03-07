@@ -1,17 +1,19 @@
 module Client.App.Models
     exposing
-        ( Msg(DashBoardMsg, Refresh, OnLocation, FileTreeMsg)
+        ( Msg(DashBoardMsg, DependencyGraphMsg, Refresh, OnLocation, FileTreeMsg)
         , Model
-        , Content(DashBoardContent, FileTreeContent)
+        , Content(DashBoardContent, DependencyGraphContent, FileTreeContent)
         )
 
 import Client.DashBoard.DashBoard as DashBoard
+import Client.DependencyGraph.DependencyGraph as DependencyGraph
 import Client.FileTree as FileTree
 import Navigation exposing (Location)
 
 
 type Msg
     = DashBoardMsg DashBoard.Msg
+    | DependencyGraphMsg DependencyGraph.Msg
     | FileTreeMsg FileTree.Msg
     | Refresh
     | OnLocation Location
@@ -26,3 +28,4 @@ type alias Model =
 type Content
     = DashBoardContent DashBoard.Model
     | FileTreeContent FileTree.Model
+    | DependencyGraphContent DependencyGraph.Model

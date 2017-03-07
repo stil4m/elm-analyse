@@ -12,6 +12,7 @@ import Tuple2
 import Analyser.Messages.Util as Messages
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.Configuration as Configuration exposing (Configuration)
+import Graph as Graph
 import Logger
 
 
@@ -224,8 +225,12 @@ onSourceLoadingStageMsg x stage model =
                 messages =
                     Inspection.run (SourceLoadingStage.parsedFiles newStage) model.dependencies model.configuration
 
+                newGraph =
+                    Graph.run (SourceLoadingStage.parsedFiles newStage) model.dependencies
+
                 newState =
                     State.finishWithNewMessages messages model.state
+                        |> State.updateGraph newGraph
 
                 newModel =
                     { model
