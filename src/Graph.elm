@@ -1,9 +1,10 @@
-module Graph exposing (Graph, decode, encode, init, run)
+module Graph exposing (Graph, decode, empty, encode, init, run)
 
-import Graph.Edge as Edge exposing (Edge)
 import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.Files.Types exposing (Dependency, LoadedSourceFiles)
 import AST.Types as AST
+import Graph.Edge as Edge exposing (Edge)
+import Graph.Node as Node exposing (Node)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
 import Json.Encode as JE exposing (Value)
@@ -11,10 +12,16 @@ import Json.Encode as JE exposing (Value)
 
 type alias Graph =
     { edges : List Edge
+    , nodes : List Node
     }
 
 
-init : List Edge -> Graph
+empty : Graph
+empty =
+    init [] []
+
+
+init : List Edge -> List Node -> Graph
 init =
     Graph
 
@@ -23,43 +30,60 @@ run : LoadedSourceFiles -> List Dependency -> Graph
 run sources deps =
     let
         files =
-            sources
-                |> List.filterMap (FileContext.create sources deps)
+            List.filterMap (FileContext.create sources deps) sources
+
+        edges =
+            List.map edgesInFile files
+                |> List.concat
+
+        nodes =
+            List.filterMap .moduleName files
+                |> List.map nodeFromFile
     in
-        files
-            |> List.map runForFile
-            |> List.concat
-            |> init
+        init edges nodes
 
 
-runForFile : FileContext -> List Edge
-runForFile file =
-    let
-        imports =
-            file.ast.imports
-                |> List.map .moduleName
-                |> List.map (Just >> stringFromModuleName)
-
-        from =
-            stringFromModuleName file.moduleName
-    in
-        List.map (\to -> Edge from to) imports
+nodeFromFile : AST.ModuleName -> Node
+nodeFromFile moduleName =
+    { identifier = nodeIdentifierFromModuleName moduleName
+    , name = moduleName
+    }
 
 
-stringFromModuleName : Maybe AST.ModuleName -> String
-stringFromModuleName moduleName =
-    Maybe.map (String.join ".") moduleName
-        |> Maybe.withDefault "Unknown"
+edgesInFile : FileContext -> List Edge
+edgesInFile file =
+    case file.moduleName of
+        Just fromModule ->
+            let
+                from =
+                    nodeIdentifierFromModuleName fromModule
+
+                imports =
+                    file.ast.imports
+                        |> List.map .moduleName
+                        |> List.map nodeIdentifierFromModuleName
+            in
+                List.map (\to -> Edge from to) imports
+
+        Nothing ->
+            []
+
+
+nodeIdentifierFromModuleName : AST.ModuleName -> Node.Identifier
+nodeIdentifierFromModuleName moduleName =
+    String.join "." moduleName
 
 
 decode : Decoder Graph
 decode =
     JD.succeed Graph
         |: JD.field "edges" (JD.list Edge.decode)
+        |: JD.field "nodes" (JD.list Node.decode)
 
 
 encode : Graph -> Value
 encode record =
     JE.object
         [ ( "edges", JE.list (List.map Edge.encode record.edges) )
+        , ( "nodes", JE.list (List.map Node.encode record.nodes) )
         ]

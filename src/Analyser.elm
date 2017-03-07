@@ -12,7 +12,7 @@ import Tuple2
 import Analyser.Messages.Util as Messages
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.Configuration as Configuration exposing (Configuration)
-import Graph as Graph
+import Graph
 import Logger
 
 

@@ -3,7 +3,7 @@ module Analyser.State exposing (..)
 import Analyser.Messages.Types exposing (Message, MessageId, MessageStatus(Applicable))
 import Analyser.Messages.Json exposing (encodeMessage, decodeMessage)
 import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing)
-import Graph as Graph exposing (Graph)
+import Graph exposing (Graph)
 import Json.Encode as JE exposing (Value)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
@@ -34,7 +34,7 @@ initialState =
     , idCount = 0
     , status = Initialising
     , queue = []
-    , graph = Graph.init []
+    , graph = Graph.empty
     }
 
 
