@@ -3,7 +3,6 @@ module Graph exposing (Graph, decode, empty, encode, init, run)
 import AST.Types as AST
 import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.Files.Types exposing (Dependency, LoadedSourceFiles)
-import Array
 import Dict exposing (Dict)
 import Graph.Color as Color exposing (Color)
 import Graph.Edge as Edge exposing (Edge)
@@ -11,6 +10,7 @@ import Graph.Node as Node exposing (Node)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
 import Json.Encode as JE exposing (Value)
+import List.Extra as List
 import Set
 
 
@@ -75,10 +75,10 @@ colors moduleNames =
                 |> List.sort
 
         allColors =
-            Array.fromList Color.list
+            Color.list
 
         colorsLength =
-            Array.length allColors
+            List.length allColors
 
         colorsForModuleNames =
             topModuleNames
@@ -86,7 +86,7 @@ colors moduleNames =
                     (\index name ->
                         let
                             color =
-                                Array.get (index % colorsLength) allColors
+                                List.getAt (index % colorsLength) allColors
                                     |> Maybe.withDefault Color.fallback
                         in
                             ( name, color )
@@ -97,14 +97,10 @@ colors moduleNames =
 
 nodeFromFile : Dict String Color -> AST.ModuleName -> Node
 nodeFromFile colors moduleName =
-    let
-        color =
-            Dict.get (topModuleName moduleName) colors |> Maybe.withDefault Color.fallback
-    in
-        { color = color
-        , identifier = nodeIdentifierFromModuleName moduleName
-        , name = moduleName
-        }
+    { color = Dict.get (topModuleName moduleName) colors |> Maybe.withDefault Color.fallback
+    , identifier = nodeIdentifierFromModuleName moduleName
+    , name = moduleName
+    }
 
 
 edgesInFile : FileContext -> List Edge

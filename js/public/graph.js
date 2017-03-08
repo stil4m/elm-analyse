@@ -44,7 +44,7 @@ function displayGraph(elementId, graphData) {
     // the incoming data is not fully configured for sigma.js
     // the nodes miss size, x, y and label
     // we also add an original color for our click handler
-    graphData.nodes.forEach(function(item, index, array) {
+    graphData.nodes.forEach(function(item, index) {
         item.size = 1;
         item.color = item.color || "#ec5148"
         item.originalColor = item.color
@@ -52,7 +52,7 @@ function displayGraph(elementId, graphData) {
         item.y = Math.random();
         item.label = item.name.join('.');
     });
-    graphData.edges.forEach(function(item, index, array) {
+    graphData.edges.forEach(function(item, index) {
         item.color = item.color || "#bbb"
         item.originalColor = item.color
     });
