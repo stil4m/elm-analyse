@@ -232,7 +232,7 @@ onSourceLoadingStageMsg x stage model =
                     Inspection.run loadedSourceFiles (CodeBase.dependencies newCodeBase) model.configuration
 
                 newGraph =
-                    Graph.run (SourceLoadingStage.parsedFiles newStage) model.dependencies
+                    Graph.run (CodeBase.sourceFiles newCodeBase) (CodeBase.dependencies newCodeBase)
 
                 newState =
                     State.finishWithNewMessages messages model.state
