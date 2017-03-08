@@ -5,7 +5,6 @@ import Analyser.SourceLoadingStage as SourceLoadingStage
 import AnalyserPorts
 import Platform exposing (program)
 import Inspection
-import Analyser.Files.Types exposing (Dependency, Version)
 import Analyser.State as State exposing (State)
 import Analyser.Fixer as Fixer
 import Tuple2
@@ -14,10 +13,11 @@ import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Graph
 import Logger
+import Analyser.CodeBase as CodeBase exposing (CodeBase)
 
 
 type alias Model =
-    { dependencies : List Dependency
+    { codeBase : CodeBase
     , context : Context
     , configuration : Configuration
     , stage : Stage
@@ -53,14 +53,14 @@ init =
         { context = ContextLoader.emptyContext
         , stage = Finished
         , configuration = Configuration.defaultConfiguration
-        , dependencies = []
+        , codeBase = CodeBase.init
         , state = State.initialState
         }
 
 
 reset : Model -> ( Model, Cmd Msg )
 reset model =
-    ( { model | stage = ContextLoadingStage, state = State.initialState, dependencies = [] }
+    ( { model | stage = ContextLoadingStage, state = State.initialState, codeBase = CodeBase.init }
     , ContextLoader.loadContext ()
     )
         |> doSendState
@@ -204,7 +204,7 @@ onInterfaceLoadingStageMsg x stage model =
             InterfaceLoadingStage.update x stage
     in
         if InterfaceLoadingStage.isDone newStage then
-            ( { model | dependencies = InterfaceLoadingStage.getDependencies newStage }
+            ( { model | codeBase = CodeBase.setDependencies (InterfaceLoadingStage.getDependencies newStage) model.codeBase }
             , Cmd.map InterfaceLoadingStageMsg cmds
             )
                 |> startSourceLoading model.context.sourceFiles
@@ -222,8 +222,14 @@ onSourceLoadingStageMsg x stage model =
     in
         if SourceLoadingStage.isDone newStage then
             let
+                loadedSourceFiles =
+                    (SourceLoadingStage.parsedFiles newStage)
+
+                newCodeBase =
+                    CodeBase.addSourceFiles loadedSourceFiles model.codeBase
+
                 messages =
-                    Inspection.run (SourceLoadingStage.parsedFiles newStage) model.dependencies model.configuration
+                    Inspection.run loadedSourceFiles (CodeBase.dependencies newCodeBase) model.configuration
 
                 newGraph =
                     Graph.run (SourceLoadingStage.parsedFiles newStage) model.dependencies
@@ -236,6 +242,7 @@ onSourceLoadingStageMsg x stage model =
                     { model
                         | stage = Finished
                         , state = newState
+                        , codeBase = newCodeBase
                     }
             in
                 ( newModel
