@@ -42,7 +42,7 @@ onLocation l =
                 |> Tuple2.mapFirst (\x -> { content = FileTreeContent x, location = l })
                 |> Tuple2.mapSecond (Cmd.map FileTreeMsg)
 
-        "#dependency-graph" ->
+        "#module-graph" ->
             Graph.init l
                 |> Tuple2.mapFirst (\x -> { content = GraphContent x, location = l })
                 |> Tuple2.mapSecond (Cmd.map GraphMsg)
@@ -75,7 +75,18 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnLocation l ->
-            onLocation l
+            let
+                ( newModel, cmd ) =
+                    onLocation l
+
+                removeGraphCmd =
+                    if newModel.location.hash /= "#module-graph" then
+                        -- attempt to remove graph if we are not in graph view
+                        Graph.removeCmd
+                    else
+                        Cmd.none
+            in
+                newModel ! [ cmd, removeGraphCmd ]
 
         Refresh ->
             ( model

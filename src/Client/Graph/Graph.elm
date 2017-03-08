@@ -1,12 +1,37 @@
-module Client.Graph.Graph exposing (Model, Msg, subscriptions, init, update, view, withState)
+port module Client.Graph.Graph
+    exposing
+        ( Model
+        , Msg
+        , init
+        , removeCmd
+        , subscriptions
+        , update
+        , view
+        , withState
+        )
 
-import Graph.GraphViz as GraphViz
 import Analyser.State as State exposing (State)
 import Client.Socket exposing (dashboardAddress)
+import Graph
 import Html exposing (Html, div, text)
-import Json.Decode as JD
+import Html.Attributes as Html
+import Json.Decode as JD exposing (Value)
 import Navigation exposing (Location)
 import WebSocket as WS
+
+
+-- port for sending strings out to JavaScript
+
+
+port updateGraph : ( String, Value ) -> Cmd msg
+
+
+port removeGraph : String -> Cmd msg
+
+
+removeCmd : Cmd msg
+removeCmd =
+    removeGraph graphElementId
 
 
 type alias Model =
@@ -39,19 +64,40 @@ update : Location -> Msg -> Model -> ( Model, Cmd Msg )
 update _ msg model =
     case msg of
         NewState state ->
-            withState (Result.toMaybe state) model ! []
+            withState (Result.toMaybe state) model ! [ cmdForResult state ]
+
+
+graphElementId : String
+graphElementId =
+    "sigmaGraph"
+
+
+cmdForResult : Result String State -> Cmd Msg
+cmdForResult result =
+    case result of
+        Err _ ->
+            Cmd.none
+
+        Ok state ->
+            updateGraph ( graphElementId, Graph.encode state.graph )
 
 
 view : Model -> Html Msg
 view m =
     div []
-        [ case m.state of
-            Nothing ->
-                text "Loading..."
-
-            Just state ->
-                if State.isBusy state then
-                    text "Loading..."
-                else
-                    Html.pre [] [ text (GraphViz.string state.graph) ]
+        [ loadingStateLabel m.state
+        , div [ Html.id graphElementId ] []
         ]
+
+
+loadingStateLabel : Maybe State -> Html Msg
+loadingStateLabel maybeState =
+    case maybeState of
+        Nothing ->
+            text "Loading..."
+
+        Just state ->
+            if State.isBusy state then
+                text "Loading..."
+            else
+                text ""
