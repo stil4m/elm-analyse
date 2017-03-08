@@ -13,6 +13,7 @@ const sigmaSettings = {
     maxEdgeSize: 1,
     fontStyle: "bold",
     defaultLabelSize: 16,
+    labelThreshold: 12,
 };
 
 
