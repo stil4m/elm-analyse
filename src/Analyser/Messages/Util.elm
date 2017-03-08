@@ -1,7 +1,7 @@
 module Analyser.Messages.Util exposing (..)
 
-import Analyser.Messages.Types exposing (..)
 import AST.Ranges as Ranges exposing (Range, rangeToString)
+import Analyser.Messages.Types exposing (..)
 
 
 type alias CanFix =
@@ -141,6 +141,17 @@ getMessageInfo m =
         UnreadableSourceFile fileName ->
             ( String.concat
                 [ "Could not parse source file: ", fileName ]
+            , always [ fileName ]
+            , []
+            , True
+            )
+
+        UnnecessaryPortModule fileName ->
+            ( String.concat
+                [ "File  `"
+                , fileName
+                , "` is defined as a `port` module, but is does not declare ports. It may be better to remove these."
+                ]
             , always [ fileName ]
             , []
             , True

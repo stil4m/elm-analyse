@@ -16,6 +16,7 @@ type alias Config context =
     , onImport : Order context Import
     , onFunction : Order context Function
     , onFunctionSignature : Order context FunctionSignature
+    , onPortDeclaration : Order context FunctionSignature
     , onTypeAlias : Order context TypeAlias
     , onDestructuring : Order context Destructuring
     , onExpression : Order context Expression
@@ -35,6 +36,7 @@ defaultConfig =
     { onFile = Continue
     , onImport = Continue
     , onFunction = Continue
+    , onPortDeclaration = Continue
     , onFunctionSignature = Continue
     , onTypeReference = Continue
     , onTypeAlias = Continue
@@ -108,7 +110,7 @@ inspectDeclaration config declaration context =
             inspectType config typeDecl context
 
         PortDeclaration signature ->
-            inspectSignature config signature context
+            inspectPortDeclaration config signature context
 
         InfixDeclaration _ ->
             context
@@ -155,6 +157,15 @@ inspectFunction config function context =
                )
         )
         function
+        context
+
+
+inspectPortDeclaration : Config context -> FunctionSignature -> context -> context
+inspectPortDeclaration config signature context =
+    actionLambda
+        config.onPortDeclaration
+        (inspectSignature config signature)
+        signature
         context
 
 

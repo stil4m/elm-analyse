@@ -19,6 +19,7 @@ import Analyser.Checks.ListOperators as ListOperators
 import Analyser.Checks.LineLength as LineLength
 import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
 import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
+import Analyser.Checks.UnnecessaryPortModule as UnnecessaryPortModule
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Util
 import Analyser.Configuration as Configuration exposing (Configuration)
@@ -42,6 +43,7 @@ checkers =
     , LineLength.checker
     , UnnecessaryListConcat.checker
     , MultiLineRecordFormatting.checker
+    , UnnecessaryPortModule.checker
     ]
 
 
