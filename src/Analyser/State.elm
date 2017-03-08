@@ -3,6 +3,7 @@ module Analyser.State exposing (..)
 import Analyser.Messages.Types exposing (Message, MessageId, MessageStatus(Applicable))
 import Analyser.Messages.Json exposing (encodeMessage, decodeMessage)
 import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing)
+import Graph exposing (Graph)
 import Json.Encode as JE exposing (Value)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
@@ -13,6 +14,7 @@ type alias State =
     , idCount : Int
     , status : Status
     , queue : List Task
+    , graph : Graph
     }
 
 
@@ -32,6 +34,7 @@ initialState =
     , idCount = 0
     , status = Initialising
     , queue = []
+    , graph = Graph.empty
     }
 
 
@@ -103,6 +106,11 @@ finishWithNewMessages messages s =
             |> sortMessages
 
 
+updateGraph : Graph -> State -> State
+updateGraph newGraph s =
+    { s | graph = newGraph }
+
+
 decodeState : Decoder State
 decodeState =
     JD.succeed State
@@ -110,6 +118,7 @@ decodeState =
         |: JD.field "idCount" JD.int
         |: JD.field "status" decodeStatus
         |: JD.field "queue" (JD.list JD.int)
+        |: JD.field "graph" Graph.decode
 
 
 encodeState : State -> Value
@@ -119,6 +128,7 @@ encodeState state =
         , ( "idCount", JE.int state.idCount )
         , ( "status", encodeStatus state.status )
         , ( "queue", JE.list (List.map JE.int state.queue) )
+        , ( "graph", Graph.encode state.graph )
         ]
 
 

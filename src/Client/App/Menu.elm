@@ -26,6 +26,8 @@ view l =
                 [ ul [ class "nav in" ]
                     [ menuItem l "#dashboard" "Dashboard" "dashboard"
                     , menuItem l "#tree" "Tree" "files-o"
+                      -- Pending https://github.com/stil4m/elm-analyse/issues/40:
+                      -- , menuItem l "#dependency-graph" "Dependency graph" "cubes"
                     ]
                 ]
             ]
