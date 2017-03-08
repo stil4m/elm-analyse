@@ -214,6 +214,43 @@ onInterfaceLoadingStageMsg x stage model =
             )
 
 
+finishProcess : SourceLoadingStage.Model -> Cmd SourceLoadingStage.Msg -> Model -> ( Model, Cmd Msg )
+finishProcess newStage cmds model =
+    let
+        loadedSourceFiles =
+            SourceLoadingStage.parsedFiles newStage
+
+        newCodeBase =
+            CodeBase.addSourceFiles loadedSourceFiles model.codeBase
+
+        messages =
+            Inspection.run loadedSourceFiles (CodeBase.dependencies newCodeBase) model.configuration
+
+        newGraph =
+            Graph.run (CodeBase.sourceFiles newCodeBase) (CodeBase.dependencies newCodeBase)
+
+        newState =
+            State.finishWithNewMessages messages model.state
+                |> State.updateGraph newGraph
+
+        newModel =
+            { model
+                | stage = Finished
+                , state = newState
+                , codeBase = newCodeBase
+            }
+    in
+        ( newModel
+        , Cmd.batch
+            [ AnalyserPorts.sendMessagesAsStrings newState.messages
+            , AnalyserPorts.sendMessagesAsJson newState.messages
+            , AnalyserPorts.sendStateAsJson newState
+            , Cmd.map SourceLoadingStageMsg cmds
+            ]
+        )
+            |> handleNextStep
+
+
 onSourceLoadingStageMsg : SourceLoadingStage.Msg -> SourceLoadingStage.Model -> Model -> ( Model, Cmd Msg )
 onSourceLoadingStageMsg x stage model =
     let
@@ -221,38 +258,7 @@ onSourceLoadingStageMsg x stage model =
             SourceLoadingStage.update x stage
     in
         if SourceLoadingStage.isDone newStage then
-            let
-                loadedSourceFiles =
-                    SourceLoadingStage.parsedFiles newStage
-
-                newCodeBase =
-                    CodeBase.addSourceFiles loadedSourceFiles model.codeBase
-
-                messages =
-                    Inspection.run loadedSourceFiles (CodeBase.dependencies newCodeBase) model.configuration
-
-                newGraph =
-                    Graph.run (CodeBase.sourceFiles newCodeBase) (CodeBase.dependencies newCodeBase)
-
-                newState =
-                    State.finishWithNewMessages messages model.state
-                        |> State.updateGraph newGraph
-
-                newModel =
-                    { model
-                        | stage = Finished
-                        , state = newState
-                        , codeBase = newCodeBase
-                    }
-            in
-                ( newModel
-                , Cmd.batch
-                    [ AnalyserPorts.sendMessagesAsStrings newState.messages
-                    , AnalyserPorts.sendMessagesAsJson newState.messages
-                    , AnalyserPorts.sendStateAsJson newState
-                    ]
-                )
-                    |> handleNextStep
+            finishProcess newStage cmds model
         else
             ( { model | stage = SourceLoadingStage newStage }
             , Cmd.map SourceLoadingStageMsg cmds
