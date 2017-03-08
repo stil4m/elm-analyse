@@ -223,7 +223,7 @@ onSourceLoadingStageMsg x stage model =
         if SourceLoadingStage.isDone newStage then
             let
                 loadedSourceFiles =
-                    (SourceLoadingStage.parsedFiles newStage)
+                    SourceLoadingStage.parsedFiles newStage
 
                 newCodeBase =
                     CodeBase.addSourceFiles loadedSourceFiles model.codeBase

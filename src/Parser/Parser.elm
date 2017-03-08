@@ -1,7 +1,7 @@
 module Parser.Parser exposing (parse)
 
 import AST.Types exposing (File)
-import Combine exposing (Parser, (<*), (*>), end, mapError, withLocation, choice)
+import Combine exposing (Parser, (<*), (*>), end, mapError, withLocation)
 import Parser.File exposing (file)
 import Parser.State exposing (State, emptyState)
 
@@ -19,4 +19,4 @@ parse input =
 
 withEnd : Parser State File -> Parser State File
 withEnd p =
-    p <* (withLocation (\s -> end |> mapError (\x -> [ "Could not continue parsing on location " ++ toString ( s.line, s.column ) ])))
+    p <* withLocation (\s -> end |> mapError (\_ -> [ "Could not continue parsing on location " ++ toString ( s.line, s.column ) ]))
