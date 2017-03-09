@@ -49,12 +49,19 @@ run sources deps =
             List.map .identifier nodes
                 |> Set.fromList
 
+        {-
+           Edges to external nodes (i.e. dependencies outside of the scope of
+           this app, such as Core and external packages) must be filtered out
+           in order to create a valid graph (as these dependencies are not
+           represented in the files and hence are missing from the nodes).
+        -}
+        removeEdgesToDependecies =
+            Edge.filterForIdentifiers identifiers
+
         edges =
             List.map edgesInFile files
                 |> List.concat
-                |> -- edges to external node (not included in nodes)
-                   -- must be filtered out to create a valid graph
-                   Edge.filterForIdentifiers identifiers
+                |> removeEdgesToDependecies
     in
         init edges nodes
 
@@ -84,12 +91,9 @@ colors moduleNames =
             topModuleNames
                 |> List.indexedMap
                     (\index name ->
-                        let
-                            color =
-                                List.getAt (index % colorsLength) allColors
-                                    |> Maybe.withDefault Color.fallback
-                        in
-                            ( name, color )
+                        List.getAt (index % colorsLength) allColors
+                            |> Maybe.withDefault Color.fallback
+                            |> (,) name
                     )
     in
         Dict.fromList colorsForModuleNames
