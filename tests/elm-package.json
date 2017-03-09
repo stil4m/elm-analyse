@@ -18,6 +18,7 @@
         "elm-community/result-extra": "2.2.0 <= v < 3.0.0",
         "elm-lang/core": "5.1.1 <= v < 6.0.0",
         "elm-lang/html": "2.0.0 <= v < 3.0.0",
+        "iosphere/elm-network-graph": "1.2.0 <= v < 2.0.0",
         "mgold/elm-random-pcg": "4.0.2 <= v < 5.0.0",
         "rtfeldman/hex": "1.0.0 <= v < 2.0.0",
         "rtfeldman/node-test-runner": "3.0.0 <= v < 4.0.0"

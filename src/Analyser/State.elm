@@ -4,6 +4,8 @@ import Analyser.Messages.Types exposing (Message, MessageId, MessageStatus(Appli
 import Analyser.Messages.Json exposing (encodeMessage, decodeMessage)
 import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing)
 import Graph exposing (Graph)
+import Graph.Json as Graph
+import Graph.Node exposing (Node)
 import Json.Encode as JE exposing (Value)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
@@ -14,7 +16,7 @@ type alias State =
     , idCount : Int
     , status : Status
     , queue : List Task
-    , graph : Graph
+    , graph : Graph Node
     }
 
 
@@ -106,7 +108,7 @@ finishWithNewMessages messages s =
             |> sortMessages
 
 
-updateGraph : Graph -> State -> State
+updateGraph : Graph Node -> State -> State
 updateGraph newGraph s =
     { s | graph = newGraph }
 
