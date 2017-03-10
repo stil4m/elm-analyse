@@ -8612,6 +8612,1205 @@ var _elm_community$json_extra$Json_Decode_Extra$andMap = _elm_lang$core$Json_Dec
 var _elm_community$json_extra$Json_Decode_Extra_ops = _elm_community$json_extra$Json_Decode_Extra_ops || {};
 _elm_community$json_extra$Json_Decode_Extra_ops['|:'] = _elm_lang$core$Basics$flip(_elm_community$json_extra$Json_Decode_Extra$andMap);
 
+var _elm_community$list_extra$List_Extra$greedyGroupsOfWithStep = F3(
+	function (size, step, xs) {
+		var okayXs = _elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$List$length(xs),
+			0) > 0;
+		var okayArgs = (_elm_lang$core$Native_Utils.cmp(size, 0) > 0) && (_elm_lang$core$Native_Utils.cmp(step, 0) > 0);
+		var xs_ = A2(_elm_lang$core$List$drop, step, xs);
+		var group = A2(_elm_lang$core$List$take, size, xs);
+		return (okayArgs && okayXs) ? {
+			ctor: '::',
+			_0: group,
+			_1: A3(_elm_community$list_extra$List_Extra$greedyGroupsOfWithStep, size, step, xs_)
+		} : {ctor: '[]'};
+	});
+var _elm_community$list_extra$List_Extra$greedyGroupsOf = F2(
+	function (size, xs) {
+		return A3(_elm_community$list_extra$List_Extra$greedyGroupsOfWithStep, size, size, xs);
+	});
+var _elm_community$list_extra$List_Extra$groupsOfWithStep = F3(
+	function (size, step, xs) {
+		var okayArgs = (_elm_lang$core$Native_Utils.cmp(size, 0) > 0) && (_elm_lang$core$Native_Utils.cmp(step, 0) > 0);
+		var xs_ = A2(_elm_lang$core$List$drop, step, xs);
+		var group = A2(_elm_lang$core$List$take, size, xs);
+		var okayLength = _elm_lang$core$Native_Utils.eq(
+			size,
+			_elm_lang$core$List$length(group));
+		return (okayArgs && okayLength) ? {
+			ctor: '::',
+			_0: group,
+			_1: A3(_elm_community$list_extra$List_Extra$groupsOfWithStep, size, step, xs_)
+		} : {ctor: '[]'};
+	});
+var _elm_community$list_extra$List_Extra$groupsOf = F2(
+	function (size, xs) {
+		return A3(_elm_community$list_extra$List_Extra$groupsOfWithStep, size, size, xs);
+	});
+var _elm_community$list_extra$List_Extra$zip5 = _elm_lang$core$List$map5(
+	F5(
+		function (v0, v1, v2, v3, v4) {
+			return {ctor: '_Tuple5', _0: v0, _1: v1, _2: v2, _3: v3, _4: v4};
+		}));
+var _elm_community$list_extra$List_Extra$zip4 = _elm_lang$core$List$map4(
+	F4(
+		function (v0, v1, v2, v3) {
+			return {ctor: '_Tuple4', _0: v0, _1: v1, _2: v2, _3: v3};
+		}));
+var _elm_community$list_extra$List_Extra$zip3 = _elm_lang$core$List$map3(
+	F3(
+		function (v0, v1, v2) {
+			return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
+		}));
+var _elm_community$list_extra$List_Extra$zip = _elm_lang$core$List$map2(
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}));
+var _elm_community$list_extra$List_Extra$isPrefixOf = F2(
+	function (prefix, xs) {
+		var _p0 = {ctor: '_Tuple2', _0: prefix, _1: xs};
+		if (_p0._0.ctor === '[]') {
+			return true;
+		} else {
+			if (_p0._1.ctor === '[]') {
+				return false;
+			} else {
+				return _elm_lang$core$Native_Utils.eq(_p0._0._0, _p0._1._0) && A2(_elm_community$list_extra$List_Extra$isPrefixOf, _p0._0._1, _p0._1._1);
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$isSuffixOf = F2(
+	function (suffix, xs) {
+		return A2(
+			_elm_community$list_extra$List_Extra$isPrefixOf,
+			_elm_lang$core$List$reverse(suffix),
+			_elm_lang$core$List$reverse(xs));
+	});
+var _elm_community$list_extra$List_Extra$selectSplit = function (xs) {
+	var _p1 = xs;
+	if (_p1.ctor === '[]') {
+		return {ctor: '[]'};
+	} else {
+		var _p5 = _p1._1;
+		var _p4 = _p1._0;
+		return {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple3',
+				_0: {ctor: '[]'},
+				_1: _p4,
+				_2: _p5
+			},
+			_1: A2(
+				_elm_lang$core$List$map,
+				function (_p2) {
+					var _p3 = _p2;
+					return {
+						ctor: '_Tuple3',
+						_0: {ctor: '::', _0: _p4, _1: _p3._0},
+						_1: _p3._1,
+						_2: _p3._2
+					};
+				},
+				_elm_community$list_extra$List_Extra$selectSplit(_p5))
+		};
+	}
+};
+var _elm_community$list_extra$List_Extra$select = function (xs) {
+	var _p6 = xs;
+	if (_p6.ctor === '[]') {
+		return {ctor: '[]'};
+	} else {
+		var _p10 = _p6._1;
+		var _p9 = _p6._0;
+		return {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: _p9, _1: _p10},
+			_1: A2(
+				_elm_lang$core$List$map,
+				function (_p7) {
+					var _p8 = _p7;
+					return {
+						ctor: '_Tuple2',
+						_0: _p8._0,
+						_1: {ctor: '::', _0: _p9, _1: _p8._1}
+					};
+				},
+				_elm_community$list_extra$List_Extra$select(_p10))
+		};
+	}
+};
+var _elm_community$list_extra$List_Extra$tailsHelp = F2(
+	function (e, list) {
+		var _p11 = list;
+		if (_p11.ctor === '::') {
+			var _p12 = _p11._0;
+			return {
+				ctor: '::',
+				_0: {ctor: '::', _0: e, _1: _p12},
+				_1: {ctor: '::', _0: _p12, _1: _p11._1}
+			};
+		} else {
+			return {ctor: '[]'};
+		}
+	});
+var _elm_community$list_extra$List_Extra$tails = A2(
+	_elm_lang$core$List$foldr,
+	_elm_community$list_extra$List_Extra$tailsHelp,
+	{
+		ctor: '::',
+		_0: {ctor: '[]'},
+		_1: {ctor: '[]'}
+	});
+var _elm_community$list_extra$List_Extra$isInfixOf = F2(
+	function (infix, xs) {
+		return A2(
+			_elm_lang$core$List$any,
+			_elm_community$list_extra$List_Extra$isPrefixOf(infix),
+			_elm_community$list_extra$List_Extra$tails(xs));
+	});
+var _elm_community$list_extra$List_Extra$inits = A2(
+	_elm_lang$core$List$foldr,
+	F2(
+		function (e, acc) {
+			return {
+				ctor: '::',
+				_0: {ctor: '[]'},
+				_1: A2(
+					_elm_lang$core$List$map,
+					F2(
+						function (x, y) {
+							return {ctor: '::', _0: x, _1: y};
+						})(e),
+					acc)
+			};
+		}),
+	{
+		ctor: '::',
+		_0: {ctor: '[]'},
+		_1: {ctor: '[]'}
+	});
+var _elm_community$list_extra$List_Extra$groupWhileTransitively = F2(
+	function (cmp, xs_) {
+		var _p13 = xs_;
+		if (_p13.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			if (_p13._1.ctor === '[]') {
+				return {
+					ctor: '::',
+					_0: {
+						ctor: '::',
+						_0: _p13._0,
+						_1: {ctor: '[]'}
+					},
+					_1: {ctor: '[]'}
+				};
+			} else {
+				var _p15 = _p13._0;
+				var _p14 = A2(_elm_community$list_extra$List_Extra$groupWhileTransitively, cmp, _p13._1);
+				if (_p14.ctor === '::') {
+					return A2(cmp, _p15, _p13._1._0) ? {
+						ctor: '::',
+						_0: {ctor: '::', _0: _p15, _1: _p14._0},
+						_1: _p14._1
+					} : {
+						ctor: '::',
+						_0: {
+							ctor: '::',
+							_0: _p15,
+							_1: {ctor: '[]'}
+						},
+						_1: _p14
+					};
+				} else {
+					return {ctor: '[]'};
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$stripPrefix = F2(
+	function (prefix, xs) {
+		var step = F2(
+			function (e, m) {
+				var _p16 = m;
+				if (_p16.ctor === 'Nothing') {
+					return _elm_lang$core$Maybe$Nothing;
+				} else {
+					if (_p16._0.ctor === '[]') {
+						return _elm_lang$core$Maybe$Nothing;
+					} else {
+						return _elm_lang$core$Native_Utils.eq(e, _p16._0._0) ? _elm_lang$core$Maybe$Just(_p16._0._1) : _elm_lang$core$Maybe$Nothing;
+					}
+				}
+			});
+		return A3(
+			_elm_lang$core$List$foldl,
+			step,
+			_elm_lang$core$Maybe$Just(xs),
+			prefix);
+	});
+var _elm_community$list_extra$List_Extra$dropWhileRight = function (p) {
+	return A2(
+		_elm_lang$core$List$foldr,
+		F2(
+			function (x, xs) {
+				return (p(x) && _elm_lang$core$List$isEmpty(xs)) ? {ctor: '[]'} : {ctor: '::', _0: x, _1: xs};
+			}),
+		{ctor: '[]'});
+};
+var _elm_community$list_extra$List_Extra$takeWhileRight = function (p) {
+	var step = F2(
+		function (x, _p17) {
+			var _p18 = _p17;
+			var _p19 = _p18._0;
+			return (p(x) && _p18._1) ? {
+				ctor: '_Tuple2',
+				_0: {ctor: '::', _0: x, _1: _p19},
+				_1: true
+			} : {ctor: '_Tuple2', _0: _p19, _1: false};
+		});
+	return function (_p20) {
+		return _elm_lang$core$Tuple$first(
+			A3(
+				_elm_lang$core$List$foldr,
+				step,
+				{
+					ctor: '_Tuple2',
+					_0: {ctor: '[]'},
+					_1: true
+				},
+				_p20));
+	};
+};
+var _elm_community$list_extra$List_Extra$splitAt = F2(
+	function (n, xs) {
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_elm_lang$core$List$take, n, xs),
+			_1: A2(_elm_lang$core$List$drop, n, xs)
+		};
+	});
+var _elm_community$list_extra$List_Extra$groupsOfVarying_ = F3(
+	function (listOflengths, list, accu) {
+		groupsOfVarying_:
+		while (true) {
+			var _p21 = {ctor: '_Tuple2', _0: listOflengths, _1: list};
+			if (((_p21.ctor === '_Tuple2') && (_p21._0.ctor === '::')) && (_p21._1.ctor === '::')) {
+				var _p22 = A2(_elm_community$list_extra$List_Extra$splitAt, _p21._0._0, list);
+				var head = _p22._0;
+				var tail = _p22._1;
+				var _v11 = _p21._0._1,
+					_v12 = tail,
+					_v13 = {ctor: '::', _0: head, _1: accu};
+				listOflengths = _v11;
+				list = _v12;
+				accu = _v13;
+				continue groupsOfVarying_;
+			} else {
+				return _elm_lang$core$List$reverse(accu);
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$groupsOfVarying = F2(
+	function (listOflengths, list) {
+		return A3(
+			_elm_community$list_extra$List_Extra$groupsOfVarying_,
+			listOflengths,
+			list,
+			{ctor: '[]'});
+	});
+var _elm_community$list_extra$List_Extra$unfoldr = F2(
+	function (f, seed) {
+		var _p23 = f(seed);
+		if (_p23.ctor === 'Nothing') {
+			return {ctor: '[]'};
+		} else {
+			return {
+				ctor: '::',
+				_0: _p23._0._0,
+				_1: A2(_elm_community$list_extra$List_Extra$unfoldr, f, _p23._0._1)
+			};
+		}
+	});
+var _elm_community$list_extra$List_Extra$scanr1 = F2(
+	function (f, xs_) {
+		var _p24 = xs_;
+		if (_p24.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			if (_p24._1.ctor === '[]') {
+				return {
+					ctor: '::',
+					_0: _p24._0,
+					_1: {ctor: '[]'}
+				};
+			} else {
+				var _p25 = A2(_elm_community$list_extra$List_Extra$scanr1, f, _p24._1);
+				if (_p25.ctor === '::') {
+					return {
+						ctor: '::',
+						_0: A2(f, _p24._0, _p25._0),
+						_1: _p25
+					};
+				} else {
+					return {ctor: '[]'};
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$scanr = F3(
+	function (f, acc, xs_) {
+		var _p26 = xs_;
+		if (_p26.ctor === '[]') {
+			return {
+				ctor: '::',
+				_0: acc,
+				_1: {ctor: '[]'}
+			};
+		} else {
+			var _p27 = A3(_elm_community$list_extra$List_Extra$scanr, f, acc, _p26._1);
+			if (_p27.ctor === '::') {
+				return {
+					ctor: '::',
+					_0: A2(f, _p26._0, _p27._0),
+					_1: _p27
+				};
+			} else {
+				return {ctor: '[]'};
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$scanl1 = F2(
+	function (f, xs_) {
+		var _p28 = xs_;
+		if (_p28.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			return A3(_elm_lang$core$List$scanl, f, _p28._0, _p28._1);
+		}
+	});
+var _elm_community$list_extra$List_Extra$indexedFoldr = F3(
+	function (func, acc, list) {
+		var step = F2(
+			function (x, _p29) {
+				var _p30 = _p29;
+				var _p31 = _p30._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _p31 - 1,
+					_1: A3(func, _p31, x, _p30._1)
+				};
+			});
+		return _elm_lang$core$Tuple$second(
+			A3(
+				_elm_lang$core$List$foldr,
+				step,
+				{
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$List$length(list) - 1,
+					_1: acc
+				},
+				list));
+	});
+var _elm_community$list_extra$List_Extra$indexedFoldl = F3(
+	function (func, acc, list) {
+		var step = F2(
+			function (x, _p32) {
+				var _p33 = _p32;
+				var _p34 = _p33._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _p34 + 1,
+					_1: A3(func, _p34, x, _p33._1)
+				};
+			});
+		return _elm_lang$core$Tuple$second(
+			A3(
+				_elm_lang$core$List$foldl,
+				step,
+				{ctor: '_Tuple2', _0: 0, _1: acc},
+				list));
+	});
+var _elm_community$list_extra$List_Extra$foldr1 = F2(
+	function (f, xs) {
+		var mf = F2(
+			function (x, m) {
+				return _elm_lang$core$Maybe$Just(
+					function () {
+						var _p35 = m;
+						if (_p35.ctor === 'Nothing') {
+							return x;
+						} else {
+							return A2(f, x, _p35._0);
+						}
+					}());
+			});
+		return A3(_elm_lang$core$List$foldr, mf, _elm_lang$core$Maybe$Nothing, xs);
+	});
+var _elm_community$list_extra$List_Extra$foldl1 = F2(
+	function (f, xs) {
+		var mf = F2(
+			function (x, m) {
+				return _elm_lang$core$Maybe$Just(
+					function () {
+						var _p36 = m;
+						if (_p36.ctor === 'Nothing') {
+							return x;
+						} else {
+							return A2(f, _p36._0, x);
+						}
+					}());
+			});
+		return A3(_elm_lang$core$List$foldl, mf, _elm_lang$core$Maybe$Nothing, xs);
+	});
+var _elm_community$list_extra$List_Extra$interweaveHelp = F3(
+	function (l1, l2, acc) {
+		interweaveHelp:
+		while (true) {
+			var _p37 = {ctor: '_Tuple2', _0: l1, _1: l2};
+			_v24_1:
+			do {
+				if (_p37._0.ctor === '::') {
+					if (_p37._1.ctor === '::') {
+						var _v25 = _p37._0._1,
+							_v26 = _p37._1._1,
+							_v27 = A2(
+							_elm_lang$core$Basics_ops['++'],
+							acc,
+							{
+								ctor: '::',
+								_0: _p37._0._0,
+								_1: {
+									ctor: '::',
+									_0: _p37._1._0,
+									_1: {ctor: '[]'}
+								}
+							});
+						l1 = _v25;
+						l2 = _v26;
+						acc = _v27;
+						continue interweaveHelp;
+					} else {
+						break _v24_1;
+					}
+				} else {
+					if (_p37._1.ctor === '[]') {
+						break _v24_1;
+					} else {
+						return A2(_elm_lang$core$Basics_ops['++'], acc, _p37._1);
+					}
+				}
+			} while(false);
+			return A2(_elm_lang$core$Basics_ops['++'], acc, _p37._0);
+		}
+	});
+var _elm_community$list_extra$List_Extra$interweave = F2(
+	function (l1, l2) {
+		return A3(
+			_elm_community$list_extra$List_Extra$interweaveHelp,
+			l1,
+			l2,
+			{ctor: '[]'});
+	});
+var _elm_community$list_extra$List_Extra$permutations = function (xs_) {
+	var _p38 = xs_;
+	if (_p38.ctor === '[]') {
+		return {
+			ctor: '::',
+			_0: {ctor: '[]'},
+			_1: {ctor: '[]'}
+		};
+	} else {
+		var f = function (_p39) {
+			var _p40 = _p39;
+			return A2(
+				_elm_lang$core$List$map,
+				F2(
+					function (x, y) {
+						return {ctor: '::', _0: x, _1: y};
+					})(_p40._0),
+				_elm_community$list_extra$List_Extra$permutations(_p40._1));
+		};
+		return A2(
+			_elm_lang$core$List$concatMap,
+			f,
+			_elm_community$list_extra$List_Extra$select(_p38));
+	}
+};
+var _elm_community$list_extra$List_Extra$isPermutationOf = F2(
+	function (permut, xs) {
+		return A2(
+			_elm_lang$core$List$member,
+			permut,
+			_elm_community$list_extra$List_Extra$permutations(xs));
+	});
+var _elm_community$list_extra$List_Extra$subsequencesNonEmpty = function (xs) {
+	var _p41 = xs;
+	if (_p41.ctor === '[]') {
+		return {ctor: '[]'};
+	} else {
+		var _p42 = _p41._0;
+		var f = F2(
+			function (ys, r) {
+				return {
+					ctor: '::',
+					_0: ys,
+					_1: {
+						ctor: '::',
+						_0: {ctor: '::', _0: _p42, _1: ys},
+						_1: r
+					}
+				};
+			});
+		return {
+			ctor: '::',
+			_0: {
+				ctor: '::',
+				_0: _p42,
+				_1: {ctor: '[]'}
+			},
+			_1: A3(
+				_elm_lang$core$List$foldr,
+				f,
+				{ctor: '[]'},
+				_elm_community$list_extra$List_Extra$subsequencesNonEmpty(_p41._1))
+		};
+	}
+};
+var _elm_community$list_extra$List_Extra$subsequences = function (xs) {
+	return {
+		ctor: '::',
+		_0: {ctor: '[]'},
+		_1: _elm_community$list_extra$List_Extra$subsequencesNonEmpty(xs)
+	};
+};
+var _elm_community$list_extra$List_Extra$isSubsequenceOf = F2(
+	function (subseq, xs) {
+		return A2(
+			_elm_lang$core$List$member,
+			subseq,
+			_elm_community$list_extra$List_Extra$subsequences(xs));
+	});
+var _elm_community$list_extra$List_Extra$transpose = function (ll) {
+	transpose:
+	while (true) {
+		var _p43 = ll;
+		if (_p43.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			if (_p43._0.ctor === '[]') {
+				var _v32 = _p43._1;
+				ll = _v32;
+				continue transpose;
+			} else {
+				var _p44 = _p43._1;
+				var tails = A2(_elm_lang$core$List$filterMap, _elm_lang$core$List$tail, _p44);
+				var heads = A2(_elm_lang$core$List$filterMap, _elm_lang$core$List$head, _p44);
+				return {
+					ctor: '::',
+					_0: {ctor: '::', _0: _p43._0._0, _1: heads},
+					_1: _elm_community$list_extra$List_Extra$transpose(
+						{ctor: '::', _0: _p43._0._1, _1: tails})
+				};
+			}
+		}
+	}
+};
+var _elm_community$list_extra$List_Extra$intercalate = function (xs) {
+	return function (_p45) {
+		return _elm_lang$core$List$concat(
+			A2(_elm_lang$core$List$intersperse, xs, _p45));
+	};
+};
+var _elm_community$list_extra$List_Extra$filterNot = F2(
+	function (pred, list) {
+		return A2(
+			_elm_lang$core$List$filter,
+			function (_p46) {
+				return !pred(_p46);
+			},
+			list);
+	});
+var _elm_community$list_extra$List_Extra$removeAt = F2(
+	function (index, l) {
+		if (_elm_lang$core$Native_Utils.cmp(index, 0) < 0) {
+			return l;
+		} else {
+			var tail = _elm_lang$core$List$tail(
+				A2(_elm_lang$core$List$drop, index, l));
+			var head = A2(_elm_lang$core$List$take, index, l);
+			var _p47 = tail;
+			if (_p47.ctor === 'Nothing') {
+				return l;
+			} else {
+				return A2(_elm_lang$core$List$append, head, _p47._0);
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$stableSortWith = F2(
+	function (pred, list) {
+		var predWithIndex = F2(
+			function (_p49, _p48) {
+				var _p50 = _p49;
+				var _p51 = _p48;
+				var result = A2(pred, _p50._0, _p51._0);
+				var _p52 = result;
+				if (_p52.ctor === 'EQ') {
+					return A2(_elm_lang$core$Basics$compare, _p50._1, _p51._1);
+				} else {
+					return result;
+				}
+			});
+		var listWithIndex = A2(
+			_elm_lang$core$List$indexedMap,
+			F2(
+				function (i, a) {
+					return {ctor: '_Tuple2', _0: a, _1: i};
+				}),
+			list);
+		return A2(
+			_elm_lang$core$List$map,
+			_elm_lang$core$Tuple$first,
+			A2(_elm_lang$core$List$sortWith, predWithIndex, listWithIndex));
+	});
+var _elm_community$list_extra$List_Extra$setAt = F3(
+	function (index, value, l) {
+		if (_elm_lang$core$Native_Utils.cmp(index, 0) < 0) {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			var tail = _elm_lang$core$List$tail(
+				A2(_elm_lang$core$List$drop, index, l));
+			var head = A2(_elm_lang$core$List$take, index, l);
+			var _p53 = tail;
+			if (_p53.ctor === 'Nothing') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				return _elm_lang$core$Maybe$Just(
+					A2(
+						_elm_lang$core$List$append,
+						head,
+						{ctor: '::', _0: value, _1: _p53._0}));
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$remove = F2(
+	function (x, xs) {
+		var _p54 = xs;
+		if (_p54.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			var _p56 = _p54._1;
+			var _p55 = _p54._0;
+			return _elm_lang$core$Native_Utils.eq(x, _p55) ? _p56 : {
+				ctor: '::',
+				_0: _p55,
+				_1: A2(_elm_community$list_extra$List_Extra$remove, x, _p56)
+			};
+		}
+	});
+var _elm_community$list_extra$List_Extra$updateIfIndex = F3(
+	function (predicate, update, list) {
+		return A2(
+			_elm_lang$core$List$indexedMap,
+			F2(
+				function (i, x) {
+					return predicate(i) ? update(x) : x;
+				}),
+			list);
+	});
+var _elm_community$list_extra$List_Extra$updateAt = F3(
+	function (index, update, list) {
+		return ((_elm_lang$core$Native_Utils.cmp(index, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(
+			index,
+			_elm_lang$core$List$length(list)) > -1)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+			A3(
+				_elm_community$list_extra$List_Extra$updateIfIndex,
+				F2(
+					function (x, y) {
+						return _elm_lang$core$Native_Utils.eq(x, y);
+					})(index),
+				update,
+				list));
+	});
+var _elm_community$list_extra$List_Extra$updateIf = F3(
+	function (predicate, update, list) {
+		return A2(
+			_elm_lang$core$List$map,
+			function (item) {
+				return predicate(item) ? update(item) : item;
+			},
+			list);
+	});
+var _elm_community$list_extra$List_Extra$replaceIf = F3(
+	function (predicate, replacement, list) {
+		return A3(
+			_elm_community$list_extra$List_Extra$updateIf,
+			predicate,
+			_elm_lang$core$Basics$always(replacement),
+			list);
+	});
+var _elm_community$list_extra$List_Extra$findIndices = function (p) {
+	return function (_p57) {
+		return A2(
+			_elm_lang$core$List$map,
+			_elm_lang$core$Tuple$first,
+			A2(
+				_elm_lang$core$List$filter,
+				function (_p58) {
+					var _p59 = _p58;
+					return p(_p59._1);
+				},
+				A2(
+					_elm_lang$core$List$indexedMap,
+					F2(
+						function (v0, v1) {
+							return {ctor: '_Tuple2', _0: v0, _1: v1};
+						}),
+					_p57)));
+	};
+};
+var _elm_community$list_extra$List_Extra$findIndex = function (p) {
+	return function (_p60) {
+		return _elm_lang$core$List$head(
+			A2(_elm_community$list_extra$List_Extra$findIndices, p, _p60));
+	};
+};
+var _elm_community$list_extra$List_Extra$elemIndices = function (x) {
+	return _elm_community$list_extra$List_Extra$findIndices(
+		F2(
+			function (x, y) {
+				return _elm_lang$core$Native_Utils.eq(x, y);
+			})(x));
+};
+var _elm_community$list_extra$List_Extra$elemIndex = function (x) {
+	return _elm_community$list_extra$List_Extra$findIndex(
+		F2(
+			function (x, y) {
+				return _elm_lang$core$Native_Utils.eq(x, y);
+			})(x));
+};
+var _elm_community$list_extra$List_Extra$find = F2(
+	function (predicate, list) {
+		find:
+		while (true) {
+			var _p61 = list;
+			if (_p61.ctor === '[]') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				var _p62 = _p61._0;
+				if (predicate(_p62)) {
+					return _elm_lang$core$Maybe$Just(_p62);
+				} else {
+					var _v41 = predicate,
+						_v42 = _p61._1;
+					predicate = _v41;
+					list = _v42;
+					continue find;
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$notMember = function (x) {
+	return function (_p63) {
+		return !A2(_elm_lang$core$List$member, x, _p63);
+	};
+};
+var _elm_community$list_extra$List_Extra$andThen = _elm_lang$core$List$concatMap;
+var _elm_community$list_extra$List_Extra$lift2 = F3(
+	function (f, la, lb) {
+		return A2(
+			_elm_community$list_extra$List_Extra$andThen,
+			function (a) {
+				return A2(
+					_elm_community$list_extra$List_Extra$andThen,
+					function (b) {
+						return {
+							ctor: '::',
+							_0: A2(f, a, b),
+							_1: {ctor: '[]'}
+						};
+					},
+					lb);
+			},
+			la);
+	});
+var _elm_community$list_extra$List_Extra$lift3 = F4(
+	function (f, la, lb, lc) {
+		return A2(
+			_elm_community$list_extra$List_Extra$andThen,
+			function (a) {
+				return A2(
+					_elm_community$list_extra$List_Extra$andThen,
+					function (b) {
+						return A2(
+							_elm_community$list_extra$List_Extra$andThen,
+							function (c) {
+								return {
+									ctor: '::',
+									_0: A3(f, a, b, c),
+									_1: {ctor: '[]'}
+								};
+							},
+							lc);
+					},
+					lb);
+			},
+			la);
+	});
+var _elm_community$list_extra$List_Extra$lift4 = F5(
+	function (f, la, lb, lc, ld) {
+		return A2(
+			_elm_community$list_extra$List_Extra$andThen,
+			function (a) {
+				return A2(
+					_elm_community$list_extra$List_Extra$andThen,
+					function (b) {
+						return A2(
+							_elm_community$list_extra$List_Extra$andThen,
+							function (c) {
+								return A2(
+									_elm_community$list_extra$List_Extra$andThen,
+									function (d) {
+										return {
+											ctor: '::',
+											_0: A4(f, a, b, c, d),
+											_1: {ctor: '[]'}
+										};
+									},
+									ld);
+							},
+							lc);
+					},
+					lb);
+			},
+			la);
+	});
+var _elm_community$list_extra$List_Extra$andMap = F2(
+	function (l, fl) {
+		return A3(
+			_elm_lang$core$List$map2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			fl,
+			l);
+	});
+var _elm_community$list_extra$List_Extra$uniqueHelp = F3(
+	function (f, existing, remaining) {
+		uniqueHelp:
+		while (true) {
+			var _p64 = remaining;
+			if (_p64.ctor === '[]') {
+				return {ctor: '[]'};
+			} else {
+				var _p66 = _p64._1;
+				var _p65 = _p64._0;
+				var computedFirst = f(_p65);
+				if (A2(_elm_lang$core$Set$member, computedFirst, existing)) {
+					var _v44 = f,
+						_v45 = existing,
+						_v46 = _p66;
+					f = _v44;
+					existing = _v45;
+					remaining = _v46;
+					continue uniqueHelp;
+				} else {
+					return {
+						ctor: '::',
+						_0: _p65,
+						_1: A3(
+							_elm_community$list_extra$List_Extra$uniqueHelp,
+							f,
+							A2(_elm_lang$core$Set$insert, computedFirst, existing),
+							_p66)
+					};
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$uniqueBy = F2(
+	function (f, list) {
+		return A3(_elm_community$list_extra$List_Extra$uniqueHelp, f, _elm_lang$core$Set$empty, list);
+	});
+var _elm_community$list_extra$List_Extra$allDifferentBy = F2(
+	function (f, list) {
+		return _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$List$length(list),
+			_elm_lang$core$List$length(
+				A2(_elm_community$list_extra$List_Extra$uniqueBy, f, list)));
+	});
+var _elm_community$list_extra$List_Extra$allDifferent = function (list) {
+	return A2(_elm_community$list_extra$List_Extra$allDifferentBy, _elm_lang$core$Basics$identity, list);
+};
+var _elm_community$list_extra$List_Extra$unique = function (list) {
+	return A3(_elm_community$list_extra$List_Extra$uniqueHelp, _elm_lang$core$Basics$identity, _elm_lang$core$Set$empty, list);
+};
+var _elm_community$list_extra$List_Extra$dropWhile = F2(
+	function (predicate, list) {
+		dropWhile:
+		while (true) {
+			var _p67 = list;
+			if (_p67.ctor === '[]') {
+				return {ctor: '[]'};
+			} else {
+				if (predicate(_p67._0)) {
+					var _v48 = predicate,
+						_v49 = _p67._1;
+					predicate = _v48;
+					list = _v49;
+					continue dropWhile;
+				} else {
+					return list;
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$takeWhile = function (predicate) {
+	var takeWhileMemo = F2(
+		function (memo, list) {
+			takeWhileMemo:
+			while (true) {
+				var _p68 = list;
+				if (_p68.ctor === '[]') {
+					return _elm_lang$core$List$reverse(memo);
+				} else {
+					var _p69 = _p68._0;
+					if (predicate(_p69)) {
+						var _v51 = {ctor: '::', _0: _p69, _1: memo},
+							_v52 = _p68._1;
+						memo = _v51;
+						list = _v52;
+						continue takeWhileMemo;
+					} else {
+						return _elm_lang$core$List$reverse(memo);
+					}
+				}
+			}
+		});
+	return takeWhileMemo(
+		{ctor: '[]'});
+};
+var _elm_community$list_extra$List_Extra$span = F2(
+	function (p, xs) {
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_elm_community$list_extra$List_Extra$takeWhile, p, xs),
+			_1: A2(_elm_community$list_extra$List_Extra$dropWhile, p, xs)
+		};
+	});
+var _elm_community$list_extra$List_Extra$break = function (p) {
+	return _elm_community$list_extra$List_Extra$span(
+		function (_p70) {
+			return !p(_p70);
+		});
+};
+var _elm_community$list_extra$List_Extra$groupWhile = F2(
+	function (eq, xs_) {
+		var _p71 = xs_;
+		if (_p71.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			var _p73 = _p71._0;
+			var _p72 = A2(
+				_elm_community$list_extra$List_Extra$span,
+				eq(_p73),
+				_p71._1);
+			var ys = _p72._0;
+			var zs = _p72._1;
+			return {
+				ctor: '::',
+				_0: {ctor: '::', _0: _p73, _1: ys},
+				_1: A2(_elm_community$list_extra$List_Extra$groupWhile, eq, zs)
+			};
+		}
+	});
+var _elm_community$list_extra$List_Extra$group = _elm_community$list_extra$List_Extra$groupWhile(
+	F2(
+		function (x, y) {
+			return _elm_lang$core$Native_Utils.eq(x, y);
+		}));
+var _elm_community$list_extra$List_Extra$minimumBy = F2(
+	function (f, ls) {
+		var minBy = F2(
+			function (x, _p74) {
+				var _p75 = _p74;
+				var _p76 = _p75._1;
+				var fx = f(x);
+				return (_elm_lang$core$Native_Utils.cmp(fx, _p76) < 0) ? {ctor: '_Tuple2', _0: x, _1: fx} : {ctor: '_Tuple2', _0: _p75._0, _1: _p76};
+			});
+		var _p77 = ls;
+		if (_p77.ctor === '::') {
+			if (_p77._1.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p77._0);
+			} else {
+				var _p78 = _p77._0;
+				return _elm_lang$core$Maybe$Just(
+					_elm_lang$core$Tuple$first(
+						A3(
+							_elm_lang$core$List$foldl,
+							minBy,
+							{
+								ctor: '_Tuple2',
+								_0: _p78,
+								_1: f(_p78)
+							},
+							_p77._1)));
+			}
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_community$list_extra$List_Extra$maximumBy = F2(
+	function (f, ls) {
+		var maxBy = F2(
+			function (x, _p79) {
+				var _p80 = _p79;
+				var _p81 = _p80._1;
+				var fx = f(x);
+				return (_elm_lang$core$Native_Utils.cmp(fx, _p81) > 0) ? {ctor: '_Tuple2', _0: x, _1: fx} : {ctor: '_Tuple2', _0: _p80._0, _1: _p81};
+			});
+		var _p82 = ls;
+		if (_p82.ctor === '::') {
+			if (_p82._1.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p82._0);
+			} else {
+				var _p83 = _p82._0;
+				return _elm_lang$core$Maybe$Just(
+					_elm_lang$core$Tuple$first(
+						A3(
+							_elm_lang$core$List$foldl,
+							maxBy,
+							{
+								ctor: '_Tuple2',
+								_0: _p83,
+								_1: f(_p83)
+							},
+							_p82._1)));
+			}
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_community$list_extra$List_Extra$uncons = function (xs) {
+	var _p84 = xs;
+	if (_p84.ctor === '[]') {
+		return _elm_lang$core$Maybe$Nothing;
+	} else {
+		return _elm_lang$core$Maybe$Just(
+			{ctor: '_Tuple2', _0: _p84._0, _1: _p84._1});
+	}
+};
+var _elm_community$list_extra$List_Extra$swapAt = F3(
+	function (index1, index2, l) {
+		swapAt:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.eq(index1, index2)) {
+				return _elm_lang$core$Maybe$Just(l);
+			} else {
+				if (_elm_lang$core$Native_Utils.cmp(index1, index2) > 0) {
+					var _v59 = index2,
+						_v60 = index1,
+						_v61 = l;
+					index1 = _v59;
+					index2 = _v60;
+					l = _v61;
+					continue swapAt;
+				} else {
+					if (_elm_lang$core$Native_Utils.cmp(index1, 0) < 0) {
+						return _elm_lang$core$Maybe$Nothing;
+					} else {
+						var _p85 = A2(_elm_community$list_extra$List_Extra$splitAt, index1, l);
+						var part1 = _p85._0;
+						var tail1 = _p85._1;
+						var _p86 = A2(_elm_community$list_extra$List_Extra$splitAt, index2 - index1, tail1);
+						var head2 = _p86._0;
+						var tail2 = _p86._1;
+						return A3(
+							_elm_lang$core$Maybe$map2,
+							F2(
+								function (_p88, _p87) {
+									var _p89 = _p88;
+									var _p90 = _p87;
+									return _elm_lang$core$List$concat(
+										{
+											ctor: '::',
+											_0: part1,
+											_1: {
+												ctor: '::',
+												_0: {ctor: '::', _0: _p90._0, _1: _p89._1},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '::', _0: _p89._0, _1: _p90._1},
+													_1: {ctor: '[]'}
+												}
+											}
+										});
+								}),
+							_elm_community$list_extra$List_Extra$uncons(head2),
+							_elm_community$list_extra$List_Extra$uncons(tail2));
+					}
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$iterate = F2(
+	function (f, x) {
+		var _p91 = f(x);
+		if (_p91.ctor === 'Just') {
+			return {
+				ctor: '::',
+				_0: x,
+				_1: A2(_elm_community$list_extra$List_Extra$iterate, f, _p91._0)
+			};
+		} else {
+			return {
+				ctor: '::',
+				_0: x,
+				_1: {ctor: '[]'}
+			};
+		}
+	});
+var _elm_community$list_extra$List_Extra$getAt = F2(
+	function (idx, xs) {
+		return (_elm_lang$core$Native_Utils.cmp(idx, 0) < 0) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$List$head(
+			A2(_elm_lang$core$List$drop, idx, xs));
+	});
+var _elm_community$list_extra$List_Extra_ops = _elm_community$list_extra$List_Extra_ops || {};
+_elm_community$list_extra$List_Extra_ops['!!'] = _elm_lang$core$Basics$flip(_elm_community$list_extra$List_Extra$getAt);
+var _elm_community$list_extra$List_Extra$init = function () {
+	var maybe = F2(
+		function (d, f) {
+			return function (_p92) {
+				return A2(
+					_elm_lang$core$Maybe$withDefault,
+					d,
+					A2(_elm_lang$core$Maybe$map, f, _p92));
+			};
+		});
+	return A2(
+		_elm_lang$core$List$foldr,
+		function (x) {
+			return function (_p93) {
+				return _elm_lang$core$Maybe$Just(
+					A3(
+						maybe,
+						{ctor: '[]'},
+						F2(
+							function (x, y) {
+								return {ctor: '::', _0: x, _1: y};
+							})(x),
+						_p93));
+			};
+		},
+		_elm_lang$core$Maybe$Nothing);
+}();
+var _elm_community$list_extra$List_Extra$last = _elm_community$list_extra$List_Extra$foldl1(
+	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
+
 var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
 var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
 var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
@@ -10734,6 +11933,385 @@ var _elm_lang$websocket$WebSocket$onSelfMsg = F3(
 	});
 _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/websocket', init: _elm_lang$websocket$WebSocket$init, onEffects: _elm_lang$websocket$WebSocket$onEffects, onSelfMsg: _elm_lang$websocket$WebSocket$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$websocket$WebSocket$cmdMap, subMap: _elm_lang$websocket$WebSocket$subMap};
 
+var _iosphere$elm_network_graph$Graph_Node$identifierFromName = function (name) {
+	return A2(_elm_lang$core$String$join, '-', name);
+};
+var _iosphere$elm_network_graph$Graph_Node$namePrefix = F2(
+	function (n, name) {
+		return A2(_elm_lang$core$List$take, n, name);
+	});
+var _iosphere$elm_network_graph$Graph_Node$fromName = function (name) {
+	return {
+		identifier: _iosphere$elm_network_graph$Graph_Node$identifierFromName(name),
+		name: name
+	};
+};
+var _iosphere$elm_network_graph$Graph_Node$Node = F2(
+	function (a, b) {
+		return {identifier: a, name: b};
+	});
+
+var _iosphere$elm_network_graph$Graph_Edge$filterForIdentifiers = function (identifiers) {
+	return _elm_lang$core$List$filter(
+		function (edge) {
+			return A2(_elm_lang$core$Set$member, edge.to, identifiers) && A2(_elm_lang$core$Set$member, edge.from, identifiers);
+		});
+};
+var _iosphere$elm_network_graph$Graph_Edge$Edge = F2(
+	function (a, b) {
+		return {from: a, to: b};
+	});
+
+var _iosphere$elm_network_graph$Graph$filterEdgesForNodes = F2(
+	function (edges, nodes) {
+		var identifiers = _elm_lang$core$Set$fromList(
+			A2(
+				_elm_lang$core$List$map,
+				function (_) {
+					return _.identifier;
+				},
+				nodes));
+		return A2(_iosphere$elm_network_graph$Graph_Edge$filterForIdentifiers, identifiers, edges);
+	});
+var _iosphere$elm_network_graph$Graph$Graph = F2(
+	function (a, b) {
+		return {edges: a, nodes: b};
+	});
+var _iosphere$elm_network_graph$Graph$init = _iosphere$elm_network_graph$Graph$Graph;
+var _iosphere$elm_network_graph$Graph$empty = A2(
+	_iosphere$elm_network_graph$Graph$init,
+	{ctor: '[]'},
+	{ctor: '[]'});
+var _iosphere$elm_network_graph$Graph$filter = F2(
+	function (filterBy, graph) {
+		var filteredNodes = A2(_elm_lang$core$List$filter, filterBy, graph.nodes);
+		var filteredEdges = A2(_iosphere$elm_network_graph$Graph$filterEdgesForNodes, graph.edges, filteredNodes);
+		return A2(_iosphere$elm_network_graph$Graph$Graph, filteredEdges, filteredNodes);
+	});
+var _iosphere$elm_network_graph$Graph$filterByName = function (namesPrefix) {
+	var filterBy = function (node) {
+		return _elm_lang$core$Native_Utils.eq(
+			A2(
+				_elm_lang$core$List$take,
+				_elm_lang$core$List$length(namesPrefix),
+				node.name),
+			namesPrefix);
+	};
+	return _iosphere$elm_network_graph$Graph$filter(filterBy);
+};
+
+var _iosphere$elm_network_graph$Graph_Colored_Color$list = {
+	ctor: '::',
+	_0: '#F44336',
+	_1: {
+		ctor: '::',
+		_0: '#E91E63',
+		_1: {
+			ctor: '::',
+			_0: '#9C27B0',
+			_1: {
+				ctor: '::',
+				_0: '#673AB7',
+				_1: {
+					ctor: '::',
+					_0: '#3F51B5',
+					_1: {
+						ctor: '::',
+						_0: '#2196F3',
+						_1: {
+							ctor: '::',
+							_0: '#03A9F4',
+							_1: {
+								ctor: '::',
+								_0: '#00BCD4',
+								_1: {
+									ctor: '::',
+									_0: '#009688',
+									_1: {
+										ctor: '::',
+										_0: '#4CAF50',
+										_1: {
+											ctor: '::',
+											_0: '#8BC34A',
+											_1: {
+												ctor: '::',
+												_0: '#FF9800',
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _iosphere$elm_network_graph$Graph_Colored_Color$fallback = '#f00';
+
+var _iosphere$elm_network_graph$Graph_Colored_Node$encode = function (record) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'color',
+				_1: _elm_lang$core$Json_Encode$string(record.color)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'id',
+					_1: _elm_lang$core$Json_Encode$string(record.identifier)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'name',
+						_1: _elm_lang$core$Json_Encode$list(
+							A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, record.name))
+					},
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _iosphere$elm_network_graph$Graph_Colored_Node$init = F3(
+	function (color, identifier, name) {
+		return {color: color, identifier: identifier, name: name};
+	});
+var _iosphere$elm_network_graph$Graph_Colored_Node$decode = A2(
+	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+		A2(
+			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+			_elm_lang$core$Json_Decode$succeed(_iosphere$elm_network_graph$Graph_Colored_Node$init),
+			A2(_elm_lang$core$Json_Decode$field, 'color', _elm_lang$core$Json_Decode$string)),
+		A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'name',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)));
+var _iosphere$elm_network_graph$Graph_Colored_Node$fromNode = F2(
+	function (node, color) {
+		return A3(_iosphere$elm_network_graph$Graph_Colored_Node$init, color, node.identifier, node.name);
+	});
+
+var _iosphere$elm_network_graph$Graph_Colored_Decorator$coloredNode = F3(
+	function (depth, colors, node) {
+		return A2(
+			_iosphere$elm_network_graph$Graph_Colored_Node$fromNode,
+			node,
+			A2(
+				_elm_lang$core$Maybe$withDefault,
+				_iosphere$elm_network_graph$Graph_Colored_Color$fallback,
+				A2(
+					_elm_lang$core$Dict$get,
+					A2(_iosphere$elm_network_graph$Graph_Node$namePrefix, depth, node.name),
+					colors)));
+	});
+var _iosphere$elm_network_graph$Graph_Colored_Decorator$colors = F2(
+	function (depth, moduleNames) {
+		var allColors = _iosphere$elm_network_graph$Graph_Colored_Color$list;
+		var colorsLength = _elm_lang$core$List$length(allColors);
+		var topModuleNames = _elm_lang$core$List$sort(
+			_elm_lang$core$Set$toList(
+				_elm_lang$core$Set$fromList(
+					A2(
+						_elm_lang$core$List$map,
+						_iosphere$elm_network_graph$Graph_Node$namePrefix(depth),
+						moduleNames))));
+		var colorsForModuleNames = A2(
+			_elm_lang$core$List$indexedMap,
+			F2(
+				function (index, name) {
+					return A2(
+						F2(
+							function (v0, v1) {
+								return {ctor: '_Tuple2', _0: v0, _1: v1};
+							}),
+						name,
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							_iosphere$elm_network_graph$Graph_Colored_Color$fallback,
+							A2(
+								_elm_community$list_extra$List_Extra$getAt,
+								A2(_elm_lang$core$Basics_ops['%'], index, colorsLength),
+								allColors)));
+				}),
+			topModuleNames);
+		return _elm_lang$core$Dict$fromList(colorsForModuleNames);
+	});
+var _iosphere$elm_network_graph$Graph_Colored_Decorator$coloredGraph = F2(
+	function (depth, uncoloredGraph) {
+		var moduleNames = A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.name;
+			},
+			uncoloredGraph.nodes);
+		var strictlyPositiveDepth = A2(_elm_lang$core$Basics$max, 1, depth);
+		var moduleColors = A2(_iosphere$elm_network_graph$Graph_Colored_Decorator$colors, strictlyPositiveDepth, moduleNames);
+		var coloredNodes = A2(
+			_elm_lang$core$List$map,
+			A2(_iosphere$elm_network_graph$Graph_Colored_Decorator$coloredNode, strictlyPositiveDepth, moduleColors),
+			uncoloredGraph.nodes);
+		return {
+			ctor: '_Tuple2',
+			_0: moduleColors,
+			_1: A2(_iosphere$elm_network_graph$Graph$Graph, uncoloredGraph.edges, coloredNodes)
+		};
+	});
+
+var _iosphere$elm_network_graph$Graph_Edge_Json$encode = function (record) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'id',
+				_1: _elm_lang$core$Json_Encode$string(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						record.from,
+						A2(_elm_lang$core$Basics_ops['++'], '<->', record.to)))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'source',
+					_1: _elm_lang$core$Json_Encode$string(record.from)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'target',
+						_1: _elm_lang$core$Json_Encode$string(record.to)
+					},
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _iosphere$elm_network_graph$Graph_Edge_Json$decode = A2(
+	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+		_elm_lang$core$Json_Decode$succeed(_iosphere$elm_network_graph$Graph_Edge$Edge),
+		A2(_elm_lang$core$Json_Decode$field, 'source', _elm_lang$core$Json_Decode$string)),
+	A2(_elm_lang$core$Json_Decode$field, 'target', _elm_lang$core$Json_Decode$string));
+
+var _iosphere$elm_network_graph$Graph_Colored_Graph$encode = function (record) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'edges',
+				_1: _elm_lang$core$Json_Encode$list(
+					A2(_elm_lang$core$List$map, _iosphere$elm_network_graph$Graph_Edge_Json$encode, record.edges))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'nodes',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(_elm_lang$core$List$map, _iosphere$elm_network_graph$Graph_Colored_Node$encode, record.nodes))
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _iosphere$elm_network_graph$Graph_Colored_Graph$decode = A2(
+	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+		_elm_lang$core$Json_Decode$succeed(_iosphere$elm_network_graph$Graph$Graph),
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'edges',
+			_elm_lang$core$Json_Decode$list(_iosphere$elm_network_graph$Graph_Edge_Json$decode))),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'nodes',
+		_elm_lang$core$Json_Decode$list(_iosphere$elm_network_graph$Graph_Colored_Node$decode)));
+
+var _iosphere$elm_network_graph$Graph_Node_Json$encode = function (record) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'id',
+				_1: _elm_lang$core$Json_Encode$string(record.identifier)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'name',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, record.name))
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _iosphere$elm_network_graph$Graph_Node_Json$decode = A2(
+	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+		_elm_lang$core$Json_Decode$succeed(_iosphere$elm_network_graph$Graph_Node$Node),
+		A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'name',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)));
+
+var _iosphere$elm_network_graph$Graph_Json$encode = function (record) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'edges',
+				_1: _elm_lang$core$Json_Encode$list(
+					A2(_elm_lang$core$List$map, _iosphere$elm_network_graph$Graph_Edge_Json$encode, record.edges))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'nodes',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(_elm_lang$core$List$map, _iosphere$elm_network_graph$Graph_Node_Json$encode, record.nodes))
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _iosphere$elm_network_graph$Graph_Json$decode = A2(
+	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+		_elm_lang$core$Json_Decode$succeed(_iosphere$elm_network_graph$Graph$Graph),
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'edges',
+			_elm_lang$core$Json_Decode$list(_iosphere$elm_network_graph$Graph_Edge_Json$decode))),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'nodes',
+		_elm_lang$core$Json_Decode$list(_iosphere$elm_network_graph$Graph_Node_Json$decode)));
+
 var _krisajenkins$elm_exts$Exts_Html_Bootstrap$video = F2(
 	function (ratio, url) {
 		var ratioClass = function () {
@@ -11982,9 +13560,10 @@ var _user$project$Analyser_Messages_Types$DuplicateImport = F3(
 	function (a, b, c) {
 		return {ctor: 'DuplicateImport', _0: a, _1: b, _2: c};
 	});
-var _user$project$Analyser_Messages_Types$FileLoadFailed = function (a) {
-	return {ctor: 'FileLoadFailed', _0: a};
-};
+var _user$project$Analyser_Messages_Types$FileLoadFailed = F2(
+	function (a, b) {
+		return {ctor: 'FileLoadFailed', _0: a, _1: b};
+	});
 var _user$project$Analyser_Messages_Types$UnformattedFile = function (a) {
 	return {ctor: 'UnformattedFile', _0: a};
 };
@@ -12409,7 +13988,15 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: 'file',
 							_1: _elm_lang$core$Json_Encode$string(_p0._0)
 						},
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'message',
+								_1: _elm_lang$core$Json_Encode$string(_p0._1)
+							},
+							_1: {ctor: '[]'}
+						}
 					}));
 		case 'DuplicateImport':
 			return A2(
@@ -12964,7 +14551,11 @@ var _user$project$Analyser_Messages_Json$decodeMessageData = _user$project$Util_
 															_0: {
 																ctor: '_Tuple2',
 																_0: 'FileLoadFailed',
-																_1: A2(_elm_lang$core$Json_Decode$map, _user$project$Analyser_Messages_Types$FileLoadFailed, _user$project$Analyser_Messages_Json$fileField)
+																_1: A3(
+																	_elm_lang$core$Json_Decode$map2,
+																	_user$project$Analyser_Messages_Types$FileLoadFailed,
+																	_user$project$Analyser_Messages_Json$fileField,
+																	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string))
 															},
 															_1: {
 																ctor: '::',
@@ -13593,8 +15184,12 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 							_0: _p23,
 							_1: {
 								ctor: '::',
-								_0: '\"',
-								_1: {ctor: '[]'}
+								_0: '\" due to: ',
+								_1: {
+									ctor: '::',
+									_0: _p0._1,
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}),
@@ -14211,12 +15806,26 @@ var _user$project$Analyser_State$encodeState = function (state) {
 							_1: _elm_lang$core$Json_Encode$list(
 								A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$int, state.queue))
 						},
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'graph',
+								_1: _iosphere$elm_network_graph$Graph_Json$encode(state.graph)
+							},
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
 		});
 };
+var _user$project$Analyser_State$updateGraph = F2(
+	function (newGraph, s) {
+		return _elm_lang$core$Native_Utils.update(
+			s,
+			{graph: newGraph});
+	});
 var _user$project$Analyser_State$sortMessages = function (state) {
 	return _elm_lang$core$Native_Utils.update(
 		state,
@@ -14286,9 +15895,9 @@ var _user$project$Analyser_State$isBusy = function (s) {
 			return false;
 	}
 };
-var _user$project$Analyser_State$State = F4(
-	function (a, b, c, d) {
-		return {messages: a, idCount: b, status: c, queue: d};
+var _user$project$Analyser_State$State = F5(
+	function (a, b, c, d, e) {
+		return {messages: a, idCount: b, status: c, queue: d, graph: e};
 	});
 var _user$project$Analyser_State$Idle = {ctor: 'Idle'};
 var _user$project$Analyser_State$finishWithNewMessages = F2(
@@ -14347,7 +15956,8 @@ var _user$project$Analyser_State$initialState = {
 	messages: {ctor: '[]'},
 	idCount: 0,
 	status: _user$project$Analyser_State$Initialising,
-	queue: {ctor: '[]'}
+	queue: {ctor: '[]'},
+	graph: _iosphere$elm_network_graph$Graph$empty
 };
 var _user$project$Analyser_State$decodeStatus = A2(
 	_elm_lang$core$Json_Decode$andThen,
@@ -14374,17 +15984,20 @@ var _user$project$Analyser_State$decodeState = A2(
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			A2(
 				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-				_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_State$State),
 				A2(
-					_elm_lang$core$Json_Decode$field,
-					'messages',
-					_elm_lang$core$Json_Decode$list(_user$project$Analyser_Messages_Json$decodeMessage))),
-			A2(_elm_lang$core$Json_Decode$field, 'idCount', _elm_lang$core$Json_Decode$int)),
-		A2(_elm_lang$core$Json_Decode$field, 'status', _user$project$Analyser_State$decodeStatus)),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'queue',
-		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$int)));
+					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+					_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_State$State),
+					A2(
+						_elm_lang$core$Json_Decode$field,
+						'messages',
+						_elm_lang$core$Json_Decode$list(_user$project$Analyser_Messages_Json$decodeMessage))),
+				A2(_elm_lang$core$Json_Decode$field, 'idCount', _elm_lang$core$Json_Decode$int)),
+			A2(_elm_lang$core$Json_Decode$field, 'status', _user$project$Analyser_State$decodeStatus)),
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'queue',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$int))),
+	A2(_elm_lang$core$Json_Decode$field, 'graph', _iosphere$elm_network_graph$Graph_Json$decode));
 
 var _user$project$Client_Socket$dashboardAddress = function (_p0) {
 	var _p1 = _p0;
@@ -15379,6 +16992,271 @@ var _user$project$Client_DashBoard_DashBoard$subscriptions = F2(
 			});
 	});
 
+var _user$project$Client_Graph_Graph$loadingStateLabel = function (maybeState) {
+	var _p0 = maybeState;
+	if (_p0.ctor === 'Nothing') {
+		return _elm_lang$html$Html$text('Loading...');
+	} else {
+		return _user$project$Analyser_State$isBusy(_p0._0) ? _elm_lang$html$Html$text('Busy...') : _elm_lang$html$Html$text('');
+	}
+};
+var _user$project$Client_Graph_Graph$withGraph = F2(
+	function (model, graph) {
+		var _p1 = A2(
+			_iosphere$elm_network_graph$Graph_Colored_Decorator$coloredGraph,
+			1 + _elm_lang$core$List$length(model.filter),
+			graph);
+		var colors = _p1._0;
+		var coloredGraph = _p1._1;
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{
+				graph: _elm_lang$core$Maybe$Just(coloredGraph),
+				colors: colors
+			});
+	});
+var _user$project$Client_Graph_Graph$graphElementId = 'sigmaGraph';
+var _user$project$Client_Graph_Graph$init = function (location) {
+	return A2(
+		_elm_lang$core$Platform_Cmd_ops['!'],
+		{
+			state: _elm_lang$core$Maybe$Nothing,
+			graph: _elm_lang$core$Maybe$Nothing,
+			colors: _elm_lang$core$Dict$empty,
+			filter: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$websocket$WebSocket$send,
+				_user$project$Client_Socket$dashboardAddress(location),
+				'ping'),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Client_Graph_Graph$withNewState = F2(
+	function (state, m) {
+		return A2(
+			_user$project$Client_Graph_Graph$withGraph,
+			_elm_lang$core$Native_Utils.update(
+				m,
+				{
+					state: _elm_lang$core$Maybe$Just(state),
+					filter: {ctor: '[]'}
+				}),
+			state.graph);
+	});
+var _user$project$Client_Graph_Graph$updateGraph = _elm_lang$core$Native_Platform.outgoingPort(
+	'updateGraph',
+	function (v) {
+		return [v._0, v._1];
+	});
+var _user$project$Client_Graph_Graph$cmdForUpdatedGraph = function (maybeGraph) {
+	var _p2 = maybeGraph;
+	if (_p2.ctor === 'Nothing') {
+		return _elm_lang$core$Platform_Cmd$none;
+	} else {
+		return _user$project$Client_Graph_Graph$updateGraph(
+			{
+				ctor: '_Tuple2',
+				_0: _user$project$Client_Graph_Graph$graphElementId,
+				_1: _iosphere$elm_network_graph$Graph_Colored_Graph$encode(_p2._0)
+			});
+	}
+};
+var _user$project$Client_Graph_Graph$update = F3(
+	function (_p3, msg, model) {
+		var _p4 = msg;
+		if (_p4.ctor === 'NewState') {
+			var _p5 = _p4._0;
+			if (_p5.ctor === 'Err') {
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'});
+			} else {
+				var newModel = A2(_user$project$Client_Graph_Graph$withNewState, _p5._0, model);
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					newModel,
+					{
+						ctor: '::',
+						_0: _user$project$Client_Graph_Graph$cmdForUpdatedGraph(newModel.graph),
+						_1: {ctor: '[]'}
+					});
+			}
+		} else {
+			var _p7 = _p4._0;
+			var newModelWithFilter = _elm_lang$core$Native_Utils.update(
+				model,
+				{filter: _p7});
+			var _p6 = model.state;
+			if (_p6.ctor === 'Nothing') {
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					newModelWithFilter,
+					{ctor: '[]'});
+			} else {
+				var modelWithNewGraph = A2(
+					_user$project$Client_Graph_Graph$withGraph,
+					newModelWithFilter,
+					A2(
+						_iosphere$elm_network_graph$Graph$filter,
+						function (node) {
+							return _elm_lang$core$Native_Utils.eq(
+								A2(
+									_elm_lang$core$List$take,
+									_elm_lang$core$List$length(_p7),
+									node.name),
+								_p7);
+						},
+						_p6._0.graph));
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					modelWithNewGraph,
+					{
+						ctor: '::',
+						_0: _user$project$Client_Graph_Graph$cmdForUpdatedGraph(modelWithNewGraph.graph),
+						_1: {ctor: '[]'}
+					});
+			}
+		}
+	});
+var _user$project$Client_Graph_Graph$removeGraph = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeGraph',
+	function (v) {
+		return v;
+	});
+var _user$project$Client_Graph_Graph$removeCmd = _user$project$Client_Graph_Graph$removeGraph(_user$project$Client_Graph_Graph$graphElementId);
+var _user$project$Client_Graph_Graph$Model = F4(
+	function (a, b, c, d) {
+		return {state: a, graph: b, colors: c, filter: d};
+	});
+var _user$project$Client_Graph_Graph$SetFilter = function (a) {
+	return {ctor: 'SetFilter', _0: a};
+};
+var _user$project$Client_Graph_Graph$legendEntry = F2(
+	function (colors, names) {
+		var _p8 = A2(_elm_lang$core$Dict$get, names, colors);
+		if (_p8.ctor === 'Just') {
+			return _elm_lang$core$Maybe$Just(
+				A2(
+					_elm_lang$html$Html$li,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'color', _1: _p8._0},
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(
+								_user$project$Client_Graph_Graph$SetFilter(names)),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							A2(_elm_lang$core$String$join, '.', names)),
+						_1: {ctor: '[]'}
+					}));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _user$project$Client_Graph_Graph$legend = F2(
+	function (filter, colors) {
+		var clearButton = _elm_lang$core$List$isEmpty(filter) ? _elm_lang$html$Html$text('') : A2(
+			_elm_lang$html$Html$button,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('btn btn-default'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						_user$project$Client_Graph_Graph$SetFilter(
+							{ctor: '[]'})),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Reset Filter'),
+				_1: {ctor: '[]'}
+			});
+		var names = _elm_lang$core$List$sort(
+			_elm_lang$core$Dict$keys(colors));
+		var entries = A2(
+			_elm_lang$core$List$filterMap,
+			_user$project$Client_Graph_Graph$legendEntry(colors),
+			names);
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('graph__legend'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: clearButton,
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$ul,
+						{ctor: '[]'},
+						entries),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$Client_Graph_Graph$view = function (m) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _user$project$Client_Graph_Graph$loadingStateLabel(m.state),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$id(_user$project$Client_Graph_Graph$graphElementId),
+						_1: {ctor: '[]'}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(_user$project$Client_Graph_Graph$legend, m.filter, m.colors),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _user$project$Client_Graph_Graph$NewState = function (a) {
+	return {ctor: 'NewState', _0: a};
+};
+var _user$project$Client_Graph_Graph$subscriptions = F2(
+	function (location, _p9) {
+		return _elm_lang$core$Platform_Sub$batch(
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$websocket$WebSocket$listen,
+					_user$project$Client_Socket$dashboardAddress(location),
+					function (_p10) {
+						return _user$project$Client_Graph_Graph$NewState(
+							A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Analyser_State$decodeState, _p10));
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+
 var _user$project$Client_FileTree$messagesForSelectedFile = function (m) {
 	var _p0 = m.fileIndex;
 	if (_p0.ctor === 'Just') {
@@ -15728,8 +17606,14 @@ var _user$project$Client_App_Models$Refresh = {ctor: 'Refresh'};
 var _user$project$Client_App_Models$FileTreeMsg = function (a) {
 	return {ctor: 'FileTreeMsg', _0: a};
 };
+var _user$project$Client_App_Models$GraphMsg = function (a) {
+	return {ctor: 'GraphMsg', _0: a};
+};
 var _user$project$Client_App_Models$DashBoardMsg = function (a) {
 	return {ctor: 'DashBoardMsg', _0: a};
+};
+var _user$project$Client_App_Models$GraphContent = function (a) {
+	return {ctor: 'GraphContent', _0: a};
 };
 var _user$project$Client_App_Models$FileTreeContent = function (a) {
 	return {ctor: 'FileTreeContent', _0: a};
@@ -15909,7 +17793,11 @@ var _user$project$Client_App_Menu$view = function (l) {
 										_1: {
 											ctor: '::',
 											_0: A4(_user$project$Client_App_Menu$menuItem, l, '#tree', 'Tree', 'files-o'),
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: A4(_user$project$Client_App_Menu$menuItem, l, '#module-graph', 'Module graph', 'cubes'),
+												_1: {ctor: '[]'}
+											}
 										}
 									}),
 								_1: {ctor: '[]'}
@@ -15921,10 +17809,34 @@ var _user$project$Client_App_Menu$view = function (l) {
 		});
 };
 
-var _user$project$Client_App_App$onDashBoardMsg = F2(
+var _user$project$Client_App_App$onGraphMsg = F2(
 	function (subMsg, model) {
 		var _p0 = model.content;
-		if (_p0.ctor === 'DashBoardContent') {
+		if (_p0.ctor === 'GraphContent') {
+			return A2(
+				_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
+				_elm_lang$core$Platform_Cmd$map(_user$project$Client_App_Models$GraphMsg),
+				A2(
+					_Fresheyeball$elm_tuple_extra$Tuple2$mapFirst,
+					function (x) {
+						return _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								content: _user$project$Client_App_Models$GraphContent(x)
+							});
+					},
+					A3(_user$project$Client_Graph_Graph$update, model.location, subMsg, _p0._0)));
+		} else {
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				model,
+				{ctor: '[]'});
+		}
+	});
+var _user$project$Client_App_App$onDashBoardMsg = F2(
+	function (subMsg, model) {
+		var _p1 = model.content;
+		if (_p1.ctor === 'DashBoardContent') {
 			return A2(
 				_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
 				_elm_lang$core$Platform_Cmd$map(_user$project$Client_App_Models$DashBoardMsg),
@@ -15937,7 +17849,7 @@ var _user$project$Client_App_App$onDashBoardMsg = F2(
 								content: _user$project$Client_App_Models$DashBoardContent(x)
 							});
 					},
-					A3(_user$project$Client_DashBoard_DashBoard$update, model.location, subMsg, _p0._0)));
+					A3(_user$project$Client_DashBoard_DashBoard$update, model.location, subMsg, _p1._0)));
 		} else {
 			return A2(
 				_elm_lang$core$Platform_Cmd_ops['!'],
@@ -15947,8 +17859,8 @@ var _user$project$Client_App_App$onDashBoardMsg = F2(
 	});
 var _user$project$Client_App_App$onFileTreeMsg = F2(
 	function (subMsg, model) {
-		var _p1 = model.content;
-		if (_p1.ctor === 'FileTreeContent') {
+		var _p2 = model.content;
+		if (_p2.ctor === 'FileTreeContent') {
 			return A2(
 				_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
 				_elm_lang$core$Platform_Cmd$map(_user$project$Client_App_Models$FileTreeMsg),
@@ -15961,7 +17873,7 @@ var _user$project$Client_App_App$onFileTreeMsg = F2(
 								content: _user$project$Client_App_Models$FileTreeContent(x)
 							});
 					},
-					A3(_user$project$Client_FileTree$update, model.location, subMsg, _p1._0)));
+					A3(_user$project$Client_FileTree$update, model.location, subMsg, _p2._0)));
 		} else {
 			return A2(
 				_elm_lang$core$Platform_Cmd_ops['!'],
@@ -15988,17 +17900,23 @@ var _user$project$Client_App_App$view = function (m) {
 					{
 						ctor: '::',
 						_0: function () {
-							var _p2 = m.content;
-							if (_p2.ctor === 'DashBoardContent') {
-								return A2(
-									_elm_lang$html$Html$map,
-									_user$project$Client_App_Models$DashBoardMsg,
-									_user$project$Client_DashBoard_DashBoard$view(_p2._0));
-							} else {
-								return A2(
-									_elm_lang$html$Html$map,
-									_user$project$Client_App_Models$FileTreeMsg,
-									_user$project$Client_FileTree$view(_p2._0));
+							var _p3 = m.content;
+							switch (_p3.ctor) {
+								case 'DashBoardContent':
+									return A2(
+										_elm_lang$html$Html$map,
+										_user$project$Client_App_Models$DashBoardMsg,
+										_user$project$Client_DashBoard_DashBoard$view(_p3._0));
+								case 'GraphContent':
+									return A2(
+										_elm_lang$html$Html$map,
+										_user$project$Client_App_Models$GraphMsg,
+										_user$project$Client_Graph_Graph$view(_p3._0));
+								default:
+									return A2(
+										_elm_lang$html$Html$map,
+										_user$project$Client_App_Models$FileTreeMsg,
+										_user$project$Client_FileTree$view(_p3._0));
 							}
 						}(),
 						_1: {ctor: '[]'}
@@ -16008,41 +17926,70 @@ var _user$project$Client_App_App$view = function (m) {
 		});
 };
 var _user$project$Client_App_App$onLocation = function (l) {
-	var _p3 = l.hash;
-	if (_p3 === '#tree') {
-		return A2(
-			_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
-			_elm_lang$core$Platform_Cmd$map(_user$project$Client_App_Models$FileTreeMsg),
-			A2(
-				_Fresheyeball$elm_tuple_extra$Tuple2$mapFirst,
-				function (x) {
-					return {
-						content: _user$project$Client_App_Models$FileTreeContent(x),
-						location: l
-					};
-				},
-				_user$project$Client_FileTree$init(l)));
-	} else {
-		return A2(
-			_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
-			_elm_lang$core$Platform_Cmd$map(_user$project$Client_App_Models$DashBoardMsg),
-			A2(
-				_Fresheyeball$elm_tuple_extra$Tuple2$mapFirst,
-				function (x) {
-					return {
-						content: _user$project$Client_App_Models$DashBoardContent(x),
-						location: l
-					};
-				},
-				_user$project$Client_DashBoard_DashBoard$init(l)));
+	var _p4 = l.hash;
+	switch (_p4) {
+		case '#tree':
+			return A2(
+				_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
+				_elm_lang$core$Platform_Cmd$map(_user$project$Client_App_Models$FileTreeMsg),
+				A2(
+					_Fresheyeball$elm_tuple_extra$Tuple2$mapFirst,
+					function (x) {
+						return {
+							content: _user$project$Client_App_Models$FileTreeContent(x),
+							location: l
+						};
+					},
+					_user$project$Client_FileTree$init(l)));
+		case '#module-graph':
+			return A2(
+				_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
+				_elm_lang$core$Platform_Cmd$map(_user$project$Client_App_Models$GraphMsg),
+				A2(
+					_Fresheyeball$elm_tuple_extra$Tuple2$mapFirst,
+					function (x) {
+						return {
+							content: _user$project$Client_App_Models$GraphContent(x),
+							location: l
+						};
+					},
+					_user$project$Client_Graph_Graph$init(l)));
+		default:
+			return A2(
+				_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
+				_elm_lang$core$Platform_Cmd$map(_user$project$Client_App_Models$DashBoardMsg),
+				A2(
+					_Fresheyeball$elm_tuple_extra$Tuple2$mapFirst,
+					function (x) {
+						return {
+							content: _user$project$Client_App_Models$DashBoardContent(x),
+							location: l
+						};
+					},
+					_user$project$Client_DashBoard_DashBoard$init(l)));
 	}
 };
 var _user$project$Client_App_App$update = F2(
 	function (msg, model) {
-		var _p4 = msg;
-		switch (_p4.ctor) {
+		var _p5 = msg;
+		switch (_p5.ctor) {
 			case 'OnLocation':
-				return _user$project$Client_App_App$onLocation(_p4._0);
+				var _p6 = _user$project$Client_App_App$onLocation(_p5._0);
+				var newModel = _p6._0;
+				var cmd = _p6._1;
+				var removeGraphCmd = (!_elm_lang$core$Native_Utils.eq(newModel.location.hash, '#module-graph')) ? _user$project$Client_Graph_Graph$removeCmd : _elm_lang$core$Platform_Cmd$none;
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					newModel,
+					{
+						ctor: '::',
+						_0: cmd,
+						_1: {
+							ctor: '::',
+							_0: removeGraphCmd,
+							_1: {ctor: '[]'}
+						}
+					});
 			case 'Refresh':
 				return {
 					ctor: '_Tuple2',
@@ -16053,9 +18000,11 @@ var _user$project$Client_App_App$update = F2(
 						'reload')
 				};
 			case 'DashBoardMsg':
-				return A2(_user$project$Client_App_App$onDashBoardMsg, _p4._0, model);
+				return A2(_user$project$Client_App_App$onDashBoardMsg, _p5._0, model);
+			case 'GraphMsg':
+				return A2(_user$project$Client_App_App$onGraphMsg, _p5._0, model);
 			default:
-				return A2(_user$project$Client_App_App$onFileTreeMsg, _p4._0, model);
+				return A2(_user$project$Client_App_App$onFileTreeMsg, _p5._0, model);
 		}
 	});
 var _user$project$Client_App_App$init = _user$project$Client_App_App$onLocation;
@@ -16064,17 +18013,23 @@ var _user$project$Client_App_App$subscriptions = function (model) {
 		{
 			ctor: '::',
 			_0: function () {
-				var _p5 = model.content;
-				if (_p5.ctor === 'DashBoardContent') {
-					return A2(
-						_elm_lang$core$Platform_Sub$map,
-						_user$project$Client_App_Models$DashBoardMsg,
-						A2(_user$project$Client_DashBoard_DashBoard$subscriptions, model.location, _p5._0));
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Sub$map,
-						_user$project$Client_App_Models$FileTreeMsg,
-						A2(_user$project$Client_FileTree$subscriptions, model.location, _p5._0));
+				var _p7 = model.content;
+				switch (_p7.ctor) {
+					case 'DashBoardContent':
+						return A2(
+							_elm_lang$core$Platform_Sub$map,
+							_user$project$Client_App_Models$DashBoardMsg,
+							A2(_user$project$Client_DashBoard_DashBoard$subscriptions, model.location, _p7._0));
+					case 'GraphContent':
+						return A2(
+							_elm_lang$core$Platform_Sub$map,
+							_user$project$Client_App_Models$GraphMsg,
+							A2(_user$project$Client_Graph_Graph$subscriptions, model.location, _p7._0));
+					default:
+						return A2(
+							_elm_lang$core$Platform_Sub$map,
+							_user$project$Client_App_Models$FileTreeMsg,
+							A2(_user$project$Client_FileTree$subscriptions, model.location, _p7._0));
 				}
 			}(),
 			_1: {
