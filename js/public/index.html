@@ -19,6 +19,27 @@
             position: relative;
             background-color: #fff;
         }
+
+        .graph__legend {
+            margin: 10px;
+            padding: 20px;
+            background-color: #eee;
+            border-radius: 2px;
+        }
+
+        .graph__legend li {
+            display: inline-block;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+
+        .graph__legend li:hover {
+            text-decoration: underline;
+        }
+
+        .graph__legend::after {
+            clear: left;
+        }
     </style>
     <script src="sigma/sigma.min.js"></script>
     <script src="sigma/plugins/sigma.plugins.animate.min.js"></script>

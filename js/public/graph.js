@@ -13,7 +13,7 @@ const sigmaSettings = {
     maxEdgeSize: 1,
     fontStyle: "bold",
     defaultLabelSize: 16,
-    labelThreshold: 12,
+    labelThreshold: 10,
 };
 
 
@@ -49,8 +49,8 @@ function displayGraph(elementId, graphData) {
         item.size = 1;
         item.color = item.color || "#ec5148"
         item.originalColor = item.color
-        item.x = Math.random();
-        item.y = Math.random();
+        item.x = index % 10;
+        item.y = index % 4;
         item.label = item.name.join('.');
     });
     graphData.edges.forEach(function(item, index) {

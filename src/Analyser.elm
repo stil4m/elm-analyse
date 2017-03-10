@@ -11,7 +11,7 @@ import Tuple2
 import Analyser.Messages.Util as Messages
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.Configuration as Configuration exposing (Configuration)
-import Graph
+import GraphBuilder
 import Logger
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
 
@@ -227,7 +227,7 @@ finishProcess newStage cmds model =
             Inspection.run loadedSourceFiles (CodeBase.dependencies newCodeBase) model.configuration
 
         newGraph =
-            Graph.run (CodeBase.sourceFiles newCodeBase) (CodeBase.dependencies newCodeBase)
+            GraphBuilder.run (CodeBase.sourceFiles newCodeBase) (CodeBase.dependencies newCodeBase)
 
         newState =
             State.finishWithNewMessages messages model.state
