@@ -1,13 +1,17 @@
 module Graph exposing (Graph, decode, empty, encode, init, run)
 
+import AST.Types as AST
 import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.Files.Types exposing (Dependency, LoadedSourceFiles)
-import AST.Types as AST
+import Dict exposing (Dict)
+import Graph.Color as Color exposing (Color)
 import Graph.Edge as Edge exposing (Edge)
 import Graph.Node as Node exposing (Node)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
 import Json.Encode as JE exposing (Value)
+import List.Extra as List
+import Set
 
 
 type alias Graph =
@@ -32,20 +36,73 @@ run sources deps =
         files =
             List.filterMap (FileContext.create sources deps) sources
 
+        moduleNames =
+            List.filterMap .moduleName files
+
+        moduleColors =
+            colors moduleNames
+
+        nodes =
+            List.map (nodeFromFile moduleColors) moduleNames
+
+        identifiers =
+            List.map .identifier nodes
+                |> Set.fromList
+
+        {-
+           Edges to external nodes (i.e. dependencies outside of the scope of
+           this app, such as Core and external packages) must be filtered out
+           in order to create a valid graph (as these dependencies are not
+           represented in the files and hence are missing from the nodes).
+        -}
+        removeEdgesToDependecies =
+            Edge.filterForIdentifiers identifiers
+
         edges =
             List.map edgesInFile files
                 |> List.concat
-
-        nodes =
-            List.filterMap .moduleName files
-                |> List.map nodeFromFile
+                |> removeEdgesToDependecies
     in
         init edges nodes
 
 
-nodeFromFile : AST.ModuleName -> Node
-nodeFromFile moduleName =
-    { identifier = nodeIdentifierFromModuleName moduleName
+topModuleName : AST.ModuleName -> String
+topModuleName moduleNameAST =
+    List.head moduleNameAST
+        |> Maybe.withDefault "Unknown"
+
+
+colors : List AST.ModuleName -> Dict String Color
+colors moduleNames =
+    let
+        topModuleNames =
+            List.map topModuleName moduleNames
+                |> Set.fromList
+                |> Set.toList
+                |> List.sort
+
+        allColors =
+            Color.list
+
+        colorsLength =
+            List.length allColors
+
+        colorsForModuleNames =
+            topModuleNames
+                |> List.indexedMap
+                    (\index name ->
+                        List.getAt (index % colorsLength) allColors
+                            |> Maybe.withDefault Color.fallback
+                            |> (,) name
+                    )
+    in
+        Dict.fromList colorsForModuleNames
+
+
+nodeFromFile : Dict String Color -> AST.ModuleName -> Node
+nodeFromFile colors moduleName =
+    { color = Dict.get (topModuleName moduleName) colors |> Maybe.withDefault Color.fallback
+    , identifier = nodeIdentifierFromModuleName moduleName
     , name = moduleName
     }
 
@@ -71,7 +128,7 @@ edgesInFile file =
 
 nodeIdentifierFromModuleName : AST.ModuleName -> Node.Identifier
 nodeIdentifierFromModuleName moduleName =
-    String.join "." moduleName
+    String.join "-" moduleName
 
 
 decode : Decoder Graph

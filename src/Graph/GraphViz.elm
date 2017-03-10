@@ -6,23 +6,15 @@ module Graph.GraphViz exposing (string)
 -}
 
 import Graph exposing (Graph)
-import Graph.Edge as Edge exposing (Edge)
+import Graph.Edge exposing (Edge)
 import Graph.Node exposing (Node)
-import Set
 
 
 string : Graph -> String
 string graph =
     let
-        identifiers =
-            -- external node are not correctly rendered by GraphViz
-            -- (we exclude them below)
-            List.map .identifier graph.nodes
-                |> Set.fromList
-
         edgesString =
-            Edge.filterForIdentifiers identifiers graph.edges
-                |> List.map edge
+            List.map edge graph.edges
                 |> String.join "\n"
 
         nodesString =

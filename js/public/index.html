@@ -8,11 +8,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/3.3.7+1/css/sb-admin-2.css" />
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" crossorigin="anonymous">
     <style>
-      .message-dialog .modal .modal-dialog {
-        padding: 20px;
-        width:100%;
-      }
+        .message-dialog .modal .modal-dialog {
+            padding: 20px;
+            width: 100%;
+        }
+
+        #sigmaGraph {
+            width: 100%;
+            height: 600px;
+            position: relative;
+            background-color: #fff;
+        }
     </style>
+    <script src="sigma/sigma.min.js"></script>
+    <script src="sigma/plugins/sigma.plugins.animate.min.js"></script>
+    <script src="sigma/plugins/sigma.plugins.relativeSize.min.js"></script>
+    <script src="sigma/plugins/sigma.layout.forceAtlas2.min.js"></script>
 </head>
 
 <body>
@@ -23,5 +34,5 @@
     var el = document.getElementById('app');
     var app = Elm.Client.Main.embed(el);
 </script>
-
+<script src="graph.js"></script>
 </html>

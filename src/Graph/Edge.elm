@@ -30,13 +30,14 @@ filterForIdentifiers identifiers =
 decode : Decoder Edge
 decode =
     JD.succeed Edge
-        |: JD.field "from" JD.string
-        |: JD.field "to" JD.string
+        |: JD.field "source" JD.string
+        |: JD.field "target" JD.string
 
 
 encode : Edge -> Value
 encode record =
     JE.object
-        [ ( "from", JE.string record.from )
-        , ( "to", JE.string record.to )
+        [ ( "id", JE.string <| record.from ++ "<->" ++ record.to )
+        , ( "source", JE.string record.from )
+        , ( "target", JE.string record.to )
         ]
