@@ -25,7 +25,7 @@ create sourceFiles dependencies ( fileContent, target ) =
             OperatorTable.buildModuleIndex sourceFiles dependencies
     in
         case target of
-            Failed ->
+            Failed _ ->
                 Nothing
 
             Loaded l ->

@@ -5,18 +5,19 @@ import Analyser.SourceLoadingStage as SourceLoadingStage
 import AnalyserPorts
 import Platform exposing (program)
 import Inspection
-import Analyser.Files.Types exposing (Dependency, Version)
 import Analyser.State as State exposing (State)
 import Analyser.Fixer as Fixer
 import Tuple2
 import Analyser.Messages.Util as Messages
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.Configuration as Configuration exposing (Configuration)
-import Analyser.Logging as Logging
+import GraphBuilder
+import Logger
+import Analyser.CodeBase as CodeBase exposing (CodeBase)
 
 
 type alias Model =
-    { dependencies : List Dependency
+    { codeBase : CodeBase
     , context : Context
     , configuration : Configuration
     , stage : Stage
@@ -52,14 +53,14 @@ init =
         { context = ContextLoader.emptyContext
         , stage = Finished
         , configuration = Configuration.defaultConfiguration
-        , dependencies = []
+        , codeBase = CodeBase.init
         , state = State.initialState
         }
 
 
 reset : Model -> ( Model, Cmd Msg )
 reset model =
-    ( { model | stage = ContextLoadingStage, state = State.initialState, dependencies = [] }
+    ( { model | stage = ContextLoadingStage, state = State.initialState, codeBase = CodeBase.init }
     , ContextLoader.loadContext ()
     )
         |> doSendState
@@ -92,7 +93,7 @@ update msg model =
                   }
                 , Cmd.batch <|
                     Cmd.map InterfaceLoadingStageMsg cmds
-                        :: List.map ((,) "INFO" >> Logging.log) messages
+                        :: List.map Logger.info messages
                 )
                     |> doSendState
 
@@ -203,7 +204,7 @@ onInterfaceLoadingStageMsg x stage model =
             InterfaceLoadingStage.update x stage
     in
         if InterfaceLoadingStage.isDone newStage then
-            ( { model | dependencies = InterfaceLoadingStage.getDependencies newStage }
+            ( { model | codeBase = CodeBase.setDependencies (InterfaceLoadingStage.getDependencies newStage) model.codeBase }
             , Cmd.map InterfaceLoadingStageMsg cmds
             )
                 |> startSourceLoading model.context.sourceFiles
@@ -213,6 +214,43 @@ onInterfaceLoadingStageMsg x stage model =
             )
 
 
+finishProcess : SourceLoadingStage.Model -> Cmd SourceLoadingStage.Msg -> Model -> ( Model, Cmd Msg )
+finishProcess newStage cmds model =
+    let
+        loadedSourceFiles =
+            SourceLoadingStage.parsedFiles newStage
+
+        newCodeBase =
+            CodeBase.addSourceFiles loadedSourceFiles model.codeBase
+
+        messages =
+            Inspection.run loadedSourceFiles (CodeBase.dependencies newCodeBase) model.configuration
+
+        newGraph =
+            GraphBuilder.run (CodeBase.sourceFiles newCodeBase) (CodeBase.dependencies newCodeBase)
+
+        newState =
+            State.finishWithNewMessages messages model.state
+                |> State.updateGraph newGraph
+
+        newModel =
+            { model
+                | stage = Finished
+                , state = newState
+                , codeBase = newCodeBase
+            }
+    in
+        ( newModel
+        , Cmd.batch
+            [ AnalyserPorts.sendMessagesAsStrings newState.messages
+            , AnalyserPorts.sendMessagesAsJson newState.messages
+            , AnalyserPorts.sendStateAsJson newState
+            , Cmd.map SourceLoadingStageMsg cmds
+            ]
+        )
+            |> handleNextStep
+
+
 onSourceLoadingStageMsg : SourceLoadingStage.Msg -> SourceLoadingStage.Model -> Model -> ( Model, Cmd Msg )
 onSourceLoadingStageMsg x stage model =
     let
@@ -220,27 +258,7 @@ onSourceLoadingStageMsg x stage model =
             SourceLoadingStage.update x stage
     in
         if SourceLoadingStage.isDone newStage then
-            let
-                messages =
-                    Inspection.run (SourceLoadingStage.parsedFiles newStage) model.dependencies model.configuration
-
-                newState =
-                    State.finishWithNewMessages messages model.state
-
-                newModel =
-                    { model
-                        | stage = Finished
-                        , state = newState
-                    }
-            in
-                ( newModel
-                , Cmd.batch
-                    [ AnalyserPorts.sendMessagesAsStrings newState.messages
-                    , AnalyserPorts.sendMessagesAsJson newState.messages
-                    , AnalyserPorts.sendStateAsJson newState
-                    ]
-                )
-                    |> handleNextStep
+            finishProcess newStage cmds model
         else
             ( { model | stage = SourceLoadingStage newStage }
             , Cmd.map SourceLoadingStageMsg cmds

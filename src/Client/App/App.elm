@@ -1,15 +1,16 @@
 module Client.App.App exposing (init, view, update, subscriptions)
 
+import Client.App.Menu
+import Client.App.Models exposing (Content(DashBoardContent, GraphContent, FileTreeContent), Model, Msg(..))
+import Client.DashBoard.DashBoard as DashBoard
+import Client.Graph.Graph as Graph
+import Client.FileTree as FileTree
+import Client.Socket exposing (controlAddress)
 import Html exposing (Html, div)
 import Html.Attributes exposing (id)
-import Client.App.Menu
-import Client.App.Models exposing (Model, Content(DashBoardContent, FileTreeContent), Msg(..))
-import Client.DashBoard.DashBoard as DashBoard
-import Client.FileTree as FileTree
+import Navigation exposing (Location)
 import Tuple2
 import WebSocket as WS
-import Navigation exposing (Location)
-import Client.Socket exposing (controlAddress)
 
 
 subscriptions : Model -> Sub Msg
@@ -18,6 +19,9 @@ subscriptions model =
         [ case model.content of
             DashBoardContent sub ->
                 DashBoard.subscriptions model.location sub |> Sub.map DashBoardMsg
+
+            GraphContent sub ->
+                Graph.subscriptions model.location sub |> Sub.map GraphMsg
 
             FileTreeContent sub ->
                 FileTree.subscriptions model.location sub |> Sub.map FileTreeMsg
@@ -38,6 +42,11 @@ onLocation l =
                 |> Tuple2.mapFirst (\x -> { content = FileTreeContent x, location = l })
                 |> Tuple2.mapSecond (Cmd.map FileTreeMsg)
 
+        "#module-graph" ->
+            Graph.init l
+                |> Tuple2.mapFirst (\x -> { content = GraphContent x, location = l })
+                |> Tuple2.mapSecond (Cmd.map GraphMsg)
+
         _ ->
             DashBoard.init l
                 |> Tuple2.mapFirst (\x -> { content = DashBoardContent x, location = l })
@@ -53,6 +62,9 @@ view m =
                 DashBoardContent subModel ->
                     DashBoard.view subModel |> Html.map DashBoardMsg
 
+                GraphContent subModel ->
+                    Graph.view subModel |> Html.map GraphMsg
+
                 FileTreeContent subModel ->
                     FileTree.view subModel |> Html.map FileTreeMsg
             ]
@@ -63,7 +75,18 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnLocation l ->
-            onLocation l
+            let
+                ( newModel, cmd ) =
+                    onLocation l
+
+                removeGraphCmd =
+                    if newModel.location.hash /= "#module-graph" then
+                        -- attempt to remove graph if we are not in graph view
+                        Graph.removeCmd
+                    else
+                        Cmd.none
+            in
+                newModel ! [ cmd, removeGraphCmd ]
 
         Refresh ->
             ( model
@@ -72,6 +95,9 @@ update msg model =
 
         DashBoardMsg subMsg ->
             onDashBoardMsg subMsg model
+
+        GraphMsg subMsg ->
+            onGraphMsg subMsg model
 
         FileTreeMsg subMsg ->
             onFileTreeMsg subMsg model
@@ -96,6 +122,18 @@ onDashBoardMsg subMsg model =
             DashBoard.update model.location subMsg subModel
                 |> Tuple2.mapFirst (\x -> { model | content = DashBoardContent x })
                 |> Tuple2.mapSecond (Cmd.map DashBoardMsg)
+
+        _ ->
+            model ! []
+
+
+onGraphMsg : Graph.Msg -> Model -> ( Model, Cmd Msg )
+onGraphMsg subMsg model =
+    case model.content of
+        GraphContent subModel ->
+            Graph.update model.location subMsg subModel
+                |> Tuple2.mapFirst (\x -> { model | content = GraphContent x })
+                |> Tuple2.mapSecond (Cmd.map GraphMsg)
 
         _ ->
             model ! []

@@ -233,11 +233,12 @@ getMessageInfo m =
             , True
             )
 
-        FileLoadFailed fileName ->
+        FileLoadFailed fileName message ->
             ( String.concat
                 [ "Could not load file \""
                 , fileName
-                , "\""
+                , "\" due to: "
+                , message
                 ]
             , always [ fileName ]
             , []

@@ -12,7 +12,7 @@ module.exports = function(app, config, directory) {
         if (app.ports[key]) {
             app.ports[key].subscribe(f);
         } else {
-            console.log('Port ', key, ' is not defined');
+            console.log('WARN: Port ', key, ' is not defined');
         }
     }
 

@@ -46,8 +46,8 @@ testFix name checker fixer triples =
                 test name <|
                     \() ->
                         Parser.parse input
-                            |> Maybe.map (PostProcessing.postProcess Dict.empty)
-                            |> Result.fromMaybe "Parse Failed"
+                            |> Result.map (PostProcessing.postProcess Dict.empty)
+                            |> Result.mapError (always "Parse Failed")
                             |> Result.andThen (analyseAndFix checker fixer input)
                             |> Expect.equal (Ok output)
             )

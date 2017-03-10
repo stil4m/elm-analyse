@@ -12,6 +12,8 @@ import Parser.Parser as Parser
 import Result
 import Maybe.Extra as Maybe
 import Analyser.Util
+import Logger
+import Result.Extra as Result
 
 
 port loadFile : String -> Cmd msg
@@ -33,7 +35,10 @@ type alias RefeshedAST =
 
 init : String -> Cmd Msg
 init s =
-    loadFile s
+    Cmd.batch
+        [ loadFile s
+        , Logger.info ("Load file " ++ s ++ "...")
+        ]
 
 
 subscriptions : Sub Msg
@@ -72,7 +77,7 @@ onInputLoadingInterface fileContent =
         |> Maybe.map loadedInterfaceForFile
         |> Maybe.map (flip (,) False)
         |> Maybe.orElseLazy (\() -> Just ( loadedFileFromContent fileContent, True ))
-        |> Maybe.withDefault ( Failed, False )
+        |> Maybe.withDefault ( Failed "Internal problem in the file loader. Please report an issue.", False )
 
 
 loadedFileFromContent : FileContent -> FileLoad
@@ -85,9 +90,10 @@ loadedFileFromContent fileContent =
         case fileContent.content of
             Just content ->
                 (Parser.parse content
-                    |> Maybe.map loadedInterfaceForFile
-                    |> Maybe.withDefault Failed
+                    |> Result.map loadedInterfaceForFile
+                    |> Result.mapError (List.head >> Maybe.withDefault "" >> Failed)
+                    |> Result.merge
                 )
 
             Nothing ->
-                Failed
+                Failed "No file content"

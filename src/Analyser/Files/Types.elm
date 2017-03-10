@@ -53,7 +53,7 @@ type alias LoadedFile =
 
 
 type FileLoad
-    = Failed
+    = Failed String
     | Loaded LoadedFileData
 
 

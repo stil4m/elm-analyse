@@ -49,7 +49,7 @@ type MessageData
     | DebugLog FileName Range
     | DebugCrash FileName Range
     | UnformattedFile FileName
-    | FileLoadFailed FileName
+    | FileLoadFailed FileName String
     | DuplicateImport FileName AST.ModuleName (List Range)
     | UnusedTypeAlias FileName String Range
     | RedefineVariable FileName String Range Range

@@ -1,5 +1,16 @@
 # elm-analyse changelog
 
+
+## 0.4.0 (2017-03-10)
+
+* [Issue #33](https://github.com/stil4m/elm-analyse/issues/33) Better messages when parsing to AST fails
+* [Issue #34](https://github.com/stil4m/elm-analyse/issues/34) Allow configuration for excluded paths
+* [Issue #35](https://github.com/stil4m/elm-analyse/issues/35) Better distinction in logging between loading dependencies and files
+* [Issue #38](https://github.com/stil4m/elm-analyse/issues/38) Cached sources interfere with code completion in elmjutsu
+* [PR #39](https://github.com/stil4m/elm-analyse/pull/39) Add module graph analysing. Thanks to [@felixLam](https://github.com/felixLam)
+* [PR #42](https://github.com/stil4m/elm-analyse/pull/42) Add interactive module graph using sigma.js. Thanks to [@felixLam](https://github.com/felixLam)
+* [PR #43](https://github.com/stil4m/elm-analyse/pull/43) Visualisation with Sigma.js with filtering. Thanks to [@felixLam](https://github.com/felixLam)
+
 ## 0.3.1 (2017-03-06)
 
 * [Issue #36](https://github.com/stil4m/elm-analyse/issues/36) Exit with error code when encountering issues. Thanks to [@felixLam](https://github.com/felixLam)

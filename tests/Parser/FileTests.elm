@@ -6,7 +6,6 @@ import Expect
 import Json.Decode
 import Json.Encode
 import Parser.CombineTestUtil exposing (..)
-import Parser.Declarations as Parser exposing (..)
 import Parser.File as Parser exposing (file)
 import Parser.Samples as Samples
 import Parser.Parser as Parser
@@ -26,6 +25,20 @@ all =
                                 parseFullStringState emptyState s Parser.file |> Expect.notEqual Nothing
                     )
                 |> Test.concat
+            ]
+        , describe "Error messages" <|
+            [ test "failure on module name" <|
+                \() ->
+                    Parser.parse "module foo exposing (..)\nx = 1"
+                        |> Expect.equal (Err [ "Could not continue parsing on location (1,0)" ])
+            , test "failure on declaration" <|
+                \() ->
+                    Parser.parse "module Foo exposing (..)\n\ntype x = \n  1"
+                        |> Expect.equal (Err [ "Could not continue parsing on location (2,-1)" ])
+            , test "failure on declaration expression" <|
+                \() ->
+                    Parser.parse "module Foo exposing (..) \nx = \n  x + _"
+                        |> Expect.equal (Err [ "Could not continue parsing on location (2,5)" ])
             ]
         , describe "FileTests - serialisation"
             [ Samples.allSamples

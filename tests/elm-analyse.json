@@ -1,0 +1,9 @@
+{
+  "checks" : {
+    "ExposeAll": false,
+    "ImportAll": false
+  },
+  "excludedPaths" : [
+    "../src"
+  ]
+}

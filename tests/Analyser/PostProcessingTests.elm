@@ -240,8 +240,8 @@ all =
                 test name <|
                     \() ->
                         Parser.Parser.parse input
-                            |> Maybe.map (PostProcessing.postProcess table)
-                            |> Expect.equal (Just output)
+                            |> Result.map (PostProcessing.postProcess table)
+                            |> Expect.equal (Ok output)
             )
             [ functionWithDocs
             , operatorFunctionWithDocs
