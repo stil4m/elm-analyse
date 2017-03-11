@@ -1,29 +1,28 @@
 const fs = require('fs');
 const fsExtra = require('fs-extra');
-const cp = require('child_process');
 const cachePath = './elm-stuff/.elm-analyse';
 
 function readDependencyJson(dependency, version, cb) {
     //TODO Error handling
-    fs.readFile(cachePath + '/' + dependency + "/" + version + "/dependency.json", cb);
+    fs.readFile(cachePath + '/' + dependency + '/' + version + '/dependency.json', cb);
 }
 
 function storeShaJson(sha1, content) {
-    fs.writeFile(cachePath + '/_shas/' + sha1 + ".json", content, function() {});
+    fs.writeFile(cachePath + '/_shas/' + sha1 + '.json', content, function() {});
 }
 
 function storeDependencyJson(dependency, version, content) {
-    const targetDir = cachePath + '/' + dependency + "/" + version;
+    const targetDir = cachePath + '/' + dependency + '/' + version;
     fsExtra.ensureDirSync(targetDir);
-    fs.writeFile(targetDir + "/dependency.json", content, function() {});
+    fs.writeFile(targetDir + '/dependency.json', content, function() {});
 }
 
 function elmCachePathForSha(sha) {
-    return cachePath + '/_shas/' + sha + '.elma'
+    return cachePath + '/_shas/' + sha + '.elma';
 }
 
 function astCachePathForSha(sha) {
-    return cachePath + '/_shas/' + sha + '.json'
+    return cachePath + '/_shas/' + sha + '.json';
 }
 
 function hasAstForSha(sha) {
@@ -47,4 +46,4 @@ module.exports = {
     jsonCachePathForSha: astCachePathForSha,
     readAstForSha: readAstForSha,
     setupShaFolder: setupShaFolder
-}
+};

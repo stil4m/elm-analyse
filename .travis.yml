@@ -11,10 +11,7 @@ cache:
   - elm-stuff
 
 install:
-  - npm install -g elm
-  - npm install -g elm-test
-  - elm-package install -y
-  - pushd tests && elm-package install -y && popd
+  - npm install
 
 script:
-  - elm-test
+  - npm run test

@@ -1,5 +1,4 @@
 const fs = require('fs');
-const cp = require('child_process');
 const _ = require('lodash');
 const find = require('find');
 const _path = require('path');
@@ -9,15 +8,15 @@ function targetFilesForPathAndPackage(directory, path, pack) {
     const targetFiles = _.uniq(_.flatten(packTargetDirs.map(x => {
         const exists = fs.existsSync(path + '/' + x);
         if (!exists) {
-            return []
+            return [];
         }
 
         return find.fileSync(/\.elm$/, path + '/' + x)
             .filter(x => {
-                const relativePath = x.replace(path, '')
+                const relativePath = x.replace(path, '');
                 return relativePath.indexOf('elm-stuff') === -1
                       && relativePath.indexOf('node_modules') === -1
-                      && (x.length > 0)
+                      && (x.length > 0);
             });
     }))).map(function(s) {
         const sParts = s.split(_path.sep);
@@ -32,14 +31,14 @@ function targetFilesForPathAndPackage(directory, path, pack) {
             }
         }
 
-        const result = dirParts.map(_ => "../").join() + sParts.join('/');
+        const result = dirParts.map(_ => '../').join() + sParts.join('/');
         return result;
     });
     return targetFiles;
 }
 
 function dependencyFiles(directory, dep, version) {
-    const depPath = directory + "/elm-stuff/packages/" + dep + "/" + version;
+    const depPath = directory + '/elm-stuff/packages/' + dep + '/' + version;
     const depPackageFile = require(depPath + '/elm-package.json');
     const unfilteredTargetFiles = targetFilesForPathAndPackage(directory, depPath, depPackageFile);
 
@@ -52,7 +51,6 @@ function dependencyFiles(directory, dep, version) {
 function gather(directory) {
     const packageFile = require(directory + '/elm-package.json');
     const exactDeps = require(directory + '/elm-stuff/exact-dependencies.json');
-    const targetDirs = packageFile['source-directories'];
     const dependencies = Object.keys(packageFile['dependencies']);
 
     var interfaceFiles = dependencies
@@ -73,4 +71,4 @@ function gather(directory) {
 module.exports = {
     gather: gather,
     getDependencyFiles: dependencyFiles
-}
+};
