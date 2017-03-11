@@ -16,13 +16,13 @@ module.exports = function(app, config, directory) {
         }
     }
 
-    checkedSubscribe('loadContext', function(x) {
+    checkedSubscribe('loadContext', function(_x) {
         const input = fileGatherer.gather(directory);
         var configuration;
         try {
             configuration = fs.readFileSync('./elm-analyse.json').toString();
         } catch (e) {
-            configuration = "";
+            configuration = '';
         }
         const data = {
             sourceFiles: input.sourceFiles,
@@ -53,7 +53,7 @@ module.exports = function(app, config, directory) {
         cache.readDependencyJson(dependency, version, function(err, content) {
             if (err) {
                 //TODO
-                app.ports.onRawDependency.send([dependency, version, "" + x]);
+                app.ports.onRawDependency.send([dependency, version, '' + x]);
             } else {
                 app.ports.onRawDependency.send([dependency, version, content.toString()]);
             }
@@ -69,15 +69,14 @@ module.exports = function(app, config, directory) {
         var depName = dep[0];
         var version = dep[1];
         var result = fileGatherer.getDependencyFiles(directory, depName, version);
-        var targets = [];
 
         const promises = result.map(fileName => new Promise(function(accept) {
-            fileReader(directory, fileName, accept)
+            fileReader(directory, fileName, accept);
         }));
         Promise.all(promises).then(function(targets) {
             app.ports.onDependencyFiles.send([depName, version, targets]);
         }, function(e) {
-            console.log("Error when loading files for loadDependencyFiles:", dep);
+            console.log('Error when loading files for loadDependencyFiles:', dep);
             console.log(e);
         });
     });
@@ -85,11 +84,11 @@ module.exports = function(app, config, directory) {
     checkedSubscribe('loadFileContentWithShas', function(files) {
         const promises = files.map(fileName => new Promise(function(accept) {
             fileReader(directory, fileName, accept);
-        }))
+        }));
         Promise.all(promises).then(function(pairs) {
             app.ports.onFileContentWithShas.send(pairs.map(x => [x.sha1, x.path, x.content]));
         }, function(e) {
-            console.log("Error when loading files for loadFileContentWithShas:");
+            console.log('Error when loading files for loadFileContentWithShas:');
             console.log(e);
         });
     });
@@ -97,19 +96,19 @@ module.exports = function(app, config, directory) {
     checkedSubscribe('storeFiles', function(files) {
         var promises = files.map(file => {
             return new Promise(function(accept) {
-                fs.writeFile(file[0], file[1], function(err) {
-                    console.log("Written file", file[0], "...");
+                fs.writeFile(file[0], file[1], function(_err) {
+                    console.log('Written file', file[0], '...');
                     try {
                         cp.execSync(config.elmFormatPath + ' --yes ' + file[0], {
                             stdio: []
                         });
-                        console.log("Formatted file", file[0]);
+                        console.log('Formatted file', file[0]);
                         accept();
                     } catch (e) {
-                        console.log("Could not formatted file", file[0]);
+                        console.log('Could not formatted file', file[0]);
                         accept();
                     }
-                })
+                });
             });
         });
         Promise.all(promises).then(function() {
@@ -117,4 +116,4 @@ module.exports = function(app, config, directory) {
         });
     });
 
-}
+};

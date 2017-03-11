@@ -1,17 +1,14 @@
-var express = require('express')
+var express = require('express');
 var app = express();
 var expressWs = require('express-ws')(app);
 const fs = require('fs');
 const fileGatherer = require('../util/file-gatherer');
-app.use(express.static(__dirname + '/../public'))
+app.use(express.static(__dirname + '/../public'));
 
 
 module.exports = function(config) {
     console.log('Elm Analyser server starting with config:');
     console.log(config);
-    const state = {
-        initializing: true
-    }
 
     const elm = require('./worker')(config);
     require('./dashboard')(app, elm, expressWs);
@@ -31,6 +28,6 @@ module.exports = function(config) {
     });
 
     app.listen(config.port, function() {
-        console.log("Server started");
+        console.log('Server started');
     });
 };
