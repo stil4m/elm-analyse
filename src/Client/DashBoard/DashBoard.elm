@@ -1,7 +1,7 @@
 module Client.DashBoard.DashBoard exposing (Model, Msg, subscriptions, init, update, view)
 
 import Analyser.State as State exposing (State)
-import Html exposing (Html, div, text, span, h3)
+import Html exposing (Html, div, text, h3)
 import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
 import Time
@@ -75,7 +75,7 @@ update location msg model =
 view : Model -> Html Msg
 view m =
     LoadingScreen.viewStateFromRemoteData m.state <|
-        \state ->
+        \_ ->
             div []
                 [ h3 [] [ text "Messages" ]
                 , MessageList.view m.messageList |> Html.map MessageListMsg
