@@ -23,6 +23,7 @@ import Html.Events exposing (onClick)
 import Json.Decode as JD exposing (Value)
 import Navigation exposing (Location)
 import WebSocket as WS
+import Client.LoadingScreen as LoadingScreen
 
 
 -- port for sending strings out to JavaScript
@@ -133,23 +134,10 @@ withGraph model graph =
 view : Model -> Html Msg
 view m =
     Html.div []
-        [ loadingStateLabel m.state
+        [ LoadingScreen.viewStateFromMaybe m.state (\_ -> Html.text "")
         , Html.div [ Html.id graphElementId ] []
         , legend m.filter m.colors
         ]
-
-
-loadingStateLabel : Maybe State -> Html Msg
-loadingStateLabel maybeState =
-    case maybeState of
-        Nothing ->
-            Html.text "Loading..."
-
-        Just state ->
-            if State.isBusy state then
-                Html.text "Busy..."
-            else
-                Html.text ""
 
 
 legend : Filter -> ColorDict -> Html Msg
