@@ -1,4 +1,4 @@
-module AST.Util exposing (fileExposingList, fileModuleName, getParenthesized, isOperatorApplication, isLambda, isIf, isCase, moduleExposingList, patternModuleNames)
+module AST.Util exposing (fileExposingList, isPortModule, fileModuleName, getParenthesized, isOperatorApplication, isLambda, isIf, isCase, moduleExposingList, patternModuleNames)
 
 import AST.Types
     exposing
@@ -30,6 +30,16 @@ moduleExposingList m =
 
         NoModule ->
             None
+
+
+isPortModule : File -> Bool
+isPortModule file =
+    case file.moduleDefinition of
+        PortModule _ ->
+            True
+
+        _ ->
+            False
 
 
 fileExposingList : File -> Maybe (Exposure Expose)

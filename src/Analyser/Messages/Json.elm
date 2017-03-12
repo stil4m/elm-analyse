@@ -102,6 +102,7 @@ decodeMessageData =
         , ( "DebugCrash", decodeFileAndRange DebugCrash )
         , ( "MultiLineRecordFormatting", decodeFileAndRange MultiLineRecordFormatting )
         , ( "UnformattedFile", JD.map UnformattedFile fileField )
+        , ( "UnnecessaryPortModule", JD.map UnnecessaryPortModule fileField )
         , ( "FileLoadFailed", JD.map2 FileLoadFailed fileField (JD.field "message" JD.string) )
         , ( "DuplicateImport"
           , JD.succeed DuplicateImport
@@ -265,6 +266,12 @@ encodeMessageData m =
 
         UnformattedFile file ->
             encodeTyped "UnformattedFile" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    ]
+
+        UnnecessaryPortModule file ->
+            encodeTyped "UnnecessaryPortModule" <|
                 JE.object
                     [ ( "file", JE.string file )
                     ]
