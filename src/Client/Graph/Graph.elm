@@ -10,20 +10,22 @@ port module Client.Graph.Graph
         )
 
 import Analyser.State as State exposing (State)
-import Graph.Colored.Color exposing (ColorDict)
-import Graph.Colored.Graph as ColoredGraph exposing (ColoredGraph)
-import Graph.Colored.Decorator as GraphDecorator
+import Client.LoadingScreen as LoadingScreen
 import Client.Socket exposing (dashboardAddress)
-import Dict
+import Dict exposing (Dict)
 import Graph exposing (Graph)
-import Graph.Node exposing (Node)
+import Graph.Colored.Color exposing (ColorDict)
+import Graph.Colored.Decorator as GraphDecorator
+import Graph.Colored.Graph as ColoredGraph exposing (ColoredGraph)
+import Graph.Degree as Degree exposing (Degree)
+import Graph.Node as Node exposing (Node)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events exposing (onClick)
+import Html.Lazy
 import Json.Decode as JD exposing (Value)
 import Navigation exposing (Location)
 import WebSocket as WS
-import Client.LoadingScreen as LoadingScreen
 
 
 -- port for sending strings out to JavaScript
@@ -137,6 +139,7 @@ view m =
         [ LoadingScreen.viewStateFromMaybe m.state (\_ -> Html.text "")
         , Html.div [ Html.id graphElementId ] []
         , legend m.filter m.colors
+        , Maybe.map2 (Html.Lazy.lazy2 topListInAndOut) m.graph m.state |> Maybe.withDefault (Html.text "")
         ]
 
 
@@ -168,8 +171,75 @@ legendEntry colors names =
         Just color ->
             Html.li
                 [ Html.style [ ( "color", color ) ], onClick (SetFilter names) ]
-                [ Html.text (String.join "." names) ]
+                [ Html.text (nameToString names) ]
                 |> Just
 
         Nothing ->
             Nothing
+
+
+nameToString : Node.Name -> String
+nameToString names =
+    String.join "." names
+
+
+topListInAndOut : ColoredGraph -> State -> Html Msg
+topListInAndOut graph state =
+    let
+        topDegrees =
+            Degree.topDegrees graph
+
+        nodesDict =
+            Node.dictFromList state.graph.nodes
+    in
+        Html.div []
+            [ panel "Top importees" (topList nodesDict (List.take 20 topDegrees.incoming))
+            , panel "Top importers" (topList nodesDict (List.take 20 topDegrees.outgoing))
+            ]
+
+
+panel : String -> Html Msg -> Html Msg
+panel title content =
+    Html.div
+        [ Html.class "col-lg-6" ]
+        [ Html.div
+            [ Html.class "panel panel-default" ]
+            [ Html.div [ Html.class "panel-heading" ]
+                [ Html.text title ]
+            , Html.div [ Html.class "panel-body" ]
+                [ content ]
+            ]
+        ]
+
+
+topList : Dict Node.Identifier Node -> List ( Node.Identifier, Degree.InOut Degree ) -> Html msg
+topList nodesDict list =
+    Html.table [ Html.class "table" ]
+        [ Html.thead []
+            [ Html.tr []
+                [ Html.th [] [ Html.text "Module" ]
+                , Html.th [] [ Html.text "Imported by" ]
+                , Html.th [] [ Html.text "Importing" ]
+                ]
+            ]
+        , Html.tbody []
+            (List.map
+                (\( identifier, degrees ) ->
+                    let
+                        node =
+                            Dict.get identifier nodesDict
+
+                        nameString =
+                            Maybe.map .name node
+                                |> Maybe.map nameToString
+                                |> Maybe.withDefault identifier
+                    in
+                        Html.tr []
+                            [ Html.td [] [ Html.text nameString ]
+                            , Html.td [] [ Html.text (toString degrees.incoming) ]
+                            , Html.td [] [ Html.text (toString degrees.outgoing) ]
+                            ]
+                )
+                list
+            )
+        ]
