@@ -14,6 +14,7 @@ import Client.Graph.Node as Node
 import Client.Graph.Table as Table
 import Client.LoadingScreen as LoadingScreen
 import Client.Socket exposing (dashboardAddress)
+import Client.View.BreadCrumb as BreadCrumb
 import Client.View.Panel as Panel
 import Dict exposing (Dict)
 import Graph exposing (Graph)
@@ -26,6 +27,7 @@ import Html.Attributes as Html
 import Html.Events exposing (onClick)
 import Html.Lazy
 import Json.Decode as JD exposing (Value)
+import List.Extra as List
 import Navigation exposing (Location)
 import WebSocket as WS
 
@@ -164,14 +166,15 @@ legend filter colors =
         entries =
             List.filterMap (legendEntry colors) names
 
-        clearButton =
+        breadCrumb =
             if List.isEmpty filter then
                 Html.text ""
             else
-                Html.button [ Html.class "btn btn-default", onClick (SetFilter []) ] [ Html.text "Reset Filter" ]
+                breadCrumbsForFilter filter
+                    |> BreadCrumb.view (List.last filter |> Maybe.withDefault "Current Filter")
     in
         Html.div [ Html.class "graph__legend" ]
-            [ clearButton
+            [ breadCrumb
             , Html.ul [] entries
             ]
 
@@ -187,3 +190,25 @@ legendEntry colors names =
 
         Nothing ->
             Nothing
+
+
+breadCrumbsForFilter : Filter -> List (BreadCrumb.Item Msg)
+breadCrumbsForFilter filter =
+    -- From a filter [A,B,C] build crumbs [[A], [A, B], [A, B, C]]
+    { title = "All"
+    , msg = SetFilter []
+    , color = ""
+    }
+        :: (List.indexedMap (\index _ -> List.take (index + 1) filter) filter
+                |> -- drop the last entry
+                   List.take (List.length filter - 1)
+                |> List.map breadCrumbItem
+           )
+
+
+breadCrumbItem : List String -> BreadCrumb.Item Msg
+breadCrumbItem nodeName =
+    { title = List.last nodeName |> Maybe.withDefault ""
+    , msg = SetFilter nodeName
+    , color = ""
+    }
