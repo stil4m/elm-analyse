@@ -14,6 +14,7 @@ import Client.Graph.Node as Node
 import Client.Graph.Table as Table
 import Client.LoadingScreen as LoadingScreen
 import Client.Socket exposing (dashboardAddress)
+import Client.View.Panel as Panel
 import Dict exposing (Dict)
 import Graph exposing (Graph)
 import Graph.Colored.Color exposing (ColorDict)
@@ -138,10 +139,18 @@ view : Model -> Html Msg
 view m =
     Html.div []
         [ LoadingScreen.viewStateFromMaybe m.state (\_ -> Html.text "")
-        , Html.div [ Html.id graphElementId ] []
-        , legend m.filter m.colors
-        , Maybe.map (.graph >> Html.Lazy.lazy (Table.view 20)) m.state
-            |> Maybe.withDefault (Html.text "")
+        , Html.h3 [] [ Html.text "Module Graph" ]
+        , Html.div [ Html.class "row" ]
+            [ Panel.viewWithFooter Panel.WidthFull
+                "Graph"
+                (Panel.documentationButton "ModuleGraph.md")
+                (Html.div [ Html.id graphElementId ] [])
+                (Just (legend m.filter m.colors))
+            ]
+        , Html.div [ Html.class "row" ]
+            [ Maybe.map (.graph >> Html.Lazy.lazy (Table.view 20)) m.state
+                |> Maybe.withDefault (Html.text "")
+            ]
         ]
 
 

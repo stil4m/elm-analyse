@@ -1,7 +1,7 @@
 module Client.Graph.Table exposing (view)
 
 import Client.Graph.Node as Node
-import Client.View as View
+import Client.View.Panel as Panel
 import Dict exposing (Dict)
 import Graph exposing (Graph)
 import Graph.Degree as Degree exposing (Degree)
@@ -28,10 +28,19 @@ topListInAndOut count graph =
 
         nodesDict =
             Node.dictFromList graph.nodes
+
+        documentationButton anchor =
+            Panel.documentationButton ("ModuleGraph.md#" ++ anchor)
     in
         Html.div []
-            [ View.panel "Top importees" (topList nodesDict (List.take count topDegrees.incoming))
-            , View.panel "Top importers" (topList nodesDict (List.take count topDegrees.outgoing))
+            [ Panel.view Panel.WidthHalf
+                "Top importees"
+                (documentationButton "top-importees")
+                (topList nodesDict (List.take count topDegrees.incoming))
+            , Panel.view Panel.WidthHalf
+                "Top importers"
+                (documentationButton "top-importers")
+                (topList nodesDict (List.take count topDegrees.outgoing))
             ]
 
 
