@@ -5,16 +5,16 @@
 The graph shows you all modules in your code base. Each dot represent one
 module. Mouseover a module to reveal its name or zoom in to view more labels.
 
-The color of each node is determined by the modules name space. The first
-component of each module's name determines the color: e.g. Module A.1 and A.2
-will receive one color, B.1 another.
+The color of each dot is determined by the module's namespace. The first
+component of each module's name determines the color: e.g. Module `A.1` and
+`A.2` will receive one color, `B.1` another.
 
 The size of each module is determine by the number of in- and outbound
 connections (i.e. how often it is imported and how many module it imports).
 
 You can click a module to highlight only the modules direcly related to it.
-Click a module name space in the legend to limit the graph (and table below) to
-include only modules of that name space and their internal relation. 
+Click a module's namespace in the legend to limit the graph (and table below) to
+include only modules of that namespace and their internal relation.
 
 
 ## Top importees and importers
