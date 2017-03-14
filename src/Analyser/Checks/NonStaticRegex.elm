@@ -7,18 +7,12 @@ import Analyser.Messages.Types exposing (Message, MessageData(NonStaticRegex), n
 import Inspector exposing (Order(Post, Inner), defaultConfig)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
-import ASTUtil.Expose as Expose
+import ASTUtil.Imports as Imports exposing (FunctionReference)
 
 
 type alias Context =
     { staticEnvironment : Bool
     , usages : List Range
-    }
-
-
-type alias FunctionReference =
-    { moduleName : ModuleName
-    , exposesRegex : Bool
     }
 
 
@@ -37,7 +31,7 @@ scan : FileContext -> Configuration -> List Message
 scan fileContext _ =
     let
         regexImport =
-            buildRegexImportInformation fileContext.ast.imports
+            Imports.buildImportInformation [ "Regex" ] "regex" fileContext.ast
     in
         case regexImport of
             Nothing ->
@@ -153,16 +147,3 @@ onExpressionFunctionReference ( range, inner ) context =
 
         _ ->
             context
-
-
-buildRegexImportInformation : List Import -> Maybe FunctionReference
-buildRegexImportInformation imports =
-    imports
-        |> List.filter (\i -> i.moduleName == [ "Regex" ])
-        |> List.head
-        |> Maybe.map
-            (\i ->
-                { moduleName = Maybe.withDefault i.moduleName i.moduleAlias
-                , exposesRegex = Expose.exposesFunction "regex" i.exposingList
-                }
-            )
