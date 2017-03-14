@@ -12,6 +12,7 @@ port module Client.Graph.Graph
 import Analyser.State as State exposing (State)
 import Client.Graph.Node as Node
 import Client.Graph.Table as Table
+import Client.Graph.Widgets as Widgets
 import Client.LoadingScreen as LoadingScreen
 import Client.Socket exposing (dashboardAddress)
 import Client.View.BreadCrumb as BreadCrumb
@@ -139,21 +140,39 @@ withGraph model graph =
 
 view : Model -> Html Msg
 view m =
-    Html.div []
-        [ LoadingScreen.viewStateFromMaybe m.state (\_ -> Html.text "")
-        , Html.h3 [] [ Html.text "Module Graph" ]
-        , Html.div [ Html.class "row" ]
-            [ Panel.viewWithFooter Panel.WidthFull
-                "Graph"
-                (Panel.documentationButton "ModuleGraph.md")
-                (Html.div [ Html.id graphElementId ] [])
-                (Just (legend m.filter m.colors))
+    let
+        maybeGraph =
+            Maybe.map .graph m.state
+    in
+        Html.div []
+            [ LoadingScreen.viewStateFromMaybe m.state (\_ -> Html.text "")
+            , Html.h3 [] [ Html.text "Module Graph" ]
+            , Html.div [ Html.class "row" ]
+                (widgets maybeGraph)
+            , Html.div [ Html.class "row" ]
+                [ Panel.viewWithFooter Panel.WidthFull
+                    "Graph"
+                    (Panel.documentationButton "ModuleGraph.md")
+                    (Html.div [ Html.id graphElementId ] [])
+                    (Just (legend m.filter m.colors))
+                ]
+            , Html.div [ Html.class "row" ]
+                [ Maybe.map (Html.Lazy.lazy (Table.view 20)) maybeGraph
+                    |> Maybe.withDefault (Html.text "")
+                ]
             ]
-        , Html.div [ Html.class "row" ]
-            [ Maybe.map (.graph >> Html.Lazy.lazy (Table.view 20)) m.state
-                |> Maybe.withDefault (Html.text "")
+
+
+widgets : Maybe (Graph Node) -> List (Html msg)
+widgets maybeGraph =
+    case maybeGraph of
+        Just graph ->
+            [ Widgets.countModules graph.nodes
+            , Widgets.countImports graph.edges
             ]
-        ]
+
+        Nothing ->
+            [ Html.text "" ]
 
 
 legend : Filter -> ColorDict -> Html Msg
