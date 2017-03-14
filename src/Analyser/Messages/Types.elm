@@ -63,6 +63,7 @@ type MessageData
     | LineLengthExceeded FileName (List Range)
     | MultiLineRecordFormatting FileName Range
     | UnnecessaryPortModule FileName
+    | NonStaticRegex FileName Range
 
 
 type alias GetFiles =
