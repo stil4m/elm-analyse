@@ -130,6 +130,7 @@ decodeMessageData =
         , ( "DropConcatOfLists", decodeFileAndRange DropConcatOfLists )
         , ( "DropConsOfItemAndList", decodeFileAndRange DropConsOfItemAndList )
         , ( "UnnecessaryListConcat", decodeFileAndRange UnnecessaryListConcat )
+        , ( "NonStaticRegex", decodeFileAndRange NonStaticRegex )
         ]
 
 
@@ -365,4 +366,11 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "ranges", JE.list (List.map Ranges.encode ranges) )
+                    ]
+
+        NonStaticRegex file range ->
+            encodeTyped "NonStaticRegex" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "range", Ranges.encode range )
                     ]

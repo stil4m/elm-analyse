@@ -209,6 +209,18 @@ getMessageInfo m =
             , True
             )
 
+        NonStaticRegex fileName range ->
+            ( String.concat
+                [ "Use of `Regex.regex` as non-static in file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , always [ fileName ]
+            , [ range ]
+            , False
+            )
+
         DebugLog fileName range ->
             ( String.concat
                 [ "Use of debug log in file \""

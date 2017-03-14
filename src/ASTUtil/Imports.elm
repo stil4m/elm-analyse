@@ -1,15 +1,23 @@
-module ASTUtil.Imports exposing (findImportWithRange, naiveStringifyImport, removeRangeFromImport)
+module ASTUtil.Imports exposing (FunctionReference, findImportWithRange, buildImportInformation, naiveStringifyImport, removeRangeFromImport)
 
 import AST.Types
     exposing
         ( File
         , Import
+        , ModuleName
         , Exposure(None, All, Explicit)
         , ValueConstructorExpose
         , Expose(InfixExpose, FunctionExpose, TypeOrAliasExpose, TypeExpose)
         , ExposedType
         )
 import AST.Ranges as Ranges exposing (Range)
+import ASTUtil.Expose as Expose
+
+
+type alias FunctionReference =
+    { moduleName : ModuleName
+    , exposesRegex : Bool
+    }
 
 
 {-|
@@ -20,6 +28,19 @@ findImportWithRange ast range =
     ast.imports
         |> List.filter (.range >> Ranges.containsRange range)
         |> List.head
+
+
+buildImportInformation : ModuleName -> String -> File -> Maybe FunctionReference
+buildImportInformation moduleName function file =
+    file.imports
+        |> List.filter (\i -> i.moduleName == moduleName)
+        |> List.head
+        |> Maybe.map
+            (\i ->
+                { moduleName = Maybe.withDefault i.moduleName i.moduleAlias
+                , exposesRegex = Expose.exposesFunction function i.exposingList
+                }
+            )
 
 
 naiveStringifyImport : Import -> String
