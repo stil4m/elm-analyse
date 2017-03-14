@@ -29,6 +29,10 @@ checker =
     }
 
 
+{-|
+Find out if `Regex.regex` and in what manner.
+If it is imported the dynamic usages should inspected and then transformed into messages.
+-}
 scan : FileContext -> Configuration -> List Message
 scan fileContext _ =
     let
@@ -40,30 +44,48 @@ scan fileContext _ =
                 []
 
             Just regexImport ->
-                Inspector.inspect
-                    { defaultConfig
-                        | onExpression = Post (onExpression regexImport)
-                        , onFunction = Inner onFunction
-                    }
-                    fileContext.ast
-                    { staticEnvironment = True, usages = [] }
+                findRegexUsagesInFunctions regexImport fileContext
                     |> .usages
                     |> List.map (NonStaticRegex fileContext.path)
                     |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
+{-| Inspect all functions to verify if the enviroments changes from static to dynamic, and check all expressions for regex usages.
+-}
+findRegexUsagesInFunctions : FunctionReference -> FileContext -> Context
+findRegexUsagesInFunctions regexImport fileContext =
+    Inspector.inspect
+        { defaultConfig
+            | onFunction = Inner onFunction
+            , onExpression = Post (onExpression regexImport)
+        }
+        fileContext.ast
+        startingContext
+
+
+startingContext : Context
+startingContext =
+    { staticEnvironment = True, usages = [] }
+
+
+{-|
+Set the `staticEnvironment` to False when an function is encountered.
+When the function returns from inner, reset the property in the context.
+-}
 onFunction : (Context -> Context) -> Function -> Context -> Context
-onFunction f function context =
+onFunction inner function context =
     if not (isStatic function) then
         let
             after =
-                f { context | staticEnvironment = False }
+                inner { context | staticEnvironment = False }
         in
             { after | staticEnvironment = context.staticEnvironment }
     else
-        f context
+        inner context
 
 
+{-| Check if a function is a real function or just a value. Will return true if it is a value.
+-}
 isStatic : Function -> Bool
 isStatic function =
     if List.length function.declaration.arguments > 0 then
@@ -108,6 +130,8 @@ addUsedRegex range context =
         { context | usages = range :: context.usages }
 
 
+{-| Check if regex in a qualified expression (with either the module name or the alias for the module)
+-}
 onExpressionQualified : ModuleName -> Expression -> Context -> Context
 onExpressionQualified moduleName ( range, inner ) context =
     case inner of
