@@ -209,9 +209,8 @@ handleNextStep (( model, cmds ) as input) =
                 Just ( newState, taskId ) ->
                     case Fixer.init taskId newState of
                         Nothing ->
-                            --TODO Log something here
                             ( { model | state = newState }
-                            , Cmd.none
+                            , Logger.info ("Could not fix message: '" ++ toString taskId ++ "'.")
                             )
 
                         Just ( fixerModel, fixerCmds, newState2 ) ->

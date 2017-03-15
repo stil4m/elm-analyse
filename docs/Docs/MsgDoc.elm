@@ -17,6 +17,7 @@ import Analyser.Checks.NoUncurriedPrefix
 import Analyser.Checks.NonStaticRegex
 import Analyser.Checks.OverriddenVariables
 import Analyser.Checks.SingleFieldRecord
+import Analyser.Checks.TriggerWords
 import Analyser.Checks.UnnecessaryListConcat
 import Analyser.Checks.UnnecessaryParens
 import Analyser.Checks.UnnecessaryPortModule
@@ -106,6 +107,7 @@ allMessages =
     , singleFieldRecord
     , lineLengthExceeded
     , duplicateRecordFieldUpdate
+    , triggerWords
     ]
 
 
@@ -114,6 +116,28 @@ forKey x =
     allMessages
         |> List.filter (.key >> (==) x)
         |> List.head
+
+
+triggerWords : MsgDoc
+triggerWords =
+    { name = "Trigger Words"
+    , shortDescription = "Comments can tell you what that you have to put your code a bit more attention. You should resolve things as 'TODO' and such."
+    , key = "TriggerWords"
+    , arguments =
+        [ ( "file", FileName )
+        , ( "word", VariableName )
+        , ( "range", Range )
+        ]
+    , example = Dynamic Analyser.Checks.TriggerWords.checker
+    , input = """
+module Foo exposing (sum)
+
+-- TODO actually implement this
+sum : Int -> Int -> Int
+sum x y =
+    0
+"""
+    }
 
 
 duplicateRecordFieldUpdate : MsgDoc

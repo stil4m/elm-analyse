@@ -41,15 +41,3 @@ type alias ModuleIndex =
 
 type alias OperatorTable =
     Dict String AST.Infix
-
-
-
---
--- type alias FileContent =
---     { path : String
---     , success : Bool
---     , sha1 : Maybe String
---     , content : Maybe String
---     , ast : Maybe String
---     , formatted : Bool
---     }

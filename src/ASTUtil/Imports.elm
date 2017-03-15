@@ -6,6 +6,7 @@ import Elm.Syntax.Exposing as Exposing exposing (..)
 import Elm.Syntax.File exposing (..)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Range exposing (Range)
+import List.Extra as List
 
 
 type alias FunctionReference =
@@ -61,11 +62,10 @@ stringifyExposingList exp =
                         [] ->
                             ""
 
-                        _ ->
+                        xs ->
                             let
-                                --TODO
                                 areOnDifferentLines =
-                                    False
+                                    rangesOnDifferentLines (List.map Exposing.topLevelExposeRange xs)
 
                                 seperator =
                                     if areOnDifferentLines then
@@ -75,6 +75,15 @@ stringifyExposingList exp =
                             in
                             "(" ++ (List.map stringifyExpose explicits |> String.join seperator) ++ ")"
                    )
+
+
+rangesOnDifferentLines : List Range -> Bool
+rangesOnDifferentLines ranges =
+    let
+        starts =
+            List.map (.start >> .row) ranges
+    in
+    List.length (List.unique starts) == List.length starts
 
 
 stringifyExpose : TopLevelExpose -> String
@@ -108,11 +117,10 @@ stringifyExposedType { name, constructors } =
                         [] ->
                             ""
 
-                        _ ->
+                        xs ->
                             let
-                                --TODO
                                 areOnDifferentLines =
-                                    False
+                                    rangesOnDifferentLines (List.map Tuple.second xs)
 
                                 seperator =
                                     if areOnDifferentLines then

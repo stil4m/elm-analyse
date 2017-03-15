@@ -119,7 +119,6 @@ outdateMessagesForFile fileName state =
 finishWithNewMessages : List Message -> State -> State
 finishWithNewMessages messages s =
     let
-        --TODO, Can we miss something here?
         untouchedMessages =
             s.messages
                 |> List.filter (.status >> (==) Applicable)

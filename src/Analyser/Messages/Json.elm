@@ -137,6 +137,7 @@ decodeMessageData =
         , ( "DropConcatOfLists", decodeFileAndRange DropConcatOfLists )
         , ( "DropConsOfItemAndList", decodeFileAndRange DropConsOfItemAndList )
         , ( "UnnecessaryListConcat", decodeFileAndRange UnnecessaryListConcat )
+        , ( "TriggerWord", JD.map3 TriggerWord fileField (JD.field "word" JD.string) (JD.field "range" Range.decode) )
         , ( "NonStaticRegex", decodeFileAndRange NonStaticRegex )
         , ( "CoreArrayUsage", decodeFileAndRange CoreArrayUsage )
         , ( "FunctionInLet", decodeFileAndRange FunctionInLet )
@@ -391,6 +392,14 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "ranges", JE.list (List.map Range.encode ranges) )
+                    ]
+
+        TriggerWord file word range ->
+            encodeTyped "TriggerWord" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "word", JE.string word )
+                    , ( "range", Range.encode range )
                     ]
 
         NonStaticRegex file range ->

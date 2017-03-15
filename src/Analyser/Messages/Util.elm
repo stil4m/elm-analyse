@@ -229,6 +229,18 @@ getMessageInfo m =
             , True
             )
 
+        TriggerWord fileName triggerWord range ->
+            ( String.concat
+                [ "`" ++ triggerWord ++ "` should not be used in comments. Found in \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , always [ fileName ]
+            , [ range ]
+            , False
+            )
+
         NonStaticRegex fileName range ->
             ( String.concat
                 [ "Use of `Regex.regex` as non-static in file \""

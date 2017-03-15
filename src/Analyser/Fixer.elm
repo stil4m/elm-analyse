@@ -101,7 +101,6 @@ update codeBase msg (Model model) =
                 )
             else
                 let
-                    -- TODO If parse failed?
                     fixData =
                         reference
                             |> List.filterMap

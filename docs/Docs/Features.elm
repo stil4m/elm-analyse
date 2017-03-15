@@ -71,8 +71,6 @@ packageCycles : Html msg
 packageCycles =
     div []
         [ h2 [] [ text "Package Cycles" ]
-
-        -- TODO
         , i [] [ text "Documentation is coming soon" ]
         ]
 
@@ -81,8 +79,6 @@ editorIntegration : Html msg
 editorIntegration =
     div []
         [ h2 [] [ text "Editor Integration" ]
-
-        -- TODO
         , i [] [ text "Documentation is coming soon" ]
         ]
 

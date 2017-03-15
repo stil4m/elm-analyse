@@ -102,5 +102,4 @@ findRecords rangeContext x =
             ( Range.build rangeContext r, fields ) :: List.concatMap (Tuple.second >> findRecords rangeContext) fields
 
         FunctionTypeAnnotation left right _ ->
-            -- TODO: Think about if this makes sense
             findRecords rangeContext left ++ findRecords rangeContext right

@@ -3,5 +3,8 @@
     "ExposeAll": false,
     "ImportAll": false,
     "LineLengthExceeded": false
+  },
+  "TriggerWords" : {
+      "words" : ["todo", "fix"]
   }
 }

@@ -107,4 +107,9 @@ configurationProperties =
       , description = "Defines the maximum line length"
       , defaultValue = "150"
       }
+    , { check = "TriggerWords"
+      , property = "words"
+      , description = "Array of words that would trigger a violation."
+      , defaultValue = "[ \"todo\" ]"
+      }
     ]

@@ -53,7 +53,6 @@ findParentPattern file range =
     in
     Inspector.inspect
         { defaultConfig
-          -- TODO Collect all pattern locations. Extract this to another place?
             | onFunction = Pre onFunction
             , onCase = Pre onCase
             , onLambda = Pre onLambda

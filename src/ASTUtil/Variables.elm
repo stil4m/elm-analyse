@@ -1,6 +1,5 @@
 module ASTUtil.Variables exposing (..)
 
-import AST.Ranges exposing (emptyRange)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Declaration exposing (..)
 import Elm.Syntax.Exposing exposing (..)
@@ -91,7 +90,6 @@ getImportExposedVars e =
                                     None ->
                                         [ ( VariablePointer exposedType.name exposedType.range, Imported ) ]
 
-                                    --TODO
                                     Explicit constructors ->
                                         constructors |> List.map (uncurry VariablePointer >> flip (,) Imported)
                     )
@@ -110,12 +108,10 @@ getDeclarationVars decl =
             List.map (\{ name, range } -> ( { value = name, range = range }, TopLevel )) t.constructors
 
         PortDeclaration p ->
-            --TODO Range + Test
-            [ ( { value = p.name, range = emptyRange }, TopLevel ) ]
+            [ ( { value = p.name, range = p.range }, TopLevel ) ]
 
-        InfixDeclaration i ->
-            --TODO Range + Test
-            [ ( { value = i.operator, range = emptyRange }, TopLevel ) ]
+        InfixDeclaration _ ->
+            []
 
         Destructuring pattern _ ->
             patternToVars pattern
