@@ -131,6 +131,7 @@ decodeMessageData =
         , ( "DropConsOfItemAndList", decodeFileAndRange DropConsOfItemAndList )
         , ( "UnnecessaryListConcat", decodeFileAndRange UnnecessaryListConcat )
         , ( "NonStaticRegex", decodeFileAndRange NonStaticRegex )
+        , ( "CoreArrayUsage", decodeFileAndRange CoreArrayUsage )
         ]
 
 
@@ -370,6 +371,13 @@ encodeMessageData m =
 
         NonStaticRegex file range ->
             encodeTyped "NonStaticRegex" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "range", Ranges.encode range )
+                    ]
+
+        CoreArrayUsage file range ->
+            encodeTyped "CoreArrayUsage" <|
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "range", Ranges.encode range )

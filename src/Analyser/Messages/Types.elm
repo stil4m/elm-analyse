@@ -64,6 +64,7 @@ type MessageData
     | MultiLineRecordFormatting FileName Range
     | UnnecessaryPortModule FileName
     | NonStaticRegex FileName Range
+    | CoreArrayUsage FileName Range
 
 
 type alias GetFiles =

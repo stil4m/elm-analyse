@@ -221,6 +221,18 @@ getMessageInfo m =
             , False
             )
 
+        CoreArrayUsage fileName range ->
+            ( String.concat
+                [ "Use of `Array` is disadviced. In \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , always [ fileName ]
+            , [ range ]
+            , False
+            )
+
         DebugLog fileName range ->
             ( String.concat
                 [ "Use of debug log in file \""
