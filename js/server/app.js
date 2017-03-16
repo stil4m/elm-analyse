@@ -28,6 +28,6 @@ module.exports = function(config) {
     });
 
     app.listen(config.port, function() {
-        console.log('Server started');
+        console.log('Listening on http://localhost:' + config.port);
     });
 };
