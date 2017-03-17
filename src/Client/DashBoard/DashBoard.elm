@@ -1,7 +1,7 @@
 module Client.DashBoard.DashBoard exposing (Model, Msg, subscriptions, init, update, view)
 
 import Analyser.State as State exposing (State)
-import Html exposing (Html, div, text, span, h3)
+import Html exposing (Html, div, text, h3)
 import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
 import Time
@@ -10,6 +10,7 @@ import Tuple2
 import Navigation exposing (Location)
 import Client.Socket exposing (dashboardAddress)
 import Client.MessageList as MessageList
+import Client.LoadingScreen as LoadingScreen
 
 
 type alias Model =
@@ -73,26 +74,9 @@ update location msg model =
 
 view : Model -> Html Msg
 view m =
-    div []
-        [ case m.state of
-            RD.Loading ->
-                text "Loading..."
-
-            RD.Success state ->
-                if State.isBusy state then
-                    text "Loading..."
-                else
-                    div []
-                        [ h3 [] [ text "Messages" ]
-                        , MessageList.view m.messageList |> Html.map MessageListMsg
-                        ]
-
-            RD.Failure e ->
-                div []
-                    [ text "Something went wrong"
-                    , text <| toString e
-                    ]
-
-            RD.NotAsked ->
-                span [] []
-        ]
+    LoadingScreen.viewStateFromRemoteData m.state <|
+        \_ ->
+            div []
+                [ h3 [] [ text "Messages" ]
+                , MessageList.view m.messageList |> Html.map MessageListMsg
+                ]

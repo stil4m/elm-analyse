@@ -1,8 +1,8 @@
 module Client.FileTree exposing (Model, Msg, init, subscriptions, update, view)
 
 import Navigation exposing (Location)
-import Html exposing (Html, text, span, div, a)
-import Html.Attributes exposing (class, style)
+import Html exposing (..)
+import Html.Attributes exposing (class, style, type_, checked)
 import Html.Events exposing (onClick)
 import Json.Decode as JD exposing (string, list)
 import Analyser.State as State exposing (State)
@@ -35,6 +35,7 @@ type Msg
     | NewState (Result String State)
     | OnSelectFile String
     | Tick
+    | ToggleHideGoodFiles
 
 
 init : Location -> ( Model, Cmd Msg )
@@ -112,6 +113,11 @@ update location msg model =
         OnSelectFile x ->
             ( { model | selectedFile = Just x } |> updateMessageList, Cmd.none )
 
+        ToggleHideGoodFiles ->
+            ( { model | hideGoodFiles = not model.hideGoodFiles }
+            , Cmd.none
+            )
+
         MessageListMsg subMsg ->
             MessageList.update location subMsg model.messageList
                 |> Tuple2.mapFirst (\x -> { model | messageList = x })
@@ -148,20 +154,37 @@ view m =
                 , text fileName
                 ]
     in
-        case m.fileIndex of
-            Just fileIndex ->
-                div [ class "row", style [ ( "padding-top", "10px" ) ] ]
-                    [ div [ class "col-md-6 col-sm-6", style [ ( "margin-top", "10px" ) ] ]
-                        [ div [ class "list-group" ]
-                            (fileIndex
-                                |> List.filter allowFile
-                                |> List.map asItem
-                            )
+        div []
+            [ div [ class "checkbox" ]
+                [ label []
+                    [ input
+                        [ type_ "checkbox"
+                        , checked m.hideGoodFiles
+                        , onClick ToggleHideGoodFiles
                         ]
-                    , div [ class "col-md-6 col-sm-6" ]
-                        [ MessageList.view m.messageList |> Html.map MessageListMsg
-                        ]
+                        []
+                    , text "Only show files with messages"
                     ]
+                ]
+            , hr [] []
+            , case m.fileIndex of
+                Just fileIndex ->
+                    div [ class "row", style [ ( "padding-top", "10px" ) ] ]
+                        [ div [ class "col-md-6 col-sm-6" ]
+                            [ div [ class "list-group" ]
+                                (fileIndex
+                                    |> List.filter allowFile
+                                    |> List.map asItem
+                                )
+                            ]
+                        , div [ class "col-md-6 col-sm-6" ]
+                            [ if m.selectedFile == Nothing then
+                                div [] []
+                              else
+                                MessageList.view m.messageList |> Html.map MessageListMsg
+                            ]
+                        ]
 
-            _ ->
-                div [] []
+                _ ->
+                    div [] []
+            ]

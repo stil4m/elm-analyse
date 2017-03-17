@@ -102,6 +102,7 @@ decodeMessageData =
         , ( "DebugCrash", decodeFileAndRange DebugCrash )
         , ( "MultiLineRecordFormatting", decodeFileAndRange MultiLineRecordFormatting )
         , ( "UnformattedFile", JD.map UnformattedFile fileField )
+        , ( "UnnecessaryPortModule", JD.map UnnecessaryPortModule fileField )
         , ( "FileLoadFailed", JD.map2 FileLoadFailed fileField (JD.field "message" JD.string) )
         , ( "DuplicateImport"
           , JD.succeed DuplicateImport
@@ -129,6 +130,8 @@ decodeMessageData =
         , ( "DropConcatOfLists", decodeFileAndRange DropConcatOfLists )
         , ( "DropConsOfItemAndList", decodeFileAndRange DropConsOfItemAndList )
         , ( "UnnecessaryListConcat", decodeFileAndRange UnnecessaryListConcat )
+        , ( "NonStaticRegex", decodeFileAndRange NonStaticRegex )
+        , ( "CoreArrayUsage", decodeFileAndRange CoreArrayUsage )
         ]
 
 
@@ -269,6 +272,12 @@ encodeMessageData m =
                     [ ( "file", JE.string file )
                     ]
 
+        UnnecessaryPortModule file ->
+            encodeTyped "UnnecessaryPortModule" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    ]
+
         FileLoadFailed file message ->
             encodeTyped "FileLoadFailed" <|
                 JE.object
@@ -358,4 +367,18 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "ranges", JE.list (List.map Ranges.encode ranges) )
+                    ]
+
+        NonStaticRegex file range ->
+            encodeTyped "NonStaticRegex" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "range", Ranges.encode range )
+                    ]
+
+        CoreArrayUsage file range ->
+            encodeTyped "CoreArrayUsage" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "range", Ranges.encode range )
                     ]

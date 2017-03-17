@@ -7,13 +7,14 @@ install:
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
   # install modules
-  - npm install -g elm
   - npm install
 
 # Post-install test scripts.
 test_script:
-  - node --version
-  - npm --version
-  - ./node_modules/.bin/elm-test
+  - npm run eslint
+  - npm run elm-format
+  - npm run test
+  - npm run build
+  - npm run self-check
 
 build: off

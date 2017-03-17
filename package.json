@@ -1,42 +1,53 @@
 {
-    "name": "elm-analyse",
-    "version": "0.4.0",
-    "description": "A tool that allows you analyse your Elm code and identifies deficiencies and best practices.",
-    "repository": {
-        "type": "git",
-        "url": "github.com/stil4m/elm-analyse"
-    },
-    "bugs": {
-        "url": "https://github.com/stil4m/elm-analyse/issues",
-        "email": "mstijlaart@gmail.com"
-    },
-    "scripts": {
-        "build": "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\""
-    },
-    "author": "Mats Stijlaart",
-    "license": "MIT",
-    "bin": {
-        "elm-analyse": "js/bin/index.js"
-    },
-    "keywords" : [
-        "elm",
-        "ast",
-        "lint"
-    ],
-    "dependencies": {
-        "elm": "0.18.0",
-        "elm-test": "0.18.2",
-        "express": "4.14.1",
-        "express-ws": "2.0.0",
-        "find": "0.2.7",
-        "fs-extra": "2.0.0",
-        "gulp": "3.9.1",
-        "gulp-elm": "0.6.1",
-        "lodash": "4.17.4",
-        "minimist": "1.2.0",
-        "nodemon": "1.11.0",
-        "normalize-newline": "3.0.0",
-        "run-sequence": "1.2.2",
-        "sums": "0.2.4"
-    }
+  "name": "elm-analyse",
+  "version": "0.4.0",
+  "description": "A tool that allows you analyse your Elm code and identifies deficiencies and best practices.",
+  "repository": {
+    "type": "git",
+    "url": "github.com/stil4m/elm-analyse"
+  },
+  "bugs": {
+    "url": "https://github.com/stil4m/elm-analyse/issues",
+    "email": "mstijlaart@gmail.com"
+  },
+  "scripts": {
+    "postinstall": "./node_modules/.bin/elm-format-download -t ./node_modules/.bin",
+    "eslint": "./node_modules/.bin/gulp lint",
+    "elm-format": "./node_modules/.bin/elm-format --validate src/ tests/",
+    "self-check": "node \"./js/bin/index.js\"",
+    "test": "./node_modules/.bin/elm-test",
+    "build": "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\"",
+    "pr-check": "npm install && npm run eslint && npm run elm-format && npm run test && npm run build && npm run self-check"
+  },
+  "author": "Mats Stijlaart",
+  "license": "MIT",
+  "bin": {
+    "elm-analyse": "js/bin/index.js"
+  },
+  "keywords": [
+    "elm",
+    "ast",
+    "lint"
+  ],
+  "dependencies": {
+    "elm": "0.18.0",
+    "elm-test": "0.18.2",
+    "express": "4.14.1",
+    "express-ws": "2.0.0",
+    "find": "0.2.7",
+    "fs-extra": "2.0.0",
+    "gulp": "3.9.1",
+    "gulp-elm": "0.6.1",
+    "lodash": "4.17.4",
+    "minimist": "1.2.0",
+    "nodemon": "1.11.0",
+    "normalize-newline": "3.0.0",
+    "run-sequence": "1.2.2",
+    "sums": "0.2.4"
+  },
+  "devDependencies": {
+    "elm-format-download": "^0.2.1",
+    "eslint": "^3.17.1",
+    "gulp-eslint": "^3.0.1"
+  }
 }
