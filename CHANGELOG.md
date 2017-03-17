@@ -1,5 +1,15 @@
 # elm-analyse changelog
 
+## 0.5.0 (2017-03-17)
+
+* [Issue #43](https://github.com/stil4m/elm-analyse/issues/43) Add ESLint to verify style of code in PRs
+* [Issue #45](https://github.com/stil4m/elm-analyse/issues/45) Add UnnecessaryPortModule check
+* [Issue #46](https://github.com/stil4m/elm-analyse/issues/46) Use of Regex.regex as a non static function (runtime error abound)
+* [Issue #51](https://github.com/stil4m/elm-analyse/issues/51) Use of Core's Array package
+* [Issue #54](https://github.com/stil4m/elm-analyse/issues/54) Print `http://localhost:{port}` when running with -s. Thanks to [@zwilias](https://github.com/zwilias)
+* [Issue #56](https://github.com/stil4m/elm-analyse/issues/56) Ignore elm source files in directories with starting with lower case.
+* [PR #47](https://github.com/stil4m/elm-analyse/pull/47) Add list of top importers and importees. Thanks to [@felixLam](https://github.com/felixLam)
+* [PR #48](https://github.com/stil4m/elm-analyse/pull/48) Improve module graph UI. Thanks to [@felixLam](https://github.com/felixLam)
 
 ## 0.4.0 (2017-03-10)
 
