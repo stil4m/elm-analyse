@@ -10466,6 +10466,10 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _elm_lang$html$Html_Lazy$lazy3 = _elm_lang$virtual_dom$VirtualDom$lazy3;
+var _elm_lang$html$Html_Lazy$lazy2 = _elm_lang$virtual_dom$VirtualDom$lazy2;
+var _elm_lang$html$Html_Lazy$lazy = _elm_lang$virtual_dom$VirtualDom$lazy;
+
 var _elm_lang$http$Native_Http = function() {
 
 
@@ -11933,6 +11937,16 @@ var _elm_lang$websocket$WebSocket$onSelfMsg = F3(
 	});
 _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/websocket', init: _elm_lang$websocket$WebSocket$init, onEffects: _elm_lang$websocket$WebSocket$onEffects, onSelfMsg: _elm_lang$websocket$WebSocket$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$websocket$WebSocket$cmdMap, subMap: _elm_lang$websocket$WebSocket$subMap};
 
+var _iosphere$elm_network_graph$Graph_Node$dictFromList = function (nodes) {
+	return A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (node, dict) {
+				return A3(_elm_lang$core$Dict$insert, node.identifier, node, dict);
+			}),
+		_elm_lang$core$Dict$empty,
+		nodes);
+};
 var _iosphere$elm_network_graph$Graph_Node$identifierFromName = function (name) {
 	return A2(_elm_lang$core$String$join, '-', name);
 };
@@ -12243,6 +12257,95 @@ var _iosphere$elm_network_graph$Graph_Colored_Graph$decode = A2(
 		_elm_lang$core$Json_Decode$field,
 		'nodes',
 		_elm_lang$core$Json_Decode$list(_iosphere$elm_network_graph$Graph_Colored_Node$decode)));
+
+var _iosphere$elm_network_graph$Graph_Degree$compareDegreesDictTuple = F3(
+	function (sortByField, _p1, _p0) {
+		var _p2 = _p1;
+		var _p3 = _p0;
+		var degreeCompare = A2(
+			_elm_lang$core$Basics$compare,
+			sortByField(_p2._1),
+			sortByField(_p3._1));
+		return _elm_lang$core$Native_Utils.eq(degreeCompare, _elm_lang$core$Basics$EQ) ? A2(_elm_lang$core$Basics$compare, _p3._0, _p2._0) : degreeCompare;
+	});
+var _iosphere$elm_network_graph$Graph_Degree$incoming = F2(
+	function (graph, identifier) {
+		return _elm_lang$core$List$length(
+			A2(
+				_elm_lang$core$List$filter,
+				function (edge) {
+					return _elm_lang$core$Native_Utils.eq(edge.to, identifier);
+				},
+				graph.edges));
+	});
+var _iosphere$elm_network_graph$Graph_Degree$outgoing = F2(
+	function (graph, identifier) {
+		return _elm_lang$core$List$length(
+			A2(
+				_elm_lang$core$List$filter,
+				function (edge) {
+					return _elm_lang$core$Native_Utils.eq(edge.from, identifier);
+				},
+				graph.edges));
+	});
+var _iosphere$elm_network_graph$Graph_Degree$InOut = F2(
+	function (a, b) {
+		return {incoming: a, outgoing: b};
+	});
+var _iosphere$elm_network_graph$Graph_Degree$degreesInDict = F2(
+	function (dict, identifier) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			A2(_iosphere$elm_network_graph$Graph_Degree$InOut, 0, 0),
+			A2(_elm_lang$core$Dict$get, identifier, dict));
+	});
+var _iosphere$elm_network_graph$Graph_Degree$updateDegrees = F3(
+	function (allEdges, edge, dict) {
+		var toDegree = A2(_iosphere$elm_network_graph$Graph_Degree$degreesInDict, dict, edge.to);
+		var updatedToDegree = _elm_lang$core$Native_Utils.update(
+			toDegree,
+			{incoming: toDegree.incoming + 1});
+		var fromDegree = A2(_iosphere$elm_network_graph$Graph_Degree$degreesInDict, dict, edge.from);
+		var updatedFromDegree = _elm_lang$core$Native_Utils.update(
+			fromDegree,
+			{outgoing: fromDegree.outgoing + 1});
+		return A3(
+			_elm_lang$core$Dict$insert,
+			edge.to,
+			updatedToDegree,
+			A3(_elm_lang$core$Dict$insert, edge.from, updatedFromDegree, dict));
+	});
+var _iosphere$elm_network_graph$Graph_Degree$allDegrees = function (graph) {
+	return A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (edge, dict) {
+				return A3(_iosphere$elm_network_graph$Graph_Degree$updateDegrees, graph.edges, edge, dict);
+			}),
+		_elm_lang$core$Dict$empty,
+		graph.edges);
+};
+var _iosphere$elm_network_graph$Graph_Degree$topDegrees = function (graph) {
+	var degreesList = _elm_lang$core$Dict$toList(
+		_iosphere$elm_network_graph$Graph_Degree$allDegrees(graph));
+	var topIn = _elm_lang$core$List$reverse(
+		A2(
+			_elm_lang$core$List$sortWith,
+			_iosphere$elm_network_graph$Graph_Degree$compareDegreesDictTuple(
+				function (_) {
+					return _.incoming;
+				}),
+			degreesList));
+	var topOut = _elm_lang$core$List$reverse(
+		A2(
+			_elm_lang$core$List$sortWith,
+			_iosphere$elm_network_graph$Graph_Degree$compareDegreesDictTuple(
+				function (_) {
+					return _.outgoing;
+				}),
+			degreesList));
+	return A2(_iosphere$elm_network_graph$Graph_Degree$InOut, topIn, topOut);
+};
 
 var _iosphere$elm_network_graph$Graph_Node_Json$encode = function (record) {
 	return _elm_lang$core$Json_Encode$object(
@@ -13512,6 +13615,17 @@ var _user$project$Analyser_Messages_Types$newMessage = A2(_user$project$Analyser
 var _user$project$Analyser_Messages_Types$Fixing = {ctor: 'Fixing'};
 var _user$project$Analyser_Messages_Types$Blocked = {ctor: 'Blocked'};
 var _user$project$Analyser_Messages_Types$Outdated = {ctor: 'Outdated'};
+var _user$project$Analyser_Messages_Types$CoreArrayUsage = F2(
+	function (a, b) {
+		return {ctor: 'CoreArrayUsage', _0: a, _1: b};
+	});
+var _user$project$Analyser_Messages_Types$NonStaticRegex = F2(
+	function (a, b) {
+		return {ctor: 'NonStaticRegex', _0: a, _1: b};
+	});
+var _user$project$Analyser_Messages_Types$UnnecessaryPortModule = function (a) {
+	return {ctor: 'UnnecessaryPortModule', _0: a};
+};
 var _user$project$Analyser_Messages_Types$MultiLineRecordFormatting = F2(
 	function (a, b) {
 		return {ctor: 'MultiLineRecordFormatting', _0: a, _1: b};
@@ -13976,6 +14090,20 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 						},
 						_1: {ctor: '[]'}
 					}));
+		case 'UnnecessaryPortModule':
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'UnnecessaryPortModule',
+				_elm_lang$core$Json_Encode$object(
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'file',
+							_1: _elm_lang$core$Json_Encode$string(_p0._0)
+						},
+						_1: {ctor: '[]'}
+					}));
 		case 'FileLoadFailed':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
@@ -14278,7 +14406,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_1: {ctor: '[]'}
 						}
 					}));
-		default:
+		case 'LineLengthExceeded':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'LineLengthExceeded',
@@ -14297,6 +14425,50 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: 'ranges',
 								_1: _elm_lang$core$Json_Encode$list(
 									A2(_elm_lang$core$List$map, _user$project$AST_Ranges$encode, _p0._1))
+							},
+							_1: {ctor: '[]'}
+						}
+					}));
+		case 'NonStaticRegex':
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'NonStaticRegex',
+				_elm_lang$core$Json_Encode$object(
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'file',
+							_1: _elm_lang$core$Json_Encode$string(_p0._0)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'range',
+								_1: _user$project$AST_Ranges$encode(_p0._1)
+							},
+							_1: {ctor: '[]'}
+						}
+					}));
+		default:
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'CoreArrayUsage',
+				_elm_lang$core$Json_Encode$object(
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'file',
+							_1: _elm_lang$core$Json_Encode$string(_p0._0)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'range',
+								_1: _user$project$AST_Ranges$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -14550,124 +14722,148 @@ var _user$project$Analyser_Messages_Json$decodeMessageData = _user$project$Util_
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'FileLoadFailed',
-																_1: A3(
-																	_elm_lang$core$Json_Decode$map2,
-																	_user$project$Analyser_Messages_Types$FileLoadFailed,
-																	_user$project$Analyser_Messages_Json$fileField,
-																	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string))
+																_0: 'UnnecessaryPortModule',
+																_1: A2(_elm_lang$core$Json_Decode$map, _user$project$Analyser_Messages_Types$UnnecessaryPortModule, _user$project$Analyser_Messages_Json$fileField)
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'DuplicateImport',
-																	_1: A2(
-																		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																		A2(
-																			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																			A2(
-																				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																				_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$DuplicateImport),
-																				_user$project$Analyser_Messages_Json$fileField),
-																			_user$project$Analyser_Messages_Json$moduleNameField),
-																		A2(
-																			_elm_lang$core$Json_Decode$field,
-																			'ranges',
-																			_elm_lang$core$Json_Decode$list(_user$project$AST_Ranges$decode)))
+																	_0: 'FileLoadFailed',
+																	_1: A3(
+																		_elm_lang$core$Json_Decode$map2,
+																		_user$project$Analyser_Messages_Types$FileLoadFailed,
+																		_user$project$Analyser_Messages_Json$fileField,
+																		A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string))
 																},
 																_1: {
 																	ctor: '::',
 																	_0: {
 																		ctor: '_Tuple2',
-																		_0: 'UnusedTypeAlias',
-																		_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$UnusedTypeAlias)
+																		_0: 'DuplicateImport',
+																		_1: A2(
+																			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																			A2(
+																				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																				A2(
+																					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																					_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$DuplicateImport),
+																					_user$project$Analyser_Messages_Json$fileField),
+																				_user$project$Analyser_Messages_Json$moduleNameField),
+																			A2(
+																				_elm_lang$core$Json_Decode$field,
+																				'ranges',
+																				_elm_lang$core$Json_Decode$list(_user$project$AST_Ranges$decode)))
 																	},
 																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'RedefineVariable',
-																			_1: A2(
-																				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																				A2(
-																					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																					A2(
-																						_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																						A2(
-																							_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																							_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$RedefineVariable),
-																							_user$project$Analyser_Messages_Json$fileField),
-																						_user$project$Analyser_Messages_Json$varNameField),
-																					A2(_elm_lang$core$Json_Decode$field, 'range1', _user$project$AST_Ranges$decode)),
-																				A2(_elm_lang$core$Json_Decode$field, 'range2', _user$project$AST_Ranges$decode))
+																			_0: 'UnusedTypeAlias',
+																			_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$UnusedTypeAlias)
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'LineLengthExceeded',
+																				_0: 'RedefineVariable',
 																				_1: A2(
 																					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 																					A2(
 																						_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																						_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$LineLengthExceeded),
-																						_user$project$Analyser_Messages_Json$fileField),
-																					A2(
-																						_elm_lang$core$Json_Decode$field,
-																						'ranges',
-																						_elm_lang$core$Json_Decode$list(_user$project$AST_Ranges$decode)))
+																						A2(
+																							_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																							A2(
+																								_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																								_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$RedefineVariable),
+																								_user$project$Analyser_Messages_Json$fileField),
+																							_user$project$Analyser_Messages_Json$varNameField),
+																						A2(_elm_lang$core$Json_Decode$field, 'range1', _user$project$AST_Ranges$decode)),
+																					A2(_elm_lang$core$Json_Decode$field, 'range2', _user$project$AST_Ranges$decode))
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'NoUncurriedPrefix',
-																					_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$NoUncurriedPrefix)
+																					_0: 'LineLengthExceeded',
+																					_1: A2(
+																						_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																						A2(
+																							_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																							_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$LineLengthExceeded),
+																							_user$project$Analyser_Messages_Json$fileField),
+																						A2(
+																							_elm_lang$core$Json_Decode$field,
+																							'ranges',
+																							_elm_lang$core$Json_Decode$list(_user$project$AST_Ranges$decode)))
 																				},
 																				_1: {
 																					ctor: '::',
 																					_0: {
 																						ctor: '_Tuple2',
-																						_0: 'UnusedImportAlias',
-																						_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImportAlias)
+																						_0: 'NoUncurriedPrefix',
+																						_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$NoUncurriedPrefix)
 																					},
 																					_1: {
 																						ctor: '::',
 																						_0: {
 																							ctor: '_Tuple2',
-																							_0: 'UnusedImport',
-																							_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImport)
+																							_0: 'UnusedImportAlias',
+																							_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImportAlias)
 																						},
 																						_1: {
 																							ctor: '::',
 																							_0: {
 																								ctor: '_Tuple2',
-																								_0: 'UseConsOverConcat',
-																								_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UseConsOverConcat)
+																								_0: 'UnusedImport',
+																								_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImport)
 																							},
 																							_1: {
 																								ctor: '::',
 																								_0: {
 																									ctor: '_Tuple2',
-																									_0: 'DropConcatOfLists',
-																									_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConcatOfLists)
+																									_0: 'UseConsOverConcat',
+																									_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UseConsOverConcat)
 																								},
 																								_1: {
 																									ctor: '::',
 																									_0: {
 																										ctor: '_Tuple2',
-																										_0: 'DropConsOfItemAndList',
-																										_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConsOfItemAndList)
+																										_0: 'DropConcatOfLists',
+																										_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConcatOfLists)
 																									},
 																									_1: {
 																										ctor: '::',
 																										_0: {
 																											ctor: '_Tuple2',
-																											_0: 'UnnecessaryListConcat',
-																											_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UnnecessaryListConcat)
+																											_0: 'DropConsOfItemAndList',
+																											_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConsOfItemAndList)
 																										},
-																										_1: {ctor: '[]'}
+																										_1: {
+																											ctor: '::',
+																											_0: {
+																												ctor: '_Tuple2',
+																												_0: 'UnnecessaryListConcat',
+																												_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UnnecessaryListConcat)
+																											},
+																											_1: {
+																												ctor: '::',
+																												_0: {
+																													ctor: '_Tuple2',
+																													_0: 'NonStaticRegex',
+																													_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$NonStaticRegex)
+																												},
+																												_1: {
+																													ctor: '::',
+																													_0: {
+																														ctor: '_Tuple2',
+																														_0: 'CoreArrayUsage',
+																														_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$CoreArrayUsage)
+																													},
+																													_1: {ctor: '[]'}
+																												}
+																											}
+																										}
 																									}
 																								}
 																							}
@@ -14912,26 +15108,21 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_2: {ctor: '[]'},
 				_3: true
 			};
-		case 'ExposeAll':
-			var _p11 = _p0._1;
+		case 'UnnecessaryPortModule':
 			var _p10 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Exposing all in file \"',
+						_0: 'File  `',
 						_1: {
 							ctor: '::',
 							_0: _p10,
 							_1: {
 								ctor: '::',
-								_0: '\" at ',
-								_1: {
-									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p11),
-									_1: {ctor: '[]'}
-								}
+								_0: '` is defined as a `port` module, but is does not declare ports. It may be better to remove these.',
+								_1: {ctor: '[]'}
 							}
 						}
 					}),
@@ -14941,16 +15132,48 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: _p10,
 						_1: {ctor: '[]'}
 					}),
+				_2: {ctor: '[]'},
+				_3: true
+			};
+		case 'ExposeAll':
+			var _p12 = _p0._1;
+			var _p11 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Exposing all in file \"',
+						_1: {
+							ctor: '::',
+							_0: _p11,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$AST_Ranges$rangeToString(_p12),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p11,
+						_1: {ctor: '[]'}
+					}),
 				_2: {
 					ctor: '::',
-					_0: _p11,
+					_0: _p12,
 					_1: {ctor: '[]'}
 				},
 				_3: false
 			};
 		case 'ImportAll':
-			var _p13 = _p0._2;
-			var _p12 = _p0._0;
+			var _p14 = _p0._2;
+			var _p13 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -14965,13 +15188,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '`in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p12,
+									_0: _p13,
 									_1: {
 										ctor: '::',
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p13),
+											_0: _user$project$AST_Ranges$rangeToString(_p14),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -14982,19 +15205,19 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p12,
+						_0: _p13,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p13,
+					_0: _p14,
 					_1: {ctor: '[]'}
 				},
 				_3: false
 			};
 		case 'NoTopLevelSignature':
-			var _p15 = _p0._2;
-			var _p14 = _p0._0;
+			var _p16 = _p0._2;
+			var _p15 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15009,13 +15232,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '` in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p14,
+									_0: _p15,
 									_1: {
 										ctor: '::',
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p15),
+											_0: _user$project$AST_Ranges$rangeToString(_p16),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -15026,19 +15249,19 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p14,
+						_0: _p15,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p15,
+					_0: _p16,
 					_1: {ctor: '[]'}
 				},
 				_3: false
 			};
 		case 'UnnecessaryParens':
-			var _p17 = _p0._1;
-			var _p16 = _p0._0;
+			var _p18 = _p0._1;
+			var _p17 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15047,13 +15270,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Unnecessary parens in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p16,
+							_0: _p17,
 							_1: {
 								ctor: '::',
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p17),
+									_0: _user$project$AST_Ranges$rangeToString(_p18),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15062,19 +15285,91 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p16,
+						_0: _p17,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p17,
+					_0: _p18,
 					_1: {ctor: '[]'}
 				},
 				_3: true
 			};
+		case 'NonStaticRegex':
+			var _p20 = _p0._1;
+			var _p19 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Use of `Regex.regex` as non-static in file \"',
+						_1: {
+							ctor: '::',
+							_0: _p19,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$AST_Ranges$rangeToString(_p20),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p19,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p20,
+					_1: {ctor: '[]'}
+				},
+				_3: false
+			};
+		case 'CoreArrayUsage':
+			var _p22 = _p0._1;
+			var _p21 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Use of `Array` is disadviced. In \"',
+						_1: {
+							ctor: '::',
+							_0: _p21,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$AST_Ranges$rangeToString(_p22),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p21,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p22,
+					_1: {ctor: '[]'}
+				},
+				_3: false
+			};
 		case 'DebugLog':
-			var _p19 = _p0._1;
-			var _p18 = _p0._0;
+			var _p24 = _p0._1;
+			var _p23 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15083,13 +15378,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Use of debug log in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p18,
+							_0: _p23,
 							_1: {
 								ctor: '::',
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p19),
+									_0: _user$project$AST_Ranges$rangeToString(_p24),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15098,19 +15393,19 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p18,
+						_0: _p23,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p19,
+					_0: _p24,
 					_1: {ctor: '[]'}
 				},
 				_3: true
 			};
 		case 'DebugCrash':
-			var _p21 = _p0._1;
-			var _p20 = _p0._0;
+			var _p26 = _p0._1;
+			var _p25 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15119,13 +15414,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Use of debug crash in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p20,
+							_0: _p25,
 							_1: {
 								ctor: '::',
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p21),
+									_0: _user$project$AST_Ranges$rangeToString(_p26),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15134,18 +15429,18 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p20,
+						_0: _p25,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p21,
+					_0: _p26,
 					_1: {ctor: '[]'}
 				},
 				_3: true
 			};
 		case 'UnformattedFile':
-			var _p22 = _p0._0;
+			var _p27 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15154,7 +15449,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Unformatted file \"',
 						_1: {
 							ctor: '::',
-							_0: _p22,
+							_0: _p27,
 							_1: {
 								ctor: '::',
 								_0: '\"',
@@ -15165,14 +15460,14 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p22,
+						_0: _p27,
 						_1: {ctor: '[]'}
 					}),
 				_2: {ctor: '[]'},
 				_3: true
 			};
 		case 'FileLoadFailed':
-			var _p23 = _p0._0;
+			var _p28 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15181,7 +15476,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Could not load file \"',
 						_1: {
 							ctor: '::',
-							_0: _p23,
+							_0: _p28,
 							_1: {
 								ctor: '::',
 								_0: '\" due to: ',
@@ -15196,15 +15491,15 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p23,
+						_0: _p28,
 						_1: {ctor: '[]'}
 					}),
 				_2: {ctor: '[]'},
 				_3: true
 			};
 		case 'DuplicateImport':
-			var _p25 = _p0._2;
-			var _p24 = _p0._0;
+			var _p30 = _p0._2;
+			var _p29 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15219,7 +15514,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '`in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p24,
+									_0: _p29,
 									_1: {
 										ctor: '::',
 										_0: '\" at [ ',
@@ -15228,7 +15523,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 											_0: A2(
 												_elm_lang$core$String$join,
 												' | ',
-												A2(_elm_lang$core$List$map, _user$project$AST_Ranges$rangeToString, _p25)),
+												A2(_elm_lang$core$List$map, _user$project$AST_Ranges$rangeToString, _p30)),
 											_1: {
 												ctor: '::',
 												_0: ' ]',
@@ -15243,15 +15538,15 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p24,
+						_0: _p29,
 						_1: {ctor: '[]'}
 					}),
-				_2: _p25,
+				_2: _p30,
 				_3: true
 			};
 		case 'UnusedImportAlias':
-			var _p27 = _p0._2;
-			var _p26 = _p0._0;
+			var _p32 = _p0._2;
+			var _p31 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15266,13 +15561,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '`in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p26,
+									_0: _p31,
 									_1: {
 										ctor: '::',
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p27),
+											_0: _user$project$AST_Ranges$rangeToString(_p32),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -15283,19 +15578,19 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p26,
+						_0: _p31,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p27,
+					_0: _p32,
 					_1: {ctor: '[]'}
 				},
 				_3: true
 			};
 		case 'UnusedImport':
-			var _p29 = _p0._2;
-			var _p28 = _p0._0;
+			var _p34 = _p0._2;
+			var _p33 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15310,13 +15605,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '`in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p28,
+									_0: _p33,
 									_1: {
 										ctor: '::',
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p29),
+											_0: _user$project$AST_Ranges$rangeToString(_p34),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -15327,19 +15622,19 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p28,
+						_0: _p33,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p29,
+					_0: _p34,
 					_1: {ctor: '[]'}
 				},
 				_3: true
 			};
 		case 'UnusedTypeAlias':
-			var _p31 = _p0._2;
-			var _p30 = _p0._0;
+			var _p36 = _p0._2;
+			var _p35 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15354,13 +15649,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '` is not used in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p30,
+									_0: _p35,
 									_1: {
 										ctor: '::',
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p31),
+											_0: _user$project$AST_Ranges$rangeToString(_p36),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -15371,19 +15666,19 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p30,
+						_0: _p35,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p31,
+					_0: _p36,
 					_1: {ctor: '[]'}
 				},
 				_3: true
 			};
 		case 'MultiLineRecordFormatting':
-			var _p33 = _p0._1;
-			var _p32 = _p0._0;
+			var _p38 = _p0._1;
+			var _p37 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15392,13 +15687,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Record should be formatted over multiple lines in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p32,
+							_0: _p37,
 							_1: {
 								ctor: '::',
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p33),
+									_0: _user$project$AST_Ranges$rangeToString(_p38),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15407,19 +15702,19 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p32,
+						_0: _p37,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p33,
+					_0: _p38,
 					_1: {ctor: '[]'}
 				},
 				_3: true
 			};
 		case 'NoUncurriedPrefix':
-			var _p35 = _p0._2;
-			var _p34 = _p0._0;
+			var _p40 = _p0._2;
+			var _p39 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15434,109 +15729,16 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '` is unneeded in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p34,
+									_0: _p39,
 									_1: {
 										ctor: '::',
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p35),
+											_0: _user$project$AST_Ranges$rangeToString(_p40),
 											_1: {ctor: '[]'}
 										}
 									}
-								}
-							}
-						}
-					}),
-				_1: _elm_lang$core$Basics$always(
-					{
-						ctor: '::',
-						_0: _p34,
-						_1: {ctor: '[]'}
-					}),
-				_2: {
-					ctor: '::',
-					_0: _p35,
-					_1: {ctor: '[]'}
-				},
-				_3: false
-			};
-		case 'RedefineVariable':
-			var _p38 = _p0._3;
-			var _p37 = _p0._2;
-			var _p36 = _p0._0;
-			return {
-				ctor: '_Tuple4',
-				_0: _elm_lang$core$String$concat(
-					{
-						ctor: '::',
-						_0: 'Variable `',
-						_1: {
-							ctor: '::',
-							_0: _p0._1,
-							_1: {
-								ctor: '::',
-								_0: '` is redefined in file \"',
-								_1: {
-									ctor: '::',
-									_0: _p36,
-									_1: {
-										ctor: '::',
-										_0: '\". At ',
-										_1: {
-											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p37),
-											_1: {
-												ctor: '::',
-												_0: ' and ',
-												_1: {
-													ctor: '::',
-													_0: _user$project$AST_Ranges$rangeToString(_p38),
-													_1: {ctor: '[]'}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}),
-				_1: _elm_lang$core$Basics$always(
-					{
-						ctor: '::',
-						_0: _p36,
-						_1: {ctor: '[]'}
-					}),
-				_2: {
-					ctor: '::',
-					_0: _p37,
-					_1: {
-						ctor: '::',
-						_0: _p38,
-						_1: {ctor: '[]'}
-					}
-				},
-				_3: false
-			};
-		case 'UseConsOverConcat':
-			var _p40 = _p0._1;
-			var _p39 = _p0._0;
-			return {
-				ctor: '_Tuple4',
-				_0: _elm_lang$core$String$concat(
-					{
-						ctor: '::',
-						_0: 'Use `::` instead of `++` in file \"',
-						_1: {
-							ctor: '::',
-							_0: _p39,
-							_1: {
-								ctor: '::',
-								_0: '\" at ',
-								_1: {
-									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p40),
-									_1: {ctor: '[]'}
 								}
 							}
 						}
@@ -15552,27 +15754,44 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 					_0: _p40,
 					_1: {ctor: '[]'}
 				},
-				_3: true
+				_3: false
 			};
-		case 'DropConcatOfLists':
-			var _p42 = _p0._1;
+		case 'RedefineVariable':
+			var _p43 = _p0._3;
+			var _p42 = _p0._2;
 			var _p41 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Joining two literal lists with `++`, but instead you can just join the lists. \"',
+						_0: 'Variable `',
 						_1: {
 							ctor: '::',
-							_0: _p41,
+							_0: _p0._1,
 							_1: {
 								ctor: '::',
-								_0: '\" at ',
+								_0: '` is redefined in file \"',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p42),
-									_1: {ctor: '[]'}
+									_0: _p41,
+									_1: {
+										ctor: '::',
+										_0: '\". At ',
+										_1: {
+											ctor: '::',
+											_0: _user$project$AST_Ranges$rangeToString(_p42),
+											_1: {
+												ctor: '::',
+												_0: ' and ',
+												_1: {
+													ctor: '::',
+													_0: _user$project$AST_Ranges$rangeToString(_p43),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
 								}
 							}
 						}
@@ -15586,28 +15805,32 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_2: {
 					ctor: '::',
 					_0: _p42,
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _p43,
+						_1: {ctor: '[]'}
+					}
 				},
-				_3: true
+				_3: false
 			};
-		case 'DropConsOfItemAndList':
-			var _p44 = _p0._1;
-			var _p43 = _p0._0;
+		case 'UseConsOverConcat':
+			var _p45 = _p0._1;
+			var _p44 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Adding an item to the front of a literal list, but instead you can just put it in the list. \"',
+						_0: 'Use `::` instead of `++` in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p43,
+							_0: _p44,
 							_1: {
 								ctor: '::',
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p44),
+									_0: _user$project$AST_Ranges$rangeToString(_p45),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15616,19 +15839,91 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p43,
+						_0: _p44,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p44,
+					_0: _p45,
+					_1: {ctor: '[]'}
+				},
+				_3: true
+			};
+		case 'DropConcatOfLists':
+			var _p47 = _p0._1;
+			var _p46 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Joining two literal lists with `++`, but instead you can just join the lists. \"',
+						_1: {
+							ctor: '::',
+							_0: _p46,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$AST_Ranges$rangeToString(_p47),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p46,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p47,
+					_1: {ctor: '[]'}
+				},
+				_3: true
+			};
+		case 'DropConsOfItemAndList':
+			var _p49 = _p0._1;
+			var _p48 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Adding an item to the front of a literal list, but instead you can just put it in the list. \"',
+						_1: {
+							ctor: '::',
+							_0: _p48,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$AST_Ranges$rangeToString(_p49),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p48,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p49,
 					_1: {ctor: '[]'}
 				},
 				_3: true
 			};
 		case 'LineLengthExceeded':
-			var _p46 = _p0._1;
-			var _p45 = _p0._0;
+			var _p51 = _p0._1;
+			var _p50 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15638,13 +15933,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$core$Basics$toString(
-								_elm_lang$core$List$length(_p46)),
+								_elm_lang$core$List$length(_p51)),
 							_1: {
 								ctor: '::',
 								_0: ' line(s) in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p45,
+									_0: _p50,
 									_1: {
 										ctor: '::',
 										_0: '\".',
@@ -15657,15 +15952,15 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p45,
+						_0: _p50,
 						_1: {ctor: '[]'}
 					}),
-				_2: _p46,
+				_2: _p51,
 				_3: false
 			};
 		default:
-			var _p48 = _p0._1;
-			var _p47 = _p0._0;
+			var _p53 = _p0._1;
+			var _p52 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15674,13 +15969,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Better merge the arguments of `List.concat` to a single list in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p47,
+							_0: _p52,
 							_1: {
 								ctor: '::',
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p48),
+									_0: _user$project$AST_Ranges$rangeToString(_p53),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15689,12 +15984,12 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p47,
+						_0: _p52,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p48,
+					_0: _p53,
 					_1: {ctor: '[]'}
 				},
 				_3: true
@@ -15702,18 +15997,18 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 	}
 };
 var _user$project$Analyser_Messages_Util$canFix = function (m) {
-	var _p49 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var result = _p49._3;
+	var _p54 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var result = _p54._3;
 	return result;
 };
 var _user$project$Analyser_Messages_Util$getRanges = function (m) {
-	var _p50 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var r = _p50._2;
+	var _p55 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var r = _p55._2;
 	return r;
 };
 var _user$project$Analyser_Messages_Util$getFiles = function (m) {
-	var _p51 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p51._1;
+	var _p56 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p56._1;
 	return f(m);
 };
 var _user$project$Analyser_Messages_Util$compareMessage = F2(
@@ -15742,8 +16037,8 @@ var _user$project$Analyser_Messages_Util$compareMessage = F2(
 					_user$project$Analyser_Messages_Util$getRanges(b.data)))) : A2(_elm_lang$core$Basics$compare, aFile, bFile);
 	});
 var _user$project$Analyser_Messages_Util$asString = function (m) {
-	var _p52 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p52._0;
+	var _p57 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p57._0;
 	return f;
 };
 var _user$project$Analyser_Messages_Util$markFixing = F2(
@@ -16827,6 +17122,47 @@ var _user$project$Client_MessageList$view = function (model) {
 		});
 };
 
+var _user$project$Client_LoadingScreen$viewStateFromMaybe = F2(
+	function (maybeState, f) {
+		var _p0 = maybeState;
+		if (_p0.ctor === 'Nothing') {
+			return _elm_lang$html$Html$text('Loading...');
+		} else {
+			var _p1 = _p0._0;
+			return _user$project$Analyser_State$isBusy(_p1) ? _elm_lang$html$Html$text('Loading...') : f(_p1);
+		}
+	});
+var _user$project$Client_LoadingScreen$viewStateFromRemoteData = F2(
+	function (rd, f) {
+		var _p2 = rd;
+		switch (_p2.ctor) {
+			case 'Loading':
+				return _elm_lang$html$Html$text('Loading...');
+			case 'Success':
+				var _p3 = _p2._0;
+				return _user$project$Analyser_State$isBusy(_p3) ? _elm_lang$html$Html$text('Loading...') : f(_p3);
+			case 'Failure':
+				return A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Something went wrong'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								_elm_lang$core$Basics$toString(_p2._0)),
+							_1: {ctor: '[]'}
+						}
+					});
+			default:
+				return A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{ctor: '[]'});
+		}
+	});
+
 var _user$project$Client_DashBoard_DashBoard$init = function (location) {
 	return {
 		ctor: '_Tuple2',
@@ -16902,60 +17238,31 @@ var _user$project$Client_DashBoard_DashBoard$update = F3(
 	});
 var _user$project$Client_DashBoard_DashBoard$view = function (m) {
 	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: function () {
-				var _p3 = m.state;
-				switch (_p3.ctor) {
-					case 'Loading':
-						return _elm_lang$html$Html$text('Loading...');
-					case 'Success':
-						return _user$project$Analyser_State$isBusy(_p3._0) ? _elm_lang$html$Html$text('Loading...') : A2(
-							_elm_lang$html$Html$div,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$h3,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Messages'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$map,
-										_user$project$Client_DashBoard_DashBoard$MessageListMsg,
-										_user$project$Client_MessageList$view(m.messageList)),
-									_1: {ctor: '[]'}
-								}
-							});
-					case 'Failure':
-						return A2(
-							_elm_lang$html$Html$div,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Something went wrong'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										_elm_lang$core$Basics$toString(_p3._0)),
-									_1: {ctor: '[]'}
-								}
-							});
-					default:
-						return A2(
-							_elm_lang$html$Html$span,
-							{ctor: '[]'},
-							{ctor: '[]'});
-				}
-			}(),
-			_1: {ctor: '[]'}
+		_user$project$Client_LoadingScreen$viewStateFromRemoteData,
+		m.state,
+		function (_p3) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h3,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Messages'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$map,
+							_user$project$Client_DashBoard_DashBoard$MessageListMsg,
+							_user$project$Client_MessageList$view(m.messageList)),
+						_1: {ctor: '[]'}
+					}
+				});
 		});
 };
 var _user$project$Client_DashBoard_DashBoard$Tick = {ctor: 'Tick'};
@@ -16992,22 +17299,545 @@ var _user$project$Client_DashBoard_DashBoard$subscriptions = F2(
 			});
 	});
 
-var _user$project$Client_Graph_Graph$loadingStateLabel = function (maybeState) {
-	var _p0 = maybeState;
-	if (_p0.ctor === 'Nothing') {
-		return _elm_lang$html$Html$text('Loading...');
+var _user$project$Client_Graph_Node$nameToString = function (names) {
+	return A2(_elm_lang$core$String$join, '.', names);
+};
+
+var _user$project$Client_View_Panel$classForWidth = function (panelWidth) {
+	var _p0 = panelWidth;
+	if (_p0.ctor === 'WidthFull') {
+		return _elm_lang$html$Html_Attributes$class('col-lg-12');
 	} else {
-		return _user$project$Analyser_State$isBusy(_p0._0) ? _elm_lang$html$Html$text('Busy...') : _elm_lang$html$Html$text('');
+		return _elm_lang$html$Html_Attributes$class('col-lg-6');
+	}
+};
+var _user$project$Client_View_Panel$headerButton = function (button) {
+	var _p1 = button;
+	if (_p1.ctor === 'Documentation') {
+		return A2(
+			_elm_lang$html$Html$a,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$href(_p1._0),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'float', _1: 'right'},
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$i,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('fa fa-book'),
+						_1: {ctor: '[]'}
+					},
+					{ctor: '[]'}),
+				_1: {ctor: '[]'}
+			});
+	} else {
+		return _elm_lang$html$Html$text('');
+	}
+};
+var _user$project$Client_View_Panel$panelFooter = function (maybeContent) {
+	var _p2 = maybeContent;
+	if (_p2.ctor === 'Just') {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('panel-footer'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _p2._0,
+				_1: {ctor: '[]'}
+			});
+	} else {
+		return _elm_lang$html$Html$text('');
+	}
+};
+var _user$project$Client_View_Panel$viewWithFooter = F5(
+	function (panelWidth, title, button, content, maybeFooter) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _user$project$Client_View_Panel$classForWidth(panelWidth),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('panel panel-default'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('panel-heading'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(title),
+								_1: {
+									ctor: '::',
+									_0: _user$project$Client_View_Panel$headerButton(button),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('panel-body'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: content,
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: _user$project$Client_View_Panel$panelFooter(maybeFooter),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$Client_View_Panel$view = F4(
+	function (panelWidth, title, button, content) {
+		return A5(_user$project$Client_View_Panel$viewWithFooter, panelWidth, title, button, content, _elm_lang$core$Maybe$Nothing);
+	});
+var _user$project$Client_View_Panel$WidthHalf = {ctor: 'WidthHalf'};
+var _user$project$Client_View_Panel$WidthFull = {ctor: 'WidthFull'};
+var _user$project$Client_View_Panel$NoButton = {ctor: 'NoButton'};
+var _user$project$Client_View_Panel$Documentation = function (a) {
+	return {ctor: 'Documentation', _0: a};
+};
+var _user$project$Client_View_Panel$documentationButton = function (path) {
+	return _user$project$Client_View_Panel$Documentation(
+		A2(_elm_lang$core$Basics_ops['++'], 'https://github.com/stil4m/elm-analyse/blob/master/docs/', path));
+};
+
+var _user$project$Client_Graph_Table$topList = F2(
+	function (nodesDict, list) {
+		return A2(
+			_elm_lang$html$Html$table,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('table'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$thead,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$tr,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$th,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Module'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$th,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Imported by'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$th,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Importing'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$tbody,
+						{ctor: '[]'},
+						A2(
+							_elm_lang$core$List$map,
+							function (_p0) {
+								var _p1 = _p0;
+								var _p3 = _p1._0;
+								var _p2 = _p1._1;
+								var node = A2(_elm_lang$core$Dict$get, _p3, nodesDict);
+								var nameString = A2(
+									_elm_lang$core$Maybe$withDefault,
+									_p3,
+									A2(
+										_elm_lang$core$Maybe$map,
+										_user$project$Client_Graph_Node$nameToString,
+										A2(
+											_elm_lang$core$Maybe$map,
+											function (_) {
+												return _.name;
+											},
+											node)));
+								return A2(
+									_elm_lang$html$Html$tr,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$td,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text(nameString),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$td,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text(
+														_elm_lang$core$Basics$toString(_p2.incoming)),
+													_1: {ctor: '[]'}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text(
+															_elm_lang$core$Basics$toString(_p2.outgoing)),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									});
+							},
+							list)),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$Client_Graph_Table$topListInAndOut = F2(
+	function (count, graph) {
+		var documentationButton = function (anchor) {
+			return _user$project$Client_View_Panel$documentationButton(
+				A2(_elm_lang$core$Basics_ops['++'], 'ModuleGraph.md#', anchor));
+		};
+		var nodesDict = _iosphere$elm_network_graph$Graph_Node$dictFromList(graph.nodes);
+		var topDegrees = _iosphere$elm_network_graph$Graph_Degree$topDegrees(graph);
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A4(
+					_user$project$Client_View_Panel$view,
+					_user$project$Client_View_Panel$WidthHalf,
+					'Top importees',
+					documentationButton('top-importees'),
+					A2(
+						_user$project$Client_Graph_Table$topList,
+						nodesDict,
+						A2(_elm_lang$core$List$take, count, topDegrees.incoming))),
+				_1: {
+					ctor: '::',
+					_0: A4(
+						_user$project$Client_View_Panel$view,
+						_user$project$Client_View_Panel$WidthHalf,
+						'Top importers',
+						documentationButton('top-importers'),
+						A2(
+							_user$project$Client_Graph_Table$topList,
+							nodesDict,
+							A2(_elm_lang$core$List$take, count, topDegrees.outgoing))),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$Client_Graph_Table$view = F2(
+	function (count, graph) {
+		return _elm_lang$core$List$isEmpty(graph.nodes) ? _elm_lang$html$Html$text('') : A2(_user$project$Client_Graph_Table$topListInAndOut, count, graph);
+	});
+
+var _user$project$Client_View_Widget$colorForCategory = function (category) {
+	var _p0 = category;
+	switch (_p0.ctor) {
+		case 'Default':
+			return 'primary';
+		case 'Error':
+			return 'red';
+		case 'Success':
+			return 'green';
+		default:
+			return 'yellow';
+	}
+};
+var _user$project$Client_View_Widget$view = F4(
+	function (category, title, icon, value) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('col-lg-3 col-md-6'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'panel panel-',
+								_user$project$Client_View_Widget$colorForCategory(category))),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('panel-heading'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('row'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('col-xs-3'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$i,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class(
+															A2(_elm_lang$core$Basics_ops['++'], 'fa fa-5x ', icon)),
+														_1: {ctor: '[]'}
+													},
+													{ctor: '[]'}),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('col-xs-9 text-right'),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$div,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('huge'),
+															_1: {ctor: '[]'}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text(
+																_elm_lang$core$Basics$toString(value)),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$div,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text(title),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$Client_View_Widget$Warning = {ctor: 'Warning'};
+var _user$project$Client_View_Widget$Success = {ctor: 'Success'};
+var _user$project$Client_View_Widget$Error = {ctor: 'Error'};
+var _user$project$Client_View_Widget$Default = {ctor: 'Default'};
+
+var _user$project$Client_Graph_Widgets$countModules = function (nodes) {
+	return A4(
+		_user$project$Client_View_Widget$view,
+		_user$project$Client_View_Widget$Success,
+		'Total modules',
+		'fa-cube',
+		_elm_lang$core$List$length(nodes));
+};
+var _user$project$Client_Graph_Widgets$countImports = function (edges) {
+	return A4(
+		_user$project$Client_View_Widget$view,
+		_user$project$Client_View_Widget$Success,
+		'Total imports',
+		'fa-arrow-circle-o-down',
+		_elm_lang$core$List$length(edges));
+};
+
+var _user$project$Client_View_BreadCrumb$li = F2(
+	function ($class, content) {
+		return A2(
+			_elm_lang$html$Html$li,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class(
+					A2(_elm_lang$core$Basics_ops['++'], 'breadcrumb-item ', $class)),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: content,
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$Client_View_BreadCrumb$itemView = function (item) {
+	return A2(
+		_user$project$Client_View_BreadCrumb$li,
+		'',
+		A2(
+			_elm_lang$html$Html$a,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onClick(item.msg),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(item.title),
+				_1: {ctor: '[]'}
+			}));
+};
+var _user$project$Client_View_BreadCrumb$view = F2(
+	function (activeItem, list) {
+		return A2(
+			_elm_lang$html$Html$ul,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('breadcrumb'),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(_elm_lang$core$List$map, _user$project$Client_View_BreadCrumb$itemView, list),
+				{
+					ctor: '::',
+					_0: A2(
+						_user$project$Client_View_BreadCrumb$li,
+						'active',
+						_elm_lang$html$Html$text(activeItem)),
+					_1: {ctor: '[]'}
+				}));
+	});
+var _user$project$Client_View_BreadCrumb$Item = F3(
+	function (a, b, c) {
+		return {title: a, color: b, msg: c};
+	});
+
+var _user$project$Client_Graph_Graph$widgets = function (maybeGraph) {
+	var _p0 = maybeGraph;
+	if (_p0.ctor === 'Just') {
+		var _p1 = _p0._0;
+		return {
+			ctor: '::',
+			_0: _user$project$Client_Graph_Widgets$countModules(_p1.nodes),
+			_1: {
+				ctor: '::',
+				_0: _user$project$Client_Graph_Widgets$countImports(_p1.edges),
+				_1: {ctor: '[]'}
+			}
+		};
+	} else {
+		return {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		};
 	}
 };
 var _user$project$Client_Graph_Graph$withGraph = F2(
 	function (model, graph) {
-		var _p1 = A2(
+		var _p2 = A2(
 			_iosphere$elm_network_graph$Graph_Colored_Decorator$coloredGraph,
 			1 + _elm_lang$core$List$length(model.filter),
 			graph);
-		var colors = _p1._0;
-		var coloredGraph = _p1._1;
+		var colors = _p2._0;
+		var coloredGraph = _p2._1;
 		return _elm_lang$core$Native_Utils.update(
 			model,
 			{
@@ -17052,30 +17882,30 @@ var _user$project$Client_Graph_Graph$updateGraph = _elm_lang$core$Native_Platfor
 		return [v._0, v._1];
 	});
 var _user$project$Client_Graph_Graph$cmdForUpdatedGraph = function (maybeGraph) {
-	var _p2 = maybeGraph;
-	if (_p2.ctor === 'Nothing') {
+	var _p3 = maybeGraph;
+	if (_p3.ctor === 'Nothing') {
 		return _elm_lang$core$Platform_Cmd$none;
 	} else {
 		return _user$project$Client_Graph_Graph$updateGraph(
 			{
 				ctor: '_Tuple2',
 				_0: _user$project$Client_Graph_Graph$graphElementId,
-				_1: _iosphere$elm_network_graph$Graph_Colored_Graph$encode(_p2._0)
+				_1: _iosphere$elm_network_graph$Graph_Colored_Graph$encode(_p3._0)
 			});
 	}
 };
 var _user$project$Client_Graph_Graph$update = F3(
-	function (_p3, msg, model) {
-		var _p4 = msg;
-		if (_p4.ctor === 'NewState') {
-			var _p5 = _p4._0;
-			if (_p5.ctor === 'Err') {
+	function (_p4, msg, model) {
+		var _p5 = msg;
+		if (_p5.ctor === 'NewState') {
+			var _p6 = _p5._0;
+			if (_p6.ctor === 'Err') {
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
 					{ctor: '[]'});
 			} else {
-				var newModel = A2(_user$project$Client_Graph_Graph$withNewState, _p5._0, model);
+				var newModel = A2(_user$project$Client_Graph_Graph$withNewState, _p6._0, model);
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					newModel,
@@ -17086,12 +17916,12 @@ var _user$project$Client_Graph_Graph$update = F3(
 					});
 			}
 		} else {
-			var _p7 = _p4._0;
+			var _p8 = _p5._0;
 			var newModelWithFilter = _elm_lang$core$Native_Utils.update(
 				model,
-				{filter: _p7});
-			var _p6 = model.state;
-			if (_p6.ctor === 'Nothing') {
+				{filter: _p8});
+			var _p7 = model.state;
+			if (_p7.ctor === 'Nothing') {
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					newModelWithFilter,
@@ -17106,11 +17936,11 @@ var _user$project$Client_Graph_Graph$update = F3(
 							return _elm_lang$core$Native_Utils.eq(
 								A2(
 									_elm_lang$core$List$take,
-									_elm_lang$core$List$length(_p7),
+									_elm_lang$core$List$length(_p8),
 									node.name),
-								_p7);
+								_p8);
 						},
-						_p6._0.graph));
+						_p7._0.graph));
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					modelWithNewGraph,
@@ -17137,8 +17967,8 @@ var _user$project$Client_Graph_Graph$SetFilter = function (a) {
 };
 var _user$project$Client_Graph_Graph$legendEntry = F2(
 	function (colors, names) {
-		var _p8 = A2(_elm_lang$core$Dict$get, names, colors);
-		if (_p8.ctor === 'Just') {
+		var _p9 = A2(_elm_lang$core$Dict$get, names, colors);
+		if (_p9.ctor === 'Just') {
 			return _elm_lang$core$Maybe$Just(
 				A2(
 					_elm_lang$html$Html$li,
@@ -17147,7 +17977,7 @@ var _user$project$Client_Graph_Graph$legendEntry = F2(
 						_0: _elm_lang$html$Html_Attributes$style(
 							{
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'color', _1: _p8._0},
+								_0: {ctor: '_Tuple2', _0: 'color', _1: _p9._0},
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -17160,33 +17990,53 @@ var _user$project$Client_Graph_Graph$legendEntry = F2(
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(
-							A2(_elm_lang$core$String$join, '.', names)),
+							_user$project$Client_Graph_Node$nameToString(names)),
 						_1: {ctor: '[]'}
 					}));
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
 		}
 	});
+var _user$project$Client_Graph_Graph$breadCrumbItem = function (nodeName) {
+	return {
+		title: A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_community$list_extra$List_Extra$last(nodeName)),
+		msg: _user$project$Client_Graph_Graph$SetFilter(nodeName),
+		color: ''
+	};
+};
+var _user$project$Client_Graph_Graph$breadCrumbsForFilter = function (filter) {
+	return {
+		ctor: '::',
+		_0: {
+			title: 'All',
+			msg: _user$project$Client_Graph_Graph$SetFilter(
+				{ctor: '[]'}),
+			color: ''
+		},
+		_1: A2(
+			_elm_lang$core$List$map,
+			_user$project$Client_Graph_Graph$breadCrumbItem,
+			A2(
+				_elm_lang$core$List$take,
+				_elm_lang$core$List$length(filter) - 1,
+				A2(
+					_elm_lang$core$List$drop,
+					1,
+					_elm_community$list_extra$List_Extra$inits(filter))))
+	};
+};
 var _user$project$Client_Graph_Graph$legend = F2(
 	function (filter, colors) {
-		var clearButton = _elm_lang$core$List$isEmpty(filter) ? _elm_lang$html$Html$text('') : A2(
-			_elm_lang$html$Html$button,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('btn btn-default'),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						_user$project$Client_Graph_Graph$SetFilter(
-							{ctor: '[]'})),
-					_1: {ctor: '[]'}
-				}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('Reset Filter'),
-				_1: {ctor: '[]'}
-			});
+		var breadCrumb = _elm_lang$core$List$isEmpty(filter) ? _elm_lang$html$Html$text('') : A2(
+			_user$project$Client_View_BreadCrumb$view,
+			A2(
+				_elm_lang$core$Maybe$withDefault,
+				'Current Filter',
+				_elm_community$list_extra$List_Extra$last(filter)),
+			_user$project$Client_Graph_Graph$breadCrumbsForFilter(filter));
 		var names = _elm_lang$core$List$sort(
 			_elm_lang$core$Dict$keys(colors));
 		var entries = A2(
@@ -17202,7 +18052,7 @@ var _user$project$Client_Graph_Graph$legend = F2(
 			},
 			{
 				ctor: '::',
-				_0: clearButton,
+				_0: breadCrumb,
 				_1: {
 					ctor: '::',
 					_0: A2(
@@ -17214,26 +18064,95 @@ var _user$project$Client_Graph_Graph$legend = F2(
 			});
 	});
 var _user$project$Client_Graph_Graph$view = function (m) {
+	var maybeGraph = A2(
+		_elm_lang$core$Maybe$map,
+		function (_) {
+			return _.graph;
+		},
+		m.state);
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _user$project$Client_Graph_Graph$loadingStateLabel(m.state),
+			_0: A2(
+				_user$project$Client_LoadingScreen$viewStateFromMaybe,
+				m.state,
+				function (_p10) {
+					return _elm_lang$html$Html$text('');
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$div,
+					_elm_lang$html$Html$h3,
+					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$id(_user$project$Client_Graph_Graph$graphElementId),
+						_0: _elm_lang$html$Html$text('Module Graph'),
 						_1: {ctor: '[]'}
-					},
-					{ctor: '[]'}),
+					}),
 				_1: {
 					ctor: '::',
-					_0: A2(_user$project$Client_Graph_Graph$legend, m.filter, m.colors),
-					_1: {ctor: '[]'}
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('row'),
+							_1: {ctor: '[]'}
+						},
+						_user$project$Client_Graph_Graph$widgets(maybeGraph)),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('row'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A5(
+									_user$project$Client_View_Panel$viewWithFooter,
+									_user$project$Client_View_Panel$WidthFull,
+									'Graph',
+									_user$project$Client_View_Panel$documentationButton('ModuleGraph.md'),
+									A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$id(_user$project$Client_Graph_Graph$graphElementId),
+											_1: {ctor: '[]'}
+										},
+										{ctor: '[]'}),
+									_elm_lang$core$Maybe$Just(
+										A2(_user$project$Client_Graph_Graph$legend, m.filter, m.colors))),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('row'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$core$Maybe$withDefault,
+										_elm_lang$html$Html$text(''),
+										A2(
+											_elm_lang$core$Maybe$map,
+											_elm_lang$html$Html_Lazy$lazy(
+												_user$project$Client_Graph_Table$view(20)),
+											maybeGraph)),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}
 				}
 			}
 		});
@@ -17242,16 +18161,16 @@ var _user$project$Client_Graph_Graph$NewState = function (a) {
 	return {ctor: 'NewState', _0: a};
 };
 var _user$project$Client_Graph_Graph$subscriptions = F2(
-	function (location, _p9) {
+	function (location, _p11) {
 		return _elm_lang$core$Platform_Sub$batch(
 			{
 				ctor: '::',
 				_0: A2(
 					_elm_lang$websocket$WebSocket$listen,
 					_user$project$Client_Socket$dashboardAddress(location),
-					function (_p10) {
+					function (_p12) {
 						return _user$project$Client_Graph_Graph$NewState(
-							A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Analyser_State$decodeState, _p10));
+							A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Analyser_State$decodeState, _p12));
 					}),
 				_1: {ctor: '[]'}
 			});
@@ -17330,6 +18249,7 @@ var _user$project$Client_FileTree$Model = F6(
 	function (a, b, c, d, e, f) {
 		return {hideGoodFiles: a, tree: b, state: c, fileIndex: d, selectedFile: e, messageList: f};
 	});
+var _user$project$Client_FileTree$ToggleHideGoodFiles = {ctor: 'ToggleHideGoodFiles'};
 var _user$project$Client_FileTree$Tick = {ctor: 'Tick'};
 var _user$project$Client_FileTree$OnSelectFile = function (a) {
 	return {ctor: 'OnSelectFile', _0: a};
@@ -17421,6 +18341,14 @@ var _user$project$Client_FileTree$update = F3(
 							})),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'ToggleHideGoodFiles':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{hideGoodFiles: !model.hideGoodFiles}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			default:
 				return A2(
 					_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
@@ -17480,83 +18408,134 @@ var _user$project$Client_FileTree$view = function (m) {
 			_elm_lang$core$List$length(_p9._1),
 			0) > 0) : true;
 	};
-	var _p10 = m.fileIndex;
-	if (_p10.ctor === 'Just') {
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('row'),
-				_1: {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$style(
-						{
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '10px'},
-							_1: {ctor: '[]'}
-						}),
+					_0: _elm_lang$html$Html_Attributes$class('checkbox'),
 					_1: {ctor: '[]'}
-				}
-			},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('col-md-6 col-sm-6'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$style(
-								{
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '10px'},
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('list-group'),
-								_1: {ctor: '[]'}
-							},
-							A2(
-								_elm_lang$core$List$map,
-								asItem,
-								A2(_elm_lang$core$List$filter, allowFile, _p10._0))),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
+				},
+				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('col-md-6 col-sm-6'),
-							_1: {ctor: '[]'}
-						},
+						_elm_lang$html$Html$label,
+						{ctor: '[]'},
 						{
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$map,
-								_user$project$Client_FileTree$MessageListMsg,
-								_user$project$Client_MessageList$view(m.messageList)),
-							_1: {ctor: '[]'}
+								_elm_lang$html$Html$input,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$checked(m.hideGoodFiles),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(_user$project$Client_FileTree$ToggleHideGoodFiles),
+											_1: {ctor: '[]'}
+										}
+									}
+								},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Only show files with messages'),
+								_1: {ctor: '[]'}
+							}
 						}),
 					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$hr,
+					{ctor: '[]'},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: function () {
+						var _p10 = m.fileIndex;
+						if (_p10.ctor === 'Just') {
+							return A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('row'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$style(
+											{
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '10px'},
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('col-md-6 col-sm-6'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('list-group'),
+													_1: {ctor: '[]'}
+												},
+												A2(
+													_elm_lang$core$List$map,
+													asItem,
+													A2(_elm_lang$core$List$filter, allowFile, _p10._0))),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('col-md-6 col-sm-6'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$core$Native_Utils.eq(m.selectedFile, _elm_lang$core$Maybe$Nothing) ? A2(
+													_elm_lang$html$Html$div,
+													{ctor: '[]'},
+													{ctor: '[]'}) : A2(
+													_elm_lang$html$Html$map,
+													_user$project$Client_FileTree$MessageListMsg,
+													_user$project$Client_MessageList$view(m.messageList)),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								});
+						} else {
+							return A2(
+								_elm_lang$html$Html$div,
+								{ctor: '[]'},
+								{ctor: '[]'});
+						}
+					}(),
+					_1: {ctor: '[]'}
 				}
-			});
-	} else {
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			{ctor: '[]'});
-	}
+			}
+		});
 };
 var _user$project$Client_FileTree$OnFileTree = function (a) {
 	return {ctor: 'OnFileTree', _0: a};
