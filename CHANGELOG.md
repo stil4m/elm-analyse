@@ -1,5 +1,9 @@
 # elm-analyse changelog
 
+## 0.5.1 (2017-03-18)
+
+* [Issue #57](https://github.com/stil4m/elm-analyse/issues/57) Can't install elm-analyse on Linux
+
 ## 0.5.0 (2017-03-17)
 
 * [Issue #43](https://github.com/stil4m/elm-analyse/issues/43) Add ESLint to verify style of code in PRs
