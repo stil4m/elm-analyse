@@ -11,7 +11,7 @@ import Parser.TypeReference exposing (typeReference)
 import AST.Types exposing (File, Module, Declaration(AliasDecl, FuncDecl, TypeDecl, InfixDeclaration, DestructuringDeclaration, PortDeclaration), Destructuring, Function, FunctionSignature, FunctionDeclaration, Pattern, Expression, InnerExpression(..), RecordUpdate, Lambda, Case, CaseBlock, LetBlock, Cases)
 import AST.Ranges exposing (Range)
 import Parser.Typings exposing (typeDeclaration)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer)
+import Parser.Util exposing (exactIndentWhitespace, commentSequence, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer)
 import Parser.Whitespace exposing (manySpaces)
 import Parser.State exposing (State, pushIndent, popIndent)
 import Parser.Ranges exposing (withRange, withRangeCustomStart)
@@ -227,7 +227,7 @@ listExpression =
     lazy
         (\() ->
             ListExpr
-                <$> or ([] <$ (string "[" *> maybe (or moreThanIndentWhitespace exactIndentWhitespace) *> string "]"))
+                <$> or ([] <$ (string "[" *> maybe (choice [ moreThanIndentWhitespace, exactIndentWhitespace, trimmed commentSequence ]) *> string "]"))
                         (between
                             (string "[")
                             (string "]")
