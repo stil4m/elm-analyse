@@ -3,7 +3,9 @@ var app = express();
 var expressWs = require('express-ws')(app);
 const fs = require('fs');
 const fileGatherer = require('../util/file-gatherer');
-app.use(express.static(__dirname + '/../public'));
+app.use(express.static(__dirname + '/../public', {
+    etag: false
+}));
 
 
 module.exports = function(config) {
