@@ -395,6 +395,9 @@ writeExpression ( range, inner ) =
             Floatable f ->
                 string (toString f)
 
+            Negation x ->
+                append (string "-") (writeExpression x)
+
             Literal s ->
                 string (toString s)
 

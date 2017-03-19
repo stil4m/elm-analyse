@@ -122,6 +122,7 @@ expressionNotApplication =
                     , prefixOperatorExpression
                     , tupledExpression
                     , recordAccessFunctionExpression
+                    , negationExpression
                     , operatorExpression
                     , floatableExpression
                     , integerExpression
@@ -420,6 +421,27 @@ ifBlockExpression =
 prefixOperatorExpression : Parser State InnerExpression
 prefixOperatorExpression =
     PrefixOperator <$> parens prefixOperatorToken
+
+
+negationExpression : Parser State InnerExpression
+negationExpression =
+    lazy
+        (\() ->
+            Negation
+                <$> (string "-"
+                        *> (rangedExpression
+                                (choice
+                                    [ qualifiedExpression
+                                    , functionOrValueExpression
+                                    , integerExpression
+                                    , floatableExpression
+                                    , tupledExpression
+                                    ]
+                                )
+                                >>= liftRecordAccess
+                           )
+                    )
+        )
 
 
 operatorExpression : Parser State InnerExpression

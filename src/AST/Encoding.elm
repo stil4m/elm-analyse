@@ -492,6 +492,9 @@ encodeExpression ( range, inner ) =
                 Floatable x ->
                     encodeTyped "float" (float x)
 
+                Negation x ->
+                    encodeTyped "negation" (encodeExpression x)
+
                 Literal x ->
                     encodeTyped "literal" (string x)
 

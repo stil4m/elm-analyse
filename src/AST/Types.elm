@@ -142,6 +142,7 @@ type InnerExpression
     | Operator String
     | Integer Int
     | Floatable Float
+    | Negation Expression
     | Literal String
     | CharLiteral Char
     | TupledExpression (List Expression)
