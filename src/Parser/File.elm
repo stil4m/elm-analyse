@@ -1,6 +1,6 @@
 module Parser.File exposing (file)
 
-import Combine exposing (maybe, (*>), (>>=), (<*), (<$), (<$>), sepBy, succeed, Parser, (<*>), withState)
+import Combine exposing (maybe, (*>), (<*), sepBy, succeed, Parser, (<*>), withState)
 import Parser.Imports exposing (importDefinition)
 import Parser.Modules exposing (moduleDefinition)
 import Parser.Declarations exposing (declaration)

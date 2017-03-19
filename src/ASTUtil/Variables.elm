@@ -62,9 +62,8 @@ getImportExposedVars e =
                 |> List.concatMap
                     (\exposed ->
                         case exposed of
-                            InfixExpose _ _ ->
-                                --TODO
-                                []
+                            InfixExpose x r ->
+                                [ ( VariablePointer x r, Imported ) ]
 
                             FunctionExpose x r ->
                                 [ ( VariablePointer x r, Imported ) ]

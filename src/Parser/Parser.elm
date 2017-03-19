@@ -1,7 +1,7 @@
 module Parser.Parser exposing (parse)
 
 import AST.Types exposing (File)
-import Combine exposing (Parser, (<*), (*>), end, mapError, withLocation)
+import Combine exposing (Parser, (<*), end, mapError, withLocation)
 import Parser.File exposing (file)
 import Parser.State exposing (State, emptyState)
 

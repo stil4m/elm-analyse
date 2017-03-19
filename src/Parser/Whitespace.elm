@@ -1,6 +1,6 @@
 module Parser.Whitespace exposing (nSpaces, manySpaces, many1Spaces, realNewLine, untilNewlineToken)
 
-import Combine exposing ((<$>), regex, (<$), Parser)
+import Combine exposing (regex, Parser)
 
 
 nSpaces : Int -> Parser s String
