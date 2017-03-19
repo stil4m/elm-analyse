@@ -349,6 +349,7 @@ decodeInnerExpression =
                 , ( "operator", string |> map Operator )
                 , ( "integer", int |> map Integer )
                 , ( "float", float |> map Floatable )
+                , ( "negation", decodeExpression |> map Negation )
                 , ( "literal", string |> map Literal )
                 , ( "charLiteral", decodeChar |> map CharLiteral )
                 , ( "tupled", list decodeExpression |> map TupledExpression )

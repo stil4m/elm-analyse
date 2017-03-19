@@ -1,4 +1,4 @@
-module ASTUtil.Writer exposing (Writer, write, breaked, epsilon, parensComma, spaced, string, maybe, indent, bracesComma, sepBy, sepByComma, bracketsComma, sepBySpace, join)
+module ASTUtil.Writer exposing (Writer, write, breaked, epsilon, parensComma, spaced, string, maybe, indent, bracesComma, sepBy, sepByComma, bracketsComma, sepBySpace, join, append)
 
 import AST.Ranges exposing (Range)
 import List.Extra as List
@@ -12,6 +12,7 @@ type Node
     = Sep ( String, String, String ) (List ( Range, Node ))
     | Breaked (List Node)
     | Str String
+    | Append Node Node
     | Indent Int Node
     | Spaced (List Node)
     | Joined (List Node)
@@ -63,6 +64,9 @@ writeIndented indent w =
 
         Joined items ->
             String.concat (List.map (writeIndented indent) items)
+
+        Append x y ->
+            (writeIndented indent) x ++ (writeIndented indent) y
 
 
 startOnDifferentLines : List Range -> Bool
@@ -128,6 +132,11 @@ sepBySpace =
 sepBy : ( String, String, String ) -> List ( Range, Node ) -> Node
 sepBy =
     Sep
+
+
+append : Node -> Node -> Node
+append =
+    Append
 
 
 join : List Node -> Node

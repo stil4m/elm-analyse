@@ -245,6 +245,9 @@ inspectInnerExpression config expression context =
         Floatable _ ->
             context
 
+        Negation x ->
+            inspectExpression config x context
+
         Literal _ ->
             context
 
