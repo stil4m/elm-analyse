@@ -48,6 +48,7 @@
   "devDependencies": {
     "elm-format-download": "^0.2.1",
     "eslint": "^3.17.1",
-    "gulp-eslint": "^3.0.1"
+    "gulp-eslint": "^3.0.1",
+    "gulp-replace": "^0.5.4"
   }
 }
