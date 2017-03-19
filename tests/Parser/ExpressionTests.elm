@@ -352,6 +352,19 @@ all =
                     |> Maybe.map noRangeExpression
                     |> Maybe.map Tuple.second
                     |> Expect.equal (Just (Negation (emptyRanged <| FunctionOrValue "x")))
+        , test "negated expression in application" <|
+            \() ->
+                parseFullStringWithNullState "toFloat -5" expression
+                    |> Maybe.map noRangeExpression
+                    |> Maybe.map Tuple.second
+                    |> Expect.equal
+                        (Just
+                            (Application
+                                [ (emptyRanged <| FunctionOrValue "toFloat")
+                                , (emptyRanged <| Negation (emptyRanged <| Integer 5))
+                                ]
+                            )
+                        )
         , test "negated expression for parenthesized" <|
             \() ->
                 parseFullStringWithNullState "-(x - y)" expression

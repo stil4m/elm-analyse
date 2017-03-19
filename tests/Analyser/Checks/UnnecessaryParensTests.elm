@@ -350,6 +350,32 @@ foo =
     )
 
 
+parensAroundApplicationWithNegatedArg : ( String, String, List MessageData )
+parensAroundApplicationWithNegatedArg =
+    ( "parensAroundApplicationWithNegatedArg"
+    , """module Bar exposing (..)
+
+foo =
+    (toFloat -5) / 2
+"""
+    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 3 }, end = { row = 3, column = 15 } }
+      ]
+    )
+
+
+negatedApplicationWithParens : ( String, String, List MessageData )
+negatedApplicationWithParens =
+    ( "negatedApplicationWithParens"
+    , """module Bar exposing (..)
+
+foo =
+    toFloat -(bar baz) / 2
+
+"""
+    , []
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnnecessaryParensTests"
@@ -379,4 +405,6 @@ all =
         , parensInTuple
         , parensInLambdaExpressionWithQualifiedExpression
         , parensInLambdaExpressionWithQualifiedExpressionWithArgs
+        , parensAroundApplicationWithNegatedArg
+        , negatedApplicationWithParens
         ]
