@@ -249,6 +249,26 @@ all =
                 parseFullStringWithNullState "[\n]" expression
                     |> Maybe.map Tuple.second
                     |> Expect.equal (Just (ListExpr []))
+        , test "listExpression singleton with comment" <|
+            \() ->
+                parseFullStringWithNullState "[ 1 {- Foo-} ]" expression
+                    |> Maybe.map noRangeExpression
+                    |> Maybe.map Tuple.second
+                    |> Expect.equal
+                        (Just
+                            (ListExpr
+                                [ ( emptyRange
+                                  , Integer 1
+                                  )
+                                ]
+                            )
+                        )
+        , test "listExpression empty with comment" <|
+            \() ->
+                parseFullStringWithNullState "[{-| Foo -}]" expression
+                    |> Maybe.map noRangeExpression
+                    |> Maybe.map Tuple.second
+                    |> Expect.equal (Just (ListExpr []))
         , test "listExpression on indent" <|
             \() ->
                 parseFullStringWithNullState "  [\n]" (whitespace *> expression)
