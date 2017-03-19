@@ -226,16 +226,31 @@ listExpression : Parser State InnerExpression
 listExpression =
     lazy
         (\() ->
-            ListExpr
-                <$> or ([] <$ (string "[" *> maybe (choice [ moreThanIndentWhitespace, exactIndentWhitespace, trimmed commentSequence ]) *> string "]"))
-                        (between
+            or emptyListExpression
+                (ListExpr
+                    <$> between
                             (string "[")
                             (string "]")
                             (sepBy (string ",")
                                 (trimmed expression)
                             )
-                        )
+                )
         )
+
+
+emptyListExpression : Parser State InnerExpression
+emptyListExpression =
+    ListExpr []
+        <$ (string "["
+                *> maybe
+                    (choice
+                        [ moreThanIndentWhitespace
+                        , exactIndentWhitespace
+                        , trimmed commentSequence
+                        ]
+                    )
+                *> string "]"
+           )
 
 
 
