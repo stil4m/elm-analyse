@@ -66,7 +66,7 @@ writeIndented indent w =
             String.concat (List.map (writeIndented indent) items)
 
         Append x y ->
-            (writeIndented indent) x ++ (writeIndented indent) y
+            writeIndented indent x ++ writeIndented indent y
 
 
 startOnDifferentLines : List Range -> Bool

@@ -427,7 +427,7 @@ negationExpression : Parser State InnerExpression
 negationExpression =
     lazy
         (\() ->
-            Negation <$> (string "-" *> (rangedExpression (or functionOrValueExpression tupledExpression)))
+            Negation <$> (string "-" *> rangedExpression (or functionOrValueExpression tupledExpression))
         )
 
 
