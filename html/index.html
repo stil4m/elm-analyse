@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>Elm Analyse {{VERSION}}</title>
-    <script src="/client-elm.js" charset="utf-8"></script>
+    <script src="/client-elm.js?cache_buster={{VERSION}}" charset="utf-8"></script>
     <link rel="stylesheet" href="/bootstrap/start-bootstrap-admin-2_v3.3.7.css" />
     <link href="/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" />
     <style>
@@ -53,5 +53,5 @@
     var el = document.getElementById('app');
     var app = Elm.Client.Main.embed(el);
 </script>
-<script src="graph.js"></script>
+<script src="graph.js?cache_buster={{VERSION}}"></script>
 </html>

@@ -84,7 +84,7 @@ gulp.task('lint', () => {
 gulp.task('html', () => {
     const packageVersion = require('./package.json').version;
     gulp.src('html/index.html')
-      .pipe(gulpReplace(/\{\{VERSION\}\}/, 'v' + packageVersion))
+      .pipe(gulpReplace(/\{\{VERSION\}\}/g, 'v' + packageVersion))
       .pipe(gulp.dest('js/public/'));
 });
 
