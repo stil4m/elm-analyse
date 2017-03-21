@@ -28,12 +28,14 @@ import Analyser.Fixes.UnusedImportTests
 import Analyser.Fixes.UnusedTypeAliasTests
 import Analyser.Checks.MultiLineRecordFormattingTests
 import Analyser.Checks.NonStaticRegexTests
+import Analyser.Checks.FunctionsInLetTests
 
 
 all : Test
 all =
     Test.concat
         [ Analyser.Checks.NonStaticRegexTests.all
+        , Analyser.Checks.FunctionsInLetTests.all
         , Analyser.Fixes.UnusedTypeAliasTests.all
         , Analyser.Checks.MultiLineRecordFormattingTests.all
         , Analyser.Checks.ListOperatorsTests.all

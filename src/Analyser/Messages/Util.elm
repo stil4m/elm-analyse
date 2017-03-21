@@ -428,7 +428,7 @@ getMessageInfo m =
             , False
             )
 
-        Analyser.Messages.Types.UnnecessaryListConcat fileName range ->
+        UnnecessaryListConcat fileName range ->
             ( String.concat
                 [ "Better merge the arguments of `List.concat` to a single list in file \""
                 , fileName
@@ -438,4 +438,16 @@ getMessageInfo m =
             , always [ fileName ]
             , [ range ]
             , True
+            )
+
+        FunctionInLet fileName range ->
+            ( String.concat
+                [ "Let statement containing functions should be avoided in \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , always [ fileName ]
+            , [ range ]
+            , False
             )

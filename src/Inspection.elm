@@ -22,6 +22,7 @@ import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
 import Analyser.Checks.UnnecessaryPortModule as UnnecessaryPortModule
 import Analyser.Checks.NonStaticRegex as NonStaticRegex
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
+import Analyser.Checks.FunctionsInLet as FunctionsInLet
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Util
 import Analyser.Configuration as Configuration exposing (Configuration)
@@ -48,6 +49,7 @@ checkers =
     , UnnecessaryPortModule.checker
     , NonStaticRegex.checker
     , CoreArrayUsage.checker
+    , FunctionsInLet.checker
     ]
 
 

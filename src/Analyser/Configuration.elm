@@ -36,7 +36,7 @@ isPathExcluded p (Configuration { excludedPaths }) =
 defaultChecks : Dict String Bool
 defaultChecks =
     Dict.fromList
-        []
+        [ ( "FunctionsInLet", False ) ]
 
 
 checkPropertyAsInt : String -> String -> Configuration -> Maybe Int
