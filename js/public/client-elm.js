@@ -13529,6 +13529,9 @@ var _user$project$AST_Types$CharLiteral = function (a) {
 var _user$project$AST_Types$Literal = function (a) {
 	return {ctor: 'Literal', _0: a};
 };
+var _user$project$AST_Types$Negation = function (a) {
+	return {ctor: 'Negation', _0: a};
+};
 var _user$project$AST_Types$Floatable = function (a) {
 	return {ctor: 'Floatable', _0: a};
 };
@@ -13615,6 +13618,10 @@ var _user$project$Analyser_Messages_Types$newMessage = A2(_user$project$Analyser
 var _user$project$Analyser_Messages_Types$Fixing = {ctor: 'Fixing'};
 var _user$project$Analyser_Messages_Types$Blocked = {ctor: 'Blocked'};
 var _user$project$Analyser_Messages_Types$Outdated = {ctor: 'Outdated'};
+var _user$project$Analyser_Messages_Types$FunctionInLet = F2(
+	function (a, b) {
+		return {ctor: 'FunctionInLet', _0: a, _1: b};
+	});
 var _user$project$Analyser_Messages_Types$CoreArrayUsage = F2(
 	function (a, b) {
 		return {ctor: 'CoreArrayUsage', _0: a, _1: b};
@@ -14451,10 +14458,32 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_1: {ctor: '[]'}
 						}
 					}));
-		default:
+		case 'CoreArrayUsage':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'CoreArrayUsage',
+				_elm_lang$core$Json_Encode$object(
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'file',
+							_1: _elm_lang$core$Json_Encode$string(_p0._0)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'range',
+								_1: _user$project$AST_Ranges$encode(_p0._1)
+							},
+							_1: {ctor: '[]'}
+						}
+					}));
+		default:
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'FunctionInLet',
 				_elm_lang$core$Json_Encode$object(
 					{
 						ctor: '::',
@@ -14860,7 +14889,15 @@ var _user$project$Analyser_Messages_Json$decodeMessageData = _user$project$Util_
 																														_0: 'CoreArrayUsage',
 																														_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$CoreArrayUsage)
 																													},
-																													_1: {ctor: '[]'}
+																													_1: {
+																														ctor: '::',
+																														_0: {
+																															ctor: '_Tuple2',
+																															_0: 'FunctionInLet',
+																															_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$FunctionInLet)
+																														},
+																														_1: {ctor: '[]'}
+																													}
 																												}
 																											}
 																										}
@@ -15958,7 +15995,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_2: _p51,
 				_3: false
 			};
-		default:
+		case 'UnnecessaryListConcat':
 			var _p53 = _p0._1;
 			var _p52 = _p0._0;
 			return {
@@ -15994,21 +16031,57 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
+		default:
+			var _p55 = _p0._1;
+			var _p54 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Let statement containing functions should be avoided in \"',
+						_1: {
+							ctor: '::',
+							_0: _p54,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$AST_Ranges$rangeToString(_p55),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p54,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p55,
+					_1: {ctor: '[]'}
+				},
+				_3: false
+			};
 	}
 };
 var _user$project$Analyser_Messages_Util$canFix = function (m) {
-	var _p54 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var result = _p54._3;
+	var _p56 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var result = _p56._3;
 	return result;
 };
 var _user$project$Analyser_Messages_Util$getRanges = function (m) {
-	var _p55 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var r = _p55._2;
+	var _p57 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var r = _p57._2;
 	return r;
 };
 var _user$project$Analyser_Messages_Util$getFiles = function (m) {
-	var _p56 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p56._1;
+	var _p58 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p58._1;
 	return f(m);
 };
 var _user$project$Analyser_Messages_Util$compareMessage = F2(
@@ -16037,8 +16110,8 @@ var _user$project$Analyser_Messages_Util$compareMessage = F2(
 					_user$project$Analyser_Messages_Util$getRanges(b.data)))) : A2(_elm_lang$core$Basics$compare, aFile, bFile);
 	});
 var _user$project$Analyser_Messages_Util$asString = function (m) {
-	var _p57 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p57._0;
+	var _p59 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p59._0;
 	return f;
 };
 var _user$project$Analyser_Messages_Util$markFixing = F2(

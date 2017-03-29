@@ -10223,6 +10223,9 @@ var _user$project$AST_Types$CharLiteral = function (a) {
 var _user$project$AST_Types$Literal = function (a) {
 	return {ctor: 'Literal', _0: a};
 };
+var _user$project$AST_Types$Negation = function (a) {
+	return {ctor: 'Negation', _0: a};
+};
 var _user$project$AST_Types$Floatable = function (a) {
 	return {ctor: 'Floatable', _0: a};
 };
@@ -11117,118 +11120,126 @@ var _user$project$AST_Decoding$decodeInnerExpression = _elm_lang$core$Json_Decod
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'literal',
-														_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$Literal, _elm_lang$core$Json_Decode$string)
+														_0: 'negation',
+														_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$Negation, _user$project$AST_Decoding$decodeExpression)
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'charLiteral',
-															_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$CharLiteral, _user$project$AST_Decoding$decodeChar)
+															_0: 'literal',
+															_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$Literal, _elm_lang$core$Json_Decode$string)
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'tupled',
-																_1: A2(
-																	_elm_lang$core$Json_Decode$map,
-																	_user$project$AST_Types$TupledExpression,
-																	_elm_lang$core$Json_Decode$list(_user$project$AST_Decoding$decodeExpression))
+																_0: 'charLiteral',
+																_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$CharLiteral, _user$project$AST_Decoding$decodeChar)
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'list',
+																	_0: 'tupled',
 																	_1: A2(
 																		_elm_lang$core$Json_Decode$map,
-																		_user$project$AST_Types$ListExpr,
+																		_user$project$AST_Types$TupledExpression,
 																		_elm_lang$core$Json_Decode$list(_user$project$AST_Decoding$decodeExpression))
 																},
 																_1: {
 																	ctor: '::',
 																	_0: {
 																		ctor: '_Tuple2',
-																		_0: 'parenthesized',
-																		_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$ParenthesizedExpression, _user$project$AST_Decoding$decodeExpression)
+																		_0: 'list',
+																		_1: A2(
+																			_elm_lang$core$Json_Decode$map,
+																			_user$project$AST_Types$ListExpr,
+																			_elm_lang$core$Json_Decode$list(_user$project$AST_Decoding$decodeExpression))
 																	},
 																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'let',
-																			_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$LetExpression, _user$project$AST_Decoding$decodeLetBlock)
+																			_0: 'parenthesized',
+																			_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$ParenthesizedExpression, _user$project$AST_Decoding$decodeExpression)
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'case',
-																				_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$CaseExpression, _user$project$AST_Decoding$decodeCaseBlock)
+																				_0: 'let',
+																				_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$LetExpression, _user$project$AST_Decoding$decodeLetBlock)
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'lambda',
-																					_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$LambdaExpression, _user$project$AST_Decoding$decodeLambda)
+																					_0: 'case',
+																					_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$CaseExpression, _user$project$AST_Decoding$decodeCaseBlock)
 																				},
 																				_1: {
 																					ctor: '::',
 																					_0: {
 																						ctor: '_Tuple2',
-																						_0: 'qualified',
-																						_1: A3(
-																							_elm_lang$core$Json_Decode$map2,
-																							_user$project$AST_Types$QualifiedExpr,
-																							A2(_elm_lang$core$Json_Decode$field, 'moduleName', _user$project$AST_Decoding$decodeModuleName),
-																							_user$project$AST_Decoding$nameField)
+																						_0: 'lambda',
+																						_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$LambdaExpression, _user$project$AST_Decoding$decodeLambda)
 																					},
 																					_1: {
 																						ctor: '::',
 																						_0: {
 																							ctor: '_Tuple2',
-																							_0: 'recordAccess',
+																							_0: 'qualified',
 																							_1: A3(
 																								_elm_lang$core$Json_Decode$map2,
-																								_user$project$AST_Types$RecordAccess,
-																								A2(_elm_lang$core$Json_Decode$field, 'expression', _user$project$AST_Decoding$decodeExpression),
+																								_user$project$AST_Types$QualifiedExpr,
+																								A2(_elm_lang$core$Json_Decode$field, 'moduleName', _user$project$AST_Decoding$decodeModuleName),
 																								_user$project$AST_Decoding$nameField)
 																						},
 																						_1: {
 																							ctor: '::',
 																							_0: {
 																								ctor: '_Tuple2',
-																								_0: 'recordAccessFunction',
-																								_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$RecordAccessFunction, _elm_lang$core$Json_Decode$string)
+																								_0: 'recordAccess',
+																								_1: A3(
+																									_elm_lang$core$Json_Decode$map2,
+																									_user$project$AST_Types$RecordAccess,
+																									A2(_elm_lang$core$Json_Decode$field, 'expression', _user$project$AST_Decoding$decodeExpression),
+																									_user$project$AST_Decoding$nameField)
 																							},
 																							_1: {
 																								ctor: '::',
 																								_0: {
 																									ctor: '_Tuple2',
-																									_0: 'record',
-																									_1: A2(
-																										_elm_lang$core$Json_Decode$map,
-																										_user$project$AST_Types$RecordExpr,
-																										_elm_lang$core$Json_Decode$list(_user$project$AST_Decoding$decodeRecordSetter))
+																									_0: 'recordAccessFunction',
+																									_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$RecordAccessFunction, _elm_lang$core$Json_Decode$string)
 																								},
 																								_1: {
 																									ctor: '::',
 																									_0: {
 																										ctor: '_Tuple2',
-																										_0: 'recordUpdate',
-																										_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$RecordUpdateExpression, _user$project$AST_Decoding$decodeRecordUpdate)
+																										_0: 'record',
+																										_1: A2(
+																											_elm_lang$core$Json_Decode$map,
+																											_user$project$AST_Types$RecordExpr,
+																											_elm_lang$core$Json_Decode$list(_user$project$AST_Decoding$decodeRecordSetter))
 																									},
 																									_1: {
 																										ctor: '::',
 																										_0: {
 																											ctor: '_Tuple2',
-																											_0: 'glsl',
-																											_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$GLSLExpression, _elm_lang$core$Json_Decode$string)
+																											_0: 'recordUpdate',
+																											_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$RecordUpdateExpression, _user$project$AST_Decoding$decodeRecordUpdate)
 																										},
-																										_1: {ctor: '[]'}
+																										_1: {
+																											ctor: '::',
+																											_0: {
+																												ctor: '_Tuple2',
+																												_0: 'glsl',
+																												_1: A2(_elm_lang$core$Json_Decode$map, _user$project$AST_Types$GLSLExpression, _elm_lang$core$Json_Decode$string)
+																											},
+																											_1: {ctor: '[]'}
+																										}
 																									}
 																								}
 																							}
@@ -12608,6 +12619,11 @@ var _user$project$AST_Encoding$encodeExpression = function (_p42) {
 									_user$project$Util_Json$encodeTyped,
 									'float',
 									_elm_lang$core$Json_Encode$float(_p44._0));
+							case 'Negation':
+								return A2(
+									_user$project$Util_Json$encodeTyped,
+									'negation',
+									_user$project$AST_Encoding$encodeExpression(_p44._0));
 							case 'Literal':
 								return A2(
 									_user$project$Util_Json$encodeTyped,
@@ -13181,12 +13197,17 @@ var _user$project$ASTUtil_Writer$writeIndented = F2(
 						_elm_lang$core$List$map,
 						_user$project$ASTUtil_Writer$writeIndented(indent),
 						_p1._0));
-			default:
+			case 'Joined':
 				return _elm_lang$core$String$concat(
 					A2(
 						_elm_lang$core$List$map,
 						_user$project$ASTUtil_Writer$writeIndented(indent),
 						_p1._0));
+			default:
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(_user$project$ASTUtil_Writer$writeIndented, indent, _p1._0),
+					A2(_user$project$ASTUtil_Writer$writeIndented, indent, _p1._1));
 		}
 	});
 var _user$project$ASTUtil_Writer$write = _user$project$ASTUtil_Writer$writeIndented(0);
@@ -13203,6 +13224,11 @@ var _user$project$ASTUtil_Writer$Indent = F2(
 		return {ctor: 'Indent', _0: a, _1: b};
 	});
 var _user$project$ASTUtil_Writer$indent = _user$project$ASTUtil_Writer$Indent;
+var _user$project$ASTUtil_Writer$Append = F2(
+	function (a, b) {
+		return {ctor: 'Append', _0: a, _1: b};
+	});
+var _user$project$ASTUtil_Writer$append = _user$project$ASTUtil_Writer$Append;
 var _user$project$ASTUtil_Writer$Str = function (a) {
 	return {ctor: 'Str', _0: a};
 };
@@ -13981,6 +14007,11 @@ var _user$project$ASTUtil_ASTWriter$writeExpression = function (_p26) {
 			case 'Floatable':
 				return _user$project$ASTUtil_Writer$string(
 					_elm_lang$core$Basics$toString(_p34._0));
+			case 'Negation':
+				return A2(
+					_user$project$ASTUtil_Writer$append,
+					_user$project$ASTUtil_Writer$string('-'),
+					_user$project$ASTUtil_ASTWriter$writeExpression(_p34._0));
 			case 'Literal':
 				return _user$project$ASTUtil_Writer$string(
 					_elm_lang$core$Basics$toString(_p34._0));
@@ -14438,6 +14469,27 @@ var _user$project$ASTUtil_ASTWriter$writeFile = function (file) {
 		});
 };
 var _user$project$ASTUtil_ASTWriter$write = _user$project$ASTUtil_Writer$write;
+
+var _user$project$ASTUtil_Functions$isFunctionTypeReference = function (typeReference) {
+	var _p0 = typeReference;
+	if (_p0.ctor === 'FunctionTypeReference') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$ASTUtil_Functions$isFunctionSignature = function (_p1) {
+	var _p2 = _p1;
+	return _user$project$ASTUtil_Functions$isFunctionTypeReference(_p2.typeReference);
+};
+var _user$project$ASTUtil_Functions$isStatic = function ($function) {
+	return (_elm_lang$core$Native_Utils.cmp(
+		_elm_lang$core$List$length($function.declaration.$arguments),
+		0) > 0) ? false : ($function.declaration.operatorDefinition ? false : (A2(
+		_elm_lang$core$Maybe$withDefault,
+		false,
+		A2(_elm_lang$core$Maybe$map, _user$project$ASTUtil_Functions$isFunctionSignature, $function.signature)) ? false : true));
+};
 
 var _user$project$ASTUtil_Imports$removeRangeFromConstructors = F2(
 	function (range, exp) {
@@ -15013,6 +15065,8 @@ var _user$project$Inspector$inspectInnerExpression = F3(
 				return context;
 			case 'Floatable':
 				return context;
+			case 'Negation':
+				return A3(_user$project$Inspector$inspectExpression, config, _p5._0, context);
 			case 'Literal':
 				return context;
 			case 'CharLiteral':
@@ -15528,7 +15582,15 @@ var _user$project$ASTUtil_Variables$getImportExposedVars = function (e) {
 					var _p11 = exposed;
 					switch (_p11.ctor) {
 						case 'InfixExpose':
-							return {ctor: '[]'};
+							return {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: A2(_user$project$AST_Types$VariablePointer, _p11._0, _p11._1),
+									_1: _user$project$ASTUtil_Variables$Imported
+								},
+								_1: {ctor: '[]'}
+							};
 						case 'FunctionExpose':
 							return {
 								ctor: '::',
@@ -17734,6 +17796,31 @@ var _user$project$Parser_Declarations$literalExpression = A2(
 	_elm_community$parser_combinators$Combine_ops['<$>'],
 	_user$project$AST_Types$Literal,
 	A2(_elm_community$parser_combinators$Combine$or, _user$project$Parser_Tokens$multiLineStringLiteral, _user$project$Parser_Tokens$stringLiteral));
+var _user$project$Parser_Declarations$emptyListExpression = A2(
+	_elm_community$parser_combinators$Combine_ops['<$'],
+	_user$project$AST_Types$ListExpr(
+		{ctor: '[]'}),
+	A2(
+		_elm_community$parser_combinators$Combine_ops['*>'],
+		A2(
+			_elm_community$parser_combinators$Combine_ops['*>'],
+			_elm_community$parser_combinators$Combine$string('['),
+			_elm_community$parser_combinators$Combine$maybe(
+				_elm_community$parser_combinators$Combine$choice(
+					{
+						ctor: '::',
+						_0: _user$project$Parser_Util$moreThanIndentWhitespace,
+						_1: {
+							ctor: '::',
+							_0: _user$project$Parser_Util$exactIndentWhitespace,
+							_1: {
+								ctor: '::',
+								_0: _user$project$Parser_Util$trimmed(_user$project$Parser_Util$commentSequence),
+								_1: {ctor: '[]'}
+							}
+						}
+					}))),
+		_elm_community$parser_combinators$Combine$string(']')));
 var _user$project$Parser_Declarations$glslExpression = A2(
 	_elm_community$parser_combinators$Combine_ops['<$>'],
 	function (_p5) {
@@ -17978,41 +18065,45 @@ var _user$project$Parser_Declarations$expressionNotApplication = _elm_community$
 												_0: _user$project$Parser_Declarations$recordAccessFunctionExpression,
 												_1: {
 													ctor: '::',
-													_0: _user$project$Parser_Declarations$operatorExpression,
+													_0: _user$project$Parser_Declarations$negationExpression,
 													_1: {
 														ctor: '::',
-														_0: _user$project$Parser_Declarations$floatableExpression,
+														_0: _user$project$Parser_Declarations$operatorExpression,
 														_1: {
 															ctor: '::',
-															_0: _user$project$Parser_Declarations$integerExpression,
+															_0: _user$project$Parser_Declarations$floatableExpression,
 															_1: {
 																ctor: '::',
-																_0: _user$project$Parser_Declarations$letExpression,
+																_0: _user$project$Parser_Declarations$integerExpression,
 																_1: {
 																	ctor: '::',
-																	_0: _user$project$Parser_Declarations$lambdaExpression,
+																	_0: _user$project$Parser_Declarations$letExpression,
 																	_1: {
 																		ctor: '::',
-																		_0: _user$project$Parser_Declarations$literalExpression,
+																		_0: _user$project$Parser_Declarations$lambdaExpression,
 																		_1: {
 																			ctor: '::',
-																			_0: _user$project$Parser_Declarations$charLiteralExpression,
+																			_0: _user$project$Parser_Declarations$literalExpression,
 																			_1: {
 																				ctor: '::',
-																				_0: _user$project$Parser_Declarations$recordExpression,
+																				_0: _user$project$Parser_Declarations$charLiteralExpression,
 																				_1: {
 																					ctor: '::',
-																					_0: _user$project$Parser_Declarations$recordUpdateExpression,
+																					_0: _user$project$Parser_Declarations$recordExpression,
 																					_1: {
 																						ctor: '::',
-																						_0: _user$project$Parser_Declarations$glslExpression,
+																						_0: _user$project$Parser_Declarations$recordUpdateExpression,
 																						_1: {
 																							ctor: '::',
-																							_0: _user$project$Parser_Declarations$listExpression,
+																							_0: _user$project$Parser_Declarations$glslExpression,
 																							_1: {
 																								ctor: '::',
-																								_0: _user$project$Parser_Declarations$caseExpression,
-																								_1: {ctor: '[]'}
+																								_0: _user$project$Parser_Declarations$listExpression,
+																								_1: {
+																									ctor: '::',
+																									_0: _user$project$Parser_Declarations$caseExpression,
+																									_1: {ctor: '[]'}
+																								}
 																							}
 																						}
 																					}
@@ -18225,21 +18316,11 @@ var _user$project$Parser_Declarations$listExpression = _elm_community$parser_com
 	function (_p39) {
 		var _p40 = _p39;
 		return A2(
-			_elm_community$parser_combinators$Combine_ops['<$>'],
-			_user$project$AST_Types$ListExpr,
+			_elm_community$parser_combinators$Combine$or,
+			_user$project$Parser_Declarations$emptyListExpression,
 			A2(
-				_elm_community$parser_combinators$Combine$or,
-				A2(
-					_elm_community$parser_combinators$Combine_ops['<$'],
-					{ctor: '[]'},
-					A2(
-						_elm_community$parser_combinators$Combine_ops['*>'],
-						A2(
-							_elm_community$parser_combinators$Combine_ops['*>'],
-							_elm_community$parser_combinators$Combine$string('['),
-							_elm_community$parser_combinators$Combine$maybe(
-								A2(_elm_community$parser_combinators$Combine$or, _user$project$Parser_Util$moreThanIndentWhitespace, _user$project$Parser_Util$exactIndentWhitespace))),
-						_elm_community$parser_combinators$Combine$string(']'))),
+				_elm_community$parser_combinators$Combine_ops['<$>'],
+				_user$project$AST_Types$ListExpr,
 				A3(
 					_elm_community$parser_combinators$Combine$between,
 					_elm_community$parser_combinators$Combine$string('['),
@@ -18249,9 +18330,64 @@ var _user$project$Parser_Declarations$listExpression = _elm_community$parser_com
 						_elm_community$parser_combinators$Combine$string(','),
 						_user$project$Parser_Util$trimmed(_user$project$Parser_Declarations$expression)))));
 	});
-var _user$project$Parser_Declarations$recordExpression = _elm_community$parser_combinators$Combine$lazy(
+var _user$project$Parser_Declarations$negationExpression = _elm_community$parser_combinators$Combine$lazy(
 	function (_p41) {
 		var _p42 = _p41;
+		return A2(
+			_elm_community$parser_combinators$Combine_ops['<$>'],
+			_user$project$AST_Types$Negation,
+			A2(
+				_elm_community$parser_combinators$Combine_ops['*>'],
+				_elm_community$parser_combinators$Combine$string('-'),
+				A2(
+					_elm_community$parser_combinators$Combine_ops['>>='],
+					_user$project$Parser_Declarations$rangedExpression(
+						_elm_community$parser_combinators$Combine$choice(
+							{
+								ctor: '::',
+								_0: _user$project$Parser_Declarations$qualifiedExpression,
+								_1: {
+									ctor: '::',
+									_0: _user$project$Parser_Declarations$functionOrValueExpression,
+									_1: {
+										ctor: '::',
+										_0: _user$project$Parser_Declarations$integerExpression,
+										_1: {
+											ctor: '::',
+											_0: _user$project$Parser_Declarations$floatableExpression,
+											_1: {
+												ctor: '::',
+												_0: _user$project$Parser_Declarations$tupledExpression,
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							})),
+					_user$project$Parser_Declarations$liftRecordAccess)));
+	});
+var _user$project$Parser_Declarations$tupledExpression = _elm_community$parser_combinators$Combine$lazy(
+	function (_p43) {
+		var _p44 = _p43;
+		return A2(
+			_elm_community$parser_combinators$Combine_ops['<$>'],
+			function (l) {
+				var _p45 = l;
+				if ((_p45.ctor === '::') && (_p45._1.ctor === '[]')) {
+					return _user$project$AST_Types$ParenthesizedExpression(_p45._0);
+				} else {
+					return _user$project$AST_Types$TupledExpression(_p45);
+				}
+			},
+			_elm_community$parser_combinators$Combine$parens(
+				A2(
+					_elm_community$parser_combinators$Combine$sepBy1,
+					_elm_community$parser_combinators$Combine$string(','),
+					_user$project$Parser_Util$trimmed(_user$project$Parser_Declarations$expression))));
+	});
+var _user$project$Parser_Declarations$recordExpression = _elm_community$parser_combinators$Combine$lazy(
+	function (_p46) {
+		var _p47 = _p46;
 		return A2(
 			_elm_community$parser_combinators$Combine_ops['<$>'],
 			_user$project$AST_Types$RecordExpr,
@@ -18269,8 +18405,8 @@ var _user$project$Parser_Declarations$recordFields = function (oneOrMore) {
 		_user$project$Parser_Util$trimmed(_user$project$Parser_Declarations$recordExpressionField));
 };
 var _user$project$Parser_Declarations$recordExpressionField = _elm_community$parser_combinators$Combine$lazy(
-	function (_p43) {
-		var _p44 = _p43;
+	function (_p48) {
+		var _p49 = _p48;
 		return A2(
 			_elm_community$parser_combinators$Combine_ops['<*>'],
 			A2(
@@ -18293,8 +18429,8 @@ var _user$project$Parser_Declarations$recordExpressionField = _elm_community$par
 				_user$project$Parser_Declarations$expression));
 	});
 var _user$project$Parser_Declarations$recordUpdateExpression = _elm_community$parser_combinators$Combine$lazy(
-	function (_p45) {
-		var _p46 = _p45;
+	function (_p50) {
+		var _p51 = _p50;
 		return A3(
 			_elm_community$parser_combinators$Combine$between,
 			_elm_community$parser_combinators$Combine$string('{'),
@@ -18313,29 +18449,10 @@ var _user$project$Parser_Declarations$recordUpdateExpression = _elm_community$pa
 						_elm_community$parser_combinators$Combine$string('|'),
 						_user$project$Parser_Declarations$recordFields(true)))));
 	});
-var _user$project$Parser_Declarations$tupledExpression = _elm_community$parser_combinators$Combine$lazy(
-	function (_p47) {
-		var _p48 = _p47;
-		return A2(
-			_elm_community$parser_combinators$Combine_ops['<$>'],
-			function (l) {
-				var _p49 = l;
-				if ((_p49.ctor === '::') && (_p49._1.ctor === '[]')) {
-					return _user$project$AST_Types$ParenthesizedExpression(_p49._0);
-				} else {
-					return _user$project$AST_Types$TupledExpression(_p49);
-				}
-			},
-			_elm_community$parser_combinators$Combine$parens(
-				A2(
-					_elm_community$parser_combinators$Combine$sepBy1,
-					_elm_community$parser_combinators$Combine$string(','),
-					_user$project$Parser_Util$trimmed(_user$project$Parser_Declarations$expression))));
-	});
 var _user$project$Parser_Declarations$promoteToApplicationExpression = function (expr) {
 	return _elm_community$parser_combinators$Combine$lazy(
-		function (_p50) {
-			var _p51 = _p50;
+		function (_p52) {
+			var _p53 = _p52;
 			return A2(
 				_user$project$Parser_Declarations$rangedExpressionWithStart,
 				_elm_lang$core$Tuple$first(expr),
@@ -18347,8 +18464,8 @@ var _user$project$Parser_Declarations$promoteToApplicationExpression = function 
 								{ctor: '::', _0: expr, _1: rest});
 						}),
 					_elm_community$parser_combinators$Combine$lazy(
-						function (_p52) {
-							var _p53 = _p52;
+						function (_p54) {
+							var _p55 = _p54;
 							return _elm_community$parser_combinators$Combine$many1(
 								A2(
 									_elm_community$parser_combinators$Combine_ops['*>'],
@@ -18358,8 +18475,8 @@ var _user$project$Parser_Declarations$promoteToApplicationExpression = function 
 		});
 };
 var _user$project$Parser_Declarations$declaration = _elm_community$parser_combinators$Combine$lazy(
-	function (_p54) {
-		var _p55 = _p54;
+	function (_p56) {
+		var _p57 = _p56;
 		return _elm_community$parser_combinators$Combine$choice(
 			{
 				ctor: '::',
@@ -19311,6 +19428,10 @@ var _user$project$Analyser_Messages_Types$newMessage = A2(_user$project$Analyser
 var _user$project$Analyser_Messages_Types$Fixing = {ctor: 'Fixing'};
 var _user$project$Analyser_Messages_Types$Blocked = {ctor: 'Blocked'};
 var _user$project$Analyser_Messages_Types$Outdated = {ctor: 'Outdated'};
+var _user$project$Analyser_Messages_Types$FunctionInLet = F2(
+	function (a, b) {
+		return {ctor: 'FunctionInLet', _0: a, _1: b};
+	});
 var _user$project$Analyser_Messages_Types$CoreArrayUsage = F2(
 	function (a, b) {
 		return {ctor: 'CoreArrayUsage', _0: a, _1: b};
@@ -20473,7 +20594,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_2: _p51,
 				_3: false
 			};
-		default:
+		case 'UnnecessaryListConcat':
 			var _p53 = _p0._1;
 			var _p52 = _p0._0;
 			return {
@@ -20509,21 +20630,57 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
+		default:
+			var _p55 = _p0._1;
+			var _p54 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Let statement containing functions should be avoided in \"',
+						_1: {
+							ctor: '::',
+							_0: _p54,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$AST_Ranges$rangeToString(_p55),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p54,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p55,
+					_1: {ctor: '[]'}
+				},
+				_3: false
+			};
 	}
 };
 var _user$project$Analyser_Messages_Util$canFix = function (m) {
-	var _p54 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var result = _p54._3;
+	var _p56 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var result = _p56._3;
 	return result;
 };
 var _user$project$Analyser_Messages_Util$getRanges = function (m) {
-	var _p55 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var r = _p55._2;
+	var _p57 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var r = _p57._2;
 	return r;
 };
 var _user$project$Analyser_Messages_Util$getFiles = function (m) {
-	var _p56 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p56._1;
+	var _p58 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p58._1;
 	return f(m);
 };
 var _user$project$Analyser_Messages_Util$compareMessage = F2(
@@ -20552,8 +20709,8 @@ var _user$project$Analyser_Messages_Util$compareMessage = F2(
 					_user$project$Analyser_Messages_Util$getRanges(b.data)))) : A2(_elm_lang$core$Basics$compare, aFile, bFile);
 	});
 var _user$project$Analyser_Messages_Util$asString = function (m) {
-	var _p57 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p57._0;
+	var _p59 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p59._0;
 	return f;
 };
 var _user$project$Analyser_Messages_Util$markFixing = F2(
@@ -21247,10 +21404,32 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_1: {ctor: '[]'}
 						}
 					}));
-		default:
+		case 'CoreArrayUsage':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'CoreArrayUsage',
+				_elm_lang$core$Json_Encode$object(
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'file',
+							_1: _elm_lang$core$Json_Encode$string(_p0._0)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'range',
+								_1: _user$project$AST_Ranges$encode(_p0._1)
+							},
+							_1: {ctor: '[]'}
+						}
+					}));
+		default:
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'FunctionInLet',
 				_elm_lang$core$Json_Encode$object(
 					{
 						ctor: '::',
@@ -21656,7 +21835,15 @@ var _user$project$Analyser_Messages_Json$decodeMessageData = _user$project$Util_
 																														_0: 'CoreArrayUsage',
 																														_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$CoreArrayUsage)
 																													},
-																													_1: {ctor: '[]'}
+																													_1: {
+																														ctor: '::',
+																														_0: {
+																															ctor: '_Tuple2',
+																															_0: 'FunctionInLet',
+																															_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$FunctionInLet)
+																														},
+																														_1: {ctor: '[]'}
+																													}
 																												}
 																											}
 																										}
@@ -22574,7 +22761,11 @@ var _user$project$Analyser_Configuration$checkPropertyAsInt = F3(
 					_p1._0.raw)));
 	});
 var _user$project$Analyser_Configuration$defaultChecks = _elm_lang$core$Dict$fromList(
-	{ctor: '[]'});
+	{
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'FunctionsInLet', _1: false},
+		_1: {ctor: '[]'}
+	});
 var _user$project$Analyser_Configuration$withDefaultChecks = function (x) {
 	return A6(
 		_elm_lang$core$Dict$merge,
@@ -24818,29 +25009,9 @@ var _user$project$Analyser_Checks_NonStaticRegex$onExpression = F3(
 			expression,
 			A2(_user$project$Analyser_Checks_NonStaticRegex$onExpressionFunctionReference, expression, context)) : A3(_user$project$Analyser_Checks_NonStaticRegex$onExpressionQualified, x.moduleName, expression, context);
 	});
-var _user$project$Analyser_Checks_NonStaticRegex$isFunctionTypeReference = function (typeReference) {
-	var _p6 = typeReference;
-	if (_p6.ctor === 'FunctionTypeReference') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$Analyser_Checks_NonStaticRegex$isFunctionSignature = function (_p7) {
-	var _p8 = _p7;
-	return _user$project$Analyser_Checks_NonStaticRegex$isFunctionTypeReference(_p8.typeReference);
-};
-var _user$project$Analyser_Checks_NonStaticRegex$isStatic = function ($function) {
-	return (_elm_lang$core$Native_Utils.cmp(
-		_elm_lang$core$List$length($function.declaration.$arguments),
-		0) > 0) ? false : ($function.declaration.operatorDefinition ? false : (A2(
-		_elm_lang$core$Maybe$withDefault,
-		false,
-		A2(_elm_lang$core$Maybe$map, _user$project$Analyser_Checks_NonStaticRegex$isFunctionSignature, $function.signature)) ? false : true));
-};
 var _user$project$Analyser_Checks_NonStaticRegex$onFunction = F3(
 	function (inner, $function, context) {
-		if (!_user$project$Analyser_Checks_NonStaticRegex$isStatic($function)) {
+		if (!_user$project$ASTUtil_Functions$isStatic($function)) {
 			var after = inner(
 				_elm_lang$core$Native_Utils.update(
 					context,
@@ -24871,7 +25042,7 @@ var _user$project$Analyser_Checks_NonStaticRegex$findRegexUsagesInFunctions = F2
 			_user$project$Analyser_Checks_NonStaticRegex$startingContext);
 	});
 var _user$project$Analyser_Checks_NonStaticRegex$scan = F2(
-	function (fileContext, _p9) {
+	function (fileContext, _p6) {
 		var regexImport = A3(
 			_user$project$ASTUtil_Imports$buildImportInformation,
 			{
@@ -24881,8 +25052,8 @@ var _user$project$Analyser_Checks_NonStaticRegex$scan = F2(
 			},
 			'regex',
 			fileContext.ast);
-		var _p10 = regexImport;
-		if (_p10.ctor === 'Nothing') {
+		var _p7 = regexImport;
+		if (_p7.ctor === 'Nothing') {
 			return {ctor: '[]'};
 		} else {
 			return A2(
@@ -24899,7 +25070,7 @@ var _user$project$Analyser_Checks_NonStaticRegex$scan = F2(
 					function (_) {
 						return _.usages;
 					}(
-						A2(_user$project$Analyser_Checks_NonStaticRegex$findRegexUsagesInFunctions, _p10._0, fileContext))));
+						A2(_user$project$Analyser_Checks_NonStaticRegex$findRegexUsagesInFunctions, _p7._0, fileContext))));
 		}
 	});
 var _user$project$Analyser_Checks_NonStaticRegex$checker = {
@@ -24961,6 +25132,75 @@ var _user$project$Analyser_Checks_CoreArrayUsage$checker = {
 		})
 };
 
+var _user$project$Analyser_Checks_FunctionsInLet$onLetBlock = F3(
+	function ($continue, _p0, context) {
+		return function (after) {
+			return _elm_lang$core$Native_Utils.update(
+				after,
+				{inLetBlock: context.inLetBlock});
+		}(
+			$continue(
+				_elm_lang$core$Native_Utils.update(
+					context,
+					{inLetBlock: true})));
+	});
+var _user$project$Analyser_Checks_FunctionsInLet$onFunction = F2(
+	function ($function, context) {
+		var isStatic = _user$project$ASTUtil_Functions$isStatic($function);
+		return ((!isStatic) && context.inLetBlock) ? _elm_lang$core$Native_Utils.update(
+			context,
+			{
+				functions: {ctor: '::', _0: $function, _1: context.functions}
+			}) : context;
+	});
+var _user$project$Analyser_Checks_FunctionsInLet$asMessage = F2(
+	function (fileContext, f) {
+		return A2(
+			_user$project$Analyser_Messages_Types$newMessage,
+			{
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+				_1: {ctor: '[]'}
+			},
+			A2(_user$project$Analyser_Messages_Types$FunctionInLet, fileContext.path, f.declaration.name.range));
+	});
+var _user$project$Analyser_Checks_FunctionsInLet$startingContext = {
+	inLetBlock: false,
+	functions: {ctor: '[]'}
+};
+var _user$project$Analyser_Checks_FunctionsInLet$scan = F2(
+	function (fileContext, _p1) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Checks_FunctionsInLet$asMessage(fileContext),
+			function (_) {
+				return _.functions;
+			}(
+				A3(
+					_user$project$Inspector$inspect,
+					_elm_lang$core$Native_Utils.update(
+						_user$project$Inspector$defaultConfig,
+						{
+							onLetBlock: _user$project$Inspector$Inner(_user$project$Analyser_Checks_FunctionsInLet$onLetBlock),
+							onFunction: _user$project$Inspector$Post(_user$project$Analyser_Checks_FunctionsInLet$onFunction)
+						}),
+					fileContext.ast,
+					_user$project$Analyser_Checks_FunctionsInLet$startingContext)));
+	});
+var _user$project$Analyser_Checks_FunctionsInLet$checker = {
+	check: _user$project$Analyser_Checks_FunctionsInLet$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'FunctionsInLet',
+			_1: {ctor: '[]'}
+		})
+};
+var _user$project$Analyser_Checks_FunctionsInLet$Context = F2(
+	function (a, b) {
+		return {inLetBlock: a, functions: b};
+	});
+
 var _user$project$Inspection$checkers = {
 	ctor: '::',
 	_0: _user$project$Analyser_Checks_UnusedVariable$checker,
@@ -25018,7 +25258,11 @@ var _user$project$Inspection$checkers = {
 																		_1: {
 																			ctor: '::',
 																			_0: _user$project$Analyser_Checks_CoreArrayUsage$checker,
-																			_1: {ctor: '[]'}
+																			_1: {
+																				ctor: '::',
+																				_0: _user$project$Analyser_Checks_FunctionsInLet$checker,
+																				_1: {ctor: '[]'}
+																			}
 																		}
 																	}
 																}
