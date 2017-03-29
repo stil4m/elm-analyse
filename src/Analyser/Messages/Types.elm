@@ -65,6 +65,7 @@ type MessageData
     | UnnecessaryPortModule FileName
     | NonStaticRegex FileName Range
     | CoreArrayUsage FileName Range
+    | FunctionInLet FileName Range
 
 
 type alias GetFiles =
