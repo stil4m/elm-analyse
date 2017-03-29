@@ -1,6 +1,6 @@
 module Parser.Ranges exposing (withRange, withRangeTuple, withRangeCustomStart)
 
-import Combine exposing (Parser, ParseLocation, withLocation, succeed, (>>=), (<*>), (<$>))
+import Combine exposing (Parser, ParseLocation, withLocation, succeed, (<*>))
 import Parser.State exposing (State)
 import AST.Ranges exposing (Range, Location)
 

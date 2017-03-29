@@ -1,6 +1,6 @@
 module Analyser.Checks.NonStaticRegex exposing (checker)
 
-import AST.Types exposing (File, FunctionSignature, TypeReference(FunctionTypeReference), InnerExpression(QualifiedExpr, FunctionOrValue), Import, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName, Expression, InnerExpression)
+import AST.Types exposing (File, FunctionSignature, TypeReference, InnerExpression(QualifiedExpr, FunctionOrValue), Import, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName, Expression, InnerExpression)
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(NonStaticRegex), newMessage)
@@ -8,6 +8,7 @@ import Inspector exposing (Order(Post, Inner), defaultConfig)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import ASTUtil.Imports as Imports exposing (FunctionReference)
+import ASTUtil.Functions
 
 
 type alias Context =
@@ -68,7 +69,7 @@ When the function returns from inner, reset the property in the context.
 -}
 onFunction : (Context -> Context) -> Function -> Context -> Context
 onFunction inner function context =
-    if not (isStatic function) then
+    if not (ASTUtil.Functions.isStatic function) then
         let
             after =
                 inner { context | staticEnvironment = False }
@@ -76,35 +77,6 @@ onFunction inner function context =
             { after | staticEnvironment = context.staticEnvironment }
     else
         inner context
-
-
-{-| Check if a function is a real function or just a value. Will return true if it is a value.
--}
-isStatic : Function -> Bool
-isStatic function =
-    if List.length function.declaration.arguments > 0 then
-        False
-    else if function.declaration.operatorDefinition then
-        False
-    else if Maybe.withDefault False <| Maybe.map isFunctionSignature function.signature then
-        False
-    else
-        True
-
-
-isFunctionSignature : FunctionSignature -> Bool
-isFunctionSignature { typeReference } =
-    isFunctionTypeReference typeReference
-
-
-isFunctionTypeReference : TypeReference -> Bool
-isFunctionTypeReference typeReference =
-    case typeReference of
-        FunctionTypeReference _ _ _ ->
-            True
-
-        _ ->
-            False
 
 
 onExpression : FunctionReference -> Expression -> Context -> Context

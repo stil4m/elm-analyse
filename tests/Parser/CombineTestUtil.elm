@@ -335,5 +335,8 @@ noRangeInnerExpression inner =
         RecordAccess e n ->
             RecordAccess (noRangeExpression e) n
 
+        Negation expr ->
+            Negation (noRangeExpression expr)
+
         _ ->
             inner

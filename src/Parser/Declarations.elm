@@ -11,7 +11,7 @@ import Parser.TypeReference exposing (typeReference)
 import AST.Types exposing (File, Module, Declaration(AliasDecl, FuncDecl, TypeDecl, InfixDeclaration, DestructuringDeclaration, PortDeclaration), Destructuring, Function, FunctionSignature, FunctionDeclaration, Pattern, Expression, InnerExpression(..), RecordUpdate, Lambda, Case, CaseBlock, LetBlock, Cases)
 import AST.Ranges exposing (Range)
 import Parser.Typings exposing (typeDeclaration)
-import Parser.Util exposing (exactIndentWhitespace, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer)
+import Parser.Util exposing (exactIndentWhitespace, commentSequence, moreThanIndentWhitespace, trimmed, unstrictIndentWhitespace, asPointer)
 import Parser.Whitespace exposing (manySpaces)
 import Parser.State exposing (State, pushIndent, popIndent)
 import Parser.Ranges exposing (withRange, withRangeCustomStart)
@@ -122,6 +122,7 @@ expressionNotApplication =
                     , prefixOperatorExpression
                     , tupledExpression
                     , recordAccessFunctionExpression
+                    , negationExpression
                     , operatorExpression
                     , floatableExpression
                     , integerExpression
@@ -226,16 +227,31 @@ listExpression : Parser State InnerExpression
 listExpression =
     lazy
         (\() ->
-            ListExpr
-                <$> or ([] <$ (string "[" *> maybe (or moreThanIndentWhitespace exactIndentWhitespace) *> string "]"))
-                        (between
+            or emptyListExpression
+                (ListExpr
+                    <$> between
                             (string "[")
                             (string "]")
                             (sepBy (string ",")
                                 (trimmed expression)
                             )
-                        )
+                )
         )
+
+
+emptyListExpression : Parser State InnerExpression
+emptyListExpression =
+    ListExpr []
+        <$ (string "["
+                *> maybe
+                    (choice
+                        [ moreThanIndentWhitespace
+                        , exactIndentWhitespace
+                        , trimmed commentSequence
+                        ]
+                    )
+                *> string "]"
+           )
 
 
 
@@ -420,6 +436,27 @@ ifBlockExpression =
 prefixOperatorExpression : Parser State InnerExpression
 prefixOperatorExpression =
     PrefixOperator <$> parens prefixOperatorToken
+
+
+negationExpression : Parser State InnerExpression
+negationExpression =
+    lazy
+        (\() ->
+            Negation
+                <$> (string "-"
+                        *> (rangedExpression
+                                (choice
+                                    [ qualifiedExpression
+                                    , functionOrValueExpression
+                                    , integerExpression
+                                    , floatableExpression
+                                    , tupledExpression
+                                    ]
+                                )
+                                >>= liftRecordAccess
+                           )
+                    )
+        )
 
 
 operatorExpression : Parser State InnerExpression

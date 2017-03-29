@@ -113,8 +113,7 @@ update msg (Model model) =
                                 (\( _, path, content ) ->
                                     Parser.parse content
                                         -- TODO Should we inject the operator table?
-                                        |>
-                                            Result.map (PostProcessing.postProcess Dict.empty)
+                                        |> Result.map (PostProcessing.postProcess Dict.empty)
                                         |> Result.map ((,,) path content)
                                         |> Result.toMaybe
                                 )

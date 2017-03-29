@@ -170,6 +170,36 @@ foo =
     )
 
 
+unusedOperator : ( String, String, List MessageData )
+unusedOperator =
+    ( "unusedOperator"
+    , """module Bar exposing (foo)
+
+foo = 1
+
+(&>) _ b = b
+
+"""
+    , [ UnusedTopLevel "./foo.elm" "&>" { start = { row = 4, column = -1 }, end = { row = 4, column = 3 } }
+      ]
+    )
+
+
+unusedImportedOperator : ( String, String, List MessageData )
+unusedImportedOperator =
+    ( "unusedImportedOperator"
+    , """module Bar exposing (foo)
+
+import Foo exposing ((!!))
+
+foo = 1
+
+"""
+    , [ UnusedImportedVariable "./foo.elm" "!!" { start = { row = 2, column = 20 }, end = { row = 2, column = 24 } }
+      ]
+    )
+
+
 destructuringSameName : ( String, String, List MessageData )
 destructuringSameName =
     ( "destructuringSameName"
@@ -378,6 +408,8 @@ all =
         , exposedValueConstructor
         , onlyUsedInSelf
         , usedOperator
+        , unusedOperator
+        , unusedImportedOperator
         , destructuringSameName
         , unusedInEffectModule
         , unusedImportedVariable

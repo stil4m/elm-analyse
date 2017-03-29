@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Elm Analyse {{VERSION}}</title>
+    <script src="/client-elm.js?cache_buster={{VERSION}}" charset="utf-8"></script>
+    <link rel="stylesheet" href="/bootstrap/start-bootstrap-admin-2_v3.3.7.css" />
+    <link href="/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <style>
+        .message-dialog .modal .modal-dialog {
+            padding: 20px;
+            width: 100%;
+        }
+
+        #sigmaGraph {
+            width: 100%;
+            height: 600px;
+            position: relative;
+        }
+
+        .graph__legend ul {
+            margin: 0;
+            padding: 0px;
+        }
+
+        .graph__legend li {
+            display: inline-block;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+
+        .graph__legend li:hover {
+            text-decoration: underline;
+        }
+
+        .graph__legend::after {
+            clear: left;
+        }
+
+    </style>
+    <script src="sigma/sigma.min.js"></script>
+    <script src="sigma/plugins/sigma.plugins.animate.min.js"></script>
+    <script src="sigma/plugins/sigma.plugins.relativeSize.min.js"></script>
+    <script src="sigma/plugins/sigma.layout.forceAtlas2.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+    </div>
+</body>
+<script type="text/javascript">
+    var el = document.getElementById('app');
+    var app = Elm.Client.Main.embed(el);
+</script>
+<script src="graph.js?cache_buster={{VERSION}}"></script>
+</html>

@@ -1,4 +1,5 @@
 const gulp = require('gulp');
+const gulpReplace = require('gulp-replace');
 const elm = require('gulp-elm');
 const devMode = true;
 const runSequence = require('run-sequence');
@@ -56,7 +57,7 @@ gulp.task('elm-all', function() {
     return runSequence('elm-client', 'elm-backend', 'elm-performance-single-file');
 });
 
-gulp.task('watch', ['elm-backend', 'elm-client'], function() {
+gulp.task('watch', ['html', 'elm-backend', 'elm-client'], function() {
     gulp.watch(['src/**', 'performance/**.elm'], function() {
         runSequence('elm-all');
     });
@@ -64,11 +65,11 @@ gulp.task('watch', ['elm-backend', 'elm-client'], function() {
 
 gulp.task('lint', () => {
     return gulp.src(['js/**/*.js',
-            '!js/public/graph.js',
-            '!js/backend-elm.js',
-            '!js/public/client-elm.js',
-            '!js/public/sigma/**/*.js'
-        ])
+        '!js/public/graph.js',
+        '!js/backend-elm.js',
+        '!js/public/client-elm.js',
+        '!js/public/sigma/**/*.js'
+    ])
         // eslint() attaches the lint output to the "eslint" property
         // of the file object so it can be used by other modules.
         .pipe(eslint())
@@ -80,6 +81,12 @@ gulp.task('lint', () => {
         .pipe(eslint.failAfterError());
 });
 
+gulp.task('html', () => {
+    const packageVersion = require('./package.json').version;
+    gulp.src('html/index.html')
+      .pipe(gulpReplace(/\{\{VERSION\}\}/g, 'v' + packageVersion))
+      .pipe(gulp.dest('js/public/'));
+});
 
 
-gulp.task('default', ['elm-backend', 'elm-client', 'elm-performance-single-file']);
+gulp.task('default', ['elm-backend', 'elm-client', 'html', 'elm-performance-single-file']);

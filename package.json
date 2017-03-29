@@ -30,24 +30,24 @@
     "lint"
   ],
   "dependencies": {
-    "elm": "0.18.0",
-    "elm-test": "0.18.2",
     "express": "4.14.1",
     "express-ws": "2.0.0",
     "find": "0.2.7",
     "fs-extra": "2.0.0",
-    "gulp": "3.9.1",
-    "gulp-elm": "0.6.1",
     "lodash": "4.17.4",
     "minimist": "1.2.0",
-    "nodemon": "1.11.0",
     "normalize-newline": "3.0.0",
-    "run-sequence": "1.2.2",
     "sums": "0.2.4"
   },
   "devDependencies": {
-    "elm-format-download": "^0.2.1",
+    "elm": "0.18.0",
+    "elm-test": "0.18.2",
+    "elm-format-download": "0.2.4",
     "eslint": "^3.17.1",
-    "gulp-eslint": "^3.0.1"
+    "gulp": "3.9.1",
+    "gulp-elm": "0.6.1",
+    "gulp-eslint": "^3.0.1",
+    "gulp-replace": "^0.5.4",
+    "run-sequence": "1.2.2"
   }
 }
