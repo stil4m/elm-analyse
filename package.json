@@ -42,7 +42,7 @@
   "devDependencies": {
     "elm": "0.18.0",
     "elm-test": "0.18.2",
-    "elm-format-download": "0.2.4",
+    "elm-format": "0.6.1-alpha",
     "eslint": "^3.17.1",
     "gulp": "3.9.1",
     "gulp-elm": "0.6.1",
