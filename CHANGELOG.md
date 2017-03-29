@@ -1,5 +1,13 @@
 # elm-analyse changelog
 
+## 0.6.0 (2017-03-29)
+
+* [Issue #58](https://github.com/stil4m/elm-analyse/issues/58) Unnecessary params and negative numbers
+* [Issue #59](https://github.com/stil4m/elm-analyse/issues/59) Parsing error with empty list + multiline comment
+* [Issue #60](https://github.com/stil4m/elm-analyse/issues/60) Add cache buster to UI sources
+* [Issue #61](https://github.com/stil4m/elm-analyse/issues/61) Functions defined in let bindings
+* [Issue #63](https://github.com/stil4m/elm-analyse/issues/63) Unused imported operator
+
 ## 0.5.1 (2017-03-18)
 
 * [Issue #57](https://github.com/stil4m/elm-analyse/issues/57) Can't install elm-analyse on Linux
