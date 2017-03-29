@@ -12,12 +12,11 @@
   },
   "scripts": {
     "eslint": "./node_modules/.bin/gulp lint",
-    "download-elm-format": "./node_modules/.bin/elm-format-download -t ./node_modules/.bin",
     "elm-format": "./node_modules/.bin/elm-format --validate src/ tests/",
     "self-check": "node \"./js/bin/index.js\"",
     "test": "./node_modules/.bin/elm-test",
     "build": "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\"",
-    "pr-check": "npm install && npm run eslint && npm run download-elm-format && npm run elm-format && npm run test && npm run build && npm run self-check"
+    "pr-check": "npm install && npm run eslint && npm run elm-format && npm run test && npm run build && npm run self-check"
   },
   "author": "Mats Stijlaart",
   "license": "MIT",
