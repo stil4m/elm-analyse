@@ -47,7 +47,8 @@ reserved =
     , "infixr"
     , "infixl"
     , "type"
-      --, "alias" Apparently this is not a reserved keyword
+
+    --, "alias" Apparently this is not a reserved keyword
     , "where"
     ]
         |> List.map (flip (,) True)
