@@ -11,9 +11,8 @@ all =
         [ replaceRangeWithTests ]
 
 
-{-|
-  Col is 0 based, but with a offset of minus 1. Thus 5 means the 7th character
-  Row is 0 based.
+{-| Col is 0 based, but with a offset of minus 1. Thus 5 means the 7th character
+Row is 0 based.
 -}
 replaceRangeWithTests : Test
 replaceRangeWithTests =
