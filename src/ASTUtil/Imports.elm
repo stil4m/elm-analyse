@@ -20,8 +20,7 @@ type alias FunctionReference =
     }
 
 
-{-|
-  Will look for an import within the file that includes a range. Will return a `Nothing` when no such import exists.
+{-| Will look for an import within the file that includes a range. Will return a `Nothing` when no such import exists.
 -}
 findImportWithRange : File -> Range -> Maybe Import
 findImportWithRange ast range =
