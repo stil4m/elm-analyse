@@ -13,7 +13,7 @@ module.exports = function(config) {
     console.log(config);
 
     const elm = require('./worker')(config);
-    require('./dashboard')(app, elm, expressWs);
+    const dashboard = require('./dashboard')(app, elm, expressWs);
     require('./control')(app, elm, expressWs);
 
     app.get('/file', function(req, res) {
@@ -27,6 +27,10 @@ module.exports = function(config) {
         const directory = process.cwd();
         const x = fileGatherer.gather(directory);
         res.send(x.sourceFiles);
+    });
+
+    app.get('/state', function(req, res) {
+        res.send(dashboard.getState());
     });
 
     app.listen(config.port, function() {
