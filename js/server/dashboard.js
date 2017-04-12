@@ -24,4 +24,9 @@ module.exports = function(app, elm, expressWs) {
         expressWs.getWss().clients.forEach(x => x.send(renderState()));
     });
 
+    return {
+        getState: function() {
+            return state;
+        }
+    };
 };
