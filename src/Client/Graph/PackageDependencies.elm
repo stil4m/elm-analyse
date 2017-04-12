@@ -2,19 +2,30 @@ module Client.Graph.PackageDependencies exposing (Model, Msg, init, update, view
 
 import Analyser.State exposing (State)
 import Dict exposing (Dict)
+import Graph exposing (Graph)
+import Graph.Node exposing (Node)
 import Graph.Edge exposing (Edge)
 import Html exposing (Html)
 import Html.Attributes as Html
+import Html.Events as Html
 import List.Extra as List
 import Set
 
 
-type Model
-    = Model (List String) (Dict ( String, String ) Int)
+type alias Model =
+    { names : List String
+    , relations : PackageFileRelations
+    , selected : Maybe ( String, String )
+    , graph : Graph Node
+    }
 
 
-type alias Msg =
-    ()
+type alias PackageFileRelations =
+    Dict ( String, String ) (List ( String, String ))
+
+
+type Msg
+    = Select String String
 
 
 init : State -> ( Model, Cmd Msg )
@@ -30,7 +41,7 @@ init { graph } =
                 |> Set.toList
                 |> List.sort
     in
-        ( Model names relations
+        ( Model names relations Nothing graph
         , Cmd.none
         )
 
@@ -38,20 +49,75 @@ init { graph } =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        () ->
-            ( model
+        Select from to ->
+            ( { model | selected = Just ( from, to ) }
             , Cmd.none
             )
 
 
-view : Model -> Html msg
-view (Model names relations) =
-    Html.table [ Html.class "table table-condensed" ]
-        [ Html.tbody []
-            (Html.tr [] (Html.td [] [] :: List.map headerNameTd names)
-                :: List.map (\x -> packageCycleRow x names relations) names
-            )
+view : Model -> Html Msg
+view { names, relations, selected } =
+    Html.div []
+        [ Html.table [ Html.class "table table-condensed" ]
+            [ Html.tbody []
+                (Html.tr [] (Html.td [] [] :: List.map headerNameTd names)
+                    :: List.map (\x -> packageCycleRow x names relations selected) names
+                )
+            ]
+        , Maybe.map (interPackageRelationsTable relations) selected |> Maybe.withDefault (Html.div [] [])
         ]
+
+
+interPackageRelationsTable : PackageFileRelations -> ( String, String ) -> Html a
+interPackageRelationsTable relations ( from, to ) =
+    Html.div [ Html.class "row" ]
+        [ Html.div [ Html.class "col-md-6" ]
+            [ interPackageRelationTable ( from, to ) (Dict.get ( from, to ) relations |> Maybe.withDefault [])
+            ]
+        , Html.div [ Html.class "col-md-6" ]
+            [ interPackageRelationTable ( to, from ) (Dict.get ( to, from ) relations |> Maybe.withDefault [])
+            ]
+        ]
+
+
+interPackageRelationTable : ( String, String ) -> List ( String, String ) -> Html a
+interPackageRelationTable ( from, to ) rels =
+    Html.table [ Html.class "table" ]
+        [ Html.thead []
+            [ Html.tr []
+                [ Html.th []
+                    [ packageNameHtml from, Html.text " -> ", packageNameHtml to ]
+                ]
+            ]
+        , Html.tbody [] <|
+            case rels of
+                [] ->
+                    [ Html.tr []
+                        [ Html.td []
+                            [ Html.i
+                                [ Html.style [ ( "color", "#777" ) ] ]
+                                [ Html.text "No dependencies" ]
+                            ]
+                        ]
+                    ]
+
+                _ ->
+                    (rels
+                        |> List.map (\( a, b ) -> a ++ " -> " ++ b)
+                        |> List.map (\x -> Html.tr [] [ Html.td [] [ Html.text x ] ])
+                    )
+        ]
+
+
+packageNameHtml : String -> Html msg
+packageNameHtml input =
+    case input of
+        "" ->
+            Html.span [ Html.style [ ( "color", "#999" ) ] ]
+                [ Html.text "<<root>>" ]
+
+        _ ->
+            Html.text input
 
 
 headerNameTd : String -> Html msg
@@ -74,57 +140,76 @@ headerNameTd x =
                     , ( "width", "30px" )
                     ]
                 ]
-                [ Html.text x ]
+                [ packageNameHtml x ]
             ]
 
 
 asNameTd : String -> Html msg
 asNameTd x =
-    Html.th [] [ Html.text x ]
+    Html.th [] [ packageNameHtml x ]
 
 
-packageCycleRow : String -> List String -> Dict ( String, String ) Int -> Html msg
-packageCycleRow name names relations =
+packageCycleRow : String -> List String -> PackageFileRelations -> Maybe ( String, String ) -> Html Msg
+packageCycleRow name names relations selected =
     Html.tr []
         (asNameTd name
-            :: List.map (\other -> packageContentTd name other relations) names
+            :: List.map (\other -> packageContentTd name other relations selected) names
         )
 
 
-packageContentTd : String -> String -> Dict ( String, String ) Int -> Html msg
-packageContentTd from to relations =
+packageContentTd : String -> String -> PackageFileRelations -> Maybe ( String, String ) -> Html Msg
+packageContentTd from to relations selected =
     if from == to then
         Html.td [ Html.style [ ( "background", "black" ) ] ] []
     else
         let
-            bg =
-                if Dict.member ( from, to ) relations && Dict.member ( to, from ) relations then
-                    "red"
+            styleClass =
+                if selected == Just ( from, to ) || selected == Just ( to, from ) then
+                    "info"
+                else if Dict.member ( from, to ) relations && Dict.member ( to, from ) relations then
+                    "danger"
                 else
-                    "white"
+                    ""
         in
-            Html.td [ Html.style [ ( "background", bg ), ( "text-align", "center" ) ] ]
+            Html.td
+                [ Html.class styleClass
+                , Html.style [ ( "text-align", "center" ) ]
+                , Html.onClick (Select from to)
+                ]
                 [ Dict.get ( from, to ) relations
-                    |> Maybe.map toString
+                    |> Maybe.map (List.length >> toString)
                     |> Maybe.withDefault ""
                     |> Html.text
                 ]
 
 
-edgeToPackageRel : Edge -> ( String, String )
+edgeToPackageRel : Edge -> ( ( String, String ), ( String, String ) )
 edgeToPackageRel edge =
-    ( String.split "-" edge.from |> List.init |> Maybe.withDefault [] |> String.join "."
-    , String.split "-" edge.to |> List.init |> Maybe.withDefault [] |> String.join "."
-    )
+    let
+        fromList =
+            String.split "-" edge.from
+
+        toList =
+            String.split "-" edge.to
+
+        fromPackage =
+            fromList |> List.init |> Maybe.withDefault [] |> String.join "."
+
+        toPackage =
+            toList |> List.init |> Maybe.withDefault [] |> String.join "."
+    in
+        ( ( fromPackage, toPackage )
+        , ( fromList |> String.join ".", toList |> String.join "." )
+        )
 
 
-packageListRelationAsBag : List ( String, String ) -> Dict ( String, String ) Int
+packageListRelationAsBag : List ( ( String, String ), ( String, String ) ) -> PackageFileRelations
 packageListRelationAsBag =
-    List.foldl
-        (\pair base ->
+    List.foldr
+        (\( key, value ) base ->
             Dict.update
-                pair
-                (Maybe.map ((+) 1) >> Maybe.withDefault 1 >> Just)
+                key
+                (Maybe.map ((::) value) >> Maybe.withDefault [ value ] >> Just)
                 base
         )
         Dict.empty
