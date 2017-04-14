@@ -8390,8 +8390,11 @@ var _elm_community$parser_combinators$Combine$currentLocation = function (stream
 				}
 			}
 		});
-	var lines = A2(_elm_lang$core$String$split, '\n', stream.data);
-	return A3(find, stream.position, 0, lines);
+	return A3(
+		find,
+		stream.position,
+		0,
+		A2(_elm_lang$core$String$split, '\n', stream.data));
 };
 var _elm_community$parser_combinators$Combine$currentSourceLine = function (_p4) {
 	return function (_) {
@@ -8596,7 +8599,7 @@ var _elm_community$parser_combinators$Combine$between = F3(
 			A2(_elm_community$parser_combinators$Combine_ops['*>'], lp, p),
 			rp);
 	});
-var _elm_community$parser_combinators$Combine$sequence = function (ps) {
+var _elm_community$parser_combinators$Combine$sequence = function (parsers) {
 	var accumulate = F4(
 		function (acc, ps, state, stream) {
 			accumulate:
@@ -8639,7 +8642,7 @@ var _elm_community$parser_combinators$Combine$sequence = function (ps) {
 				return A4(
 					accumulate,
 					{ctor: '[]'},
-					ps,
+					parsers,
 					state,
 					stream);
 			}));
@@ -8818,6 +8821,10 @@ var _elm_community$parser_combinators$Combine$regex = function (pat) {
 var _elm_community$parser_combinators$Combine$whitespace = A2(
 	_elm_community$parser_combinators$Combine_ops['<?>'],
 	_elm_community$parser_combinators$Combine$regex('[ \t\r\n]*'),
+	'whitespace');
+var _elm_community$parser_combinators$Combine$whitespace1 = A2(
+	_elm_community$parser_combinators$Combine_ops['<?>'],
+	_elm_community$parser_combinators$Combine$regex('[ \t\r\n]+'),
 	'whitespace');
 var _elm_community$parser_combinators$Combine$while = function (pred) {
 	var accumulate = F3(
@@ -9335,7 +9342,7 @@ var _elm_community$parser_combinators$Combine_Num$unwrap = F2(
 				'Combine.Num',
 				{
 					start: {line: 23, column: 5},
-					end: {line: 28, column: 85}
+					end: {line: 28, column: 83}
 				},
 				_p0)(
 				A2(

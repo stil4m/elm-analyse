@@ -17919,24 +17919,6 @@ var _user$project$Client_Graph_Graph$withGraph = F2(
 			});
 	});
 var _user$project$Client_Graph_Graph$graphElementId = 'sigmaGraph';
-var _user$project$Client_Graph_Graph$init = function (location) {
-	return A2(
-		_elm_lang$core$Platform_Cmd_ops['!'],
-		{
-			state: _elm_lang$core$Maybe$Nothing,
-			graph: _elm_lang$core$Maybe$Nothing,
-			colors: _elm_lang$core$Dict$empty,
-			filter: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$websocket$WebSocket$send,
-				_user$project$Client_Socket$dashboardAddress(location),
-				'ping'),
-			_1: {ctor: '[]'}
-		});
-};
 var _user$project$Client_Graph_Graph$withNewState = F2(
 	function (state, m) {
 		return A2(
@@ -17967,62 +17949,61 @@ var _user$project$Client_Graph_Graph$cmdForUpdatedGraph = function (maybeGraph) 
 			});
 	}
 };
-var _user$project$Client_Graph_Graph$update = F3(
-	function (_p4, msg, model) {
-		var _p5 = msg;
-		if (_p5.ctor === 'NewState') {
-			var _p6 = _p5._0;
-			if (_p6.ctor === 'Err') {
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					{ctor: '[]'});
-			} else {
-				var newModel = A2(_user$project$Client_Graph_Graph$withNewState, _p6._0, model);
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					newModel,
-					{
-						ctor: '::',
-						_0: _user$project$Client_Graph_Graph$cmdForUpdatedGraph(newModel.graph),
-						_1: {ctor: '[]'}
-					});
-			}
+var _user$project$Client_Graph_Graph$init = function (state) {
+	var newModel = A2(
+		_user$project$Client_Graph_Graph$withNewState,
+		state,
+		{
+			state: _elm_lang$core$Maybe$Nothing,
+			graph: _elm_lang$core$Maybe$Nothing,
+			colors: _elm_lang$core$Dict$empty,
+			filter: {ctor: '[]'}
+		});
+	return A2(
+		_elm_lang$core$Platform_Cmd_ops['!'],
+		newModel,
+		{
+			ctor: '::',
+			_0: _user$project$Client_Graph_Graph$cmdForUpdatedGraph(newModel.graph),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Client_Graph_Graph$update = F2(
+	function (msg, model) {
+		var _p4 = msg;
+		var _p6 = _p4._0;
+		var newModelWithFilter = _elm_lang$core$Native_Utils.update(
+			model,
+			{filter: _p6});
+		var _p5 = model.state;
+		if (_p5.ctor === 'Nothing') {
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				newModelWithFilter,
+				{ctor: '[]'});
 		} else {
-			var _p8 = _p5._0;
-			var newModelWithFilter = _elm_lang$core$Native_Utils.update(
-				model,
-				{filter: _p8});
-			var _p7 = model.state;
-			if (_p7.ctor === 'Nothing') {
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					newModelWithFilter,
-					{ctor: '[]'});
-			} else {
-				var modelWithNewGraph = A2(
-					_user$project$Client_Graph_Graph$withGraph,
-					newModelWithFilter,
-					A2(
-						_iosphere$elm_network_graph$Graph$filter,
-						function (node) {
-							return _elm_lang$core$Native_Utils.eq(
-								A2(
-									_elm_lang$core$List$take,
-									_elm_lang$core$List$length(_p8),
-									node.name),
-								_p8);
-						},
-						_p7._0.graph));
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					modelWithNewGraph,
-					{
-						ctor: '::',
-						_0: _user$project$Client_Graph_Graph$cmdForUpdatedGraph(modelWithNewGraph.graph),
-						_1: {ctor: '[]'}
-					});
-			}
+			var modelWithNewGraph = A2(
+				_user$project$Client_Graph_Graph$withGraph,
+				newModelWithFilter,
+				A2(
+					_iosphere$elm_network_graph$Graph$filter,
+					function (node) {
+						return _elm_lang$core$Native_Utils.eq(
+							A2(
+								_elm_lang$core$List$take,
+								_elm_lang$core$List$length(_p6),
+								node.name),
+							_p6);
+					},
+					_p5._0.graph));
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				modelWithNewGraph,
+				{
+					ctor: '::',
+					_0: _user$project$Client_Graph_Graph$cmdForUpdatedGraph(modelWithNewGraph.graph),
+					_1: {ctor: '[]'}
+				});
 		}
 	});
 var _user$project$Client_Graph_Graph$removeGraph = _elm_lang$core$Native_Platform.outgoingPort(
@@ -18040,8 +18021,8 @@ var _user$project$Client_Graph_Graph$SetFilter = function (a) {
 };
 var _user$project$Client_Graph_Graph$legendEntry = F2(
 	function (colors, names) {
-		var _p9 = A2(_elm_lang$core$Dict$get, names, colors);
-		if (_p9.ctor === 'Just') {
+		var _p7 = A2(_elm_lang$core$Dict$get, names, colors);
+		if (_p7.ctor === 'Just') {
 			return _elm_lang$core$Maybe$Just(
 				A2(
 					_elm_lang$html$Html$li,
@@ -18050,7 +18031,7 @@ var _user$project$Client_Graph_Graph$legendEntry = F2(
 						_0: _elm_lang$html$Html_Attributes$style(
 							{
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'color', _1: _p9._0},
+								_0: {ctor: '_Tuple2', _0: 'color', _1: _p7._0},
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -18151,7 +18132,7 @@ var _user$project$Client_Graph_Graph$view = function (m) {
 			_0: A2(
 				_user$project$Client_LoadingScreen$viewStateFromMaybe,
 				m.state,
-				function (_p10) {
+				function (_p8) {
 					return _elm_lang$html$Html$text('');
 				}),
 			_1: {
@@ -18230,24 +18211,548 @@ var _user$project$Client_Graph_Graph$view = function (m) {
 			}
 		});
 };
-var _user$project$Client_Graph_Graph$NewState = function (a) {
-	return {ctor: 'NewState', _0: a};
+
+var _user$project$Client_Graph_PackageDependencies$packageListRelationAsBag = A2(
+	_elm_lang$core$List$foldr,
+	F2(
+		function (_p0, base) {
+			var _p1 = _p0;
+			var _p3 = _p1._1;
+			return A3(
+				_elm_lang$core$Dict$update,
+				_p1._0,
+				function (_p2) {
+					return _elm_lang$core$Maybe$Just(
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							{
+								ctor: '::',
+								_0: _p3,
+								_1: {ctor: '[]'}
+							},
+							A2(
+								_elm_lang$core$Maybe$map,
+								F2(
+									function (x, y) {
+										return {ctor: '::', _0: x, _1: y};
+									})(_p3),
+								_p2)));
+				},
+				base);
+		}),
+	_elm_lang$core$Dict$empty);
+var _user$project$Client_Graph_PackageDependencies$edgeToPackageRel = function (edge) {
+	var toList = A2(_elm_lang$core$String$split, '-', edge.to);
+	var toPackage = A2(
+		_elm_lang$core$String$join,
+		'.',
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			{ctor: '[]'},
+			_elm_community$list_extra$List_Extra$init(toList)));
+	var fromList = A2(_elm_lang$core$String$split, '-', edge.from);
+	var fromPackage = A2(
+		_elm_lang$core$String$join,
+		'.',
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			{ctor: '[]'},
+			_elm_community$list_extra$List_Extra$init(fromList)));
+	return {
+		ctor: '_Tuple2',
+		_0: {ctor: '_Tuple2', _0: fromPackage, _1: toPackage},
+		_1: {
+			ctor: '_Tuple2',
+			_0: A2(_elm_lang$core$String$join, '.', fromList),
+			_1: A2(_elm_lang$core$String$join, '.', toList)
+		}
+	};
 };
-var _user$project$Client_Graph_Graph$subscriptions = F2(
-	function (location, _p11) {
-		return _elm_lang$core$Platform_Sub$batch(
+var _user$project$Client_Graph_PackageDependencies$packageNameHtml = function (input) {
+	var _p4 = input;
+	if (_p4 === '') {
+		return A2(
+			_elm_lang$html$Html$span,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'color', _1: '#999'},
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('<<root>>'),
+				_1: {ctor: '[]'}
+			});
+	} else {
+		return _elm_lang$html$Html$text(input);
+	}
+};
+var _user$project$Client_Graph_PackageDependencies$headerNameTd = function (x) {
+	var height = 200;
+	return A2(
+		_elm_lang$html$Html$th,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'height',
+						_1: A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(height),
+							'px')
+					},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'text-align', _1: 'left'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'whitespace', _1: 'nowrap'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'width', _1: '30px'},
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'transform',
+								_1: A2(
+									_elm_lang$core$Basics_ops['++'],
+									'rotate(-90deg) translate(',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_elm_lang$core$Basics$toString(
+											_elm_lang$core$Basics$negate(height) + 40),
+										'px, 0px)'))
+							},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'width', _1: '30px'},
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _user$project$Client_Graph_PackageDependencies$packageNameHtml(x),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Client_Graph_PackageDependencies$asNameTd = function (x) {
+	return A2(
+		_elm_lang$html$Html$th,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _user$project$Client_Graph_PackageDependencies$packageNameHtml(x),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Client_Graph_PackageDependencies$interPackageRelationTable = F2(
+	function (_p5, rels) {
+		var _p6 = _p5;
+		return A2(
+			_elm_lang$html$Html$table,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('table'),
+				_1: {ctor: '[]'}
+			},
 			{
 				ctor: '::',
 				_0: A2(
-					_elm_lang$websocket$WebSocket$listen,
-					_user$project$Client_Socket$dashboardAddress(location),
-					function (_p12) {
-						return _user$project$Client_Graph_Graph$NewState(
-							A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Analyser_State$decodeState, _p12));
+					_elm_lang$html$Html$thead,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$tr,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$th,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _user$project$Client_Graph_PackageDependencies$packageNameHtml(_p6._0),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(' -> '),
+											_1: {
+												ctor: '::',
+												_0: _user$project$Client_Graph_PackageDependencies$packageNameHtml(_p6._1),
+												_1: {ctor: '[]'}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
 					}),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$tbody,
+						{ctor: '[]'},
+						function () {
+							var _p7 = rels;
+							if (_p7.ctor === '[]') {
+								return {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$tr,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$td,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$i,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$style(
+																{
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: 'color', _1: '#777'},
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('No dependencies'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								};
+							} else {
+								return A2(
+									_elm_lang$core$List$map,
+									function (x) {
+										return A2(
+											_elm_lang$html$Html$tr,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text(x),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											});
+									},
+									A2(
+										_elm_lang$core$List$map,
+										function (_p8) {
+											var _p9 = _p8;
+											return A2(
+												_elm_lang$core$Basics_ops['++'],
+												_p9._0,
+												A2(_elm_lang$core$Basics_ops['++'], ' -> ', _p9._1));
+										},
+										rels));
+							}
+						}()),
+					_1: {ctor: '[]'}
+				}
 			});
 	});
+var _user$project$Client_Graph_PackageDependencies$interPackageRelationsTable = F2(
+	function (relations, _p10) {
+		var _p11 = _p10;
+		var _p13 = _p11._1;
+		var _p12 = _p11._0;
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('row'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('col-md-6'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_user$project$Client_Graph_PackageDependencies$interPackageRelationTable,
+							{ctor: '_Tuple2', _0: _p12, _1: _p13},
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								{ctor: '[]'},
+								A2(
+									_elm_lang$core$Dict$get,
+									{ctor: '_Tuple2', _0: _p12, _1: _p13},
+									relations))),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('col-md-6'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_user$project$Client_Graph_PackageDependencies$interPackageRelationTable,
+								{ctor: '_Tuple2', _0: _p13, _1: _p12},
+								A2(
+									_elm_lang$core$Maybe$withDefault,
+									{ctor: '[]'},
+									A2(
+										_elm_lang$core$Dict$get,
+										{ctor: '_Tuple2', _0: _p13, _1: _p12},
+										relations))),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$Client_Graph_PackageDependencies$update = F2(
+	function (msg, model) {
+		var _p14 = msg;
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Native_Utils.update(
+				model,
+				{
+					selected: _elm_lang$core$Maybe$Just(
+						{ctor: '_Tuple2', _0: _p14._0, _1: _p14._1})
+				}),
+			_1: _elm_lang$core$Platform_Cmd$none
+		};
+	});
+var _user$project$Client_Graph_PackageDependencies$Model = F4(
+	function (a, b, c, d) {
+		return {names: a, relations: b, selected: c, graph: d};
+	});
+var _user$project$Client_Graph_PackageDependencies$init = function (_p15) {
+	var _p16 = _p15;
+	var _p19 = _p16.graph;
+	var relations = _user$project$Client_Graph_PackageDependencies$packageListRelationAsBag(
+		A2(_elm_lang$core$List$map, _user$project$Client_Graph_PackageDependencies$edgeToPackageRel, _p19.edges));
+	var names = _elm_lang$core$List$sort(
+		_elm_lang$core$Set$toList(
+			_elm_lang$core$Set$fromList(
+				A2(
+					_elm_lang$core$List$concatMap,
+					function (_p17) {
+						var _p18 = _p17;
+						return {
+							ctor: '::',
+							_0: _p18._0,
+							_1: {
+								ctor: '::',
+								_0: _p18._1,
+								_1: {ctor: '[]'}
+							}
+						};
+					},
+					_elm_lang$core$Dict$keys(relations)))));
+	return {
+		ctor: '_Tuple2',
+		_0: A4(_user$project$Client_Graph_PackageDependencies$Model, names, relations, _elm_lang$core$Maybe$Nothing, _p19),
+		_1: _elm_lang$core$Platform_Cmd$none
+	};
+};
+var _user$project$Client_Graph_PackageDependencies$Select = F2(
+	function (a, b) {
+		return {ctor: 'Select', _0: a, _1: b};
+	});
+var _user$project$Client_Graph_PackageDependencies$packageContentTd = F4(
+	function (from, to, relations, selected) {
+		if (_elm_lang$core$Native_Utils.eq(from, to)) {
+			return A2(
+				_elm_lang$html$Html$td,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'background', _1: 'black'},
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{ctor: '[]'});
+		} else {
+			var styleClass = (_elm_lang$core$Native_Utils.eq(
+				selected,
+				_elm_lang$core$Maybe$Just(
+					{ctor: '_Tuple2', _0: from, _1: to})) || _elm_lang$core$Native_Utils.eq(
+				selected,
+				_elm_lang$core$Maybe$Just(
+					{ctor: '_Tuple2', _0: to, _1: from}))) ? 'info' : ((A2(
+				_elm_lang$core$Dict$member,
+				{ctor: '_Tuple2', _0: from, _1: to},
+				relations) && A2(
+				_elm_lang$core$Dict$member,
+				{ctor: '_Tuple2', _0: to, _1: from},
+				relations)) ? 'danger' : '');
+			return A2(
+				_elm_lang$html$Html$td,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class(styleClass),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'text-align', _1: 'center'},
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(
+								A2(_user$project$Client_Graph_PackageDependencies$Select, from, to)),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							'',
+							A2(
+								_elm_lang$core$Maybe$map,
+								function (_p20) {
+									return _elm_lang$core$Basics$toString(
+										_elm_lang$core$List$length(_p20));
+								},
+								A2(
+									_elm_lang$core$Dict$get,
+									{ctor: '_Tuple2', _0: from, _1: to},
+									relations)))),
+					_1: {ctor: '[]'}
+				});
+		}
+	});
+var _user$project$Client_Graph_PackageDependencies$packageCycleRow = F4(
+	function (name, names, relations, selected) {
+		return A2(
+			_elm_lang$html$Html$tr,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _user$project$Client_Graph_PackageDependencies$asNameTd(name),
+				_1: A2(
+					_elm_lang$core$List$map,
+					function (other) {
+						return A4(_user$project$Client_Graph_PackageDependencies$packageContentTd, name, other, relations, selected);
+					},
+					names)
+			});
+	});
+var _user$project$Client_Graph_PackageDependencies$view = function (_p21) {
+	var _p22 = _p21;
+	var _p25 = _p22.selected;
+	var _p24 = _p22.relations;
+	var _p23 = _p22.names;
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$table,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('table table-condensed'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$tbody,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$tr,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$td,
+										{ctor: '[]'},
+										{ctor: '[]'}),
+									_1: A2(_elm_lang$core$List$map, _user$project$Client_Graph_PackageDependencies$headerNameTd, _p23)
+								}),
+							_1: A2(
+								_elm_lang$core$List$map,
+								function (x) {
+									return A4(_user$project$Client_Graph_PackageDependencies$packageCycleRow, x, _p23, _p24, _p25);
+								},
+								_p23)
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$core$Maybe$withDefault,
+					A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{ctor: '[]'}),
+					A2(
+						_elm_lang$core$Maybe$map,
+						_user$project$Client_Graph_PackageDependencies$interPackageRelationsTable(_p24),
+						_p25)),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 
 var _user$project$Client_FileTree$messagesForSelectedFile = function (m) {
 	var _p0 = m.fileIndex;
@@ -18647,6 +19152,104 @@ var _user$project$Client_FileTree$init = function (location) {
 	};
 };
 
+var _user$project$Client_StaticStatePage$StaticPage = F3(
+	function (a, b, c) {
+		return {view: a, update: b, init: c};
+	});
+var _user$project$Client_StaticStatePage$Model = F3(
+	function (a, b, c) {
+		return {staticPage: a, subModel: b, state: c};
+	});
+var _user$project$Client_StaticStatePage$ProxyMsg = function (a) {
+	return {ctor: 'ProxyMsg', _0: a};
+};
+var _user$project$Client_StaticStatePage$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'OnState') {
+			var _p3 = _p0._0;
+			var _p1 = function () {
+				var _p2 = _krisajenkins$remotedata$RemoteData$toMaybe(_p3);
+				if (_p2.ctor === 'Just') {
+					return A2(
+						_elm_lang$core$Tuple$mapFirst,
+						_elm_lang$core$Maybe$Just,
+						model.staticPage.init(_p2._0));
+				} else {
+					return {ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: _elm_lang$core$Platform_Cmd$none};
+				}
+			}();
+			var newSubModel = _p1._0;
+			var subModelMsgs = _p1._1;
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{state: _p3, subModel: newSubModel}),
+				_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Client_StaticStatePage$ProxyMsg, subModelMsgs)
+			};
+		} else {
+			var _p4 = model.subModel;
+			if (_p4.ctor === 'Nothing') {
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			} else {
+				var _p5 = A2(model.staticPage.update, _p0._0, _p4._0);
+				var newSubModel = _p5._0;
+				var subModelMsgs = _p5._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							subModel: _elm_lang$core$Maybe$Just(newSubModel)
+						}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Client_StaticStatePage$ProxyMsg, subModelMsgs)
+				};
+			}
+		}
+	});
+var _user$project$Client_StaticStatePage$view = function (model) {
+	return A2(
+		_user$project$Client_LoadingScreen$viewStateFromRemoteData,
+		model.state,
+		function (_p6) {
+			var _p7 = model.subModel;
+			if (_p7.ctor === 'Just') {
+				return A2(
+					_elm_lang$html$Html$map,
+					_user$project$Client_StaticStatePage$ProxyMsg,
+					model.staticPage.view(_p7._0));
+			} else {
+				return A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('NOTHING'),
+						_1: {ctor: '[]'}
+					});
+			}
+		});
+};
+var _user$project$Client_StaticStatePage$OnState = function (a) {
+	return {ctor: 'OnState', _0: a};
+};
+var _user$project$Client_StaticStatePage$init = function (x) {
+	return {
+		ctor: '_Tuple2',
+		_0: A3(_user$project$Client_StaticStatePage$Model, x, _elm_lang$core$Maybe$Nothing, _krisajenkins$remotedata$RemoteData$Loading),
+		_1: A2(
+			_elm_lang$core$Platform_Cmd$map,
+			_user$project$Client_StaticStatePage$OnState,
+			_krisajenkins$remotedata$RemoteData$sendRequest(
+				A2(_elm_lang$http$Http$get, '/state', _user$project$Analyser_State$decodeState)))
+	};
+};
+
+var _user$project$Client_App_Models$moduleGraphPage = _user$project$Client_StaticStatePage$init(
+	{view: _user$project$Client_Graph_Graph$view, update: _user$project$Client_Graph_Graph$update, init: _user$project$Client_Graph_Graph$init});
+var _user$project$Client_App_Models$packageDependenciesPage = _user$project$Client_StaticStatePage$init(
+	{view: _user$project$Client_Graph_PackageDependencies$view, update: _user$project$Client_Graph_PackageDependencies$update, init: _user$project$Client_Graph_PackageDependencies$init});
 var _user$project$Client_App_Models$Model = F2(
 	function (a, b) {
 		return {location: a, content: b};
@@ -18655,6 +19258,9 @@ var _user$project$Client_App_Models$OnLocation = function (a) {
 	return {ctor: 'OnLocation', _0: a};
 };
 var _user$project$Client_App_Models$Refresh = {ctor: 'Refresh'};
+var _user$project$Client_App_Models$PackageDependenciesMsg = function (a) {
+	return {ctor: 'PackageDependenciesMsg', _0: a};
+};
 var _user$project$Client_App_Models$FileTreeMsg = function (a) {
 	return {ctor: 'FileTreeMsg', _0: a};
 };
@@ -18663,6 +19269,9 @@ var _user$project$Client_App_Models$GraphMsg = function (a) {
 };
 var _user$project$Client_App_Models$DashBoardMsg = function (a) {
 	return {ctor: 'DashBoardMsg', _0: a};
+};
+var _user$project$Client_App_Models$PackageDependenciesContent = function (a) {
+	return {ctor: 'PackageDependenciesContent', _0: a};
 };
 var _user$project$Client_App_Models$GraphContent = function (a) {
 	return {ctor: 'GraphContent', _0: a};
@@ -18848,7 +19457,11 @@ var _user$project$Client_App_Menu$view = function (l) {
 											_1: {
 												ctor: '::',
 												_0: A4(_user$project$Client_App_Menu$menuItem, l, '#module-graph', 'Module graph', 'cubes'),
-												_1: {ctor: '[]'}
+												_1: {
+													ctor: '::',
+													_0: A4(_user$project$Client_App_Menu$menuItem, l, '#package-dependencies', 'Package Dependencies', 'crosshairs'),
+													_1: {ctor: '[]'}
+												}
 											}
 										}
 									}),
@@ -18877,7 +19490,7 @@ var _user$project$Client_App_App$onGraphMsg = F2(
 								content: _user$project$Client_App_Models$GraphContent(x)
 							});
 					},
-					A3(_user$project$Client_Graph_Graph$update, model.location, subMsg, _p0._0)));
+					A2(_user$project$Client_StaticStatePage$update, subMsg, _p0._0)));
 		} else {
 			return A2(
 				_elm_lang$core$Platform_Cmd_ops['!'],
@@ -18933,6 +19546,30 @@ var _user$project$Client_App_App$onFileTreeMsg = F2(
 				{ctor: '[]'});
 		}
 	});
+var _user$project$Client_App_App$onPackageDependenciesMsg = F2(
+	function (subMsg, model) {
+		var _p3 = model.content;
+		if (_p3.ctor === 'PackageDependenciesContent') {
+			return A2(
+				_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
+				_elm_lang$core$Platform_Cmd$map(_user$project$Client_App_Models$PackageDependenciesMsg),
+				A2(
+					_Fresheyeball$elm_tuple_extra$Tuple2$mapFirst,
+					function (x) {
+						return _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								content: _user$project$Client_App_Models$PackageDependenciesContent(x)
+							});
+					},
+					A2(_user$project$Client_StaticStatePage$update, subMsg, _p3._0)));
+		} else {
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				model,
+				{ctor: '[]'});
+		}
+	});
 var _user$project$Client_App_App$view = function (m) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -18952,23 +19589,28 @@ var _user$project$Client_App_App$view = function (m) {
 					{
 						ctor: '::',
 						_0: function () {
-							var _p3 = m.content;
-							switch (_p3.ctor) {
+							var _p4 = m.content;
+							switch (_p4.ctor) {
 								case 'DashBoardContent':
 									return A2(
 										_elm_lang$html$Html$map,
 										_user$project$Client_App_Models$DashBoardMsg,
-										_user$project$Client_DashBoard_DashBoard$view(_p3._0));
+										_user$project$Client_DashBoard_DashBoard$view(_p4._0));
 								case 'GraphContent':
 									return A2(
 										_elm_lang$html$Html$map,
 										_user$project$Client_App_Models$GraphMsg,
-										_user$project$Client_Graph_Graph$view(_p3._0));
-								default:
+										_user$project$Client_StaticStatePage$view(_p4._0));
+								case 'FileTreeContent':
 									return A2(
 										_elm_lang$html$Html$map,
 										_user$project$Client_App_Models$FileTreeMsg,
-										_user$project$Client_FileTree$view(_p3._0));
+										_user$project$Client_FileTree$view(_p4._0));
+								default:
+									return A2(
+										_elm_lang$html$Html$map,
+										_user$project$Client_App_Models$PackageDependenciesMsg,
+										_user$project$Client_StaticStatePage$view(_p4._0));
 							}
 						}(),
 						_1: {ctor: '[]'}
@@ -18978,8 +19620,8 @@ var _user$project$Client_App_App$view = function (m) {
 		});
 };
 var _user$project$Client_App_App$onLocation = function (l) {
-	var _p4 = l.hash;
-	switch (_p4) {
+	var _p5 = l.hash;
+	switch (_p5) {
 		case '#tree':
 			return A2(
 				_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
@@ -19005,7 +19647,20 @@ var _user$project$Client_App_App$onLocation = function (l) {
 							location: l
 						};
 					},
-					_user$project$Client_Graph_Graph$init(l)));
+					_user$project$Client_App_Models$moduleGraphPage));
+		case '#package-dependencies':
+			return A2(
+				_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
+				_elm_lang$core$Platform_Cmd$map(_user$project$Client_App_Models$PackageDependenciesMsg),
+				A2(
+					_Fresheyeball$elm_tuple_extra$Tuple2$mapFirst,
+					function (x) {
+						return {
+							content: _user$project$Client_App_Models$PackageDependenciesContent(x),
+							location: l
+						};
+					},
+					_user$project$Client_App_Models$packageDependenciesPage));
 		default:
 			return A2(
 				_Fresheyeball$elm_tuple_extra$Tuple2$mapSecond,
@@ -19023,12 +19678,12 @@ var _user$project$Client_App_App$onLocation = function (l) {
 };
 var _user$project$Client_App_App$update = F2(
 	function (msg, model) {
-		var _p5 = msg;
-		switch (_p5.ctor) {
+		var _p6 = msg;
+		switch (_p6.ctor) {
 			case 'OnLocation':
-				var _p6 = _user$project$Client_App_App$onLocation(_p5._0);
-				var newModel = _p6._0;
-				var cmd = _p6._1;
+				var _p7 = _user$project$Client_App_App$onLocation(_p6._0);
+				var newModel = _p7._0;
+				var cmd = _p7._1;
 				var removeGraphCmd = (!_elm_lang$core$Native_Utils.eq(newModel.location.hash, '#module-graph')) ? _user$project$Client_Graph_Graph$removeCmd : _elm_lang$core$Platform_Cmd$none;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
@@ -19052,11 +19707,13 @@ var _user$project$Client_App_App$update = F2(
 						'reload')
 				};
 			case 'DashBoardMsg':
-				return A2(_user$project$Client_App_App$onDashBoardMsg, _p5._0, model);
+				return A2(_user$project$Client_App_App$onDashBoardMsg, _p6._0, model);
 			case 'GraphMsg':
-				return A2(_user$project$Client_App_App$onGraphMsg, _p5._0, model);
+				return A2(_user$project$Client_App_App$onGraphMsg, _p6._0, model);
+			case 'FileTreeMsg':
+				return A2(_user$project$Client_App_App$onFileTreeMsg, _p6._0, model);
 			default:
-				return A2(_user$project$Client_App_App$onFileTreeMsg, _p5._0, model);
+				return A2(_user$project$Client_App_App$onPackageDependenciesMsg, _p6._0, model);
 		}
 	});
 var _user$project$Client_App_App$init = _user$project$Client_App_App$onLocation;
@@ -19065,23 +19722,22 @@ var _user$project$Client_App_App$subscriptions = function (model) {
 		{
 			ctor: '::',
 			_0: function () {
-				var _p7 = model.content;
-				switch (_p7.ctor) {
+				var _p8 = model.content;
+				switch (_p8.ctor) {
 					case 'DashBoardContent':
 						return A2(
 							_elm_lang$core$Platform_Sub$map,
 							_user$project$Client_App_Models$DashBoardMsg,
-							A2(_user$project$Client_DashBoard_DashBoard$subscriptions, model.location, _p7._0));
+							A2(_user$project$Client_DashBoard_DashBoard$subscriptions, model.location, _p8._0));
 					case 'GraphContent':
-						return A2(
-							_elm_lang$core$Platform_Sub$map,
-							_user$project$Client_App_Models$GraphMsg,
-							A2(_user$project$Client_Graph_Graph$subscriptions, model.location, _p7._0));
-					default:
+						return _elm_lang$core$Platform_Sub$none;
+					case 'FileTreeContent':
 						return A2(
 							_elm_lang$core$Platform_Sub$map,
 							_user$project$Client_App_Models$FileTreeMsg,
-							A2(_user$project$Client_FileTree$subscriptions, model.location, _p7._0));
+							A2(_user$project$Client_FileTree$subscriptions, model.location, _p8._0));
+					default:
+						return _elm_lang$core$Platform_Sub$none;
 				}
 			}(),
 			_1: {
