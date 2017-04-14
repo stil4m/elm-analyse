@@ -24,8 +24,7 @@ checker =
     }
 
 
-{-|
-Find out if `Regex.regex` and in what manner.
+{-| Find out if `Regex.regex` and in what manner.
 If it is imported the dynamic usages should inspected and then transformed into messages.
 -}
 scan : FileContext -> Configuration -> List Message
@@ -63,8 +62,7 @@ startingContext =
     { staticEnvironment = True, usages = [] }
 
 
-{-|
-Set the `staticEnvironment` to False when an function is encountered.
+{-| Set the `staticEnvironment` to False when an function is encountered.
 When the function returns from inner, reset the property in the context.
 -}
 onFunction : (Context -> Context) -> Function -> Context -> Context

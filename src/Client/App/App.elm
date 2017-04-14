@@ -1,7 +1,7 @@
 module Client.App.App exposing (init, view, update, subscriptions)
 
 import Client.App.Menu
-import Client.App.Models exposing (Content(DashBoardContent, GraphContent, FileTreeContent), Model, Msg(..))
+import Client.App.Models exposing (Content(DashBoardContent, GraphContent, FileTreeContent, PackageDependenciesContent), Model, Msg(..), packageDependenciesPage, PackageDependenciesPageMsg, ModuleGraphPageMsg, moduleGraphPage)
 import Client.DashBoard.DashBoard as DashBoard
 import Client.Graph.Graph as Graph
 import Client.FileTree as FileTree
@@ -11,6 +11,7 @@ import Html.Attributes exposing (id)
 import Navigation exposing (Location)
 import Tuple2
 import WebSocket as WS
+import Client.StaticStatePage as StaticStatePage
 
 
 subscriptions : Model -> Sub Msg
@@ -20,11 +21,14 @@ subscriptions model =
             DashBoardContent sub ->
                 DashBoard.subscriptions model.location sub |> Sub.map DashBoardMsg
 
-            GraphContent sub ->
-                Graph.subscriptions model.location sub |> Sub.map GraphMsg
+            GraphContent _ ->
+                Sub.none
 
             FileTreeContent sub ->
                 FileTree.subscriptions model.location sub |> Sub.map FileTreeMsg
+
+            PackageDependenciesContent _ ->
+                Sub.none
         , WS.keepAlive (controlAddress model.location)
         ]
 
@@ -43,9 +47,14 @@ onLocation l =
                 |> Tuple2.mapSecond (Cmd.map FileTreeMsg)
 
         "#module-graph" ->
-            Graph.init l
+            moduleGraphPage
                 |> Tuple2.mapFirst (\x -> { content = GraphContent x, location = l })
                 |> Tuple2.mapSecond (Cmd.map GraphMsg)
+
+        "#package-dependencies" ->
+            packageDependenciesPage
+                |> Tuple2.mapFirst (\x -> { content = PackageDependenciesContent x, location = l })
+                |> Tuple2.mapSecond (Cmd.map PackageDependenciesMsg)
 
         _ ->
             DashBoard.init l
@@ -63,10 +72,13 @@ view m =
                     DashBoard.view subModel |> Html.map DashBoardMsg
 
                 GraphContent subModel ->
-                    Graph.view subModel |> Html.map GraphMsg
+                    StaticStatePage.view subModel |> Html.map GraphMsg
 
                 FileTreeContent subModel ->
                     FileTree.view subModel |> Html.map FileTreeMsg
+
+                PackageDependenciesContent subModel ->
+                    StaticStatePage.view subModel |> Html.map PackageDependenciesMsg
             ]
         ]
 
@@ -102,6 +114,21 @@ update msg model =
         FileTreeMsg subMsg ->
             onFileTreeMsg subMsg model
 
+        PackageDependenciesMsg subMsg ->
+            onPackageDependenciesMsg subMsg model
+
+
+onPackageDependenciesMsg : PackageDependenciesPageMsg -> Model -> ( Model, Cmd Msg )
+onPackageDependenciesMsg subMsg model =
+    case model.content of
+        PackageDependenciesContent subModel ->
+            StaticStatePage.update subMsg subModel
+                |> Tuple2.mapFirst (\x -> { model | content = PackageDependenciesContent x })
+                |> Tuple2.mapSecond (Cmd.map PackageDependenciesMsg)
+
+        _ ->
+            model ! []
+
 
 onFileTreeMsg : FileTree.Msg -> Model -> ( Model, Cmd Msg )
 onFileTreeMsg subMsg model =
@@ -127,11 +154,11 @@ onDashBoardMsg subMsg model =
             model ! []
 
 
-onGraphMsg : Graph.Msg -> Model -> ( Model, Cmd Msg )
+onGraphMsg : ModuleGraphPageMsg -> Model -> ( Model, Cmd Msg )
 onGraphMsg subMsg model =
     case model.content of
         GraphContent subModel ->
-            Graph.update model.location subMsg subModel
+            StaticStatePage.update subMsg subModel
                 |> Tuple2.mapFirst (\x -> { model | content = GraphContent x })
                 |> Tuple2.mapSecond (Cmd.map GraphMsg)
 

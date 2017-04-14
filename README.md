@@ -11,8 +11,8 @@ A tool that allows you analyse your [Elm](http://elm-lang.org/) code and identif
 <img src="https://github.com/stil4m/elm-analyse/raw/master/images/dashboard.png">
 <img src="https://github.com/stil4m/elm-analyse/raw/master/images/single-message.png">
 <img src="https://github.com/stil4m/elm-analyse/raw/master/images/terminal-output.png">
-
-
+<img src="https://github.com/stil4m/elm-analyse/raw/master/images/module-graph.png">
+<img src="https://github.com/stil4m/elm-analyse/raw/master/images/package-dependencies.png">
 
 ---
 ## Usage

@@ -4,17 +4,15 @@ port module Client.Graph.Graph
         , Msg
         , init
         , removeCmd
-        , subscriptions
         , update
         , view
         )
 
-import Analyser.State as State exposing (State)
+import Analyser.State exposing (State)
 import Client.Graph.Node as Node
 import Client.Graph.Table as Table
 import Client.Graph.Widgets as Widgets
 import Client.LoadingScreen as LoadingScreen
-import Client.Socket exposing (dashboardAddress)
 import Client.View.BreadCrumb as BreadCrumb
 import Client.View.Panel as Panel
 import Dict exposing (Dict)
@@ -27,10 +25,8 @@ import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events exposing (onClick)
 import Html.Lazy
-import Json.Decode as JD exposing (Value)
+import Json.Decode exposing (Value)
 import List.Extra as List
-import Navigation exposing (Location)
-import WebSocket as WS
 
 
 -- port for sending strings out to JavaScript
@@ -60,13 +56,7 @@ type alias Model =
 
 
 type Msg
-    = NewState (Result String State)
-    | SetFilter (List String)
-
-
-subscriptions : Location -> Model -> Sub Msg
-subscriptions location _ =
-    Sub.batch [ WS.listen (dashboardAddress location) (JD.decodeString State.decodeState >> NewState) ]
+    = SetFilter (List String)
 
 
 withNewState : State -> Model -> Model
@@ -75,27 +65,19 @@ withNewState state m =
     withGraph { m | state = Just state, filter = [] } state.graph
 
 
-init : Location -> ( Model, Cmd Msg )
-init location =
-    { state = Nothing, graph = Nothing, colors = Dict.empty, filter = [] }
-        ! [ WS.send (dashboardAddress location) "ping" ]
+init : State -> ( Model, Cmd Msg )
+init state =
+    let
+        newModel =
+            { state = Nothing, graph = Nothing, colors = Dict.empty, filter = [] }
+                |> withNewState state
+    in
+        newModel ! [ cmdForUpdatedGraph newModel.graph ]
 
 
-update : Location -> Msg -> Model -> ( Model, Cmd Msg )
-update _ msg model =
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
     case msg of
-        NewState newState ->
-            case newState of
-                Err _ ->
-                    model ! []
-
-                Ok state ->
-                    let
-                        newModel =
-                            withNewState state model
-                    in
-                        newModel ! [ cmdForUpdatedGraph newModel.graph ]
-
         SetFilter filter ->
             let
                 newModelWithFilter =
