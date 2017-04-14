@@ -1,5 +1,10 @@
 # elm-analyse changelog
 
+## 0.7.0 (2017-04-14)
+
+* [Issue #64](https://github.com/stil4m/elm-analyse/issues/64) Detect cyclic package dependencies
+* [Issue #65](https://github.com/stil4m/elm-analyse/issues/65) Depend on elm-format node module
+
 ## 0.6.0 (2017-03-29)
 
 * [Issue #58](https://github.com/stil4m/elm-analyse/issues/58) Unnecessary params and negative numbers
