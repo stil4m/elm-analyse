@@ -11,8 +11,8 @@ import Json.Decode
 import Parser.Parser as Parser
 import Result
 import Maybe.Extra as Maybe
-import Analyser.Util
-import Logger
+import Analyser.Files.Util
+import Util.Logger as Logger
 import Result.Extra as Result
 
 
@@ -56,7 +56,7 @@ update msg =
 
                 cmd =
                     if store then
-                        ( fileContent.sha1, Analyser.Util.withLoaded fileLoad )
+                        ( fileContent.sha1, Analyser.Files.Util.withLoaded fileLoad )
                             |> uncurry (Maybe.map2 (\a b -> storeAstForSha ( a, Json.Encode.encode 0 (AST.Encoding.encode b.ast) )))
                             |> Maybe.withDefault Cmd.none
                     else

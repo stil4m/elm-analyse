@@ -2,7 +2,7 @@ module Analyser.PostProcessing.Documentation exposing (postProcess)
 
 import AST.Ranges exposing (Range)
 import AST.Types exposing (File, TypeAlias, RecordUpdate, Expression, Function, InfixDirection, Infix, Declaration(FuncDecl, AliasDecl), FunctionDeclaration)
-import Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 
 
 postProcess : File -> File

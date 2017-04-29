@@ -12,7 +12,7 @@ gulp.task('elm-init', function() {
 
 
 gulp.task('elm-client', ['elm-init'], function() {
-    return gulp.src('src/Client/Main.elm')
+    return gulp.src('src/Client.elm')
         .pipe(elm.bundle('client-elm.js'))
         .on('error', function(e) {
             //Elm compilation errors are already logged to the console

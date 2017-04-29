@@ -1,4 +1,4 @@
-module Client.DashBoard.ActiveMessageDialog exposing (Model, Msg, show, init, update, view, subscriptions)
+module Client.Components.ActiveMessageDialog exposing (Model, Msg, show, init, update, view, subscriptions)
 
 import AST.Ranges exposing (Range)
 import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile, UnusedImportAlias, UnusedPatternVariable, UnusedTypeAlias))

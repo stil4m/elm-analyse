@@ -1,4 +1,4 @@
-module Analyser.Util exposing (isLoaded, withLoaded, fileLoadError)
+module Analyser.Files.Util exposing (isLoaded, withLoaded, fileLoadError)
 
 import Analyser.Files.Types exposing (FileLoad(Failed, Loaded), LoadedFileData)
 

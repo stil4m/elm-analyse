@@ -5,7 +5,7 @@ import AST.Ranges exposing (Range)
 import AST.Util
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(ExposeAll), newMessage)
-import Inspector exposing (defaultConfig, Order(Inner))
+import ASTUtil.Inspector as Inspector exposing (defaultConfig, Order(Inner))
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 

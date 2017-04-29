@@ -11,8 +11,8 @@ import Parser.Parser as Parser
 import Result
 import Maybe.Extra as Maybe
 import Dict
-import Analyser.Util
-import Logger
+import Analyser.Files.Util
+import Util.Logger as Logger
 import Result.Extra as Result
 
 
@@ -108,7 +108,7 @@ update msg model =
                     interfaces =
                         loadedFiles
                             |> List.filterMap
-                                (Analyser.Util.withLoaded
+                                (Analyser.Files.Util.withLoaded
                                     >> Maybe.andThen
                                         (\z ->
                                             Util.fileModuleName z.ast
@@ -120,7 +120,7 @@ update msg model =
                     dependency =
                         Dependency model.name model.version interfaces
                 in
-                    if not <| List.all Analyser.Util.isLoaded loadedFiles then
+                    if not <| List.all Analyser.Files.Util.isLoaded loadedFiles then
                         ( { model | result = Just (Err "Could not load all dependency files") }
                         , Cmd.none
                         )

@@ -6,7 +6,7 @@ import AST.Util as Util
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedImportAlias), newMessage)
 import Dict exposing (Dict)
-import Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Tuple2
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)

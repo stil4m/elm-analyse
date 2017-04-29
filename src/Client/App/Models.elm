@@ -13,7 +13,7 @@ module Client.App.Models
 import Client.DashBoard.DashBoard as DashBoard
 import Client.Graph.Graph as Graph
 import Client.Graph.PackageDependencies as PackageDependencies
-import Client.FileTree as FileTree
+import Client.Components.FileTree as FileTree
 import Navigation exposing (Location)
 import Client.StaticStatePage as StaticStatePage exposing (StaticPage)
 

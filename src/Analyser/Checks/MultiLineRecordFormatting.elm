@@ -6,7 +6,7 @@ import AST.Ranges exposing (Range)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting), newMessage)
-import Inspector exposing (..)
+import ASTUtil.Inspector as Inspector exposing (..)
 
 
 checker : Checker

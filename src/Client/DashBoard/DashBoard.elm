@@ -9,7 +9,7 @@ import WebSocket as WS
 import Tuple2
 import Navigation exposing (Location)
 import Client.Socket exposing (dashboardAddress)
-import Client.MessageList as MessageList
+import Client.Components.MessageList as MessageList
 import Client.LoadingScreen as LoadingScreen
 
 

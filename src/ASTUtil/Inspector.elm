@@ -1,4 +1,4 @@
-module Inspector exposing (Order(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
+module ASTUtil.Inspector exposing (Order(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
 import AST.Types exposing (File, Import, ValueConstructor, InfixDirection, Type, TypeAlias, TypeReference(..), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate)
 

@@ -24,7 +24,7 @@ import Analyser.Checks.NonStaticRegex as NonStaticRegex
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.FunctionsInLet as FunctionsInLet
 import Analyser.Checks.Base exposing (Checker)
-import Analyser.Util
+import Analyser.Files.Util
 import Analyser.Configuration as Configuration exposing (Configuration)
 
 
@@ -70,11 +70,11 @@ run sources deps configuration =
 
         ( validSources, invalidSources ) =
             includedSources
-                |> List.partition (Tuple.second >> Analyser.Util.isLoaded)
+                |> List.partition (Tuple.second >> Analyser.Files.Util.isLoaded)
 
         failedMessages =
             invalidSources
-                |> List.filterMap (\( source, result ) -> Maybe.map ((,) source) (Analyser.Util.fileLoadError result))
+                |> List.filterMap (\( source, result ) -> Maybe.map ((,) source) (Analyser.Files.Util.fileLoadError result))
                 |> List.map
                     (\( source, error ) ->
                         newMessage

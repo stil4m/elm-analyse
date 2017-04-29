@@ -4,7 +4,7 @@ import AST.Types exposing (File, Case, LetBlock, VariablePointer, Destructuring,
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryListConcat), newMessage)
-import Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 

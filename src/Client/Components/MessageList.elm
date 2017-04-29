@@ -1,6 +1,6 @@
-module Client.MessageList exposing (..)
+module Client.Components.MessageList exposing (..)
 
-import Client.DashBoard.ActiveMessageDialog as ActiveMessageDialog
+import Client.Components.ActiveMessageDialog as ActiveMessageDialog
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
 import Analyser.Messages.Types exposing (Message, MessageStatus)

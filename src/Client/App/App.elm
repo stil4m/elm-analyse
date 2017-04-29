@@ -4,7 +4,7 @@ import Client.App.Menu
 import Client.App.Models exposing (Content(DashBoardContent, GraphContent, FileTreeContent, PackageDependenciesContent), Model, Msg(..), packageDependenciesPage, PackageDependenciesPageMsg, ModuleGraphPageMsg, moduleGraphPage)
 import Client.DashBoard.DashBoard as DashBoard
 import Client.Graph.Graph as Graph
-import Client.FileTree as FileTree
+import Client.Components.FileTree as FileTree
 import Client.Socket exposing (controlAddress)
 import Html exposing (Html, div)
 import Html.Attributes exposing (id)

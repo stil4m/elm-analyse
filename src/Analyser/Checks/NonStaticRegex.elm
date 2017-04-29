@@ -4,7 +4,7 @@ import AST.Types exposing (File, FunctionSignature, TypeReference, InnerExpressi
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(NonStaticRegex), newMessage)
-import Inspector exposing (Order(Post, Inner), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(Post, Inner), defaultConfig)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import ASTUtil.Imports as Imports exposing (FunctionReference)

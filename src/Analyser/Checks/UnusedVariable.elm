@@ -19,7 +19,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Files.Interface as Interface
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel, UnusedImportedVariable, UnusedPatternVariable), newMessage)
 import Dict exposing (Dict)
-import Inspector exposing (defaultConfig, Order(Inner, Pre, Post))
+import ASTUtil.Inspector as Inspector exposing (defaultConfig, Order(Inner, Pre, Post))
 import ASTUtil.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, patternToVars, patternToVarsInner, getDeclarationsVars, patternToUsedVars, withoutTopLevel)
 import Tuple3
 import Analyser.Configuration as Configuration exposing (Configuration)

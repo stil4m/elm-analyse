@@ -4,7 +4,7 @@ import AST.Types exposing (Expression, InnerExpression(QualifiedExpr))
 import AST.Ranges exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DebugLog, DebugCrash), newMessage)
-import Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 

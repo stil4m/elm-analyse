@@ -12,7 +12,7 @@ import Analyser.Messages.Util as Messages
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import GraphBuilder
-import Logger
+import Util.Logger as Logger
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
 
 

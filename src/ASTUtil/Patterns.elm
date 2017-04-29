@@ -4,7 +4,7 @@ import AST.Types exposing (File, Pattern(..), Function, Case, VariablePointer, Q
 import AST.Ranges as Ranges exposing (Range)
 import ASTUtil.PatternOptimizer as PatternOptimizer
 import Maybe.Extra as Maybe
-import Inspector exposing (defaultConfig, Order(Pre))
+import ASTUtil.Inspector as Inspector exposing (defaultConfig, Order(Pre))
 
 
 findParentPattern : File -> Range -> Maybe Pattern

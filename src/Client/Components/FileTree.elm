@@ -1,4 +1,4 @@
-module Client.FileTree exposing (Model, Msg, init, subscriptions, update, view)
+module Client.Components.FileTree exposing (Model, Msg, init, subscriptions, update, view)
 
 import Navigation exposing (Location)
 import Html exposing (..)
@@ -11,7 +11,7 @@ import Http
 import WebSocket as WS
 import Client.Socket exposing (dashboardAddress)
 import Time
-import Client.MessageList as MessageList
+import Client.Components.MessageList as MessageList
 import Tuple2
 
 
