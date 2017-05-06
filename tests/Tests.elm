@@ -22,7 +22,6 @@ import ASTUtil.PatternOptimizerTests
 import Analyser.Fixes.FileContentTests
 import Analyser.Checks.ListOperatorsTests
 import Analyser.Checks.UnnecessaryListConcatTests
-import ASTUtil.WriterTests
 import Analyser.Fixes.UnnecessaryParensTests
 import Analyser.Fixes.UnusedImportTests
 import Analyser.Fixes.UnusedTypeAliasTests
@@ -61,5 +60,4 @@ all =
         , PostProcessingTests.all
         , ParserTests.all
         , ASTUtil.PatternOptimizerTests.all
-        , ASTUtil.WriterTests.all
         ]
