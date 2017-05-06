@@ -1,9 +1,10 @@
 module ASTUtil.ASTWriter exposing (..)
 
-import AST.Ranges exposing (Range, emptyRange)
+import AST.Ranges exposing (Range)
 import AST.Types exposing (..)
 import ASTUtil.Writer exposing (..)
 import ASTUtil.Expose
+import List.Extra as List
 
 
 write : Writer -> String
@@ -106,8 +107,12 @@ writeExposureExpose x =
                 string "(..)"
 
             Explicit exposeList ->
-                parensComma <|
-                    List.map (\item -> ( ASTUtil.Expose.range item, writeExpose item )) exposeList
+                let
+                    diffLines =
+                        List.map ASTUtil.Expose.range exposeList
+                            |> startOnDifferentLines
+                in
+                    parensComma diffLines (List.map writeExpose exposeList)
         ]
 
 
@@ -140,7 +145,17 @@ writeExposureValueConstructor x =
             string "(..)"
 
         Explicit exposeList ->
-            parensComma (List.map (\( n, r ) -> ( r, string n )) exposeList)
+            let
+                diffLines =
+                    List.map Tuple.second exposeList
+                        |> startOnDifferentLines
+            in
+                parensComma diffLines (List.map (Tuple.first >> string) exposeList)
+
+
+startOnDifferentLines : List Range -> Bool
+startOnDifferentLines xs =
+    List.length (List.unique (List.map (.start >> .row) xs)) > 1
 
 
 writeImport : Import -> Writer
@@ -238,19 +253,23 @@ writeType type_ =
             , spaced (List.map string type_.generics)
             , string "="
             ]
-        , sepBy ( "=", "|", "" )
-            (List.map writeValueConstructor type_.constructors)
+        , let
+            diffLines =
+                List.map .range type_.constructors
+                    |> startOnDifferentLines
+          in
+            sepBy ( "=", "|", "" )
+                diffLines
+                (List.map writeValueConstructor type_.constructors)
         ]
 
 
-writeValueConstructor : ValueConstructor -> ( Range, Writer )
-writeValueConstructor { name, arguments, range } =
-    ( range
-    , spaced
+writeValueConstructor : ValueConstructor -> Writer
+writeValueConstructor { name, arguments } =
+    spaced
         [ string name
         , spaced (List.map writeTypeReference arguments)
         ]
-    )
 
 
 writePortDeclaration : FunctionSignature -> Writer
@@ -296,19 +315,17 @@ writeTypeReference typeReference =
             string "()"
 
         Tupled xs _ ->
-            parensComma
-                (List.map (\x -> ( emptyRange, writeTypeReference x )) xs)
+            parensComma False (List.map writeTypeReference xs)
 
         Record xs _ ->
-            bracesComma
-                (List.map (\x -> ( emptyRange, writeRecordField x )) xs)
+            bracesComma False (List.map writeRecordField xs)
 
         GenericRecord name fields _ ->
             spaced
                 [ string "{"
                 , string name
                 , string "|"
-                , sepByComma (List.map (\x -> ( emptyRange, writeRecordField x )) fields)
+                , sepByComma False (List.map writeRecordField fields)
                 , string "}"
                 ]
 
@@ -339,6 +356,15 @@ writeExpression ( range, inner ) =
             ( Tuple.first expr
             , spaced [ string name, string "=", writeExpression expr ]
             )
+
+        sepHelper : (Bool -> List Writer -> Writer) -> List ( Range, Writer ) -> Writer
+        sepHelper f l =
+            let
+                diffLines =
+                    List.map Tuple.first l
+                        |> startOnDifferentLines
+            in
+                f diffLines (List.map Tuple.second l)
     in
         case inner of
             UnitExpr ->
@@ -355,19 +381,19 @@ writeExpression ( range, inner ) =
                     x :: rest ->
                         spaced
                             [ writeExpression x
-                            , sepBySpace (List.map recurRangeHelper rest)
+                            , sepHelper sepBySpace (List.map recurRangeHelper rest)
                             ]
 
             OperatorApplication x dir left right ->
                 case dir of
                     Left ->
-                        sepBySpace
+                        sepHelper sepBySpace
                             [ ( Tuple.first left, writeExpression left )
                             , ( range, spaced [ string x, writeExpression right ] )
                             ]
 
                     Right ->
-                        sepBySpace
+                        sepHelper sepBySpace
                             [ ( Tuple.first left, spaced [ writeExpression left, string x ] )
                             , ( Tuple.first right, writeExpression right )
                             ]
@@ -405,7 +431,7 @@ writeExpression ( range, inner ) =
                 string (toString c)
 
             TupledExpression t ->
-                sepByComma (List.map recurRangeHelper t)
+                sepHelper sepByComma (List.map recurRangeHelper t)
 
             ParenthesizedExpression x ->
                 join [ string "(", writeExpression x, string ")" ]
@@ -443,10 +469,10 @@ writeExpression ( range, inner ) =
                     ]
 
             RecordExpr setters ->
-                bracesComma (List.map writeRecordSetter setters)
+                sepHelper bracesComma (List.map writeRecordSetter setters)
 
             ListExpr xs ->
-                bracketsComma (List.map recurRangeHelper xs)
+                sepHelper bracketsComma (List.map recurRangeHelper xs)
 
             QualifiedExpr moduleName name ->
                 join [ writeModuleName moduleName, string name ]
@@ -462,7 +488,7 @@ writeExpression ( range, inner ) =
                     [ string "{"
                     , string name
                     , string "|"
-                    , sepByComma (List.map writeRecordSetter updates)
+                    , sepHelper sepByComma (List.map writeRecordSetter updates)
                     , string "}"
                     ]
 
@@ -496,16 +522,16 @@ writePattern p =
             string (toString f)
 
         TuplePattern inner _ ->
-            parensComma (List.map (writePattern >> (,) emptyRange) inner)
+            parensComma False (List.map writePattern inner)
 
         RecordPattern inner _ ->
-            bracesComma (List.map (.value >> string >> (,) emptyRange) inner)
+            bracesComma False (List.map (.value >> string) inner)
 
         UnConsPattern left right _ ->
             spaced [ writePattern left, string "::", writePattern right ]
 
         ListPattern inner _ ->
-            bracketsComma (List.map (writePattern >> (,) emptyRange) inner)
+            bracketsComma False (List.map writePattern inner)
 
         VarPattern var _ ->
             string var

@@ -1,15 +1,12 @@
 module ASTUtil.Writer exposing (Writer, write, breaked, epsilon, parensComma, spaced, string, maybe, indent, bracesComma, sepBy, sepByComma, bracketsComma, sepBySpace, join, append)
 
-import AST.Ranges exposing (Range)
-import List.Extra as List
-
 
 type alias Writer =
     Node
 
 
 type Node
-    = Sep ( String, String, String ) (List ( Range, Node ))
+    = Sep ( String, String, String ) Bool (List Node)
     | Breaked (List Node)
     | Str String
     | Append Node Node
@@ -31,11 +28,10 @@ write =
 writeIndented : Int -> Writer -> String
 writeIndented indent w =
     case w of
-        Sep ( pre, sep, post ) items ->
+        Sep ( pre, sep, post ) differentLines items ->
             let
-                differentLines =
-                    startOnDifferentLines (List.map Tuple.first items)
-
+                -- differentLines =
+                -- startOnDifferentLines (List.map Tuple.first items)
                 seperator =
                     if differentLines then
                         "\n" ++ asIndent indent ++ sep
@@ -45,7 +41,7 @@ writeIndented indent w =
                 String.concat
                     [ pre
                     , String.join seperator
-                        (List.map (Tuple.second >> writeIndented indent) items)
+                        (List.map (identity >> writeIndented indent) items)
                     , post
                     ]
 
@@ -67,11 +63,6 @@ writeIndented indent w =
 
         Append x y ->
             writeIndented indent x ++ writeIndented indent y
-
-
-startOnDifferentLines : List Range -> Bool
-startOnDifferentLines xs =
-    List.length (List.unique (List.map (.start >> .row) xs)) > 1
 
 
 indent : Int -> Writer -> Writer
@@ -104,32 +95,32 @@ maybe =
     Maybe.withDefault epsilon
 
 
-parensComma : List ( Range, Node ) -> Node
+parensComma : Bool -> List Node -> Node
 parensComma =
     Sep ( "(", ", ", ")" )
 
 
-bracesComma : List ( Range, Node ) -> Node
+bracesComma : Bool -> List Node -> Node
 bracesComma =
     Sep ( "{", ", ", "}" )
 
 
-bracketsComma : List ( Range, Node ) -> Node
+bracketsComma : Bool -> List Node -> Node
 bracketsComma =
     Sep ( "[", ", ", "]" )
 
 
-sepByComma : List ( Range, Node ) -> Node
+sepByComma : Bool -> List Node -> Node
 sepByComma =
     Sep ( "", ", ", "" )
 
 
-sepBySpace : List ( Range, Node ) -> Node
+sepBySpace : Bool -> List Node -> Node
 sepBySpace =
     Sep ( "", " ", "" )
 
 
-sepBy : ( String, String, String ) -> List ( Range, Node ) -> Node
+sepBy : ( String, String, String ) -> Bool -> List Node -> Node
 sepBy =
     Sep
 
