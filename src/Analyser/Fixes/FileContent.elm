@@ -1,7 +1,7 @@
 module Analyser.Fixes.FileContent exposing (..)
 
 import List.Extra as List
-import AST.Ranges exposing (Range, Location)
+import Elm.Syntax.Range exposing (Range, Location)
 
 
 replaceRangeWith : Range -> String -> String -> String

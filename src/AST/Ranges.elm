@@ -1,50 +1,6 @@
-module AST.Ranges exposing (Location, Range, rangeToString, getRange, emptyRange, encode, decode, orderByStart, containsRange, compareRangeStarts)
+module AST.Ranges exposing (rangeToString, getRange, emptyRange, orderByStart, containsRange, compareRangeStarts)
 
-import Json.Decode as JD exposing (Decoder)
-import Json.Encode as JE exposing (Value)
-import Json.Decode.Extra exposing (fromResult)
-
-
-type alias Location =
-    { row : Int
-    , column : Int
-    }
-
-
-type alias Range =
-    { start : Location
-    , end : Location
-    }
-
-
-decode : Decoder Range
-decode =
-    JD.list JD.int
-        |> JD.andThen
-            (fromList >> fromResult)
-
-
-fromList : List Int -> Result String Range
-fromList input =
-    case input of
-        [ a, b, c, d ] ->
-            Ok
-                { start = { row = a, column = b }
-                , end = { row = c, column = d }
-                }
-
-        _ ->
-            Err "Invalid input list"
-
-
-encode : Range -> Value
-encode { start, end } =
-    JE.list
-        [ JE.int start.row
-        , JE.int start.column
-        , JE.int end.row
-        , JE.int end.column
-        ]
+import Elm.Syntax.Range exposing (Range, Location)
 
 
 orderByStart : Range -> Range -> Order

@@ -7,8 +7,6 @@ node_js:
 cache:
   directories:
   - node_modules
-  - tests/elm-stuff
-  - elm-stuff
 
 install:
   - npm install

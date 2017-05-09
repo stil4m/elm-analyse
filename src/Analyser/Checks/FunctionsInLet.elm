@@ -5,7 +5,7 @@ import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Inner), defaultConfig)
-import AST.Types exposing (..)
+import Elm.Syntax.Expression exposing (..)
 import ASTUtil.Functions
 
 

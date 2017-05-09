@@ -1,6 +1,6 @@
 module Analyser.Fixes.Base exposing (..)
 
-import AST.Types exposing (File)
+import Elm.Syntax.File exposing (..)
 import Analyser.Messages.Types exposing (MessageData)
 
 

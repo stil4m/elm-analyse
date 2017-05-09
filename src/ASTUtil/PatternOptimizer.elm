@@ -1,7 +1,7 @@
 module ASTUtil.PatternOptimizer exposing (optimize, patternRange)
 
-import AST.Types exposing (Pattern(..))
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Pattern exposing (..)
 
 
 emptyRange : Range

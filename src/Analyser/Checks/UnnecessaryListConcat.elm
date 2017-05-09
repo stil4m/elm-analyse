@@ -1,7 +1,7 @@
 module Analyser.Checks.UnnecessaryListConcat exposing (checker)
 
-import AST.Types exposing (File, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName, Expression, InnerExpression(Application, ListExpr, QualifiedExpr))
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryListConcat), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)

@@ -1,17 +1,14 @@
 port module Analyser.Files.FileLoader exposing (Msg, init, subscriptions, update)
 
-import AST.Types
-import AST.Util as Util
-import AST.Encoding
-import AST.Decoding
-import Analyser.Files.Types exposing (FileContent, FileLoad(Loaded, Failed), LoadedFile, LoadedFileData)
-import Analyser.Files.Interface as Interface
+import Elm.RawFile exposing (RawFile)
+import Elm.Json.Encode
+import Elm.Json.Decode as Elm
+import Analyser.Files.Types exposing (LoadedSourceFile, FileContent, LoadedFileData)
 import Json.Encode
 import Json.Decode
-import Parser.Parser as Parser
+import Elm.Parser as Parser
 import Result
 import Maybe.Extra as Maybe
-import Analyser.Files.Util
 import Util.Logger as Logger
 import Result.Extra as Result
 
@@ -46,7 +43,7 @@ subscriptions =
     fileContent OnFileContent
 
 
-update : Msg -> ( LoadedFile, Cmd a )
+update : Msg -> ( LoadedSourceFile, Cmd a )
 update msg =
     case msg of
         OnFileContent fileContent ->
@@ -56,8 +53,8 @@ update msg =
 
                 cmd =
                     if store then
-                        ( fileContent.sha1, Analyser.Files.Util.withLoaded fileLoad )
-                            |> uncurry (Maybe.map2 (\a b -> storeAstForSha ( a, Json.Encode.encode 0 (AST.Encoding.encode b.ast) )))
+                        ( fileContent.sha1, Result.toMaybe fileLoad )
+                            |> uncurry (Maybe.map2 (\a b -> storeAstForSha ( a, Json.Encode.encode 0 (Elm.Json.Encode.encode b) )))
                             |> Maybe.withDefault Cmd.none
                     else
                         Cmd.none
@@ -65,35 +62,25 @@ update msg =
                 ( ( fileContent, fileLoad ), cmd )
 
 
-loadedInterfaceForFile : AST.Types.File -> FileLoad
-loadedInterfaceForFile file =
-    Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
-
-
-onInputLoadingInterface : FileContent -> ( FileLoad, RefeshedAST )
+onInputLoadingInterface : FileContent -> ( Result String RawFile, RefeshedAST )
 onInputLoadingInterface fileContent =
     fileContent.ast
-        |> Maybe.andThen (Json.Decode.decodeString AST.Decoding.decode >> Result.toMaybe)
-        |> Maybe.map loadedInterfaceForFile
+        |> Maybe.andThen (Json.Decode.decodeString Elm.decode >> Result.toMaybe)
+        |> Maybe.map Ok
         |> Maybe.map (flip (,) False)
         |> Maybe.orElseLazy (\() -> Just ( loadedFileFromContent fileContent, True ))
-        |> Maybe.withDefault ( Failed "Internal problem in the file loader. Please report an issue.", False )
+        |> Maybe.withDefault ( Err "Internal problem in the file loader. Please report an issue.", False )
 
 
-loadedFileFromContent : FileContent -> FileLoad
+loadedFileFromContent : FileContent -> Result String RawFile
 loadedFileFromContent fileContent =
-    let
-        loadedInterfaceForFile : AST.Types.File -> FileLoad
-        loadedInterfaceForFile file =
-            Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
-    in
-        case fileContent.content of
-            Just content ->
-                (Parser.parse content
-                    |> Result.map loadedInterfaceForFile
-                    |> Result.mapError (List.head >> Maybe.withDefault "" >> Failed)
-                    |> Result.merge
-                )
+    case fileContent.content of
+        Just content ->
+            (Parser.parse content
+                |> Result.map Ok
+                |> Result.mapError (List.head >> Maybe.withDefault "" >> Err)
+                |> Result.merge
+            )
 
-            Nothing ->
-                Failed "No file content"
+        Nothing ->
+            Err "No file content"

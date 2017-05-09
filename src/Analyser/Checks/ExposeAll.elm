@@ -1,13 +1,14 @@
 module Analyser.Checks.ExposeAll exposing (checker)
 
-import AST.Types exposing (Exposure(All, None, Explicit), Expose(TypeExpose), File)
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.File exposing (..)
 import AST.Util
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(ExposeAll), newMessage)
 import ASTUtil.Inspector as Inspector exposing (defaultConfig, Order(Inner))
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Elm.Syntax.Exposing exposing (..)
 
 
 checker : Checker

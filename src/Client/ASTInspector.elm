@@ -3,11 +3,11 @@ module ASTInspector exposing (main)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
-import Parser.Parser as Parser
-import AST.Types exposing (File)
+import Elm.Parser as Parser
+import Elm.Syntax.File exposing (File)
 import CssFrameworks
 import CssFrameworks.Bootstrap
-import AST.Encoding exposing (encode)
+import Elm.Json.Encode as Elm
 import Json.Encode as JE
 
 
@@ -33,7 +33,7 @@ update : Msg -> Model -> Model
 update msg _ =
     case msg of
         ChangeInput s ->
-            Model s (Parser.parse s)
+            Model s (Parser.parse s |> Result.toMaybe)
 
 
 view : Model -> Html Msg
@@ -45,7 +45,7 @@ view (Model _ file) =
                 [ div [ class "col-md-6 col-sm-6" ]
                     [ textarea [ onInput ChangeInput, rows 40, cols 80 ] [] ]
                 , div [ class "col-md-6 col-sm-6" ]
-                    [ pre [] [ file |> Maybe.map (encode >> JE.encode 2) |> Maybe.withDefault "" |> text ] ]
+                    [ pre [] [ file |> Maybe.map (Elm.encode >> JE.encode 2) |> Maybe.withDefault "" |> text ] ]
                 ]
             ]
         ]

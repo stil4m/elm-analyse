@@ -1,7 +1,7 @@
 module Analyser.Checks.CoreArrayUsage exposing (checker)
 
 import Analyser.Messages.Types exposing (Message, MessageData(CoreArrayUsage), newMessage)
-import AST.Types exposing (InnerExpression, ModuleName, Import)
+import Elm.Syntax.Module exposing (Import)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)

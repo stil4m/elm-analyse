@@ -1,7 +1,8 @@
 module Analyser.Checks.NonStaticRegex exposing (checker)
 
-import AST.Types exposing (File, FunctionSignature, TypeReference, InnerExpression(QualifiedExpr, FunctionOrValue), Import, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName, Expression, InnerExpression)
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Base exposing (..)
+import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(NonStaticRegex), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Inner), defaultConfig)

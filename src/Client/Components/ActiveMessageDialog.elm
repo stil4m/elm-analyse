@@ -1,6 +1,6 @@
 module Client.Components.ActiveMessageDialog exposing (Model, Msg, show, init, update, view, subscriptions)
 
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
 import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile, UnusedImportAlias, UnusedPatternVariable, UnusedTypeAlias))
 import Analyser.Messages.Util as Messages
 import Dialog exposing (Config)

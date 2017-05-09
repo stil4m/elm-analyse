@@ -1,17 +1,11 @@
 module ASTUtil.Imports exposing (FunctionReference, findImportWithRange, buildImportInformation, naiveStringifyImport, removeRangeFromImport)
 
-import AST.Types
-    exposing
-        ( File
-        , Import
-        , ModuleName
-        , Exposure(None, All, Explicit)
-        , ValueConstructorExpose
-        , Expose(InfixExpose, FunctionExpose, TypeOrAliasExpose, TypeExpose)
-        , ExposedType
-        )
-import AST.Ranges as Ranges exposing (Range)
-import ASTUtil.Expose as Expose
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Exposing as Exposing exposing (..)
+import Elm.Syntax.Base exposing (..)
+import AST.Ranges as Ranges
 
 
 type alias FunctionReference =
@@ -37,7 +31,7 @@ buildImportInformation moduleName function file =
         |> Maybe.map
             (\i ->
                 { moduleName = Maybe.withDefault i.moduleName i.moduleAlias
-                , exposesRegex = Expose.exposesFunction function i.exposingList
+                , exposesRegex = Exposing.exposesFunction function i.exposingList
                 }
             )
 
@@ -52,7 +46,7 @@ naiveStringifyImport imp =
         ]
 
 
-stringifyExposingList : Exposure Expose -> String
+stringifyExposingList : Exposing TopLevelExpose -> String
 stringifyExposingList exp =
     case exp of
         None ->
@@ -82,7 +76,7 @@ stringifyExposingList exp =
                             "(" ++ (List.map stringifyExpose explicits |> String.join seperator) ++ ")"
 
 
-stringifyExpose : Expose -> String
+stringifyExpose : TopLevelExpose -> String
 stringifyExpose expose =
     case expose of
         InfixExpose s _ ->
@@ -133,7 +127,7 @@ removeRangeFromImport range imp =
     { imp | exposingList = removeRangeFromExposingList range imp.exposingList }
 
 
-removeRangeFromExposingList : Range -> Exposure Expose -> Exposure Expose
+removeRangeFromExposingList : Range -> Exposing TopLevelExpose -> Exposing TopLevelExpose
 removeRangeFromExposingList range exp =
     case exp of
         None ->
@@ -154,7 +148,7 @@ removeRangeFromExposingList range exp =
                     Explicit x
 
 
-removeRangeFromExpose : Range -> Expose -> Maybe Expose
+removeRangeFromExpose : Range -> TopLevelExpose -> Maybe TopLevelExpose
 removeRangeFromExpose range expose =
     case expose of
         InfixExpose x r ->
@@ -181,7 +175,7 @@ removeRangeFromExpose range expose =
                     { exposedType | constructors = removeRangeFromConstructors range exposedType.constructors }
 
 
-removeRangeFromConstructors : Range -> Exposure ValueConstructorExpose -> Exposure ValueConstructorExpose
+removeRangeFromConstructors : Range -> Exposing ValueConstructorExpose -> Exposing ValueConstructorExpose
 removeRangeFromConstructors range exp =
     case exp of
         None ->

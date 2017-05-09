@@ -1,43 +1,48 @@
-module Analyser.FileContext exposing (FileContext, create)
+module Analyser.FileContext exposing (FileContext, build)
 
-import AST.Types as AST
-import Analyser.Files.Types exposing (Dependency, Interface, LoadedSourceFile, LoadedSourceFiles, FileLoad(Failed, Loaded))
-import Analyser.Files.Interface as Interface
-import Maybe exposing (Maybe(Just, Nothing))
-import Analyser.OperatorTable as OperatorTable
-import Analyser.PostProcessing as PostProcessing
+import Analyser.Files.Types exposing (LoadedSourceFile, LoadedSourceFiles)
+import Elm.Interface as Interface exposing (Interface)
+import Elm.Dependency exposing (Dependency)
+import Elm.Syntax.Base exposing (ModuleName)
+import Elm.Syntax.File exposing (File)
+import Elm.Processing as Processing exposing (ProcessContext)
+import Elm.RawFile as RawFile
 
 
 type alias FileContext =
     { interface : Interface
-    , moduleName : Maybe AST.ModuleName
-    , ast : AST.File
+    , moduleName : Maybe ModuleName
+    , ast : File
     , content : String
     , path : String
     , sha1 : String
     }
 
 
-create : LoadedSourceFiles -> List Dependency -> LoadedSourceFile -> Maybe FileContext
-create sourceFiles dependencies ( fileContent, target ) =
+build : List LoadedSourceFile -> List Dependency -> List LoadedSourceFile -> List FileContext
+build allSources dependencies selected =
     let
         moduleIndex =
-            OperatorTable.buildModuleIndex sourceFiles dependencies
+            List.foldl
+                Processing.addFile
+                (List.foldl Processing.addDependency Processing.init dependencies)
+                (List.filterMap (Tuple.second >> Result.toMaybe) allSources)
     in
-        case target of
-            Failed _ ->
-                Nothing
+        List.filterMap (buildForFile moduleIndex) selected
 
-            Loaded l ->
-                Just <|
-                    let
-                        operatorTable =
-                            OperatorTable.build l.ast.imports moduleIndex
-                    in
-                        { moduleName = l.moduleName
-                        , ast = PostProcessing.postProcess operatorTable l.ast
-                        , path = fileContent.path
-                        , content = fileContent.content |> Maybe.withDefault ""
-                        , interface = Interface.build l.ast
-                        , sha1 = Maybe.withDefault "" fileContent.sha1
-                        }
+
+buildForFile : ProcessContext -> LoadedSourceFile -> Maybe FileContext
+buildForFile moduleIndex ( fileContent, r ) =
+    case r of
+        Err _ ->
+            Nothing
+
+        Ok l ->
+            Just <|
+                { moduleName = RawFile.moduleName l
+                , ast = Processing.process moduleIndex l
+                , path = fileContent.path
+                , content = fileContent.content |> Maybe.withDefault ""
+                , interface = Interface.build l
+                , sha1 = Maybe.withDefault "" fileContent.sha1
+                }

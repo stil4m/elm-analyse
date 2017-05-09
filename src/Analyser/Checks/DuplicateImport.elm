@@ -1,7 +1,8 @@
 module Analyser.Checks.DuplicateImport exposing (checker)
 
-import AST.Types exposing (InnerExpression, ModuleName, Import)
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Base exposing (ModuleName)
+import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.Range exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImport), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)

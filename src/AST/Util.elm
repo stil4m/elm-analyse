@@ -1,22 +1,15 @@
 module AST.Util exposing (fileExposingList, isPortModule, fileModuleName, getParenthesized, isOperatorApplication, isLambda, isIf, isCase, moduleExposingList, patternModuleNames)
 
-import AST.Types
-    exposing
-        ( File
-        , Exposure(None)
-        , Expose
-        , Module(NormalModule, PortModule, EffectModule, NoModule)
-        , Exposure
-        , ModuleName
-        , Expose
-        , Expression
-        , Pattern(TuplePattern, RecordPattern, UnConsPattern, ListPattern, NamedPattern, QualifiedNamePattern, AsPattern, ParenthesizedPattern)
-        , InnerExpression(OperatorApplication, ParenthesizedExpression, LambdaExpression, IfBlock, CaseExpression)
-        )
-import AST.Ranges exposing (Range)
+import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Expression exposing (Expression, InnerExpression(OperatorApplication, ParenthesizedExpression, LambdaExpression, IfBlock, CaseExpression))
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Base exposing (ModuleName)
+import Elm.Syntax.Pattern exposing (Pattern(..))
+import Elm.Syntax.Module exposing (Module(NormalModule, PortModule, EffectModule, NoModule))
+import Elm.Syntax.Exposing exposing (..)
 
 
-moduleExposingList : Module -> Exposure Expose
+moduleExposingList : Module -> Exposing TopLevelExpose
 moduleExposingList m =
     case m of
         NormalModule x ->
@@ -42,7 +35,7 @@ isPortModule file =
             False
 
 
-fileExposingList : File -> Maybe (Exposure Expose)
+fileExposingList : File -> Maybe (Exposing TopLevelExpose)
 fileExposingList file =
     case file.moduleDefinition of
         NormalModule x ->

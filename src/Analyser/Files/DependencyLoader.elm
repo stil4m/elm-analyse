@@ -1,19 +1,18 @@
 port module Analyser.Files.DependencyLoader exposing (..)
 
-import AST.Decoding
-import AST.Types
-import AST.Util as Util
-import Analyser.Files.Types exposing (Version, Dependency, FileContent, FileLoad(Loaded, Failed), LoadedFile, LoadedFileData)
-import Analyser.Files.Interface as Interface
+import Analyser.Files.Types exposing (Version, FileContent, LoadedSourceFile, LoadedFileData)
+import Elm.Interface as Interface
+import Elm.Dependency exposing (Dependency)
 import Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
 import Json.Decode
-import Parser.Parser as Parser
+import Elm.Parser as Parser
 import Result
 import Maybe.Extra as Maybe
 import Dict
-import Analyser.Files.Util
 import Util.Logger as Logger
 import Result.Extra as Result
+import Elm.Json.Decode as Elm
+import Elm.RawFile as RawFile exposing (RawFile)
 
 
 port loadRawDependency : ( String, Version ) -> Cmd msg
@@ -44,7 +43,7 @@ type alias Model =
     { name : String
     , version : Version
     , toParse : List String
-    , parsed : List LoadedFile
+    , parsed : List LoadedSourceFile
     , result : Maybe (Result String Dependency)
     }
 
@@ -108,10 +107,10 @@ update msg model =
                     interfaces =
                         loadedFiles
                             |> List.filterMap
-                                (Analyser.Files.Util.withLoaded
+                                (Result.toMaybe
                                     >> Maybe.andThen
                                         (\z ->
-                                            Util.fileModuleName z.ast
+                                            RawFile.moduleName z.ast
                                                 |> Maybe.map (flip (,) z.interface)
                                         )
                                 )
@@ -120,7 +119,7 @@ update msg model =
                     dependency =
                         Dependency model.name model.version interfaces
                 in
-                    if not <| List.all Analyser.Files.Util.isLoaded loadedFiles then
+                    if not <| List.all Result.isOk loadedFiles then
                         ( { model | result = Just (Err "Could not load all dependency files") }
                         , Cmd.none
                         )
@@ -134,34 +133,34 @@ update msg model =
                         )
 
 
-loadedInterfaceForFile : AST.Types.File -> FileLoad
+loadedInterfaceForFile : RawFile -> Result String LoadedFileData
 loadedInterfaceForFile file =
-    Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
+    Ok { ast = file, moduleName = RawFile.moduleName file, interface = Interface.build file }
 
 
-onInputLoadingInterface : FileContent -> FileLoad
+onInputLoadingInterface : FileContent -> Result String LoadedFileData
 onInputLoadingInterface fileContent =
     fileContent.ast
-        |> Maybe.andThen (Json.Decode.decodeString AST.Decoding.decode >> Result.toMaybe)
+        |> Maybe.andThen (Json.Decode.decodeString Elm.decode >> Result.toMaybe)
         |> Maybe.map loadedInterfaceForFile
         |> Maybe.orElseLazy (\() -> Just (loadedFileFromContent fileContent))
-        |> Maybe.withDefault (Failed "Internal problem in the file loader. Please report an issue.")
+        |> Maybe.withDefault (Err "Internal problem in the file loader. Please report an issue.")
 
 
-loadedFileFromContent : FileContent -> FileLoad
+loadedFileFromContent : FileContent -> Result String LoadedFileData
 loadedFileFromContent fileContent =
     let
-        loadedInterfaceForFile : AST.Types.File -> FileLoad
+        loadedInterfaceForFile : RawFile -> Result String LoadedFileData
         loadedInterfaceForFile file =
-            Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
+            Ok { ast = file, moduleName = RawFile.moduleName file, interface = Interface.build file }
     in
         case fileContent.content of
             Just content ->
                 (Parser.parse content
                     |> Result.map loadedInterfaceForFile
-                    |> Result.mapError (List.head >> Maybe.withDefault "" >> Failed)
+                    |> Result.mapError (List.head >> Maybe.withDefault "" >> Err)
                     |> Result.merge
                 )
 
             Nothing ->
-                Failed "No file content"
+                Err "No file content"

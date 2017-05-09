@@ -1,13 +1,12 @@
 module Analyser exposing (main)
 
-import Analyser.InterfaceLoadingStage as InterfaceLoadingStage
+import Analyser.DependencyLoadingStage as DependencyLoadingStage
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import AnalyserPorts
 import Platform exposing (program)
 import Inspection
 import Analyser.State as State exposing (State)
 import Analyser.Fixer as Fixer
-import Tuple2
 import Analyser.Messages.Util as Messages
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.Configuration as Configuration exposing (Configuration)
@@ -27,7 +26,7 @@ type alias Model =
 
 type Msg
     = OnContext Context
-    | InterfaceLoadingStageMsg InterfaceLoadingStage.Msg
+    | DependencyLoadingStageMsg DependencyLoadingStage.Msg
     | SourceLoadingStageMsg SourceLoadingStage.Msg
     | Reset
     | OnFixMessage Int
@@ -36,7 +35,7 @@ type Msg
 
 type Stage
     = ContextLoadingStage
-    | InterfaceLoadingStage InterfaceLoadingStage.Model
+    | DependencyLoadingStage DependencyLoadingStage.Model
     | SourceLoadingStage SourceLoadingStage.Model
     | FixerStage Fixer.Model
     | Finished
@@ -84,23 +83,23 @@ update msg model =
                     Configuration.fromString context.configuration
 
                 ( stage, cmds ) =
-                    InterfaceLoadingStage.init context.interfaceFiles
+                    DependencyLoadingStage.init context.interfaceFiles
             in
                 ( { model
                     | context = context
                     , configuration = configuration
-                    , stage = InterfaceLoadingStage stage
+                    , stage = DependencyLoadingStage stage
                   }
                 , Cmd.batch <|
-                    Cmd.map InterfaceLoadingStageMsg cmds
+                    Cmd.map DependencyLoadingStageMsg cmds
                         :: List.map Logger.info messages
                 )
                     |> doSendState
 
-        InterfaceLoadingStageMsg x ->
+        DependencyLoadingStageMsg x ->
             case model.stage of
-                InterfaceLoadingStage stage ->
-                    onInterfaceLoadingStageMsg x stage model
+                DependencyLoadingStage stage ->
+                    onDependencyLoadingStageMsg x stage model
 
                 _ ->
                     ( model, Cmd.none )
@@ -129,7 +128,7 @@ onFixerMsg x stage model =
     let
         ( newFixerModel, fixerCmds ) =
             Fixer.update x stage
-                |> Tuple2.mapSecond (Cmd.map FixerMsg)
+                |> Tuple.mapSecond (Cmd.map FixerMsg)
     in
         if Fixer.isDone newFixerModel then
             if Fixer.succeeded newFixerModel then
@@ -156,7 +155,7 @@ startSourceLoading files ( model, cmds ) =
 
                 files_ ->
                     SourceLoadingStage.init files_
-                        |> Tuple2.mapFirst SourceLoadingStage
+                        |> Tuple.mapFirst SourceLoadingStage
                         |> Tuple.mapSecond (Cmd.map SourceLoadingStageMsg)
     in
         ( { model | stage = nextStage }
@@ -197,20 +196,20 @@ doSendState ( model, cmds ) =
     )
 
 
-onInterfaceLoadingStageMsg : InterfaceLoadingStage.Msg -> InterfaceLoadingStage.Model -> Model -> ( Model, Cmd Msg )
-onInterfaceLoadingStageMsg x stage model =
+onDependencyLoadingStageMsg : DependencyLoadingStage.Msg -> DependencyLoadingStage.Model -> Model -> ( Model, Cmd Msg )
+onDependencyLoadingStageMsg x stage model =
     let
         ( newStage, cmds ) =
-            InterfaceLoadingStage.update x stage
+            DependencyLoadingStage.update x stage
     in
-        if InterfaceLoadingStage.isDone newStage then
-            ( { model | codeBase = CodeBase.setDependencies (InterfaceLoadingStage.getDependencies newStage) model.codeBase }
-            , Cmd.map InterfaceLoadingStageMsg cmds
+        if DependencyLoadingStage.isDone newStage then
+            ( { model | codeBase = CodeBase.setDependencies (DependencyLoadingStage.getDependencies newStage) model.codeBase }
+            , Cmd.map DependencyLoadingStageMsg cmds
             )
                 |> startSourceLoading model.context.sourceFiles
         else
-            ( { model | stage = InterfaceLoadingStage newStage }
-            , Cmd.map InterfaceLoadingStageMsg cmds
+            ( { model | stage = DependencyLoadingStage newStage }
+            , Cmd.map DependencyLoadingStageMsg cmds
             )
 
 
@@ -274,8 +273,8 @@ subscriptions model =
             ContextLoadingStage ->
                 ContextLoader.onLoadedContext OnContext
 
-            InterfaceLoadingStage stage ->
-                InterfaceLoadingStage.subscriptions stage |> Sub.map InterfaceLoadingStageMsg
+            DependencyLoadingStage stage ->
+                DependencyLoadingStage.subscriptions stage |> Sub.map DependencyLoadingStageMsg
 
             SourceLoadingStage stage ->
                 SourceLoadingStage.subscriptions stage |> Sub.map SourceLoadingStageMsg

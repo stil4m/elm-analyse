@@ -2,7 +2,8 @@ module Inspection exposing (run)
 
 import Analyser.FileContext as FileContext
 import Analyser.Messages.Types exposing (Message, MessageData(FileLoadFailed, UnformattedFile), newMessage)
-import Analyser.Files.Types exposing (Dependency, LoadedSourceFiles)
+import Analyser.Files.Types exposing (LoadedSourceFiles)
+import Elm.Dependency exposing (Dependency)
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.ExposeAll as ExposeAll
 import Analyser.Checks.ImportAll as ImportAll
@@ -24,7 +25,7 @@ import Analyser.Checks.NonStaticRegex as NonStaticRegex
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.FunctionsInLet as FunctionsInLet
 import Analyser.Checks.Base exposing (Checker)
-import Analyser.Files.Util
+import Result.Extra
 import Analyser.Configuration as Configuration exposing (Configuration)
 
 
@@ -70,11 +71,19 @@ run sources deps configuration =
 
         ( validSources, invalidSources ) =
             includedSources
-                |> List.partition (Tuple.second >> Analyser.Files.Util.isLoaded)
+                |> List.partition (Tuple.second >> Result.Extra.isOk)
 
         failedMessages =
             invalidSources
-                |> List.filterMap (\( source, result ) -> Maybe.map ((,) source) (Analyser.Files.Util.fileLoadError result))
+                |> List.filterMap
+                    (\( source, result ) ->
+                        case result of
+                            Err e ->
+                                Just ( source, e )
+
+                            Ok _ ->
+                                Nothing
+                    )
                 |> List.map
                     (\( source, error ) ->
                         newMessage
@@ -100,8 +109,7 @@ run sources deps configuration =
                     )
 
         inspectionMessages =
-            includedSources
-                |> List.filterMap (FileContext.create sources deps)
+            FileContext.build sources deps includedSources
                 |> List.concatMap (\x -> List.concatMap (\c -> c.check x configuration) enabledChecks)
 
         messages =

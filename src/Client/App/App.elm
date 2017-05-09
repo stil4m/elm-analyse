@@ -9,7 +9,6 @@ import Client.Socket exposing (controlAddress)
 import Html exposing (Html, div)
 import Html.Attributes exposing (id)
 import Navigation exposing (Location)
-import Tuple2
 import WebSocket as WS
 import Client.StaticStatePage as StaticStatePage
 
@@ -43,23 +42,23 @@ onLocation l =
     case l.hash of
         "#tree" ->
             FileTree.init l
-                |> Tuple2.mapFirst (\x -> { content = FileTreeContent x, location = l })
-                |> Tuple2.mapSecond (Cmd.map FileTreeMsg)
+                |> Tuple.mapFirst (\x -> { content = FileTreeContent x, location = l })
+                |> Tuple.mapSecond (Cmd.map FileTreeMsg)
 
         "#module-graph" ->
             moduleGraphPage
-                |> Tuple2.mapFirst (\x -> { content = GraphContent x, location = l })
-                |> Tuple2.mapSecond (Cmd.map GraphMsg)
+                |> Tuple.mapFirst (\x -> { content = GraphContent x, location = l })
+                |> Tuple.mapSecond (Cmd.map GraphMsg)
 
         "#package-dependencies" ->
             packageDependenciesPage
-                |> Tuple2.mapFirst (\x -> { content = PackageDependenciesContent x, location = l })
-                |> Tuple2.mapSecond (Cmd.map PackageDependenciesMsg)
+                |> Tuple.mapFirst (\x -> { content = PackageDependenciesContent x, location = l })
+                |> Tuple.mapSecond (Cmd.map PackageDependenciesMsg)
 
         _ ->
             DashBoard.init l
-                |> Tuple2.mapFirst (\x -> { content = DashBoardContent x, location = l })
-                |> Tuple2.mapSecond (Cmd.map DashBoardMsg)
+                |> Tuple.mapFirst (\x -> { content = DashBoardContent x, location = l })
+                |> Tuple.mapSecond (Cmd.map DashBoardMsg)
 
 
 view : Model -> Html.Html Msg
@@ -123,8 +122,8 @@ onPackageDependenciesMsg subMsg model =
     case model.content of
         PackageDependenciesContent subModel ->
             StaticStatePage.update subMsg subModel
-                |> Tuple2.mapFirst (\x -> { model | content = PackageDependenciesContent x })
-                |> Tuple2.mapSecond (Cmd.map PackageDependenciesMsg)
+                |> Tuple.mapFirst (\x -> { model | content = PackageDependenciesContent x })
+                |> Tuple.mapSecond (Cmd.map PackageDependenciesMsg)
 
         _ ->
             model ! []
@@ -135,8 +134,8 @@ onFileTreeMsg subMsg model =
     case model.content of
         FileTreeContent subModel ->
             FileTree.update model.location subMsg subModel
-                |> Tuple2.mapFirst (\x -> { model | content = FileTreeContent x })
-                |> Tuple2.mapSecond (Cmd.map FileTreeMsg)
+                |> Tuple.mapFirst (\x -> { model | content = FileTreeContent x })
+                |> Tuple.mapSecond (Cmd.map FileTreeMsg)
 
         _ ->
             model ! []
@@ -147,8 +146,8 @@ onDashBoardMsg subMsg model =
     case model.content of
         DashBoardContent subModel ->
             DashBoard.update model.location subMsg subModel
-                |> Tuple2.mapFirst (\x -> { model | content = DashBoardContent x })
-                |> Tuple2.mapSecond (Cmd.map DashBoardMsg)
+                |> Tuple.mapFirst (\x -> { model | content = DashBoardContent x })
+                |> Tuple.mapSecond (Cmd.map DashBoardMsg)
 
         _ ->
             model ! []
@@ -159,8 +158,8 @@ onGraphMsg subMsg model =
     case model.content of
         GraphContent subModel ->
             StaticStatePage.update subMsg subModel
-                |> Tuple2.mapFirst (\x -> { model | content = GraphContent x })
-                |> Tuple2.mapSecond (Cmd.map GraphMsg)
+                |> Tuple.mapFirst (\x -> { model | content = GraphContent x })
+                |> Tuple.mapSecond (Cmd.map GraphMsg)
 
         _ ->
             model ! []
