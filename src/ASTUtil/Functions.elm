@@ -1,6 +1,7 @@
 module ASTUtil.Functions exposing (isStatic)
 
-import AST.Types exposing (Function, FunctionSignature, TypeReference(FunctionTypeReference))
+import Elm.Syntax.TypeAnnotation exposing (..)
+import Elm.Syntax.Expression exposing (..)
 
 
 isStatic : Function -> Bool
@@ -16,14 +17,14 @@ isStatic function =
 
 
 isFunctionSignature : FunctionSignature -> Bool
-isFunctionSignature { typeReference } =
-    isFunctionTypeReference typeReference
+isFunctionSignature { typeAnnotation } =
+    isFunctionTypeAnnotation typeAnnotation
 
 
-isFunctionTypeReference : TypeReference -> Bool
-isFunctionTypeReference typeReference =
-    case typeReference of
-        FunctionTypeReference _ _ _ ->
+isFunctionTypeAnnotation : TypeAnnotation -> Bool
+isFunctionTypeAnnotation typeAnnotation =
+    case typeAnnotation of
+        FunctionTypeAnnotation _ _ _ ->
             True
 
         _ ->

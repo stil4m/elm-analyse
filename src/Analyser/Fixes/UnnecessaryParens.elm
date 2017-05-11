@@ -1,9 +1,9 @@
 module Analyser.Fixes.UnnecessaryParens exposing (fixer)
 
 import Analyser.Messages.Types exposing (MessageData(UnnecessaryParens))
-import AST.Ranges exposing (Range, Location)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.File exposing (..)
 import Tuple3
-import AST.Types exposing (File)
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Fixes.Base exposing (Fixer)
 

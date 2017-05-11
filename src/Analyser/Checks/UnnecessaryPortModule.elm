@@ -1,6 +1,6 @@
 module Analyser.Checks.UnnecessaryPortModule exposing (checker)
 
-import AST.Types exposing (File, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName, Expression, InnerExpression, FunctionSignature)
+import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
 import AST.Util
 import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryPortModule), newMessage)

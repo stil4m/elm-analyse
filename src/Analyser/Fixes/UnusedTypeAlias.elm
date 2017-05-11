@@ -2,8 +2,10 @@ module Analyser.Fixes.UnusedTypeAlias exposing (fixer)
 
 import Analyser.Messages.Types exposing (MessageData(UnusedTypeAlias))
 import Analyser.Fixes.Base exposing (Fixer)
-import AST.Types exposing (File, TypeAlias, Declaration(AliasDecl))
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.File exposing (..)
+import Elm.Syntax.TypeAlias exposing (..)
+import Elm.Syntax.Declaration exposing (..)
 import Analyser.Fixes.FileContent as FileContent
 
 
@@ -68,7 +70,7 @@ removeTypeAlias typeAlias content =
     let
         start =
             typeAlias.documentation
-                |> Maybe.map (Tuple.second >> .start)
+                |> Maybe.map (.range >> .start)
                 |> Maybe.withDefault typeAlias.range.start
 
         end =

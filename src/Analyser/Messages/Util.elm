@@ -1,6 +1,7 @@
 module Analyser.Messages.Util exposing (..)
 
-import AST.Ranges as Ranges exposing (Range, rangeToString)
+import AST.Ranges as Ranges exposing (rangeToString)
+import Elm.Syntax.Range exposing (Range)
 import Analyser.Messages.Types exposing (..)
 
 

@@ -10,10 +10,10 @@ import Analyser.Fixes.UnusedPatternVariable as UnusedPatternVariableFixer
 import Analyser.Fixes.UnformattedFile as UnformattedFileFixer
 import Analyser.Fixes.UnusedTypeAlias as UnusedTypeAliasFixer
 import Tuple3
-import Parser.Parser as Parser
 import Analyser.Fixes.Base exposing (Fixer)
-import Analyser.PostProcessing as PostProcessing
-import Dict
+import Elm.Syntax.File exposing (File)
+import Elm.Parser as Parser
+import Elm.Processing as Processing
 
 
 port storeFiles : List ( String, String ) -> Cmd msg
@@ -113,7 +113,7 @@ update msg (Model model) =
                                 (\( _, path, content ) ->
                                     Parser.parse content
                                         -- TODO Should we inject the operator table?
-                                        |> Result.map (PostProcessing.postProcess Dict.empty)
+                                        |> Result.map (\x -> Processing.process Processing.init x)
                                         |> Result.map ((,,) path content)
                                         |> Result.toMaybe
                                 )

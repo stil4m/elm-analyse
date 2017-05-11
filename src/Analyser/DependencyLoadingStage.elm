@@ -1,7 +1,8 @@
-module Analyser.InterfaceLoadingStage exposing (Model, Msg, init, isDone, getDependencies, update, subscriptions)
+module Analyser.DependencyLoadingStage exposing (Model, Msg, init, isDone, getDependencies, update, subscriptions)
 
 import Analyser.Files.DependencyLoader as DependencyLoader
-import Analyser.Files.Types exposing (Dependency, Version)
+import Analyser.Files.Types exposing (Version)
+import Elm.Dependency exposing (Dependency)
 
 
 type Model

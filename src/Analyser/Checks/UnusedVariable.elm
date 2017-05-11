@@ -1,26 +1,18 @@
 module Analyser.Checks.UnusedVariable exposing (checker)
 
-import AST.Types
-    exposing
-        ( File
-        , Lambda
-        , RecordUpdate
-        , LetBlock
-        , Function
-        , VariablePointer
-        , Case
-        , InfixDirection
-        , Expression
-        , Module(EffectModule)
-        , Destructuring
-        )
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Base exposing (..)
+import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Infix exposing (..)
+import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Files.Interface as Interface
+import Elm.Interface as Interface
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel, UnusedImportedVariable, UnusedPatternVariable), newMessage)
 import Dict exposing (Dict)
 import ASTUtil.Inspector as Inspector exposing (defaultConfig, Order(Inner, Pre, Post))
-import ASTUtil.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, patternToVars, patternToVarsInner, getDeclarationsVars, patternToUsedVars, withoutTopLevel)
+import ASTUtil.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, patternToVars, patternToVarsInner, getLetDeclarationsVars, patternToUsedVars, withoutTopLevel)
 import Tuple3
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
@@ -86,7 +78,7 @@ scan fileContext configuration =
                 |> Dict.toList
                 |> onlyUnused
                 |> List.filter (filterByModuleType fileContext)
-                |> List.filter (Tuple.first >> flip Interface.doesExposeFunction fileContext.interface >> not)
+                |> List.filter (Tuple.first >> flip Interface.exposesFunction fileContext.interface >> not)
                 |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType fileContext.path configuration t x y)
                 |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
     in
@@ -276,14 +268,14 @@ onLambda f lambda context =
 onLetBlock : (UsedVariableContext -> UsedVariableContext) -> LetBlock -> UsedVariableContext -> UsedVariableContext
 onLetBlock f letBlock context =
     letBlock.declarations
-        |> (getDeclarationsVars >> withoutTopLevel)
+        |> (getLetDeclarationsVars >> withoutTopLevel)
         |> flip pushScope context
         |> f
         |> popScope
 
 
-onDestructuring : Destructuring -> UsedVariableContext -> UsedVariableContext
-onDestructuring { pattern } context =
+onDestructuring : ( Pattern, Expression ) -> UsedVariableContext -> UsedVariableContext
+onDestructuring ( pattern, _ ) context =
     List.foldl addUsedVariable
         context
         (List.map .value (patternToUsedVars pattern))

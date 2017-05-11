@@ -1,7 +1,8 @@
 module Analyser.CodeBase exposing (CodeBase, init, dependencies, setDependencies, sourceFiles, addSourceFiles, mergeLoadedSourceFiles)
 
-import Analyser.Files.Types exposing (Dependency, Version, LoadedSourceFile)
+import Analyser.Files.Types exposing (LoadedSourceFile)
 import Dict exposing (Dict)
+import Elm.Dependency exposing (Dependency, Version)
 
 
 type CodeBase

@@ -1,8 +1,9 @@
 module Analyser.Checks.MultiLineRecordFormatting exposing (checker)
 
 import Analyser.FileContext exposing (FileContext)
-import AST.Types exposing (..)
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.TypeAnnotation exposing (..)
+import Elm.Syntax.TypeAlias exposing (..)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting), newMessage)
@@ -35,7 +36,7 @@ scan fileContext _ =
 
 fieldsOnSameLine : ( RecordField, RecordField ) -> Bool
 fieldsOnSameLine ( left, right ) =
-    (typeReferenceRange (Tuple.second left)).start.row == (typeReferenceRange (Tuple.second right)).start.row
+    (typeAnnotationRange (Tuple.second left)).start.row == (typeAnnotationRange (Tuple.second right)).start.row
 
 
 firstTwo : RecordDefinition -> Maybe ( RecordField, RecordField )
@@ -50,11 +51,11 @@ firstTwo def =
 
 onTypeAlias : TypeAlias -> List ( Range, RecordDefinition ) -> List ( Range, RecordDefinition )
 onTypeAlias x context =
-    findRecords x.typeReference ++ context
+    findRecords x.typeAnnotation ++ context
 
 
-typeReferenceRange : TypeReference -> Range
-typeReferenceRange x =
+typeAnnotationRange : TypeAnnotation -> Range
+typeAnnotationRange x =
     case x of
         GenericType _ r ->
             r
@@ -74,11 +75,11 @@ typeReferenceRange x =
         GenericRecord _ _ r ->
             r
 
-        FunctionTypeReference _ _ r ->
+        FunctionTypeAnnotation _ _ r ->
             r
 
 
-findRecords : TypeReference -> List ( Range, RecordDefinition )
+findRecords : TypeAnnotation -> List ( Range, RecordDefinition )
 findRecords x =
     case x of
         GenericType _ _ ->
@@ -99,6 +100,6 @@ findRecords x =
         GenericRecord _ fields r ->
             ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
 
-        FunctionTypeReference left right _ ->
+        FunctionTypeAnnotation left right _ ->
             -- TODO: Think about if this makes sense
             findRecords left ++ findRecords right

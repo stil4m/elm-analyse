@@ -1,8 +1,9 @@
 module Analyser.Fixes.UnusedImportedVariable exposing (fixer)
 
 import Analyser.Messages.Types exposing (MessageData(UnusedImportedVariable))
-import AST.Types exposing (File, Import, Exposure, ValueConstructorExpose, Expose, ExposedType)
-import AST.Ranges exposing (Range)
+import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Range exposing (..)
+import Elm.Syntax.Module exposing (..)
 import ASTUtil.Imports as Imports
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Fixes.Base exposing (Fixer)

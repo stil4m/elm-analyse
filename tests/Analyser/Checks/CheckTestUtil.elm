@@ -1,15 +1,15 @@
 module Analyser.Checks.CheckTestUtil exposing (..)
 
-import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (defaultConfiguration)
-import Analyser.Files.Interface as Interface
 import Analyser.Messages.Types exposing (Message, MessageData)
-import AST.Util
 import Analyser.Files.Types exposing (..)
-import Parser.Parser
+import Elm.Parser
 import Test exposing (Test, describe, test)
 import Expect
+import Elm.Interface as Interface exposing (Interface)
+import Elm.RawFile as RawFile
+import Elm.Processing as Processing
 
 
 fileContentFromInput : String -> FileContent
@@ -19,10 +19,18 @@ fileContentFromInput input =
 
 getMessages : String -> Checker -> Maybe (List MessageData)
 getMessages input checker =
-    Parser.Parser.parse input
-        |> Result.map (\file -> ( fileContentFromInput input, Loaded { interface = Interface.build file, ast = file, moduleName = AST.Util.fileModuleName file } ))
+    Elm.Parser.parse input
+        |> Result.map
+            (\rawFile ->
+                { interface = Interface.build rawFile
+                , moduleName = RawFile.moduleName rawFile
+                , ast = Processing.process Processing.init rawFile
+                , content = ""
+                , path = "./foo.elm"
+                , sha1 = ""
+                }
+            )
         |> Result.toMaybe
-        |> Maybe.andThen (\file -> FileContext.create [ file ] [] file)
         |> Maybe.map (flip checker.check defaultConfiguration >> List.map .data)
 
 

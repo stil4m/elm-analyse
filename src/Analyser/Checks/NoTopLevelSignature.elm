@@ -1,7 +1,7 @@
 module Analyser.Checks.NoTopLevelSignature exposing (checker)
 
-import AST.Ranges exposing (Range)
-import AST.Types exposing (Function)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Expression exposing (..)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)

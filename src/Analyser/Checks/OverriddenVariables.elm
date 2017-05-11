@@ -1,7 +1,9 @@
 module Analyser.Checks.OverriddenVariables exposing (checker)
 
-import AST.Types exposing (File, Case, LetBlock, VariablePointer, Destructuring, Pattern, Function, Lambda, Exposure, ModuleName)
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Base exposing (..)
+import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Expression exposing (..)
 import ASTUtil.Variables exposing (getImportsVars, patternToVars)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(RedefineVariable), newMessage)
@@ -77,10 +79,10 @@ visitWithPatterns patterns f context =
     visitWithVariablePointers (patterns |> List.concatMap patternToVars |> List.map Tuple.first) f context
 
 
-onDestructuring : (Context -> Context) -> Destructuring -> Context -> Context
-onDestructuring f destructuring context =
+onDestructuring : (Context -> Context) -> ( Pattern, Expression ) -> Context -> Context
+onDestructuring f ( pattern, _ ) context =
     visitWithVariablePointers
-        (destructuring.pattern |> patternToVars |> List.map Tuple.first)
+        (pattern |> patternToVars |> List.map Tuple.first)
         f
         context
 

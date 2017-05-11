@@ -1,7 +1,8 @@
 module GraphBuilder exposing (run)
 
 import Analyser.FileContext as FileContext exposing (FileContext)
-import Analyser.Files.Types exposing (Dependency, LoadedSourceFiles)
+import Analyser.Files.Types exposing (LoadedSourceFiles)
+import Elm.Dependency exposing (Dependency)
 import Graph exposing (Graph)
 import Graph.Edge as Edge exposing (Edge)
 import Graph.Node as Node exposing (Node)
@@ -12,7 +13,7 @@ run : LoadedSourceFiles -> List Dependency -> Graph Node
 run sources deps =
     let
         files =
-            List.filterMap (FileContext.create sources deps) sources
+            FileContext.build sources deps sources
 
         moduleNames =
             List.filterMap .moduleName files

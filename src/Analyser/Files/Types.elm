@@ -1,43 +1,23 @@
 module Analyser.Files.Types
     exposing
-        ( Dependency
-        , Version
+        ( Version
         , LoadedSourceFiles
         , LoadedSourceFile
-        , FileLoad(Failed, Loaded)
-        , LoadedFile
         , ModuleIndex
         , OperatorTable
         , FileContent
         , LoadedFileData
-        , Interface
-        , ExposedInterface(Function, Type, Alias, Operator)
         )
 
-import AST.Types as AST
+import Elm.Syntax.Infix as AST
+import Elm.Syntax.Base as AST
 import Dict exposing (Dict)
+import Elm.Interface exposing (Interface)
+import Elm.RawFile exposing (RawFile)
 
 
 type alias Version =
     String
-
-
-type alias Dependency =
-    { name : String
-    , version : Version
-    , interfaces : Dict AST.ModuleName Interface
-    }
-
-
-type alias Interface =
-    List ExposedInterface
-
-
-type ExposedInterface
-    = Function String
-    | Type ( String, List String )
-    | Alias String
-    | Operator AST.Infix
 
 
 type alias LoadedSourceFiles =
@@ -45,22 +25,13 @@ type alias LoadedSourceFiles =
 
 
 type alias LoadedSourceFile =
-    ( FileContent, FileLoad )
-
-
-type alias LoadedFile =
-    ( FileContent, FileLoad )
-
-
-type FileLoad
-    = Failed String
-    | Loaded LoadedFileData
+    ( FileContent, Result String RawFile )
 
 
 type alias LoadedFileData =
     { interface : Interface
     , moduleName : Maybe AST.ModuleName
-    , ast : AST.File
+    , ast : RawFile
     }
 
 

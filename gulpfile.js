@@ -39,26 +39,12 @@ gulp.task('elm-backend', ['elm-init'], function() {
         .pipe(gulp.dest('js'));
 });
 
-gulp.task('elm-performance-single-file', ['elm-init'], function() {
-    return gulp.src('performance/SingleFileRead.elm')
-        .pipe(elm.bundle('SingleFileRead.js'))
-        .on('error', function(e) {
-            //Elm compilation errors are already logged to the console
-            if (!devMode) {
-                throw e;
-            } else {
-                console.log(e);
-            }
-        })
-        .pipe(gulp.dest('performance/generated'));
-});
-
 gulp.task('elm-all', function() {
-    return runSequence('elm-client', 'elm-backend', 'elm-performance-single-file');
+    return runSequence('elm-client', 'elm-backend');
 });
 
 gulp.task('watch', ['html', 'elm-backend', 'elm-client'], function() {
-    gulp.watch(['src/**', 'performance/**.elm'], function() {
+    gulp.watch(['src/**'], function() {
         runSequence('elm-all');
     });
 });
@@ -89,4 +75,4 @@ gulp.task('html', () => {
 });
 
 
-gulp.task('default', ['elm-backend', 'elm-client', 'html', 'elm-performance-single-file']);
+gulp.task('default', ['elm-backend', 'elm-client', 'html']);
