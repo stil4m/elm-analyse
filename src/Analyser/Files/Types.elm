@@ -5,7 +5,6 @@ module Analyser.Files.Types
         , LoadedSourceFile
         , ModuleIndex
         , OperatorTable
-        , FileContent
         , LoadedFileData
         )
 
@@ -14,6 +13,7 @@ import Elm.Syntax.Base as AST
 import Dict exposing (Dict)
 import Elm.Interface exposing (Interface)
 import Elm.RawFile exposing (RawFile)
+import Analyser.Files.FileContent exposing (FileContent)
 
 
 type alias Version =
@@ -43,11 +43,13 @@ type alias OperatorTable =
     Dict String AST.Infix
 
 
-type alias FileContent =
-    { path : String
-    , success : Bool
-    , sha1 : Maybe String
-    , content : Maybe String
-    , ast : Maybe String
-    , formatted : Bool
-    }
+
+--
+-- type alias FileContent =
+--     { path : String
+--     , success : Bool
+--     , sha1 : Maybe String
+--     , content : Maybe String
+--     , ast : Maybe String
+--     , formatted : Bool
+--     }

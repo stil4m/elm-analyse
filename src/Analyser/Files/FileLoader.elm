@@ -1,16 +1,11 @@
 port module Analyser.Files.FileLoader exposing (Msg, init, subscriptions, update)
 
-import Elm.RawFile exposing (RawFile)
 import Elm.Json.Encode
-import Elm.Json.Decode as Elm
-import Analyser.Files.Types exposing (LoadedSourceFile, FileContent, LoadedFileData)
+import Analyser.Files.Types exposing (LoadedSourceFile, LoadedFileData)
+import Analyser.Files.FileContent as FileContent exposing (FileContent)
 import Json.Encode
-import Json.Decode
-import Elm.Parser as Parser
 import Result
-import Maybe.Extra as Maybe
 import Util.Logger as Logger
-import Result.Extra as Result
 
 
 port loadFile : String -> Cmd msg
@@ -49,7 +44,7 @@ update msg =
         OnFileContent fileContent ->
             let
                 ( fileLoad, store ) =
-                    onInputLoadingInterface fileContent
+                    FileContent.asRawFile fileContent
 
                 cmd =
                     if store then
@@ -59,28 +54,6 @@ update msg =
                     else
                         Cmd.none
             in
-                ( ( fileContent, fileLoad ), cmd )
-
-
-onInputLoadingInterface : FileContent -> ( Result String RawFile, RefeshedAST )
-onInputLoadingInterface fileContent =
-    fileContent.ast
-        |> Maybe.andThen (Json.Decode.decodeString Elm.decode >> Result.toMaybe)
-        |> Maybe.map Ok
-        |> Maybe.map (flip (,) False)
-        |> Maybe.orElseLazy (\() -> Just ( loadedFileFromContent fileContent, True ))
-        |> Maybe.withDefault ( Err "Internal problem in the file loader. Please report an issue.", False )
-
-
-loadedFileFromContent : FileContent -> Result String RawFile
-loadedFileFromContent fileContent =
-    case fileContent.content of
-        Just content ->
-            (Parser.parse content
-                |> Result.map Ok
-                |> Result.mapError (List.head >> Maybe.withDefault "" >> Err)
-                |> Result.merge
-            )
-
-        Nothing ->
-            Err "No file content"
+                ( ( fileContent, fileLoad )
+                , cmd
+                )
