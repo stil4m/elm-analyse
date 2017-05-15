@@ -10,6 +10,7 @@ import Analyser.Fixer as Fixer
 import Analyser.Messages.Util as Messages
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.Configuration as Configuration exposing (Configuration)
+import Analyser.Files.Types exposing (LoadedSourceFile)
 import GraphBuilder
 import Util.Logger as Logger
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
@@ -127,8 +128,7 @@ onFixerMsg : Fixer.Msg -> Fixer.Model -> Model -> ( Model, Cmd Msg )
 onFixerMsg x stage model =
     let
         ( newFixerModel, fixerCmds ) =
-            Fixer.update x stage
-                |> Tuple.mapSecond (Cmd.map FixerMsg)
+            Tuple.mapSecond (Cmd.map FixerMsg) (Fixer.update model.codeBase x stage)
     in
         if Fixer.isDone newFixerModel then
             if Fixer.succeeded newFixerModel then
@@ -213,20 +213,31 @@ onDependencyLoadingStageMsg x stage model =
             )
 
 
+isSourceFileIncluded : Configuration -> LoadedSourceFile -> Bool
+isSourceFileIncluded configuration =
+    Tuple.first
+        >> .path
+        >> flip Configuration.isPathExcluded configuration
+        >> not
+
+
 finishProcess : SourceLoadingStage.Model -> Cmd SourceLoadingStage.Msg -> Model -> ( Model, Cmd Msg )
 finishProcess newStage cmds model =
     let
         loadedSourceFiles =
             SourceLoadingStage.parsedFiles newStage
 
+        includedSources =
+            List.filter (isSourceFileIncluded model.configuration) loadedSourceFiles
+
         newCodeBase =
             CodeBase.addSourceFiles loadedSourceFiles model.codeBase
 
         messages =
-            Inspection.run loadedSourceFiles (CodeBase.dependencies newCodeBase) model.configuration
+            Inspection.run newCodeBase includedSources model.configuration
 
         newGraph =
-            GraphBuilder.run (CodeBase.sourceFiles newCodeBase) (CodeBase.dependencies newCodeBase)
+            GraphBuilder.run newCodeBase (CodeBase.sourceFiles newCodeBase)
 
         newState =
             State.finishWithNewMessages messages model.state

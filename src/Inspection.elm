@@ -3,7 +3,6 @@ module Inspection exposing (run)
 import Analyser.FileContext as FileContext
 import Analyser.Messages.Types exposing (Message, MessageData(FileLoadFailed, UnformattedFile), newMessage)
 import Analyser.Files.Types exposing (LoadedSourceFiles)
-import Elm.Dependency exposing (Dependency)
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.ExposeAll as ExposeAll
 import Analyser.Checks.ImportAll as ImportAll
@@ -26,7 +25,8 @@ import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.FunctionsInLet as FunctionsInLet
 import Analyser.Checks.Base exposing (Checker)
 import Result.Extra
-import Analyser.Configuration as Configuration exposing (Configuration)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.CodeBase exposing (CodeBase)
 
 
 checkers : List Checker
@@ -54,20 +54,11 @@ checkers =
     ]
 
 
-run : LoadedSourceFiles -> List Dependency -> Configuration -> List Message
-run sources deps configuration =
+run : CodeBase -> LoadedSourceFiles -> Configuration -> List Message
+run codeBase includedSources configuration =
     let
         enabledChecks =
             List.filter (\x -> x.shouldCheck configuration) checkers
-
-        includedSources =
-            List.filter
-                (Tuple.first
-                    >> .path
-                    >> flip Configuration.isPathExcluded configuration
-                    >> not
-                )
-                sources
 
         ( validSources, invalidSources ) =
             includedSources
@@ -109,7 +100,7 @@ run sources deps configuration =
                     )
 
         inspectionMessages =
-            FileContext.build sources deps includedSources
+            FileContext.build codeBase includedSources
                 |> List.concatMap (\x -> List.concatMap (\c -> c.check x configuration) enabledChecks)
 
         messages =

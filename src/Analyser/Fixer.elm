@@ -11,9 +11,9 @@ import Analyser.Fixes.UnformattedFile as UnformattedFileFixer
 import Analyser.Fixes.UnusedTypeAlias as UnusedTypeAliasFixer
 import Tuple3
 import Analyser.Fixes.Base exposing (Fixer)
-import Elm.Syntax.File exposing (File)
 import Elm.Parser as Parser
 import Elm.Processing as Processing
+import Analyser.CodeBase as CodeBase exposing (CodeBase)
 
 
 port storeFiles : List ( String, String ) -> Cmd msg
@@ -93,8 +93,8 @@ message (Model m) =
     m.message
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg (Model model) =
+update : CodeBase -> Msg -> Model -> ( Model, Cmd Msg )
+update codeBase msg (Model model) =
     case msg of
         LoadedFileContent reference ->
             if not (fileHashesEqual reference model.message) then
@@ -113,7 +113,7 @@ update msg (Model model) =
                                 (\( _, path, content ) ->
                                     Parser.parse content
                                         -- TODO Should we inject the operator table?
-                                        |> Result.map (\x -> Processing.process Processing.init x)
+                                        |> Result.map (Processing.process (CodeBase.processContext codeBase))
                                         |> Result.map ((,,) path content)
                                         |> Result.toMaybe
                                 )

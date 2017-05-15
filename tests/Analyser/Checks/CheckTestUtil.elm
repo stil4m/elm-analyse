@@ -4,6 +4,7 @@ import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (defaultConfiguration)
 import Analyser.Messages.Types exposing (Message, MessageData)
 import Analyser.Files.Types exposing (..)
+import Analyser.Files.FileContent as FileContent exposing (FileContent)
 import Elm.Parser
 import Test exposing (Test, describe, test)
 import Expect

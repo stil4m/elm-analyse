@@ -21,10 +21,6 @@ type Msg
     = OnFileContent FileContent
 
 
-type alias RefeshedAST =
-    Bool
-
-
 init : String -> Cmd Msg
 init s =
     Cmd.batch

@@ -2,11 +2,11 @@ module Analyser.FileContext exposing (FileContext, build)
 
 import Analyser.Files.Types exposing (LoadedSourceFile, LoadedSourceFiles)
 import Elm.Interface as Interface exposing (Interface)
-import Elm.Dependency exposing (Dependency)
 import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.File exposing (File)
 import Elm.Processing as Processing exposing (ProcessContext)
 import Elm.RawFile as RawFile
+import Analyser.CodeBase as CodeBase exposing (CodeBase)
 
 
 type alias FileContext =
@@ -19,14 +19,11 @@ type alias FileContext =
     }
 
 
-build : List LoadedSourceFile -> List Dependency -> List LoadedSourceFile -> List FileContext
-build allSources dependencies selected =
+build : CodeBase -> List LoadedSourceFile -> List FileContext
+build codeBase selected =
     let
         moduleIndex =
-            List.foldl
-                Processing.addFile
-                (List.foldl Processing.addDependency Processing.init dependencies)
-                (List.filterMap (Tuple.second >> Result.toMaybe) allSources)
+            CodeBase.processContext codeBase
     in
         List.filterMap (buildForFile moduleIndex) selected
 
