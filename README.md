@@ -36,7 +36,7 @@ npm install -g elm-analyse
 or if using `yarn`:
 
 ```
-yarn add elm-analyse
+yarn global add elm-analyse
 ```
 
 ### Run
