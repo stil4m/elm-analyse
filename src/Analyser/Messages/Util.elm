@@ -1,7 +1,7 @@
 module Analyser.Messages.Util exposing (..)
 
 import AST.Ranges as Ranges exposing (rangeToString)
-import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Range exposing (Range, emptyRange)
 import Analyser.Messages.Types exposing (..)
 
 
@@ -40,6 +40,26 @@ asString m =
             getMessageInfo m
     in
         f
+
+
+messageFile : Message -> String
+messageFile m =
+    getFiles m.data |> List.head |> Maybe.withDefault ""
+
+
+firstRange : Message -> Range
+firstRange a =
+    getRanges a.data |> List.head |> Maybe.withDefault emptyRange
+
+
+compareMessageLocation : Message -> Message -> Order
+compareMessageLocation a b =
+    Ranges.orderByStart (firstRange a) (firstRange b)
+
+
+compareMessageFile : Message -> Message -> Order
+compareMessageFile a b =
+    compare (messageFile a) (messageFile b)
 
 
 compareMessage : Message -> Message -> Order
