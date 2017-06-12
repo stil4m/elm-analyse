@@ -1,10 +1,13 @@
 module ASTUtil.Patterns exposing (findParentPattern)
 
-import AST.Types exposing (File, Pattern(..), Function, Case, VariablePointer, QualifiedNameRef, Lambda)
-import AST.Ranges as Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Expression exposing (..)
+import AST.Ranges as Ranges
 import ASTUtil.PatternOptimizer as PatternOptimizer
 import Maybe.Extra as Maybe
-import Inspector exposing (defaultConfig, Order(Pre))
+import ASTUtil.Inspector as Inspector exposing (defaultConfig, Order(Pre))
 
 
 findParentPattern : File -> Range -> Maybe Pattern

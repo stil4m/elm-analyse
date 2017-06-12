@@ -1,7 +1,8 @@
 module ASTUtil.PatternOptimizerTests exposing (all)
 
 import AST.Ranges exposing (emptyRange)
-import AST.Types exposing (..)
+import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Base exposing (..)
 import ASTUtil.PatternOptimizer exposing (optimize)
 import Expect
 import Test exposing (..)

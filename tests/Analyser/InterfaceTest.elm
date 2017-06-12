@@ -1,11 +1,10 @@
 module Analyser.InterfaceTest exposing (..)
 
 import Expect
-import Analyser.Files.Interface as Interface
-import Analyser.Files.Types exposing (Interface, ExposedInterface(..))
-import Parser.Parser as Parser
-import AST.Types as AST
+import Elm.Parser as Parser
+import Elm.Interface as Interface exposing (..)
 import Test exposing (..)
+import Elm.Syntax.Infix as AST exposing (..)
 
 
 toInterface : String -> String -> Interface -> Test

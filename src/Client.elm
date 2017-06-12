@@ -1,4 +1,4 @@
-module Client.Main exposing (main)
+module Client exposing (main)
 
 import Client.App.Models as App
 import Client.App.App as App

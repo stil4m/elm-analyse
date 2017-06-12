@@ -1,19 +1,15 @@
 port module Analyser.Files.DependencyLoader exposing (..)
 
-import AST.Decoding
-import AST.Types
-import AST.Util as Util
-import Analyser.Files.Types exposing (Version, Dependency, FileContent, FileLoad(Loaded, Failed), LoadedFile, LoadedFileData)
-import Analyser.Files.Interface as Interface
+import Analyser.Files.Types exposing (Version, LoadedSourceFile, LoadedFileData)
+import Elm.Interface as Interface
+import Elm.Dependency exposing (Dependency)
 import Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
-import Json.Decode
-import Parser.Parser as Parser
 import Result
-import Maybe.Extra as Maybe
 import Dict
-import Analyser.Util
-import Logger
+import Util.Logger as Logger
 import Result.Extra as Result
+import Elm.RawFile as RawFile exposing (RawFile)
+import Analyser.Files.FileContent as FileContent exposing (FileContent)
 
 
 port loadRawDependency : ( String, Version ) -> Cmd msg
@@ -44,7 +40,7 @@ type alias Model =
     { name : String
     , version : Version
     , toParse : List String
-    , parsed : List LoadedFile
+    , parsed : List LoadedSourceFile
     , result : Maybe (Result String Dependency)
     }
 
@@ -102,66 +98,49 @@ update msg model =
             else
                 let
                     loadedFiles =
-                        files
-                            |> List.map onInputLoadingInterface
-
-                    interfaces =
-                        loadedFiles
-                            |> List.filterMap
-                                (Analyser.Util.withLoaded
-                                    >> Maybe.andThen
-                                        (\z ->
-                                            Util.fileModuleName z.ast
-                                                |> Maybe.map (flip (,) z.interface)
-                                        )
-                                )
-                            |> Dict.fromList
-
-                    dependency =
-                        Dependency model.name model.version interfaces
+                        List.map dependencyFileInterface files
                 in
-                    if not <| List.all Analyser.Util.isLoaded loadedFiles then
+                    if not <| List.all Result.isOk loadedFiles then
                         ( { model | result = Just (Err "Could not load all dependency files") }
                         , Cmd.none
                         )
                     else
-                        ( { model | result = Just (Ok dependency) }
-                        , storeRawDependency
-                            ( dependency.name
-                            , dependency.version
-                            , serialiseDependency dependency
+                        let
+                            dependency =
+                                buildDependency model loadedFiles
+                        in
+                            ( { model | result = Just (Ok dependency) }
+                            , storeRawDependency
+                                ( dependency.name
+                                , dependency.version
+                                , serialiseDependency dependency
+                                )
                             )
-                        )
 
 
-loadedInterfaceForFile : AST.Types.File -> FileLoad
-loadedInterfaceForFile file =
-    Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
-
-
-onInputLoadingInterface : FileContent -> FileLoad
-onInputLoadingInterface fileContent =
-    fileContent.ast
-        |> Maybe.andThen (Json.Decode.decodeString AST.Decoding.decode >> Result.toMaybe)
-        |> Maybe.map loadedInterfaceForFile
-        |> Maybe.orElseLazy (\() -> Just (loadedFileFromContent fileContent))
-        |> Maybe.withDefault (Failed "Internal problem in the file loader. Please report an issue.")
-
-
-loadedFileFromContent : FileContent -> FileLoad
-loadedFileFromContent fileContent =
+buildDependency : Model -> List (Result x LoadedFileData) -> Dependency
+buildDependency model loadedFiles =
     let
-        loadedInterfaceForFile : AST.Types.File -> FileLoad
-        loadedInterfaceForFile file =
-            Loaded { ast = file, moduleName = Util.fileModuleName file, interface = Interface.build file }
+        interfaces =
+            loadedFiles
+                |> List.filterMap
+                    (Result.toMaybe
+                        >> Maybe.andThen
+                            (\z ->
+                                RawFile.moduleName z.ast
+                                    |> Maybe.map (flip (,) z.interface)
+                            )
+                    )
+                |> Dict.fromList
     in
-        case fileContent.content of
-            Just content ->
-                (Parser.parse content
-                    |> Result.map loadedInterfaceForFile
-                    |> Result.mapError (List.head >> Maybe.withDefault "" >> Failed)
-                    |> Result.merge
-                )
+        Dependency model.name model.version interfaces
 
-            Nothing ->
-                Failed "No file content"
+
+dependencyFileInterface : FileContent -> Result String LoadedFileData
+dependencyFileInterface =
+    FileContent.asRawFile >> Tuple.first >> Result.map loadedInterfaceForFile
+
+
+loadedInterfaceForFile : RawFile -> LoadedFileData
+loadedInterfaceForFile file =
+    { ast = file, moduleName = RawFile.moduleName file, interface = Interface.build file }

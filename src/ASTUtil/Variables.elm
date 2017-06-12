@@ -1,7 +1,14 @@
 module ASTUtil.Variables exposing (..)
 
-import AST.Ranges exposing (Range, emptyRange)
-import AST.Types exposing (Declaration(..), Expose(..), Exposure(..), File, Import, Pattern(..), QualifiedNameRef, VariablePointer)
+import AST.Ranges exposing (emptyRange)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.Base exposing (..)
+import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Declaration exposing (..)
+import Elm.Syntax.Exposing exposing (..)
 
 
 type VariableType
@@ -38,6 +45,11 @@ getDeclarationsVars =
     List.concatMap getDeclarationVars
 
 
+getLetDeclarationsVars : List LetDeclaration -> List ( VariablePointer, VariableType )
+getLetDeclarationsVars =
+    List.concatMap getLetDeclarationVars
+
+
 getImportsVars : List Import -> List ( VariablePointer, VariableType )
 getImportsVars =
     List.concatMap getImportVars
@@ -48,7 +60,7 @@ getImportVars imp =
     getImportExposedVars imp.exposingList
 
 
-getImportExposedVars : Exposure Expose -> List ( VariablePointer, VariableType )
+getImportExposedVars : Exposing TopLevelExpose -> List ( VariablePointer, VariableType )
 getImportExposedVars e =
     case e of
         All _ ->
@@ -105,8 +117,18 @@ getDeclarationVars decl =
             --TODO Range + Test
             [ ( { value = i.operator, range = emptyRange }, TopLevel ) ]
 
-        DestructuringDeclaration destructuring ->
-            patternToVars destructuring.pattern
+        Destructuring pattern _ ->
+            patternToVars pattern
+
+
+getLetDeclarationVars : LetDeclaration -> List ( VariablePointer, VariableType )
+getLetDeclarationVars decl =
+    case decl of
+        LetFunction f ->
+            [ ( f.declaration.name, TopLevel ) ]
+
+        LetDestructuring pattern _ ->
+            patternToVars pattern
 
 
 patternToUsedVars : Pattern -> List VariablePointer

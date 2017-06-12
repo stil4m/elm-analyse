@@ -1,10 +1,10 @@
 module Analyser.Checks.NoUncurriedPrefix exposing (checker)
 
-import AST.Types exposing (InnerExpression(Application, PrefixOperator), Expression)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(NoUncurriedPrefix), newMessage)
-import Inspector exposing (Order(Post), defaultConfig)
-import AST.Ranges exposing (Range)
+import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 

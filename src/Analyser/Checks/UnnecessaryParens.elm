@@ -1,38 +1,12 @@
 module Analyser.Checks.UnnecessaryParens exposing (checker)
 
-import AST.Types
-    exposing
-        ( Expression
-        , Lambda
-        , InnerExpression
-            ( ListExpr
-            , ParenthesizedExpression
-            , OperatorApplication
-            , FunctionOrValue
-            , Integer
-            , TupledExpression
-            , Floatable
-            , Literal
-            , CharLiteral
-            , Application
-            , IfBlock
-            , RecordExpr
-            , RecordUpdateExpression
-            , RecordAccessFunction
-            , RecordAccess
-            , CaseExpression
-            , QualifiedExpr
-            )
-        , InfixDirection
-        , Function
-        , CaseBlock
-        , File
-        )
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Infix exposing (..)
+import Elm.Syntax.Expression exposing (..)
 import AST.Util exposing (getParenthesized, isOperatorApplication, isLambda, isIf, isCase)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens), newMessage)
-import Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Maybe.Extra as Maybe
 import List.Extra as List
 import Analyser.Configuration exposing (Configuration)

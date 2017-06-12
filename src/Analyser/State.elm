@@ -9,6 +9,7 @@ import Graph.Node exposing (Node)
 import Json.Encode as JE exposing (Value)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
+import List.Extra as List
 
 
 type alias State =
@@ -86,7 +87,13 @@ startFixing message state =
 
 sortMessages : State -> State
 sortMessages state =
-    { state | messages = List.sortWith Messages.compareMessage state.messages }
+    { state
+        | messages =
+            state.messages
+                |> List.sortWith Messages.compareMessageFile
+                |> List.groupWhile (\a b -> Messages.messageFile a == Messages.messageFile b)
+                |> List.concatMap (List.sortWith Messages.compareMessageLocation)
+    }
 
 
 finishWithNewMessages : List Message -> State -> State

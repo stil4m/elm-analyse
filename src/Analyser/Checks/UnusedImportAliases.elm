@@ -1,13 +1,15 @@
 module Analyser.Checks.UnusedImportAliases exposing (checker)
 
-import AST.Ranges exposing (Range)
-import AST.Types exposing (Case, Pattern, Expression, InnerExpression(QualifiedExpr), Import, ModuleName, FunctionSignature, TypeAlias, TypeReference(Typed))
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Base exposing (..)
+import Elm.Syntax.TypeAnnotation exposing (..)
+import Elm.Syntax.Expression exposing (..)
 import AST.Util as Util
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedImportAlias), newMessage)
 import Dict exposing (Dict)
-import Inspector exposing (Order(Post), defaultConfig)
-import Tuple2
+import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 
@@ -35,7 +37,7 @@ scan fileContext _ =
     in
         Inspector.inspect
             { defaultConfig
-                | onTypeReference = Post onTypeReference
+                | onTypeAnnotation = Post onTypeAnnotation
                 , onExpression = Post onExpression
                 , onCase = Post onCase
             }
@@ -43,14 +45,14 @@ scan fileContext _ =
             aliases
             |> Dict.toList
             |> List.filter (Tuple.second >> Tuple.second >> (==) 0)
-            |> List.map (Tuple2.mapSecond Tuple.first)
+            |> List.map (Tuple.mapSecond Tuple.first)
             |> List.map (uncurry (UnusedImportAlias fileContext.path))
             |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 markUsage : ModuleName -> Context -> Context
 markUsage key context =
-    Dict.update key (Maybe.map (Tuple2.mapSecond ((+) 1))) context
+    Dict.update key (Maybe.map (Tuple.mapSecond ((+) 1))) context
 
 
 onImport : Import -> Context -> Context
@@ -63,9 +65,9 @@ onImport imp context =
             context
 
 
-onTypeReference : TypeReference -> Context -> Context
-onTypeReference typeReference context =
-    case typeReference of
+onTypeAnnotation : TypeAnnotation -> Context -> Context
+onTypeAnnotation typeAnnotation context =
+    case typeAnnotation of
         Typed moduleName _ _ _ ->
             markUsage moduleName context
 

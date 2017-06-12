@@ -43,7 +43,13 @@ var args = minimist(process.argv.slice(2), {
     const packageFileExists = fs.existsSync('./elm-package.json');
     if (!packageFileExists) {
         console.log('There is no elm-package.json file in this directory. elm-analyse will only work in directories where such a file is located.');
-        return;
+        process.exit(1);
+    }
+
+    const elmStuffExists = fs.existsSync('./elm-stuff');
+    if (!elmStuffExists || !fs.existsSync('./elm-stuff/exact-dependencies.json')) {
+        console.log('Cannot detect which packages are installed. Please run `elm-package install` once.');
+        process.exit(1);
     }
 
 

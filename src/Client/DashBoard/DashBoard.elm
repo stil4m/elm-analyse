@@ -6,10 +6,9 @@ import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
 import Time
 import WebSocket as WS
-import Tuple2
 import Navigation exposing (Location)
 import Client.Socket exposing (dashboardAddress)
-import Client.MessageList as MessageList
+import Client.Components.MessageList as MessageList
 import Client.LoadingScreen as LoadingScreen
 
 
@@ -68,8 +67,8 @@ update location msg model =
 
         MessageListMsg subMsg ->
             MessageList.update location subMsg model.messageList
-                |> Tuple2.mapFirst (\x -> { model | messageList = x })
-                |> Tuple2.mapSecond (Cmd.map MessageListMsg)
+                |> Tuple.mapFirst (\x -> { model | messageList = x })
+                |> Tuple.mapSecond (Cmd.map MessageListMsg)
 
 
 view : Model -> Html Msg

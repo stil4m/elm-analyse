@@ -1,9 +1,7 @@
 module Tests exposing (all)
 
 import Analyser.InterfaceTest as InterfaceTest
-import Analyser.PostProcessingTests as PostProcessingTests
 import Test exposing (Test)
-import Parser.Tests as ParserTests
 import Analyser.Checks.NoTopLevelSignatureTests
 import Analyser.Checks.UnusedVariableTests
 import Analyser.Checks.ExposeAllTests
@@ -22,7 +20,6 @@ import ASTUtil.PatternOptimizerTests
 import Analyser.Fixes.FileContentTests
 import Analyser.Checks.ListOperatorsTests
 import Analyser.Checks.UnnecessaryListConcatTests
-import ASTUtil.WriterTests
 import Analyser.Fixes.UnnecessaryParensTests
 import Analyser.Fixes.UnusedImportTests
 import Analyser.Fixes.UnusedTypeAliasTests
@@ -58,8 +55,5 @@ all =
         , Analyser.Checks.ExposeAllTests.all
         , Analyser.Checks.UnnecessaryListConcatTests.all
         , InterfaceTest.all
-        , PostProcessingTests.all
-        , ParserTests.all
         , ASTUtil.PatternOptimizerTests.all
-        , ASTUtil.WriterTests.all
         ]

@@ -1,5 +1,12 @@
 # elm-analyse changelog
 
+## 0.8.0 (2017-06-14)
+
+* [Issue #68](https://github.com/stil4m/elm-analyse/issues/68) Extract [elm-syntax](https://github.com/stil4m/elm-syntax)
+* [Issue #70](https://github.com/stil4m/elm-analyse/issues/70) Order message by filename
+* [Issue #72](https://github.com/stil4m/elm-analyse/issues/72) Check if elm-stuff exists and halt start
+
+
 ## 0.7.0 (2017-04-14)
 
 * [Issue #64](https://github.com/stil4m/elm-analyse/issues/64) Detect cyclic package dependencies

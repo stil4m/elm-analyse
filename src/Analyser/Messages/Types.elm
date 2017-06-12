@@ -1,7 +1,7 @@
 module Analyser.Messages.Types exposing (..)
 
-import AST.Ranges exposing (Range)
-import AST.Types as AST
+import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Base exposing (ModuleName)
 
 
 type alias MessageId =
@@ -43,19 +43,19 @@ type MessageData
     | UnusedImportedVariable FileName String Range
     | UnusedPatternVariable FileName String Range
     | ExposeAll FileName Range
-    | ImportAll FileName AST.ModuleName Range
+    | ImportAll FileName ModuleName Range
     | NoTopLevelSignature FileName String Range
     | UnnecessaryParens FileName Range
     | DebugLog FileName Range
     | DebugCrash FileName Range
     | UnformattedFile FileName
     | FileLoadFailed FileName String
-    | DuplicateImport FileName AST.ModuleName (List Range)
+    | DuplicateImport FileName ModuleName (List Range)
     | UnusedTypeAlias FileName String Range
     | RedefineVariable FileName String Range Range
     | NoUncurriedPrefix FileName String Range
-    | UnusedImportAlias FileName AST.ModuleName Range
-    | UnusedImport FileName AST.ModuleName Range
+    | UnusedImportAlias FileName ModuleName Range
+    | UnusedImport FileName ModuleName Range
     | UseConsOverConcat FileName Range
     | DropConcatOfLists FileName Range
     | DropConsOfItemAndList FileName Range

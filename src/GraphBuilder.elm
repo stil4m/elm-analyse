@@ -1,18 +1,19 @@
 module GraphBuilder exposing (run)
 
 import Analyser.FileContext as FileContext exposing (FileContext)
-import Analyser.Files.Types exposing (Dependency, LoadedSourceFiles)
+import Analyser.Files.Types exposing (LoadedSourceFiles)
 import Graph exposing (Graph)
 import Graph.Edge as Edge exposing (Edge)
 import Graph.Node as Node exposing (Node)
 import Set
+import Analyser.CodeBase exposing (CodeBase)
 
 
-run : LoadedSourceFiles -> List Dependency -> Graph Node
-run sources deps =
+run : CodeBase -> LoadedSourceFiles -> Graph Node
+run codeBase sources =
     let
         files =
-            List.filterMap (FileContext.create sources deps) sources
+            FileContext.build codeBase sources
 
         moduleNames =
             List.filterMap .moduleName files

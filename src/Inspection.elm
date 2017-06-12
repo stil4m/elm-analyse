@@ -2,7 +2,7 @@ module Inspection exposing (run)
 
 import Analyser.FileContext as FileContext
 import Analyser.Messages.Types exposing (Message, MessageData(FileLoadFailed, UnformattedFile), newMessage)
-import Analyser.Files.Types exposing (Dependency, LoadedSourceFiles)
+import Analyser.Files.Types exposing (LoadedSourceFiles)
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.ExposeAll as ExposeAll
 import Analyser.Checks.ImportAll as ImportAll
@@ -24,8 +24,9 @@ import Analyser.Checks.NonStaticRegex as NonStaticRegex
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.FunctionsInLet as FunctionsInLet
 import Analyser.Checks.Base exposing (Checker)
-import Analyser.Util
-import Analyser.Configuration as Configuration exposing (Configuration)
+import Result.Extra
+import Analyser.Configuration exposing (Configuration)
+import Analyser.CodeBase exposing (CodeBase)
 
 
 checkers : List Checker
@@ -53,28 +54,27 @@ checkers =
     ]
 
 
-run : LoadedSourceFiles -> List Dependency -> Configuration -> List Message
-run sources deps configuration =
+run : CodeBase -> LoadedSourceFiles -> Configuration -> List Message
+run codeBase includedSources configuration =
     let
         enabledChecks =
             List.filter (\x -> x.shouldCheck configuration) checkers
 
-        includedSources =
-            List.filter
-                (Tuple.first
-                    >> .path
-                    >> flip Configuration.isPathExcluded configuration
-                    >> not
-                )
-                sources
-
         ( validSources, invalidSources ) =
             includedSources
-                |> List.partition (Tuple.second >> Analyser.Util.isLoaded)
+                |> List.partition (Tuple.second >> Result.Extra.isOk)
 
         failedMessages =
             invalidSources
-                |> List.filterMap (\( source, result ) -> Maybe.map ((,) source) (Analyser.Util.fileLoadError result))
+                |> List.filterMap
+                    (\( source, result ) ->
+                        case result of
+                            Err e ->
+                                Just ( source, e )
+
+                            Ok _ ->
+                                Nothing
+                    )
                 |> List.map
                     (\( source, error ) ->
                         newMessage
@@ -100,8 +100,7 @@ run sources deps configuration =
                     )
 
         inspectionMessages =
-            includedSources
-                |> List.filterMap (FileContext.create sources deps)
+            FileContext.build codeBase includedSources
                 |> List.concatMap (\x -> List.concatMap (\c -> c.check x configuration) enabledChecks)
 
         messages =

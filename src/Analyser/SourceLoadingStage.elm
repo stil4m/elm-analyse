@@ -1,6 +1,6 @@
 module Analyser.SourceLoadingStage exposing (init, update, isDone, parsedFiles, Model, Msg, subscriptions)
 
-import Analyser.Files.Types exposing (FileContent, FileLoad, LoadedFile, LoadedSourceFiles)
+import Analyser.Files.Types exposing (LoadedSourceFile, LoadedSourceFiles)
 import Analyser.Files.FileLoader as FileLoader
 import List.Extra
 
@@ -15,7 +15,7 @@ type Msg
 
 type alias State =
     { filesToLoad : Maybe ( String, List String )
-    , parsedFiles : List LoadedFile
+    , parsedFiles : List LoadedSourceFile
     }
 
 

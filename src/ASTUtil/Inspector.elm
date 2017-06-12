@@ -1,6 +1,14 @@
-module Inspector exposing (Order(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
+module ASTUtil.Inspector exposing (Order(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
 
-import AST.Types exposing (File, Import, ValueConstructor, InfixDirection, Type, TypeAlias, TypeReference(..), FunctionSignature, Declaration(TypeDecl, FuncDecl, AliasDecl, PortDeclaration, InfixDeclaration, DestructuringDeclaration), Function, Destructuring, Expression, InnerExpression(..), Lambda, LetBlock, Case, RecordUpdate)
+import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Declaration exposing (..)
+import Elm.Syntax.Infix exposing (..)
+import Elm.Syntax.Type exposing (..)
+import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.TypeAlias exposing (..)
+import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.TypeAnnotation exposing (..)
 
 
 type Order context x
@@ -18,10 +26,10 @@ type alias Config context =
     , onFunctionSignature : Order context FunctionSignature
     , onPortDeclaration : Order context FunctionSignature
     , onTypeAlias : Order context TypeAlias
-    , onDestructuring : Order context Destructuring
+    , onDestructuring : Order context ( Pattern, Expression )
     , onExpression : Order context Expression
     , onOperatorApplication : Order context ( String, InfixDirection, Expression, Expression )
-    , onTypeReference : Order context TypeReference
+    , onTypeAnnotation : Order context TypeAnnotation
     , onLambda : Order context Lambda
     , onLetBlock : Order context LetBlock
     , onCase : Order context Case
@@ -38,7 +46,7 @@ defaultConfig =
     , onFunction = Continue
     , onPortDeclaration = Continue
     , onFunctionSignature = Continue
-    , onTypeReference = Continue
+    , onTypeAnnotation = Continue
     , onTypeAlias = Continue
     , onDestructuring = Continue
     , onExpression = Continue
@@ -97,6 +105,21 @@ inspectDeclarations config declarations context =
     List.foldl (inspectDeclaration config) context declarations
 
 
+inspectLetDeclarations : Config context -> List LetDeclaration -> context -> context
+inspectLetDeclarations config declarations context =
+    List.foldl (inspectLetDeclaration config) context declarations
+
+
+inspectLetDeclaration : Config context -> LetDeclaration -> context -> context
+inspectLetDeclaration config declaration context =
+    case declaration of
+        LetFunction function ->
+            inspectFunction config function context
+
+        LetDestructuring pattern expression ->
+            inspectDestructuring config ( pattern, expression ) context
+
+
 inspectDeclaration : Config context -> Declaration -> context -> context
 inspectDeclaration config declaration context =
     case declaration of
@@ -115,8 +138,8 @@ inspectDeclaration config declaration context =
         InfixDeclaration _ ->
             context
 
-        DestructuringDeclaration destructing ->
-            inspectDestructuring config destructing context
+        Destructuring pattern expresion ->
+            inspectDestructuring config ( pattern, expresion ) context
 
 
 inspectType : Config context -> Type -> context -> context
@@ -126,23 +149,23 @@ inspectType config typeDecl context =
 
 inspectValueConstructor : Config context -> ValueConstructor -> context -> context
 inspectValueConstructor config valueConstructor context =
-    List.foldl (inspectTypeReference config) context valueConstructor.arguments
+    List.foldl (inspectTypeAnnotation config) context valueConstructor.arguments
 
 
 inspectTypeAlias : Config context -> TypeAlias -> context -> context
 inspectTypeAlias config typeAlias context =
     actionLambda
         config.onTypeAlias
-        (inspectTypeReference config typeAlias.typeReference)
+        (inspectTypeAnnotation config typeAlias.typeAnnotation)
         typeAlias
         context
 
 
-inspectDestructuring : Config context -> Destructuring -> context -> context
+inspectDestructuring : Config context -> ( Pattern, Expression ) -> context -> context
 inspectDestructuring config destructuring context =
     actionLambda
         config.onDestructuring
-        (inspectExpression config destructuring.expression)
+        (inspectExpression config (Tuple.second destructuring))
         destructuring
         context
 
@@ -173,37 +196,37 @@ inspectSignature : Config context -> FunctionSignature -> context -> context
 inspectSignature config signature context =
     actionLambda
         config.onFunctionSignature
-        (inspectTypeReference config signature.typeReference)
+        (inspectTypeAnnotation config signature.typeAnnotation)
         signature
         context
 
 
-inspectTypeReference : Config context -> TypeReference -> context -> context
-inspectTypeReference config typeReference context =
+inspectTypeAnnotation : Config context -> TypeAnnotation -> context -> context
+inspectTypeAnnotation config typeAnnotation context =
     actionLambda
-        config.onTypeReference
-        (inspectTypeReferenceInner config typeReference)
-        typeReference
+        config.onTypeAnnotation
+        (inspectTypeAnnotationInner config typeAnnotation)
+        typeAnnotation
         context
 
 
-inspectTypeReferenceInner : Config context -> TypeReference -> context -> context
-inspectTypeReferenceInner config typeRefence context =
+inspectTypeAnnotationInner : Config context -> TypeAnnotation -> context -> context
+inspectTypeAnnotationInner config typeRefence context =
     case typeRefence of
         Typed _ _ typeArgs _ ->
-            List.foldl (inspectTypeReference config) context typeArgs
+            List.foldl (inspectTypeAnnotation config) context typeArgs
 
-        Tupled typeReferences _ ->
-            List.foldl (inspectTypeReference config) context typeReferences
+        Tupled typeAnnotations _ ->
+            List.foldl (inspectTypeAnnotation config) context typeAnnotations
 
         Record recordDefinition _ ->
-            List.foldl (inspectTypeReference config) context (List.map Tuple.second recordDefinition)
+            List.foldl (inspectTypeAnnotation config) context (List.map Tuple.second recordDefinition)
 
         GenericRecord _ recordDefinition _ ->
-            List.foldl (inspectTypeReference config) context (List.map Tuple.second recordDefinition)
+            List.foldl (inspectTypeAnnotation config) context (List.map Tuple.second recordDefinition)
 
-        FunctionTypeReference left right _ ->
-            List.foldl (inspectTypeReference config) context [ left, right ]
+        FunctionTypeAnnotation left right _ ->
+            List.foldl (inspectTypeAnnotation config) context [ left, right ]
 
         Unit _ ->
             context
@@ -290,7 +313,7 @@ inspectInnerExpression config expression context =
         LetExpression letBlock ->
             let
                 next =
-                    inspectDeclarations config letBlock.declarations >> inspectExpression config letBlock.expression
+                    inspectLetDeclarations config letBlock.declarations >> inspectExpression config letBlock.expression
             in
                 actionLambda config.onLetBlock
                     next

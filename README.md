@@ -164,10 +164,10 @@ See [#10](https://github.com/stil4m/elm-analyse/issues/10).
 The library is divided into the following main modules:
 
 * `Analyser`: The `main` file that bootstraps the analysis and maintains the core state
-* `AST.*`: The AST for Elm 0.18 and related functions to serialise and deserialise.
 * `ASTUtil.*`: Utility functions for fact extraction on the AST.
-* `Parser.*`: Parsing Elm files using [parser-combinators](https://github.com/elm-community/parser-combinators).
 * `Analyser.Checks.*`: All the checks that are performed
 * `Analyser.Fixes.*`: All the fixes that can be performed,
 * `Analyser.Messages.*`: All messages that can be produced and the supporting functions
 * `Client.*`: Front-end code for running in 'server' mode.
+
+The code that represents the Elm syntax and the parsing is supported by the [elm-syntax](github.com/stil4m/elm-syntax) package.

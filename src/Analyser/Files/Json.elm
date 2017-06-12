@@ -1,13 +1,13 @@
 module Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
 
-import Analyser.Files.Types exposing (Dependency, ExposedInterface(..), Interface)
+import Elm.Dependency exposing (Dependency)
+import Elm.Interface exposing (Exposed(..), Interface)
 import Dict
 import Json.Encode as JE exposing (Value)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
 import Util.Json exposing (decodeTyped, encodeTyped)
-import AST.Decoding exposing (decodeInfix)
-import AST.Encoding exposing (encodeInfix)
+import Elm.Syntax.Infix as Infix
 
 
 deserialiseDependency : String -> Maybe Dependency
@@ -58,7 +58,7 @@ encodeInterface =
     JE.list << List.map encodeExposedInterface
 
 
-encodeExposedInterface : ExposedInterface -> Value
+encodeExposedInterface : Exposed -> Value
 encodeExposedInterface x =
     case x of
         Function s ->
@@ -76,7 +76,7 @@ encodeExposedInterface x =
             encodeTyped "alias" (JE.string s)
 
         Operator s ->
-            encodeTyped "operator" (encodeInfix s)
+            encodeTyped "operator" (Infix.encode s)
 
 
 decodeInterface : Decoder Interface
@@ -84,7 +84,7 @@ decodeInterface =
     JD.list decodeExposedInterface
 
 
-decodeExposedInterface : Decoder ExposedInterface
+decodeExposedInterface : Decoder Exposed
 decodeExposedInterface =
     decodeTyped
         [ ( "function", JD.string |> JD.map Function )
@@ -95,5 +95,5 @@ decodeExposedInterface =
                 |> JD.map Type
           )
         , ( "alias", JD.string |> JD.map Alias )
-        , ( "operator", decodeInfix |> JD.map Operator )
+        , ( "operator", Infix.decode |> JD.map Operator )
         ]

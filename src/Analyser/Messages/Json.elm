@@ -1,7 +1,7 @@
 module Analyser.Messages.Json exposing (serialiseMessage, encodeMessage, decodeMessage)
 
-import AST.Ranges as Ranges exposing (Range)
-import AST.Types as AST
+import Elm.Syntax.Range as Range exposing (Range)
+import Elm.Syntax.Base as AST
 import Analyser.Messages.Types exposing (Message, MessageData(..), MessageStatus(..))
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
@@ -14,7 +14,7 @@ decodeFileVarNameAndRange f =
     JD.succeed f
         |: fileField
         |: varNameField
-        |: JD.field "range" Ranges.decode
+        |: JD.field "range" Range.decode
 
 
 decodeFileModuleNameAndRange : (String -> AST.ModuleName -> Range -> MessageData) -> Decoder MessageData
@@ -22,14 +22,14 @@ decodeFileModuleNameAndRange f =
     JD.succeed f
         |: fileField
         |: moduleNameField
-        |: JD.field "range" Ranges.decode
+        |: JD.field "range" Range.decode
 
 
 decodeFileAndRange : (String -> Range -> MessageData) -> Decoder MessageData
 decodeFileAndRange f =
     JD.succeed f
         |: fileField
-        |: JD.field "range" Ranges.decode
+        |: JD.field "range" Range.decode
 
 
 varNameField : Decoder String
@@ -108,20 +108,20 @@ decodeMessageData =
           , JD.succeed DuplicateImport
                 |: fileField
                 |: moduleNameField
-                |: JD.field "ranges" (JD.list Ranges.decode)
+                |: JD.field "ranges" (JD.list Range.decode)
           )
         , ( "UnusedTypeAlias", decodeFileVarNameAndRange UnusedTypeAlias )
         , ( "RedefineVariable"
           , JD.succeed RedefineVariable
                 |: fileField
                 |: varNameField
-                |: JD.field "range1" Ranges.decode
-                |: JD.field "range2" Ranges.decode
+                |: JD.field "range1" Range.decode
+                |: JD.field "range2" Range.decode
           )
         , ( "LineLengthExceeded"
           , JD.succeed LineLengthExceeded
                 |: fileField
-                |: JD.field "ranges" (JD.list Ranges.decode)
+                |: JD.field "ranges" (JD.list Range.decode)
           )
         , ( "NoUncurriedPrefix", decodeFileVarNameAndRange NoUncurriedPrefix )
         , ( "UnusedImportAlias", decodeFileModuleNameAndRange UnusedImportAlias )
@@ -189,7 +189,7 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         UnusedTopLevel file varName range ->
@@ -197,7 +197,7 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         UnusedImportedVariable file varName range ->
@@ -205,7 +205,7 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         UnusedPatternVariable file varName range ->
@@ -213,14 +213,14 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         ExposeAll file range ->
             encodeTyped "ExposeAll" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         ImportAll file moduleName range ->
@@ -228,7 +228,7 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "moduleName", JE.list <| List.map JE.string moduleName )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         NoTopLevelSignature file varName range ->
@@ -236,35 +236,35 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         UnnecessaryParens file range ->
             encodeTyped "UnnecessaryParens" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         MultiLineRecordFormatting file range ->
             encodeTyped "MultiLineRecordFormatting" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         DebugLog file range ->
             encodeTyped "DebugLog" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         DebugCrash file range ->
             encodeTyped "DebugCrash" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         UnformattedFile file ->
@@ -291,7 +291,7 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "moduleName", JE.list <| List.map JE.string moduleName )
-                    , ( "ranges", JE.list <| List.map Ranges.encode ranges )
+                    , ( "ranges", JE.list <| List.map Range.encode ranges )
                     ]
 
         UnusedTypeAlias file varName range ->
@@ -299,7 +299,7 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         RedefineVariable file varName range1 range2 ->
@@ -307,8 +307,8 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )
-                    , ( "range1", Ranges.encode range1 )
-                    , ( "range2", Ranges.encode range2 )
+                    , ( "range1", Range.encode range1 )
+                    , ( "range2", Range.encode range2 )
                     ]
 
         NoUncurriedPrefix file varName range ->
@@ -316,7 +316,7 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "varName", JE.string varName )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         UnusedImportAlias file moduleName range ->
@@ -324,7 +324,7 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "moduleName", JE.list <| List.map JE.string moduleName )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         UnusedImport file moduleName range ->
@@ -332,61 +332,61 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "moduleName", JE.list <| List.map JE.string moduleName )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         UseConsOverConcat file range ->
             encodeTyped "UseConsOverConcat" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         DropConcatOfLists file range ->
             encodeTyped "DropConcatOfLists" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         DropConsOfItemAndList file range ->
             encodeTyped "DropConsOfItemAndList" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         UnnecessaryListConcat file range ->
             encodeTyped "UnnecessaryListConcat" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         LineLengthExceeded file ranges ->
             encodeTyped "LineLengthExceeded" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "ranges", JE.list (List.map Ranges.encode ranges) )
+                    , ( "ranges", JE.list (List.map Range.encode ranges) )
                     ]
 
         NonStaticRegex file range ->
             encodeTyped "NonStaticRegex" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         CoreArrayUsage file range ->
             encodeTyped "CoreArrayUsage" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]
 
         FunctionInLet file range ->
             encodeTyped "FunctionInLet" <|
                 JE.object
                     [ ( "file", JE.string file )
-                    , ( "range", Ranges.encode range )
+                    , ( "range", Range.encode range )
                     ]

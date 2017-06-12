@@ -3,23 +3,22 @@ module Analyser.Fixes.TestUtil exposing (testFix)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Fixes.Base exposing (Fixer)
+import Elm.Interface as Interface
 import Test exposing (Test, describe, test)
-import AST.Types exposing (File)
-import Analyser.Files.Interface as Interface
+import Elm.Syntax.File exposing (File)
 import Analyser.Configuration as Configuration
-import AST.Util exposing (fileModuleName)
-import Parser.Parser as Parser
-import Analyser.PostProcessing as PostProcessing
+import Elm.Parser as Parser
 import Expect
-import Dict
+import Elm.Processing as Processing
+import Elm.RawFile as RawFile exposing (RawFile)
 
 
-analyseAndFix : Checker -> Fixer -> String -> File -> Result String String
-analyseAndFix checker fixer input f =
+analyseAndFix : Checker -> Fixer -> String -> RawFile -> File -> Result String String
+analyseAndFix checker fixer input rawFile f =
     let
         fileContext =
-            { interface = Interface.build f
-            , moduleName = fileModuleName f
+            { interface = Interface.build rawFile
+            , moduleName = RawFile.moduleName rawFile
             , ast = f
             , content = input
             , path = "./Foo.elm"
@@ -46,9 +45,15 @@ testFix name checker fixer triples =
                 test name <|
                     \() ->
                         Parser.parse input
-                            |> Result.map (PostProcessing.postProcess Dict.empty)
                             |> Result.mapError (always "Parse Failed")
-                            |> Result.andThen (analyseAndFix checker fixer input)
+                            |> Result.andThen
+                                (\x ->
+                                    analyseAndFix checker
+                                        fixer
+                                        input
+                                        x
+                                        (Processing.process Processing.init x)
+                                )
                             |> Expect.equal (Ok output)
             )
         <|

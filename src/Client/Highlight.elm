@@ -1,6 +1,6 @@
 module Client.Highlight exposing (..)
 
-import AST.Ranges exposing (Range)
+import Elm.Syntax.Range exposing (Range)
 import Html exposing (Html, pre, text, span)
 import Html.Attributes exposing (style, id)
 

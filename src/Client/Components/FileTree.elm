@@ -1,4 +1,4 @@
-module Client.FileTree exposing (Model, Msg, init, subscriptions, update, view)
+module Client.Components.FileTree exposing (Model, Msg, init, subscriptions, update, view)
 
 import Navigation exposing (Location)
 import Html exposing (..)
@@ -11,8 +11,7 @@ import Http
 import WebSocket as WS
 import Client.Socket exposing (dashboardAddress)
 import Time
-import Client.MessageList as MessageList
-import Tuple2
+import Client.Components.MessageList as MessageList
 
 
 type alias Model =
@@ -120,8 +119,8 @@ update location msg model =
 
         MessageListMsg subMsg ->
             MessageList.update location subMsg model.messageList
-                |> Tuple2.mapFirst (\x -> { model | messageList = x })
-                |> Tuple2.mapSecond (Cmd.map MessageListMsg)
+                |> Tuple.mapFirst (\x -> { model | messageList = x })
+                |> Tuple.mapSecond (Cmd.map MessageListMsg)
 
 
 messagesForSelectedFile : Model -> List Message

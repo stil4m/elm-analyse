@@ -4,8 +4,8 @@ import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), newMessage)
-import Inspector exposing (Order(Post, Inner), defaultConfig)
-import AST.Types exposing (..)
+import ASTUtil.Inspector as Inspector exposing (Order(Post, Inner), defaultConfig)
+import Elm.Syntax.Expression exposing (..)
 import ASTUtil.Functions
 
 

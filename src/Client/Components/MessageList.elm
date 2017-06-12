@@ -1,11 +1,10 @@
-module Client.MessageList exposing (..)
+module Client.Components.MessageList exposing (..)
 
-import Client.DashBoard.ActiveMessageDialog as ActiveMessageDialog
+import Client.Components.ActiveMessageDialog as ActiveMessageDialog
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
 import Analyser.Messages.Types exposing (Message, MessageStatus)
 import Client.Messages as M
-import Tuple2
 import Navigation exposing (Location)
 
 
@@ -35,13 +34,13 @@ update location msg model =
     case msg of
         Focus m ->
             ActiveMessageDialog.show m model.active
-                |> Tuple2.mapFirst (\x -> { model | active = x })
-                |> Tuple2.mapSecond (Cmd.map ActiveMessageDialogMsg)
+                |> Tuple.mapFirst (\x -> { model | active = x })
+                |> Tuple.mapSecond (Cmd.map ActiveMessageDialogMsg)
 
         ActiveMessageDialogMsg subMsg ->
             ActiveMessageDialog.update location subMsg model.active
-                |> Tuple2.mapFirst (\x -> { model | active = x })
-                |> Tuple2.mapSecond (Cmd.map ActiveMessageDialogMsg)
+                |> Tuple.mapFirst (\x -> { model | active = x })
+                |> Tuple.mapSecond (Cmd.map ActiveMessageDialogMsg)
 
 
 view : Model -> Html Msg

@@ -1,13 +1,13 @@
 module Analyser.Fixes.UnusedPatternVariable exposing (fixer)
 
 import Analyser.Fixes.FileContent as FileContent
-import AST.Ranges exposing (Range)
-import AST.Types exposing (File, Pattern, Function, Case)
+import Elm.Syntax.File exposing (File)
 import Analyser.Messages.Types exposing (MessageData(UnusedPatternVariable))
 import ASTUtil.PatternOptimizer as PatternOptimizer
 import ASTUtil.Patterns as Patterns
-import ASTUtil.ASTWriter as ASTWriter
+import Elm.Writer as Writer
 import Analyser.Fixes.Base exposing (Fixer)
+import Elm.Syntax.Range exposing (..)
 
 
 fixer : Fixer
@@ -48,8 +48,8 @@ fixPattern ( fileName, content, ast ) range =
                 [ ( fileName
                   , FileContent.replaceRangeWith
                         (PatternOptimizer.patternRange parentPattern)
-                        (ASTWriter.writePattern (PatternOptimizer.optimize range parentPattern)
-                            |> ASTWriter.write
+                        (Writer.writePattern (PatternOptimizer.optimize range parentPattern)
+                            |> Writer.write
                         )
                         content
                   )
