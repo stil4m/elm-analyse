@@ -14,6 +14,8 @@ module.exports = function(config) {
 
     const elm = require('./worker')(config);
     const dashboard = require('./dashboard')(app, elm, expressWs);
+
+    require('./watcher')(app, elm);
     require('./control')(app, elm, expressWs);
 
     app.get('/file', function(req, res) {

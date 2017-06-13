@@ -1,19 +1,21 @@
 module Analyser exposing (main)
 
+import Analyser.CodeBase as CodeBase exposing (CodeBase)
+import Analyser.Configuration as Configuration exposing (Configuration)
+import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.DependencyLoadingStage as DependencyLoadingStage
-import Analyser.SourceLoadingStage as SourceLoadingStage
-import AnalyserPorts
-import Platform exposing (program)
-import Inspection
-import Analyser.State as State exposing (State)
+import Analyser.FileWatch as FileWatch exposing (FileChange(Remove, Update))
+import Analyser.Files.Types exposing (LoadedSourceFile)
 import Analyser.Fixer as Fixer
 import Analyser.Messages.Util as Messages
-import Analyser.ContextLoader as ContextLoader exposing (Context)
-import Analyser.Configuration as Configuration exposing (Configuration)
-import Analyser.Files.Types exposing (LoadedSourceFile)
+import Analyser.SourceLoadingStage as SourceLoadingStage
+import Analyser.State as State exposing (State)
+import AnalyserPorts
 import GraphBuilder
+import Inspection
+import Platform exposing (program)
+import Time
 import Util.Logger as Logger
-import Analyser.CodeBase as CodeBase exposing (CodeBase)
 
 
 type alias Model =
@@ -22,6 +24,7 @@ type alias Model =
     , configuration : Configuration
     , stage : Stage
     , state : State
+    , changedFiles : List String
     }
 
 
@@ -29,6 +32,8 @@ type Msg
     = OnContext Context
     | DependencyLoadingStageMsg DependencyLoadingStage.Msg
     | SourceLoadingStageMsg SourceLoadingStage.Msg
+    | Change FileChange
+    | ReloadTick
     | Reset
     | OnFixMessage Int
     | FixerMsg Fixer.Msg
@@ -55,6 +60,7 @@ init =
         , configuration = Configuration.defaultConfiguration
         , codeBase = CodeBase.init
         , state = State.initialState
+        , changedFiles = []
         }
 
 
@@ -123,6 +129,36 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        Change (Update x) ->
+            doSendState
+                ( { model
+                    | state = State.outdateMessagesForFile x model.state
+                    , changedFiles = x :: model.changedFiles
+                  }
+                , Cmd.none
+                )
+
+        ReloadTick ->
+            if model.stage == Finished && model.changedFiles /= [] then
+                startSourceLoading
+                    model.changedFiles
+                    ( { model | changedFiles = [] }
+                    , Cmd.none
+                    )
+            else
+                ( model
+                , Cmd.none
+                )
+
+        Change (Remove x) ->
+            doSendState
+                ( { model
+                    | state = State.removeMessagesForFile x model.state
+                    , changedFiles = List.filter (not << (==) x) model.changedFiles
+                  }
+                , Logger.info ("File was removed: '" ++ x ++ "'. Removing known messages.")
+                )
+
 
 onFixerMsg : Fixer.Msg -> Fixer.Model -> Model -> ( Model, Cmd Msg )
 onFixerMsg x stage model =
@@ -132,10 +168,7 @@ onFixerMsg x stage model =
     in
         if Fixer.isDone newFixerModel then
             if Fixer.succeeded newFixerModel then
-                --TODO What to do with the checking and the state
-                startSourceLoading
-                    (Fixer.touchedFiles newFixerModel)
-                    ( model, fixerCmds )
+                ( { model | stage = Finished }, fixerCmds )
             else
                 startSourceLoading (Messages.getFiles (Fixer.message newFixerModel).data)
                     ( model, fixerCmds )
@@ -279,6 +312,8 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ AnalyserPorts.onReset (always Reset)
+        , Time.every Time.second (always ReloadTick)
+        , FileWatch.watcher Change
         , AnalyserPorts.onFixMessage OnFixMessage
         , case model.stage of
             ContextLoadingStage ->
