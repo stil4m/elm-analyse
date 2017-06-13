@@ -96,6 +96,11 @@ sortMessages state =
     }
 
 
+removeMessagesForFile : String -> State -> State
+removeMessagesForFile fileName state =
+    { state | messages = List.filter (\m -> Messages.messageFile m /= fileName) state.messages }
+
+
 outdateMessagesForFile : String -> State -> State
 outdateMessagesForFile fileName state =
     { state

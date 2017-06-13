@@ -1,5 +1,7 @@
 port module Analyser.FileWatch exposing (watcher, FileChange(Remove, Update))
 
+import Debug as SafeDebug
+
 
 port fileWatch : (( String, String ) -> msg) -> Sub msg
 
@@ -21,10 +23,10 @@ asFileChange p =
             Update x
 
         ( "remove", x ) ->
-            Update x
+            Remove x
 
         _ ->
-            Debug.crash
+            SafeDebug.crash
                 ("Unknown filechange: "
                     ++ toString p
                     ++ "."

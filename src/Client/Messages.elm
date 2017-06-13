@@ -26,17 +26,17 @@ view focus n x =
             , ( "padding", "10px" )
             , ( "border", "1px solid #ccc" )
             , ( "border-radius", "3px" )
-            , ( "backgound"
+            , ( "background"
               , if x.status == Fixing then
-                    "1px solid #dff0d8"
+                    "#dff0d8"
                 else
-                    "1px solid #eee"
+                    "#fafafa"
               )
             , ( "opacity"
               , if x.status == Outdated then
                     ".5"
                 else
-                    ("1.0")
+                    "1.0"
               )
             ]
         ]
@@ -54,9 +54,8 @@ view focus n x =
                 [ strong []
                     [ text <| (++) "#" <| toString <| n + 1 ]
                 ]
-            , span [ style [ ( "display", "table-cell" ) ] ]
-                [ text (toString x.status)
-                , text <| Messages.asString x.data
-                ]
+            , span
+                [ style [ ( "display", "table-cell" ) ] ]
+                [ text <| Messages.asString x.data ]
             ]
         ]
