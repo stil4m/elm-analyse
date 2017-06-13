@@ -13,7 +13,7 @@ import Analyser.State as State exposing (State)
 import AnalyserPorts
 import GraphBuilder
 import Inspection
-import Platform exposing (program)
+import Platform exposing (programWithFlags)
 import Time
 import Util.Logger as Logger
 
@@ -25,6 +25,7 @@ type alias Model =
     , stage : Stage
     , state : State
     , changedFiles : List String
+    , server : Bool
     }
 
 
@@ -47,13 +48,13 @@ type Stage
     | Finished
 
 
-main : Program Never Model Msg
+main : Program Bool Model Msg
 main =
-    program { init = init, update = update, subscriptions = subscriptions }
+    programWithFlags { init = init, update = update, subscriptions = subscriptions }
 
 
-init : ( Model, Cmd Msg )
-init =
+init : Bool -> ( Model, Cmd Msg )
+init server =
     reset
         { context = ContextLoader.emptyContext
         , stage = Finished
@@ -61,6 +62,7 @@ init =
         , codeBase = CodeBase.init
         , state = State.initialState
         , changedFiles = []
+        , server = server
         }
 
 
@@ -82,7 +84,7 @@ update msg model =
                 |> handleNextStep
 
         Reset ->
-            init
+            init model.server
 
         OnContext context ->
             let
@@ -312,7 +314,10 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ AnalyserPorts.onReset (always Reset)
-        , Time.every Time.second (always ReloadTick)
+        , if model.server then
+            Time.every Time.second (always ReloadTick)
+          else
+            Sub.none
         , FileWatch.watcher Change
         , AnalyserPorts.onFixMessage OnFixMessage
         , case model.stage of

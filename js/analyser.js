@@ -5,7 +5,7 @@ module.exports = function(config) {
     const loggingPorts = require('./util/logging-ports');
     const Elm = require('./backend-elm');
 
-    var app = Elm.Analyser.worker();
+    var app = Elm.Analyser.worker(false);
 
     app.ports.sendMessages.subscribe(function(x) {
         if (x.length == 0) {
