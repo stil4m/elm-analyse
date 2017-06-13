@@ -12,4 +12,5 @@ install:
   - npm install
 
 script:
+  - npm run check-prettier
   - npm run test
