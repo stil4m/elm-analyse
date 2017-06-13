@@ -1,6 +1,6 @@
 module Analyser.State exposing (..)
 
-import Analyser.Messages.Types exposing (Message, MessageId, MessageStatus(Applicable))
+import Analyser.Messages.Types as Messages exposing (Message, MessageId, MessageStatus(Applicable))
 import Analyser.Messages.Json exposing (encodeMessage, decodeMessage)
 import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing)
 import Graph exposing (Graph)
@@ -93,6 +93,21 @@ sortMessages state =
                 |> List.sortWith Messages.compareMessageFile
                 |> List.groupWhile (\a b -> Messages.messageFile a == Messages.messageFile b)
                 |> List.concatMap (List.sortWith Messages.compareMessageLocation)
+    }
+
+
+outdateMessagesForFile : String -> State -> State
+outdateMessagesForFile fileName state =
+    { state
+        | messages =
+            state.messages
+                |> List.map
+                    (\m ->
+                        if Messages.messageFile m == fileName then
+                            Messages.outdate m
+                        else
+                            m
+                    )
     }
 
 

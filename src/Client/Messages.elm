@@ -1,6 +1,6 @@
 module Client.Messages exposing (viewAll)
 
-import Analyser.Messages.Types exposing (Message, MessageStatus(Fixing))
+import Analyser.Messages.Types exposing (Message, MessageStatus(Fixing, Outdated))
 import Analyser.Messages.Util as Messages
 import Html exposing (Html, li, div, a, strong, text, span, ul)
 import Html.Attributes exposing (style)
@@ -26,12 +26,17 @@ view focus n x =
             , ( "padding", "10px" )
             , ( "border", "1px solid #ccc" )
             , ( "border-radius", "3px" )
-            , ( "backgound", "1px solid #eee" )
-            , ( "opacity"
+            , ( "backgound"
               , if x.status == Fixing then
+                    "1px solid #dff0d8"
+                else
+                    "1px solid #eee"
+              )
+            , ( "opacity"
+              , if x.status == Outdated then
                     ".5"
                 else
-                    "1.0"
+                    ("1.0")
               )
             ]
         ]
@@ -50,6 +55,8 @@ view focus n x =
                     [ text <| (++) "#" <| toString <| n + 1 ]
                 ]
             , span [ style [ ( "display", "table-cell" ) ] ]
-                [ text <| Messages.asString x.data ]
+                [ text (toString x.status)
+                , text <| Messages.asString x.data
+                ]
             ]
         ]

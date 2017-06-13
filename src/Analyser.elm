@@ -14,6 +14,7 @@ import Analyser.Files.Types exposing (LoadedSourceFile)
 import GraphBuilder
 import Util.Logger as Logger
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
+import Analyser.FileWatch as FileWatch exposing (FileChange(Remove, Update))
 
 
 type alias Model =
@@ -29,6 +30,7 @@ type Msg
     = OnContext Context
     | DependencyLoadingStageMsg DependencyLoadingStage.Msg
     | SourceLoadingStageMsg SourceLoadingStage.Msg
+    | Change FileChange
     | Reset
     | OnFixMessage Int
     | FixerMsg Fixer.Msg
@@ -122,6 +124,18 @@ update msg model =
 
                 _ ->
                     ( model, Cmd.none )
+
+        Change (Update x) ->
+            doSendState
+                ( { model | state = State.outdateMessagesForFile x model.state }
+                , Logger.info "Got a update for file."
+                )
+
+        Change (Remove x) ->
+            doSendState
+                ( { model | state = State.outdateMessagesForFile x model.state }
+                , Logger.info "Got a remove for file."
+                )
 
 
 onFixerMsg : Fixer.Msg -> Fixer.Model -> Model -> ( Model, Cmd Msg )
@@ -279,6 +293,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ AnalyserPorts.onReset (always Reset)
+        , FileWatch.watcher Change
         , AnalyserPorts.onFixMessage OnFixMessage
         , case model.stage of
             ContextLoadingStage ->

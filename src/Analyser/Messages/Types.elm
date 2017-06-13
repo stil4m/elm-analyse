@@ -29,6 +29,11 @@ newMessage =
     Message 0 Applicable
 
 
+outdate : Message -> Message
+outdate m =
+    { m | status = Outdated }
+
+
 type MessageStatus
     = Outdated
     | Blocked
