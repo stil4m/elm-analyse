@@ -1,4 +1,4 @@
-var watch = require("node-watch");
+var watch = require('node-watch');
 
 module.exports = function(app, elmWorker) {
     const pack = require(process.cwd() + '/elm-package.json');
