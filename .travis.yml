@@ -4,6 +4,9 @@ language: node_js
 node_js:
   - "5"
 
+matrix:
+  fast_finish: true
+  
 cache:
   directories:
   - node_modules
@@ -12,4 +15,5 @@ install:
   - npm install
 
 script:
+  - sh ./prettier-check.sh
   - npm run test
