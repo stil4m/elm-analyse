@@ -62,7 +62,7 @@ visitWithVariablePointers variablePointers f ( redefines, known ) =
 
         newKnown : Dict String Syntax.Range
         newKnown =
-            List.foldl (\a b -> Dict.insert a.value (a.range) b) known variablePointers
+            List.foldl (\a b -> Dict.insert a.value a.range b) known variablePointers
 
         ( newRedefines, _ ) =
             f ( redefines, newKnown )

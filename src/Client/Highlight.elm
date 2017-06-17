@@ -8,7 +8,7 @@ import Html.Attributes exposing (style, id)
 beforeHighlight : List String -> Range -> String
 beforeHighlight targetRows range =
     let
-        ( startRow, startColumn, endRow, endColumn ) =
+        ( startRow, startColumn, _, _ ) =
             Range.toTuple range
 
         uiStartRow =
@@ -30,7 +30,7 @@ beforeHighlight targetRows range =
 afterHighlight : List String -> Range -> String
 afterHighlight targetRows range =
     let
-        ( startRow, startColumn, endRow, endColumn ) =
+        ( startRow, _, endRow, endColumn ) =
             Range.toTuple range
 
         uiStartRow =
@@ -116,7 +116,7 @@ highlightedString targetRows range =
 highlightedPre : String -> Range -> Html msg
 highlightedPre content range =
     let
-        ( startRow, startColumn, endRow, endColumn ) =
+        ( startRow, _, endRow, _ ) =
             Range.toTuple range
 
         target =

@@ -13,15 +13,12 @@ import Maybe.Extra as Maybe
 findParentPattern : File -> Range -> Maybe Pattern
 findParentPattern file range =
     let
-        _ =
-            Debug.log "RANGE" range
-
         onFunction : Function -> Maybe Pattern -> Maybe Pattern
         onFunction func =
             Maybe.orElseLazy
                 (\() ->
                     func.declaration.arguments
-                        |> List.filter (PatternOptimizer.patternRange >> Debug.log "Pattern Range fun" >> Ranges.containsRange range)
+                        |> List.filter (PatternOptimizer.patternRange >> Ranges.containsRange range)
                         |> List.head
                 )
 
@@ -45,7 +42,7 @@ findParentPattern file range =
                 )
 
         onDestructuring : ( Pattern, Expression ) -> Maybe Pattern -> Maybe Pattern
-        onDestructuring ( patt, exp ) =
+        onDestructuring ( patt, _ ) =
             Maybe.orElseLazy
                 (\() ->
                     if PatternOptimizer.patternRange patt |> Ranges.containsRange range then

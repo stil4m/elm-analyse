@@ -96,10 +96,10 @@ findRecords rangeContext x =
             List.concatMap (findRecords rangeContext) inner
 
         Record fields r ->
-            ( Range.build rangeContext r, fields ) :: List.concatMap (Tuple.second >> (findRecords rangeContext)) fields
+            ( Range.build rangeContext r, fields ) :: List.concatMap (Tuple.second >> findRecords rangeContext) fields
 
         GenericRecord _ fields r ->
-            ( Range.build rangeContext r, fields ) :: List.concatMap (Tuple.second >> (findRecords rangeContext)) fields
+            ( Range.build rangeContext r, fields ) :: List.concatMap (Tuple.second >> findRecords rangeContext) fields
 
         FunctionTypeAnnotation left right _ ->
             -- TODO: Think about if this makes sense

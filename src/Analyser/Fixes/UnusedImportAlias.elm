@@ -46,7 +46,7 @@ updateImport ( fileName, content, ast ) range =
         Just imp ->
             Ok
                 [ ( fileName
-                  , writeNewImport (imp.range) { imp | moduleAlias = Nothing } content
+                  , writeNewImport imp.range { imp | moduleAlias = Nothing } content
                   )
                 ]
 

@@ -51,7 +51,7 @@ findRegexUsagesInFunctions : RangeContext -> FunctionReference -> FileContext ->
 findRegexUsagesInFunctions rangeContext regexImport fileContext =
     Inspector.inspect
         { defaultConfig
-            | onFunction = Inner (onFunction)
+            | onFunction = Inner onFunction
             , onExpression = Post (onExpression rangeContext regexImport)
         }
         fileContext.ast

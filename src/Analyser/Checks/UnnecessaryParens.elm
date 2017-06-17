@@ -36,7 +36,7 @@ scan rangeContext fileContext _ =
                 []
     in
         x
-            |> List.uniqueBy (toString)
+            |> List.uniqueBy toString
             |> List.map (Range.build rangeContext >> UnnecessaryParens fileContext.path)
             |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
@@ -65,7 +65,7 @@ onExpression : Expression -> Context -> Context
 onExpression ( range, expression ) context =
     case expression of
         ParenthesizedExpression inner ->
-            onParenthesizedExpression (range) inner context
+            onParenthesizedExpression range inner context
 
         OperatorApplication op dir left right ->
             onOperatorApplication ( op, dir, left, right ) context
@@ -98,14 +98,14 @@ onExpression ( range, expression ) context =
 onListExpr : List Expression -> Context -> Context
 onListExpr exprs context =
     List.filterMap getParenthesized exprs
-        |> List.map (Tuple.first)
+        |> List.map Tuple.first
         |> flip (++) context
 
 
 onTuple : List Expression -> Context -> Context
 onTuple exprs context =
     List.filterMap getParenthesized exprs
-        |> List.map (Tuple.first)
+        |> List.map Tuple.first
         |> flip (++) context
 
 
@@ -113,7 +113,7 @@ onRecord : List ( String, Expression ) -> Context -> Context
 onRecord fields context =
     fields
         |> List.filterMap (Tuple.second >> getParenthesized)
-        |> List.map (Tuple.first)
+        |> List.map Tuple.first
         |> flip (++) context
 
 
@@ -131,7 +131,7 @@ onIfBlock : Expression -> Expression -> Expression -> Context -> Context
 onIfBlock clause thenBranch elseBranch context =
     [ clause, thenBranch, elseBranch ]
         |> List.filterMap getParenthesized
-        |> List.map (Tuple.first)
+        |> List.map Tuple.first
         |> flip (++) context
 
 
@@ -140,7 +140,7 @@ onApplication parts context =
     List.head parts
         |> Maybe.andThen getParenthesized
         |> Maybe.filter (Tuple.second >> isOperatorApplication >> not)
-        |> Maybe.map (Tuple.first)
+        |> Maybe.map Tuple.first
         |> Maybe.map (flip (::) context)
         |> Maybe.withDefault context
 
