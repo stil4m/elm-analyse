@@ -1,24 +1,27 @@
 module ASTUtil.Patterns exposing (findParentPattern)
 
-import Elm.Syntax.Range exposing (Range)
+import AST.Ranges as Ranges
+import ASTUtil.Inspector as Inspector exposing (Order(Pre), defaultConfig)
+import ASTUtil.PatternOptimizer as PatternOptimizer
+import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.File exposing (..)
 import Elm.Syntax.Pattern exposing (..)
-import Elm.Syntax.Expression exposing (..)
-import AST.Ranges as Ranges
-import ASTUtil.PatternOptimizer as PatternOptimizer
+import Elm.Syntax.Range exposing (Range)
 import Maybe.Extra as Maybe
-import ASTUtil.Inspector as Inspector exposing (defaultConfig, Order(Pre))
 
 
 findParentPattern : File -> Range -> Maybe Pattern
 findParentPattern file range =
     let
+        _ =
+            Debug.log "RANGE" range
+
         onFunction : Function -> Maybe Pattern -> Maybe Pattern
         onFunction func =
             Maybe.orElseLazy
                 (\() ->
                     func.declaration.arguments
-                        |> List.filter (PatternOptimizer.patternRange >> Ranges.containsRange range)
+                        |> List.filter (PatternOptimizer.patternRange >> Debug.log "Pattern Range fun" >> Ranges.containsRange range)
                         |> List.head
                 )
 
@@ -40,6 +43,16 @@ findParentPattern file range =
                         |> List.filter (PatternOptimizer.patternRange >> Ranges.containsRange range)
                         |> List.head
                 )
+
+        onDestructuring : ( Pattern, Expression ) -> Maybe Pattern -> Maybe Pattern
+        onDestructuring ( patt, exp ) =
+            Maybe.orElseLazy
+                (\() ->
+                    if PatternOptimizer.patternRange patt |> Ranges.containsRange range then
+                        Just patt
+                    else
+                        Nothing
+                )
     in
         Inspector.inspect
             { defaultConfig
@@ -47,6 +60,7 @@ findParentPattern file range =
                 | onFunction = Pre onFunction
                 , onCase = Pre onCase
                 , onLambda = Pre onLambda
+                , onDestructuring = Pre onDestructuring
             }
             file
             Nothing
