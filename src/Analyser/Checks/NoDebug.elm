@@ -1,6 +1,6 @@
 module Analyser.Checks.NoDebug exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DebugLog, DebugCrash), newMessage)
@@ -25,8 +25,8 @@ type alias Context =
     List ( DebugType, Range )
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext configuration =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext configuration =
     Inspector.inspect
         { defaultConfig | onExpression = Post onExpression }
         fileContext.ast

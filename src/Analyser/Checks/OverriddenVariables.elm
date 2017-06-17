@@ -1,6 +1,6 @@
 module Analyser.Checks.OverriddenVariables exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Pattern exposing (..)
 import Elm.Syntax.Expression exposing (..)
@@ -28,8 +28,8 @@ type alias Redefine =
     ( String, Range, Range )
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext _ =
     let
         topLevels : Dict String Range
         topLevels =

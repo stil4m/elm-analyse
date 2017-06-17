@@ -3,11 +3,12 @@ module Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Configuration exposing (Configuration, checkEnabled)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message)
+import Analyser.Messages.Range exposing (RangeContext)
 
 
 type alias Checker =
     { shouldCheck : Configuration -> Bool
-    , check : FileContext -> Configuration -> List Message
+    , check : RangeContext -> FileContext -> Configuration -> List Message
     }
 
 

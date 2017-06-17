@@ -2,7 +2,7 @@ module Analyser.Checks.DuplicateImport exposing (checker)
 
 import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.Module exposing (Import)
-import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImport), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)
@@ -22,8 +22,8 @@ type alias Context =
     Dict ModuleName (List Range)
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext _ =
     Inspector.inspect
         { defaultConfig
             | onImport = Post onImport

@@ -2,6 +2,7 @@ module Inspection exposing (run)
 
 import Analyser.FileContext as FileContext
 import Analyser.Messages.Types exposing (Message, MessageData(..), newMessage)
+import Analyser.Messages.Range as Range
 import Analyser.Files.Types exposing (LoadedSourceFiles)
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.ExposeAll as ExposeAll
@@ -101,8 +102,7 @@ run codeBase includedSources configuration =
 
         inspectionMessages =
             FileContext.build codeBase includedSources
-                |> List.concatMap (\x -> List.concatMap (\c -> c.check x configuration) enabledChecks)
-                |> List.map normaliseMessageRanges
+                |> List.concatMap (inspectFileContext configuration enabledChecks)
 
         messages =
             List.concat [ failedMessages, fileMessages, inspectionMessages ]
@@ -110,101 +110,11 @@ run codeBase includedSources configuration =
         messages
 
 
-normaliseMessageRanges : Message -> Message
-normaliseMessageRanges m =
-    { m | data = normaliseMessageData m.data }
-
-
-normaliseMessageData : MessageData -> MessageData
-normaliseMessageData =
-    identity
-
-
-
--- case d of
---     UnusedVariable fileName name r ->
---         UnusedVariable fileName name (cleanNormalRange r)
---
---     UnusedTopLevel fileName name r ->
---         UnusedTopLevel fileName name (cleanNormalRange r)
---
---     UnusedImportedVariable fileName name r ->
---         UnusedImportedVariable fileName name (cleanNormalRange r)
---
---     UnusedPatternVariable fileName name r ->
---         UnusedPatternVariable fileName name (cleanNormalRange r)
---
---     UnreadableSourceFile fileName ->
---         UnreadableSourceFile fileName
---
---     ExposeAll fileName r ->
---         ExposeAll fileName (cleanNormalRange r)
---
---     ImportAll fileName name r ->
---         ImportAll fileName name (cleanNormalRange r)
---
---     NoTopLevelSignature fileName modName r ->
---         NoTopLevelSignature fileName modName (cleanNormalRange r)
---
---     UnnecessaryParens fileName r ->
---         UnnecessaryParens (fileName) (cleanNormalRange r)
---
---     DebugLog fileName r ->
---         DebugLog fileName (cleanNormalRange r)
---
---     DebugCrash fileName r ->
---         DebugCrash fileName (cleanNormalRange r)
---
---     UnformattedFile fileName ->
---         UnformattedFile fileName
---
---     FileLoadFailed fileName name ->
---         FileLoadFailed fileName name
---
---     DuplicateImport fileName modName ranges ->
---         DuplicateImport fileName modName (List.map cleanNormalRange ranges)
---
---     UnusedTypeAlias fileName modName ranges ->
---         UnusedTypeAlias fileName modName ranges
---
---     RedefineVariable fileName var r1 r2 ->
---         RedefineVariable fileName var (cleanNormalRange r1) (cleanNormalRange r2)
---
---     NoUncurriedPrefix fileName name r ->
---         NoUncurriedPrefix fileName name (cleanNormalRange r)
---
---     UnusedImportAlias fileName name r ->
---         UnusedImportAlias fileName name (cleanNormalRange r)
---
---     UnusedImport fileName name r ->
---         UnusedImport fileName name (cleanNormalRange r)
---
---     UseConsOverConcat fileName r ->
---         UseConsOverConcat fileName (cleanNormalRange r)
---
---     DropConcatOfLists fileName r ->
---         DropConcatOfLists fileName (cleanNormalRange r)
---
---     DropConsOfItemAndList fileName r ->
---         DropConsOfItemAndList fileName (cleanNormalRange r)
---
---     UnnecessaryListConcat fileName r ->
---         UnnecessaryListConcat fileName (cleanNormalRange r)
---
---     LineLengthExceeded fileName r ->
---         LineLengthExceeded fileName (List.map cleanNormalRange r)
---
---     MultiLineRecordFormatting fileName r ->
---         MultiLineRecordFormatting fileName (cleanNormalRange r)
---
---     UnnecessaryPortModule fileName ->
---         UnnecessaryPortModule fileName
---
---     NonStaticRegex fileName r ->
---         NonStaticRegex fileName (cleanNormalRange r)
---
---     CoreArrayUsage fileName r ->
---         CoreArrayUsage fileName (cleanNormalRange r)
---
---     FunctionInLet fileName r ->
---         FunctionInLet fileName (cleanNormalRange r)
+inspectFileContext : Configuration -> List Checker -> FileContext.FileContext -> List Message
+inspectFileContext configuration enabledChecks fileContext =
+    let
+        rangeContext =
+            Range.context fileContext.content
+                |> Debug.log "Range context:"
+    in
+        List.concatMap (\c -> c.check rangeContext fileContext configuration) enabledChecks

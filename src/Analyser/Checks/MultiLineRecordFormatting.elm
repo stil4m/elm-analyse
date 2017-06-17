@@ -7,7 +7,7 @@ import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting), newMessage)
 import ASTUtil.Inspector as Inspector exposing (..)
-import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.Range as Syntax
 
 
@@ -18,8 +18,8 @@ checker =
     }
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext _ =
     let
         threshold =
             2

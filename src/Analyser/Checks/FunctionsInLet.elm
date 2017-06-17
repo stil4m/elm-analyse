@@ -7,7 +7,7 @@ import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), ne
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Inner), defaultConfig)
 import Elm.Syntax.Expression exposing (..)
 import ASTUtil.Functions
-import Analyser.Messages.Range as Range
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 
 
 type alias Context =
@@ -28,8 +28,8 @@ checker =
     }
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext _ =
     Inspector.inspect
         { defaultConfig
             | onLetBlock = Inner onLetBlock

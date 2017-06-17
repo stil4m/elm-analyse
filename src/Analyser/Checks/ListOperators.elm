@@ -6,7 +6,7 @@ import Analyser.Messages.Types exposing (Message, MessageData(UseConsOverConcat,
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
-import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 
 
 checker : Checker
@@ -26,8 +26,8 @@ type Deficiency
     | UseCons
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext configuration =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext configuration =
     Inspector.inspect
         { defaultConfig
             | onExpression = Post onExpression

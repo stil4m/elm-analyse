@@ -6,7 +6,7 @@ import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(NoTopLevelSignature), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Inner, Skip), defaultConfig)
-import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 
 
 checker : Checker
@@ -16,8 +16,8 @@ checker =
     }
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext _ =
     Inspector.inspect
         { defaultConfig | onFunction = Inner onFunction, onDestructuring = Skip }
         fileContext.ast

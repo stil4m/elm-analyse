@@ -1,4 +1,4 @@
-module Analyser.Messages.Range exposing (Range, Context, context, build, encode, decode, rangeToString, emptyRange, orderByStart, compareRangeStarts, asSyntaxRange, toTuple)
+module Analyser.Messages.Range exposing (Range, RangeContext, context, build, encode, decode, rangeToString, emptyRange, orderByStart, compareRangeStarts, asSyntaxRange, toTuple)
 
 import Elm.Syntax.Range as Syntax
 import Dict exposing (Dict)
@@ -11,7 +11,7 @@ type Range
     = Range Syntax.Range Syntax.Range
 
 
-type Context
+type RangeContext
     = Context (Dict Int Int)
 
 
@@ -45,7 +45,7 @@ rangeToString (Range real _) =
     AstRanges.rangeToString real
 
 
-context : String -> Context
+context : String -> RangeContext
 context input =
     String.split "\n" input
         |> List.indexedMap (\x y -> ( x, String.length y ))

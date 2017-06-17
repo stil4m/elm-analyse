@@ -1,6 +1,6 @@
 module Analyser.Checks.ExposeAll exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.File exposing (..)
 import AST.Util
 import Analyser.FileContext exposing (FileContext)
@@ -22,8 +22,8 @@ type alias ExposeAllContext =
     List Range
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext _ =
     let
         x : ExposeAllContext
         x =

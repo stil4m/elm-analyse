@@ -6,7 +6,7 @@ import Analyser.Messages.Types exposing (Message, MessageData(NoUncurriedPrefix)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
-import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 
 
 checker : Checker
@@ -20,8 +20,8 @@ type alias Context =
     List ( String, Range )
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext _ =
     Inspector.inspect
         { defaultConfig
             | onExpression = Post onExpression

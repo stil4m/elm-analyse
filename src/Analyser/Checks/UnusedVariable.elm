@@ -1,6 +1,6 @@
 module Analyser.Checks.UnusedVariable exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.File exposing (..)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Base exposing (..)
@@ -39,8 +39,8 @@ type alias UsedVariableContext =
     }
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext configuration =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext configuration =
     let
         x : UsedVariableContext
         x =

@@ -1,6 +1,6 @@
 module Analyser.Checks.NonStaticRegex exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
@@ -28,8 +28,8 @@ checker =
 {-| Find out if `Regex.regex` and in what manner.
 If it is imported the dynamic usages should inspected and then transformed into messages.
 -}
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext _ =
     let
         regexImport =
             Imports.buildImportInformation [ "Regex" ] "regex" fileContext.ast

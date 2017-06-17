@@ -1,6 +1,6 @@
 module Analyser.Checks.UnusedImportAliases exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.TypeAnnotation exposing (..)
@@ -25,8 +25,8 @@ type alias Context =
     Dict ModuleName ( Range, Int )
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext _ =
     let
         aliases : Context
         aliases =
