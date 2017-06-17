@@ -11,6 +11,8 @@ cache:
   directories:
   - node_modules
   - sysconfcpus
+  - tests/elm-stuff/build-artifacts
+
 install:
   - |
     if [ ! -d sysconfcpus/bin ];
@@ -25,4 +27,4 @@ install:
 
 script:
   - sh ./prettier-check.sh
-  - npm run test
+  - $TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 npm run test
