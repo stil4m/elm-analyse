@@ -1,7 +1,8 @@
 module Analyser.Checks.UnusedVariable exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Range as Syntax
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Pattern exposing (..)
@@ -26,7 +27,7 @@ checker =
 
 
 type alias Scope =
-    Dict String ( Int, VariableType, Range )
+    Dict String ( Int, VariableType, Syntax.Range )
 
 
 type alias ActiveScope =
@@ -39,8 +40,8 @@ type alias UsedVariableContext =
     }
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext configuration =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan rangeContext fileContext configuration =
     let
         x : UsedVariableContext
         x =
@@ -59,7 +60,7 @@ scan fileContext configuration =
                 fileContext.ast
                 emptyContext
 
-        onlyUnused : List ( String, ( Int, VariableType, Range ) ) -> List ( String, ( Int, VariableType, Range ) )
+        onlyUnused : List ( String, ( Int, VariableType, Syntax.Range ) ) -> List ( String, ( Int, VariableType, Syntax.Range ) )
         onlyUnused =
             List.filter (Tuple.second >> Tuple3.first >> (==) 0)
 
@@ -67,7 +68,7 @@ scan fileContext configuration =
             x.poppedScopes
                 |> List.concatMap Dict.toList
                 |> onlyUnused
-                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType fileContext.path configuration t x y)
+                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType fileContext.path configuration t x (Range.build rangeContext y))
                 |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
         unusedTopLevels =
@@ -79,7 +80,7 @@ scan fileContext configuration =
                 |> onlyUnused
                 |> List.filter (filterByModuleType fileContext)
                 |> List.filter (Tuple.first >> flip Interface.exposesFunction fileContext.interface >> not)
-                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType fileContext.path configuration t x y)
+                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType fileContext.path configuration t x (Range.build rangeContext y))
                 |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
     in
         unusedVariables ++ unusedTopLevels
@@ -113,7 +114,7 @@ forVariableType path configuration variableType variableName range =
                 Nothing
 
 
-filterByModuleType : FileContext -> ( String, ( Int, VariableType, Range ) ) -> Bool
+filterByModuleType : FileContext -> ( String, ( Int, VariableType, Syntax.Range ) ) -> Bool
 filterByModuleType fileContext =
     case fileContext.ast.moduleDefinition of
         EffectModule _ ->
@@ -123,7 +124,7 @@ filterByModuleType fileContext =
             (always True)
 
 
-filterForEffectModule : ( String, ( Int, VariableType, Range ) ) -> Bool
+filterForEffectModule : ( String, ( Int, VariableType, Syntax.Range ) ) -> Bool
 filterForEffectModule ( k, _ ) =
     not <| List.member k [ "init", "onEffects", "onSelfMsg", "subMap", "cmdMap" ]
 

@@ -10,7 +10,7 @@ module.exports = function(app, elm, expressWs) {
         return JSON.stringify(state);
     }
 
-    app.ws("/dashboard", function(ws, _req) {
+    app.ws("/state", function(ws, _req) {
         ws.send(renderState());
         ws.on("message", function(_msg) {
             ws.send(renderState());

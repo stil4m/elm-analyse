@@ -11,6 +11,7 @@ import Elm.Parser as Parser
 import Expect
 import Elm.Processing as Processing
 import Elm.RawFile as RawFile exposing (RawFile)
+import Analyser.Messages.Range as Range
 
 
 analyseAndFix : Checker -> Fixer -> String -> RawFile -> File -> Result String String
@@ -26,7 +27,7 @@ analyseAndFix checker fixer input rawFile f =
             }
 
         x =
-            checker.check fileContext Configuration.defaultConfiguration
+            checker.check (Range.context input) fileContext Configuration.defaultConfiguration
     in
         case x of
             [] ->

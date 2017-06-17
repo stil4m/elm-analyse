@@ -1,6 +1,6 @@
 module Analyser.Messages.Types exposing (..)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range exposing (Range)
 import Elm.Syntax.Base exposing (ModuleName)
 
 

@@ -1,6 +1,6 @@
 module Analyser.Checks.ExposeAll exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.File exposing (..)
 import AST.Util
 import Analyser.FileContext exposing (FileContext)
@@ -22,13 +22,13 @@ type alias ExposeAllContext =
     List Range
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan rangeContext fileContext _ =
     let
         x : ExposeAllContext
         x =
             Inspector.inspect
-                { defaultConfig | onFile = Inner onFile }
+                { defaultConfig | onFile = Inner (onFile rangeContext) }
                 fileContext.ast
                 []
     in
@@ -37,14 +37,14 @@ scan fileContext _ =
             |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
-onFile : (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
-onFile _ file _ =
+onFile : RangeContext -> (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
+onFile rangeContext _ file _ =
     case AST.Util.fileExposingList file |> Maybe.withDefault None of
         None ->
             []
 
         All x ->
-            [ x ]
+            [ Range.build rangeContext x ]
 
         Explicit x ->
             x
@@ -54,7 +54,7 @@ onFile _ file _ =
                             TypeExpose exposedType ->
                                 case exposedType.constructors of
                                     All allRange ->
-                                        Just allRange
+                                        Just (Range.build rangeContext allRange)
 
                                     _ ->
                                         Nothing

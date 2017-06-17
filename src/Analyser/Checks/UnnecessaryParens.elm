@@ -1,6 +1,7 @@
 module Analyser.Checks.UnnecessaryParens exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Elm.Syntax.Range as Syntax
 import Elm.Syntax.Infix exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import AST.Util exposing (getParenthesized, isOperatorApplication, isLambda, isIf, isCase)
@@ -21,16 +22,11 @@ checker =
 
 
 type alias Context =
-    List Range
+    List Syntax.Range
 
 
-rangetoTuple : Range -> ( Int, Int, Int, Int )
-rangetoTuple x =
-    ( x.start.row, x.start.column, x.end.row, x.end.column )
-
-
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan rangeContext fileContext _ =
     let
         x : Context
         x =
@@ -40,8 +36,8 @@ scan fileContext _ =
                 []
     in
         x
-            |> List.uniqueBy rangetoTuple
-            |> List.map (UnnecessaryParens fileContext.path)
+            |> List.uniqueBy toString
+            |> List.map (Range.build rangeContext >> UnnecessaryParens fileContext.path)
             |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
@@ -174,7 +170,7 @@ allowedOnLHS expr =
         ]
 
 
-onParenthesizedExpression : Range -> Expression -> Context -> Context
+onParenthesizedExpression : Syntax.Range -> Expression -> Context -> Context
 onParenthesizedExpression range expression context =
     case Tuple.second expression of
         RecordAccess _ _ ->

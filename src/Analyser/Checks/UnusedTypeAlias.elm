@@ -1,6 +1,6 @@
 module Analyser.Checks.UnusedTypeAlias exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.TypeAnnotation exposing (..)
 import Elm.Syntax.TypeAlias exposing (..)
 import Analyser.FileContext exposing (FileContext)
@@ -24,13 +24,13 @@ type alias Context =
     Dict String ( String, Range, Int )
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan rangeContext fileContext _ =
     let
         collectedAliased : Context
         collectedAliased =
             Inspector.inspect
-                { defaultConfig | onTypeAlias = Post onTypeAlias }
+                { defaultConfig | onTypeAlias = Post (onTypeAlias rangeContext) }
                 fileContext.ast
                 Dict.empty
     in
@@ -69,6 +69,6 @@ onFunctionOrValue =
     markTypeAlias
 
 
-onTypeAlias : TypeAlias -> Context -> Context
-onTypeAlias typeAlias context =
-    Dict.insert typeAlias.name ( typeAlias.name, typeAlias.range, 0 ) context
+onTypeAlias : RangeContext -> TypeAlias -> Context -> Context
+onTypeAlias rangeContext typeAlias context =
+    Dict.insert typeAlias.name ( typeAlias.name, Range.build rangeContext typeAlias.range, 0 ) context

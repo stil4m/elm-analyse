@@ -1,8 +1,7 @@
 module Analyser.Messages.Util exposing (..)
 
-import AST.Ranges as Ranges exposing (rangeToString)
-import Elm.Syntax.Range exposing (Range, emptyRange)
 import Analyser.Messages.Types exposing (..)
+import Analyser.Messages.Range as Ranges exposing (Range, rangeToString, emptyRange)
 
 
 type alias CanFix =

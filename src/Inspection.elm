@@ -1,7 +1,8 @@
 module Inspection exposing (run)
 
 import Analyser.FileContext as FileContext
-import Analyser.Messages.Types exposing (Message, MessageData(FileLoadFailed, UnformattedFile), newMessage)
+import Analyser.Messages.Types exposing (Message, MessageData(..), newMessage)
+import Analyser.Messages.Range as Range
 import Analyser.Files.Types exposing (LoadedSourceFiles)
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.ExposeAll as ExposeAll
@@ -101,9 +102,18 @@ run codeBase includedSources configuration =
 
         inspectionMessages =
             FileContext.build codeBase includedSources
-                |> List.concatMap (\x -> List.concatMap (\c -> c.check x configuration) enabledChecks)
+                |> List.concatMap (inspectFileContext configuration enabledChecks)
 
         messages =
             List.concat [ failedMessages, fileMessages, inspectionMessages ]
     in
         messages
+
+
+inspectFileContext : Configuration -> List Checker -> FileContext.FileContext -> List Message
+inspectFileContext configuration enabledChecks fileContext =
+    let
+        rangeContext =
+            Range.context fileContext.content
+    in
+        List.concatMap (\c -> c.check rangeContext fileContext configuration) enabledChecks

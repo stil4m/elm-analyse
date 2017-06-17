@@ -1,23 +1,26 @@
 module Client.Highlight exposing (..)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Html exposing (Html, pre, text, span)
 import Html.Attributes exposing (style, id)
 
 
 beforeHighlight : List String -> Range -> String
-beforeHighlight targetRows { start } =
+beforeHighlight targetRows range =
     let
-        startRow =
-            max 0 (start.row - 3)
+        ( startRow, startColumn, _, _ ) =
+            Range.toTuple range
+
+        uiStartRow =
+            max 0 (startRow - 3)
 
         preLines =
-            List.take (start.row - startRow) targetRows
+            List.take (startRow - uiStartRow) targetRows
 
         preLineText =
-            List.drop (start.row - startRow) targetRows
+            List.drop (startRow - uiStartRow) targetRows
                 |> List.head
-                |> Maybe.map (String.left <| start.column + 1)
+                |> Maybe.map (String.left <| startColumn)
                 |> Maybe.map List.singleton
                 |> Maybe.withDefault []
     in
@@ -25,36 +28,29 @@ beforeHighlight targetRows { start } =
 
 
 afterHighlight : List String -> Range -> String
-afterHighlight targetRows { end, start } =
+afterHighlight targetRows range =
     let
-        startRow =
-            max 0 (start.row - 3)
+        ( startRow, _, endRow, endColumn ) =
+            Range.toTuple range
 
-        endRow =
-            if end.column < 0 then
-                end.row - 1
-            else
-                end.row
+        uiStartRow =
+            max 0 (startRow - 3)
 
         endsOnLineEnding =
-            end.row /= endRow
+            False
 
         postLineText =
             if endsOnLineEnding then
                 ""
             else
-                List.drop (end.row - startRow) targetRows
+                List.drop (endRow - uiStartRow) targetRows
                     |> List.head
-                    |> Maybe.map (String.dropLeft <| end.column + 1)
+                    |> Maybe.map (String.dropLeft <| endColumn)
                     |> Maybe.withDefault ""
                     |> flip (++) "\n"
 
         postLines =
-            (if endsOnLineEnding then
-                end.row - startRow
-             else
-                end.row - startRow + 1
-            )
+            (endRow - uiStartRow + 1)
                 |> flip List.drop targetRows
                 |> String.join "\n"
     in
@@ -64,22 +60,19 @@ afterHighlight targetRows { end, start } =
 highlightedString : List String -> Range -> String
 highlightedString targetRows range =
     let
-        startRow =
-            max 0 (range.start.row - 3)
+        ( startRow, startColumn, endRow, endColumn ) =
+            Range.toTuple range
 
-        endRow =
-            if range.end.column < 0 then
-                range.end.row - 1
-            else
-                range.end.row
+        uiStartRow =
+            max 0 (startRow - 3)
 
         endsOnLineEnding =
-            range.end.row /= endRow
+            False
 
         highlightedRowsFull =
             targetRows
-                |> List.drop (range.start.row - startRow)
-                |> List.take (endRow - range.start.row + 1)
+                |> List.drop (startRow - uiStartRow)
+                |> List.take (endRow - startRow + 1)
     in
         case highlightedRowsFull of
             [] ->
@@ -87,11 +80,8 @@ highlightedString targetRows range =
 
             [ x ] ->
                 x
-                    |> (String.dropLeft <| range.start.column + 1)
-                    |> if range.end.row /= endRow then
-                        identity >> flip (++) "\n"
-                       else
-                        String.left (range.end.column - range.start.column)
+                    |> (String.dropLeft <| startColumn)
+                    |> String.left (endColumn - startColumn)
 
             _ ->
                 let
@@ -103,7 +93,7 @@ highlightedString targetRows range =
                     firstHighlightedRow =
                         highlightedRowsFull
                             |> List.head
-                            |> Maybe.map (String.dropLeft <| range.start.column + 1)
+                            |> Maybe.map (String.dropLeft <| startColumn)
                             |> Maybe.map List.singleton
                             |> Maybe.withDefault []
 
@@ -115,7 +105,7 @@ highlightedString targetRows range =
                                 (if endsOnLineEnding then
                                     flip (++) "\n"
                                  else
-                                    String.left <| range.end.column + 1
+                                    String.left <| endColumn
                                 )
                             |> Maybe.map List.singleton
                             |> Maybe.withDefault []
@@ -126,19 +116,16 @@ highlightedString targetRows range =
 highlightedPre : String -> Range -> Html msg
 highlightedPre content range =
     let
+        ( startRow, _, endRow, _ ) =
+            Range.toTuple range
+
         target =
             String.split "\n" content
-                |> List.drop startRow
-                |> List.take (endRow - range.start.row + 7)
+                |> List.drop uiStartRow
+                |> List.take (endRow - startRow + 7)
 
-        startRow =
-            max 0 (range.start.row - 3)
-
-        endRow =
-            if range.end.column < 0 then
-                range.end.row - 1
-            else
-                range.end.row
+        uiStartRow =
+            max 0 (startRow - 3)
 
         preText =
             beforeHighlight target range

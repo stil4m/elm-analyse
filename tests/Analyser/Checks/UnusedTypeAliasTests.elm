@@ -4,6 +4,7 @@ import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedTypeAlias as UnusedTypeAlias
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
+import Analyser.Messages.Range as Range
 
 
 unusedButExposed : ( String, String, List MessageData )
@@ -102,7 +103,10 @@ type alias Person = { name : String, age : Int}
 
 foo = 1
 """
-    , [ UnusedTypeAlias "./foo.elm" "Person" { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+    , [ UnusedTypeAlias "./foo.elm" "Person" <|
+            Range.manual
+                { start = { row = 2, column = 0 }, end = { row = 2, column = 47 } }
+                { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
       ]
     )
 

@@ -3,81 +3,91 @@ module Analyser.Checks.ImportAllTests exposing (..)
 import Analyser.Checks.ImportAll as ImportAll
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Messages.Types exposing (..)
-import Expect
 import Test exposing (..)
+import Analyser.Messages.Range as Range
 
 
-importAll : String
+importAll : ( String, String, List MessageData )
 importAll =
-    """module Bar exposing (..)
+    ( "importAll"
+    , """module Bar exposing (..)
 
 import Foo exposing (..)
 
 """
+    , [ ImportAll "./foo.elm" [ "Foo" ] <|
+            Range.manual
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
+                { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
+      ]
+    )
 
 
-importAllMultiple : String
+importAllMultiple : ( String, String, List MessageData )
 importAllMultiple =
-    """module Bar exposing (..)
+    ( "importAllMultiple"
+    , """module Bar exposing (..)
 
 import Foo exposing (..)
 import Baz exposing (..)
 
 """
+    , [ ImportAll "./foo.elm" [ "Foo" ] <|
+            Range.manual
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
+                { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
+      , ImportAll "./foo.elm" [ "Baz" ] <|
+            Range.manual
+                { start = { row = 3, column = 21 }, end = { row = 3, column = 23 } }
+                { start = { row = 3, column = 20 }, end = { row = 3, column = 22 } }
+      ]
+    )
 
 
-importStrict : String
+importStrict : ( String, String, List MessageData )
 importStrict =
-    """module Bar exposing (foo)
+    ( "importStrict"
+    , """module Bar exposing (foo)
 
 import Foo exposing (foo)
 """
+    , []
+    )
 
 
-importAllConstructors : String
+importAllConstructors : ( String, String, List MessageData )
 importAllConstructors =
-    """module Bar exposing (foo)
+    ( "importAllConstructors"
+    , """module Bar exposing (foo)
 
 import Foo exposing (Bar(..))
 """
+    , [ ImportAll "./foo.elm" [ "Foo" ] <|
+            Range.manual
+                { start = { row = 2, column = 25 }, end = { row = 2, column = 27 } }
+                { start = { row = 2, column = 24 }, end = { row = 2, column = 26 } }
+      ]
+    )
 
 
-importConstructorsStrict : String
+importConstructorsStrict : ( String, String, List MessageData )
 importConstructorsStrict =
-    """module Bar exposing (foo)
+    ( "importConstructorsStrict"
+    , """module Bar exposing (foo)
 
 import Foo exposing (Bar(Baz))
 """
+    , []
+    )
 
 
 all : Test
 all =
-    describe "Analyser.ImportAllTests"
-        [ test "importAll" <|
-            \() ->
-                CTU.getMessages importAll ImportAll.checker
-                    |> Expect.equal
-                        (Just [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } } ])
-        , test "importAllMultiple" <|
-            \() ->
-                CTU.getMessages importAllMultiple ImportAll.checker
-                    |> Expect.equal
-                        (Just
-                            [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
-                            , ImportAll "./foo.elm" [ "Baz" ] { start = { row = 3, column = 20 }, end = { row = 3, column = 22 } }
-                            ]
-                        )
-        , test "importStrict" <|
-            \() ->
-                CTU.getMessages importStrict ImportAll.checker
-                    |> Expect.equal
-                        (Just [])
-        , test "importAllConstructors" <|
-            \() ->
-                CTU.getMessages importAllConstructors ImportAll.checker
-                    |> Expect.equal (Just [ ImportAll "./foo.elm" [ "Foo" ] { start = { row = 2, column = 24 }, end = { row = 2, column = 26 } } ])
-        , test "importConstructorsStrict" <|
-            \() ->
-                CTU.getMessages importConstructorsStrict ImportAll.checker
-                    |> Expect.equal (Just [])
+    CTU.build "Analyser.Checks.ImportAllTests"
+        ImportAll.checker
+        [ importAll
+        , importAllMultiple
+        , importStrict
+        , importAllConstructors
+        , importConstructorsStrict
         ]
