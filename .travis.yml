@@ -21,7 +21,7 @@ install:
       make && make install;
       cd ..;
     fi
-  - nmp install
+  - npm install
 
 script:
   - sh ./prettier-check.sh
