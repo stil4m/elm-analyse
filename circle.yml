@@ -9,7 +9,6 @@ dependencies:
 
 test:
   post:
-    - npm run test
     -  sh ./prettier-check.sh
 
 
