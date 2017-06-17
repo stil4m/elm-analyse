@@ -10,4 +10,4 @@ controlAddress { host } =
 
 dashboardAddress : Location -> String
 dashboardAddress { host } =
-    "ws://" ++ host ++ "/dashboard"
+    "ws://" ++ host ++ "/state"
