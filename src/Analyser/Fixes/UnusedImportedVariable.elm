@@ -2,7 +2,7 @@ module Analyser.Fixes.UnusedImportedVariable exposing (fixer)
 
 import Analyser.Messages.Types exposing (MessageData(UnusedImportedVariable))
 import Elm.Syntax.File exposing (..)
-import Elm.Syntax.Range exposing (..)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.Module exposing (..)
 import ASTUtil.Imports as Imports
 import Analyser.Fixes.FileContent as FileContent
@@ -41,11 +41,11 @@ fix input messageData =
 
 removeImport : ( String, String, File ) -> Range -> Result String (List ( String, String ))
 removeImport ( fileName, content, ast ) range =
-    case Imports.findImportWithRange ast range of
+    case Imports.findImportWithRange ast (Range.asSyntaxRange range) of
         Just imp ->
             Ok
                 [ ( fileName
-                  , writeNewImport imp.range (Imports.removeRangeFromImport range imp) content
+                  , writeNewImport (Range.build imp.range) (Imports.removeRangeFromImport (Range.asSyntaxRange range) imp) content
                   )
                 ]
 
@@ -55,7 +55,11 @@ removeImport ( fileName, content, ast ) range =
 
 writeNewImport : Range -> Import -> String -> String
 writeNewImport r imp i =
-    FileContent.replaceLines
-        ( r.start.row, r.end.row )
-        (Imports.naiveStringifyImport imp)
-        i
+    let
+        syntaxRange =
+            Range.asSyntaxRange r
+    in
+        FileContent.replaceLines
+            ( syntaxRange.start.row, syntaxRange.end.row )
+            (Imports.naiveStringifyImport imp)
+            i

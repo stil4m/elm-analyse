@@ -2,11 +2,12 @@ module Analyser.Fixes.UnusedTypeAlias exposing (fixer)
 
 import Analyser.Messages.Types exposing (MessageData(UnusedTypeAlias))
 import Analyser.Fixes.Base exposing (Fixer)
-import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Range as Syntax
 import Elm.Syntax.File exposing (..)
 import Elm.Syntax.TypeAlias exposing (..)
 import Elm.Syntax.Declaration exposing (..)
 import Analyser.Fixes.FileContent as FileContent
+import Analyser.Messages.Range as Range exposing (Range)
 
 
 fixer : Fixer
@@ -54,7 +55,7 @@ findTypeAlias range file =
             (\decl ->
                 case decl of
                     AliasDecl typeAlias ->
-                        if typeAlias.range == range then
+                        if typeAlias.range == Range.asSyntaxRange range then
                             Just typeAlias
                         else
                             Nothing
@@ -76,4 +77,4 @@ removeTypeAlias typeAlias content =
         end =
             typeAlias.range.end
     in
-        FileContent.replaceRangeWith (Range start end) "" content
+        FileContent.replaceRangeWith ((Syntax.Range start end)) "" content

@@ -1,12 +1,12 @@
 module Analyser.Checks.NoUncurriedPrefix exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(NoUncurriedPrefix), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Messages.Range as Range exposing (Range)
 
 
 checker : Checker
@@ -41,7 +41,7 @@ onExpression ( _, expression ) context =
                     if String.startsWith ",," x then
                         context
                     else
-                        ( x, r ) :: context
+                        ( x, Range.build r ) :: context
 
                 _ ->
                     context

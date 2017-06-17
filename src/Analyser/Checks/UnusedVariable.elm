@@ -1,6 +1,6 @@
 module Analyser.Checks.UnusedVariable exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.File exposing (..)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Base exposing (..)
@@ -134,7 +134,7 @@ pushScope vars x =
         y : ActiveScope
         y =
             vars
-                |> List.map (\( z, t ) -> ( z.value, ( 0, t, z.range ) ))
+                |> List.map (\( z, t ) -> ( z.value, ( 0, t, Range.build z.range ) ))
                 |> Dict.fromList
                 |> (,) []
     in

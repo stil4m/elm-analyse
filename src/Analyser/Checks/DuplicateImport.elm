@@ -2,7 +2,7 @@ module Analyser.Checks.DuplicateImport exposing (checker)
 
 import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.Module exposing (Import)
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImport), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)
@@ -46,7 +46,7 @@ onImport : Import -> Context -> Context
 onImport { moduleName, range } context =
     case Dict.get moduleName context of
         Just _ ->
-            Dict.update moduleName (Maybe.map (flip (++) [ range ])) context
+            Dict.update moduleName (Maybe.map (flip (++) [ Range.build range ])) context
 
         Nothing ->
-            Dict.insert moduleName [ range ] context
+            Dict.insert moduleName [ Range.build range ] context

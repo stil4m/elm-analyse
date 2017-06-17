@@ -1,6 +1,6 @@
 module Analyser.Checks.UnusedTypeAlias exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.TypeAnnotation exposing (..)
 import Elm.Syntax.TypeAlias exposing (..)
 import Analyser.FileContext exposing (FileContext)
@@ -71,4 +71,4 @@ onFunctionOrValue =
 
 onTypeAlias : TypeAlias -> Context -> Context
 onTypeAlias typeAlias context =
-    Dict.insert typeAlias.name ( typeAlias.name, typeAlias.range, 0 ) context
+    Dict.insert typeAlias.name ( typeAlias.name, Range.build typeAlias.range, 0 ) context

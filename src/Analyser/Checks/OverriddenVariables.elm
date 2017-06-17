@@ -1,6 +1,6 @@
 module Analyser.Checks.OverriddenVariables exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Pattern exposing (..)
 import Elm.Syntax.Expression exposing (..)
@@ -34,7 +34,7 @@ scan fileContext _ =
         topLevels : Dict String Range
         topLevels =
             getImportsVars fileContext.ast.imports
-                |> List.map (\( x, _ ) -> ( x.value, x.range ))
+                |> List.map (\( x, _ ) -> ( x.value, Range.build x.range ))
                 |> Dict.fromList
     in
         Inspector.inspect
@@ -61,14 +61,14 @@ visitWithVariablePointers variablePointers f ( redefines, known ) =
 
         newKnown : Dict String Range
         newKnown =
-            List.foldl (\a b -> Dict.insert a.value a.range b) known variablePointers
+            List.foldl (\a b -> Dict.insert a.value (Range.build a.range) b) known variablePointers
 
         ( newRedefines, _ ) =
             f ( redefines, newKnown )
     in
         ( newRedefines
             ++ (redefinedPattern
-                    |> List.filterMap (\x -> Dict.get x.value known |> Maybe.map (\r -> ( x.value, r, x.range )))
+                    |> List.filterMap (\x -> Dict.get x.value known |> Maybe.map (\r -> ( x.value, r, Range.build x.range )))
                )
         , known
         )

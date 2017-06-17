@@ -1,6 +1,6 @@
 module Analyser.Checks.UnnecessaryParens exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.Infix exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import AST.Util exposing (getParenthesized, isOperatorApplication, isLambda, isIf, isCase)
@@ -24,11 +24,6 @@ type alias Context =
     List Range
 
 
-rangetoTuple : Range -> ( Int, Int, Int, Int )
-rangetoTuple x =
-    ( x.start.row, x.start.column, x.end.row, x.end.column )
-
-
 scan : FileContext -> Configuration -> List Message
 scan fileContext _ =
     let
@@ -40,7 +35,7 @@ scan fileContext _ =
                 []
     in
         x
-            |> List.uniqueBy rangetoTuple
+            |> List.uniqueBy (Range.rangeToString)
             |> List.map (UnnecessaryParens fileContext.path)
             |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
@@ -49,7 +44,7 @@ onFunction : Function -> Context -> Context
 onFunction function context =
     case function.declaration.expression of
         ( range, ParenthesizedExpression _ ) ->
-            range :: context
+            Range.build range :: context
 
         _ ->
             context
@@ -59,7 +54,7 @@ onLambda : Lambda -> Context -> Context
 onLambda lambda context =
     case lambda.expression of
         ( range, ParenthesizedExpression _ ) ->
-            range :: context
+            Range.build range :: context
 
         _ ->
             context
@@ -69,7 +64,7 @@ onExpression : Expression -> Context -> Context
 onExpression ( range, expression ) context =
     case expression of
         ParenthesizedExpression inner ->
-            onParenthesizedExpression range inner context
+            onParenthesizedExpression (Range.build range) inner context
 
         OperatorApplication op dir left right ->
             onOperatorApplication ( op, dir, left, right ) context
@@ -102,14 +97,14 @@ onExpression ( range, expression ) context =
 onListExpr : List Expression -> Context -> Context
 onListExpr exprs context =
     List.filterMap getParenthesized exprs
-        |> List.map Tuple.first
+        |> List.map (Tuple.first >> Range.build)
         |> flip (++) context
 
 
 onTuple : List Expression -> Context -> Context
 onTuple exprs context =
     List.filterMap getParenthesized exprs
-        |> List.map Tuple.first
+        |> List.map (Tuple.first >> Range.build)
         |> flip (++) context
 
 
@@ -117,7 +112,7 @@ onRecord : List ( String, Expression ) -> Context -> Context
 onRecord fields context =
     fields
         |> List.filterMap (Tuple.second >> getParenthesized)
-        |> List.map Tuple.first
+        |> List.map (Tuple.first >> Range.build)
         |> flip (++) context
 
 
@@ -125,7 +120,7 @@ onCaseBlock : CaseBlock -> Context -> Context
 onCaseBlock caseBlock context =
     case getParenthesized caseBlock.expression of
         Just ( range, _ ) ->
-            range :: context
+            Range.build range :: context
 
         Nothing ->
             context
@@ -135,7 +130,7 @@ onIfBlock : Expression -> Expression -> Expression -> Context -> Context
 onIfBlock clause thenBranch elseBranch context =
     [ clause, thenBranch, elseBranch ]
         |> List.filterMap getParenthesized
-        |> List.map Tuple.first
+        |> List.map (Tuple.first >> Range.build)
         |> flip (++) context
 
 
@@ -144,7 +139,7 @@ onApplication parts context =
     List.head parts
         |> Maybe.andThen getParenthesized
         |> Maybe.filter (Tuple.second >> isOperatorApplication >> not)
-        |> Maybe.map Tuple.first
+        |> Maybe.map (Tuple.first >> Range.build)
         |> Maybe.map (flip (::) context)
         |> Maybe.withDefault context
 
@@ -162,6 +157,7 @@ onOperatorApplication ( _, _, left, right ) context =
         , fixHandSide (always True) right
         ]
             |> List.filterMap identity
+            |> List.map Range.build
             |> flip (++) context
 
 

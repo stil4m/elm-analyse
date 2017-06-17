@@ -1,6 +1,6 @@
 module Analyser.Checks.UnusedImportAliases exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.TypeAnnotation exposing (..)
@@ -59,7 +59,7 @@ onImport : Import -> Context -> Context
 onImport imp context =
     case imp.moduleAlias of
         Just x ->
-            Dict.insert x ( imp.range, 0 ) context
+            Dict.insert x ( Range.build imp.range, 0 ) context
 
         Nothing ->
             context

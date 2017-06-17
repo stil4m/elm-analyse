@@ -1,6 +1,6 @@
 module Analyser.Checks.NoDebug exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DebugLog, DebugCrash), newMessage)
@@ -56,7 +56,7 @@ onExpression ( range, expression ) context =
     case expression of
         QualifiedExpr moduleName f ->
             entryForQualifiedExpr moduleName f
-                |> Maybe.map (flip (,) range >> flip (::) context)
+                |> Maybe.map (flip (,) (Range.build range) >> flip (::) context)
                 |> Maybe.withDefault context
 
         _ ->

@@ -1,6 +1,6 @@
 module Analyser.Checks.UnnecessaryListConcat exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryListConcat), newMessage)
@@ -47,7 +47,7 @@ onExpression ( r, inner ) context =
     case inner of
         Application [ ( _, QualifiedExpr [ "List" ] "concat" ), ( _, ListExpr args ) ] ->
             if List.all isListExpression args then
-                r :: context
+                Range.build r :: context
             else
                 context
 

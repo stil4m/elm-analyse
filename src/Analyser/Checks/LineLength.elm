@@ -4,6 +4,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(LineLengthExceeded), newMessage)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Messages.Range as Range
 
 
 checker : Checker
@@ -33,5 +34,5 @@ scan fileContext configuration =
         else
             [ newMessage
                 [ ( fileContext.sha1, fileContext.path ) ]
-                (LineLengthExceeded fileContext.path longLineRanges)
+                (LineLengthExceeded fileContext.path (List.map Range.build longLineRanges))
             ]

@@ -1,12 +1,12 @@
 module Analyser.Checks.ListOperators exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UseConsOverConcat, DropConcatOfLists, DropConsOfItemAndList), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Messages.Range as Range exposing (Range)
 
 
 checker : Checker
@@ -65,13 +65,13 @@ onExpression : Expression -> Context -> Context
 onExpression ( r, inner ) context =
     case inner of
         OperatorApplication "++" _ ( _, ListExpr _ ) ( _, ListExpr _ ) ->
-            ( DropConcat, r ) :: context
+            ( DropConcat, Range.build r ) :: context
 
         OperatorApplication "::" _ _ ( _, ListExpr _ ) ->
-            ( DropCons, r ) :: context
+            ( DropCons, Range.build r ) :: context
 
         OperatorApplication "++" _ ( _, ListExpr [ _ ] ) _ ->
-            ( UseCons, r ) :: context
+            ( UseCons, Range.build r ) :: context
 
         _ ->
             context

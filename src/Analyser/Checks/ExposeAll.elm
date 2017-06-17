@@ -1,6 +1,6 @@
 module Analyser.Checks.ExposeAll exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.File exposing (..)
 import AST.Util
 import Analyser.FileContext exposing (FileContext)
@@ -44,7 +44,7 @@ onFile _ file _ =
             []
 
         All x ->
-            [ x ]
+            [ Range.build x ]
 
         Explicit x ->
             x
@@ -54,7 +54,7 @@ onFile _ file _ =
                             TypeExpose exposedType ->
                                 case exposedType.constructors of
                                     All allRange ->
-                                        Just allRange
+                                        Just (Range.build allRange)
 
                                     _ ->
                                         Nothing

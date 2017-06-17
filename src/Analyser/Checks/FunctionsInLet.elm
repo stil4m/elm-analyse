@@ -7,6 +7,7 @@ import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), ne
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Inner), defaultConfig)
 import Elm.Syntax.Expression exposing (..)
 import ASTUtil.Functions
+import Analyser.Messages.Range as Range
 
 
 type alias Context =
@@ -43,7 +44,7 @@ scan fileContext _ =
 asMessage : FileContext -> Function -> Message
 asMessage fileContext f =
     newMessage [ ( fileContext.sha1, fileContext.path ) ]
-        (FunctionInLet fileContext.path f.declaration.name.range)
+        (FunctionInLet fileContext.path (Range.build f.declaration.name.range))
 
 
 onFunction : Function -> Context -> Context

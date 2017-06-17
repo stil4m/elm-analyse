@@ -1,13 +1,14 @@
 module Analyser.Checks.MultiLineRecordFormatting exposing (checker)
 
 import Analyser.FileContext exposing (FileContext)
-import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.TypeAnnotation exposing (..)
 import Elm.Syntax.TypeAlias exposing (..)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting), newMessage)
 import ASTUtil.Inspector as Inspector exposing (..)
+import Analyser.Messages.Range as Range exposing (Range)
+import Elm.Syntax.Range as Syntax
 
 
 checker : Checker
@@ -54,7 +55,7 @@ onTypeAlias x context =
     findRecords x.typeAnnotation ++ context
 
 
-typeAnnotationRange : TypeAnnotation -> Range
+typeAnnotationRange : TypeAnnotation -> Syntax.Range
 typeAnnotationRange x =
     case x of
         GenericType _ r ->
@@ -95,10 +96,10 @@ findRecords x =
             List.concatMap findRecords inner
 
         Record fields r ->
-            ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
+            ( Range.build r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
 
         GenericRecord _ fields r ->
-            ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
+            ( Range.build r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
 
         FunctionTypeAnnotation left right _ ->
             -- TODO: Think about if this makes sense

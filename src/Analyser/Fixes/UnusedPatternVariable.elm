@@ -7,7 +7,7 @@ import ASTUtil.PatternOptimizer as PatternOptimizer
 import ASTUtil.Patterns as Patterns
 import Elm.Writer as Writer
 import Analyser.Fixes.Base exposing (Fixer)
-import Elm.Syntax.Range exposing (..)
+import Analyser.Messages.Range as Range exposing (Range)
 
 
 fixer : Fixer
@@ -42,13 +42,13 @@ fix input messageData =
 
 fixPattern : ( String, String, File ) -> Range -> Result String (List ( String, String ))
 fixPattern ( fileName, content, ast ) range =
-    case Patterns.findParentPattern ast range of
+    case Patterns.findParentPattern ast (Range.asSyntaxRange range) of
         Just parentPattern ->
             Ok
                 [ ( fileName
                   , FileContent.replaceRangeWith
                         (PatternOptimizer.patternRange parentPattern)
-                        (Writer.writePattern (PatternOptimizer.optimize range parentPattern)
+                        (Writer.writePattern (PatternOptimizer.optimize (Range.asSyntaxRange range) parentPattern)
                             |> Writer.write
                         )
                         content

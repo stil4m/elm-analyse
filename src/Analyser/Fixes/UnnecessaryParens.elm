@@ -1,7 +1,7 @@
 module Analyser.Fixes.UnnecessaryParens exposing (fixer)
 
 import Analyser.Messages.Types exposing (MessageData(UnnecessaryParens))
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.File exposing (..)
 import Tuple3
 import Analyser.Fixes.FileContent as FileContent
@@ -39,10 +39,13 @@ fix input messageData =
 
 
 fixContent : Range -> ( String, String ) -> Result String ( String, String )
-fixContent { start, end } ( fileName, content ) =
+fixContent range ( fileName, content ) =
     let
+        { start, end } =
+            Range.asSyntaxRange range
+
         startChar =
-            FileContent.getCharAtLocation start content
+            FileContent.getCharAtLocation ( start.row, start.column ) content
 
         lines =
             content
@@ -50,29 +53,25 @@ fixContent { start, end } ( fileName, content ) =
 
         endCharLoc =
             if end.column <= -2 then
-                { end
-                    | column =
-                        lines
-                            |> List.drop (end.row - 1)
-                            |> List.head
-                            |> Maybe.withDefault ""
-                            |> String.length
-                            |> flip (-) 2
-                    , row = end.row - 1
-                }
+                ( end.row - 1
+                , lines
+                    |> List.drop (end.row - 1)
+                    |> List.head
+                    |> Maybe.withDefault ""
+                    |> String.length
+                    |> flip (-) 2
+                )
             else if end.column == -1 then
-                { end
-                    | column =
-                        lines
-                            |> List.drop (end.row - 2)
-                            |> List.head
-                            |> Maybe.withDefault ""
-                            |> String.length
-                            |> flip (-) 2
-                    , row = end.row - 2
-                }
+                ( end.row - 2
+                , lines
+                    |> List.drop (end.row - 2)
+                    |> List.head
+                    |> Maybe.withDefault ""
+                    |> String.length
+                    |> flip (-) 2
+                )
             else
-                { end | column = end.column - 1 }
+                ( end.row, end.column - 1 )
 
         endChar =
             FileContent.getCharAtLocation endCharLoc content
@@ -80,7 +79,7 @@ fixContent { start, end } ( fileName, content ) =
         case ( startChar, endChar ) of
             ( Just "(", Just ")" ) ->
                 content
-                    |> FileContent.replaceLocationWith start " "
+                    |> FileContent.replaceLocationWith ( start.row, start.column ) " "
                     |> FileContent.replaceLocationWith endCharLoc ""
                     |> (,) fileName
                     |> Ok

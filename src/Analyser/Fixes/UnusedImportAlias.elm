@@ -5,8 +5,8 @@ import ASTUtil.Imports as Imports
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Fixes.Base exposing (Fixer)
 import Elm.Syntax.File exposing (..)
-import Elm.Syntax.Range exposing (..)
 import Elm.Syntax.Module exposing (..)
+import Analyser.Messages.Range as Range exposing (Range)
 
 
 fixer : Fixer
@@ -41,11 +41,11 @@ fix input messageData =
 
 updateImport : ( String, String, File ) -> Range -> Result String (List ( String, String ))
 updateImport ( fileName, content, ast ) range =
-    case Imports.findImportWithRange ast range of
+    case Imports.findImportWithRange ast (Range.asSyntaxRange range) of
         Just imp ->
             Ok
                 [ ( fileName
-                  , writeNewImport imp.range { imp | moduleAlias = Nothing } content
+                  , writeNewImport (Range.build imp.range) { imp | moduleAlias = Nothing } content
                   )
                 ]
 
@@ -55,7 +55,11 @@ updateImport ( fileName, content, ast ) range =
 
 writeNewImport : Range -> Import -> String -> String
 writeNewImport r imp i =
-    FileContent.replaceLines
-        ( r.start.row, r.end.row )
-        (Imports.naiveStringifyImport imp)
-        i
+    let
+        syntaxRange =
+            Range.asSyntaxRange r
+    in
+        FileContent.replaceLines
+            ( syntaxRange.start.row, syntaxRange.end.row )
+            (Imports.naiveStringifyImport imp)
+            i

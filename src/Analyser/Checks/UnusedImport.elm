@@ -1,6 +1,6 @@
 module Analyser.Checks.UnusedImport exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.TypeAnnotation exposing (..)
@@ -59,7 +59,7 @@ markUsage key context =
 onImport : Import -> Context -> Context
 onImport imp context =
     if imp.moduleAlias == Nothing && imp.exposingList == None then
-        Dict.insert imp.moduleName ( imp.range, 0 ) context
+        Dict.insert imp.moduleName ( Range.build imp.range, 0 ) context
     else
         context
 

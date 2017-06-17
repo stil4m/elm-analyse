@@ -1,6 +1,6 @@
 module Analyser.Checks.NonStaticRegex exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
@@ -102,7 +102,7 @@ onExpressionQualified moduleName ( range, inner ) context =
     case inner of
         QualifiedExpr m f ->
             if f == "regex" && m == moduleName then
-                addUsedRegex range context
+                addUsedRegex (Range.build range) context
             else
                 context
 
@@ -114,7 +114,7 @@ onExpressionFunctionReference : Expression -> Context -> Context
 onExpressionFunctionReference ( range, inner ) context =
     case inner of
         FunctionOrValue "regex" ->
-            addUsedRegex range context
+            addUsedRegex (Range.build range) context
 
         _ ->
             context
