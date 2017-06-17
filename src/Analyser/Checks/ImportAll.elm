@@ -2,7 +2,6 @@ module Analyser.Checks.ImportAll exposing (checker)
 
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Base exposing (..)
-import AST.Ranges as Ranges
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(ImportAll), newMessage)
 import ASTUtil.Inspector as Inspector exposing (defaultConfig, Order(Post))
@@ -24,9 +23,9 @@ type alias ExposeAllContext =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     Inspector.inspect
-        { defaultConfig | onImport = Post onImport }
+        { defaultConfig | onImport = Post (onImport rangeContext) }
         fileContext.ast
         []
         |> List.sortWith (\( _, a ) ( _, b ) -> Range.orderByStart a b)
@@ -34,12 +33,12 @@ scan _ fileContext _ =
         |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
-onImport : Import -> ExposeAllContext -> ExposeAllContext
-onImport imp context =
+onImport : RangeContext -> Import -> ExposeAllContext -> ExposeAllContext
+onImport rangeContext imp context =
     flip List.append context <|
         case imp.exposingList of
             All range ->
-                [ ( imp.moduleName, Range.build range ) ]
+                [ ( imp.moduleName, Range.build rangeContext range ) ]
 
             None ->
                 []
@@ -52,7 +51,7 @@ onImport imp context =
                                 TypeExpose exposedType ->
                                     case exposedType.constructors of
                                         All range ->
-                                            Just ( imp.moduleName, Range.build range )
+                                            Just ( imp.moduleName, Range.build rangeContext range )
 
                                         _ ->
                                             Nothing

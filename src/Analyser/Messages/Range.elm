@@ -68,8 +68,8 @@ asSyntaxRange (Range _ parsed) =
     parsed
 
 
-build : Syntax.Range -> Range
-build ({ start, end } as parsed) =
+build : RangeContext -> Syntax.Range -> Range
+build _ ({ start, end } as parsed) =
     if start.row == 1 then
         Range
             { start = { row = start.row - 1, column = start.column }

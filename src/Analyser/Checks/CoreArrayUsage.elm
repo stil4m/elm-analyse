@@ -16,10 +16,10 @@ checker =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     fileContext.ast.imports
         |> List.filter isArrayImport
-        |> List.map (.range >> Range.build >> CoreArrayUsage fileContext.path)
+        |> List.map (.range >> Range.build rangeContext >> CoreArrayUsage fileContext.path)
         |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
         |> List.take 1
 

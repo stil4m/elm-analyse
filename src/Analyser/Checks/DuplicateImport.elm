@@ -23,10 +23,10 @@ type alias Context =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     Inspector.inspect
         { defaultConfig
-            | onImport = Post onImport
+            | onImport = Post (onImport rangeContext)
             , onFunction = Skip
         }
         fileContext.ast
@@ -42,11 +42,11 @@ hasLength f =
     List.length >> f
 
 
-onImport : Import -> Context -> Context
-onImport { moduleName, range } context =
+onImport : RangeContext -> Import -> Context -> Context
+onImport rangeContext { moduleName, range } context =
     case Dict.get moduleName context of
         Just _ ->
-            Dict.update moduleName (Maybe.map (flip (++) [ Range.build range ])) context
+            Dict.update moduleName (Maybe.map (flip (++) [ Range.build rangeContext range ])) context
 
         Nothing ->
-            Dict.insert moduleName [ Range.build range ] context
+            Dict.insert moduleName [ Range.build rangeContext range ] context

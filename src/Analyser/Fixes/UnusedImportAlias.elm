@@ -5,6 +5,7 @@ import ASTUtil.Imports as Imports
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Fixes.Base exposing (Fixer)
 import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Range as Syntax
 import Elm.Syntax.Module exposing (..)
 import Analyser.Messages.Range as Range exposing (Range)
 
@@ -45,7 +46,7 @@ updateImport ( fileName, content, ast ) range =
         Just imp ->
             Ok
                 [ ( fileName
-                  , writeNewImport (Range.build imp.range) { imp | moduleAlias = Nothing } content
+                  , writeNewImport (imp.range) { imp | moduleAlias = Nothing } content
                   )
                 ]
 
@@ -53,13 +54,9 @@ updateImport ( fileName, content, ast ) range =
             Err "Could not locate import for the target range"
 
 
-writeNewImport : Range -> Import -> String -> String
-writeNewImport r imp i =
-    let
-        syntaxRange =
-            Range.asSyntaxRange r
-    in
-        FileContent.replaceLines
-            ( syntaxRange.start.row, syntaxRange.end.row )
-            (Imports.naiveStringifyImport imp)
-            i
+writeNewImport : Syntax.Range -> Import -> String -> String
+writeNewImport syntaxRange imp i =
+    FileContent.replaceLines
+        ( syntaxRange.start.row, syntaxRange.end.row )
+        (Imports.naiveStringifyImport imp)
+        i

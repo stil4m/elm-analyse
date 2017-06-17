@@ -19,13 +19,13 @@ checker =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     let
         threshold =
             2
     in
         Inspector.inspect
-            { defaultConfig | onTypeAlias = Post onTypeAlias }
+            { defaultConfig | onTypeAlias = Post (onTypeAlias rangeContext) }
             fileContext.ast
             []
             |> List.filter (Tuple.second >> List.length >> (<=) threshold)
@@ -50,9 +50,9 @@ firstTwo def =
             Nothing
 
 
-onTypeAlias : TypeAlias -> List ( Range, RecordDefinition ) -> List ( Range, RecordDefinition )
-onTypeAlias x context =
-    findRecords x.typeAnnotation ++ context
+onTypeAlias : RangeContext -> TypeAlias -> List ( Range, RecordDefinition ) -> List ( Range, RecordDefinition )
+onTypeAlias rangeContext x context =
+    findRecords rangeContext x.typeAnnotation ++ context
 
 
 typeAnnotationRange : TypeAnnotation -> Syntax.Range
@@ -80,27 +80,27 @@ typeAnnotationRange x =
             r
 
 
-findRecords : TypeAnnotation -> List ( Range, RecordDefinition )
-findRecords x =
+findRecords : RangeContext -> TypeAnnotation -> List ( Range, RecordDefinition )
+findRecords rangeContext x =
     case x of
         GenericType _ _ ->
             []
 
         Typed _ _ args _ ->
-            List.concatMap findRecords args
+            List.concatMap (findRecords rangeContext) args
 
         Unit _ ->
             []
 
         Tupled inner _ ->
-            List.concatMap findRecords inner
+            List.concatMap (findRecords rangeContext) inner
 
         Record fields r ->
-            ( Range.build r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
+            ( Range.build rangeContext r, fields ) :: List.concatMap (Tuple.second >> (findRecords rangeContext)) fields
 
         GenericRecord _ fields r ->
-            ( Range.build r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
+            ( Range.build rangeContext r, fields ) :: List.concatMap (Tuple.second >> (findRecords rangeContext)) fields
 
         FunctionTypeAnnotation left right _ ->
             -- TODO: Think about if this makes sense
-            findRecords left ++ findRecords right
+            findRecords rangeContext left ++ findRecords rangeContext right

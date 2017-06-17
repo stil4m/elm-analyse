@@ -2,6 +2,7 @@ module Analyser.Fixes.UnusedImportedVariable exposing (fixer)
 
 import Analyser.Messages.Types exposing (MessageData(UnusedImportedVariable))
 import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Range as Syntax
 import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.Module exposing (..)
 import ASTUtil.Imports as Imports
@@ -45,7 +46,7 @@ removeImport ( fileName, content, ast ) range =
         Just imp ->
             Ok
                 [ ( fileName
-                  , writeNewImport (Range.build imp.range) (Imports.removeRangeFromImport (Range.asSyntaxRange range) imp) content
+                  , writeNewImport imp.range (Imports.removeRangeFromImport (Range.asSyntaxRange range) imp) content
                   )
                 ]
 
@@ -53,13 +54,9 @@ removeImport ( fileName, content, ast ) range =
             Err "Could not locate import for the target range"
 
 
-writeNewImport : Range -> Import -> String -> String
-writeNewImport r imp i =
-    let
-        syntaxRange =
-            Range.asSyntaxRange r
-    in
-        FileContent.replaceLines
-            ( syntaxRange.start.row, syntaxRange.end.row )
-            (Imports.naiveStringifyImport imp)
-            i
+writeNewImport : Syntax.Range -> Import -> String -> String
+writeNewImport syntaxRange imp i =
+    FileContent.replaceLines
+        ( syntaxRange.start.row, syntaxRange.end.row )
+        (Imports.naiveStringifyImport imp)
+        i

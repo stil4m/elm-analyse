@@ -27,10 +27,10 @@ type Deficiency
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext configuration =
+scan rangeContext fileContext configuration =
     Inspector.inspect
         { defaultConfig
-            | onExpression = Post onExpression
+            | onExpression = Post (onExpression rangeContext)
         }
         fileContext.ast
         []
@@ -61,17 +61,17 @@ deficiencyToMessageData path configuration ( deficiency, range ) =
                     Nothing
 
 
-onExpression : Expression -> Context -> Context
-onExpression ( r, inner ) context =
+onExpression : RangeContext -> Expression -> Context -> Context
+onExpression rangeContext ( r, inner ) context =
     case inner of
         OperatorApplication "++" _ ( _, ListExpr _ ) ( _, ListExpr _ ) ->
-            ( DropConcat, Range.build r ) :: context
+            ( DropConcat, Range.build rangeContext r ) :: context
 
         OperatorApplication "::" _ _ ( _, ListExpr _ ) ->
-            ( DropCons, Range.build r ) :: context
+            ( DropCons, Range.build rangeContext r ) :: context
 
         OperatorApplication "++" _ ( _, ListExpr [ _ ] ) _ ->
-            ( UseCons, Range.build r ) :: context
+            ( UseCons, Range.build rangeContext r ) :: context
 
         _ ->
             context

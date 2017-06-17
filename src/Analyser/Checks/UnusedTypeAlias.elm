@@ -25,12 +25,12 @@ type alias Context =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     let
         collectedAliased : Context
         collectedAliased =
             Inspector.inspect
-                { defaultConfig | onTypeAlias = Post onTypeAlias }
+                { defaultConfig | onTypeAlias = Post (onTypeAlias rangeContext) }
                 fileContext.ast
                 Dict.empty
     in
@@ -69,6 +69,6 @@ onFunctionOrValue =
     markTypeAlias
 
 
-onTypeAlias : TypeAlias -> Context -> Context
-onTypeAlias typeAlias context =
-    Dict.insert typeAlias.name ( typeAlias.name, Range.build typeAlias.range, 0 ) context
+onTypeAlias : RangeContext -> TypeAlias -> Context -> Context
+onTypeAlias rangeContext typeAlias context =
+    Dict.insert typeAlias.name ( typeAlias.name, Range.build rangeContext typeAlias.range, 0 ) context

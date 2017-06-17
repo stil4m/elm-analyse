@@ -21,10 +21,10 @@ type alias Context =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     Inspector.inspect
         { defaultConfig
-            | onExpression = Post onExpression
+            | onExpression = Post (onExpression rangeContext)
         }
         fileContext.ast
         []
@@ -42,12 +42,12 @@ isListExpression ( _, inner ) =
             False
 
 
-onExpression : Expression -> Context -> Context
-onExpression ( r, inner ) context =
+onExpression : RangeContext -> Expression -> Context -> Context
+onExpression rangeContext ( r, inner ) context =
     case inner of
         Application [ ( _, QualifiedExpr [ "List" ] "concat" ), ( _, ListExpr args ) ] ->
             if List.all isListExpression args then
-                Range.build r :: context
+                Range.build rangeContext r :: context
             else
                 context
 

@@ -26,12 +26,12 @@ type alias Context =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     let
         aliases : Context
         aliases =
             Inspector.inspect
-                { defaultConfig | onImport = Post onImport }
+                { defaultConfig | onImport = Post (onImport rangeContext) }
                 fileContext.ast
                 Dict.empty
     in
@@ -55,11 +55,11 @@ markUsage key context =
     Dict.update key (Maybe.map (Tuple.mapSecond ((+) 1))) context
 
 
-onImport : Import -> Context -> Context
-onImport imp context =
+onImport : RangeContext -> Import -> Context -> Context
+onImport rangeContext imp context =
     case imp.moduleAlias of
         Just x ->
-            Dict.insert x ( Range.build imp.range, 0 ) context
+            Dict.insert x ( Range.build rangeContext imp.range, 0 ) context
 
         Nothing ->
             context

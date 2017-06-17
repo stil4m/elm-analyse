@@ -2,6 +2,7 @@ module Analyser.Checks.OverriddenVariables exposing (checker)
 
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.Base exposing (..)
+import Elm.Syntax.Range as Syntax
 import Elm.Syntax.Pattern exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import ASTUtil.Variables exposing (getImportsVars, patternToVars)
@@ -21,20 +22,20 @@ checker =
 
 
 type alias Context =
-    ( List Redefine, Dict String Range )
+    ( List Redefine, Dict String Syntax.Range )
 
 
 type alias Redefine =
-    ( String, Range, Range )
+    ( String, Syntax.Range, Syntax.Range )
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     let
-        topLevels : Dict String Range
+        topLevels : Dict String Syntax.Range
         topLevels =
             getImportsVars fileContext.ast.imports
-                |> List.map (\( x, _ ) -> ( x.value, Range.build x.range ))
+                |> List.map (\( x, _ ) -> ( x.value, x.range ))
                 |> Dict.fromList
     in
         Inspector.inspect
@@ -47,7 +48,7 @@ scan _ fileContext _ =
             fileContext.ast
             ( [], topLevels )
             |> Tuple.first
-            |> List.map (\( n, r1, r2 ) -> RedefineVariable fileContext.path n r1 r2)
+            |> List.map (\( n, r1, r2 ) -> RedefineVariable fileContext.path n (Range.build rangeContext r1) (Range.build rangeContext r2))
             |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
@@ -59,16 +60,16 @@ visitWithVariablePointers variablePointers f ( redefines, known ) =
             variablePointers
                 |> List.filter (.value >> flip Dict.member known)
 
-        newKnown : Dict String Range
+        newKnown : Dict String Syntax.Range
         newKnown =
-            List.foldl (\a b -> Dict.insert a.value (Range.build a.range) b) known variablePointers
+            List.foldl (\a b -> Dict.insert a.value (a.range) b) known variablePointers
 
         ( newRedefines, _ ) =
             f ( redefines, newKnown )
     in
         ( newRedefines
             ++ (redefinedPattern
-                    |> List.filterMap (\x -> Dict.get x.value known |> Maybe.map (\r -> ( x.value, r, Range.build x.range )))
+                    |> List.filterMap (\x -> Dict.get x.value known |> Maybe.map (\r -> ( x.value, r, x.range )))
                )
         , known
         )

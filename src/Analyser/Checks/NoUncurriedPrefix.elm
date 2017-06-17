@@ -21,10 +21,10 @@ type alias Context =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     Inspector.inspect
         { defaultConfig
-            | onExpression = Post onExpression
+            | onExpression = Post (onExpression rangeContext)
         }
         fileContext.ast
         []
@@ -32,8 +32,8 @@ scan _ fileContext _ =
         |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
-onExpression : Expression -> Context -> Context
-onExpression ( _, expression ) context =
+onExpression : RangeContext -> Expression -> Context -> Context
+onExpression rangeContext ( _, expression ) context =
     case expression of
         Application xs ->
             case xs of
@@ -41,7 +41,7 @@ onExpression ( _, expression ) context =
                     if String.startsWith ",," x then
                         context
                     else
-                        ( x, Range.build r ) :: context
+                        ( x, Range.build rangeContext r ) :: context
 
                 _ ->
                     context

@@ -15,7 +15,7 @@ checker =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext configuration =
+scan rangeContext fileContext configuration =
     let
         threshold =
             Configuration.checkPropertyAsInt "LineLengthExceeded" "threshold" configuration
@@ -34,5 +34,5 @@ scan _ fileContext configuration =
         else
             [ newMessage
                 [ ( fileContext.sha1, fileContext.path ) ]
-                (LineLengthExceeded fileContext.path (List.map Range.build longLineRanges))
+                (LineLengthExceeded fileContext.path (List.map (Range.build rangeContext) longLineRanges))
             ]

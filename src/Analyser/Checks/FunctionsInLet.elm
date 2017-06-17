@@ -29,7 +29,7 @@ checker =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     Inspector.inspect
         { defaultConfig
             | onLetBlock = Inner onLetBlock
@@ -38,13 +38,13 @@ scan _ fileContext _ =
         fileContext.ast
         startingContext
         |> .functions
-        |> List.map (asMessage fileContext)
+        |> List.map (asMessage rangeContext fileContext)
 
 
-asMessage : FileContext -> Function -> Message
-asMessage fileContext f =
+asMessage : RangeContext -> FileContext -> Function -> Message
+asMessage rangeContext fileContext f =
     newMessage [ ( fileContext.sha1, fileContext.path ) ]
-        (FunctionInLet fileContext.path (Range.build f.declaration.name.range))
+        (FunctionInLet fileContext.path (Range.build rangeContext f.declaration.name.range))
 
 
 onFunction : Function -> Context -> Context

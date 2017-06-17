@@ -17,20 +17,20 @@ checker =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     Inspector.inspect
-        { defaultConfig | onFunction = Inner onFunction, onDestructuring = Skip }
+        { defaultConfig | onFunction = Inner (onFunction rangeContext), onDestructuring = Skip }
         fileContext.ast
         []
         |> List.map (uncurry (NoTopLevelSignature fileContext.path))
         |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
-onFunction : (List ( String, Range ) -> List ( String, Range )) -> Function -> List ( String, Range ) -> List ( String, Range )
-onFunction _ function context =
+onFunction : RangeContext -> (List ( String, Range ) -> List ( String, Range )) -> Function -> List ( String, Range ) -> List ( String, Range )
+onFunction rangeContext _ function context =
     case function.signature of
         Nothing ->
-            ( function.declaration.name.value, Range.build function.declaration.name.range ) :: context
+            ( function.declaration.name.value, Range.build rangeContext function.declaration.name.range ) :: context
 
         Just _ ->
             context

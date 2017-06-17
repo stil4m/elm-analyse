@@ -23,12 +23,12 @@ type alias ExposeAllContext =
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     let
         x : ExposeAllContext
         x =
             Inspector.inspect
-                { defaultConfig | onFile = Inner onFile }
+                { defaultConfig | onFile = Inner (onFile rangeContext) }
                 fileContext.ast
                 []
     in
@@ -37,14 +37,14 @@ scan _ fileContext _ =
             |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
-onFile : (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
-onFile _ file _ =
+onFile : RangeContext -> (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
+onFile rangeContext _ file _ =
     case AST.Util.fileExposingList file |> Maybe.withDefault None of
         None ->
             []
 
         All x ->
-            [ Range.build x ]
+            [ Range.build rangeContext x ]
 
         Explicit x ->
             x
@@ -54,7 +54,7 @@ onFile _ file _ =
                             TypeExpose exposedType ->
                                 case exposedType.constructors of
                                     All allRange ->
-                                        Just (Range.build allRange)
+                                        Just (Range.build rangeContext allRange)
 
                                     _ ->
                                         Nothing

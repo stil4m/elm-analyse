@@ -1,6 +1,7 @@
 module Analyser.Checks.UnnecessaryParens exposing (checker)
 
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Elm.Syntax.Range as Syntax
 import Elm.Syntax.Infix exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import AST.Util exposing (getParenthesized, isOperatorApplication, isLambda, isIf, isCase)
@@ -21,11 +22,11 @@ checker =
 
 
 type alias Context =
-    List Range
+    List Syntax.Range
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
-scan _ fileContext _ =
+scan rangeContext fileContext _ =
     let
         x : Context
         x =
@@ -35,8 +36,8 @@ scan _ fileContext _ =
                 []
     in
         x
-            |> List.uniqueBy (Range.rangeToString)
-            |> List.map (UnnecessaryParens fileContext.path)
+            |> List.uniqueBy (toString)
+            |> List.map (Range.build rangeContext >> UnnecessaryParens fileContext.path)
             |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
@@ -44,7 +45,7 @@ onFunction : Function -> Context -> Context
 onFunction function context =
     case function.declaration.expression of
         ( range, ParenthesizedExpression _ ) ->
-            Range.build range :: context
+            range :: context
 
         _ ->
             context
@@ -54,7 +55,7 @@ onLambda : Lambda -> Context -> Context
 onLambda lambda context =
     case lambda.expression of
         ( range, ParenthesizedExpression _ ) ->
-            Range.build range :: context
+            range :: context
 
         _ ->
             context
@@ -64,7 +65,7 @@ onExpression : Expression -> Context -> Context
 onExpression ( range, expression ) context =
     case expression of
         ParenthesizedExpression inner ->
-            onParenthesizedExpression (Range.build range) inner context
+            onParenthesizedExpression (range) inner context
 
         OperatorApplication op dir left right ->
             onOperatorApplication ( op, dir, left, right ) context
@@ -97,14 +98,14 @@ onExpression ( range, expression ) context =
 onListExpr : List Expression -> Context -> Context
 onListExpr exprs context =
     List.filterMap getParenthesized exprs
-        |> List.map (Tuple.first >> Range.build)
+        |> List.map (Tuple.first)
         |> flip (++) context
 
 
 onTuple : List Expression -> Context -> Context
 onTuple exprs context =
     List.filterMap getParenthesized exprs
-        |> List.map (Tuple.first >> Range.build)
+        |> List.map (Tuple.first)
         |> flip (++) context
 
 
@@ -112,7 +113,7 @@ onRecord : List ( String, Expression ) -> Context -> Context
 onRecord fields context =
     fields
         |> List.filterMap (Tuple.second >> getParenthesized)
-        |> List.map (Tuple.first >> Range.build)
+        |> List.map (Tuple.first)
         |> flip (++) context
 
 
@@ -120,7 +121,7 @@ onCaseBlock : CaseBlock -> Context -> Context
 onCaseBlock caseBlock context =
     case getParenthesized caseBlock.expression of
         Just ( range, _ ) ->
-            Range.build range :: context
+            range :: context
 
         Nothing ->
             context
@@ -130,7 +131,7 @@ onIfBlock : Expression -> Expression -> Expression -> Context -> Context
 onIfBlock clause thenBranch elseBranch context =
     [ clause, thenBranch, elseBranch ]
         |> List.filterMap getParenthesized
-        |> List.map (Tuple.first >> Range.build)
+        |> List.map (Tuple.first)
         |> flip (++) context
 
 
@@ -139,7 +140,7 @@ onApplication parts context =
     List.head parts
         |> Maybe.andThen getParenthesized
         |> Maybe.filter (Tuple.second >> isOperatorApplication >> not)
-        |> Maybe.map (Tuple.first >> Range.build)
+        |> Maybe.map (Tuple.first)
         |> Maybe.map (flip (::) context)
         |> Maybe.withDefault context
 
@@ -157,7 +158,6 @@ onOperatorApplication ( _, _, left, right ) context =
         , fixHandSide (always True) right
         ]
             |> List.filterMap identity
-            |> List.map Range.build
             |> flip (++) context
 
 
@@ -170,7 +170,7 @@ allowedOnLHS expr =
         ]
 
 
-onParenthesizedExpression : Range -> Expression -> Context -> Context
+onParenthesizedExpression : Syntax.Range -> Expression -> Context -> Context
 onParenthesizedExpression range expression context =
     case Tuple.second expression of
         RecordAccess _ _ ->
