@@ -7,6 +7,7 @@ import Dict exposing (Dict)
 import Test exposing (..)
 import Analyser.Messages.Types exposing (..)
 import Analyser.Checks.CheckTestUtil
+import Analyser.Messages.Range as Range
 
 
 table : OperatorTable
@@ -21,7 +22,12 @@ withUnusedVariableInFunction =
 
 bar x y z = x + z
 """
-    , [ (UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }) ]
+    , [ (UnusedVariable "./foo.elm" "y" <|
+            Range.manual
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
+                { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+        )
+      ]
     )
 
 
@@ -36,7 +42,11 @@ x =
   in
     2
 """
-    , [ (UnusedVariable "./foo.elm" "y" { start = { row = 4, column = 3 }, end = { row = 4, column = 4 } })
+    , [ (UnusedVariable "./foo.elm" "y" <|
+            Range.manual
+                { start = { row = 4, column = 4 }, end = { row = 4, column = 5 } }
+                { start = { row = 4, column = 3 }, end = { row = 4, column = 4 } }
+        )
       ]
     )
 
@@ -52,7 +62,10 @@ baz = 2
 
 some = 1
 """
-    , [ UnusedTopLevel "./foo.elm" "baz" { start = { row = 4, column = -1 }, end = { row = 4, column = 2 } }
+    , [ UnusedTopLevel "./foo.elm" "baz" <|
+            Range.manual
+                { start = { row = 4, column = 0 }, end = { row = 4, column = 3 } }
+                { start = { row = 4, column = -1 }, end = { row = 4, column = 2 } }
       ]
     )
 
@@ -122,7 +135,10 @@ unusedValueConstructor =
 type Some = Thing | Other
 
 """
-    , [ UnusedTopLevel "./foo.elm" "Other" { start = { row = 2, column = 19 }, end = { row = 3, column = -2 } }
+    , [ UnusedTopLevel "./foo.elm" "Other" <|
+            Range.manual
+                { start = { row = 2, column = 20 }, end = { row = 2, column = 25 } }
+                { start = { row = 2, column = 19 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -150,7 +166,10 @@ foo = 1
 
 bar = bar + foo
 """
-    , [ UnusedTopLevel "./foo.elm" "bar" { start = { row = 5, column = -1 }, end = { row = 5, column = 2 } }
+    , [ UnusedTopLevel "./foo.elm" "bar" <|
+            Range.manual
+                { start = { row = 5, column = 0 }, end = { row = 5, column = 3 } }
+                { start = { row = 5, column = -1 }, end = { row = 5, column = 2 } }
       ]
     )
 
@@ -180,7 +199,10 @@ foo = 1
 (&>) _ b = b
 
 """
-    , [ UnusedTopLevel "./foo.elm" "&>" { start = { row = 4, column = -1 }, end = { row = 4, column = 3 } }
+    , [ UnusedTopLevel "./foo.elm" "&>" <|
+            Range.manual
+                { start = { row = 4, column = 0 }, end = { row = 4, column = 4 } }
+                { start = { row = 4, column = -1 }, end = { row = 4, column = 3 } }
       ]
     )
 
@@ -195,7 +217,10 @@ import Foo exposing ((!!))
 foo = 1
 
 """
-    , [ UnusedImportedVariable "./foo.elm" "!!" { start = { row = 2, column = 20 }, end = { row = 2, column = 24 } }
+    , [ UnusedImportedVariable "./foo.elm" "!!" <|
+            Range.manual
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
+                { start = { row = 2, column = 20 }, end = { row = 2, column = 24 } }
       ]
     )
 
@@ -236,7 +261,10 @@ import Html exposing (div)
 
 foo = 1
 """
-    , [ UnusedImportedVariable "./foo.elm" "div" { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
+    , [ UnusedImportedVariable "./foo.elm" "div" <|
+            Range.manual
+                { start = { row = 2, column = 22 }, end = { row = 2, column = 25 } }
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
       ]
     )
 
@@ -295,7 +323,10 @@ foo x =
     Just y ->
       1
 """
-    , [ UnusedPatternVariable "./foo.elm" "y" { start = { row = 5, column = 8 }, end = { row = 5, column = 9 } }
+    , [ UnusedPatternVariable "./foo.elm" "y" <|
+            Range.manual
+                { start = { row = 5, column = 9 }, end = { row = 5, column = 10 } }
+                { start = { row = 5, column = 8 }, end = { row = 5, column = 9 } }
       ]
     )
 
@@ -311,7 +342,10 @@ foo x =
     y ->
       1
 """
-    , [ UnusedPatternVariable "./foo.elm" "y" { start = { row = 5, column = 3 }, end = { row = 5, column = 4 } }
+    , [ UnusedPatternVariable "./foo.elm" "y" <|
+            Range.manual
+                { start = { row = 5, column = 4 }, end = { row = 5, column = 5 } }
+                { start = { row = 5, column = 3 }, end = { row = 5, column = 4 } }
       ]
     )
 
@@ -326,7 +360,10 @@ foo x y=
     [y] ->
       y
 """
-    , [ UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+    , [ UnusedVariable "./foo.elm" "y" <|
+            Range.manual
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
+                { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
       ]
     )
 
@@ -341,7 +378,10 @@ foo x y=
     (y,_) ->
       y
 """
-    , [ UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+    , [ UnusedVariable "./foo.elm" "y" <|
+            Range.manual
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
+                { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
       ]
     )
 
@@ -356,7 +396,10 @@ foo x y=
     {y} ->
       y
 """
-    , [ UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+    , [ UnusedVariable "./foo.elm" "y" <|
+            Range.manual
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
+                { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
       ]
     )
 
@@ -371,7 +414,10 @@ foo x y=
     ((1,2) as y) ->
       y
 """
-    , [ UnusedVariable "./foo.elm" "y" { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+    , [ UnusedVariable "./foo.elm" "y" <|
+            Range.manual
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
+                { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
       ]
     )
 

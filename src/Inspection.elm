@@ -115,6 +115,5 @@ inspectFileContext configuration enabledChecks fileContext =
     let
         rangeContext =
             Range.context fileContext.content
-                |> Debug.log "Range context:"
     in
         List.concatMap (\c -> c.check rangeContext fileContext configuration) enabledChecks

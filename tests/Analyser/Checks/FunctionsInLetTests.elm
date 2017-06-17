@@ -4,6 +4,7 @@ import Analyser.Checks.FunctionsInLet as FunctionsInLet
 import Test exposing (Test)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), newMessage)
+import Analyser.Messages.Range as Range
 
 
 functionInLet : ( String, String, List MessageData )
@@ -18,7 +19,10 @@ foo x =
   in
     y x
 """
-    , [ FunctionInLet "./foo.elm" { start = { row = 4, column = 5 }, end = { row = 4, column = 6 } }
+    , [ FunctionInLet "./foo.elm" <|
+            Range.manual
+                { start = { row = 4, column = 6 }, end = { row = 4, column = 7 } }
+                { start = { row = 4, column = 5 }, end = { row = 4, column = 6 } }
       ]
     )
 

@@ -4,17 +4,22 @@ import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
+import Analyser.Messages.Range as Range
 
 
 noUsageForAlias : ( String, String, List MessageData )
 noUsageForAlias =
     ( "noUsageForAlias"
     , """module Foo exposing (..)
+
 import Bar as B
 
 foo = (+) 1 2
 """
-    , [ UnusedImportAlias "./foo.elm" [ "B" ] { start = { row = 1, column = -1 }, end = { row = 2, column = -2 } }
+    , [ UnusedImportAlias "./foo.elm" [ "B" ] <|
+            Range.manual
+                { start = { row = 2, column = 0 }, end = { row = 2, column = 15 } }
+                { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
       ]
     )
 

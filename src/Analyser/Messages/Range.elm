@@ -1,6 +1,6 @@
-module Analyser.Messages.Range exposing (Range, RangeContext, context, build, encode, decode, rangeToString, emptyRange, orderByStart, compareRangeStarts, asSyntaxRange, toTuple)
+module Analyser.Messages.Range exposing (Range, RangeContext, context, build, encode, decode, rangeToString, emptyRange, orderByStart, compareRangeStarts, asSyntaxRange, toTuple, manual)
 
-import Elm.Syntax.Range as Syntax
+import Elm.Syntax.Range as Syntax exposing (Location)
 import Dict exposing (Dict)
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE exposing (Value)
@@ -68,17 +68,30 @@ asSyntaxRange (Range _ parsed) =
     parsed
 
 
+manual : Syntax.Range -> Syntax.Range -> Range
+manual =
+    Range
+
+
 build : RangeContext -> Syntax.Range -> Range
-build _ ({ start, end } as parsed) =
+build (Context rangeContext) ({ start, end } as parsed) =
     if start.row == 1 then
         Range
             { start = { row = start.row - 1, column = start.column }
-            , end = { row = end.row - 1, column = end.column }
+            , end = realEnd rangeContext { row = end.row - 1, column = end.column }
             }
             parsed
     else
         Range
             { start = { row = start.row, column = start.column + 1 }
-            , end = { row = end.row, column = end.column + 1 }
+            , end = realEnd rangeContext { row = end.row, column = end.column + 1 }
             }
             parsed
+
+
+realEnd : Dict Int Int -> Location -> Location
+realEnd d e =
+    if e.column >= 0 then
+        e
+    else
+        { e | row = e.row - 1, column = Dict.get (e.row - 1) d |> Maybe.withDefault 0 }

@@ -3,7 +3,8 @@ module Analyser.Checks.CheckTestUtil exposing (..)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (defaultConfiguration)
 import Analyser.Messages.Types exposing (Message, MessageData)
-import Analyser.Files.Types exposing (..)
+import Analyser.Messages.Range as Range
+import Elm.Syntax.Range as Syntax
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
 import Elm.Parser
 import Test exposing (Test, describe, test)
@@ -11,6 +12,10 @@ import Expect
 import Elm.Interface as Interface exposing (Interface)
 import Elm.RawFile as RawFile
 import Elm.Processing as Processing
+
+
+type alias RangeConstructor =
+    Syntax.Range -> Range.Range
 
 
 fileContentFromInput : String -> FileContent
@@ -32,7 +37,7 @@ getMessages input checker =
                 }
             )
         |> Result.toMaybe
-        |> Maybe.map (flip checker.check defaultConfiguration >> List.map .data)
+        |> Maybe.map (flip (checker.check (Range.context input)) defaultConfiguration >> List.map .data)
 
 
 build : String -> Checker -> List ( String, String, List MessageData ) -> Test

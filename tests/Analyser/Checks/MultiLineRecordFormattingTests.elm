@@ -4,6 +4,7 @@ import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
 import Test exposing (Test)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting), newMessage)
+import Analyser.Messages.Range as Range
 
 
 singleLineSingleField : ( String, String, List MessageData )
@@ -42,7 +43,11 @@ type alias Foo =
   , y : { z : String, a : String}
   }
 """
-    , [ MultiLineRecordFormatting "./foo.elm" { start = { row = 4, column = 7 }, end = { row = 5, column = -2 } } ]
+    , [ MultiLineRecordFormatting "./foo.elm" <|
+            Range.manual
+                { start = { row = 4, column = 8 }, end = { row = 4, column = 33 } }
+                { start = { row = 4, column = 7 }, end = { row = 5, column = -2 } }
+      ]
     )
 
 
@@ -54,7 +59,11 @@ singleLineMultiField =
 type alias Foo =
   { x : Int , y : String  }
 """
-    , [ MultiLineRecordFormatting "./foo.elm" { start = { row = 3, column = 1 }, end = { row = 4, column = -2 } } ]
+    , [ MultiLineRecordFormatting "./foo.elm" <|
+            Range.manual
+                { start = { row = 3, column = 2 }, end = { row = 3, column = 27 } }
+                { start = { row = 3, column = 1 }, end = { row = 4, column = -2 } }
+      ]
     )
 
 

@@ -3,22 +3,31 @@ module Analyser.Checks.NoTopLevelSignatureTests exposing (..)
 import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Messages.Types exposing (..)
-import Expect
 import Test exposing (..)
+import Analyser.Messages.Range as Range
 
 
-noSignature : String
+noSignature : ( String, String, List MessageData )
 noSignature =
-    """module Bar exposing (..)
+    ( "noSignature"
+    , """module Bar exposing (..)
 
 
 foo = 1
 """
+    , [ (NoTopLevelSignature "./foo.elm" "foo" <|
+            Range.manual
+                { start = { row = 3, column = 0 }, end = { row = 3, column = 3 } }
+                { start = { row = 3, column = -1 }, end = { row = 3, column = 2 } }
+        )
+      ]
+    )
 
 
-noSignatureInLet : String
+noSignatureInLet : ( String, String, List MessageData )
 noSignatureInLet =
-    """module Bar exposing (foo)
+    ( "noSignatureInLet"
+    , """module Bar exposing (foo)
 
 foo : Int
 foo =
@@ -27,11 +36,14 @@ foo =
   in
     b
 """
+    , []
+    )
 
 
-noSignatureInLetForDestructure : String
+noSignatureInLetForDestructure : ( String, String, List MessageData )
 noSignatureInLetForDestructure =
-    """module Bar exposing (foo)
+    ( "noSignatureInLetForDestructure"
+    , """module Bar exposing (foo)
 
 {name} =
   let
@@ -39,36 +51,28 @@ noSignatureInLetForDestructure =
   in
     b
 """
+    , []
+    )
 
 
-withSignature : String
+withSignature : ( String, String, List MessageData )
 withSignature =
-    """module Bar exposing (foo)
+    ( "withSignature"
+    , """module Bar exposing (foo)
 
 foo : Int
 foo = 1
 """
+    , []
+    )
 
 
 all : Test
 all =
-    describe "Analyser.ExposeAllTests"
-        [ test "noSignature" <|
-            \() ->
-                CTU.getMessages noSignature NoTopLevelSignature.checker
-                    |> Expect.equal
-                        (Just [ (NoTopLevelSignature "./foo.elm" "foo" { start = { row = 3, column = -1 }, end = { row = 3, column = 2 } }) ])
-        , test "withSignature" <|
-            \() ->
-                CTU.getMessages withSignature NoTopLevelSignature.checker
-                    |> Expect.equal
-                        (Just [])
-        , test "noSignatureInLet" <|
-            \() ->
-                CTU.getMessages noSignatureInLet NoTopLevelSignature.checker
-                    |> Expect.equal (Just [])
-        , test "noSignatureInLetForDestructure" <|
-            \() ->
-                CTU.getMessages noSignatureInLetForDestructure NoTopLevelSignature.checker
-                    |> Expect.equal (Just [])
+    CTU.build "Analyser.Checks.ExposeAllTests"
+        NoTopLevelSignature.checker
+        [ noSignature
+        , noSignatureInLet
+        , noSignatureInLetForDestructure
+        , withSignature
         ]

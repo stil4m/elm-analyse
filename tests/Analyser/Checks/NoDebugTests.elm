@@ -4,6 +4,7 @@ import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NoDebug as NoDebug
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
+import Analyser.Messages.Range as Range
 
 
 debugCrash : ( String, String, List MessageData )
@@ -14,7 +15,10 @@ debugCrash =
 foo = Debug.crash "NOOO"
 
 """
-    , [ DebugCrash "./foo.elm" { start = { row = 2, column = 5 }, end = { row = 2, column = 16 } }
+    , [ DebugCrash "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 17 } }
+                { start = { row = 2, column = 5 }, end = { row = 2, column = 16 } }
       ]
     )
 
@@ -26,7 +30,10 @@ debugLog =
 
 foo x = Debug.log "This is X" x
 """
-    , [ DebugLog "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 2, column = 16 } }
+    , [ DebugLog "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 8 }, end = { row = 2, column = 17 } }
+                { start = { row = 2, column = 7 }, end = { row = 2, column = 16 } }
       ]
     )
 

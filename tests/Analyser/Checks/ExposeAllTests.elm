@@ -1,65 +1,72 @@
 module Analyser.Checks.ExposeAllTests exposing (..)
 
 import Analyser.Checks.ExposeAll as ExposeAll
-import Expect
 import Test exposing (..)
 import Analyser.Messages.Types exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
+import Analyser.Messages.Range as Range
 
 
-exposingAll : String
+exposingAll : ( String, String, List MessageData )
 exposingAll =
-    """module Bar exposing (..)
+    ( "exposingAll"
+    , """module Bar exposing (..)
 
 foo = 1
 """
+    , [ (ExposeAll "./foo.elm" <|
+            Range.manual
+                { start = { row = 0, column = 21 }, end = { row = 0, column = 23 } }
+                { start = { row = 1, column = 21 }, end = { row = 1, column = 23 } }
+        )
+      ]
+    )
 
 
-exposingStrict : String
+exposingStrict : ( String, String, List MessageData )
 exposingStrict =
-    """module Bar exposing (foo)
+    ( "exposingStrict"
+    , """module Bar exposing (foo)
 
 foo = 1
 """
+    , []
+    )
 
 
-exposingAllConstructors : String
+exposingAllConstructors : ( String, String, List MessageData )
 exposingAllConstructors =
-    """module Bar exposing (Color(..))
+    ( "exposingAllConstructors"
+    , """module Bar exposing (Color(..))
 
 type Color = Blue | Red
 """
+    , [ (ExposeAll "./foo.elm" <|
+            Range.manual
+                { start = { row = 0, column = 27 }, end = { row = 0, column = 29 } }
+                { start = { row = 1, column = 27 }, end = { row = 1, column = 29 } }
+        )
+      ]
+    )
 
 
-exposingStrictConstructors : String
+exposingStrictConstructors : ( String, String, List MessageData )
 exposingStrictConstructors =
-    """module Bar exposing (Color(Blue,Red))
+    ( "exposingStrictConstructors"
+    , """module Bar exposing (Color(Blue,Red))
 
 type Color = Blue | Red
 """
+    , []
+    )
 
 
 all : Test
 all =
-    describe "Analyser.ExposeAllTests"
-        [ test "exposingAll" <|
-            \() ->
-                CTU.getMessages exposingAll ExposeAll.checker
-                    |> Expect.equal
-                        (Just [ (ExposeAll "./foo.elm" { start = { row = 1, column = 21 }, end = { row = 1, column = 23 } }) ])
-        , test "exposingStrict" <|
-            \() ->
-                CTU.getMessages exposingStrict ExposeAll.checker
-                    |> Expect.equal
-                        (Just [])
-        , test "exposingAllConstructors" <|
-            \() ->
-                CTU.getMessages exposingAllConstructors ExposeAll.checker
-                    |> Expect.equal
-                        (Just [ (ExposeAll "./foo.elm" { start = { row = 1, column = 27 }, end = { row = 1, column = 29 } }) ])
-        , test "exposingStrictConstructors" <|
-            \() ->
-                CTU.getMessages exposingStrictConstructors ExposeAll.checker
-                    |> Expect.equal
-                        (Just [])
+    CTU.build "Analyser.Checks.ExposeAllTests"
+        ExposeAll.checker
+        [ exposingAll
+        , exposingStrict
+        , exposingAllConstructors
+        , exposingStrictConstructors
         ]
