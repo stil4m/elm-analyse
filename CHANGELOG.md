@@ -1,5 +1,16 @@
 # elm-analyse changelog
 
+## 0.9.0 (XXXX-XX-XX)
+
+* [Issue #73](https://github.com/stil4m/elm-analyse/issues/73) Update messages on file changes
+* [Issue #74](https://github.com/stil4m/elm-analyse/issues/74) Make ranges tech agnostic
+* [Issue #75](https://github.com/stil4m/elm-analyse/issues/75) Replace ESLint with
+* [Issue #76](https://github.com/stil4m/elm-analyse/issues/76) (Check) Detect duplicate imported variables
+* [Issue #78](https://github.com/stil4m/elm-analyse/issues/78) Improve speed by caching in home dir.
+* [Issue #79](https://github.com/stil4m/elm-analyse/issues/79) Speed up Travis CI build.
+ [Prettier](https://github.com/prettier/prettier)
+
+
 ## 0.8.0 (2017-06-14)
 
 * [Issue #68](https://github.com/stil4m/elm-analyse/issues/68) Extract [elm-syntax](https://github.com/stil4m/elm-syntax)
