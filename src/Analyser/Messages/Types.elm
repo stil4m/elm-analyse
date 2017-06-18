@@ -56,6 +56,7 @@ type MessageData
     | UnformattedFile FileName
     | FileLoadFailed FileName String
     | DuplicateImport FileName ModuleName (List Range)
+    | DuplicateImportedVariable FileName ModuleName String (List Range)
     | UnusedTypeAlias FileName String Range
     | RedefineVariable FileName String Range Range
     | NoUncurriedPrefix FileName String Range

@@ -26,12 +26,14 @@ import Analyser.Fixes.UnusedTypeAliasTests
 import Analyser.Checks.MultiLineRecordFormattingTests
 import Analyser.Checks.NonStaticRegexTests
 import Analyser.Checks.FunctionsInLetTests
+import Analyser.Checks.DuplicateImportedVariableTests
 
 
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.DuplicateImportTests.all
+        [ Analyser.Checks.DuplicateImportedVariableTests.all
+        , Analyser.Checks.DuplicateImportTests.all
         , Analyser.Checks.NonStaticRegexTests.all
         , Analyser.Checks.FunctionsInLetTests.all
         , Analyser.Fixes.UnusedTypeAliasTests.all

@@ -315,6 +315,23 @@ getMessageInfo m =
             , True
             )
 
+        DuplicateImportedVariable fileName moduleName name ranges ->
+            ( String.concat
+                [ "Variable `"
+                , name
+                , "` imported multiple times module `"
+                , String.join "." moduleName
+                , "`in file \""
+                , fileName
+                , "\" at [ "
+                , String.join " | " (List.map rangeToString ranges)
+                , " ]"
+                ]
+            , always [ fileName ]
+            , ranges
+            , True
+            )
+
         UnusedImportAlias fileName moduleName range ->
             ( String.concat
                 [ "Unused import alias `"
