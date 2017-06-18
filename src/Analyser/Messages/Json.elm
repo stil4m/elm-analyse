@@ -110,6 +110,13 @@ decodeMessageData =
                 |: moduleNameField
                 |: JD.field "ranges" (JD.list Range.decode)
           )
+        , ( "DuplicateImportedVariable"
+          , JD.succeed DuplicateImportedVariable
+                |: fileField
+                |: moduleNameField
+                |: JD.field "name" JD.string
+                |: JD.field "ranges" (JD.list Range.decode)
+          )
         , ( "UnusedTypeAlias", decodeFileVarNameAndRange UnusedTypeAlias )
         , ( "RedefineVariable"
           , JD.succeed RedefineVariable
@@ -291,6 +298,15 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "moduleName", JE.list <| List.map JE.string moduleName )
+                    , ( "ranges", JE.list <| List.map Range.encode ranges )
+                    ]
+
+        DuplicateImportedVariable file moduleName name ranges ->
+            encodeTyped "DuplicateImportedVariable" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "moduleName", JE.list <| List.map JE.string moduleName )
+                    , ( "name", JE.string name )
                     , ( "ranges", JE.list <| List.map Range.encode ranges )
                     ]
 

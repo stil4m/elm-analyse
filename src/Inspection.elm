@@ -24,6 +24,7 @@ import Analyser.Checks.UnnecessaryPortModule as UnnecessaryPortModule
 import Analyser.Checks.NonStaticRegex as NonStaticRegex
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.FunctionsInLet as FunctionsInLet
+import Analyser.Checks.DuplicateImportedVariable as DuplicateImportedVariable
 import Analyser.Checks.Base exposing (Checker)
 import Result.Extra
 import Analyser.Configuration exposing (Configuration)
@@ -39,6 +40,7 @@ checkers =
     , UnnecessaryParens.checker
     , NoDebug.checker
     , DuplicateImport.checker
+    , DuplicateImportedVariable.checker
     , UnusedTypeAlias.checker
     , OverriddenVariables.checker
     , NoUncurriedPrefix.checker
