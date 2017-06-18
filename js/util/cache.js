@@ -1,11 +1,17 @@
 const fs = require("fs");
 const fsExtra = require("fs-extra");
 const cachePath = "./elm-stuff/.elm-analyse";
+const osHomedir = require("os-homedir");
 
 function readDependencyJson(dependency, version, cb) {
     //TODO Error handling
     fs.readFile(
-        cachePath + "/" + dependency + "/" + version + "/dependency.json",
+        osHomedir() +
+            "/.elm-analyse/interfaces/" +
+            dependency +
+            "/" +
+            version +
+            "/dependency.json",
         cb
     );
 }
@@ -19,7 +25,8 @@ function storeShaJson(sha1, content) {
 }
 
 function storeDependencyJson(dependency, version, content) {
-    const targetDir = cachePath + "/" + dependency + "/" + version;
+    const targetDir =
+        osHomedir() + "/.elm-analyse/interfaces/" + dependency + "/" + version;
     fsExtra.ensureDirSync(targetDir);
     fs.writeFile(targetDir + "/dependency.json", content, function() {});
 }

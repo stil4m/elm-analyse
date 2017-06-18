@@ -37,6 +37,7 @@
     "minimist": "1.2.0",
     "node-watch": "^0.5.4",
     "normalize-newline": "3.0.0",
+    "os-homedir": "^1.0.2",
     "sums": "0.2.4"
   },
   "devDependencies": {
