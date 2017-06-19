@@ -6,7 +6,7 @@ import Client.DashBoard.DashBoard as DashBoard
 import Client.Graph.Graph as Graph
 import Client.Components.FileTree as FileTree
 import Client.Socket exposing (controlAddress)
-import Html exposing (Html, div)
+import Html exposing (div)
 import Html.Attributes exposing (id)
 import Navigation exposing (Location)
 import WebSocket as WS

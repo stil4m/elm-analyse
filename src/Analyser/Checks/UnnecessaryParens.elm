@@ -1,6 +1,6 @@
 module Analyser.Checks.UnnecessaryParens exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Range as Range exposing (RangeContext)
 import Elm.Syntax.Range as Syntax
 import Elm.Syntax.Infix exposing (..)
 import Elm.Syntax.Expression exposing (..)

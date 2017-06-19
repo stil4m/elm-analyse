@@ -1,6 +1,6 @@
 module Analyser.FileContext exposing (FileContext, build)
 
-import Analyser.Files.Types exposing (LoadedSourceFile, LoadedSourceFiles)
+import Analyser.Files.Types exposing (LoadedSourceFile)
 import Elm.Interface as Interface exposing (Interface)
 import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.File exposing (File)

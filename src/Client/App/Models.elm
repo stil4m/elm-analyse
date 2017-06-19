@@ -15,7 +15,7 @@ import Client.Graph.Graph as Graph
 import Client.Graph.PackageDependencies as PackageDependencies
 import Client.Components.FileTree as FileTree
 import Navigation exposing (Location)
-import Client.StaticStatePage as StaticStatePage exposing (StaticPage)
+import Client.StaticStatePage as StaticStatePage
 
 
 type alias PackageDependenciesPage =

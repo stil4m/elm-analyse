@@ -8,6 +8,7 @@ import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Pattern exposing (..)
 import Elm.Syntax.Infix exposing (..)
 import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(Typed))
 import Analyser.FileContext exposing (FileContext)
 import Elm.Interface as Interface
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel, UnusedImportedVariable, UnusedPatternVariable), newMessage)
@@ -56,6 +57,7 @@ scan rangeContext fileContext configuration =
                     , onDestructuring = Post onDestructuring
                     , onFunctionOrValue = Post onFunctionOrValue
                     , onRecordUpdate = Post onRecordUpdate
+                    , onTypeAnnotation = Post onTypeAnnotation
                 }
                 fileContext.ast
                 emptyContext
@@ -296,3 +298,13 @@ onCase f caze context =
                 |> popScope
     in
         List.foldl addUsedVariable postContext used
+
+
+onTypeAnnotation : TypeAnnotation -> UsedVariableContext -> UsedVariableContext
+onTypeAnnotation t c =
+    case t of
+        Typed [] name _ _ ->
+            addUsedVariable name c
+
+        _ ->
+            c

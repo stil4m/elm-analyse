@@ -1,6 +1,6 @@
 port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, isDone, succeeded, message, update, subscriptions)
 
-import Analyser.Messages.Types exposing (Message, MessageData)
+import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
 import Analyser.State as State exposing (State)
 import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer

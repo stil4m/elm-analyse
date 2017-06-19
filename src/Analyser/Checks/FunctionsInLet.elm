@@ -7,7 +7,7 @@ import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), ne
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Inner), defaultConfig)
 import Elm.Syntax.Expression exposing (..)
 import ASTUtil.Functions
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Range as Range exposing (RangeContext)
 
 
 type alias Context =

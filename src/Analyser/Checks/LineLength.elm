@@ -4,7 +4,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(LineLengthExceeded), newMessage)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Range as Range exposing (RangeContext)
 
 
 checker : Checker
