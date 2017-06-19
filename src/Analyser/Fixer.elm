@@ -1,6 +1,6 @@
-port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, isDone, succeeded, touchedFiles, message, update, subscriptions)
+port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, isDone, succeeded, message, update, subscriptions)
 
-import Analyser.Messages.Types exposing (Message, MessageData)
+import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
 import Analyser.State as State exposing (State)
 import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
@@ -52,7 +52,6 @@ type Model
         , fixer : Fixer
         , done : Bool
         , success : Bool
-        , touchedFiles : List String
         }
 
 
@@ -66,7 +65,7 @@ initWithMessage message state =
     getFixer message
         |> Maybe.map
             (\fixer ->
-                ( Model { message = message, fixer = fixer, done = False, success = True, touchedFiles = [] }
+                ( Model { message = message, fixer = fixer, done = False, success = True }
                 , loadFileContentWithShas (List.map Tuple.second message.files)
                 , State.startFixing message state
                 )
@@ -81,11 +80,6 @@ isDone (Model m) =
 succeeded : Model -> Bool
 succeeded (Model m) =
     m.success
-
-
-touchedFiles : Model -> List String
-touchedFiles (Model m) =
-    m.touchedFiles
 
 
 message : Model -> Message
@@ -112,7 +106,6 @@ update codeBase msg (Model model) =
                             |> List.filterMap
                                 (\( _, path, content ) ->
                                     Parser.parse content
-                                        -- TODO Should we inject the operator table?
                                         |> Result.map (Processing.process (CodeBase.processContext codeBase))
                                         |> Result.map ((,,) path content)
                                         |> Result.toMaybe
@@ -123,7 +116,7 @@ update codeBase msg (Model model) =
                 in
                     case changedFiles of
                         Ok patched ->
-                            ( Model { model | touchedFiles = List.map Tuple.first patched }
+                            ( Model model
                             , storeFiles patched
                             )
 

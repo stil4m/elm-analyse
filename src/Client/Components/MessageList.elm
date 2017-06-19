@@ -3,7 +3,7 @@ module Client.Components.MessageList exposing (..)
 import Client.Components.ActiveMessageDialog as ActiveMessageDialog
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
-import Analyser.Messages.Types exposing (Message, MessageStatus)
+import Analyser.Messages.Types exposing (Message)
 import Client.Messages as M
 import Navigation exposing (Location)
 

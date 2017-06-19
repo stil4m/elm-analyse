@@ -7,6 +7,7 @@ import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), ne
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Inner), defaultConfig)
 import Elm.Syntax.Expression exposing (..)
 import ASTUtil.Functions
+import Analyser.Messages.Range as Range exposing (RangeContext)
 
 
 type alias Context =
@@ -27,8 +28,8 @@ checker =
     }
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan rangeContext fileContext _ =
     Inspector.inspect
         { defaultConfig
             | onLetBlock = Inner onLetBlock
@@ -37,13 +38,13 @@ scan fileContext _ =
         fileContext.ast
         startingContext
         |> .functions
-        |> List.map (asMessage fileContext)
+        |> List.map (asMessage rangeContext fileContext)
 
 
-asMessage : FileContext -> Function -> Message
-asMessage fileContext f =
+asMessage : RangeContext -> FileContext -> Function -> Message
+asMessage rangeContext fileContext f =
     newMessage [ ( fileContext.sha1, fileContext.path ) ]
-        (FunctionInLet fileContext.path f.declaration.name.range)
+        (FunctionInLet fileContext.path (Range.build rangeContext f.declaration.name.range))
 
 
 onFunction : Function -> Context -> Context

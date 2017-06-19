@@ -3,6 +3,7 @@ module Analyser.Checks.DuplicateImportTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DuplicateImport as DuplicateImport
 import Analyser.Messages.Types exposing (..)
+import Analyser.Messages.Range as Range
 import Test exposing (Test)
 
 
@@ -34,8 +35,12 @@ foo = 1
 """
     , [ DuplicateImport "./foo.elm"
             [ "Baz" ]
-            [ { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
-            , { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
+            [ Range.manual
+                { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
+                { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+            , Range.manual
+                { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
+                { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
             ]
       ]
     )
@@ -54,9 +59,15 @@ foo = 1
 """
     , [ DuplicateImport "./foo.elm"
             [ "Baz" ]
-            [ { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
-            , { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } }
-            , { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
+            [ Range.manual
+                { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
+                { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+            , Range.manual
+                { start = { row = 3, column = 0 }, end = { row = 3, column = 10 } }
+                { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } }
+            , Range.manual
+                { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
+                { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
             ]
       ]
     )
@@ -76,13 +87,20 @@ foo = 1
 """
     , [ DuplicateImport "./foo.elm"
             [ "Baz" ]
-            [ { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
-            , { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
+            [ Range.manual
+                { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
+                { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+            , Range.manual { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
+                { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
             ]
       , DuplicateImport "./foo.elm"
             [ "John" ]
-            [ { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } }
-            , { start = { row = 5, column = -1 }, end = { row = 6, column = -2 } }
+            [ Range.manual
+                { start = { row = 3, column = 0 }, end = { row = 3, column = 11 } }
+                { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } }
+            , Range.manual
+                { start = { row = 5, column = 0 }, end = { row = 5, column = 11 } }
+                { start = { row = 5, column = -1 }, end = { row = 6, column = -2 } }
             ]
       ]
     )

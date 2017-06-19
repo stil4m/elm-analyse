@@ -1,6 +1,6 @@
 module Analyser.Messages.Types exposing (..)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range exposing (Range)
 import Elm.Syntax.Base exposing (ModuleName)
 
 
@@ -29,6 +29,11 @@ newMessage =
     Message 0 Applicable
 
 
+outdate : Message -> Message
+outdate m =
+    { m | status = Outdated }
+
+
 type MessageStatus
     = Outdated
     | Blocked
@@ -51,6 +56,7 @@ type MessageData
     | UnformattedFile FileName
     | FileLoadFailed FileName String
     | DuplicateImport FileName ModuleName (List Range)
+    | DuplicateImportedVariable FileName ModuleName String (List Range)
     | UnusedTypeAlias FileName String Range
     | RedefineVariable FileName String Range Range
     | NoUncurriedPrefix FileName String Range

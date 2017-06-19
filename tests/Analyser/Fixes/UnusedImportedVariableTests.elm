@@ -6,6 +6,7 @@ import Elm.Parser as Parser
 import Analyser.Fixes.UnusedImportedVariable as Fixer exposing (fixer)
 import Analyser.Messages.Types exposing (MessageData(UnusedImportedVariable))
 import Elm.Processing as Processing
+import Analyser.Messages.Range as Range
 
 
 all : Test
@@ -35,7 +36,10 @@ foo = bar 1
                             fixer.fix [ ( "./foo.elm", input, x ) ]
                                 (UnusedImportedVariable "./foo.elm"
                                     "other"
-                                    { start = { row = 2, column = 25 }, end = { row = 2, column = 30 } }
+                                    (Range.manual
+                                        { start = { row = 2, column = 26 }, end = { row = 2, column = 31 } }
+                                        { start = { row = 2, column = 25 }, end = { row = 2, column = 30 } }
+                                    )
                                 )
                                 |> Expect.equal (Ok [ ( "./foo.elm", output ) ])
 

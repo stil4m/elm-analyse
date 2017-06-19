@@ -4,6 +4,7 @@ import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Messages.Types exposing (MessageData(RedefineVariable))
 import Test exposing (..)
+import Analyser.Messages.Range as Range
 
 
 redefineImportedFunction : ( String, String, List MessageData )
@@ -17,8 +18,14 @@ foo bar = 1
   """
     , [ RedefineVariable "./foo.elm"
             "bar"
-            { start = { row = 2, column = 20 }, end = { row = 2, column = 23 } }
-            { start = { row = 4, column = 3 }, end = { row = 4, column = 6 } }
+            (Range.manual
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
+                { start = { row = 2, column = 20 }, end = { row = 2, column = 23 } }
+            )
+            (Range.manual
+                { start = { row = 4, column = 4 }, end = { row = 4, column = 7 } }
+                { start = { row = 4, column = 3 }, end = { row = 4, column = 6 } }
+            )
       ]
     )
 
@@ -37,8 +44,14 @@ foo bar =
   """
     , [ RedefineVariable "./foo.elm"
             "bar"
-            { start = { row = 2, column = 3 }, end = { row = 2, column = 6 } }
-            { start = { row = 4, column = 3 }, end = { row = 4, column = 6 } }
+            (Range.manual
+                { start = { row = 2, column = 4 }, end = { row = 2, column = 7 } }
+                { start = { row = 2, column = 3 }, end = { row = 2, column = 6 } }
+            )
+            (Range.manual
+                { start = { row = 4, column = 4 }, end = { row = 4, column = 7 } }
+                { start = { row = 4, column = 3 }, end = { row = 4, column = 6 } }
+            )
       ]
     )
 
@@ -55,8 +68,14 @@ foo bar =
   """
     , [ RedefineVariable "./foo.elm"
             "bar"
-            { start = { row = 2, column = 3 }, end = { row = 2, column = 6 } }
-            { start = { row = 4, column = 5 }, end = { row = 4, column = 8 } }
+            (Range.manual
+                { start = { row = 2, column = 4 }, end = { row = 2, column = 7 } }
+                { start = { row = 2, column = 3 }, end = { row = 2, column = 6 } }
+            )
+            (Range.manual
+                { start = { row = 4, column = 6 }, end = { row = 4, column = 9 } }
+                { start = { row = 4, column = 5 }, end = { row = 4, column = 8 } }
+            )
       ]
     )
 
@@ -72,8 +91,14 @@ bar = 1
   """
     , [ RedefineVariable "./foo.elm"
             "bar"
-            { start = { row = 2, column = 20 }, end = { row = 2, column = 23 } }
-            { start = { row = 4, column = -1 }, end = { row = 4, column = 2 } }
+            (Range.manual
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
+                { start = { row = 2, column = 20 }, end = { row = 2, column = 23 } }
+            )
+            (Range.manual
+                { start = { row = 4, column = 0 }, end = { row = 4, column = 3 } }
+                { start = { row = 4, column = -1 }, end = { row = 4, column = 2 } }
+            )
       ]
     )
 
@@ -89,12 +114,24 @@ import Bar exposing (name,age)
   """
     , [ RedefineVariable "./foo.elm"
             "age"
-            { start = { row = 2, column = 25 }, end = { row = 2, column = 28 } }
-            { start = { row = 4, column = 0 }, end = { row = 4, column = 3 } }
+            (Range.manual
+                { start = { row = 2, column = 26 }, end = { row = 2, column = 29 } }
+                { start = { row = 2, column = 25 }, end = { row = 2, column = 28 } }
+            )
+            (Range.manual
+                { start = { row = 4, column = 1 }, end = { row = 4, column = 4 } }
+                { start = { row = 4, column = 0 }, end = { row = 4, column = 3 } }
+            )
       , RedefineVariable "./foo.elm"
             "name"
-            { start = { row = 2, column = 20 }, end = { row = 2, column = 24 } }
-            { start = { row = 4, column = 4 }, end = { row = 4, column = 8 } }
+            (Range.manual
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
+                { start = { row = 2, column = 20 }, end = { row = 2, column = 24 } }
+            )
+            (Range.manual
+                { start = { row = 4, column = 5 }, end = { row = 4, column = 9 } }
+                { start = { row = 4, column = 4 }, end = { row = 4, column = 8 } }
+            )
       ]
     )
 

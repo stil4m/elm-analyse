@@ -1,6 +1,6 @@
 {
   "name": "elm-analyse",
-  "version": "0.8.0",
+  "version": "0.9.0-dev",
   "description": "A tool that allows you analyse your Elm code and identifies deficiencies and best practices.",
   "repository": {
     "type": "git",
@@ -11,12 +11,12 @@
     "email": "mstijlaart@gmail.com"
   },
   "scripts": {
-    "eslint": "./node_modules/.bin/gulp lint",
+    "check-prettier": "sh ./prettier-check.sh",
     "elm-format": "./node_modules/.bin/elm-format --validate src/ tests/",
     "self-check": "node \"./js/bin/index.js\"",
     "test": "./node_modules/.bin/elm-test",
     "build": "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\"",
-    "pr-check": "npm install && npm run eslint && npm run elm-format && npm run test && npm run build && npm run self-check"
+    "pr-check": "npm install && npm run check-prettier && npm run elm-format && npm run test && npm run build && npm run self-check"
   },
   "author": "Mats Stijlaart",
   "license": "MIT",
@@ -35,18 +35,19 @@
     "fs-extra": "2.0.0",
     "lodash": "4.17.4",
     "minimist": "1.2.0",
+    "node-watch": "^0.5.4",
     "normalize-newline": "3.0.0",
+    "os-homedir": "^1.0.2",
     "sums": "0.2.4"
   },
   "devDependencies": {
     "elm": "0.18.0",
-    "elm-test": "0.18.2",
     "elm-format": "0.6.1-alpha",
-    "eslint": "^3.17.1",
+    "elm-test": "0.18.2",
     "gulp": "3.9.1",
     "gulp-elm": "0.6.1",
-    "gulp-eslint": "^3.0.1",
     "gulp-replace": "^0.5.4",
+    "prettier": "^1.4.4",
     "run-sequence": "1.2.2"
   }
 }

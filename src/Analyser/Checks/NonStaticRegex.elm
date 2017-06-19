@@ -1,6 +1,6 @@
 module Analyser.Checks.NonStaticRegex exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
@@ -28,8 +28,8 @@ checker =
 {-| Find out if `Regex.regex` and in what manner.
 If it is imported the dynamic usages should inspected and then transformed into messages.
 -}
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan rangeContext fileContext _ =
     let
         regexImport =
             Imports.buildImportInformation [ "Regex" ] "regex" fileContext.ast
@@ -39,7 +39,7 @@ scan fileContext _ =
                 []
 
             Just regexImport ->
-                findRegexUsagesInFunctions regexImport fileContext
+                findRegexUsagesInFunctions rangeContext regexImport fileContext
                     |> .usages
                     |> List.map (NonStaticRegex fileContext.path)
                     |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
@@ -47,12 +47,12 @@ scan fileContext _ =
 
 {-| Inspect all functions to verify if the enviroments changes from static to dynamic, and check all expressions for regex usages.
 -}
-findRegexUsagesInFunctions : FunctionReference -> FileContext -> Context
-findRegexUsagesInFunctions regexImport fileContext =
+findRegexUsagesInFunctions : RangeContext -> FunctionReference -> FileContext -> Context
+findRegexUsagesInFunctions rangeContext regexImport fileContext =
     Inspector.inspect
         { defaultConfig
             | onFunction = Inner onFunction
-            , onExpression = Post (onExpression regexImport)
+            , onExpression = Post (onExpression rangeContext regexImport)
         }
         fileContext.ast
         startingContext
@@ -78,13 +78,13 @@ onFunction inner function context =
         inner context
 
 
-onExpression : FunctionReference -> Expression -> Context -> Context
-onExpression x expression context =
+onExpression : RangeContext -> FunctionReference -> Expression -> Context -> Context
+onExpression rangeContext x expression context =
     if x.exposesRegex then
-        onExpressionFunctionReference expression context
-            |> onExpressionQualified x.moduleName expression
+        onExpressionFunctionReference rangeContext expression context
+            |> onExpressionQualified rangeContext x.moduleName expression
     else
-        onExpressionQualified x.moduleName expression context
+        onExpressionQualified rangeContext x.moduleName expression context
 
 
 addUsedRegex : Range -> Context -> Context
@@ -97,12 +97,12 @@ addUsedRegex range context =
 
 {-| Check if regex in a qualified expression (with either the module name or the alias for the module)
 -}
-onExpressionQualified : ModuleName -> Expression -> Context -> Context
-onExpressionQualified moduleName ( range, inner ) context =
+onExpressionQualified : RangeContext -> ModuleName -> Expression -> Context -> Context
+onExpressionQualified rangeContext moduleName ( range, inner ) context =
     case inner of
         QualifiedExpr m f ->
             if f == "regex" && m == moduleName then
-                addUsedRegex range context
+                addUsedRegex (Range.build rangeContext range) context
             else
                 context
 
@@ -110,11 +110,11 @@ onExpressionQualified moduleName ( range, inner ) context =
             context
 
 
-onExpressionFunctionReference : Expression -> Context -> Context
-onExpressionFunctionReference ( range, inner ) context =
+onExpressionFunctionReference : RangeContext -> Expression -> Context -> Context
+onExpressionFunctionReference rangeContext ( range, inner ) context =
     case inner of
         FunctionOrValue "regex" ->
-            addUsedRegex range context
+            addUsedRegex (Range.build rangeContext range) context
 
         _ ->
             context

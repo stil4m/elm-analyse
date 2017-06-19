@@ -1,12 +1,12 @@
 module Analyser.Checks.NoUncurriedPrefix exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(NoUncurriedPrefix), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 
 
 checker : Checker
@@ -20,11 +20,11 @@ type alias Context =
     List ( String, Range )
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan rangeContext fileContext _ =
     Inspector.inspect
         { defaultConfig
-            | onExpression = Post onExpression
+            | onExpression = Post (onExpression rangeContext)
         }
         fileContext.ast
         []
@@ -32,8 +32,8 @@ scan fileContext _ =
         |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
-onExpression : Expression -> Context -> Context
-onExpression ( _, expression ) context =
+onExpression : RangeContext -> Expression -> Context -> Context
+onExpression rangeContext ( _, expression ) context =
     case expression of
         Application xs ->
             case xs of
@@ -41,7 +41,7 @@ onExpression ( _, expression ) context =
                     if String.startsWith ",," x then
                         context
                     else
-                        ( x, r ) :: context
+                        ( x, Range.build rangeContext r ) :: context
 
                 _ ->
                     context

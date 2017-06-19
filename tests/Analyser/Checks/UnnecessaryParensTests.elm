@@ -4,6 +4,7 @@ import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
+import Analyser.Messages.Range as Range
 
 
 parensBetweenOperators : ( String, String, List MessageData )
@@ -14,7 +15,10 @@ parensBetweenOperators =
 foo =
   "a" ++ (f x y) ++ "b"
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 8 }, end = { row = 3, column = 15 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 3, column = 9 }, end = { row = 3, column = 16 } }
+                { start = { row = 3, column = 8 }, end = { row = 3, column = 15 } }
       ]
     )
 
@@ -46,11 +50,26 @@ john = ("John")
 
 jon = (john)
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 10, column = 5 }, end = { row = 11, column = -2 } }
-      , UnnecessaryParens "./foo.elm" { start = { row = 8, column = 6 }, end = { row = 9, column = -2 } }
-      , UnnecessaryParens "./foo.elm" { start = { row = 6, column = 5 }, end = { row = 7, column = -2 } }
-      , UnnecessaryParens "./foo.elm" { start = { row = 4, column = 5 }, end = { row = 5, column = -2 } }
-      , UnnecessaryParens "./foo.elm" { start = { row = 2, column = 5 }, end = { row = 3, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 10, column = 6 }, end = { row = 10, column = 12 } }
+                { start = { row = 10, column = 5 }, end = { row = 11, column = -2 } }
+      , UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 8, column = 7 }, end = { row = 8, column = 15 } }
+                { start = { row = 8, column = 6 }, end = { row = 9, column = -2 } }
+      , UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 6, column = 6 }, end = { row = 6, column = 11 } }
+                { start = { row = 6, column = 5 }, end = { row = 7, column = -2 } }
+      , UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 4, column = 6 }, end = { row = 4, column = 11 } }
+                { start = { row = 4, column = 5 }, end = { row = 5, column = -2 } }
+      , UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 9 } }
+                { start = { row = 2, column = 5 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -63,7 +82,10 @@ parensInOperatorForSimpleValue =
 foo = 1 + (1)
 
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 9 }, end = { row = 3, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 10 }, end = { row = 2, column = 13 } }
+                { start = { row = 2, column = 9 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -76,7 +98,10 @@ parensOnFirstPartOfApplication =
 foo = (x y) z
 
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 5 }, end = { row = 2, column = 10 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 11 } }
+                { start = { row = 2, column = 5 }, end = { row = 2, column = 10 } }
       ]
     )
 
@@ -116,7 +141,11 @@ foo x =
     False -> 3
 
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 6 }, end = { row = 3, column = 11 } } ]
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 3, column = 7 }, end = { row = 3, column = 12 } }
+                { start = { row = 3, column = 6 }, end = { row = 3, column = 11 } }
+      ]
     )
 
 
@@ -131,9 +160,18 @@ foo x =
   else
     (g x)
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 4 }, end = { row = 3, column = 9 } }
-      , UnnecessaryParens "./foo.elm" { start = { row = 4, column = 3 }, end = { row = 5, column = -2 } }
-      , UnnecessaryParens "./foo.elm" { start = { row = 6, column = 3 }, end = { row = 7, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 3, column = 5 }, end = { row = 3, column = 10 } }
+                { start = { row = 3, column = 4 }, end = { row = 3, column = 9 } }
+      , UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 4, column = 4 }, end = { row = 4, column = 9 } }
+                { start = { row = 4, column = 3 }, end = { row = 5, column = -2 } }
+      , UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 6, column = 4 }, end = { row = 6, column = 9 } }
+                { start = { row = 6, column = 3 }, end = { row = 7, column = -2 } }
       ]
     )
 
@@ -145,7 +183,10 @@ parensAroundListExpression =
 
 foo x = ([x])
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 8 }, end = { row = 2, column = 13 } }
+                { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -157,7 +198,10 @@ parensInListExpression =
 
 foo x = [ (x 1) ]
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 9 }, end = { row = 2, column = 14 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 10 }, end = { row = 2, column = 15 } }
+                { start = { row = 2, column = 9 }, end = { row = 2, column = 14 } }
       ]
     )
 
@@ -169,7 +213,10 @@ parensAroundTupleExpression =
 
 foo x = ((x, 1))
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 8 }, end = { row = 2, column = 16 } }
+                { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -181,7 +228,10 @@ parensAroundRecordExpression =
 
 foo x = ({name = x})
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 8 }, end = { row = 2, column = 20 } }
+                { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -193,7 +243,10 @@ parensAroundRecordUpdateExpression =
 
 foo x = ({ x | name = "Foo"})
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 8 }, end = { row = 2, column = 29 } }
+                { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -207,7 +260,10 @@ foo =
   { bar = (x y)
   }
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 9 }, end = { row = 4, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 3, column = 10 }, end = { row = 3, column = 15 } }
+                { start = { row = 3, column = 9 }, end = { row = 4, column = -2 } }
       ]
     )
 
@@ -222,7 +278,10 @@ foo =
     | bar = (x y)
   }
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 4, column = 11 }, end = { row = 5, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 4, column = 12 }, end = { row = 4, column = 17 } }
+                { start = { row = 4, column = 11 }, end = { row = 5, column = -2 } }
       ]
     )
 
@@ -234,7 +293,10 @@ parensAroundRecordAccess =
 
 foo x = (x.name.first)
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 8 }, end = { row = 2, column = 22 } }
+                { start = { row = 2, column = 7 }, end = { row = 3, column = -2 } }
       ]
     )
 
@@ -246,7 +308,10 @@ parensAroundRecordFunction =
 
 foo x = List.map (.name) x
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 16 }, end = { row = 2, column = 23 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 17 }, end = { row = 2, column = 24 } }
+                { start = { row = 2, column = 16 }, end = { row = 2, column = 23 } }
       ]
     )
 
@@ -301,7 +366,10 @@ parensAroundTopLevelApplication =
 foo =
     (f a b)
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 3 }, end = { row = 4, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 3, column = 4 }, end = { row = 3, column = 11 } }
+                { start = { row = 3, column = 3 }, end = { row = 4, column = -2 } }
       ]
     )
 
@@ -313,8 +381,14 @@ parensInTuple =
 
 foo = ( ("price"), (Location 0 0) )
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 2, column = 7 }, end = { row = 2, column = 16 } }
-      , UnnecessaryParens "./foo.elm" { start = { row = 2, column = 18 }, end = { row = 2, column = 32 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 8 }, end = { row = 2, column = 17 } }
+                { start = { row = 2, column = 7 }, end = { row = 2, column = 16 } }
+      , UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 2, column = 19 }, end = { row = 2, column = 33 } }
+                { start = { row = 2, column = 18 }, end = { row = 2, column = 32 } }
       ]
     )
 
@@ -330,7 +404,10 @@ foo =
             (String.concat)
         )
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 5, column = 11 }, end = { row = 6, column = -2 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 5, column = 12 }, end = { row = 5, column = 27 } }
+                { start = { row = 5, column = 11 }, end = { row = 6, column = -2 } }
       ]
     )
 
@@ -346,7 +423,11 @@ foo =
             (String.concat 1)
         )
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 5, column = 11 }, end = { row = 6, column = -2 } } ]
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 5, column = 12 }, end = { row = 5, column = 29 } }
+                { start = { row = 5, column = 11 }, end = { row = 6, column = -2 } }
+      ]
     )
 
 
@@ -358,7 +439,10 @@ parensAroundApplicationWithNegatedArg =
 foo =
     (toFloat -5) / 2
 """
-    , [ UnnecessaryParens "./foo.elm" { start = { row = 3, column = 3 }, end = { row = 3, column = 15 } }
+    , [ UnnecessaryParens "./foo.elm" <|
+            Range.manual
+                { start = { row = 3, column = 4 }, end = { row = 3, column = 16 } }
+                { start = { row = 3, column = 3 }, end = { row = 3, column = 15 } }
       ]
     )
 

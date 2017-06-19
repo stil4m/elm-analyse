@@ -4,6 +4,7 @@ import Analyser.Checks.NonStaticRegex as NonStaticRegex
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Messages.Types exposing (..)
 import Test exposing (..)
+import Analyser.Messages.Range as Range
 
 
 usedRegexWithStaticWithoutImport : ( String, String, List MessageData )
@@ -54,7 +55,10 @@ import Regex
 foo a =
     Regex.regex a
 """
-    , [ NonStaticRegex "./foo.elm" { start = { row = 5, column = 3 }, end = { row = 5, column = 14 } }
+    , [ NonStaticRegex "./foo.elm" <|
+            Range.manual
+                { start = { row = 5, column = 4 }, end = { row = 5, column = 15 } }
+                { start = { row = 5, column = 3 }, end = { row = 5, column = 14 } }
       ]
     )
 
@@ -83,7 +87,10 @@ import Regex exposing (regex)
 foo a =
     regex a
 """
-    , [ NonStaticRegex "./foo.elm" { start = { row = 5, column = 3 }, end = { row = 5, column = 8 } }
+    , [ NonStaticRegex "./foo.elm" <|
+            Range.manual
+                { start = { row = 5, column = 4 }, end = { row = 5, column = 9 } }
+                { start = { row = 5, column = 3 }, end = { row = 5, column = 8 } }
       ]
     )
 
@@ -124,7 +131,10 @@ import Regex as R
 foo a =
     R.regex a
 """
-    , [ NonStaticRegex "./foo.elm" { start = { row = 5, column = 3 }, end = { row = 5, column = 10 } }
+    , [ NonStaticRegex "./foo.elm" <|
+            Range.manual
+                { start = { row = 5, column = 4 }, end = { row = 5, column = 11 } }
+                { start = { row = 5, column = 3 }, end = { row = 5, column = 10 } }
       ]
     )
 

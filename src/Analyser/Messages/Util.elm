@@ -1,8 +1,7 @@
 module Analyser.Messages.Util exposing (..)
 
-import AST.Ranges as Ranges exposing (rangeToString)
-import Elm.Syntax.Range exposing (Range, emptyRange)
 import Analyser.Messages.Types exposing (..)
+import Analyser.Messages.Range as Ranges exposing (Range, rangeToString, emptyRange)
 
 
 type alias CanFix =
@@ -304,6 +303,23 @@ getMessageInfo m =
         DuplicateImport fileName moduleName ranges ->
             ( String.concat
                 [ "Duplicate import for module `"
+                , String.join "." moduleName
+                , "`in file \""
+                , fileName
+                , "\" at [ "
+                , String.join " | " (List.map rangeToString ranges)
+                , " ]"
+                ]
+            , always [ fileName ]
+            , ranges
+            , True
+            )
+
+        DuplicateImportedVariable fileName moduleName name ranges ->
+            ( String.concat
+                [ "Variable `"
+                , name
+                , "` imported multiple times module `"
                 , String.join "." moduleName
                 , "`in file \""
                 , fileName

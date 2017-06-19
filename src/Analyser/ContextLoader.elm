@@ -1,6 +1,6 @@
 port module Analyser.ContextLoader exposing (Context, emptyContext, loadContext, onLoadedContext)
 
-import Elm.Dependency exposing (Version, Dependency)
+import Elm.Dependency exposing (Version)
 
 
 type alias Context =

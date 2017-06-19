@@ -1,7 +1,7 @@
 module Analyser.Fixes.FileContent exposing (..)
 
 import List.Extra as List
-import Elm.Syntax.Range exposing (Range, Location)
+import Elm.Syntax.Range exposing (Range)
 
 
 replaceRangeWith : Range -> String -> String -> String
@@ -60,8 +60,8 @@ replaceRangeWith range x input =
             ]
 
 
-replaceLocationWith : Location -> String -> String -> String
-replaceLocationWith loc x input =
+replaceLocationWith : ( Int, Int ) -> String -> String -> String
+replaceLocationWith ( row, column ) x input =
     let
         rows =
             input
@@ -69,23 +69,23 @@ replaceLocationWith loc x input =
 
         lineUpdater target =
             String.concat
-                [ String.left (loc.column + 1) target
+                [ String.left (column + 1) target
                 , x
-                , String.dropLeft (loc.column + 2) target
+                , String.dropLeft (column + 2) target
                 ]
     in
         rows
-            |> List.updateIfIndex ((==) loc.row) lineUpdater
+            |> List.updateIfIndex ((==) row) lineUpdater
             |> String.join "\n"
 
 
-getCharAtLocation : Location -> String -> Maybe String
-getCharAtLocation loc input =
+getCharAtLocation : ( Int, Int ) -> String -> Maybe String
+getCharAtLocation ( row, column ) input =
     input
         |> String.split "\n"
-        |> List.drop loc.row
+        |> List.drop row
         |> List.head
-        |> Maybe.map (String.dropLeft (loc.column + 1) >> String.left 1)
+        |> Maybe.map (String.dropLeft (column + 1) >> String.left 1)
 
 
 replaceLines : ( Int, Int ) -> String -> String -> String

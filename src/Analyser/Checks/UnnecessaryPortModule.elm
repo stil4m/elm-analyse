@@ -7,6 +7,7 @@ import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryPortMod
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Messages.Range exposing (RangeContext)
 
 
 checker : Checker
@@ -16,8 +17,8 @@ checker =
     }
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan _ fileContext _ =
     if AST.Util.isPortModule fileContext.ast then
         let
             portDeclCount =

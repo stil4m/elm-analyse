@@ -5,7 +5,7 @@ import Analyser.Fixes.Base exposing (Fixer)
 import Elm.Syntax.File exposing (File)
 import ASTUtil.Imports as Imports
 import Analyser.Fixes.FileContent as FileContent
-import Elm.Syntax.Range exposing (..)
+import Analyser.Messages.Range as Range exposing (Range)
 
 
 fixer : Fixer
@@ -40,7 +40,7 @@ fix input messageData =
 
 removeImport : ( String, String, File ) -> Range -> Result String (List ( String, String ))
 removeImport ( fileName, content, ast ) range =
-    case Imports.findImportWithRange ast range of
+    case Imports.findImportWithRange ast (Range.asSyntaxRange range) of
         Just imp ->
             Ok
                 [ ( fileName

@@ -2,7 +2,7 @@ module Analyser.Checks.DuplicateImport exposing (checker)
 
 import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.Module exposing (Import)
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImport), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)
@@ -22,11 +22,11 @@ type alias Context =
     Dict ModuleName (List Range)
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan rangeContext fileContext _ =
     Inspector.inspect
         { defaultConfig
-            | onImport = Post onImport
+            | onImport = Post (onImport rangeContext)
             , onFunction = Skip
         }
         fileContext.ast
@@ -42,11 +42,11 @@ hasLength f =
     List.length >> f
 
 
-onImport : Import -> Context -> Context
-onImport { moduleName, range } context =
+onImport : RangeContext -> Import -> Context -> Context
+onImport rangeContext { moduleName, range } context =
     case Dict.get moduleName context of
         Just _ ->
-            Dict.update moduleName (Maybe.map (flip (++) [ range ])) context
+            Dict.update moduleName (Maybe.map (flip (++) [ Range.build rangeContext range ])) context
 
         Nothing ->
-            Dict.insert moduleName [ range ] context
+            Dict.insert moduleName [ Range.build rangeContext range ] context

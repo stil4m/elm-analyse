@@ -1,6 +1,6 @@
 module Analyser.Checks.UnusedImportAliases exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.TypeAnnotation exposing (..)
@@ -25,13 +25,13 @@ type alias Context =
     Dict ModuleName ( Range, Int )
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan rangeContext fileContext _ =
     let
         aliases : Context
         aliases =
             Inspector.inspect
-                { defaultConfig | onImport = Post onImport }
+                { defaultConfig | onImport = Post (onImport rangeContext) }
                 fileContext.ast
                 Dict.empty
     in
@@ -55,11 +55,11 @@ markUsage key context =
     Dict.update key (Maybe.map (Tuple.mapSecond ((+) 1))) context
 
 
-onImport : Import -> Context -> Context
-onImport imp context =
+onImport : RangeContext -> Import -> Context -> Context
+onImport rangeContext imp context =
     case imp.moduleAlias of
         Just x ->
-            Dict.insert x ( imp.range, 0 ) context
+            Dict.insert x ( Range.build rangeContext imp.range, 0 ) context
 
         Nothing ->
             context

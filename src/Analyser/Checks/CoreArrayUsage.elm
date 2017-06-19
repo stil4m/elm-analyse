@@ -5,6 +5,7 @@ import Elm.Syntax.Module exposing (Import)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Messages.Range as Range exposing (RangeContext)
 
 
 checker : Checker
@@ -14,11 +15,11 @@ checker =
     }
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext _ =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan rangeContext fileContext _ =
     fileContext.ast.imports
         |> List.filter isArrayImport
-        |> List.map (.range >> CoreArrayUsage fileContext.path)
+        |> List.map (.range >> Range.build rangeContext >> CoreArrayUsage fileContext.path)
         |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
         |> List.take 1
 

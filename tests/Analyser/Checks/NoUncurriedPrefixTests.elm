@@ -4,6 +4,7 @@ import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
+import Analyser.Messages.Range as Range
 
 
 prefixAsApplicationWithTwoArgs : ( String, String, List MessageData )
@@ -13,7 +14,10 @@ prefixAsApplicationWithTwoArgs =
 
 foo = (+) 1 2
 """
-    , [ NoUncurriedPrefix "./foo.elm" "+" { start = { row = 2, column = 5 }, end = { row = 2, column = 8 } }
+    , [ NoUncurriedPrefix "./foo.elm" "+" <|
+            Range.manual
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 9 } }
+                { start = { row = 2, column = 5 }, end = { row = 2, column = 8 } }
       ]
     )
 

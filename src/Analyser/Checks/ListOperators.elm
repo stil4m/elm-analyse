@@ -1,12 +1,12 @@
 module Analyser.Checks.ListOperators exposing (checker)
 
-import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Expression exposing (..)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UseConsOverConcat, DropConcatOfLists, DropConsOfItemAndList), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 
 
 checker : Checker
@@ -26,11 +26,11 @@ type Deficiency
     | UseCons
 
 
-scan : FileContext -> Configuration -> List Message
-scan fileContext configuration =
+scan : RangeContext -> FileContext -> Configuration -> List Message
+scan rangeContext fileContext configuration =
     Inspector.inspect
         { defaultConfig
-            | onExpression = Post onExpression
+            | onExpression = Post (onExpression rangeContext)
         }
         fileContext.ast
         []
@@ -61,17 +61,17 @@ deficiencyToMessageData path configuration ( deficiency, range ) =
                     Nothing
 
 
-onExpression : Expression -> Context -> Context
-onExpression ( r, inner ) context =
+onExpression : RangeContext -> Expression -> Context -> Context
+onExpression rangeContext ( r, inner ) context =
     case inner of
         OperatorApplication "++" _ ( _, ListExpr _ ) ( _, ListExpr _ ) ->
-            ( DropConcat, r ) :: context
+            ( DropConcat, Range.build rangeContext r ) :: context
 
         OperatorApplication "::" _ _ ( _, ListExpr _ ) ->
-            ( DropCons, r ) :: context
+            ( DropCons, Range.build rangeContext r ) :: context
 
         OperatorApplication "++" _ ( _, ListExpr [ _ ] ) _ ->
-            ( UseCons, r ) :: context
+            ( UseCons, Range.build rangeContext r ) :: context
 
         _ ->
             context

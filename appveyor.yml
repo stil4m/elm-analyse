@@ -11,7 +11,7 @@ install:
 
 # Post-install test scripts.
 test_script:
-  - npm run eslint
+  - npm run check-prettier
   - npm run elm-format
   - npm run test
   - npm run build

@@ -1,6 +1,6 @@
 module Analyser.Messages.Json exposing (serialiseMessage, encodeMessage, decodeMessage)
 
-import Elm.Syntax.Range as Range exposing (Range)
+import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.Base as AST
 import Analyser.Messages.Types exposing (Message, MessageData(..), MessageStatus(..))
 import Json.Decode as JD exposing (Decoder)
@@ -108,6 +108,13 @@ decodeMessageData =
           , JD.succeed DuplicateImport
                 |: fileField
                 |: moduleNameField
+                |: JD.field "ranges" (JD.list Range.decode)
+          )
+        , ( "DuplicateImportedVariable"
+          , JD.succeed DuplicateImportedVariable
+                |: fileField
+                |: moduleNameField
+                |: JD.field "name" JD.string
                 |: JD.field "ranges" (JD.list Range.decode)
           )
         , ( "UnusedTypeAlias", decodeFileVarNameAndRange UnusedTypeAlias )
@@ -291,6 +298,15 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "moduleName", JE.list <| List.map JE.string moduleName )
+                    , ( "ranges", JE.list <| List.map Range.encode ranges )
+                    ]
+
+        DuplicateImportedVariable file moduleName name ranges ->
+            encodeTyped "DuplicateImportedVariable" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "moduleName", JE.list <| List.map JE.string moduleName )
+                    , ( "name", JE.string name )
                     , ( "ranges", JE.list <| List.map Range.encode ranges )
                     ]
 

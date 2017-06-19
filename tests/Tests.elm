@@ -26,34 +26,37 @@ import Analyser.Fixes.UnusedTypeAliasTests
 import Analyser.Checks.MultiLineRecordFormattingTests
 import Analyser.Checks.NonStaticRegexTests
 import Analyser.Checks.FunctionsInLetTests
+import Analyser.Checks.DuplicateImportedVariableTests
 
 
 all : Test
 all =
     Test.concat
-        [ Analyser.Checks.NonStaticRegexTests.all
-        , Analyser.Checks.FunctionsInLetTests.all
-        , Analyser.Fixes.UnusedTypeAliasTests.all
-        , Analyser.Checks.MultiLineRecordFormattingTests.all
-        , Analyser.Checks.ListOperatorsTests.all
-        , Analyser.Fixes.FileContentTests.all
-        , Analyser.Fixes.UnusedImportedVariableTests.all
-        , Analyser.Fixes.UnusedImportAliasTests.all
-        , Analyser.Fixes.UnnecessaryParensTests.all
-        , Analyser.Fixes.UnusedImportTests.all
-        , Analyser.Checks.UnusedImportTests.all
-        , Analyser.Checks.UnusedImportAliasesTests.all
-        , Analyser.Checks.NoUncurriedPrefixTests.all
-        , Analyser.Checks.UnusedVariableTests.all
-        , Analyser.Checks.OverriddenVariablesTests.all
-        , Analyser.Checks.UnnecessaryParensTests.all
-        , Analyser.Checks.DuplicateImportTests.all
-        , Analyser.Checks.NoDebugTests.all
-        , Analyser.Checks.UnusedTypeAliasTests.all
-        , Analyser.Checks.NoTopLevelSignatureTests.all
-        , Analyser.Checks.ImportAllTests.all
-        , Analyser.Checks.ExposeAllTests.all
-        , Analyser.Checks.UnnecessaryListConcatTests.all
-        , InterfaceTest.all
-        , ASTUtil.PatternOptimizerTests.all
+        [ Analyser.Checks.UnusedVariableTests.all
+
+        -- ,Analyser.Checks.DuplicateImportedVariableTests.all
+        -- , Analyser.Checks.DuplicateImportTests.all
+        -- , Analyser.Checks.NonStaticRegexTests.all
+        -- , Analyser.Checks.FunctionsInLetTests.all
+        -- , Analyser.Fixes.UnusedTypeAliasTests.all
+        -- , Analyser.Checks.MultiLineRecordFormattingTests.all
+        -- , Analyser.Checks.ListOperatorsTests.all
+        -- , Analyser.Checks.UnusedImportTests.all
+        -- , Analyser.Checks.UnusedImportAliasesTests.all
+        -- , Analyser.Checks.NoUncurriedPrefixTests.all
+        -- , Analyser.Checks.OverriddenVariablesTests.all
+        -- , Analyser.Checks.UnnecessaryParensTests.all
+        -- , Analyser.Checks.NoDebugTests.all
+        -- , Analyser.Checks.UnusedTypeAliasTests.all
+        -- , Analyser.Checks.NoTopLevelSignatureTests.all
+        -- , Analyser.Checks.ImportAllTests.all
+        -- , Analyser.Checks.ExposeAllTests.all
+        -- , Analyser.Checks.UnnecessaryListConcatTests.all
+        -- , InterfaceTest.all
+        -- , ASTUtil.PatternOptimizerTests.all
+        -- , Analyser.Fixes.FileContentTests.all
+        -- , Analyser.Fixes.UnusedImportedVariableTests.all
+        -- , Analyser.Fixes.UnusedImportAliasTests.all
+        -- , Analyser.Fixes.UnnecessaryParensTests.all
+        -- , Analyser.Fixes.UnusedImportTests.all
         ]
