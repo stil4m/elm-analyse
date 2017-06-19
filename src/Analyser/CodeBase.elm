@@ -2,7 +2,7 @@ module Analyser.CodeBase exposing (CodeBase, init, dependencies, setDependencies
 
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Dict exposing (Dict)
-import Elm.Dependency exposing (Dependency, Version)
+import Elm.Dependency exposing (Dependency)
 import Elm.Processing as Processing exposing (ProcessContext)
 
 

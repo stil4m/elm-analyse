@@ -4,7 +4,7 @@ import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Elm.Syntax.TypeAnnotation exposing (..)
 import Elm.Syntax.TypeAlias exposing (..)
 import Analyser.FileContext exposing (FileContext)
-import Elm.Interface as Interface exposing (Interface)
+import Elm.Interface as Interface
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedTypeAlias), newMessage)
 import Dict exposing (Dict)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)

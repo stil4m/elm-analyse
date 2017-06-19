@@ -1,7 +1,7 @@
 port module Analyser.Files.FileLoader exposing (Msg, init, subscriptions, update)
 
 import Elm.Json.Encode
-import Analyser.Files.Types exposing (LoadedSourceFile, LoadedFileData)
+import Analyser.Files.Types exposing (LoadedSourceFile)
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
 import Json.Encode
 import Result

@@ -1,6 +1,6 @@
 module Analyser.Checks.OverriddenVariables exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Range as Range exposing (RangeContext)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Range as Syntax
 import Elm.Syntax.Pattern exposing (..)

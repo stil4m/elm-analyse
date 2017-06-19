@@ -15,7 +15,7 @@ import Client.Graph.Widgets as Widgets
 import Client.LoadingScreen as LoadingScreen
 import Client.View.BreadCrumb as BreadCrumb
 import Client.View.Panel as Panel
-import Dict exposing (Dict)
+import Dict
 import Graph exposing (Graph)
 import Graph.Colored.Color exposing (ColorDict)
 import Graph.Colored.Decorator as GraphDecorator

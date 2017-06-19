@@ -80,8 +80,8 @@ getImportExposedVars e =
                             FunctionExpose x r ->
                                 [ ( VariablePointer x r, Imported ) ]
 
-                            TypeOrAliasExpose _ _ ->
-                                []
+                            TypeOrAliasExpose x r ->
+                                [ ( VariablePointer x r, Imported ) ]
 
                             TypeExpose exposedType ->
                                 case exposedType.constructors of
@@ -89,7 +89,7 @@ getImportExposedVars e =
                                         []
 
                                     None ->
-                                        []
+                                        [ ( VariablePointer exposedType.name exposedType.range, Imported ) ]
 
                                     --TODO
                                     Explicit constructors ->
