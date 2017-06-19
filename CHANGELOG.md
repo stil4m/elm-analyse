@@ -1,6 +1,6 @@
 # elm-analyse changelog
 
-## 0.9.0 (XXXX-XX-XX)
+## 0.9.0 (2017-06-19)
 
 * [Issue #73](https://github.com/stil4m/elm-analyse/issues/73) Update messages on file changes
 * [Issue #74](https://github.com/stil4m/elm-analyse/issues/74) Make ranges tech agnostic
