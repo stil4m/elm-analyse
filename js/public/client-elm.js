@@ -8468,6 +8468,21 @@ var _elm_community$json_extra$Json_Decode_Extra$sequence = function (decoders) {
 		_elm_community$json_extra$Json_Decode_Extra$sequenceHelp(decoders),
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$value));
 };
+var _elm_community$json_extra$Json_Decode_Extra$indexedList = function (indexedDecoder) {
+	return A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (values) {
+			return _elm_community$json_extra$Json_Decode_Extra$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					indexedDecoder,
+					A2(
+						_elm_lang$core$List$range,
+						0,
+						_elm_lang$core$List$length(values) - 1)));
+		},
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$value));
+};
 var _elm_community$json_extra$Json_Decode_Extra$optionalField = F2(
 	function (fieldName, decoder) {
 		var finishDecoding = function (json) {
@@ -13299,6 +13314,122 @@ var _user$project$AST_Ranges$orderByStart = F2(
 		return (!_elm_lang$core$Native_Utils.eq(r1.start.row, r2.start.row)) ? A2(_elm_lang$core$Basics$compare, r1.start.row, r2.start.row) : A2(_elm_lang$core$Basics$compare, r1.start.column, r2.start.column);
 	});
 
+var _user$project$Analyser_Messages_Range$realEnd = F2(
+	function (d, e) {
+		return (_elm_lang$core$Native_Utils.cmp(e.column, 0) > -1) ? e : _elm_lang$core$Native_Utils.update(
+			e,
+			{
+				row: e.row - 1,
+				column: A2(
+					_elm_lang$core$Maybe$withDefault,
+					0,
+					A2(_elm_lang$core$Dict$get, e.row - 1, d))
+			});
+	});
+var _user$project$Analyser_Messages_Range$asSyntaxRange = function (_p0) {
+	var _p1 = _p0;
+	return _p1._1;
+};
+var _user$project$Analyser_Messages_Range$compareRangeStarts = F2(
+	function (_p3, _p2) {
+		var _p4 = _p3;
+		var _p5 = _p2;
+		return A2(_user$project$AST_Ranges$compareRangeStarts, _p4._0, _p5._0);
+	});
+var _user$project$Analyser_Messages_Range$orderByStart = F2(
+	function (_p7, _p6) {
+		var _p8 = _p7;
+		var _p9 = _p6;
+		return A2(_user$project$AST_Ranges$orderByStart, _p8._0, _p9._0);
+	});
+var _user$project$Analyser_Messages_Range$rangeToString = function (_p10) {
+	var _p11 = _p10;
+	return _user$project$AST_Ranges$rangeToString(_p11._0);
+};
+var _user$project$Analyser_Messages_Range$encode = function (_p12) {
+	var _p13 = _p12;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'real',
+				_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p13._0)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'parsed',
+					_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p13._1)
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$Analyser_Messages_Range$toTuple = function (_p14) {
+	var _p15 = _p14;
+	var _p16 = _p15._0;
+	return {ctor: '_Tuple4', _0: _p16.start.row, _1: _p16.start.column, _2: _p16.end.row, _3: _p16.end.column};
+};
+var _user$project$Analyser_Messages_Range$Range = F2(
+	function (a, b) {
+		return {ctor: 'Range', _0: a, _1: b};
+	});
+var _user$project$Analyser_Messages_Range$emptyRange = A2(_user$project$Analyser_Messages_Range$Range, _stil4m$elm_syntax$Elm_Syntax_Range$emptyRange, _stil4m$elm_syntax$Elm_Syntax_Range$emptyRange);
+var _user$project$Analyser_Messages_Range$decode = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_user$project$Analyser_Messages_Range$Range,
+	A2(_elm_lang$core$Json_Decode$field, 'real', _stil4m$elm_syntax$Elm_Syntax_Range$decode),
+	A2(_elm_lang$core$Json_Decode$field, 'parsed', _stil4m$elm_syntax$Elm_Syntax_Range$decode));
+var _user$project$Analyser_Messages_Range$manual = _user$project$Analyser_Messages_Range$Range;
+var _user$project$Analyser_Messages_Range$build = F2(
+	function (_p18, _p17) {
+		var _p19 = _p18;
+		var _p24 = _p19._0;
+		var _p20 = _p17;
+		var _p23 = _p20.start;
+		var _p22 = _p20;
+		var _p21 = _p20.end;
+		return _elm_lang$core$Native_Utils.eq(_p23.row, 1) ? A2(
+			_user$project$Analyser_Messages_Range$Range,
+			{
+				start: {row: _p23.row - 1, column: _p23.column},
+				end: A2(
+					_user$project$Analyser_Messages_Range$realEnd,
+					_p24,
+					{row: _p21.row - 1, column: _p21.column})
+			},
+			_p22) : A2(
+			_user$project$Analyser_Messages_Range$Range,
+			{
+				start: {row: _p23.row, column: _p23.column + 1},
+				end: A2(
+					_user$project$Analyser_Messages_Range$realEnd,
+					_p24,
+					{row: _p21.row, column: _p21.column + 1})
+			},
+			_p22);
+	});
+var _user$project$Analyser_Messages_Range$Context = function (a) {
+	return {ctor: 'Context', _0: a};
+};
+var _user$project$Analyser_Messages_Range$context = function (input) {
+	return _user$project$Analyser_Messages_Range$Context(
+		_elm_lang$core$Dict$fromList(
+			A2(
+				_elm_lang$core$List$indexedMap,
+				F2(
+					function (x, y) {
+						return {
+							ctor: '_Tuple2',
+							_0: x,
+							_1: _elm_lang$core$String$length(y)
+						};
+					}),
+				A2(_elm_lang$core$String$split, '\n', input))));
+};
+
 var _user$project$Analyser_Messages_Types$Message = F4(
 	function (a, b, c, d) {
 		return {id: a, status: b, files: c, data: d};
@@ -13308,6 +13439,11 @@ var _user$project$Analyser_Messages_Types$newMessage = A2(_user$project$Analyser
 var _user$project$Analyser_Messages_Types$Fixing = {ctor: 'Fixing'};
 var _user$project$Analyser_Messages_Types$Blocked = {ctor: 'Blocked'};
 var _user$project$Analyser_Messages_Types$Outdated = {ctor: 'Outdated'};
+var _user$project$Analyser_Messages_Types$outdate = function (m) {
+	return _elm_lang$core$Native_Utils.update(
+		m,
+		{status: _user$project$Analyser_Messages_Types$Outdated});
+};
 var _user$project$Analyser_Messages_Types$FunctionInLet = F2(
 	function (a, b) {
 		return {ctor: 'FunctionInLet', _0: a, _1: b};
@@ -13366,6 +13502,10 @@ var _user$project$Analyser_Messages_Types$RedefineVariable = F4(
 var _user$project$Analyser_Messages_Types$UnusedTypeAlias = F3(
 	function (a, b, c) {
 		return {ctor: 'UnusedTypeAlias', _0: a, _1: b, _2: c};
+	});
+var _user$project$Analyser_Messages_Types$DuplicateImportedVariable = F4(
+	function (a, b, c, d) {
+		return {ctor: 'DuplicateImportedVariable', _0: a, _1: b, _2: c, _3: d};
 	});
 var _user$project$Analyser_Messages_Types$DuplicateImport = F3(
 	function (a, b, c) {
@@ -13506,7 +13646,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._2)
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -13536,7 +13676,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._2)
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -13566,7 +13706,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._2)
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -13596,7 +13736,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._2)
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -13619,7 +13759,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -13649,7 +13789,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._2)
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -13679,7 +13819,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._2)
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -13702,7 +13842,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -13724,7 +13864,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -13746,7 +13886,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -13768,7 +13908,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -13849,9 +13989,49 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 									ctor: '_Tuple2',
 									_0: 'ranges',
 									_1: _elm_lang$core$Json_Encode$list(
-										A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Syntax_Range$encode, _p0._2))
+										A2(_elm_lang$core$List$map, _user$project$Analyser_Messages_Range$encode, _p0._2))
 								},
 								_1: {ctor: '[]'}
+							}
+						}
+					}));
+		case 'DuplicateImportedVariable':
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'DuplicateImportedVariable',
+				_elm_lang$core$Json_Encode$object(
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'file',
+							_1: _elm_lang$core$Json_Encode$string(_p0._0)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'moduleName',
+								_1: _elm_lang$core$Json_Encode$list(
+									A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, _p0._1))
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'name',
+									_1: _elm_lang$core$Json_Encode$string(_p0._2)
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'ranges',
+										_1: _elm_lang$core$Json_Encode$list(
+											A2(_elm_lang$core$List$map, _user$project$Analyser_Messages_Range$encode, _p0._3))
+									},
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}));
@@ -13879,7 +14059,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._2)
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -13909,14 +14089,14 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range1',
-									_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._2)
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
 								},
 								_1: {
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
 										_0: 'range2',
-										_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._3)
+										_1: _user$project$Analyser_Messages_Range$encode(_p0._3)
 									},
 									_1: {ctor: '[]'}
 								}
@@ -13947,7 +14127,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._2)
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -13978,7 +14158,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._2)
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -14009,7 +14189,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'range',
-									_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._2)
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -14032,7 +14212,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -14054,7 +14234,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -14076,7 +14256,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -14098,7 +14278,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -14121,7 +14301,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								ctor: '_Tuple2',
 								_0: 'ranges',
 								_1: _elm_lang$core$Json_Encode$list(
-									A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Syntax_Range$encode, _p0._1))
+									A2(_elm_lang$core$List$map, _user$project$Analyser_Messages_Range$encode, _p0._1))
 							},
 							_1: {ctor: '[]'}
 						}
@@ -14143,7 +14323,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -14165,7 +14345,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -14187,7 +14367,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'range',
-								_1: _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p0._1)
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
 							},
 							_1: {ctor: '[]'}
 						}
@@ -14319,7 +14499,7 @@ var _user$project$Analyser_Messages_Json$decodeFileAndRange = function (f) {
 			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 			_elm_lang$core$Json_Decode$succeed(f),
 			_user$project$Analyser_Messages_Json$fileField),
-		A2(_elm_lang$core$Json_Decode$field, 'range', _stil4m$elm_syntax$Elm_Syntax_Range$decode));
+		A2(_elm_lang$core$Json_Decode$field, 'range', _user$project$Analyser_Messages_Range$decode));
 };
 var _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange = function (f) {
 	return A2(
@@ -14331,7 +14511,7 @@ var _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange = function
 				_elm_lang$core$Json_Decode$succeed(f),
 				_user$project$Analyser_Messages_Json$fileField),
 			_user$project$Analyser_Messages_Json$moduleNameField),
-		A2(_elm_lang$core$Json_Decode$field, 'range', _stil4m$elm_syntax$Elm_Syntax_Range$decode));
+		A2(_elm_lang$core$Json_Decode$field, 'range', _user$project$Analyser_Messages_Range$decode));
 };
 var _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange = function (f) {
 	return A2(
@@ -14343,7 +14523,7 @@ var _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange = function (f
 				_elm_lang$core$Json_Decode$succeed(f),
 				_user$project$Analyser_Messages_Json$fileField),
 			_user$project$Analyser_Messages_Json$varNameField),
-		A2(_elm_lang$core$Json_Decode$field, 'range', _stil4m$elm_syntax$Elm_Syntax_Range$decode));
+		A2(_elm_lang$core$Json_Decode$field, 'range', _user$project$Analyser_Messages_Range$decode));
 };
 var _user$project$Analyser_Messages_Json$decodeMessageData = _user$project$Util_Json$decodeTyped(
 	{
@@ -14472,121 +14652,144 @@ var _user$project$Analyser_Messages_Json$decodeMessageData = _user$project$Util_
 																			A2(
 																				_elm_lang$core$Json_Decode$field,
 																				'ranges',
-																				_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Syntax_Range$decode)))
+																				_elm_lang$core$Json_Decode$list(_user$project$Analyser_Messages_Range$decode)))
 																	},
 																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'UnusedTypeAlias',
-																			_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$UnusedTypeAlias)
-																		},
-																		_1: {
-																			ctor: '::',
-																			_0: {
-																				ctor: '_Tuple2',
-																				_0: 'RedefineVariable',
-																				_1: A2(
+																			_0: 'DuplicateImportedVariable',
+																			_1: A2(
+																				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																				A2(
 																					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 																					A2(
 																						_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 																						A2(
 																							_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																							A2(
-																								_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																								_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$RedefineVariable),
-																								_user$project$Analyser_Messages_Json$fileField),
-																							_user$project$Analyser_Messages_Json$varNameField),
-																						A2(_elm_lang$core$Json_Decode$field, 'range1', _stil4m$elm_syntax$Elm_Syntax_Range$decode)),
-																					A2(_elm_lang$core$Json_Decode$field, 'range2', _stil4m$elm_syntax$Elm_Syntax_Range$decode))
+																							_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$DuplicateImportedVariable),
+																							_user$project$Analyser_Messages_Json$fileField),
+																						_user$project$Analyser_Messages_Json$moduleNameField),
+																					A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string)),
+																				A2(
+																					_elm_lang$core$Json_Decode$field,
+																					'ranges',
+																					_elm_lang$core$Json_Decode$list(_user$project$Analyser_Messages_Range$decode)))
+																		},
+																		_1: {
+																			ctor: '::',
+																			_0: {
+																				ctor: '_Tuple2',
+																				_0: 'UnusedTypeAlias',
+																				_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$UnusedTypeAlias)
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'LineLengthExceeded',
+																					_0: 'RedefineVariable',
 																					_1: A2(
 																						_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 																						A2(
 																							_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-																							_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$LineLengthExceeded),
-																							_user$project$Analyser_Messages_Json$fileField),
-																						A2(
-																							_elm_lang$core$Json_Decode$field,
-																							'ranges',
-																							_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Syntax_Range$decode)))
+																							A2(
+																								_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																								A2(
+																									_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																									_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$RedefineVariable),
+																									_user$project$Analyser_Messages_Json$fileField),
+																								_user$project$Analyser_Messages_Json$varNameField),
+																							A2(_elm_lang$core$Json_Decode$field, 'range1', _user$project$Analyser_Messages_Range$decode)),
+																						A2(_elm_lang$core$Json_Decode$field, 'range2', _user$project$Analyser_Messages_Range$decode))
 																				},
 																				_1: {
 																					ctor: '::',
 																					_0: {
 																						ctor: '_Tuple2',
-																						_0: 'NoUncurriedPrefix',
-																						_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$NoUncurriedPrefix)
+																						_0: 'LineLengthExceeded',
+																						_1: A2(
+																							_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																							A2(
+																								_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																								_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$LineLengthExceeded),
+																								_user$project$Analyser_Messages_Json$fileField),
+																							A2(
+																								_elm_lang$core$Json_Decode$field,
+																								'ranges',
+																								_elm_lang$core$Json_Decode$list(_user$project$Analyser_Messages_Range$decode)))
 																					},
 																					_1: {
 																						ctor: '::',
 																						_0: {
 																							ctor: '_Tuple2',
-																							_0: 'UnusedImportAlias',
-																							_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImportAlias)
+																							_0: 'NoUncurriedPrefix',
+																							_1: _user$project$Analyser_Messages_Json$decodeFileVarNameAndRange(_user$project$Analyser_Messages_Types$NoUncurriedPrefix)
 																						},
 																						_1: {
 																							ctor: '::',
 																							_0: {
 																								ctor: '_Tuple2',
-																								_0: 'UnusedImport',
-																								_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImport)
+																								_0: 'UnusedImportAlias',
+																								_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImportAlias)
 																							},
 																							_1: {
 																								ctor: '::',
 																								_0: {
 																									ctor: '_Tuple2',
-																									_0: 'UseConsOverConcat',
-																									_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UseConsOverConcat)
+																									_0: 'UnusedImport',
+																									_1: _user$project$Analyser_Messages_Json$decodeFileModuleNameAndRange(_user$project$Analyser_Messages_Types$UnusedImport)
 																								},
 																								_1: {
 																									ctor: '::',
 																									_0: {
 																										ctor: '_Tuple2',
-																										_0: 'DropConcatOfLists',
-																										_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConcatOfLists)
+																										_0: 'UseConsOverConcat',
+																										_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UseConsOverConcat)
 																									},
 																									_1: {
 																										ctor: '::',
 																										_0: {
 																											ctor: '_Tuple2',
-																											_0: 'DropConsOfItemAndList',
-																											_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConsOfItemAndList)
+																											_0: 'DropConcatOfLists',
+																											_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConcatOfLists)
 																										},
 																										_1: {
 																											ctor: '::',
 																											_0: {
 																												ctor: '_Tuple2',
-																												_0: 'UnnecessaryListConcat',
-																												_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UnnecessaryListConcat)
+																												_0: 'DropConsOfItemAndList',
+																												_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$DropConsOfItemAndList)
 																											},
 																											_1: {
 																												ctor: '::',
 																												_0: {
 																													ctor: '_Tuple2',
-																													_0: 'NonStaticRegex',
-																													_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$NonStaticRegex)
+																													_0: 'UnnecessaryListConcat',
+																													_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$UnnecessaryListConcat)
 																												},
 																												_1: {
 																													ctor: '::',
 																													_0: {
 																														ctor: '_Tuple2',
-																														_0: 'CoreArrayUsage',
-																														_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$CoreArrayUsage)
+																														_0: 'NonStaticRegex',
+																														_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$NonStaticRegex)
 																													},
 																													_1: {
 																														ctor: '::',
 																														_0: {
 																															ctor: '_Tuple2',
-																															_0: 'FunctionInLet',
-																															_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$FunctionInLet)
+																															_0: 'CoreArrayUsage',
+																															_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$CoreArrayUsage)
 																														},
-																														_1: {ctor: '[]'}
+																														_1: {
+																															ctor: '::',
+																															_0: {
+																																ctor: '_Tuple2',
+																																_0: 'FunctionInLet',
+																																_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$FunctionInLet)
+																															},
+																															_1: {ctor: '[]'}
+																														}
 																													}
 																												}
 																											}
@@ -14659,7 +14862,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p2),
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p2),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -14703,7 +14906,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p4),
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p4),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -14747,7 +14950,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p6),
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p6),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -14791,7 +14994,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p8),
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p8),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -14879,7 +15082,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p12),
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p12),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -14921,7 +15124,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p14),
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p14),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -14965,7 +15168,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p16),
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p16),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -15003,7 +15206,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p18),
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p18),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15039,7 +15242,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p20),
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p20),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15075,7 +15278,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p22),
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p22),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15111,7 +15314,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p24),
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p24),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15147,7 +15350,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p26),
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p26),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15250,7 +15453,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 											_0: A2(
 												_elm_lang$core$String$join,
 												' | ',
-												A2(_elm_lang$core$List$map, _user$project$AST_Ranges$rangeToString, _p30)),
+												A2(_elm_lang$core$List$map, _user$project$Analyser_Messages_Range$rangeToString, _p30)),
 											_1: {
 												ctor: '::',
 												_0: ' ]',
@@ -15271,9 +15474,64 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_2: _p30,
 				_3: true
 			};
-		case 'UnusedImportAlias':
-			var _p32 = _p0._2;
+		case 'DuplicateImportedVariable':
+			var _p32 = _p0._3;
 			var _p31 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Variable `',
+						_1: {
+							ctor: '::',
+							_0: _p0._2,
+							_1: {
+								ctor: '::',
+								_0: '` imported multiple times module `',
+								_1: {
+									ctor: '::',
+									_0: A2(_elm_lang$core$String$join, '.', _p0._1),
+									_1: {
+										ctor: '::',
+										_0: '`in file \"',
+										_1: {
+											ctor: '::',
+											_0: _p31,
+											_1: {
+												ctor: '::',
+												_0: '\" at [ ',
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$core$String$join,
+														' | ',
+														A2(_elm_lang$core$List$map, _user$project$Analyser_Messages_Range$rangeToString, _p32)),
+													_1: {
+														ctor: '::',
+														_0: ' ]',
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p31,
+						_1: {ctor: '[]'}
+					}),
+				_2: _p32,
+				_3: true
+			};
+		case 'UnusedImportAlias':
+			var _p34 = _p0._2;
+			var _p33 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15288,57 +15546,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '`in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p31,
-									_1: {
-										ctor: '::',
-										_0: '\" at ',
-										_1: {
-											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p32),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}
-						}
-					}),
-				_1: _elm_lang$core$Basics$always(
-					{
-						ctor: '::',
-						_0: _p31,
-						_1: {ctor: '[]'}
-					}),
-				_2: {
-					ctor: '::',
-					_0: _p32,
-					_1: {ctor: '[]'}
-				},
-				_3: true
-			};
-		case 'UnusedImport':
-			var _p34 = _p0._2;
-			var _p33 = _p0._0;
-			return {
-				ctor: '_Tuple4',
-				_0: _elm_lang$core$String$concat(
-					{
-						ctor: '::',
-						_0: 'Unused import `',
-						_1: {
-							ctor: '::',
-							_0: A2(_elm_lang$core$String$join, '.', _p0._1),
-							_1: {
-								ctor: '::',
-								_0: '`in file \"',
-								_1: {
-									ctor: '::',
 									_0: _p33,
 									_1: {
 										ctor: '::',
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p34),
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p34),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -15359,7 +15573,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'UnusedTypeAlias':
+		case 'UnusedImport':
 			var _p36 = _p0._2;
 			var _p35 = _p0._0;
 			return {
@@ -15367,13 +15581,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Type alias `',
+						_0: 'Unused import `',
 						_1: {
 							ctor: '::',
-							_0: _p0._1,
+							_0: A2(_elm_lang$core$String$join, '.', _p0._1),
 							_1: {
 								ctor: '::',
-								_0: '` is not used in file \"',
+								_0: '`in file \"',
 								_1: {
 									ctor: '::',
 									_0: _p35,
@@ -15382,7 +15596,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p36),
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p36),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -15403,25 +15617,33 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'MultiLineRecordFormatting':
-			var _p38 = _p0._1;
+		case 'UnusedTypeAlias':
+			var _p38 = _p0._2;
 			var _p37 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Record should be formatted over multiple lines in file \"',
+						_0: 'Type alias `',
 						_1: {
 							ctor: '::',
-							_0: _p37,
+							_0: _p0._1,
 							_1: {
 								ctor: '::',
-								_0: '\" at ',
+								_0: '` is not used in file \"',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p38),
-									_1: {ctor: '[]'}
+									_0: _p37,
+									_1: {
+										ctor: '::',
+										_0: '\" at ',
+										_1: {
+											ctor: '::',
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p38),
+											_1: {ctor: '[]'}
+										}
+									}
 								}
 							}
 						}
@@ -15439,33 +15661,25 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'NoUncurriedPrefix':
-			var _p40 = _p0._2;
+		case 'MultiLineRecordFormatting':
+			var _p40 = _p0._1;
 			var _p39 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Prefix notation for `',
+						_0: 'Record should be formatted over multiple lines in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p0._1,
+							_0: _p39,
 							_1: {
 								ctor: '::',
-								_0: '` is unneeded in file \"',
+								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _p39,
-									_1: {
-										ctor: '::',
-										_0: '\" at ',
-										_1: {
-											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p40),
-											_1: {ctor: '[]'}
-										}
-									}
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p40),
+									_1: {ctor: '[]'}
 								}
 							}
 						}
@@ -15481,10 +15695,9 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 					_0: _p40,
 					_1: {ctor: '[]'}
 				},
-				_3: false
+				_3: true
 			};
-		case 'RedefineVariable':
-			var _p43 = _p0._3;
+		case 'NoUncurriedPrefix':
 			var _p42 = _p0._2;
 			var _p41 = _p0._0;
 			return {
@@ -15492,31 +15705,23 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Variable `',
+						_0: 'Prefix notation for `',
 						_1: {
 							ctor: '::',
 							_0: _p0._1,
 							_1: {
 								ctor: '::',
-								_0: '` is redefined in file \"',
+								_0: '` is unneeded in file \"',
 								_1: {
 									ctor: '::',
 									_0: _p41,
 									_1: {
 										ctor: '::',
-										_0: '\". At ',
+										_0: '\" at ',
 										_1: {
 											ctor: '::',
-											_0: _user$project$AST_Ranges$rangeToString(_p42),
-											_1: {
-												ctor: '::',
-												_0: ' and ',
-												_1: {
-													ctor: '::',
-													_0: _user$project$AST_Ranges$rangeToString(_p43),
-													_1: {ctor: '[]'}
-												}
-											}
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p42),
+											_1: {ctor: '[]'}
 										}
 									}
 								}
@@ -15532,17 +15737,70 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_2: {
 					ctor: '::',
 					_0: _p42,
-					_1: {
+					_1: {ctor: '[]'}
+				},
+				_3: false
+			};
+		case 'RedefineVariable':
+			var _p45 = _p0._3;
+			var _p44 = _p0._2;
+			var _p43 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Variable `',
+						_1: {
+							ctor: '::',
+							_0: _p0._1,
+							_1: {
+								ctor: '::',
+								_0: '` is redefined in file \"',
+								_1: {
+									ctor: '::',
+									_0: _p43,
+									_1: {
+										ctor: '::',
+										_0: '\". At ',
+										_1: {
+											ctor: '::',
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p44),
+											_1: {
+												ctor: '::',
+												_0: ' and ',
+												_1: {
+													ctor: '::',
+													_0: _user$project$Analyser_Messages_Range$rangeToString(_p45),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
 						ctor: '::',
 						_0: _p43,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p44,
+					_1: {
+						ctor: '::',
+						_0: _p45,
 						_1: {ctor: '[]'}
 					}
 				},
 				_3: false
 			};
 		case 'UseConsOverConcat':
-			var _p45 = _p0._1;
-			var _p44 = _p0._0;
+			var _p47 = _p0._1;
+			var _p46 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15551,49 +15809,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Use `::` instead of `++` in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p44,
-							_1: {
-								ctor: '::',
-								_0: '\" at ',
-								_1: {
-									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p45),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}),
-				_1: _elm_lang$core$Basics$always(
-					{
-						ctor: '::',
-						_0: _p44,
-						_1: {ctor: '[]'}
-					}),
-				_2: {
-					ctor: '::',
-					_0: _p45,
-					_1: {ctor: '[]'}
-				},
-				_3: true
-			};
-		case 'DropConcatOfLists':
-			var _p47 = _p0._1;
-			var _p46 = _p0._0;
-			return {
-				ctor: '_Tuple4',
-				_0: _elm_lang$core$String$concat(
-					{
-						ctor: '::',
-						_0: 'Joining two literal lists with `++`, but instead you can just join the lists. \"',
-						_1: {
-							ctor: '::',
 							_0: _p46,
 							_1: {
 								ctor: '::',
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p47),
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p47),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15612,7 +15834,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'DropConsOfItemAndList':
+		case 'DropConcatOfLists':
 			var _p49 = _p0._1;
 			var _p48 = _p0._0;
 			return {
@@ -15620,7 +15842,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Adding an item to the front of a literal list, but instead you can just put it in the list. \"',
+						_0: 'Joining two literal lists with `++`, but instead you can just join the lists. \"',
 						_1: {
 							ctor: '::',
 							_0: _p48,
@@ -15629,7 +15851,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p49),
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p49),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15648,9 +15870,45 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'LineLengthExceeded':
+		case 'DropConsOfItemAndList':
 			var _p51 = _p0._1;
 			var _p50 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Adding an item to the front of a literal list, but instead you can just put it in the list. \"',
+						_1: {
+							ctor: '::',
+							_0: _p50,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p51),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p50,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p51,
+					_1: {ctor: '[]'}
+				},
+				_3: true
+			};
+		case 'LineLengthExceeded':
+			var _p53 = _p0._1;
+			var _p52 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15660,13 +15918,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$core$Basics$toString(
-								_elm_lang$core$List$length(_p51)),
+								_elm_lang$core$List$length(_p53)),
 							_1: {
 								ctor: '::',
 								_0: ' line(s) in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p50,
+									_0: _p52,
 									_1: {
 										ctor: '::',
 										_0: '\".',
@@ -15679,15 +15937,15 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p50,
+						_0: _p52,
 						_1: {ctor: '[]'}
 					}),
-				_2: _p51,
+				_2: _p53,
 				_3: false
 			};
 		case 'UnnecessaryListConcat':
-			var _p53 = _p0._1;
-			var _p52 = _p0._0;
+			var _p55 = _p0._1;
+			var _p54 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -15696,49 +15954,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Better merge the arguments of `List.concat` to a single list in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p52,
-							_1: {
-								ctor: '::',
-								_0: '\" at ',
-								_1: {
-									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p53),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}),
-				_1: _elm_lang$core$Basics$always(
-					{
-						ctor: '::',
-						_0: _p52,
-						_1: {ctor: '[]'}
-					}),
-				_2: {
-					ctor: '::',
-					_0: _p53,
-					_1: {ctor: '[]'}
-				},
-				_3: true
-			};
-		default:
-			var _p55 = _p0._1;
-			var _p54 = _p0._0;
-			return {
-				ctor: '_Tuple4',
-				_0: _elm_lang$core$String$concat(
-					{
-						ctor: '::',
-						_0: 'Let statement containing functions should be avoided in \"',
-						_1: {
-							ctor: '::',
 							_0: _p54,
 							_1: {
 								ctor: '::',
 								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(_p55),
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p55),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -15755,23 +15977,59 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 					_0: _p55,
 					_1: {ctor: '[]'}
 				},
+				_3: true
+			};
+		default:
+			var _p57 = _p0._1;
+			var _p56 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Let statement containing functions should be avoided in \"',
+						_1: {
+							ctor: '::',
+							_0: _p56,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p57),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p56,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p57,
+					_1: {ctor: '[]'}
+				},
 				_3: false
 			};
 	}
 };
 var _user$project$Analyser_Messages_Util$canFix = function (m) {
-	var _p56 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var result = _p56._3;
+	var _p58 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var result = _p58._3;
 	return result;
 };
 var _user$project$Analyser_Messages_Util$getRanges = function (m) {
-	var _p57 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var r = _p57._2;
+	var _p59 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var r = _p59._2;
 	return r;
 };
 var _user$project$Analyser_Messages_Util$getFiles = function (m) {
-	var _p58 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p58._1;
+	var _p60 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p60._1;
 	return f(m);
 };
 var _user$project$Analyser_Messages_Util$compareMessage = F2(
@@ -15787,29 +16045,29 @@ var _user$project$Analyser_Messages_Util$compareMessage = F2(
 			_elm_lang$core$List$head(
 				_user$project$Analyser_Messages_Util$getFiles(a.data)));
 		return _elm_lang$core$Native_Utils.eq(aFile, bFile) ? A2(
-			_user$project$AST_Ranges$compareRangeStarts,
+			_user$project$Analyser_Messages_Range$compareRangeStarts,
 			A2(
 				_elm_lang$core$Maybe$withDefault,
-				_user$project$AST_Ranges$emptyRange,
+				_user$project$Analyser_Messages_Range$emptyRange,
 				_elm_lang$core$List$head(
 					_user$project$Analyser_Messages_Util$getRanges(a.data))),
 			A2(
 				_elm_lang$core$Maybe$withDefault,
-				_user$project$AST_Ranges$emptyRange,
+				_user$project$Analyser_Messages_Range$emptyRange,
 				_elm_lang$core$List$head(
 					_user$project$Analyser_Messages_Util$getRanges(b.data)))) : A2(_elm_lang$core$Basics$compare, aFile, bFile);
 	});
 var _user$project$Analyser_Messages_Util$firstRange = function (a) {
 	return A2(
 		_elm_lang$core$Maybe$withDefault,
-		_stil4m$elm_syntax$Elm_Syntax_Range$emptyRange,
+		_user$project$Analyser_Messages_Range$emptyRange,
 		_elm_lang$core$List$head(
 			_user$project$Analyser_Messages_Util$getRanges(a.data)));
 };
 var _user$project$Analyser_Messages_Util$compareMessageLocation = F2(
 	function (a, b) {
 		return A2(
-			_user$project$AST_Ranges$orderByStart,
+			_user$project$Analyser_Messages_Range$orderByStart,
 			_user$project$Analyser_Messages_Util$firstRange(a),
 			_user$project$Analyser_Messages_Util$firstRange(b));
 	});
@@ -15828,8 +16086,8 @@ var _user$project$Analyser_Messages_Util$compareMessageFile = F2(
 			_user$project$Analyser_Messages_Util$messageFile(b));
 	});
 var _user$project$Analyser_Messages_Util$asString = function (m) {
-	var _p59 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p59._0;
+	var _p61 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p61._0;
 	return f;
 };
 var _user$project$Analyser_Messages_Util$markFixing = F2(
@@ -15911,6 +16169,36 @@ var _user$project$Analyser_State$updateGraph = F2(
 		return _elm_lang$core$Native_Utils.update(
 			s,
 			{graph: newGraph});
+	});
+var _user$project$Analyser_State$outdateMessagesForFile = F2(
+	function (fileName, state) {
+		return _elm_lang$core$Native_Utils.update(
+			state,
+			{
+				messages: A2(
+					_elm_lang$core$List$map,
+					function (m) {
+						return _elm_lang$core$Native_Utils.eq(
+							_user$project$Analyser_Messages_Util$messageFile(m),
+							fileName) ? _user$project$Analyser_Messages_Types$outdate(m) : m;
+					},
+					state.messages)
+			});
+	});
+var _user$project$Analyser_State$removeMessagesForFile = F2(
+	function (fileName, state) {
+		return _elm_lang$core$Native_Utils.update(
+			state,
+			{
+				messages: A2(
+					_elm_lang$core$List$filter,
+					function (m) {
+						return !_elm_lang$core$Native_Utils.eq(
+							_user$project$Analyser_Messages_Util$messageFile(m),
+							fileName);
+					},
+					state.messages)
+			});
 	});
 var _user$project$Analyser_State$sortMessages = function (state) {
 	return _elm_lang$core$Native_Utils.update(
@@ -16101,7 +16389,7 @@ var _user$project$Client_Socket$dashboardAddress = function (_p0) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		'ws://',
-		A2(_elm_lang$core$Basics_ops['++'], _p1.host, '/dashboard'));
+		A2(_elm_lang$core$Basics_ops['++'], _p1.host, '/state'));
 };
 var _user$project$Client_Socket$controlAddress = function (_p2) {
 	var _p3 = _p2;
@@ -16113,29 +16401,26 @@ var _user$project$Client_Socket$controlAddress = function (_p2) {
 
 var _user$project$Client_Highlight$highlightedString = F2(
 	function (targetRows, range) {
-		var endRow = (_elm_lang$core$Native_Utils.cmp(range.end.column, 0) < 0) ? (range.end.row - 1) : range.end.row;
-		var endsOnLineEnding = !_elm_lang$core$Native_Utils.eq(range.end.row, endRow);
-		var startRow = A2(_elm_lang$core$Basics$max, 0, range.start.row - 3);
+		var endsOnLineEnding = false;
+		var _p0 = _user$project$Analyser_Messages_Range$toTuple(range);
+		var startRow = _p0._0;
+		var startColumn = _p0._1;
+		var endRow = _p0._2;
+		var endColumn = _p0._3;
+		var uiStartRow = A2(_elm_lang$core$Basics$max, 0, startRow - 3);
 		var highlightedRowsFull = A2(
 			_elm_lang$core$List$take,
-			(endRow - range.start.row) + 1,
-			A2(_elm_lang$core$List$drop, range.start.row - startRow, targetRows));
-		var _p0 = highlightedRowsFull;
-		if (_p0.ctor === '[]') {
+			(endRow - startRow) + 1,
+			A2(_elm_lang$core$List$drop, startRow - uiStartRow, targetRows));
+		var _p1 = highlightedRowsFull;
+		if (_p1.ctor === '[]') {
 			return '';
 		} else {
-			if (_p0._1.ctor === '[]') {
-				return ((!_elm_lang$core$Native_Utils.eq(range.end.row, endRow)) ? function (_p1) {
-					return A3(
-						_elm_lang$core$Basics$flip,
-						F2(
-							function (x, y) {
-								return A2(_elm_lang$core$Basics_ops['++'], x, y);
-							}),
-						'\n',
-						_elm_lang$core$Basics$identity(_p1));
-				} : _elm_lang$core$String$left(range.end.column - range.start.column))(
-					_elm_lang$core$String$dropLeft(range.start.column + 1)(_p0._0));
+			if (_p1._1.ctor === '[]') {
+				return A2(
+					_elm_lang$core$String$left,
+					endColumn - startColumn,
+					_elm_lang$core$String$dropLeft(startColumn)(_p1._0));
 			} else {
 				var lastHighlighedRow = A2(
 					_elm_lang$core$Maybe$withDefault,
@@ -16151,7 +16436,7 @@ var _user$project$Client_Highlight$highlightedString = F2(
 									function (x, y) {
 										return A2(_elm_lang$core$Basics_ops['++'], x, y);
 									}),
-								'\n') : _elm_lang$core$String$left(range.end.column + 1),
+								'\n') : _elm_lang$core$String$left(endColumn),
 							_elm_lang$core$List$head(
 								_elm_lang$core$List$reverse(highlightedRowsFull)))));
 				var firstHighlightedRow = A2(
@@ -16162,7 +16447,7 @@ var _user$project$Client_Highlight$highlightedString = F2(
 						_elm_lang$core$List$singleton,
 						A2(
 							_elm_lang$core$Maybe$map,
-							_elm_lang$core$String$dropLeft(range.start.column + 1),
+							_elm_lang$core$String$dropLeft(startColumn),
 							_elm_lang$core$List$head(highlightedRowsFull))));
 				var midHighlighedRows = A2(
 					_elm_lang$core$List$take,
@@ -16179,12 +16464,13 @@ var _user$project$Client_Highlight$highlightedString = F2(
 		}
 	});
 var _user$project$Client_Highlight$afterHighlight = F2(
-	function (targetRows, _p2) {
-		var _p3 = _p2;
-		var _p4 = _p3.end;
-		var endRow = (_elm_lang$core$Native_Utils.cmp(_p4.column, 0) < 0) ? (_p4.row - 1) : _p4.row;
-		var endsOnLineEnding = !_elm_lang$core$Native_Utils.eq(_p4.row, endRow);
-		var startRow = A2(_elm_lang$core$Basics$max, 0, _p3.start.row - 3);
+	function (targetRows, range) {
+		var endsOnLineEnding = false;
+		var _p2 = _user$project$Analyser_Messages_Range$toTuple(range);
+		var startRow = _p2._0;
+		var endRow = _p2._2;
+		var endColumn = _p2._3;
+		var uiStartRow = A2(_elm_lang$core$Basics$max, 0, startRow - 3);
 		var postLineText = endsOnLineEnding ? '' : A3(
 			_elm_lang$core$Basics$flip,
 			F2(
@@ -16197,25 +16483,22 @@ var _user$project$Client_Highlight$afterHighlight = F2(
 				'',
 				A2(
 					_elm_lang$core$Maybe$map,
-					_elm_lang$core$String$dropLeft(_p4.column + 1),
+					_elm_lang$core$String$dropLeft(endColumn),
 					_elm_lang$core$List$head(
-						A2(_elm_lang$core$List$drop, _p4.row - startRow, targetRows)))));
+						A2(_elm_lang$core$List$drop, endRow - uiStartRow, targetRows)))));
 		var postLines = A2(
 			_elm_lang$core$String$join,
 			'\n',
-			A3(
-				_elm_lang$core$Basics$flip,
-				_elm_lang$core$List$drop,
-				targetRows,
-				endsOnLineEnding ? (_p4.row - startRow) : ((_p4.row - startRow) + 1)));
+			A3(_elm_lang$core$Basics$flip, _elm_lang$core$List$drop, targetRows, (endRow - uiStartRow) + 1));
 		return A2(_elm_lang$core$Basics_ops['++'], postLineText, postLines);
 	});
 var _user$project$Client_Highlight$beforeHighlight = F2(
-	function (targetRows, _p5) {
-		var _p6 = _p5;
-		var _p7 = _p6.start;
-		var startRow = A2(_elm_lang$core$Basics$max, 0, _p7.row - 3);
-		var preLines = A2(_elm_lang$core$List$take, _p7.row - startRow, targetRows);
+	function (targetRows, range) {
+		var _p3 = _user$project$Analyser_Messages_Range$toTuple(range);
+		var startRow = _p3._0;
+		var startColumn = _p3._1;
+		var uiStartRow = A2(_elm_lang$core$Basics$max, 0, startRow - 3);
+		var preLines = A2(_elm_lang$core$List$take, startRow - uiStartRow, targetRows);
 		var preLineText = A2(
 			_elm_lang$core$Maybe$withDefault,
 			{ctor: '[]'},
@@ -16224,9 +16507,9 @@ var _user$project$Client_Highlight$beforeHighlight = F2(
 				_elm_lang$core$List$singleton,
 				A2(
 					_elm_lang$core$Maybe$map,
-					_elm_lang$core$String$left(_p7.column + 1),
+					_elm_lang$core$String$left(startColumn),
 					_elm_lang$core$List$head(
-						A2(_elm_lang$core$List$drop, _p7.row - startRow, targetRows)))));
+						A2(_elm_lang$core$List$drop, startRow - uiStartRow, targetRows)))));
 		return A2(
 			_elm_lang$core$String$join,
 			'\n',
@@ -16234,14 +16517,16 @@ var _user$project$Client_Highlight$beforeHighlight = F2(
 	});
 var _user$project$Client_Highlight$highlightedPre = F2(
 	function (content, range) {
-		var endRow = (_elm_lang$core$Native_Utils.cmp(range.end.column, 0) < 0) ? (range.end.row - 1) : range.end.row;
-		var startRow = A2(_elm_lang$core$Basics$max, 0, range.start.row - 3);
+		var _p4 = _user$project$Analyser_Messages_Range$toTuple(range);
+		var startRow = _p4._0;
+		var endRow = _p4._2;
+		var uiStartRow = A2(_elm_lang$core$Basics$max, 0, startRow - 3);
 		var target = A2(
 			_elm_lang$core$List$take,
-			(endRow - range.start.row) + 7,
+			(endRow - startRow) + 7,
 			A2(
 				_elm_lang$core$List$drop,
-				startRow,
+				uiStartRow,
 				A2(_elm_lang$core$String$split, '\n', content)));
 		var preText = A2(_user$project$Client_Highlight$beforeHighlight, target, range);
 		var postText = A2(_user$project$Client_Highlight$afterHighlight, target, range);
@@ -16700,13 +16985,17 @@ var _user$project$Client_Messages$view = F3(
 									_0: {ctor: '_Tuple2', _0: 'border-radius', _1: '3px'},
 									_1: {
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'backgound', _1: '1px solid #eee'},
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'background',
+											_1: _elm_lang$core$Native_Utils.eq(x.status, _user$project$Analyser_Messages_Types$Fixing) ? '#dff0d8' : '#fafafa'
+										},
 										_1: {
 											ctor: '::',
 											_0: {
 												ctor: '_Tuple2',
 												_0: 'opacity',
-												_1: _elm_lang$core$Native_Utils.eq(x.status, _user$project$Analyser_Messages_Types$Fixing) ? '.5' : '1.0'
+												_1: _elm_lang$core$Native_Utils.eq(x.status, _user$project$Analyser_Messages_Types$Outdated) ? '.5' : '1.0'
 											},
 											_1: {ctor: '[]'}
 										}
