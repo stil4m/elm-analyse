@@ -1,5 +1,13 @@
 # elm-analyse changelog
 
+## 0.9.2 (2017-06-20)
+
+* [Issue #83](https://github.com/stil4m/elm-analyse/issues/83) Only watch file changes that are actual Elm files
+
+## 0.9.1 (2017-06-19)
+
+Fix for wrongly build Elm source.
+
 ## 0.9.0 (2017-06-19)
 
 * [Issue #73](https://github.com/stil4m/elm-analyse/issues/73) Update messages on file changes
