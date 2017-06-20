@@ -9,6 +9,15 @@ function isRealElmPaths(sourceDir, filePath) {
     return _.every(moduleParts, m => m.match("^[A-Z].*"));
 }
 
+function includedInFileSet(path) {
+    if (!path.match(/\.elm$/)) {
+        return false;
+    }
+
+    return (
+        path.indexOf("elm-stuff") === -1 && path.indexOf("node_modules") === -1
+    );
+}
 function targetFilesForPathAndPackage(directory, path, pack) {
     const packTargetDirs = pack["source-directories"];
     const targetFiles = _.uniq(
@@ -24,11 +33,7 @@ function targetFilesForPathAndPackage(directory, path, pack) {
                     .fileSync(/\.elm$/, sourceDir)
                     .filter(x => {
                         const relativePath = x.replace(path, "");
-                        return (
-                            relativePath.indexOf("elm-stuff") === -1 &&
-                            relativePath.indexOf("node_modules") === -1 &&
-                            x.length > 0
-                        );
+                        return includedInFileSet(relativePath) && x.length > 0;
                     });
                 return dirFiles.filter(x => isRealElmPaths(sourceDir, x));
             })
@@ -99,5 +104,6 @@ function gather(directory) {
 
 module.exports = {
     gather: gather,
-    getDependencyFiles: dependencyFiles
+    getDependencyFiles: dependencyFiles,
+    includedInFileSet: includedInFileSet
 };
