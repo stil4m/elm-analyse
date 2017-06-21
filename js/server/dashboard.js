@@ -15,6 +15,10 @@ module.exports = function(app, elm, expressWs) {
         ws.on("message", function(_msg) {
             ws.send(renderState());
         });
+        ws.on("error", function(_msg) {
+            console.log("WARN: Socket not gracefully closed");
+            console.log(ws.connection);
+        });
     });
 
     elm.ports.sendState.subscribe(function(stateString) {
