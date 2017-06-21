@@ -1,6 +1,6 @@
 # Elm Analyse
 
-A tool that allows you to analyse your [Elm](http://elm-lang.org/) code and identifies deficiencies and best practices.
+A tool that allows you to analyse your [Elm](http://elm-lang.org/) code, identify deficiencies and apply best practices.
 
 <img src="https://ci.appveyor.com/api/projects/status/github/stil4m/elm-analyse?branch=master&retina=true" height="24">
 <img src="https://travis-ci.org/stil4m/elm-analyse.svg?branch=master" height="24">
