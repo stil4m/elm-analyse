@@ -15,8 +15,7 @@ Fix for wrongly build Elm source.
 * [Issue #75](https://github.com/stil4m/elm-analyse/issues/75) Replace ESLint with
 * [Issue #76](https://github.com/stil4m/elm-analyse/issues/76) (Check) Detect duplicate imported variables
 * [Issue #78](https://github.com/stil4m/elm-analyse/issues/78) Improve speed by caching in home dir.
-* [Issue #79](https://github.com/stil4m/elm-analyse/issues/79) Speed up Travis CI build.
- [Prettier](https://github.com/prettier/prettier)
+* [Issue #79](https://github.com/stil4m/elm-analyse/issues/79) Speed up Travis CI build. [Prettier](https://github.com/prettier/prettier)
  * [Issue #81](https://github.com/stil4m/elm-analyse/issues/81) Imported Types and Type aliases are not marked as unused.
 
 
@@ -94,7 +93,7 @@ Fix for wrongly build Elm source.
 
 ## 0.1.4 (2017-02-25)
 
-* [#19](https://github.com/stil4m/elm-analyse/issues/19) "Unused imported variable": Destructured Single Type Union in let-statement
+* [Issue #19](https://github.com/stil4m/elm-analyse/issues/19) "Unused imported variable": Destructured Single Type Union in let-statement
 
 ## 0.1.3 (2017-02-25)
 
