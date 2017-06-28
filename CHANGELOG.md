@@ -16,7 +16,7 @@ Fix for wrongly build Elm source.
 * [Issue #76](https://github.com/stil4m/elm-analyse/issues/76) (Check) Detect duplicate imported variables
 * [Issue #78](https://github.com/stil4m/elm-analyse/issues/78) Improve speed by caching in home dir.
 * [Issue #79](https://github.com/stil4m/elm-analyse/issues/79) Speed up Travis CI build. [Prettier](https://github.com/prettier/prettier)
- * [Issue #81](https://github.com/stil4m/elm-analyse/issues/81) Imported Types and Type aliases are not marked as unused.
+* [Issue #81](https://github.com/stil4m/elm-analyse/issues/81) Imported Types and Type aliases are not marked as unused.
 
 
 ## 0.8.0 (2017-06-14)
