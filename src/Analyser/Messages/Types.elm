@@ -72,6 +72,7 @@ type MessageData
     | NonStaticRegex FileName Range
     | CoreArrayUsage FileName Range
     | FunctionInLet FileName Range
+    | SingleFieldRecord FileName Range
 
 
 type alias GetFiles =
