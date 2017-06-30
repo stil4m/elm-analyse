@@ -488,3 +488,15 @@ getMessageInfo m =
             , [ range ]
             , False
             )
+
+        SingleFieldRecord fileName range ->
+            ( String.concat
+                [ "Record has only one field, you can simply this. In file \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , always [ fileName ]
+            , [ range ]
+            , False
+            )

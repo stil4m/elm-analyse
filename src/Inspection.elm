@@ -25,6 +25,7 @@ import Analyser.Checks.NonStaticRegex as NonStaticRegex
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.FunctionsInLet as FunctionsInLet
 import Analyser.Checks.DuplicateImportedVariable as DuplicateImportedVariable
+import Analyser.Checks.SingleFieldRecord as SingleFieldRecord
 import Analyser.Checks.Base exposing (Checker)
 import Result.Extra
 import Analyser.Configuration exposing (Configuration)
@@ -54,6 +55,7 @@ checkers =
     , NonStaticRegex.checker
     , CoreArrayUsage.checker
     , FunctionsInLet.checker
+    , SingleFieldRecord.checker
     ]
 
 
