@@ -140,6 +140,7 @@ decodeMessageData =
         , ( "NonStaticRegex", decodeFileAndRange NonStaticRegex )
         , ( "CoreArrayUsage", decodeFileAndRange CoreArrayUsage )
         , ( "FunctionInLet", decodeFileAndRange FunctionInLet )
+        , ( "SingleFieldRecord", decodeFileAndRange SingleFieldRecord )
         ]
 
 
@@ -404,5 +405,12 @@ encodeMessageData m =
             encodeTyped "FunctionInLet" <|
                 JE.object
                     [ ( "file", JE.string file )
+                    , ( "range", Range.encode range )
+                    ]
+
+        SingleFieldRecord fileName range ->
+            encodeTyped "SingleFieldRecord" <|
+                JE.object
+                    [ ( "file", JE.string fileName )
                     , ( "range", Range.encode range )
                     ]
