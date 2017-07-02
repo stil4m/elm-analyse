@@ -211,7 +211,7 @@ viewWithFileContent : State -> String -> Html msg
 viewWithFileContent state x =
     div [ style [ ( "max-height", "400px" ), ( "overflow", "scroll" ) ] ]
         [ div []
-            (List.map (Highlight.highlightedPre x) state.ranges)
+            (List.map (Highlight.highlightedPre 3 x) state.ranges)
         , text <| Messages.asString state.message.data
         ]
 

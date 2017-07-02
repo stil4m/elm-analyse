@@ -25,7 +25,7 @@ import Analyser.Fixes.UnusedImportTests
 import Analyser.Fixes.UnusedTypeAliasTests
 import Analyser.Checks.MultiLineRecordFormattingTests
 import Analyser.Checks.NonStaticRegexTests
-import Analyser.Checks.FunctionsInLetTests
+import Analyser.Checks.FunctionInLetTests
 import Analyser.Checks.DuplicateImportedVariableTests
 import Analyser.Checks.SingleFieldRecordTests
 
@@ -38,7 +38,7 @@ all =
         , Analyser.Checks.DuplicateImportedVariableTests.all
         , Analyser.Checks.DuplicateImportTests.all
         , Analyser.Checks.NonStaticRegexTests.all
-        , Analyser.Checks.FunctionsInLetTests.all
+        , Analyser.Checks.FunctionInLetTests.all
         , Analyser.Fixes.UnusedTypeAliasTests.all
         , Analyser.Checks.MultiLineRecordFormattingTests.all
         , Analyser.Checks.ListOperatorsTests.all

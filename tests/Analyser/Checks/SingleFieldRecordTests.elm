@@ -49,8 +49,8 @@ type alias Foo =
     )
 
 
-singelFieldNested : ( String, String, List MessageData )
-singelFieldNested =
+singleFieldNested : ( String, String, List MessageData )
+singleFieldNested =
     ( "multiLineMultiFieldWithNested"
     , """module Bar exposing (Foo)
 
@@ -67,9 +67,9 @@ type alias Foo =
     )
 
 
-singelFieldInType : ( String, String, List MessageData )
-singelFieldInType =
-    ( "multiLineMultiFieldWithNested"
+singleFieldInType : ( String, String, List MessageData )
+singleFieldInType =
+    ( "singleFieldInType"
     , """module Bar exposing (Foo)
 
 type Foo =
@@ -77,8 +77,8 @@ type Foo =
 """
     , [ SingleFieldRecord "./foo.elm" <|
             Range.manual
-                { start = { row = 4, column = 8 }, end = { row = 4, column = 33 } }
-                { start = { row = 4, column = 7 }, end = { row = 5, column = -2 } }
+                { start = { row = 3, column = 6 }, end = { row = 3, column = 17 } }
+                { start = { row = 3, column = 5 }, end = { row = 4, column = -2 } }
       ]
     )
 
@@ -90,5 +90,6 @@ all =
         [ singleField
         , singleFieldGeneric
         , multiField
-        , singelFieldNested
+        , singleFieldNested
+        , singleFieldInType
         ]

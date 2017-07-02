@@ -1,4 +1,4 @@
-module Analyser.Checks.FunctionsInLet exposing (checker)
+module Analyser.Checks.FunctionInLet exposing (checker)
 
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Configuration exposing (Configuration)
@@ -24,7 +24,7 @@ startingContext =
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "FunctionsInLet" ]
+    , shouldCheck = keyBasedChecker [ "FunctionInLet" ]
     }
 
 
