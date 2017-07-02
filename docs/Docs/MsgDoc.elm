@@ -425,7 +425,7 @@ redefineVariable =
     , input = """
 module Foo exposing (main)
 
-foo : Maybe Int -> INT
+foo : Maybe Int -> Int
 foo x =
     case x of
         Just x ->
