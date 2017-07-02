@@ -12,7 +12,7 @@ type Range
 
 
 type RangeContext
-    = Context (Dict Int Int)
+    = Context Int (Dict Int Int)
 
 
 emptyRange : Range
@@ -47,10 +47,16 @@ rangeToString (Range real _) =
 
 context : String -> RangeContext
 context input =
-    String.split "\n" input
-        |> List.indexedMap (\x y -> ( x, String.length y ))
-        |> Dict.fromList
-        |> Context
+    let
+        rows =
+            String.split "\n" input
+
+        index =
+            rows
+                |> List.indexedMap (\x y -> ( x, String.length y ))
+                |> Dict.fromList
+    in
+        Context (List.length rows) index
 
 
 orderByStart : Range -> Range -> Order
@@ -74,24 +80,26 @@ manual =
 
 
 build : RangeContext -> Syntax.Range -> Range
-build (Context rangeContext) ({ start, end } as parsed) =
+build (Context rows rangeContext) ({ start, end } as parsed) =
     if start.row == 1 then
         Range
             { start = { row = start.row - 1, column = start.column }
-            , end = realEnd rangeContext { row = end.row - 1, column = end.column }
+            , end = realEnd rows rangeContext { row = end.row - 1, column = end.column }
             }
             parsed
     else
         Range
             { start = { row = start.row, column = start.column + 1 }
-            , end = realEnd rangeContext { row = end.row, column = end.column + 1 }
+            , end = realEnd rows rangeContext { row = end.row, column = end.column + 1 }
             }
             parsed
 
 
-realEnd : Dict Int Int -> Location -> Location
-realEnd d e =
-    if e.column >= 0 then
+realEnd : Int -> Dict Int Int -> Location -> Location
+realEnd rows d e =
+    if e.row > rows then
+        { e | row = e.row - 2, column = Dict.get (e.row - 2) d |> Maybe.withDefault 0 }
+    else if e.column >= 0 then
         e
     else
         { e | row = e.row - 1, column = Dict.get (e.row - 1) d |> Maybe.withDefault 0 }

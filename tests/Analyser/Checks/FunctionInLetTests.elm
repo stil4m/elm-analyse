@@ -1,6 +1,6 @@
-module Analyser.Checks.FunctionsInLetTests exposing (all)
+module Analyser.Checks.FunctionInLetTests exposing (all)
 
-import Analyser.Checks.FunctionsInLet as FunctionsInLet
+import Analyser.Checks.FunctionInLet as FunctionInLet
 import Test exposing (Test)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), newMessage)
@@ -44,8 +44,8 @@ foo x =
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.FunctionsInLet"
-        FunctionsInLet.checker
+    CTU.build "Analyser.Checks.FunctionInLet"
+        FunctionInLet.checker
         [ functionInLet
         , curriedValueInLet
         ]
