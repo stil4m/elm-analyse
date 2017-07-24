@@ -255,7 +255,7 @@ getMessageInfo m =
 
         DebugLog fileName range ->
             ( String.concat
-                [ "Use of debug log in file \""
+                [ "Use of Debug.log in file \""
                 , fileName
                 , "\" at "
                 , rangeToString range
@@ -267,7 +267,7 @@ getMessageInfo m =
 
         DebugCrash fileName range ->
             ( String.concat
-                [ "Use of debug crash in file \""
+                [ "Use of Debug.crash in file \""
                 , fileName
                 , "\" at "
                 , rangeToString range
