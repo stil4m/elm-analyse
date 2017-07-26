@@ -4,6 +4,7 @@ import Analyser.FileContext as FileContext
 import Analyser.Messages.Types exposing (Message, MessageData(..), newMessage)
 import Analyser.Messages.Range as Range
 import Analyser.Files.Types exposing (LoadedSourceFiles)
+import Analyser.Checks.UnformattedFile as UnformattedFile
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.ExposeAll as ExposeAll
 import Analyser.Checks.ImportAll as ImportAll
@@ -54,6 +55,7 @@ checkers =
     , NonStaticRegex.checker
     , CoreArrayUsage.checker
     , FunctionsInLet.checker
+    , UnformattedFile.checker
     ]
 
 
@@ -63,12 +65,9 @@ run codeBase includedSources configuration =
         enabledChecks =
             List.filter (\x -> x.shouldCheck configuration) checkers
 
-        ( validSources, invalidSources ) =
-            includedSources
-                |> List.partition (Tuple.second >> Result.Extra.isOk)
-
         failedMessages =
-            invalidSources
+            includedSources
+                |> List.filter (Tuple.second >> Result.Extra.isOk)
                 |> List.filterMap
                     (\( source, result ) ->
                         case result of
@@ -88,26 +87,12 @@ run codeBase includedSources configuration =
                             (FileLoadFailed source.path error)
                     )
 
-        fileMessages =
-            validSources
-                |> List.map Tuple.first
-                |> List.filter (not << .formatted)
-                |> List.map
-                    (\source ->
-                        newMessage
-                            [ ( Maybe.withDefault "" source.sha1
-                              , source.path
-                              )
-                            ]
-                            (UnformattedFile source.path)
-                    )
-
         inspectionMessages =
             FileContext.build codeBase includedSources
                 |> List.concatMap (inspectFileContext configuration enabledChecks)
 
         messages =
-            List.concat [ failedMessages, fileMessages, inspectionMessages ]
+            List.concat [ failedMessages, inspectionMessages ]
     in
         messages
 

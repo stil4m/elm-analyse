@@ -16,6 +16,7 @@ type alias FileContext =
     , content : String
     , path : String
     , sha1 : String
+    , formatted : Bool
     }
 
 
@@ -42,4 +43,5 @@ buildForFile moduleIndex ( fileContent, r ) =
                 , content = fileContent.content |> Maybe.withDefault ""
                 , interface = Interface.build l
                 , sha1 = Maybe.withDefault "" fileContent.sha1
+                , formatted = fileContent.formatted
                 }

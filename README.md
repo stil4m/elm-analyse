@@ -83,6 +83,7 @@ Add the `-s` option for server mode. This will allow you to view results in your
 | UnusedTypeAlias | When you define a type alias, but you do not use it in any signature or expose it, then it is just filling up space. It is better to remove it. |
 | UnusedVariable | Variables that are not used could be removed or marked as `_` to avoid unnecessary noise. |
 | UseConsOverConcat | If you concatenate two lists, but the right hand side is a single element list, then you should use the cons operator. |
+| UnformattedFile | This check lists all the files where 'elm-format' finds any formatting issue. |
 
 ---
 
