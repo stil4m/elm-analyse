@@ -21702,7 +21702,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Use of Debug.log in file \"',
+						_0: 'Use of debug log in file \"',
 						_1: {
 							ctor: '::',
 							_0: _p23,
@@ -21738,7 +21738,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Use of Debug.crash in file \"',
+						_0: 'Use of debug crash in file \"',
 						_1: {
 							ctor: '::',
 							_0: _p25,
