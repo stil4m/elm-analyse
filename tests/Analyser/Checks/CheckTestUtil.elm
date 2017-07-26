@@ -34,6 +34,7 @@ getMessages input checker =
                 , content = ""
                 , path = "./foo.elm"
                 , sha1 = ""
+                , formatted = True
                 }
             )
         |> Result.toMaybe

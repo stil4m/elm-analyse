@@ -21702,7 +21702,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Use of debug log in file \"',
+						_0: 'Use of Debug.log in file \"',
 						_1: {
 							ctor: '::',
 							_0: _p23,
@@ -21738,7 +21738,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Use of debug crash in file \"',
+						_0: 'Use of Debug.crash in file \"',
 						_1: {
 							ctor: '::',
 							_0: _p25,
@@ -25062,7 +25062,8 @@ var _user$project$Analyser_FileContext$buildForFile = F2(
 					path: _p4.path,
 					content: A2(_elm_lang$core$Maybe$withDefault, '', _p4.content),
 					$interface: _stil4m$elm_syntax$Elm_Interface$build(_p3),
-					sha1: A2(_elm_lang$core$Maybe$withDefault, '', _p4.sha1)
+					sha1: A2(_elm_lang$core$Maybe$withDefault, '', _p4.sha1),
+					formatted: _p4.formatted
 				});
 		}
 	});
@@ -25074,9 +25075,9 @@ var _user$project$Analyser_FileContext$build = F2(
 			_user$project$Analyser_FileContext$buildForFile(moduleIndex),
 			selected);
 	});
-var _user$project$Analyser_FileContext$FileContext = F6(
-	function (a, b, c, d, e, f) {
-		return {$interface: a, moduleName: b, ast: c, content: d, path: e, sha1: f};
+var _user$project$Analyser_FileContext$FileContext = F7(
+	function (a, b, c, d, e, f, g) {
+		return {$interface: a, moduleName: b, ast: c, content: d, path: e, sha1: f, formatted: g};
 	});
 
 var _user$project$GraphBuilder$edgesInFile = function (file) {
@@ -25146,6 +25147,31 @@ var _user$project$Analyser_Checks_Base$Checker = F2(
 	function (a, b) {
 		return {shouldCheck: a, check: b};
 	});
+
+var _user$project$Analyser_Checks_UnformattedFile$scan = F3(
+	function (_p1, fileContext, _p0) {
+		return fileContext.formatted ? {ctor: '[]'} : {
+			ctor: '::',
+			_0: A2(
+				_user$project$Analyser_Messages_Types$newMessage,
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				},
+				_user$project$Analyser_Messages_Types$UnformattedFile(fileContext.path)),
+			_1: {ctor: '[]'}
+		};
+	});
+var _user$project$Analyser_Checks_UnformattedFile$checker = {
+	check: _user$project$Analyser_Checks_UnformattedFile$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'UnformattedFile',
+			_1: {ctor: '[]'}
+		})
+};
 
 var _user$project$Analyser_Checks_UnusedVariable$flagVariable = F2(
 	function (k, l) {
@@ -27825,7 +27851,11 @@ var _user$project$Inspection$checkers = {
 																				_1: {
 																					ctor: '::',
 																					_0: _user$project$Analyser_Checks_FunctionsInLet$checker,
-																					_1: {ctor: '[]'}
+																					_1: {
+																						ctor: '::',
+																						_0: _user$project$Analyser_Checks_UnformattedFile$checker,
+																						_1: {ctor: '[]'}
+																					}
 																				}
 																			}
 																		}
@@ -27889,30 +27919,6 @@ var _user$project$Inspection$run = F3(
 					}
 				},
 				invalidSources));
-		var fileMessages = A2(
-			_elm_lang$core$List$map,
-			function (source) {
-				return A2(
-					_user$project$Analyser_Messages_Types$newMessage,
-					{
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: A2(_elm_lang$core$Maybe$withDefault, '', source.sha1),
-							_1: source.path
-						},
-						_1: {ctor: '[]'}
-					},
-					_user$project$Analyser_Messages_Types$UnformattedFile(source.path));
-			},
-			A2(
-				_elm_lang$core$List$filter,
-				function (_p8) {
-					return !function (_) {
-						return _.formatted;
-					}(_p8);
-				},
-				A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, validSources)));
 		var enabledChecks = A2(
 			_elm_lang$core$List$filter,
 			function (x) {
@@ -27929,12 +27935,8 @@ var _user$project$Inspection$run = F3(
 				_0: failedMessages,
 				_1: {
 					ctor: '::',
-					_0: fileMessages,
-					_1: {
-						ctor: '::',
-						_0: inspectionMessages,
-						_1: {ctor: '[]'}
-					}
+					_0: inspectionMessages,
+					_1: {ctor: '[]'}
 				}
 			});
 		return messages;

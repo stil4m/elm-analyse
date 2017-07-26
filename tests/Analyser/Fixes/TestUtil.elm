@@ -24,6 +24,7 @@ analyseAndFix checker fixer input rawFile f =
             , content = input
             , path = "./Foo.elm"
             , sha1 = "xxx"
+            , formatted = True
             }
 
         x =
