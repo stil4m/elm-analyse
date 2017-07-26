@@ -1,5 +1,13 @@
 # elm-analyse changelog
 
+## 0.9.4 (20170-07-26)
+
+* [PR #94](https://github.com/stil4m/elm-analyse/pull/94) Use proper names for log/crash. Thanks to [@eeue56](https://github.com/eeue56)
+
+## 0.9.3 (20170-06-23)
+
+* [Issue #88](https://github.com/stil4m/elm-analyse/issues/88) Bump node-watch library to fix duplicate file triggers.
+
 ## 0.9.2 (2017-06-20)
 
 * [Issue #83](https://github.com/stil4m/elm-analyse/issues/83) Only watch file changes that are actual Elm files
