@@ -25062,7 +25062,8 @@ var _user$project$Analyser_FileContext$buildForFile = F2(
 					path: _p4.path,
 					content: A2(_elm_lang$core$Maybe$withDefault, '', _p4.content),
 					$interface: _stil4m$elm_syntax$Elm_Interface$build(_p3),
-					sha1: A2(_elm_lang$core$Maybe$withDefault, '', _p4.sha1)
+					sha1: A2(_elm_lang$core$Maybe$withDefault, '', _p4.sha1),
+					formatted: _p4.formatted
 				});
 		}
 	});
@@ -25074,9 +25075,9 @@ var _user$project$Analyser_FileContext$build = F2(
 			_user$project$Analyser_FileContext$buildForFile(moduleIndex),
 			selected);
 	});
-var _user$project$Analyser_FileContext$FileContext = F6(
-	function (a, b, c, d, e, f) {
-		return {$interface: a, moduleName: b, ast: c, content: d, path: e, sha1: f};
+var _user$project$Analyser_FileContext$FileContext = F7(
+	function (a, b, c, d, e, f, g) {
+		return {$interface: a, moduleName: b, ast: c, content: d, path: e, sha1: f, formatted: g};
 	});
 
 var _user$project$GraphBuilder$edgesInFile = function (file) {
@@ -25146,6 +25147,31 @@ var _user$project$Analyser_Checks_Base$Checker = F2(
 	function (a, b) {
 		return {shouldCheck: a, check: b};
 	});
+
+var _user$project$Analyser_Checks_UnformattedFile$scan = F3(
+	function (_p1, fileContext, _p0) {
+		return fileContext.formatted ? {ctor: '[]'} : {
+			ctor: '::',
+			_0: A2(
+				_user$project$Analyser_Messages_Types$newMessage,
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				},
+				_user$project$Analyser_Messages_Types$UnformattedFile(fileContext.path)),
+			_1: {ctor: '[]'}
+		};
+	});
+var _user$project$Analyser_Checks_UnformattedFile$checker = {
+	check: _user$project$Analyser_Checks_UnformattedFile$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'UnformattedFile',
+			_1: {ctor: '[]'}
+		})
+};
 
 var _user$project$Analyser_Checks_UnusedVariable$flagVariable = F2(
 	function (k, l) {
@@ -27825,7 +27851,11 @@ var _user$project$Inspection$checkers = {
 																				_1: {
 																					ctor: '::',
 																					_0: _user$project$Analyser_Checks_FunctionsInLet$checker,
-																					_1: {ctor: '[]'}
+																					_1: {
+																						ctor: '::',
+																						_0: _user$project$Analyser_Checks_UnformattedFile$checker,
+																						_1: {ctor: '[]'}
+																					}
 																				}
 																			}
 																		}
@@ -27849,70 +27879,43 @@ var _user$project$Inspection$checkers = {
 };
 var _user$project$Inspection$run = F3(
 	function (codeBase, includedSources, configuration) {
-		var _p0 = A2(
-			_elm_lang$core$List$partition,
-			function (_p1) {
-				return _elm_community$result_extra$Result_Extra$isOk(
-					_elm_lang$core$Tuple$second(_p1));
-			},
-			includedSources);
-		var validSources = _p0._0;
-		var invalidSources = _p0._1;
 		var failedMessages = A2(
 			_elm_lang$core$List$map,
-			function (_p2) {
-				var _p3 = _p2;
-				var _p4 = _p3._0;
+			function (_p0) {
+				var _p1 = _p0;
+				var _p2 = _p1._0;
 				return A2(
 					_user$project$Analyser_Messages_Types$newMessage,
 					{
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: A2(_elm_lang$core$Maybe$withDefault, '', _p4.sha1),
-							_1: _p4.path
+							_0: A2(_elm_lang$core$Maybe$withDefault, '', _p2.sha1),
+							_1: _p2.path
 						},
 						_1: {ctor: '[]'}
 					},
-					A2(_user$project$Analyser_Messages_Types$FileLoadFailed, _p4.path, _p3._1));
+					A2(_user$project$Analyser_Messages_Types$FileLoadFailed, _p2.path, _p1._1));
 			},
 			A2(
 				_elm_lang$core$List$filterMap,
-				function (_p5) {
-					var _p6 = _p5;
-					var _p7 = _p6._1;
-					if (_p7.ctor === 'Err') {
+				function (_p3) {
+					var _p4 = _p3;
+					var _p5 = _p4._1;
+					if (_p5.ctor === 'Err') {
 						return _elm_lang$core$Maybe$Just(
-							{ctor: '_Tuple2', _0: _p6._0, _1: _p7._0});
+							{ctor: '_Tuple2', _0: _p4._0, _1: _p5._0});
 					} else {
 						return _elm_lang$core$Maybe$Nothing;
 					}
 				},
-				invalidSources));
-		var fileMessages = A2(
-			_elm_lang$core$List$map,
-			function (source) {
-				return A2(
-					_user$project$Analyser_Messages_Types$newMessage,
-					{
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: A2(_elm_lang$core$Maybe$withDefault, '', source.sha1),
-							_1: source.path
-						},
-						_1: {ctor: '[]'}
+				A2(
+					_elm_lang$core$List$filter,
+					function (_p6) {
+						return _elm_community$result_extra$Result_Extra$isOk(
+							_elm_lang$core$Tuple$second(_p6));
 					},
-					_user$project$Analyser_Messages_Types$UnformattedFile(source.path));
-			},
-			A2(
-				_elm_lang$core$List$filter,
-				function (_p8) {
-					return !function (_) {
-						return _.formatted;
-					}(_p8);
-				},
-				A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, validSources)));
+					includedSources)));
 		var enabledChecks = A2(
 			_elm_lang$core$List$filter,
 			function (x) {
@@ -27929,12 +27932,8 @@ var _user$project$Inspection$run = F3(
 				_0: failedMessages,
 				_1: {
 					ctor: '::',
-					_0: fileMessages,
-					_1: {
-						ctor: '::',
-						_0: inspectionMessages,
-						_1: {ctor: '[]'}
-					}
+					_0: inspectionMessages,
+					_1: {ctor: '[]'}
 				}
 			});
 		return messages;

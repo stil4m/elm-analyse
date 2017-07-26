@@ -1,5 +1,11 @@
 # elm-analyse changelog
 
+
+## 0.9.5 (2017-07-26)
+
+* [PR #95](https://github.com/stil4m/elm-analyse/pull/95) Use a checker to emit elm-format issues. Thanks to [@gollerob](https://github.com/gollerob)
+
+
 ## 0.9.4 (20170-07-26)
 
 * [PR #94](https://github.com/stil4m/elm-analyse/pull/94) Use proper names for log/crash. Thanks to [@eeue56](https://github.com/eeue56)
