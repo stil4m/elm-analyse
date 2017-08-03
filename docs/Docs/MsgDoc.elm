@@ -326,7 +326,7 @@ foo =
 singleFieldRecord : MsgDoc
 singleFieldRecord =
     { name = "Single Field Record"
-    , shortDescription = "Using a record is obsolete if yo only plan to store a single field in it."
+    , shortDescription = "Using a record is obsolete if you only plan to store a single field in it."
     , key = "SingleFieldRecord"
     , arguments =
         [ ( "file", FileName )
