@@ -141,6 +141,12 @@ decodeMessageData =
         , ( "CoreArrayUsage", decodeFileAndRange CoreArrayUsage )
         , ( "FunctionInLet", decodeFileAndRange FunctionInLet )
         , ( "SingleFieldRecord", decodeFileAndRange SingleFieldRecord )
+        , ( "DuplicateRecordFieldUpdate"
+          , JD.succeed DuplicateRecordFieldUpdate
+                |: fileField
+                |: JD.field "fieldName" JD.string
+                |: JD.field "ranges" (JD.list Range.decode)
+          )
         ]
 
 
@@ -414,3 +420,10 @@ encodeMessageData m =
                     [ ( "file", JE.string fileName )
                     , ( "range", Range.encode range )
                     ]
+
+        DuplicateRecordFieldUpdate fileName fieldName ranges ->
+            JE.object
+                [ ( "file", JE.string fileName )
+                , ( "fieldName", JE.string fieldName )
+                , ( "ranges", JE.list <| List.map Range.encode ranges )
+                ]

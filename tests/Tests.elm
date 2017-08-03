@@ -28,6 +28,7 @@ import Analyser.Checks.NonStaticRegexTests
 import Analyser.Checks.FunctionInLetTests
 import Analyser.Checks.DuplicateImportedVariableTests
 import Analyser.Checks.SingleFieldRecordTests
+import Analyser.Checks.DuplicateRecordFieldUpdateTests
 
 
 all : Test
@@ -53,6 +54,7 @@ all =
         , Analyser.Checks.ImportAllTests.all
         , Analyser.Checks.ExposeAllTests.all
         , Analyser.Checks.UnnecessaryListConcatTests.all
+        , Analyser.Checks.DuplicateRecordFieldUpdateTests.all
         , InterfaceTest.all
         , ASTUtil.PatternOptimizerTests.all
         , Analyser.Fixes.FileContentTests.all

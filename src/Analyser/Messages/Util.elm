@@ -500,3 +500,16 @@ getMessageInfo m =
             , [ range ]
             , False
             )
+
+        Analyser.Messages.Types.DuplicateRecordFieldUpdate fileName fieldName ranges ->
+            ( String.concat
+                [ "The '"
+                , fieldName
+                , "' field for a record is updated multiple times in one expression in file "
+                , fileName
+                , "."
+                ]
+            , always [ fileName ]
+            , ranges
+            , False
+            )

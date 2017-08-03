@@ -73,6 +73,7 @@ type MessageData
     | CoreArrayUsage FileName Range
     | FunctionInLet FileName Range
     | SingleFieldRecord FileName Range
+    | DuplicateRecordFieldUpdate FileName String (List Range)
 
 
 type alias GetFiles =

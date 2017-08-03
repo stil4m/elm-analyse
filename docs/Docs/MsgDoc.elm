@@ -20,6 +20,7 @@ import Analyser.Checks.UnnecessaryParens
 import Analyser.Checks.NoDebug
 import Analyser.Checks.DuplicateImport
 import Analyser.Checks.DuplicateImportedVariable
+import Analyser.Checks.DuplicateRecordFieldUpdate
 import Analyser.Checks.UnusedTypeAlias
 import Analyser.Checks.OverriddenVariables
 import Analyser.Checks.NoUncurriedPrefix
@@ -104,6 +105,7 @@ allMessages =
     , importAll
     , singleFieldRecord
     , lineLengthExceeded
+    , duplicateRecordFieldUpdate
     ]
 
 
@@ -112,6 +114,29 @@ forKey x =
     allMessages
         |> List.filter (.key >> (==) x)
         |> List.head
+
+
+duplicateRecordFieldUpdate : MsgDoc
+duplicateRecordFieldUpdate =
+    { name = "Duplicate Record Field Update"
+    , shortDescription = "You only want to update a field once in the record update syntax. Doing twice may only cause bugs."
+    , key = "DuplicateRecordFieldUpdate"
+    , arguments =
+        [ ( "file", FileName )
+        , ( "fieldName", VariableName )
+        , ( "ranges", RangeList )
+        ]
+    , example = Dynamic Analyser.Checks.DuplicateRecordFieldUpdate.checker
+    , input = """
+module Person exposing (Person, changeName)
+
+type alias Person = { name : String }
+
+changeName : Person -> Person
+changeName person =
+    { person | name = "John", name = "Jane" }
+"""
+    }
 
 
 lineLengthExceeded : MsgDoc
