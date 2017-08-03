@@ -5,14 +5,14 @@ import Html exposing (Html, pre, text, span)
 import Html.Attributes exposing (style, id)
 
 
-beforeHighlight : List String -> Range -> String
-beforeHighlight targetRows range =
+beforeHighlight : Int -> List String -> Range -> String
+beforeHighlight rowsAround targetRows range =
     let
         ( startRow, startColumn, _, _ ) =
             Range.toTuple range
 
         uiStartRow =
-            max 0 (startRow - 3)
+            max 0 (startRow - rowsAround)
 
         preLines =
             List.take (startRow - uiStartRow) targetRows
@@ -27,14 +27,14 @@ beforeHighlight targetRows range =
         String.join "\n" (preLines ++ preLineText)
 
 
-afterHighlight : List String -> Range -> String
-afterHighlight targetRows range =
+afterHighlight : Int -> List String -> Range -> String
+afterHighlight rowsAround targetRows range =
     let
         ( startRow, _, endRow, endColumn ) =
             Range.toTuple range
 
         uiStartRow =
-            max 0 (startRow - 3)
+            max 0 (startRow - rowsAround)
 
         endsOnLineEnding =
             False
@@ -57,14 +57,14 @@ afterHighlight targetRows range =
         postLineText ++ postLines
 
 
-highlightedString : List String -> Range -> String
-highlightedString targetRows range =
+highlightedString : Int -> List String -> Range -> String
+highlightedString rowsAround targetRows range =
     let
         ( startRow, startColumn, endRow, endColumn ) =
             Range.toTuple range
 
         uiStartRow =
-            max 0 (startRow - 3)
+            max 0 (startRow - rowsAround)
 
         endsOnLineEnding =
             False
@@ -113,8 +113,8 @@ highlightedString targetRows range =
                     String.join "\n" (firstHighlightedRow ++ midHighlighedRows ++ lastHighlighedRow)
 
 
-highlightedPre : String -> Range -> Html msg
-highlightedPre content range =
+highlightedPre : Int -> String -> Range -> Html msg
+highlightedPre rowsAround content range =
     let
         ( startRow, _, endRow, _ ) =
             Range.toTuple range
@@ -122,19 +122,19 @@ highlightedPre content range =
         target =
             String.split "\n" content
                 |> List.drop uiStartRow
-                |> List.take (endRow - startRow + 7)
+                |> List.take (endRow - startRow + (1 + 2 * rowsAround))
 
         uiStartRow =
-            max 0 (startRow - 3)
+            max 0 (startRow - rowsAround)
 
         preText =
-            beforeHighlight target range
+            beforeHighlight rowsAround target range
 
         postText =
-            afterHighlight target range
+            afterHighlight rowsAround target range
 
         highlighedSection =
-            highlightedString target range
+            highlightedString rowsAround target range
     in
         pre []
             [ text preText

@@ -114,7 +114,7 @@ decodeMessageData =
           , JD.succeed DuplicateImportedVariable
                 |: fileField
                 |: moduleNameField
-                |: JD.field "name" JD.string
+                |: JD.field "varName" JD.string
                 |: JD.field "ranges" (JD.list Range.decode)
           )
         , ( "UnusedTypeAlias", decodeFileVarNameAndRange UnusedTypeAlias )
@@ -140,6 +140,7 @@ decodeMessageData =
         , ( "NonStaticRegex", decodeFileAndRange NonStaticRegex )
         , ( "CoreArrayUsage", decodeFileAndRange CoreArrayUsage )
         , ( "FunctionInLet", decodeFileAndRange FunctionInLet )
+        , ( "SingleFieldRecord", decodeFileAndRange SingleFieldRecord )
         ]
 
 
@@ -306,7 +307,7 @@ encodeMessageData m =
                 JE.object
                     [ ( "file", JE.string file )
                     , ( "moduleName", JE.list <| List.map JE.string moduleName )
-                    , ( "name", JE.string name )
+                    , ( "varName", JE.string name )
                     , ( "ranges", JE.list <| List.map Range.encode ranges )
                     ]
 
@@ -404,5 +405,12 @@ encodeMessageData m =
             encodeTyped "FunctionInLet" <|
                 JE.object
                     [ ( "file", JE.string file )
+                    , ( "range", Range.encode range )
+                    ]
+
+        SingleFieldRecord fileName range ->
+            encodeTyped "SingleFieldRecord" <|
+                JE.object
+                    [ ( "file", JE.string fileName )
                     , ( "range", Range.encode range )
                     ]
