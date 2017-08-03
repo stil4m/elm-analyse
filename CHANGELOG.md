@@ -1,5 +1,10 @@
 # elm-analyse changelog
 
+## 0.10.0 (2017-08-03)
+
+* [Issue #82](https://github.com/stil4m/elm-analyse/issues/82) Setup documentation with GitHub Pages
+* [Issue #84](https://github.com/stil4m/elm-analyse/issues/84) Websocket connection error (Editor integration)
+* [Issue #90](https://github.com/stil4m/elm-analyse/issues/90) Check: Single field records
 
 ## 0.9.5 (2017-07-26)
 
