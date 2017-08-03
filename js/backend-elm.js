@@ -20029,7 +20029,7 @@ var _user$project$Analyser_Configuration$checkPropertyAsInt = F3(
 var _user$project$Analyser_Configuration$defaultChecks = _elm_lang$core$Dict$fromList(
 	{
 		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: 'FunctionsInLet', _1: false},
+		_0: {ctor: '_Tuple2', _0: 'FunctionInLet', _1: false},
 		_1: {ctor: '[]'}
 	});
 var _user$project$Analyser_Configuration$withDefaultChecks = function (x) {
@@ -20985,9 +20985,17 @@ var _user$project$Analyser_FileWatch$watcher = function (f) {
 		});
 };
 
-var _user$project$Analyser_Messages_Range$realEnd = F2(
-	function (d, e) {
-		return (_elm_lang$core$Native_Utils.cmp(e.column, 0) > -1) ? e : _elm_lang$core$Native_Utils.update(
+var _user$project$Analyser_Messages_Range$realEnd = F3(
+	function (rows, d, e) {
+		return (_elm_lang$core$Native_Utils.cmp(e.row, rows) > 0) ? _elm_lang$core$Native_Utils.update(
+			e,
+			{
+				row: e.row - 2,
+				column: A2(
+					_elm_lang$core$Maybe$withDefault,
+					0,
+					A2(_elm_lang$core$Dict$get, e.row - 2, d))
+			}) : ((_elm_lang$core$Native_Utils.cmp(e.column, 0) > -1) ? e : _elm_lang$core$Native_Utils.update(
 			e,
 			{
 				row: e.row - 1,
@@ -20995,7 +21003,7 @@ var _user$project$Analyser_Messages_Range$realEnd = F2(
 					_elm_lang$core$Maybe$withDefault,
 					0,
 					A2(_elm_lang$core$Dict$get, e.row - 1, d))
-			});
+			}));
 	});
 var _user$project$Analyser_Messages_Range$asSyntaxRange = function (_p0) {
 	var _p1 = _p0;
@@ -21057,7 +21065,8 @@ var _user$project$Analyser_Messages_Range$manual = _user$project$Analyser_Messag
 var _user$project$Analyser_Messages_Range$build = F2(
 	function (_p18, _p17) {
 		var _p19 = _p18;
-		var _p24 = _p19._0;
+		var _p25 = _p19._0;
+		var _p24 = _p19._1;
 		var _p20 = _p17;
 		var _p23 = _p20.start;
 		var _p22 = _p20;
@@ -21066,8 +21075,9 @@ var _user$project$Analyser_Messages_Range$build = F2(
 			_user$project$Analyser_Messages_Range$Range,
 			{
 				start: {row: _p23.row - 1, column: _p23.column},
-				end: A2(
+				end: A3(
 					_user$project$Analyser_Messages_Range$realEnd,
+					_p25,
 					_p24,
 					{row: _p21.row - 1, column: _p21.column})
 			},
@@ -21075,30 +21085,36 @@ var _user$project$Analyser_Messages_Range$build = F2(
 			_user$project$Analyser_Messages_Range$Range,
 			{
 				start: {row: _p23.row, column: _p23.column + 1},
-				end: A2(
+				end: A3(
 					_user$project$Analyser_Messages_Range$realEnd,
+					_p25,
 					_p24,
 					{row: _p21.row, column: _p21.column + 1})
 			},
 			_p22);
 	});
-var _user$project$Analyser_Messages_Range$Context = function (a) {
-	return {ctor: 'Context', _0: a};
-};
+var _user$project$Analyser_Messages_Range$Context = F2(
+	function (a, b) {
+		return {ctor: 'Context', _0: a, _1: b};
+	});
 var _user$project$Analyser_Messages_Range$context = function (input) {
-	return _user$project$Analyser_Messages_Range$Context(
-		_elm_lang$core$Dict$fromList(
-			A2(
-				_elm_lang$core$List$indexedMap,
-				F2(
-					function (x, y) {
-						return {
-							ctor: '_Tuple2',
-							_0: x,
-							_1: _elm_lang$core$String$length(y)
-						};
-					}),
-				A2(_elm_lang$core$String$split, '\n', input))));
+	var rows = A2(_elm_lang$core$String$split, '\n', input);
+	var index = _elm_lang$core$Dict$fromList(
+		A2(
+			_elm_lang$core$List$indexedMap,
+			F2(
+				function (x, y) {
+					return {
+						ctor: '_Tuple2',
+						_0: x,
+						_1: _elm_lang$core$String$length(y)
+					};
+				}),
+			rows));
+	return A2(
+		_user$project$Analyser_Messages_Range$Context,
+		_elm_lang$core$List$length(rows),
+		index);
 };
 
 var _user$project$Analyser_Messages_Types$Message = F4(
@@ -21115,6 +21131,10 @@ var _user$project$Analyser_Messages_Types$outdate = function (m) {
 		m,
 		{status: _user$project$Analyser_Messages_Types$Outdated});
 };
+var _user$project$Analyser_Messages_Types$SingleFieldRecord = F2(
+	function (a, b) {
+		return {ctor: 'SingleFieldRecord', _0: a, _1: b};
+	});
 var _user$project$Analyser_Messages_Types$FunctionInLet = F2(
 	function (a, b) {
 		return {ctor: 'FunctionInLet', _0: a, _1: b};
@@ -22376,7 +22396,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		default:
+		case 'FunctionInLet':
 			var _p57 = _p0._1;
 			var _p56 = _p0._0;
 			return {
@@ -22412,21 +22432,57 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: false
 			};
+		default:
+			var _p59 = _p0._1;
+			var _p58 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Record has only one field, you can simply this. In file \"',
+						_1: {
+							ctor: '::',
+							_0: _p58,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p59),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p58,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p59,
+					_1: {ctor: '[]'}
+				},
+				_3: false
+			};
 	}
 };
 var _user$project$Analyser_Messages_Util$canFix = function (m) {
-	var _p58 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var result = _p58._3;
+	var _p60 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var result = _p60._3;
 	return result;
 };
 var _user$project$Analyser_Messages_Util$getRanges = function (m) {
-	var _p59 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var r = _p59._2;
+	var _p61 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var r = _p61._2;
 	return r;
 };
 var _user$project$Analyser_Messages_Util$getFiles = function (m) {
-	var _p60 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p60._1;
+	var _p62 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p62._1;
 	return f(m);
 };
 var _user$project$Analyser_Messages_Util$compareMessage = F2(
@@ -22483,8 +22539,8 @@ var _user$project$Analyser_Messages_Util$compareMessageFile = F2(
 			_user$project$Analyser_Messages_Util$messageFile(b));
 	});
 var _user$project$Analyser_Messages_Util$asString = function (m) {
-	var _p61 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p61._0;
+	var _p63 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p63._0;
 	return f;
 };
 var _user$project$Analyser_Messages_Util$markFixing = F2(
@@ -22909,7 +22965,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'name',
+									_0: 'varName',
 									_1: _elm_lang$core$Json_Encode$string(_p0._2)
 								},
 								_1: {
@@ -23240,10 +23296,32 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_1: {ctor: '[]'}
 						}
 					}));
-		default:
+		case 'FunctionInLet':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'FunctionInLet',
+				_elm_lang$core$Json_Encode$object(
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'file',
+							_1: _elm_lang$core$Json_Encode$string(_p0._0)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'range',
+								_1: _user$project$Analyser_Messages_Range$encode(_p0._1)
+							},
+							_1: {ctor: '[]'}
+						}
+					}));
+		default:
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'SingleFieldRecord',
 				_elm_lang$core$Json_Encode$object(
 					{
 						ctor: '::',
@@ -23560,7 +23638,7 @@ var _user$project$Analyser_Messages_Json$decodeMessageData = _user$project$Util_
 																							_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$DuplicateImportedVariable),
 																							_user$project$Analyser_Messages_Json$fileField),
 																						_user$project$Analyser_Messages_Json$moduleNameField),
-																					A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string)),
+																					A2(_elm_lang$core$Json_Decode$field, 'varName', _elm_lang$core$Json_Decode$string)),
 																				A2(
 																					_elm_lang$core$Json_Decode$field,
 																					'ranges',
@@ -23678,7 +23756,15 @@ var _user$project$Analyser_Messages_Json$decodeMessageData = _user$project$Util_
 																																_0: 'FunctionInLet',
 																																_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$FunctionInLet)
 																															},
-																															_1: {ctor: '[]'}
+																															_1: {
+																																ctor: '::',
+																																_0: {
+																																	ctor: '_Tuple2',
+																																	_0: 'SingleFieldRecord',
+																																	_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$SingleFieldRecord)
+																																},
+																																_1: {ctor: '[]'}
+																															}
 																														}
 																													}
 																												}
@@ -27515,7 +27601,7 @@ var _user$project$Analyser_Checks_CoreArrayUsage$checker = {
 		})
 };
 
-var _user$project$Analyser_Checks_FunctionsInLet$onLetBlock = F3(
+var _user$project$Analyser_Checks_FunctionInLet$onLetBlock = F3(
 	function ($continue, _p0, context) {
 		return function (after) {
 			return _elm_lang$core$Native_Utils.update(
@@ -27527,7 +27613,7 @@ var _user$project$Analyser_Checks_FunctionsInLet$onLetBlock = F3(
 					context,
 					{inLetBlock: true})));
 	});
-var _user$project$Analyser_Checks_FunctionsInLet$onFunction = F2(
+var _user$project$Analyser_Checks_FunctionInLet$onFunction = F2(
 	function ($function, context) {
 		var isStatic = _user$project$ASTUtil_Functions$isStatic($function);
 		return ((!isStatic) && context.inLetBlock) ? _elm_lang$core$Native_Utils.update(
@@ -27536,7 +27622,7 @@ var _user$project$Analyser_Checks_FunctionsInLet$onFunction = F2(
 				functions: {ctor: '::', _0: $function, _1: context.functions}
 			}) : context;
 	});
-var _user$project$Analyser_Checks_FunctionsInLet$asMessage = F3(
+var _user$project$Analyser_Checks_FunctionInLet$asMessage = F3(
 	function (rangeContext, fileContext, f) {
 		return A2(
 			_user$project$Analyser_Messages_Types$newMessage,
@@ -27550,15 +27636,15 @@ var _user$project$Analyser_Checks_FunctionsInLet$asMessage = F3(
 				fileContext.path,
 				A2(_user$project$Analyser_Messages_Range$build, rangeContext, f.declaration.name.range)));
 	});
-var _user$project$Analyser_Checks_FunctionsInLet$startingContext = {
+var _user$project$Analyser_Checks_FunctionInLet$startingContext = {
 	inLetBlock: false,
 	functions: {ctor: '[]'}
 };
-var _user$project$Analyser_Checks_FunctionsInLet$scan = F3(
+var _user$project$Analyser_Checks_FunctionInLet$scan = F3(
 	function (rangeContext, fileContext, _p1) {
 		return A2(
 			_elm_lang$core$List$map,
-			A2(_user$project$Analyser_Checks_FunctionsInLet$asMessage, rangeContext, fileContext),
+			A2(_user$project$Analyser_Checks_FunctionInLet$asMessage, rangeContext, fileContext),
 			function (_) {
 				return _.functions;
 			}(
@@ -27567,22 +27653,22 @@ var _user$project$Analyser_Checks_FunctionsInLet$scan = F3(
 					_elm_lang$core$Native_Utils.update(
 						_user$project$ASTUtil_Inspector$defaultConfig,
 						{
-							onLetBlock: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_FunctionsInLet$onLetBlock),
-							onFunction: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_FunctionsInLet$onFunction)
+							onLetBlock: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_FunctionInLet$onLetBlock),
+							onFunction: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_FunctionInLet$onFunction)
 						}),
 					fileContext.ast,
-					_user$project$Analyser_Checks_FunctionsInLet$startingContext)));
+					_user$project$Analyser_Checks_FunctionInLet$startingContext)));
 	});
-var _user$project$Analyser_Checks_FunctionsInLet$checker = {
-	check: _user$project$Analyser_Checks_FunctionsInLet$scan,
+var _user$project$Analyser_Checks_FunctionInLet$checker = {
+	check: _user$project$Analyser_Checks_FunctionInLet$scan,
 	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
 		{
 			ctor: '::',
-			_0: 'FunctionsInLet',
+			_0: 'FunctionInLet',
 			_1: {ctor: '[]'}
 		})
 };
-var _user$project$Analyser_Checks_FunctionsInLet$Context = F2(
+var _user$project$Analyser_Checks_FunctionInLet$Context = F2(
 	function (a, b) {
 		return {inLetBlock: a, functions: b};
 	});
@@ -27778,6 +27864,77 @@ var _user$project$Analyser_Checks_DuplicateImportedVariable$Context = F2(
 		return {constructors: a, functionOrValues: b};
 	});
 
+var _user$project$Analyser_Checks_SingleFieldRecord$findPlainRecords = function (x) {
+	var _p0 = x;
+	if (_p0.ctor === 'Record') {
+		return {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: _p0._1, _1: _p0._0},
+			_1: {ctor: '[]'}
+		};
+	} else {
+		return {ctor: '[]'};
+	}
+};
+var _user$project$Analyser_Checks_SingleFieldRecord$onTypeAnnotation = F2(
+	function (x, context) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			_user$project$Analyser_Checks_SingleFieldRecord$findPlainRecords(x),
+			context);
+	});
+var _user$project$Analyser_Checks_SingleFieldRecord$isSingleFieldRecord = function (x) {
+	return _elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$List$length(x),
+		1);
+};
+var _user$project$Analyser_Checks_SingleFieldRecord$scan = F3(
+	function (rangeContext, fileContext, _p1) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				function (_p2) {
+					return A2(
+						_user$project$Analyser_Messages_Types$SingleFieldRecord,
+						fileContext.path,
+						A2(
+							_user$project$Analyser_Messages_Range$build,
+							rangeContext,
+							_elm_lang$core$Tuple$first(_p2)));
+				},
+				A2(
+					_elm_lang$core$List$filter,
+					function (_p3) {
+						return _user$project$Analyser_Checks_SingleFieldRecord$isSingleFieldRecord(
+							_elm_lang$core$Tuple$second(_p3));
+					},
+					A3(
+						_user$project$ASTUtil_Inspector$inspect,
+						_elm_lang$core$Native_Utils.update(
+							_user$project$ASTUtil_Inspector$defaultConfig,
+							{
+								onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_SingleFieldRecord$onTypeAnnotation)
+							}),
+						fileContext.ast,
+						{ctor: '[]'}))));
+	});
+var _user$project$Analyser_Checks_SingleFieldRecord$checker = {
+	check: _user$project$Analyser_Checks_SingleFieldRecord$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'SingleFieldRecord',
+			_1: {ctor: '[]'}
+		})
+};
+
 var _user$project$Inspection$inspectFileContext = F3(
 	function (configuration, enabledChecks, fileContext) {
 		var rangeContext = _user$project$Analyser_Messages_Range$context(fileContext.content);
@@ -27850,11 +28007,15 @@ var _user$project$Inspection$checkers = {
 																				_0: _user$project$Analyser_Checks_CoreArrayUsage$checker,
 																				_1: {
 																					ctor: '::',
-																					_0: _user$project$Analyser_Checks_FunctionsInLet$checker,
+																					_0: _user$project$Analyser_Checks_FunctionInLet$checker,
 																					_1: {
 																						ctor: '::',
 																						_0: _user$project$Analyser_Checks_UnformattedFile$checker,
-																						_1: {ctor: '[]'}
+																						_1: {
+																							ctor: '::',
+																							_0: _user$project$Analyser_Checks_SingleFieldRecord$checker,
+																							_1: {ctor: '[]'}
+																						}
 																					}
 																				}
 																			}
