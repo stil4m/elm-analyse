@@ -55,7 +55,7 @@ checkers =
     , UnnecessaryPortModule.checker
     , NonStaticRegex.checker
     , CoreArrayUsage.checker
-    , FunctionsInLet.checker
+    , FunctionInLet.checker
     , UnformattedFile.checker
     , SingleFieldRecord.checker
     ]
