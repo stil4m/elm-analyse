@@ -887,6 +887,7 @@ getMessages input checker =
                 , ast = Processing.process Processing.init rawFile
                 , content = input
                 , path = "./foo.elm"
+                , formatted = False
                 , sha1 = ""
                 }
             )
