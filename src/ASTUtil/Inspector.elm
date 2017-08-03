@@ -34,6 +34,7 @@ type alias Config context =
     , onLetBlock : Order context LetBlock
     , onCase : Order context Case
     , onFunctionOrValue : Order context String
+    , onPrefixOperator : Order context String
     , onRecordAccess : Order context ( Expression, String )
     , onRecordUpdate : Order context RecordUpdate
     }
@@ -55,6 +56,7 @@ defaultConfig =
     , onLetBlock = Continue
     , onCase = Continue
     , onFunctionOrValue = Continue
+    , onPrefixOperator = Continue
     , onRecordAccess = Continue
     , onRecordUpdate = Continue
     }
@@ -256,8 +258,11 @@ inspectInnerExpression config expression context =
                 functionOrVal
                 context
 
-        PrefixOperator _ ->
-            context
+        PrefixOperator prefix ->
+            actionLambda config.onPrefixOperator
+                identity
+                prefix
+                context
 
         Operator _ ->
             context

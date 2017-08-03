@@ -56,6 +56,7 @@ scan rangeContext fileContext configuration =
                     , onOperatorApplication = Post onOperatorAppliction
                     , onDestructuring = Post onDestructuring
                     , onFunctionOrValue = Post onFunctionOrValue
+                    , onPrefixOperator = Post onPrefixOperator
                     , onRecordUpdate = Post onRecordUpdate
                     , onTypeAnnotation = Post onTypeAnnotation
                 }
@@ -215,6 +216,11 @@ addUsedVariable x context =
 onFunctionOrValue : String -> UsedVariableContext -> UsedVariableContext
 onFunctionOrValue x context =
     addUsedVariable x context
+
+
+onPrefixOperator : String -> UsedVariableContext -> UsedVariableContext
+onPrefixOperator prefixOperator context =
+    addUsedVariable prefixOperator context
 
 
 onRecordUpdate : RecordUpdate -> UsedVariableContext -> UsedVariableContext

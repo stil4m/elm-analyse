@@ -458,36 +458,57 @@ x y =
     )
 
 
+{-| Issue #96
+-}
+usedBinaryImportedFunctionUsedAsPrefix : ( String, String, List MessageData )
+usedBinaryImportedFunctionUsedAsPrefix =
+    ( "unusedImportedType"
+    , """module Foo exposing (..)
+
+import List.Extra exposing ((!!))
+
+getItemAtIndex : Int -> Maybe String
+getItemAtIndex index =
+    let
+        someList =
+            [ "a", "b", "c" ]
+    in
+    (!!) someList index
+    """
+    , []
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedVariable"
         UnusedVariable.checker
         [ unusedImportedType
-
-        -- , withUnusedVariableInFunction
-        -- , unusedInLetExpression
-        -- , unusedFunction
-        -- , usedVariableInCaseExpression
-        -- , usedVariableAsRecordUpdate
-        -- , usedVariableInAllDeclaration
-        -- , usedValueConstructor
-        -- , unusedValueConstructor
-        -- , exposedValueConstructor
-        -- , onlyUsedInSelf
-        -- , usedOperator
-        -- , unusedOperator
-        -- , unusedImportedOperator
-        -- , destructuringSameName
-        -- , unusedInEffectModule
-        -- , unusedImportedVariable
-        -- , usedImportedVariableInPatterMatch
-        -- , usedImportedVariableAsOpaque
-        -- , exposeOperator
-        -- , unusedInCasePattern
-        -- , unusedInCasePatternAsSingle
-        -- , unusedButDestructuredWithSameNameInList
-        -- , unusedButDestructuredWithSameNameInTuple
-        -- , unusedButDestructuredWithSameNameInRecord
-        -- , unusedButDestructuredWithSameNameInAs
-        -- , usedInDestructuringLet
+        , withUnusedVariableInFunction
+        , unusedInLetExpression
+        , unusedFunction
+        , usedVariableInCaseExpression
+        , usedVariableAsRecordUpdate
+        , usedVariableInAllDeclaration
+        , usedValueConstructor
+        , unusedValueConstructor
+        , exposedValueConstructor
+        , onlyUsedInSelf
+        , usedOperator
+        , unusedOperator
+        , unusedImportedOperator
+        , destructuringSameName
+        , unusedInEffectModule
+        , unusedImportedVariable
+        , usedImportedVariableInPatterMatch
+        , usedImportedVariableAsOpaque
+        , exposeOperator
+        , unusedInCasePattern
+        , unusedInCasePatternAsSingle
+        , unusedButDestructuredWithSameNameInList
+        , unusedButDestructuredWithSameNameInTuple
+        , unusedButDestructuredWithSameNameInRecord
+        , unusedButDestructuredWithSameNameInAs
+        , usedInDestructuringLet
+        , usedBinaryImportedFunctionUsedAsPrefix
         ]
