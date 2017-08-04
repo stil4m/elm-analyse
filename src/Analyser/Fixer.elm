@@ -2,6 +2,7 @@ port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, isDone, 
 
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Fixes.MultiLineRecordFormatting as MultiLineRecordFormatting
 import Analyser.Fixes.UnformattedFile as UnformattedFileFixer
 import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
 import Analyser.Fixes.UnusedImportAlias as UnusedImportAliasFixer
@@ -156,6 +157,7 @@ fixers =
     , UnusedPatternVariableFixer.fixer
     , UnformattedFileFixer.fixer
     , UnusedTypeAliasFixer.fixer
+    , MultiLineRecordFormatting.fixer
     ]
 
 

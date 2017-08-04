@@ -1,9 +1,15 @@
-port module Analyser.FileWatch exposing (FileChange(Remove, Update), watcher)
+port module Analyser.FileWatch exposing (FileChange(Remove, Update), Person, watcher)
 
 import Debug as SafeDebug
 
 
 port fileWatch : (( String, String ) -> msg) -> Sub msg
+
+
+type alias Person =
+    { name : String
+    , age : Int
+    }
 
 
 type FileChange

@@ -4,6 +4,7 @@ import Analyser.Checks.Base exposing (Checker)
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.DuplicateImport as DuplicateImport
 import Analyser.Checks.DuplicateImportedVariable as DuplicateImportedVariable
+import Analyser.Checks.DuplicateRecordFieldUpdate as DuplicateRecordFieldUpdate
 import Analyser.Checks.ExposeAll as ExposeAll
 import Analyser.Checks.FunctionInLet as FunctionInLet
 import Analyser.Checks.ImportAll as ImportAll
@@ -57,6 +58,7 @@ checkers =
     , CoreArrayUsage.checker
     , FunctionInLet.checker
     , UnformattedFile.checker
+    , DuplicateRecordFieldUpdate.checker
     , SingleFieldRecord.checker
     ]
 

@@ -1,7 +1,7 @@
 module Client.Components.ActiveMessageDialog exposing (Model, Msg, init, show, subscriptions, update, view)
 
 import Analyser.Messages.Range exposing (Range)
-import Analyser.Messages.Types exposing (Message, MessageData(UnformattedFile, UnnecessaryParens, UnusedImportAlias, UnusedImportedVariable, UnusedPatternVariable, UnusedTypeAlias))
+import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting, UnformattedFile, UnnecessaryParens, UnusedImportAlias, UnusedImportedVariable, UnusedPatternVariable, UnusedTypeAlias))
 import Analyser.Messages.Util as Messages
 import Client.Highlight as Highlight
 import Client.Socket as Socket
@@ -184,6 +184,15 @@ fixableFooter message =
                     , onClick Fix
                     ]
                     [ text <| "Optimize pattern and format" ]
+                ]
+
+        MultiLineRecordFormatting _ _ ->
+            div []
+                [ button
+                    [ class "btn btn-success"
+                    , onClick Fix
+                    ]
+                    [ text <| "Rewrite over multiple lines and format" ]
                 ]
 
         _ ->
