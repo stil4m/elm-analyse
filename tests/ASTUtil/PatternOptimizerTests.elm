@@ -8,6 +8,10 @@ import Expect
 import Test exposing (..)
 
 
+type alias InnerTest =
+    Test
+
+
 all : Test
 all =
     describe "Analyser.Fixes.PatternOptimizer"
@@ -27,7 +31,7 @@ all =
         ]
 
 
-asPatternTests : Test
+asPatternTests : InnerTest
 asPatternTests =
     describe "AsPattern"
         [ test "should remove the asPattern when the sub pattern is factored out" <|
@@ -89,7 +93,7 @@ asPatternTests =
         ]
 
 
-recordPatternTests : Test
+recordPatternTests : InnerTest
 recordPatternTests =
     describe "RecordPattern"
         [ test "should remove variables that are unused" <|
@@ -126,7 +130,7 @@ recordPatternTests =
         ]
 
 
-listPatternTests : Test
+listPatternTests : InnerTest
 listPatternTests =
     describe "ListPattern"
         [ test "full underscored should not be changed to a list to underscore" <|
@@ -176,7 +180,7 @@ listPatternTests =
         ]
 
 
-tuplePatternTests : Test
+tuplePatternTests : InnerTest
 tuplePatternTests =
     describe "TuplePattern"
         [ test "full underscored tuple to underscore" <|

@@ -1,4 +1,4 @@
-module Analyser.Checks.DuplicateImportTests exposing (..)
+module Analyser.Checks.DuplicateImportTests exposing (all)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DuplicateImport as DuplicateImport
@@ -9,7 +9,7 @@ import Test exposing (Test)
 
 goodImports : ( String, String, List MessageData )
 goodImports =
-    ( "parensBetweenOperators"
+    ( "goodImports"
     , """module Bar exposing (..)
 
 import Baz
@@ -24,7 +24,7 @@ foo = 1
 
 badImports : ( String, String, List MessageData )
 badImports =
-    ( "parensBetweenOperators"
+    ( "badImports"
     , """module Bar exposing (..)
 
 import Baz
@@ -46,9 +46,9 @@ foo = 1
     )
 
 
-badImportsTripple : ( String, String, List MessageData )
-badImportsTripple =
-    ( "badImportsTripple"
+badImportsTriple : ( String, String, List MessageData )
+badImportsTriple =
+    ( "badImportsTriple"
     , """module Bar exposing (..)
 
 import Baz
@@ -108,10 +108,10 @@ foo = 1
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.DuplicateImportTests"
+    CTU.build "Analyser.Checks.DuplicateImport"
         DuplicateImport.checker
         [ goodImports
         , badImports
-        , badImportsTripple
+        , badImportsTriple
         , badImportDouble
         ]

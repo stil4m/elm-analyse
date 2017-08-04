@@ -298,7 +298,7 @@ foo (Blue c) =
 
 exposeOperator : ( String, String, List MessageData )
 exposeOperator =
-    ( "usedImportedVariableAsOpaque"
+    ( "exposeOperator"
     , """module Foo exposing ((@@))
 
 
@@ -459,7 +459,7 @@ x y =
 -}
 usedBinaryImportedFunctionUsedAsPrefix : ( String, String, List MessageData )
 usedBinaryImportedFunctionUsedAsPrefix =
-    ( "unusedImportedType"
+    ( "usedBinaryImportedFunctionUsedAsPrefix"
     , """module Foo exposing (..)
 
 import List.Extra exposing ((!!))

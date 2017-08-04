@@ -37,7 +37,7 @@ foo = (+) 1
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.NoUncurriedPrefixTests"
+    CTU.build "Analyser.Checks.NoUncurriedPrefix"
         NoUncurriedPrefix.checker
         [ prefixAsApplicationWithTwoArgs
         , prefixAsApplicationWithOneArg

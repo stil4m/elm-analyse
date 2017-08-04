@@ -223,7 +223,7 @@ foo x = ((x, 1))
 
 parensAroundRecordExpression : ( String, String, List MessageData )
 parensAroundRecordExpression =
-    ( "parensAroundTupleExpression"
+    ( "parensAroundRecordExpression"
     , """module Bar exposing (..)
 
 foo x = ({name = x})
@@ -238,7 +238,7 @@ foo x = ({name = x})
 
 parensAroundRecordUpdateExpression : ( String, String, List MessageData )
 parensAroundRecordUpdateExpression =
-    ( "parensAroundTupleExpression"
+    ( "parensAroundRecordUpdateExpression"
     , """module Bar exposing (..)
 
 foo x = ({ x | name = "Foo"})
@@ -480,7 +480,7 @@ foo x =
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.UnnecessaryParensTests"
+    CTU.build "Analyser.Checks.UnnecessaryParens"
         UnnecessaryParens.checker
         [ parensBetweenOperators
         , parensForInfixCombinations
@@ -494,7 +494,6 @@ all =
         , parensAroundListExpression
         , parensInListExpression
         , parensAroundTupleExpression
-        , parensAroundRecordUpdateExpression
         , parensAroundRecordUpdateExpression
         , parensInRecordFieldValues
         , parensInRecordFieldValuesForUpdate

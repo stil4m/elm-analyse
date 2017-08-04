@@ -138,7 +138,7 @@ import Bar exposing (name,age)
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.OverriddenVariablesTests"
+    CTU.build "Analyser.Checks.OverriddenVariables"
         OverriddenVariables.checker
         [ redefineImportedFunction
         , redefineInLet

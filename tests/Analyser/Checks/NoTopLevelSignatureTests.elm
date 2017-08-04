@@ -68,7 +68,7 @@ foo = 1
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.ExposeAllTests"
+    CTU.build "Analyser.Checks.NoTopLevelSignature"
         NoTopLevelSignature.checker
         [ noSignature
         , noSignatureInLet

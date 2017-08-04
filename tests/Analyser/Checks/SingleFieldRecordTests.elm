@@ -9,7 +9,7 @@ import Test exposing (Test)
 
 singleField : ( String, String, List MessageData )
 singleField =
-    ( "singleLineSingleField"
+    ( "singleField"
     , """module Bar exposing (Foo)
 
 type alias Foo =
@@ -25,7 +25,7 @@ type alias Foo =
 
 singleFieldGeneric : ( String, String, List MessageData )
 singleFieldGeneric =
-    ( "singleLineSingleField"
+    ( "singleFieldGeneric"
     , """module Bar exposing (Foo)
 
 type alias Foo a =
@@ -37,7 +37,7 @@ type alias Foo a =
 
 multiField : ( String, String, List MessageData )
 multiField =
-    ( "multiLineMultiField"
+    ( "multiField"
     , """module Bar exposing (Foo)
 
 type alias Foo =
@@ -51,7 +51,7 @@ type alias Foo =
 
 singleFieldNested : ( String, String, List MessageData )
 singleFieldNested =
-    ( "multiLineMultiFieldWithNested"
+    ( "singleFieldNested"
     , """module Bar exposing (Foo)
 
 type alias Foo =

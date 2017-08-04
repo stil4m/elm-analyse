@@ -51,7 +51,7 @@ foo x = x
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.NoDebugTests"
+    CTU.build "Analyser.Checks.NoDebug"
         NoDebug.checker
         [ debugCrash
         , debugLog

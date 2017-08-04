@@ -61,7 +61,7 @@ type Color = Blue | Red
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.ExposeAllTests"
+    CTU.build "Analyser.Checks.ExposeAll"
         ExposeAll.checker
         [ exposingAll
         , exposingStrict

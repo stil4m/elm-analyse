@@ -83,7 +83,7 @@ import Foo exposing (Bar(Baz))
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.ImportAllTests"
+    CTU.build "Analyser.Checks.ImportAll"
         ImportAll.checker
         [ importAll
         , importAllMultiple

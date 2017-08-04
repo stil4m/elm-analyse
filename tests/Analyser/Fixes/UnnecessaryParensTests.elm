@@ -58,7 +58,7 @@ f =
 
 all : Test
 all =
-    testFix "Analyser.Fixes.UnusedImportAlias"
+    testFix "Analyser.Fixes.UnnecessaryParens"
         Analyser.Checks.UnnecessaryParens.checker
         Analyser.Fixes.UnnecessaryParens.fixer
         [ fixInFile

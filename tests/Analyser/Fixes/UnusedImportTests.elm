@@ -48,7 +48,7 @@ f =
 
 all : Test
 all =
-    testFix "Analyser.Fixes.UnusedImportTests"
+    testFix "Analyser.Fixes.UnusedImport"
         checker
         fixer
         [ unusedImport

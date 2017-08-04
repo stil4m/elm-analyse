@@ -11,7 +11,7 @@ import Test exposing (Test, describe, test)
 
 all : Test
 all =
-    describe "Analyser.Fixes.UnusedImportedVariable"
+    describe "Analyser.Fixes.UnusedImportAlias"
         [ test "test fix on one line" <|
             \() ->
                 let
