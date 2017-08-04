@@ -1,7 +1,7 @@
 module Analyser.Fixes.FileContent exposing (..)
 
-import List.Extra as List
 import Elm.Syntax.Range exposing (Range)
+import List.Extra as List
 
 
 replaceRangeWith : Range -> String -> String -> String
@@ -53,11 +53,11 @@ replaceRangeWith range x input =
                 |> Maybe.map rowPostPartTakeFn
                 |> Maybe.withDefault ""
     in
-        String.concat
-            [ String.join "\n" (linesBefore ++ [ rowPrePart ])
-            , x
-            , String.join "\n" (rowPostPart :: postRows)
-            ]
+    String.concat
+        [ String.join "\n" (linesBefore ++ [ rowPrePart ])
+        , x
+        , String.join "\n" (rowPostPart :: postRows)
+        ]
 
 
 replaceLocationWith : ( Int, Int ) -> String -> String -> String
@@ -74,9 +74,9 @@ replaceLocationWith ( row, column ) x input =
                 , String.dropLeft (column + 2) target
                 ]
     in
-        rows
-            |> List.updateIfIndex ((==) row) lineUpdater
-            |> String.join "\n"
+    rows
+        |> List.updateIfIndex ((==) row) lineUpdater
+        |> String.join "\n"
 
 
 getCharAtLocation : ( Int, Int ) -> String -> Maybe String
@@ -94,9 +94,9 @@ replaceLines ( start, end ) fix input =
         lines =
             String.split "\n" input
     in
-        String.join "\n" <|
-            List.concat
-                [ List.take start lines
-                , [ fix ]
-                , List.drop end lines
-                ]
+    String.join "\n" <|
+        List.concat
+            [ List.take start lines
+            , [ fix ]
+            , List.drop end lines
+            ]

@@ -32,16 +32,16 @@ topListInAndOut count graph =
         documentationButton anchor =
             Panel.documentationButton ("ModuleGraph.md#" ++ anchor)
     in
-        Html.div []
-            [ Panel.view Panel.WidthHalf
-                "Top importees"
-                (documentationButton "top-importees")
-                (topList nodesDict (List.take count topDegrees.incoming))
-            , Panel.view Panel.WidthHalf
-                "Top importers"
-                (documentationButton "top-importers")
-                (topList nodesDict (List.take count topDegrees.outgoing))
-            ]
+    Html.div []
+        [ Panel.view Panel.WidthHalf
+            "Top importees"
+            (documentationButton "top-importees")
+            (topList nodesDict (List.take count topDegrees.incoming))
+        , Panel.view Panel.WidthHalf
+            "Top importers"
+            (documentationButton "top-importers")
+            (topList nodesDict (List.take count topDegrees.outgoing))
+        ]
 
 
 topList : Dict Node.Identifier Node -> List ( Node.Identifier, Degree.InOut Degree ) -> Html msg
@@ -66,11 +66,11 @@ topList nodesDict list =
                                 |> Maybe.map Node.nameToString
                                 |> Maybe.withDefault identifier
                     in
-                        Html.tr []
-                            [ Html.td [] [ Html.text nameString ]
-                            , Html.td [] [ Html.text (toString degrees.incoming) ]
-                            , Html.td [] [ Html.text (toString degrees.outgoing) ]
-                            ]
+                    Html.tr []
+                        [ Html.td [] [ Html.text nameString ]
+                        , Html.td [] [ Html.text (toString degrees.incoming) ]
+                        , Html.td [] [ Html.text (toString degrees.outgoing) ]
+                        ]
                 )
                 list
             )

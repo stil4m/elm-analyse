@@ -1,4 +1,4 @@
-port module Util.Logger exposing (info, warning, error)
+port module Util.Logger exposing (error, info, warning)
 
 
 port log : ( String, String ) -> Cmd msg

@@ -1,9 +1,9 @@
 module Analyser.Checks.DuplicateRecordFieldUpdateTests exposing (..)
 
-import Analyser.Checks.DuplicateRecordFieldUpdate as DuplicateRecordFieldUpdate
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Messages.Types exposing (..)
+import Analyser.Checks.DuplicateRecordFieldUpdate as DuplicateRecordFieldUpdate
 import Analyser.Messages.Range as Range
+import Analyser.Messages.Types exposing (..)
 import Test exposing (..)
 
 

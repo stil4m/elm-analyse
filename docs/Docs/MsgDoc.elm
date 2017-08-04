@@ -1,48 +1,48 @@
-module Docs.MsgDoc exposing (allMessages, view, forKey)
+module Docs.MsgDoc exposing (allMessages, forKey, view)
 
-import Analyser.Messages.Types as M exposing (Message, MessageData(..))
-import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker)
-import Html exposing (..)
-import Html.Attributes as Html
-import Analyser.Messages.Json as J
-import Json.Encode
-import Analyser.Checks.ImportAll
-import Analyser.Checks.UnusedVariable
-import Elm.Parser
-import Elm.Interface as Interface
-import Elm.RawFile as RawFile
-import Elm.Processing as Processing
-import Analyser.Messages.Range as Range
-import Analyser.Checks.ExposeAll
-import Analyser.Checks.NoTopLevelSignature
-import Analyser.Checks.UnnecessaryParens
-import Analyser.Checks.NoDebug
+import Analyser.Checks.CoreArrayUsage
 import Analyser.Checks.DuplicateImport
 import Analyser.Checks.DuplicateImportedVariable
 import Analyser.Checks.DuplicateRecordFieldUpdate
-import Analyser.Checks.UnusedTypeAlias
-import Analyser.Checks.OverriddenVariables
-import Analyser.Checks.NoUncurriedPrefix
-import Analyser.Checks.UnusedImport
-import Analyser.Checks.ListOperators
-import Analyser.Checks.UnnecessaryListConcat
-import Analyser.Checks.MultiLineRecordFormatting
-import Analyser.Checks.UnnecessaryPortModule
-import Analyser.Checks.NonStaticRegex
-import Analyser.Checks.CoreArrayUsage
-import Analyser.Checks.SingleFieldRecord
-import Analyser.Messages.Util
+import Analyser.Checks.ExposeAll
 import Analyser.Checks.FunctionInLet
-import Analyser.Checks.UnusedImportAliases
+import Analyser.Checks.ImportAll
 import Analyser.Checks.LineLength
+import Analyser.Checks.ListOperators
+import Analyser.Checks.MultiLineRecordFormatting
+import Analyser.Checks.NoDebug
+import Analyser.Checks.NoTopLevelSignature
+import Analyser.Checks.NoUncurriedPrefix
+import Analyser.Checks.NonStaticRegex
+import Analyser.Checks.OverriddenVariables
+import Analyser.Checks.SingleFieldRecord
+import Analyser.Checks.UnnecessaryListConcat
+import Analyser.Checks.UnnecessaryParens
+import Analyser.Checks.UnnecessaryPortModule
+import Analyser.Checks.UnusedImport
+import Analyser.Checks.UnusedImportAliases
+import Analyser.Checks.UnusedTypeAlias
+import Analyser.Checks.UnusedVariable
+import Analyser.Configuration as Configuration exposing (Configuration)
+import Analyser.Messages.Json as J
+import Analyser.Messages.Range as Range
+import Analyser.Messages.Types as M exposing (Message, MessageData(..))
+import Analyser.Messages.Util
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.ListGroup as ListGroup
-import Docs.Page as Page exposing (Page(Messages))
 import Client.Highlight
-import Docs.Html as DocsHtml
 import Debug as SafeDebug
+import Docs.Html as DocsHtml
+import Docs.Page as Page exposing (Page(Messages))
+import Elm.Interface as Interface
+import Elm.Parser
+import Elm.Processing as Processing
+import Elm.RawFile as RawFile
+import Html exposing (..)
+import Html.Attributes as Html
+import Json.Encode
 
 
 type MsgExample
@@ -818,24 +818,24 @@ view maybeKey =
         maybeMessageDoc =
             Maybe.andThen forKey maybeKey
     in
-        Grid.container [ Html.style [ ( "padding-top", "20px" ), ( "margin-bottom", "60px" ) ] ]
-            [ Grid.row []
-                [ Grid.col []
-                    [ h1 [] [ text "Checks" ]
-                    , hr [] []
-                    ]
-                ]
-            , Grid.row []
-                [ Grid.col [ Col.md4, Col.sm5 ]
-                    [ messagesMenu maybeMessageDoc ]
-                , Grid.col [ Col.md8, Col.sm7 ]
-                    [ maybeMessageDoc
-                        |> Maybe.map viewDoc
-                        |> Maybe.withDefault
-                            (div [] [])
-                    ]
+    Grid.container [ Html.style [ ( "padding-top", "20px" ), ( "margin-bottom", "60px" ) ] ]
+        [ Grid.row []
+            [ Grid.col []
+                [ h1 [] [ text "Checks" ]
+                , hr [] []
                 ]
             ]
+        , Grid.row []
+            [ Grid.col [ Col.md4, Col.sm5 ]
+                [ messagesMenu maybeMessageDoc ]
+            , Grid.col [ Col.md8, Col.sm7 ]
+                [ maybeMessageDoc
+                    |> Maybe.map viewDoc
+                    |> Maybe.withDefault
+                        (div [] [])
+                ]
+            ]
+        ]
 
 
 viewDoc : MsgDoc -> Html msg
@@ -844,18 +844,18 @@ viewDoc d =
         mess =
             getMessage d
     in
-        div []
-            [ h1 []
-                [ text d.name
-                ]
-            , p []
-                [ small []
-                    [ code [] [ text d.key ] ]
-                ]
-            , p [] [ text d.shortDescription ]
-            , viewArguments d
-            , viewExample d mess
+    div []
+        [ h1 []
+            [ text d.name
             ]
+        , p []
+            [ small []
+                [ code [] [ text d.key ] ]
+            ]
+        , p [] [ text d.shortDescription ]
+        , viewArguments d
+        , viewExample d mess
+        ]
 
 
 viewExample : MsgDoc -> Message -> Html msg
@@ -886,12 +886,12 @@ getMessage d =
                     getMessages (String.trim d.input) checker
                         |> Maybe.andThen List.head
             in
-                case m of
-                    Just mess ->
-                        (M.newMessage [ ( "abcdef01234567890", "./Foo.elm" ) ] mess)
+            case m of
+                Just mess ->
+                    M.newMessage [ ( "abcdef01234567890", "./Foo.elm" ) ] mess
 
-                    Nothing ->
-                        SafeDebug.crash "Something is wrong"
+                Nothing ->
+                    SafeDebug.crash "Something is wrong"
 
 
 exampleMsgJson : Message -> Html msg

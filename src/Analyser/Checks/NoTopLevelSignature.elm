@@ -1,12 +1,12 @@
 module Analyser.Checks.NoTopLevelSignature exposing (checker)
 
-import Elm.Syntax.Expression exposing (..)
+import ASTUtil.Inspector as Inspector exposing (Order(Inner, Skip), defaultConfig)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(NoTopLevelSignature), newMessage)
-import ASTUtil.Inspector as Inspector exposing (Order(Inner, Skip), defaultConfig)
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(NoTopLevelSignature), newMessage)
+import Elm.Syntax.Expression exposing (..)
 
 
 checker : Checker

@@ -1,21 +1,21 @@
 module Client.App.Models
     exposing
-        ( Msg(DashBoardMsg, GraphMsg, Refresh, OnLocation, FileTreeMsg, PackageDependenciesMsg)
+        ( Content(DashBoardContent, FileTreeContent, GraphContent, PackageDependenciesContent)
         , Model
-        , Content(DashBoardContent, GraphContent, FileTreeContent, PackageDependenciesContent)
+        , ModuleGraphPageMsg
+        , Msg(DashBoardMsg, FileTreeMsg, GraphMsg, OnLocation, PackageDependenciesMsg, Refresh)
         , PackageDependenciesPage
         , PackageDependenciesPageMsg
-        , packageDependenciesPage
-        , ModuleGraphPageMsg
         , moduleGraphPage
+        , packageDependenciesPage
         )
 
+import Client.Components.FileTree as FileTree
 import Client.DashBoard.DashBoard as DashBoard
 import Client.Graph.Graph as Graph
 import Client.Graph.PackageDependencies as PackageDependencies
-import Client.Components.FileTree as FileTree
-import Navigation exposing (Location)
 import Client.StaticStatePage as StaticStatePage
+import Navigation exposing (Location)
 
 
 type alias PackageDependenciesPage =

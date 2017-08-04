@@ -1,10 +1,10 @@
 module Analyser.Checks.MultiLineRecordFormattingTests exposing (all)
 
-import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
-import Test exposing (Test)
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting), newMessage)
+import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
 import Analyser.Messages.Range as Range
+import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting), newMessage)
+import Test exposing (Test)
 
 
 singleLineSingleField : ( String, String, List MessageData )

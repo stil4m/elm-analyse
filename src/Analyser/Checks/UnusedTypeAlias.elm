@@ -1,16 +1,16 @@
 module Analyser.Checks.UnusedTypeAlias exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Elm.Syntax.TypeAnnotation exposing (..)
-import Elm.Syntax.TypeAlias exposing (..)
+import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
-import Elm.Interface as Interface
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedTypeAlias), newMessage)
 import Dict exposing (Dict)
-import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import Elm.Interface as Interface
+import Elm.Syntax.TypeAlias exposing (..)
+import Elm.Syntax.TypeAnnotation exposing (..)
 import Tuple3
-import Analyser.Configuration exposing (Configuration)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 
 
 checker : Checker
@@ -34,19 +34,19 @@ scan rangeContext fileContext _ =
                 fileContext.ast
                 Dict.empty
     in
-        Inspector.inspect
-            { defaultConfig
-                | onTypeAnnotation = Post onTypeAnnotation
-                , onFunctionOrValue = Post onFunctionOrValue
-            }
-            fileContext.ast
-            collectedAliased
-            |> Dict.toList
-            |> List.filter (Tuple.second >> Tuple3.third >> (<) 0 >> not)
-            |> List.filter (Tuple.first >> flip Interface.exposesAlias fileContext.interface >> not)
-            |> List.map (Tuple.mapSecond Tuple3.second)
-            |> List.map (uncurry (UnusedTypeAlias fileContext.path))
-            |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+    Inspector.inspect
+        { defaultConfig
+            | onTypeAnnotation = Post onTypeAnnotation
+            , onFunctionOrValue = Post onFunctionOrValue
+        }
+        fileContext.ast
+        collectedAliased
+        |> Dict.toList
+        |> List.filter (Tuple.second >> Tuple3.third >> (<) 0 >> not)
+        |> List.filter (Tuple.first >> flip Interface.exposesAlias fileContext.interface >> not)
+        |> List.map (Tuple.mapSecond Tuple3.second)
+        |> List.map (uncurry (UnusedTypeAlias fileContext.path))
+        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 markTypeAlias : String -> Context -> Context

@@ -1,8 +1,8 @@
-module Docs.Page exposing (Page(Home, Features, Changelog, Configuration, Messages, NotFound), nextPage, hash)
+module Docs.Page exposing (Page(Changelog, Configuration, Features, Home, Messages, NotFound), hash, nextPage)
 
-import UrlParser as Url exposing (Parser, (</>))
-import String.Extra
 import Navigation exposing (Location)
+import String.Extra
+import UrlParser as Url exposing ((</>), Parser)
 
 
 type Page

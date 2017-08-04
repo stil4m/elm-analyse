@@ -1,15 +1,15 @@
 module Analyser.Checks.DuplicateRecordFieldUpdate exposing (checker)
 
-import Elm.Syntax.Range as Syntax
-import Elm.Syntax.Expression exposing (RecordUpdate, Expression)
-import Analyser.Messages.Range as Range exposing (RangeContext)
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(DuplicateRecordFieldUpdate), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
-import Dict
-import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Range as Range exposing (RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(DuplicateRecordFieldUpdate), newMessage)
+import Dict
 import Dict.Extra as Dict
+import Elm.Syntax.Expression exposing (Expression, RecordUpdate)
+import Elm.Syntax.Range as Syntax
 
 
 checker : Checker

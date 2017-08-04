@@ -1,13 +1,13 @@
 module Analyser.Fixes.UnusedTypeAlias exposing (fixer)
 
-import Analyser.Messages.Types exposing (MessageData(UnusedTypeAlias))
 import Analyser.Fixes.Base exposing (Fixer)
-import Elm.Syntax.Range as Syntax
-import Elm.Syntax.File exposing (..)
-import Elm.Syntax.TypeAlias exposing (..)
-import Elm.Syntax.Declaration exposing (..)
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Types exposing (MessageData(UnusedTypeAlias))
+import Elm.Syntax.Declaration exposing (..)
+import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Range as Syntax
+import Elm.Syntax.TypeAlias exposing (..)
 
 
 fixer : Fixer
@@ -77,4 +77,4 @@ removeTypeAlias typeAlias content =
         end =
             typeAlias.range.end
     in
-        FileContent.replaceRangeWith ((Syntax.Range start end)) "" content
+    FileContent.replaceRangeWith (Syntax.Range start end) "" content

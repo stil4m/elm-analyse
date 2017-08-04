@@ -1,13 +1,13 @@
 module Analyser.Checks.UnnecessaryPortModule exposing (checker)
 
-import Elm.Syntax.Expression exposing (..)
-import Analyser.FileContext exposing (FileContext)
 import AST.Util
-import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryPortModule), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
-import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Range exposing (RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryPortModule), newMessage)
+import Elm.Syntax.Expression exposing (..)
 
 
 checker : Checker
@@ -27,13 +27,13 @@ scan _ fileContext _ =
                     fileContext.ast
                     0
         in
-            if portDeclCount == 0 then
-                [ newMessage
-                    [ ( fileContext.sha1, fileContext.path ) ]
-                    (UnnecessaryPortModule fileContext.path)
-                ]
-            else
-                []
+        if portDeclCount == 0 then
+            [ newMessage
+                [ ( fileContext.sha1, fileContext.path ) ]
+                (UnnecessaryPortModule fileContext.path)
+            ]
+        else
+            []
     else
         []
 

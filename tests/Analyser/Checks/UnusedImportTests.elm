@@ -2,9 +2,9 @@ module Analyser.Checks.UnusedImportTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImport as UnusedImport
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
-import Analyser.Messages.Range as Range
 
 
 usedAsQualified : ( String, String, List MessageData )

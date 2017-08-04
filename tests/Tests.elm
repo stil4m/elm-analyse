@@ -1,34 +1,34 @@
 module Tests exposing (all)
 
-import Analyser.InterfaceTest as InterfaceTest
-import Test exposing (Test)
-import Analyser.Checks.NoTopLevelSignatureTests
-import Analyser.Checks.UnusedVariableTests
-import Analyser.Checks.ExposeAllTests
-import Analyser.Checks.ImportAllTests
-import Analyser.Checks.UnnecessaryParensTests
-import Analyser.Checks.NoDebugTests
+import ASTUtil.PatternOptimizerTests
 import Analyser.Checks.DuplicateImportTests
-import Analyser.Checks.UnusedTypeAliasTests
-import Analyser.Checks.OverriddenVariablesTests
+import Analyser.Checks.DuplicateImportedVariableTests
+import Analyser.Checks.DuplicateRecordFieldUpdateTests
+import Analyser.Checks.ExposeAllTests
+import Analyser.Checks.FunctionInLetTests
+import Analyser.Checks.ImportAllTests
+import Analyser.Checks.ListOperatorsTests
+import Analyser.Checks.MultiLineRecordFormattingTests
+import Analyser.Checks.NoDebugTests
+import Analyser.Checks.NoTopLevelSignatureTests
 import Analyser.Checks.NoUncurriedPrefixTests
+import Analyser.Checks.NonStaticRegexTests
+import Analyser.Checks.OverriddenVariablesTests
+import Analyser.Checks.SingleFieldRecordTests
+import Analyser.Checks.UnnecessaryListConcatTests
+import Analyser.Checks.UnnecessaryParensTests
 import Analyser.Checks.UnusedImportAliasesTests
 import Analyser.Checks.UnusedImportTests
-import Analyser.Fixes.UnusedImportedVariableTests
-import Analyser.Fixes.UnusedImportAliasTests
-import ASTUtil.PatternOptimizerTests
+import Analyser.Checks.UnusedTypeAliasTests
+import Analyser.Checks.UnusedVariableTests
 import Analyser.Fixes.FileContentTests
-import Analyser.Checks.ListOperatorsTests
-import Analyser.Checks.UnnecessaryListConcatTests
 import Analyser.Fixes.UnnecessaryParensTests
+import Analyser.Fixes.UnusedImportAliasTests
 import Analyser.Fixes.UnusedImportTests
+import Analyser.Fixes.UnusedImportedVariableTests
 import Analyser.Fixes.UnusedTypeAliasTests
-import Analyser.Checks.MultiLineRecordFormattingTests
-import Analyser.Checks.NonStaticRegexTests
-import Analyser.Checks.FunctionInLetTests
-import Analyser.Checks.DuplicateImportedVariableTests
-import Analyser.Checks.SingleFieldRecordTests
-import Analyser.Checks.DuplicateRecordFieldUpdateTests
+import Analyser.InterfaceTest as InterfaceTest
+import Test exposing (Test)
 
 
 all : Test

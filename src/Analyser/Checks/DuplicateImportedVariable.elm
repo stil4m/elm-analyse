@@ -1,16 +1,16 @@
 module Analyser.Checks.DuplicateImportedVariable exposing (checker)
 
+import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Range as Range exposing (RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImportedVariable), newMessage)
+import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (ModuleName)
+import Elm.Syntax.Exposing exposing (Exposing(..), TopLevelExpose(..))
 import Elm.Syntax.Module exposing (Import)
 import Elm.Syntax.Range as Syntax
-import Elm.Syntax.Exposing exposing (Exposing(..), TopLevelExpose(..))
-import Analyser.Messages.Range as Range exposing (RangeContext)
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImportedVariable), newMessage)
-import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)
-import Dict exposing (Dict)
-import Analyser.Configuration exposing (Configuration)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 
 
 checker : Checker
@@ -38,9 +38,9 @@ scan rangeContext fileContext _ =
                 fileContext.ast
                 { constructors = Dict.empty, functionOrValues = Dict.empty }
     in
-        (findViolations result.functionOrValues ++ findViolations result.constructors)
-            |> List.map (asMessageData rangeContext fileContext.path)
-            |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+    (findViolations result.functionOrValues ++ findViolations result.constructors)
+        |> List.map (asMessageData rangeContext fileContext.path)
+        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 asMessageData : RangeContext -> String -> ( ModuleName, String, List Syntax.Range ) -> MessageData
@@ -60,15 +60,15 @@ onImport : Import -> Context -> Context
 onImport imp context =
     let
         ( cs, vs ) =
-            (constructorsAndValues imp)
+            constructorsAndValues imp
     in
-        { context
-            | constructors = Dict.update imp.moduleName (Maybe.withDefault Dict.empty >> mergeImportedValue cs >> Just) context.constructors
-            , functionOrValues =
-                Dict.update imp.moduleName
-                    (Maybe.withDefault Dict.empty >> mergeImportedValue vs >> Just)
-                    context.functionOrValues
-        }
+    { context
+        | constructors = Dict.update imp.moduleName (Maybe.withDefault Dict.empty >> mergeImportedValue cs >> Just) context.constructors
+        , functionOrValues =
+            Dict.update imp.moduleName
+                (Maybe.withDefault Dict.empty >> mergeImportedValue vs >> Just)
+                context.functionOrValues
+    }
 
 
 mergeImportedValue : List ( String, Syntax.Range ) -> Dict String (List Syntax.Range) -> Dict String (List Syntax.Range)
@@ -84,7 +84,7 @@ mergeImportedValue l entry =
                 )
                 d
     in
-        List.foldl addPair entry l
+    List.foldl addPair entry l
 
 
 constructorsAndValues : Import -> ( List ( String, Syntax.Range ), List ( String, Syntax.Range ) )

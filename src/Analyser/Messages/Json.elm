@@ -1,8 +1,8 @@
-module Analyser.Messages.Json exposing (serialiseMessage, encodeMessage, decodeMessage)
+module Analyser.Messages.Json exposing (decodeMessage, encodeMessage, serialiseMessage)
 
 import Analyser.Messages.Range as Range exposing (Range)
-import Elm.Syntax.Base as AST
 import Analyser.Messages.Types exposing (Message, MessageData(..), MessageStatus(..))
+import Elm.Syntax.Base as AST
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
 import Json.Encode as JE

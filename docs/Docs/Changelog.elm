@@ -1,10 +1,10 @@
 module Docs.Changelog exposing (Model, Msg, init, update, view)
 
+import Docs.Html as DocsHtml
 import Html exposing (..)
-import RemoteData as RD exposing (RemoteData)
 import Http
 import Markdown
-import Docs.Html as DocsHtml
+import RemoteData as RD exposing (RemoteData)
 
 
 type Model

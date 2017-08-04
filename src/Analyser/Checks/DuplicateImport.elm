@@ -1,14 +1,14 @@
 module Analyser.Checks.DuplicateImport exposing (checker)
 
+import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImport), newMessage)
+import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.Module exposing (Import)
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImport), newMessage)
-import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)
-import Dict exposing (Dict)
-import Analyser.Configuration exposing (Configuration)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 
 
 checker : Checker

@@ -1,18 +1,18 @@
 module Analyser.Checks.UnusedImport exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Elm.Syntax.Module exposing (..)
-import Elm.Syntax.Base exposing (..)
-import Elm.Syntax.TypeAnnotation exposing (..)
-import Elm.Syntax.Expression exposing (..)
+import AST.Util as Util
+import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedImport), newMessage)
 import Dict exposing (Dict)
-import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
-import AST.Util as Util
-import Analyser.Configuration exposing (Configuration)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Exposing exposing (..)
+import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.TypeAnnotation exposing (..)
 
 
 checker : Checker
@@ -36,19 +36,19 @@ scan rangeContext fileContext _ =
                 fileContext.ast
                 Dict.empty
     in
-        Inspector.inspect
-            { defaultConfig
-                | onTypeAnnotation = Post onTypeAnnotation
-                , onExpression = Post onExpression
-                , onCase = Post onCase
-            }
-            fileContext.ast
-            aliases
-            |> Dict.toList
-            |> List.filter (Tuple.second >> Tuple.second >> (==) 0)
-            |> List.map (Tuple.mapSecond Tuple.first)
-            |> List.map (uncurry (UnusedImport fileContext.path))
-            |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+    Inspector.inspect
+        { defaultConfig
+            | onTypeAnnotation = Post onTypeAnnotation
+            , onExpression = Post onExpression
+            , onCase = Post onCase
+        }
+        fileContext.ast
+        aliases
+        |> Dict.toList
+        |> List.filter (Tuple.second >> Tuple.second >> (==) 0)
+        |> List.map (Tuple.mapSecond Tuple.first)
+        |> List.map (uncurry (UnusedImport fileContext.path))
+        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 markUsage : ModuleName -> Context -> Context

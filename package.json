@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "elm": "0.18.0",
-    "elm-format": "0.6.1-alpha",
+    "elm-format": "0.7.0-exp",
     "elm-test": "0.18.2",
     "gulp": "3.9.1",
     "gulp-elm": "0.6.1",

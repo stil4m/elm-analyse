@@ -2,8 +2,8 @@ module Analyser.Checks.DuplicateImportTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DuplicateImport as DuplicateImport
-import Analyser.Messages.Types exposing (..)
 import Analyser.Messages.Range as Range
+import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 

@@ -2,9 +2,9 @@ module Analyser.Checks.UnusedImportAliasesTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
-import Analyser.Messages.Range as Range
 
 
 noUsageForAlias : ( String, String, List MessageData )

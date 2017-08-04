@@ -1,14 +1,14 @@
 module Analyser.State exposing (..)
 
+import Analyser.Messages.Json exposing (decodeMessage, encodeMessage)
 import Analyser.Messages.Types as Messages exposing (Message, MessageId, MessageStatus(Applicable))
-import Analyser.Messages.Json exposing (encodeMessage, decodeMessage)
 import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing)
 import Graph exposing (Graph)
 import Graph.Json as Graph
 import Graph.Node exposing (Node)
-import Json.Encode as JE exposing (Value)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
+import Json.Encode as JE exposing (Value)
 import List.Extra as List
 
 
@@ -127,12 +127,12 @@ finishWithNewMessages messages s =
         messagesWithId =
             List.indexedMap (\n message -> { message | id = n + s.idCount }) messages
     in
-        { s
-            | messages = untouchedMessages ++ messagesWithId
-            , status = Idle
-            , idCount = s.idCount + List.length messages
-        }
-            |> sortMessages
+    { s
+        | messages = untouchedMessages ++ messagesWithId
+        , status = Idle
+        , idCount = s.idCount + List.length messages
+    }
+        |> sortMessages
 
 
 updateGraph : Graph Node -> State -> State

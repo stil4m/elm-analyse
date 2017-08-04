@@ -1,19 +1,19 @@
-port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, isDone, succeeded, message, update, subscriptions)
+port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, isDone, message, subscriptions, succeeded, update)
 
+import Analyser.CodeBase as CodeBase exposing (CodeBase)
+import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Fixes.UnformattedFile as UnformattedFileFixer
+import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
+import Analyser.Fixes.UnusedImportAlias as UnusedImportAliasFixer
+import Analyser.Fixes.UnusedImportedVariable as UnusedImportedVariableFixer
+import Analyser.Fixes.UnusedPatternVariable as UnusedPatternVariableFixer
+import Analyser.Fixes.UnusedTypeAlias as UnusedTypeAliasFixer
 import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
 import Analyser.State as State exposing (State)
-import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
-import Analyser.Fixes.UnusedImportedVariable as UnusedImportedVariableFixer
-import Analyser.Fixes.UnusedImportAlias as UnusedImportAliasFixer
-import Analyser.Fixes.UnusedPatternVariable as UnusedPatternVariableFixer
-import Analyser.Fixes.UnformattedFile as UnformattedFileFixer
-import Analyser.Fixes.UnusedTypeAlias as UnusedTypeAliasFixer
-import Tuple3
-import Analyser.Fixes.Base exposing (Fixer)
 import Elm.Parser as Parser
 import Elm.Processing as Processing
-import Analyser.CodeBase as CodeBase exposing (CodeBase)
+import Tuple3
 
 
 port storeFiles : List ( String, String ) -> Cmd msg
@@ -114,19 +114,19 @@ update codeBase msg (Model model) =
                     changedFiles =
                         model.fixer.fix fixData model.message.data
                 in
-                    case changedFiles of
-                        Ok patched ->
-                            ( Model model
-                            , storeFiles patched
-                            )
+                case changedFiles of
+                    Ok patched ->
+                        ( Model model
+                        , storeFiles patched
+                        )
 
-                        Err e ->
-                            ( Model { model | done = True, success = False }
-                            , sendFixResult
-                                { success = False
-                                , message = e
-                                }
-                            )
+                    Err e ->
+                        ( Model { model | done = True, success = False }
+                        , sendFixResult
+                            { success = False
+                            , message = e
+                            }
+                        )
 
         Stored _ ->
             ( Model { model | done = True }

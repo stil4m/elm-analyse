@@ -1,10 +1,10 @@
-module Analyser.Messages.Range exposing (Range, RangeContext, context, build, encode, decode, rangeToString, emptyRange, orderByStart, compareRangeStarts, asSyntaxRange, toTuple, manual)
+module Analyser.Messages.Range exposing (Range, RangeContext, asSyntaxRange, build, compareRangeStarts, context, decode, emptyRange, encode, manual, orderByStart, rangeToString, toTuple)
 
-import Elm.Syntax.Range as Syntax exposing (Location)
+import AST.Ranges as AstRanges
 import Dict exposing (Dict)
+import Elm.Syntax.Range as Syntax exposing (Location)
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE exposing (Value)
-import AST.Ranges as AstRanges
 
 
 type Range
@@ -56,7 +56,7 @@ context input =
                 |> List.indexedMap (\x y -> ( x, String.length y ))
                 |> Dict.fromList
     in
-        Context (List.length rows) index
+    Context (List.length rows) index
 
 
 orderByStart : Range -> Range -> Order

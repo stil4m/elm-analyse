@@ -1,17 +1,16 @@
 module Analyser.Fixes.TestUtil exposing (testFix)
 
 import Analyser.Checks.Base exposing (Checker)
-import Analyser.Configuration exposing (Configuration)
+import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Messages.Range as Range
 import Elm.Interface as Interface
-import Test exposing (Test, describe, test)
-import Elm.Syntax.File exposing (File)
-import Analyser.Configuration as Configuration
 import Elm.Parser as Parser
-import Expect
 import Elm.Processing as Processing
 import Elm.RawFile as RawFile exposing (RawFile)
-import Analyser.Messages.Range as Range
+import Elm.Syntax.File exposing (File)
+import Expect
+import Test exposing (Test, describe, test)
 
 
 analyseAndFix : Checker -> Fixer -> String -> RawFile -> File -> Result String String
@@ -30,13 +29,13 @@ analyseAndFix checker fixer input rawFile f =
         x =
             checker.check (Range.context input) fileContext Configuration.defaultConfiguration
     in
-        case x of
-            [] ->
-                Err "No message"
+    case x of
+        [] ->
+            Err "No message"
 
-            x :: _ ->
-                fixer.fix [ ( fileContext.path, fileContext.content, fileContext.ast ) ] x.data
-                    |> Result.map (List.head >> Maybe.map Tuple.second >> Maybe.withDefault "")
+        x :: _ ->
+            fixer.fix [ ( fileContext.path, fileContext.content, fileContext.ast ) ] x.data
+                |> Result.map (List.head >> Maybe.map Tuple.second >> Maybe.withDefault "")
 
 
 testFix : String -> Checker -> Fixer -> List ( String, String, String ) -> Test

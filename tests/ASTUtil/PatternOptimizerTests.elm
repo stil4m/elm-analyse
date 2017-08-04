@@ -1,9 +1,9 @@
 module ASTUtil.PatternOptimizerTests exposing (all)
 
 import AST.Ranges exposing (emptyRange)
-import Elm.Syntax.Pattern exposing (..)
-import Elm.Syntax.Base exposing (..)
 import ASTUtil.PatternOptimizer exposing (optimize)
+import Elm.Syntax.Base exposing (..)
+import Elm.Syntax.Pattern exposing (..)
 import Expect
 import Test exposing (..)
 
@@ -17,9 +17,9 @@ all =
                     targetRange =
                         { start = { row = 1, column = 1 }, end = { row = 1, column = 4 } }
                 in
-                    QualifiedNamePattern { moduleName = [], name = "foo" } targetRange
-                        |> optimize targetRange
-                        |> Expect.equal (AllPattern emptyRange)
+                QualifiedNamePattern { moduleName = [], name = "foo" } targetRange
+                    |> optimize targetRange
+                    |> Expect.equal (AllPattern emptyRange)
         , listPatternTests
         , tuplePatternTests
         , recordPatternTests
@@ -39,12 +39,12 @@ asPatternTests =
                     otherRange =
                         { start = { row = 2, column = 2 }, end = { row = 2, column = 4 } }
                 in
-                    AsPattern
-                        (VarPattern "x" targetRange)
-                        (VariablePointer "y" otherRange)
-                        otherRange
-                        |> optimize targetRange
-                        |> Expect.equal (VarPattern "y" otherRange)
+                AsPattern
+                    (VarPattern "x" targetRange)
+                    (VariablePointer "y" otherRange)
+                    otherRange
+                    |> optimize targetRange
+                    |> Expect.equal (VarPattern "y" otherRange)
         , test "should remove the as structure when the alias is unused" <|
             \() ->
                 let
@@ -54,12 +54,12 @@ asPatternTests =
                     otherRange =
                         { start = { row = 2, column = 2 }, end = { row = 2, column = 4 } }
                 in
-                    AsPattern
-                        (VarPattern "x" otherRange)
-                        (VariablePointer "y" targetRange)
-                        otherRange
-                        |> optimize targetRange
-                        |> Expect.equal (VarPattern "x" otherRange)
+                AsPattern
+                    (VarPattern "x" otherRange)
+                    (VariablePointer "y" targetRange)
+                    otherRange
+                    |> optimize targetRange
+                    |> Expect.equal (VarPattern "x" otherRange)
         , test "should keep the as pattern when the sub pattern remains" <|
             \() ->
                 let
@@ -69,23 +69,23 @@ asPatternTests =
                     otherRange =
                         { start = { row = 2, column = 2 }, end = { row = 2, column = 4 } }
                 in
-                    AsPattern
-                        (ListPattern
-                            [ (VarPattern "x" targetRange), (VarPattern "y" otherRange) ]
-                            otherRange
-                        )
-                        (VariablePointer "z" otherRange)
+                AsPattern
+                    (ListPattern
+                        [ VarPattern "x" targetRange, VarPattern "y" otherRange ]
                         otherRange
-                        |> optimize targetRange
-                        |> Expect.equal
-                            (AsPattern
-                                (ListPattern
-                                    [ (AllPattern emptyRange), (VarPattern "y" otherRange) ]
-                                    otherRange
-                                )
-                                (VariablePointer "z" otherRange)
+                    )
+                    (VariablePointer "z" otherRange)
+                    otherRange
+                    |> optimize targetRange
+                    |> Expect.equal
+                        (AsPattern
+                            (ListPattern
+                                [ AllPattern emptyRange, VarPattern "y" otherRange ]
                                 otherRange
                             )
+                            (VariablePointer "z" otherRange)
+                            otherRange
+                        )
         ]
 
 
@@ -101,13 +101,13 @@ recordPatternTests =
                     otherRange =
                         { start = { row = 2, column = 2 }, end = { row = 2, column = 4 } }
                 in
-                    RecordPattern
-                        [ VariablePointer "x" targetRange
-                        , VariablePointer "y" otherRange
-                        ]
-                        otherRange
-                        |> optimize targetRange
-                        |> Expect.equal (RecordPattern [ VariablePointer "y" otherRange ] otherRange)
+                RecordPattern
+                    [ VariablePointer "x" targetRange
+                    , VariablePointer "y" otherRange
+                    ]
+                    otherRange
+                    |> optimize targetRange
+                    |> Expect.equal (RecordPattern [ VariablePointer "y" otherRange ] otherRange)
         , test "should replace the record when no fields are left" <|
             \() ->
                 let
@@ -117,12 +117,12 @@ recordPatternTests =
                     otherRange =
                         { start = { row = 2, column = 2 }, end = { row = 2, column = 4 } }
                 in
-                    RecordPattern
-                        [ VariablePointer "x" targetRange
-                        ]
-                        otherRange
-                        |> optimize targetRange
-                        |> Expect.equal (AllPattern emptyRange)
+                RecordPattern
+                    [ VariablePointer "x" targetRange
+                    ]
+                    otherRange
+                    |> optimize targetRange
+                    |> Expect.equal (AllPattern emptyRange)
         ]
 
 
@@ -138,19 +138,19 @@ listPatternTests =
                     otherRange =
                         { start = { row = 2, column = 2 }, end = { row = 2, column = 4 } }
                 in
-                    ListPattern
-                        [ VarPattern "x" targetRange
-                        , AllPattern otherRange
-                        ]
-                        otherRange
-                        |> optimize targetRange
-                        |> Expect.equal
-                            (ListPattern
-                                [ AllPattern emptyRange
-                                , AllPattern otherRange
-                                ]
-                                otherRange
-                            )
+                ListPattern
+                    [ VarPattern "x" targetRange
+                    , AllPattern otherRange
+                    ]
+                    otherRange
+                    |> optimize targetRange
+                    |> Expect.equal
+                        (ListPattern
+                            [ AllPattern emptyRange
+                            , AllPattern otherRange
+                            ]
+                            otherRange
+                        )
         , test "partially underscored list to underscore" <|
             \() ->
                 let
@@ -160,19 +160,19 @@ listPatternTests =
                     otherRange =
                         { start = { row = 2, column = 2 }, end = { row = 2, column = 4 } }
                 in
-                    ListPattern
-                        [ VarPattern "x" targetRange
-                        , VarPattern "y" otherRange
-                        ]
-                        otherRange
-                        |> optimize targetRange
-                        |> Expect.equal
-                            (ListPattern
-                                [ AllPattern emptyRange
-                                , VarPattern "y" otherRange
-                                ]
-                                otherRange
-                            )
+                ListPattern
+                    [ VarPattern "x" targetRange
+                    , VarPattern "y" otherRange
+                    ]
+                    otherRange
+                    |> optimize targetRange
+                    |> Expect.equal
+                        (ListPattern
+                            [ AllPattern emptyRange
+                            , VarPattern "y" otherRange
+                            ]
+                            otherRange
+                        )
         ]
 
 
@@ -188,13 +188,13 @@ tuplePatternTests =
                     otherRange =
                         { start = { row = 2, column = 2 }, end = { row = 2, column = 4 } }
                 in
-                    TuplePattern
-                        [ VarPattern "x" targetRange
-                        , AllPattern otherRange
-                        ]
-                        otherRange
-                        |> optimize targetRange
-                        |> Expect.equal (AllPattern emptyRange)
+                TuplePattern
+                    [ VarPattern "x" targetRange
+                    , AllPattern otherRange
+                    ]
+                    otherRange
+                    |> optimize targetRange
+                    |> Expect.equal (AllPattern emptyRange)
         , test "partially underscored tuple to underscore" <|
             \() ->
                 let
@@ -204,17 +204,17 @@ tuplePatternTests =
                     otherRange =
                         { start = { row = 2, column = 2 }, end = { row = 2, column = 4 } }
                 in
-                    TuplePattern
-                        [ VarPattern "x" targetRange
-                        , VarPattern "y" otherRange
-                        ]
-                        otherRange
-                        |> optimize targetRange
-                        |> Expect.equal
-                            (TuplePattern
-                                [ AllPattern emptyRange
-                                , VarPattern "y" otherRange
-                                ]
-                                otherRange
-                            )
+                TuplePattern
+                    [ VarPattern "x" targetRange
+                    , VarPattern "y" otherRange
+                    ]
+                    otherRange
+                    |> optimize targetRange
+                    |> Expect.equal
+                        (TuplePattern
+                            [ AllPattern emptyRange
+                            , VarPattern "y" otherRange
+                            ]
+                            otherRange
+                        )
         ]

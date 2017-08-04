@@ -1,8 +1,8 @@
 module Analyser.Fixes.FileContentTests exposing (all)
 
 import Analyser.Fixes.FileContent as FileContent
-import Test exposing (Test, test, describe)
 import Expect
+import Test exposing (Test, describe, test)
 
 
 all : Test

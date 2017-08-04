@@ -1,8 +1,8 @@
 module Docs.Features exposing (view)
 
+import Docs.Html as DocsHtml
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Docs.Html as DocsHtml
 
 
 view : Html msg

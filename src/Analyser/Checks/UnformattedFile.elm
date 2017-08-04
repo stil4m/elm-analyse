@@ -1,10 +1,10 @@
 module Analyser.Checks.UnformattedFile exposing (checker)
 
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnformattedFile), newMessage)
-import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Range exposing (RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(UnformattedFile), newMessage)
 
 
 checker : Checker

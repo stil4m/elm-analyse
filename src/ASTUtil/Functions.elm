@@ -1,7 +1,7 @@
 module ASTUtil.Functions exposing (isStatic)
 
-import Elm.Syntax.TypeAnnotation exposing (..)
 import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.TypeAnnotation exposing (..)
 
 
 isStatic : Function -> Bool

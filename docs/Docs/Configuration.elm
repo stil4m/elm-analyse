@@ -1,9 +1,9 @@
 module Docs.Configuration exposing (..)
 
-import Html exposing (..)
-import Html.Attributes exposing (class, href)
 import Docs.Html as DocsHtml
 import Docs.Page as Page exposing (..)
+import Html exposing (..)
+import Html.Attributes exposing (class, href)
 
 
 view : Html a

@@ -2,9 +2,9 @@ module Analyser.Checks.UnnecessaryParensTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
-import Analyser.Messages.Range as Range
 
 
 parensBetweenOperators : ( String, String, List MessageData )
@@ -460,6 +460,24 @@ foo =
     )
 
 
+{-| Introduced for #98. Bump elm-format to 0.7.0. This version will place parens around statements lhs/rhs of oprator application.
+-}
+parensAroundCaseOnOperatorSide : ( String, String, List MessageData )
+parensAroundCaseOnOperatorSide =
+    ( "parensAroundCaseOnOperatorSide"
+    , """module Bar exposing (..)
+
+foo x =
+    1 + (case x of
+            True -> 2
+            Fasle -> 3
+        )
+
+"""
+    , []
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnnecessaryParensTests"
@@ -491,4 +509,5 @@ all =
         , parensInLambdaExpressionWithQualifiedExpressionWithArgs
         , parensAroundApplicationWithNegatedArg
         , negatedApplicationWithParens
+        , parensAroundCaseOnOperatorSide
         ]

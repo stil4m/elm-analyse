@@ -1,7 +1,7 @@
-module Analyser.SourceLoadingStage exposing (init, update, isDone, parsedFiles, Model, Msg, subscriptions)
+module Analyser.SourceLoadingStage exposing (Model, Msg, init, isDone, parsedFiles, subscriptions, update)
 
-import Analyser.Files.Types exposing (LoadedSourceFile, LoadedSourceFiles)
 import Analyser.Files.FileLoader as FileLoader
+import Analyser.Files.Types exposing (LoadedSourceFile, LoadedSourceFiles)
 import List.Extra
 
 
@@ -51,13 +51,13 @@ update msg (Model state) =
                             ( fileLoad, cmd ) =
                                 FileLoader.update subMsg
                         in
-                            ( Model
-                                { state
-                                    | filesToLoad = List.Extra.uncons rest
-                                    , parsedFiles = fileLoad :: state.parsedFiles
-                                }
-                            , Cmd.map FileLoaderMsg cmd
-                            )
+                        ( Model
+                            { state
+                                | filesToLoad = List.Extra.uncons rest
+                                , parsedFiles = fileLoad :: state.parsedFiles
+                            }
+                        , Cmd.map FileLoaderMsg cmd
+                        )
                     )
                 |> Maybe.map loadNextFile
                 |> Maybe.withDefault (Model state ! [])

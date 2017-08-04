@@ -1,11 +1,11 @@
 module Analyser.Fixes.UnusedImport exposing (fixer)
 
-import Analyser.Messages.Types exposing (MessageData(UnusedImport))
-import Analyser.Fixes.Base exposing (Fixer)
-import Elm.Syntax.File exposing (File)
 import ASTUtil.Imports as Imports
+import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Types exposing (MessageData(UnusedImport))
+import Elm.Syntax.File exposing (File)
 
 
 fixer : Fixer

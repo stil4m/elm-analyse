@@ -1,7 +1,7 @@
 module Client.LoadingScreen exposing (..)
 
 import Analyser.State as State exposing (State)
-import Html exposing (Html, text, div)
+import Html exposing (Html, div, text)
 import RemoteData as RD exposing (RemoteData)
 
 

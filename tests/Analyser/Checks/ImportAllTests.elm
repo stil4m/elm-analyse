@@ -1,10 +1,10 @@
 module Analyser.Checks.ImportAllTests exposing (..)
 
-import Analyser.Checks.ImportAll as ImportAll
 import Analyser.Checks.CheckTestUtil as CTU
+import Analyser.Checks.ImportAll as ImportAll
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (..)
-import Analyser.Messages.Range as Range
 
 
 importAll : ( String, String, List MessageData )

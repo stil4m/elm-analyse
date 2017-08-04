@@ -72,7 +72,7 @@ init state =
             { state = Nothing, graph = Nothing, colors = Dict.empty, filter = [] }
                 |> withNewState state
     in
-        newModel ! [ cmdForUpdatedGraph newModel.graph ]
+    newModel ! [ cmdForUpdatedGraph newModel.graph ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -83,17 +83,17 @@ update msg model =
                 newModelWithFilter =
                     { model | filter = filter }
             in
-                case model.state of
-                    Nothing ->
-                        newModelWithFilter ! []
+            case model.state of
+                Nothing ->
+                    newModelWithFilter ! []
 
-                    Just state ->
-                        let
-                            modelWithNewGraph =
-                                Graph.filter (\node -> List.take (List.length filter) node.name == filter) state.graph
-                                    |> withGraph newModelWithFilter
-                        in
-                            modelWithNewGraph ! [ cmdForUpdatedGraph modelWithNewGraph.graph ]
+                Just state ->
+                    let
+                        modelWithNewGraph =
+                            Graph.filter (\node -> List.take (List.length filter) node.name == filter) state.graph
+                                |> withGraph newModelWithFilter
+                    in
+                    modelWithNewGraph ! [ cmdForUpdatedGraph modelWithNewGraph.graph ]
 
 
 graphElementId : String
@@ -117,7 +117,7 @@ withGraph model graph =
         ( colors, coloredGraph ) =
             GraphDecorator.coloredGraph (1 + List.length model.filter) graph
     in
-        { model | graph = Just coloredGraph, colors = colors }
+    { model | graph = Just coloredGraph, colors = colors }
 
 
 view : Model -> Html Msg
@@ -126,23 +126,23 @@ view m =
         maybeGraph =
             Maybe.map .graph m.state
     in
-        Html.div []
-            [ LoadingScreen.viewStateFromMaybe m.state (\_ -> Html.text "")
-            , Html.h3 [] [ Html.text "Module Graph" ]
-            , Html.div [ Html.class "row" ]
-                (widgets maybeGraph)
-            , Html.div [ Html.class "row" ]
-                [ Panel.viewWithFooter Panel.WidthFull
-                    "Graph"
-                    (Panel.documentationButton "ModuleGraph.md")
-                    (Html.div [ Html.id graphElementId ] [])
-                    (Just (legend m.filter m.colors))
-                ]
-            , Html.div [ Html.class "row" ]
-                [ Maybe.map (Html.Lazy.lazy (Table.view 20)) maybeGraph
-                    |> Maybe.withDefault (Html.text "")
-                ]
+    Html.div []
+        [ LoadingScreen.viewStateFromMaybe m.state (\_ -> Html.text "")
+        , Html.h3 [] [ Html.text "Module Graph" ]
+        , Html.div [ Html.class "row" ]
+            (widgets maybeGraph)
+        , Html.div [ Html.class "row" ]
+            [ Panel.viewWithFooter Panel.WidthFull
+                "Graph"
+                (Panel.documentationButton "ModuleGraph.md")
+                (Html.div [ Html.id graphElementId ] [])
+                (Just (legend m.filter m.colors))
             ]
+        , Html.div [ Html.class "row" ]
+            [ Maybe.map (Html.Lazy.lazy (Table.view 20)) maybeGraph
+                |> Maybe.withDefault (Html.text "")
+            ]
+        ]
 
 
 widgets : Maybe (Graph Node) -> List (Html msg)
@@ -174,10 +174,10 @@ legend filter colors =
                 breadCrumbsForFilter filter
                     |> BreadCrumb.view (List.last filter |> Maybe.withDefault "Current Filter")
     in
-        Html.div [ Html.class "graph__legend" ]
-            [ breadCrumb
-            , Html.ul [] entries
-            ]
+    Html.div [ Html.class "graph__legend" ]
+        [ breadCrumb
+        , Html.ul [] entries
+        ]
 
 
 legendEntry : ColorDict -> List String -> Maybe (Html Msg)

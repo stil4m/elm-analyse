@@ -2,9 +2,9 @@ module Analyser.Checks.DuplicateImportedVariableTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DuplicateImportedVariable as DuplicateImportedVariable
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
-import Analyser.Messages.Range as Range
 
 
 duplicateSameModule : ( String, String, List MessageData )

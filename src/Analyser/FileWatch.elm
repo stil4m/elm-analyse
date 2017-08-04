@@ -1,4 +1,4 @@
-port module Analyser.FileWatch exposing (watcher, FileChange(Remove, Update))
+port module Analyser.FileWatch exposing (FileChange(Remove, Update), watcher)
 
 import Debug as SafeDebug
 

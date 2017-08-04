@@ -1,19 +1,19 @@
 module Analyser.Files.Types
     exposing
-        ( Version
-        , LoadedSourceFiles
+        ( LoadedFileData
         , LoadedSourceFile
+        , LoadedSourceFiles
         , ModuleIndex
         , OperatorTable
-        , LoadedFileData
+        , Version
         )
 
-import Elm.Syntax.Infix as AST
-import Elm.Syntax.Base as AST
+import Analyser.Files.FileContent exposing (FileContent)
 import Dict exposing (Dict)
 import Elm.Interface exposing (Interface)
 import Elm.RawFile exposing (RawFile)
-import Analyser.Files.FileContent exposing (FileContent)
+import Elm.Syntax.Base as AST
+import Elm.Syntax.Infix as AST
 
 
 type alias Version =

@@ -1,8 +1,8 @@
 module Client.App.Menu exposing (view)
 
-import Html exposing (Html, nav, div, ul, i, li, a, button, form, text)
-import Html.Attributes exposing (class, href, type_, style, attribute)
 import Client.App.Models exposing (Msg(Refresh))
+import Html exposing (Html, a, button, div, form, i, li, nav, text, ul)
+import Html.Attributes exposing (attribute, class, href, style, type_)
 import Html.Events exposing (onClick)
 import Navigation exposing (Location)
 

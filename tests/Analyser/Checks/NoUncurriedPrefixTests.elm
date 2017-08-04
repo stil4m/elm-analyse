@@ -2,9 +2,9 @@ module Analyser.Checks.NoUncurriedPrefixTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
-import Analyser.Messages.Range as Range
 
 
 prefixAsApplicationWithTwoArgs : ( String, String, List MessageData )

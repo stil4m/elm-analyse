@@ -1,14 +1,14 @@
 module Analyser.Checks.MultiLineRecordFormatting exposing (checker)
 
-import Analyser.FileContext exposing (FileContext)
-import Elm.Syntax.TypeAnnotation exposing (..)
-import Elm.Syntax.TypeAlias exposing (..)
-import Analyser.Configuration exposing (Configuration)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
-import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting), newMessage)
 import ASTUtil.Inspector as Inspector exposing (..)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting), newMessage)
 import Elm.Syntax.Range as Syntax
+import Elm.Syntax.TypeAlias exposing (..)
+import Elm.Syntax.TypeAnnotation exposing (..)
 
 
 checker : Checker
@@ -24,15 +24,15 @@ scan rangeContext fileContext _ =
         threshold =
             2
     in
-        Inspector.inspect
-            { defaultConfig | onTypeAlias = Post (onTypeAlias rangeContext) }
-            fileContext.ast
-            []
-            |> List.filter (Tuple.second >> List.length >> (<=) threshold)
-            |> List.filterMap (\( range, fields ) -> firstTwo fields |> Maybe.map ((,) range))
-            |> List.filter (Tuple.second >> fieldsOnSameLine)
-            |> List.map (Tuple.first >> MultiLineRecordFormatting fileContext.path)
-            |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+    Inspector.inspect
+        { defaultConfig | onTypeAlias = Post (onTypeAlias rangeContext) }
+        fileContext.ast
+        []
+        |> List.filter (Tuple.second >> List.length >> (<=) threshold)
+        |> List.filterMap (\( range, fields ) -> firstTwo fields |> Maybe.map ((,) range))
+        |> List.filter (Tuple.second >> fieldsOnSameLine)
+        |> List.map (Tuple.first >> MultiLineRecordFormatting fileContext.path)
+        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 fieldsOnSameLine : ( RecordField, RecordField ) -> Bool

@@ -1,9 +1,9 @@
 module Docs.Home exposing (view)
 
+import Docs.Html as DocsHtml
+import Docs.Page as Page exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Docs.Page as Page exposing (..)
-import Docs.Html as DocsHtml
 
 
 view : Html msg

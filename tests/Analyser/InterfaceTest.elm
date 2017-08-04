@@ -1,10 +1,10 @@
 module Analyser.InterfaceTest exposing (..)
 
-import Expect
-import Elm.Parser as Parser
 import Elm.Interface as Interface exposing (..)
-import Test exposing (..)
+import Elm.Parser as Parser
 import Elm.Syntax.Infix as AST exposing (..)
+import Expect
+import Test exposing (..)
 
 
 toInterface : String -> String -> Interface -> Test

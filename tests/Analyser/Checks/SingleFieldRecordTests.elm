@@ -1,10 +1,10 @@
 module Analyser.Checks.SingleFieldRecordTests exposing (all)
 
-import Analyser.Checks.SingleFieldRecord as SingleFieldRecord
-import Test exposing (Test)
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Messages.Types exposing (Message, MessageData(SingleFieldRecord), newMessage)
+import Analyser.Checks.SingleFieldRecord as SingleFieldRecord
 import Analyser.Messages.Range as Range
+import Analyser.Messages.Types exposing (Message, MessageData(SingleFieldRecord), newMessage)
+import Test exposing (Test)
 
 
 singleField : ( String, String, List MessageData )

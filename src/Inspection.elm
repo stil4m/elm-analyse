@@ -1,36 +1,36 @@
 module Inspection exposing (run)
 
-import Analyser.FileContext as FileContext
-import Analyser.Messages.Types exposing (Message, MessageData(..), newMessage)
-import Analyser.Messages.Range as Range
-import Analyser.Files.Types exposing (LoadedSourceFiles)
-import Analyser.Checks.UnformattedFile as UnformattedFile
-import Analyser.Checks.UnusedVariable as UnusedVariable
-import Analyser.Checks.ExposeAll as ExposeAll
-import Analyser.Checks.ImportAll as ImportAll
-import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
-import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
-import Analyser.Checks.NoDebug as NoDebug
-import Analyser.Checks.DuplicateImport as DuplicateImport
-import Analyser.Checks.UnusedTypeAlias as UnusedTypeAlias
-import Analyser.Checks.OverriddenVariables as OverriddenVariables
-import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
-import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
-import Analyser.Checks.UnusedImport as UnusedImport
-import Analyser.Checks.ListOperators as ListOperators
-import Analyser.Checks.LineLength as LineLength
-import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
-import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
-import Analyser.Checks.UnnecessaryPortModule as UnnecessaryPortModule
-import Analyser.Checks.NonStaticRegex as NonStaticRegex
-import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
-import Analyser.Checks.FunctionInLet as FunctionInLet
-import Analyser.Checks.DuplicateImportedVariable as DuplicateImportedVariable
-import Analyser.Checks.SingleFieldRecord as SingleFieldRecord
 import Analyser.Checks.Base exposing (Checker)
-import Result.Extra
-import Analyser.Configuration exposing (Configuration)
+import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
+import Analyser.Checks.DuplicateImport as DuplicateImport
+import Analyser.Checks.DuplicateImportedVariable as DuplicateImportedVariable
+import Analyser.Checks.ExposeAll as ExposeAll
+import Analyser.Checks.FunctionInLet as FunctionInLet
+import Analyser.Checks.ImportAll as ImportAll
+import Analyser.Checks.LineLength as LineLength
+import Analyser.Checks.ListOperators as ListOperators
+import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
+import Analyser.Checks.NoDebug as NoDebug
+import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
+import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
+import Analyser.Checks.NonStaticRegex as NonStaticRegex
+import Analyser.Checks.OverriddenVariables as OverriddenVariables
+import Analyser.Checks.SingleFieldRecord as SingleFieldRecord
+import Analyser.Checks.UnformattedFile as UnformattedFile
+import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
+import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
+import Analyser.Checks.UnnecessaryPortModule as UnnecessaryPortModule
+import Analyser.Checks.UnusedImport as UnusedImport
+import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
+import Analyser.Checks.UnusedTypeAlias as UnusedTypeAlias
+import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.CodeBase exposing (CodeBase)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext as FileContext
+import Analyser.Files.Types exposing (LoadedSourceFiles)
+import Analyser.Messages.Range as Range
+import Analyser.Messages.Types exposing (Message, MessageData(..), newMessage)
+import Result.Extra
 
 
 checkers : List Checker
@@ -96,7 +96,7 @@ run codeBase includedSources configuration =
         messages =
             List.concat [ failedMessages, inspectionMessages ]
     in
-        messages
+    messages
 
 
 inspectFileContext : Configuration -> List Checker -> FileContext.FileContext -> List Message
@@ -105,4 +105,4 @@ inspectFileContext configuration enabledChecks fileContext =
         rangeContext =
             Range.context fileContext.content
     in
-        List.concatMap (\c -> c.check rangeContext fileContext configuration) enabledChecks
+    List.concatMap (\c -> c.check rangeContext fileContext configuration) enabledChecks

@@ -1,17 +1,17 @@
 module Analyser.Checks.OverriddenVariables exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (RangeContext)
-import Elm.Syntax.Base exposing (..)
-import Elm.Syntax.Range as Syntax
-import Elm.Syntax.Pattern exposing (..)
-import Elm.Syntax.Expression exposing (..)
+import ASTUtil.Inspector as Inspector exposing (Order(Inner), defaultConfig)
 import ASTUtil.Variables exposing (getImportsVars, patternToVars)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Types exposing (Message, MessageData(RedefineVariable), newMessage)
 import Dict exposing (Dict)
-import ASTUtil.Inspector as Inspector exposing (Order(Inner), defaultConfig)
-import Analyser.Configuration exposing (Configuration)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Elm.Syntax.Base exposing (..)
+import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Range as Syntax
 
 
 checker : Checker
@@ -38,18 +38,18 @@ scan rangeContext fileContext _ =
                 |> List.map (\( x, _ ) -> ( x.value, x.range ))
                 |> Dict.fromList
     in
-        Inspector.inspect
-            { defaultConfig
-                | onFunction = Inner onFunction
-                , onLambda = Inner onLambda
-                , onCase = Inner onCase
-                , onDestructuring = Inner onDestructuring
-            }
-            fileContext.ast
-            ( [], topLevels )
-            |> Tuple.first
-            |> List.map (\( n, r1, r2 ) -> RedefineVariable fileContext.path n (Range.build rangeContext r1) (Range.build rangeContext r2))
-            |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+    Inspector.inspect
+        { defaultConfig
+            | onFunction = Inner onFunction
+            , onLambda = Inner onLambda
+            , onCase = Inner onCase
+            , onDestructuring = Inner onDestructuring
+        }
+        fileContext.ast
+        ( [], topLevels )
+        |> Tuple.first
+        |> List.map (\( n, r1, r2 ) -> RedefineVariable fileContext.path n (Range.build rangeContext r1) (Range.build rangeContext r2))
+        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 visitWithVariablePointers : List VariablePointer -> (Context -> Context) -> Context -> Context
@@ -67,12 +67,12 @@ visitWithVariablePointers variablePointers f ( redefines, known ) =
         ( newRedefines, _ ) =
             f ( redefines, newKnown )
     in
-        ( newRedefines
-            ++ (redefinedPattern
-                    |> List.filterMap (\x -> Dict.get x.value known |> Maybe.map (\r -> ( x.value, r, x.range )))
-               )
-        , known
-        )
+    ( newRedefines
+        ++ (redefinedPattern
+                |> List.filterMap (\x -> Dict.get x.value known |> Maybe.map (\r -> ( x.value, r, x.range )))
+           )
+    , known
+    )
 
 
 visitWithPatterns : List Pattern -> (Context -> Context) -> Context -> Context

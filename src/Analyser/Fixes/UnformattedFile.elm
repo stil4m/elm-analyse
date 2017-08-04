@@ -1,7 +1,7 @@
 module Analyser.Fixes.UnformattedFile exposing (fixer)
 
-import Analyser.Messages.Types exposing (MessageData(UnformattedFile))
 import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Messages.Types exposing (MessageData(UnformattedFile))
 import Elm.Syntax.File exposing (File)
 import Tuple3
 

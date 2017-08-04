@@ -1,8 +1,8 @@
 module Client.Highlight exposing (..)
 
 import Analyser.Messages.Range as Range exposing (Range)
-import Html exposing (Html, pre, text, span)
-import Html.Attributes exposing (style, id)
+import Html exposing (Html, pre, span, text)
+import Html.Attributes exposing (id, style)
 
 
 beforeHighlight : Int -> List String -> Range -> String
@@ -24,7 +24,7 @@ beforeHighlight rowsAround targetRows range =
                 |> Maybe.map List.singleton
                 |> Maybe.withDefault []
     in
-        String.join "\n" (preLines ++ preLineText)
+    String.join "\n" (preLines ++ preLineText)
 
 
 afterHighlight : Int -> List String -> Range -> String
@@ -54,7 +54,7 @@ afterHighlight rowsAround targetRows range =
                 |> flip List.drop targetRows
                 |> String.join "\n"
     in
-        postLineText ++ postLines
+    postLineText ++ postLines
 
 
 highlightedString : Int -> List String -> Range -> String
@@ -74,43 +74,43 @@ highlightedString rowsAround targetRows range =
                 |> List.drop (startRow - uiStartRow)
                 |> List.take (endRow - startRow + 1)
     in
-        case highlightedRowsFull of
-            [] ->
-                ""
+    case highlightedRowsFull of
+        [] ->
+            ""
 
-            [ x ] ->
-                x
-                    |> (String.dropLeft <| startColumn)
-                    |> String.left (endColumn - startColumn)
+        [ x ] ->
+            x
+                |> (String.dropLeft <| startColumn)
+                |> String.left (endColumn - startColumn)
 
-            _ ->
-                let
-                    midHighlighedRows =
-                        highlightedRowsFull
-                            |> List.drop 1
-                            |> List.take (List.length highlightedRowsFull - 2)
+        _ ->
+            let
+                midHighlighedRows =
+                    highlightedRowsFull
+                        |> List.drop 1
+                        |> List.take (List.length highlightedRowsFull - 2)
 
-                    firstHighlightedRow =
-                        highlightedRowsFull
-                            |> List.head
-                            |> Maybe.map (String.dropLeft <| startColumn)
-                            |> Maybe.map List.singleton
-                            |> Maybe.withDefault []
+                firstHighlightedRow =
+                    highlightedRowsFull
+                        |> List.head
+                        |> Maybe.map (String.dropLeft <| startColumn)
+                        |> Maybe.map List.singleton
+                        |> Maybe.withDefault []
 
-                    lastHighlighedRow =
-                        highlightedRowsFull
-                            |> List.reverse
-                            |> List.head
-                            |> Maybe.map
-                                (if endsOnLineEnding then
-                                    flip (++) "\n"
-                                 else
-                                    String.left <| endColumn
-                                )
-                            |> Maybe.map List.singleton
-                            |> Maybe.withDefault []
-                in
-                    String.join "\n" (firstHighlightedRow ++ midHighlighedRows ++ lastHighlighedRow)
+                lastHighlighedRow =
+                    highlightedRowsFull
+                        |> List.reverse
+                        |> List.head
+                        |> Maybe.map
+                            (if endsOnLineEnding then
+                                flip (++) "\n"
+                             else
+                                String.left <| endColumn
+                            )
+                        |> Maybe.map List.singleton
+                        |> Maybe.withDefault []
+            in
+            String.join "\n" (firstHighlightedRow ++ midHighlighedRows ++ lastHighlighedRow)
 
 
 highlightedPre : Int -> String -> Range -> Html msg
@@ -136,8 +136,8 @@ highlightedPre rowsAround content range =
         highlighedSection =
             highlightedString rowsAround target range
     in
-        pre []
-            [ text preText
-            , span [ id "highlight", style [ ( "color", "white" ), ( "background", "red" ) ] ] [ text highlighedSection ]
-            , text postText
-            ]
+    pre []
+        [ text preText
+        , span [ id "highlight", style [ ( "color", "white" ), ( "background", "red" ) ] ] [ text highlighedSection ]
+        , text postText
+        ]

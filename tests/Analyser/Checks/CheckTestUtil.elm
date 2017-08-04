@@ -2,16 +2,16 @@ module Analyser.Checks.CheckTestUtil exposing (..)
 
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (defaultConfiguration)
-import Analyser.Messages.Types exposing (Message, MessageData)
-import Analyser.Messages.Range as Range
-import Elm.Syntax.Range as Syntax
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
-import Elm.Parser
-import Test exposing (Test, describe, test)
-import Expect
+import Analyser.Messages.Range as Range
+import Analyser.Messages.Types exposing (Message, MessageData)
 import Elm.Interface as Interface exposing (Interface)
-import Elm.RawFile as RawFile
+import Elm.Parser
 import Elm.Processing as Processing
+import Elm.RawFile as RawFile
+import Elm.Syntax.Range as Syntax
+import Expect
+import Test exposing (Test, describe, test)
 
 
 type alias RangeConstructor =

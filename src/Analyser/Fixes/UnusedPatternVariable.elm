@@ -1,13 +1,13 @@
 module Analyser.Fixes.UnusedPatternVariable exposing (fixer)
 
-import Analyser.Fixes.FileContent as FileContent
-import Elm.Syntax.File exposing (File)
-import Analyser.Messages.Types exposing (MessageData(UnusedPatternVariable))
 import ASTUtil.PatternOptimizer as PatternOptimizer
 import ASTUtil.Patterns as Patterns
-import Elm.Writer as Writer
 import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Types exposing (MessageData(UnusedPatternVariable))
+import Elm.Syntax.File exposing (File)
+import Elm.Writer as Writer
 
 
 fixer : Fixer

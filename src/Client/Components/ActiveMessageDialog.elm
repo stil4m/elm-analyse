@@ -1,19 +1,19 @@
-module Client.Components.ActiveMessageDialog exposing (Model, Msg, show, init, update, view, subscriptions)
+module Client.Components.ActiveMessageDialog exposing (Model, Msg, init, show, subscriptions, update, view)
 
 import Analyser.Messages.Range exposing (Range)
-import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens, UnusedImportedVariable, UnformattedFile, UnusedImportAlias, UnusedPatternVariable, UnusedTypeAlias))
+import Analyser.Messages.Types exposing (Message, MessageData(UnformattedFile, UnnecessaryParens, UnusedImportAlias, UnusedImportedVariable, UnusedPatternVariable, UnusedTypeAlias))
 import Analyser.Messages.Util as Messages
+import Client.Highlight as Highlight
+import Client.Socket as Socket
 import Dialog exposing (Config)
-import Html exposing (Html, div, h3, text, button, i)
-import Html.Attributes exposing (style, class)
+import Html exposing (Html, button, div, h3, i, text)
+import Html.Attributes exposing (class, style)
 import Html.Events exposing (onClick)
 import Http exposing (Error)
+import Keyboard
+import Navigation exposing (Location)
 import RemoteData as RD exposing (RemoteData)
 import WebSocket as WS
-import Navigation exposing (Location)
-import Client.Socket as Socket
-import Keyboard
-import Client.Highlight as Highlight
 
 
 type alias Model =

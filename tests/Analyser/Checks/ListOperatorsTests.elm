@@ -1,10 +1,10 @@
 module Analyser.Checks.ListOperatorsTests exposing (..)
 
-import Analyser.Checks.ListOperators as ListOperators
 import Analyser.Checks.CheckTestUtil as CTU
+import Analyser.Checks.ListOperators as ListOperators
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (..)
-import Analyser.Messages.Range as Range
 
 
 couldUseCons : ( String, String, List MessageData )

@@ -1,13 +1,13 @@
-module ASTUtil.Inspector exposing (Order(Skip, Continue, Pre, Post, Inner), Config, defaultConfig, inspect)
+module ASTUtil.Inspector exposing (Config, Order(Continue, Inner, Post, Pre, Skip), defaultConfig, inspect)
 
-import Elm.Syntax.File exposing (File)
-import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Declaration exposing (..)
-import Elm.Syntax.Infix exposing (..)
-import Elm.Syntax.Type exposing (..)
-import Elm.Syntax.Pattern exposing (..)
-import Elm.Syntax.TypeAlias exposing (..)
 import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Infix exposing (..)
+import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Type exposing (..)
+import Elm.Syntax.TypeAlias exposing (..)
 import Elm.Syntax.TypeAnnotation exposing (..)
 
 
@@ -66,19 +66,19 @@ actionLambda : Order config x -> (config -> config) -> x -> config -> config
 actionLambda act =
     case act of
         Skip ->
-            (\_ _ c -> c)
+            \_ _ c -> c
 
         Continue ->
-            (\f _ c -> f c)
+            \f _ c -> f c
 
         Pre g ->
-            (\f x c -> g x c |> f)
+            \f x c -> g x c |> f
 
         Post g ->
-            (\f x c -> f c |> g x)
+            \f x c -> f c |> g x
 
         Inner g ->
-            (\f x c -> g f x c)
+            \f x c -> g f x c
 
 
 inspect : Config a -> File -> a -> a
@@ -320,10 +320,10 @@ inspectInnerExpression config expression context =
                 next =
                     inspectLetDeclarations config letBlock.declarations >> inspectExpression config letBlock.expression
             in
-                actionLambda config.onLetBlock
-                    next
-                    letBlock
-                    context
+            actionLambda config.onLetBlock
+                next
+                letBlock
+                context
 
         CaseExpression caseBlock ->
             let
@@ -333,7 +333,7 @@ inspectInnerExpression config expression context =
                 context3 =
                     List.foldl (\a b -> inspectCase config a b) context2 caseBlock.cases
             in
-                context3
+            context3
 
         LambdaExpression lambda ->
             actionLambda config.onLambda

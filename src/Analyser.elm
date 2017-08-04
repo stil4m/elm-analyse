@@ -94,16 +94,16 @@ update msg model =
                 ( stage, cmds ) =
                     DependencyLoadingStage.init context.interfaceFiles
             in
-                ( { model
-                    | context = context
-                    , configuration = configuration
-                    , stage = DependencyLoadingStage stage
-                  }
-                , Cmd.batch <|
-                    Cmd.map DependencyLoadingStageMsg cmds
-                        :: List.map Logger.info messages
-                )
-                    |> doSendState
+            ( { model
+                | context = context
+                , configuration = configuration
+                , stage = DependencyLoadingStage stage
+              }
+            , Cmd.batch <|
+                Cmd.map DependencyLoadingStageMsg cmds
+                    :: List.map Logger.info messages
+            )
+                |> doSendState
 
         DependencyLoadingStageMsg x ->
             case model.stage of
@@ -168,16 +168,16 @@ onFixerMsg x stage model =
         ( newFixerModel, fixerCmds ) =
             Tuple.mapSecond (Cmd.map FixerMsg) (Fixer.update model.codeBase x stage)
     in
-        if Fixer.isDone newFixerModel then
-            if Fixer.succeeded newFixerModel then
-                ( { model | stage = Finished }, fixerCmds )
-            else
-                startSourceLoading (Messages.getFiles (Fixer.message newFixerModel).data)
-                    ( model, fixerCmds )
+    if Fixer.isDone newFixerModel then
+        if Fixer.succeeded newFixerModel then
+            ( { model | stage = Finished }, fixerCmds )
         else
-            ( { model | stage = FixerStage newFixerModel }
-            , fixerCmds
-            )
+            startSourceLoading (Messages.getFiles (Fixer.message newFixerModel).data)
+                ( model, fixerCmds )
+    else
+        ( { model | stage = FixerStage newFixerModel }
+        , fixerCmds
+        )
 
 
 startSourceLoading : List String -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -193,9 +193,9 @@ startSourceLoading files ( model, cmds ) =
                         |> Tuple.mapFirst SourceLoadingStage
                         |> Tuple.mapSecond (Cmd.map SourceLoadingStageMsg)
     in
-        ( { model | stage = nextStage }
-        , Cmd.batch [ stageCmds, cmds ]
-        )
+    ( { model | stage = nextStage }
+    , Cmd.batch [ stageCmds, cmds ]
+    )
 
 
 handleNextStep : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -237,15 +237,15 @@ onDependencyLoadingStageMsg x stage model =
         ( newStage, cmds ) =
             DependencyLoadingStage.update x stage
     in
-        if DependencyLoadingStage.isDone newStage then
-            ( { model | codeBase = CodeBase.setDependencies (DependencyLoadingStage.getDependencies newStage) model.codeBase }
-            , Cmd.map DependencyLoadingStageMsg cmds
-            )
-                |> startSourceLoading model.context.sourceFiles
-        else
-            ( { model | stage = DependencyLoadingStage newStage }
-            , Cmd.map DependencyLoadingStageMsg cmds
-            )
+    if DependencyLoadingStage.isDone newStage then
+        ( { model | codeBase = CodeBase.setDependencies (DependencyLoadingStage.getDependencies newStage) model.codeBase }
+        , Cmd.map DependencyLoadingStageMsg cmds
+        )
+            |> startSourceLoading model.context.sourceFiles
+    else
+        ( { model | stage = DependencyLoadingStage newStage }
+        , Cmd.map DependencyLoadingStageMsg cmds
+        )
 
 
 isSourceFileIncluded : Configuration -> LoadedSourceFile -> Bool
@@ -285,15 +285,15 @@ finishProcess newStage cmds model =
                 , codeBase = newCodeBase
             }
     in
-        ( newModel
-        , Cmd.batch
-            [ AnalyserPorts.sendMessagesAsStrings newState.messages
-            , AnalyserPorts.sendMessagesAsJson newState.messages
-            , AnalyserPorts.sendStateAsJson newState
-            , Cmd.map SourceLoadingStageMsg cmds
-            ]
-        )
-            |> handleNextStep
+    ( newModel
+    , Cmd.batch
+        [ AnalyserPorts.sendMessagesAsStrings newState.messages
+        , AnalyserPorts.sendMessagesAsJson newState.messages
+        , AnalyserPorts.sendStateAsJson newState
+        , Cmd.map SourceLoadingStageMsg cmds
+        ]
+    )
+        |> handleNextStep
 
 
 onSourceLoadingStageMsg : SourceLoadingStage.Msg -> SourceLoadingStage.Model -> Model -> ( Model, Cmd Msg )
@@ -302,12 +302,12 @@ onSourceLoadingStageMsg x stage model =
         ( newStage, cmds ) =
             SourceLoadingStage.update x stage
     in
-        if SourceLoadingStage.isDone newStage then
-            finishProcess newStage cmds model
-        else
-            ( { model | stage = SourceLoadingStage newStage }
-            , Cmd.map SourceLoadingStageMsg cmds
-            )
+    if SourceLoadingStage.isDone newStage then
+        finishProcess newStage cmds model
+    else
+        ( { model | stage = SourceLoadingStage newStage }
+        , Cmd.map SourceLoadingStageMsg cmds
+        )
 
 
 subscriptions : Model -> Sub Msg

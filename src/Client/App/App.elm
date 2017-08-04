@@ -1,16 +1,16 @@
-module Client.App.App exposing (init, view, update, subscriptions)
+module Client.App.App exposing (init, subscriptions, update, view)
 
 import Client.App.Menu
-import Client.App.Models exposing (Content(DashBoardContent, GraphContent, FileTreeContent, PackageDependenciesContent), Model, Msg(..), packageDependenciesPage, PackageDependenciesPageMsg, ModuleGraphPageMsg, moduleGraphPage)
+import Client.App.Models exposing (Content(DashBoardContent, FileTreeContent, GraphContent, PackageDependenciesContent), Model, ModuleGraphPageMsg, Msg(..), PackageDependenciesPageMsg, moduleGraphPage, packageDependenciesPage)
+import Client.Components.FileTree as FileTree
 import Client.DashBoard.DashBoard as DashBoard
 import Client.Graph.Graph as Graph
-import Client.Components.FileTree as FileTree
 import Client.Socket exposing (controlAddress)
+import Client.StaticStatePage as StaticStatePage
 import Html exposing (div)
 import Html.Attributes exposing (id)
 import Navigation exposing (Location)
 import WebSocket as WS
-import Client.StaticStatePage as StaticStatePage
 
 
 subscriptions : Model -> Sub Msg
@@ -97,7 +97,7 @@ update msg model =
                     else
                         Cmd.none
             in
-                newModel ! [ cmd, removeGraphCmd ]
+            newModel ! [ cmd, removeGraphCmd ]
 
         Refresh ->
             ( model
