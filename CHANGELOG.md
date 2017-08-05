@@ -1,6 +1,6 @@
 # elm-analyse changelog
 
-## 0.11.0 (XXXX-XX-XX)
+## 0.11.0 (2017-08-05)
 
 * [Issue #52](https://github.com/stil4m/elm-analyse/issues/52) Checks: Check comments for words that should not be there
 * [Issue #91](https://github.com/stil4m/elm-analyse/issues/91) Fixers: Auto-fix MultiLineRecordFormatting
