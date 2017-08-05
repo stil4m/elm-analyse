@@ -5968,6 +5968,352 @@ var _elm_lang$core$Json_Decode$bool = _elm_lang$core$Native_Json.decodePrimitive
 var _elm_lang$core$Json_Decode$string = _elm_lang$core$Native_Json.decodePrimitive('string');
 var _elm_lang$core$Json_Decode$Decoder = {ctor: 'Decoder'};
 
+var _elm_lang$core$Set$foldr = F3(
+	function (f, b, _p0) {
+		var _p1 = _p0;
+		return A3(
+			_elm_lang$core$Dict$foldr,
+			F3(
+				function (k, _p2, b) {
+					return A2(f, k, b);
+				}),
+			b,
+			_p1._0);
+	});
+var _elm_lang$core$Set$foldl = F3(
+	function (f, b, _p3) {
+		var _p4 = _p3;
+		return A3(
+			_elm_lang$core$Dict$foldl,
+			F3(
+				function (k, _p5, b) {
+					return A2(f, k, b);
+				}),
+			b,
+			_p4._0);
+	});
+var _elm_lang$core$Set$toList = function (_p6) {
+	var _p7 = _p6;
+	return _elm_lang$core$Dict$keys(_p7._0);
+};
+var _elm_lang$core$Set$size = function (_p8) {
+	var _p9 = _p8;
+	return _elm_lang$core$Dict$size(_p9._0);
+};
+var _elm_lang$core$Set$member = F2(
+	function (k, _p10) {
+		var _p11 = _p10;
+		return A2(_elm_lang$core$Dict$member, k, _p11._0);
+	});
+var _elm_lang$core$Set$isEmpty = function (_p12) {
+	var _p13 = _p12;
+	return _elm_lang$core$Dict$isEmpty(_p13._0);
+};
+var _elm_lang$core$Set$Set_elm_builtin = function (a) {
+	return {ctor: 'Set_elm_builtin', _0: a};
+};
+var _elm_lang$core$Set$empty = _elm_lang$core$Set$Set_elm_builtin(_elm_lang$core$Dict$empty);
+var _elm_lang$core$Set$singleton = function (k) {
+	return _elm_lang$core$Set$Set_elm_builtin(
+		A2(
+			_elm_lang$core$Dict$singleton,
+			k,
+			{ctor: '_Tuple0'}));
+};
+var _elm_lang$core$Set$insert = F2(
+	function (k, _p14) {
+		var _p15 = _p14;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A3(
+				_elm_lang$core$Dict$insert,
+				k,
+				{ctor: '_Tuple0'},
+				_p15._0));
+	});
+var _elm_lang$core$Set$fromList = function (xs) {
+	return A3(_elm_lang$core$List$foldl, _elm_lang$core$Set$insert, _elm_lang$core$Set$empty, xs);
+};
+var _elm_lang$core$Set$map = F2(
+	function (f, s) {
+		return _elm_lang$core$Set$fromList(
+			A2(
+				_elm_lang$core$List$map,
+				f,
+				_elm_lang$core$Set$toList(s)));
+	});
+var _elm_lang$core$Set$remove = F2(
+	function (k, _p16) {
+		var _p17 = _p16;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$remove, k, _p17._0));
+	});
+var _elm_lang$core$Set$union = F2(
+	function (_p19, _p18) {
+		var _p20 = _p19;
+		var _p21 = _p18;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$union, _p20._0, _p21._0));
+	});
+var _elm_lang$core$Set$intersect = F2(
+	function (_p23, _p22) {
+		var _p24 = _p23;
+		var _p25 = _p22;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$intersect, _p24._0, _p25._0));
+	});
+var _elm_lang$core$Set$diff = F2(
+	function (_p27, _p26) {
+		var _p28 = _p27;
+		var _p29 = _p26;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$diff, _p28._0, _p29._0));
+	});
+var _elm_lang$core$Set$filter = F2(
+	function (p, _p30) {
+		var _p31 = _p30;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(
+				_elm_lang$core$Dict$filter,
+				F2(
+					function (k, _p32) {
+						return p(k);
+					}),
+				_p31._0));
+	});
+var _elm_lang$core$Set$partition = F2(
+	function (p, _p33) {
+		var _p34 = _p33;
+		var _p35 = A2(
+			_elm_lang$core$Dict$partition,
+			F2(
+				function (k, _p36) {
+					return p(k);
+				}),
+			_p34._0);
+		var p1 = _p35._0;
+		var p2 = _p35._1;
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Set$Set_elm_builtin(p1),
+			_1: _elm_lang$core$Set$Set_elm_builtin(p2)
+		};
+	});
+
+var _elm_community$dict_extra$Dict_Extra$find = F2(
+	function (predicate, dict) {
+		return A3(
+			_elm_lang$core$Dict$foldl,
+			F3(
+				function (k, v, acc) {
+					var _p0 = acc;
+					if (_p0.ctor === 'Just') {
+						return acc;
+					} else {
+						return A2(predicate, k, v) ? _elm_lang$core$Maybe$Just(
+							{ctor: '_Tuple2', _0: k, _1: v}) : _elm_lang$core$Maybe$Nothing;
+					}
+				}),
+			_elm_lang$core$Maybe$Nothing,
+			dict);
+	});
+var _elm_community$dict_extra$Dict_Extra$invert = function (dict) {
+	return A3(
+		_elm_lang$core$Dict$foldl,
+		F3(
+			function (k, v, acc) {
+				return A3(_elm_lang$core$Dict$insert, v, k, acc);
+			}),
+		_elm_lang$core$Dict$empty,
+		dict);
+};
+var _elm_community$dict_extra$Dict_Extra$filterMap = F2(
+	function (f, dict) {
+		return A3(
+			_elm_lang$core$Dict$foldl,
+			F3(
+				function (k, v, acc) {
+					var _p1 = A2(f, k, v);
+					if (_p1.ctor === 'Just') {
+						return A3(_elm_lang$core$Dict$insert, k, _p1._0, acc);
+					} else {
+						return acc;
+					}
+				}),
+			_elm_lang$core$Dict$empty,
+			dict);
+	});
+var _elm_community$dict_extra$Dict_Extra$mapKeys = F2(
+	function (keyMapper, dict) {
+		return A3(
+			_elm_lang$core$Dict$foldl,
+			F3(
+				function (k, v, acc) {
+					return A3(
+						_elm_lang$core$Dict$insert,
+						keyMapper(k),
+						v,
+						acc);
+				}),
+			_elm_lang$core$Dict$empty,
+			dict);
+	});
+var _elm_community$dict_extra$Dict_Extra$keepOnly = F2(
+	function (set, dict) {
+		return A3(
+			_elm_lang$core$Set$foldl,
+			F2(
+				function (k, acc) {
+					return A2(
+						_elm_lang$core$Maybe$withDefault,
+						acc,
+						A2(
+							_elm_lang$core$Maybe$map,
+							function (v) {
+								return A3(_elm_lang$core$Dict$insert, k, v, acc);
+							},
+							A2(_elm_lang$core$Dict$get, k, dict)));
+				}),
+			_elm_lang$core$Dict$empty,
+			set);
+	});
+var _elm_community$dict_extra$Dict_Extra$insertDedupe = F4(
+	function (combine, key, value, dict) {
+		var $with = function (mbValue) {
+			var _p2 = mbValue;
+			if (_p2.ctor === 'Just') {
+				return _elm_lang$core$Maybe$Just(
+					A2(combine, _p2._0, value));
+			} else {
+				return _elm_lang$core$Maybe$Just(value);
+			}
+		};
+		return A3(_elm_lang$core$Dict$update, key, $with, dict);
+	});
+var _elm_community$dict_extra$Dict_Extra$removeMany = F2(
+	function (set, dict) {
+		return A3(_elm_lang$core$Set$foldl, _elm_lang$core$Dict$remove, dict, set);
+	});
+var _elm_community$dict_extra$Dict_Extra$removeWhen = F2(
+	function (pred, dict) {
+		return A2(
+			_elm_lang$core$Dict$filter,
+			F2(
+				function (k, v) {
+					return !A2(pred, k, v);
+				}),
+			dict);
+	});
+var _elm_community$dict_extra$Dict_Extra$fromListDedupeBy = F3(
+	function (combine, keyfn, xs) {
+		return A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (x, acc) {
+					return A4(
+						_elm_community$dict_extra$Dict_Extra$insertDedupe,
+						combine,
+						keyfn(x),
+						x,
+						acc);
+				}),
+			_elm_lang$core$Dict$empty,
+			xs);
+	});
+var _elm_community$dict_extra$Dict_Extra$fromListDedupe = F2(
+	function (combine, xs) {
+		return A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (_p3, acc) {
+					var _p4 = _p3;
+					return A4(_elm_community$dict_extra$Dict_Extra$insertDedupe, combine, _p4._0, _p4._1, acc);
+				}),
+			_elm_lang$core$Dict$empty,
+			xs);
+	});
+var _elm_community$dict_extra$Dict_Extra$fromListBy = F2(
+	function (keyfn, xs) {
+		return A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (x, acc) {
+					return A3(
+						_elm_lang$core$Dict$insert,
+						keyfn(x),
+						x,
+						acc);
+				}),
+			_elm_lang$core$Dict$empty,
+			xs);
+	});
+var _elm_community$dict_extra$Dict_Extra$filterGroupBy = F2(
+	function (keyfn, list) {
+		return A3(
+			_elm_lang$core$List$foldr,
+			F2(
+				function (x, acc) {
+					var _p5 = keyfn(x);
+					if (_p5.ctor === 'Just') {
+						return A3(
+							_elm_lang$core$Dict$update,
+							_p5._0,
+							function (_p6) {
+								return _elm_lang$core$Maybe$Just(
+									A2(
+										_elm_lang$core$Maybe$withDefault,
+										{
+											ctor: '::',
+											_0: x,
+											_1: {ctor: '[]'}
+										},
+										A2(
+											_elm_lang$core$Maybe$map,
+											F2(
+												function (x, y) {
+													return {ctor: '::', _0: x, _1: y};
+												})(x),
+											_p6)));
+							},
+							acc);
+					} else {
+						return acc;
+					}
+				}),
+			_elm_lang$core$Dict$empty,
+			list);
+	});
+var _elm_community$dict_extra$Dict_Extra$groupBy = F2(
+	function (keyfn, list) {
+		return A3(
+			_elm_lang$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A3(
+						_elm_lang$core$Dict$update,
+						keyfn(x),
+						function (_p7) {
+							return _elm_lang$core$Maybe$Just(
+								A2(
+									_elm_lang$core$Maybe$withDefault,
+									{
+										ctor: '::',
+										_0: x,
+										_1: {ctor: '[]'}
+									},
+									A2(
+										_elm_lang$core$Maybe$map,
+										F2(
+											function (x, y) {
+												return {ctor: '::', _0: x, _1: y};
+											})(x),
+										_p7)));
+						},
+						acc);
+				}),
+			_elm_lang$core$Dict$empty,
+			list);
+	});
+
 //import Result //
 
 var _elm_lang$core$Native_Date = function() {
@@ -6445,137 +6791,6 @@ var _elm_lang$core$Date$Apr = {ctor: 'Apr'};
 var _elm_lang$core$Date$Mar = {ctor: 'Mar'};
 var _elm_lang$core$Date$Feb = {ctor: 'Feb'};
 var _elm_lang$core$Date$Jan = {ctor: 'Jan'};
-
-var _elm_lang$core$Set$foldr = F3(
-	function (f, b, _p0) {
-		var _p1 = _p0;
-		return A3(
-			_elm_lang$core$Dict$foldr,
-			F3(
-				function (k, _p2, b) {
-					return A2(f, k, b);
-				}),
-			b,
-			_p1._0);
-	});
-var _elm_lang$core$Set$foldl = F3(
-	function (f, b, _p3) {
-		var _p4 = _p3;
-		return A3(
-			_elm_lang$core$Dict$foldl,
-			F3(
-				function (k, _p5, b) {
-					return A2(f, k, b);
-				}),
-			b,
-			_p4._0);
-	});
-var _elm_lang$core$Set$toList = function (_p6) {
-	var _p7 = _p6;
-	return _elm_lang$core$Dict$keys(_p7._0);
-};
-var _elm_lang$core$Set$size = function (_p8) {
-	var _p9 = _p8;
-	return _elm_lang$core$Dict$size(_p9._0);
-};
-var _elm_lang$core$Set$member = F2(
-	function (k, _p10) {
-		var _p11 = _p10;
-		return A2(_elm_lang$core$Dict$member, k, _p11._0);
-	});
-var _elm_lang$core$Set$isEmpty = function (_p12) {
-	var _p13 = _p12;
-	return _elm_lang$core$Dict$isEmpty(_p13._0);
-};
-var _elm_lang$core$Set$Set_elm_builtin = function (a) {
-	return {ctor: 'Set_elm_builtin', _0: a};
-};
-var _elm_lang$core$Set$empty = _elm_lang$core$Set$Set_elm_builtin(_elm_lang$core$Dict$empty);
-var _elm_lang$core$Set$singleton = function (k) {
-	return _elm_lang$core$Set$Set_elm_builtin(
-		A2(
-			_elm_lang$core$Dict$singleton,
-			k,
-			{ctor: '_Tuple0'}));
-};
-var _elm_lang$core$Set$insert = F2(
-	function (k, _p14) {
-		var _p15 = _p14;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A3(
-				_elm_lang$core$Dict$insert,
-				k,
-				{ctor: '_Tuple0'},
-				_p15._0));
-	});
-var _elm_lang$core$Set$fromList = function (xs) {
-	return A3(_elm_lang$core$List$foldl, _elm_lang$core$Set$insert, _elm_lang$core$Set$empty, xs);
-};
-var _elm_lang$core$Set$map = F2(
-	function (f, s) {
-		return _elm_lang$core$Set$fromList(
-			A2(
-				_elm_lang$core$List$map,
-				f,
-				_elm_lang$core$Set$toList(s)));
-	});
-var _elm_lang$core$Set$remove = F2(
-	function (k, _p16) {
-		var _p17 = _p16;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A2(_elm_lang$core$Dict$remove, k, _p17._0));
-	});
-var _elm_lang$core$Set$union = F2(
-	function (_p19, _p18) {
-		var _p20 = _p19;
-		var _p21 = _p18;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A2(_elm_lang$core$Dict$union, _p20._0, _p21._0));
-	});
-var _elm_lang$core$Set$intersect = F2(
-	function (_p23, _p22) {
-		var _p24 = _p23;
-		var _p25 = _p22;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A2(_elm_lang$core$Dict$intersect, _p24._0, _p25._0));
-	});
-var _elm_lang$core$Set$diff = F2(
-	function (_p27, _p26) {
-		var _p28 = _p27;
-		var _p29 = _p26;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A2(_elm_lang$core$Dict$diff, _p28._0, _p29._0));
-	});
-var _elm_lang$core$Set$filter = F2(
-	function (p, _p30) {
-		var _p31 = _p30;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A2(
-				_elm_lang$core$Dict$filter,
-				F2(
-					function (k, _p32) {
-						return p(k);
-					}),
-				_p31._0));
-	});
-var _elm_lang$core$Set$partition = F2(
-	function (p, _p33) {
-		var _p34 = _p33;
-		var _p35 = A2(
-			_elm_lang$core$Dict$partition,
-			F2(
-				function (k, _p36) {
-					return p(k);
-				}),
-			_p34._0);
-		var p1 = _p35._0;
-		var p2 = _p35._1;
-		return {
-			ctor: '_Tuple2',
-			_0: _elm_lang$core$Set$Set_elm_builtin(p1),
-			_1: _elm_lang$core$Set$Set_elm_builtin(p2)
-		};
-	});
 
 var _elm_community$json_extra$Json_Decode_Extra$fromResult = function (result) {
 	var _p0 = result;
@@ -18560,58 +18775,67 @@ var _user$project$AST_Util$isIf = function (_p10) {
 		return false;
 	}
 };
-var _user$project$AST_Util$isLambda = function (_p13) {
+var _user$project$AST_Util$isLet = function (_p13) {
 	var _p14 = _p13;
 	var _p15 = _p14._1;
-	if (_p15.ctor === 'LambdaExpression') {
+	if (_p15.ctor === 'LetExpression') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$AST_Util$isLambda = function (_p16) {
+	var _p17 = _p16;
+	var _p18 = _p17._1;
+	if (_p18.ctor === 'LambdaExpression') {
 		return true;
 	} else {
 		return false;
 	}
 };
 var _user$project$AST_Util$fileModuleName = function (file) {
-	var _p16 = file.moduleDefinition;
-	switch (_p16.ctor) {
+	var _p19 = file.moduleDefinition;
+	switch (_p19.ctor) {
 		case 'NormalModule':
-			return _elm_lang$core$Maybe$Just(_p16._0.moduleName);
+			return _elm_lang$core$Maybe$Just(_p19._0.moduleName);
 		case 'PortModule':
-			return _elm_lang$core$Maybe$Just(_p16._0.moduleName);
+			return _elm_lang$core$Maybe$Just(_p19._0.moduleName);
 		case 'EffectModule':
-			return _elm_lang$core$Maybe$Just(_p16._0.moduleName);
+			return _elm_lang$core$Maybe$Just(_p19._0.moduleName);
 		default:
 			return _elm_lang$core$Maybe$Nothing;
 	}
 };
 var _user$project$AST_Util$fileExposingList = function (file) {
-	var _p17 = file.moduleDefinition;
-	switch (_p17.ctor) {
+	var _p20 = file.moduleDefinition;
+	switch (_p20.ctor) {
 		case 'NormalModule':
-			return _elm_lang$core$Maybe$Just(_p17._0.exposingList);
+			return _elm_lang$core$Maybe$Just(_p20._0.exposingList);
 		case 'PortModule':
-			return _elm_lang$core$Maybe$Just(_p17._0.exposingList);
+			return _elm_lang$core$Maybe$Just(_p20._0.exposingList);
 		case 'EffectModule':
-			return _elm_lang$core$Maybe$Just(_p17._0.exposingList);
+			return _elm_lang$core$Maybe$Just(_p20._0.exposingList);
 		default:
 			return _elm_lang$core$Maybe$Nothing;
 	}
 };
 var _user$project$AST_Util$isPortModule = function (file) {
-	var _p18 = file.moduleDefinition;
-	if (_p18.ctor === 'PortModule') {
+	var _p21 = file.moduleDefinition;
+	if (_p21.ctor === 'PortModule') {
 		return true;
 	} else {
 		return false;
 	}
 };
 var _user$project$AST_Util$moduleExposingList = function (m) {
-	var _p19 = m;
-	switch (_p19.ctor) {
+	var _p22 = m;
+	switch (_p22.ctor) {
 		case 'NormalModule':
-			return _p19._0.exposingList;
+			return _p22._0.exposingList;
 		case 'PortModule':
-			return _p19._0.exposingList;
+			return _p22._0.exposingList;
 		case 'EffectModule':
-			return _p19._0.exposingList;
+			return _p22._0.exposingList;
 		default:
 			return _stil4m$elm_syntax$Elm_Syntax_Exposing$None;
 	}
@@ -18723,25 +18947,43 @@ var _user$project$ASTUtil_Imports$removeRangeFromImport = F2(
 				exposingList: A2(_user$project$ASTUtil_Imports$removeRangeFromExposingList, range, imp.exposingList)
 			});
 	});
-var _user$project$ASTUtil_Imports$stringifyExposedType = function (_p12) {
-	var _p13 = _p12;
+var _user$project$ASTUtil_Imports$rangesOnDifferentLines = function (ranges) {
+	var starts = A2(
+		_elm_lang$core$List$map,
+		function (_p12) {
+			return function (_) {
+				return _.row;
+			}(
+				function (_) {
+					return _.start;
+				}(_p12));
+		},
+		ranges);
+	return _elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$List$length(
+			_elm_community$list_extra$List_Extra$unique(starts)),
+		_elm_lang$core$List$length(starts));
+};
+var _user$project$ASTUtil_Imports$stringifyExposedType = function (_p13) {
+	var _p14 = _p13;
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		_p13.name,
+		_p14.name,
 		function () {
-			var _p14 = _p13.constructors;
-			switch (_p14.ctor) {
+			var _p15 = _p14.constructors;
+			switch (_p15.ctor) {
 				case 'None':
 					return '';
 				case 'All':
 					return '(..)';
 				default:
-					var _p16 = _p14._0;
-					var _p15 = _p16;
-					if (_p15.ctor === '[]') {
+					var _p17 = _p15._0;
+					var _p16 = _p17;
+					if (_p16.ctor === '[]') {
 						return '';
 					} else {
-						var areOnDifferentLines = false;
+						var areOnDifferentLines = _user$project$ASTUtil_Imports$rangesOnDifferentLines(
+							A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$second, _p16));
 						var seperator = areOnDifferentLines ? '\n    , ' : ', ';
 						return A2(
 							_elm_lang$core$Basics_ops['++'],
@@ -18751,46 +18993,47 @@ var _user$project$ASTUtil_Imports$stringifyExposedType = function (_p12) {
 								A2(
 									_elm_lang$core$String$join,
 									seperator,
-									A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, _p16)),
+									A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, _p17)),
 								')'));
 					}
 			}
 		}());
 };
 var _user$project$ASTUtil_Imports$stringifyExpose = function (expose) {
-	var _p17 = expose;
-	switch (_p17.ctor) {
+	var _p18 = expose;
+	switch (_p18.ctor) {
 		case 'InfixExpose':
 			return A2(
 				_elm_lang$core$Basics_ops['++'],
 				'(',
-				A2(_elm_lang$core$Basics_ops['++'], _p17._0, ')'));
+				A2(_elm_lang$core$Basics_ops['++'], _p18._0, ')'));
 		case 'FunctionExpose':
-			return _p17._0;
+			return _p18._0;
 		case 'TypeOrAliasExpose':
-			return _p17._0;
+			return _p18._0;
 		default:
-			return _user$project$ASTUtil_Imports$stringifyExposedType(_p17._0);
+			return _user$project$ASTUtil_Imports$stringifyExposedType(_p18._0);
 	}
 };
 var _user$project$ASTUtil_Imports$stringifyExposingList = function (exp) {
-	var _p18 = exp;
-	switch (_p18.ctor) {
+	var _p19 = exp;
+	switch (_p19.ctor) {
 		case 'None':
 			return '';
 		case 'All':
 			return ' exposing (..)';
 		default:
-			var _p20 = _p18._0;
+			var _p21 = _p19._0;
 			return A2(
 				_elm_lang$core$Basics_ops['++'],
 				' exposing ',
 				function () {
-					var _p19 = _p20;
-					if (_p19.ctor === '[]') {
+					var _p20 = _p21;
+					if (_p20.ctor === '[]') {
 						return '';
 					} else {
-						var areOnDifferentLines = false;
+						var areOnDifferentLines = _user$project$ASTUtil_Imports$rangesOnDifferentLines(
+							A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Syntax_Exposing$topLevelExposeRange, _p20));
 						var seperator = areOnDifferentLines ? '\n    , ' : ', ';
 						return A2(
 							_elm_lang$core$Basics_ops['++'],
@@ -18800,7 +19043,7 @@ var _user$project$ASTUtil_Imports$stringifyExposingList = function (exp) {
 								A2(
 									_elm_lang$core$String$join,
 									seperator,
-									A2(_elm_lang$core$List$map, _user$project$ASTUtil_Imports$stringifyExpose, _p20)),
+									A2(_elm_lang$core$List$map, _user$project$ASTUtil_Imports$stringifyExpose, _p21)),
 								')'));
 					}
 				}());
@@ -18821,14 +19064,14 @@ var _user$project$ASTUtil_Imports$naiveStringifyImport = function (imp) {
 						'',
 						A2(
 							_elm_lang$core$Maybe$map,
-							function (_p21) {
+							function (_p22) {
 								return A2(
 									F2(
 										function (x, y) {
 											return A2(_elm_lang$core$Basics_ops['++'], x, y);
 										}),
 									' as ',
-									A2(_elm_lang$core$String$join, '.', _p21));
+									A2(_elm_lang$core$String$join, '.', _p22));
 							},
 							imp.moduleAlias)),
 					_1: {
@@ -18863,13 +19106,13 @@ var _user$project$ASTUtil_Imports$findImportWithRange = F2(
 		return _elm_lang$core$List$head(
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p22) {
+				function (_p23) {
 					return A2(
 						_user$project$AST_Ranges$containsRange,
 						range,
 						function (_) {
 							return _.range;
-						}(_p22));
+						}(_p23));
 				},
 				ast.imports));
 	});
@@ -19057,7 +19300,7 @@ var _user$project$ASTUtil_Inspector$inspectInnerExpression = F3(
 			case 'FunctionOrValue':
 				return A4(_user$project$ASTUtil_Inspector$actionLambda, config.onFunctionOrValue, _elm_lang$core$Basics$identity, _p5._0, context);
 			case 'PrefixOperator':
-				return context;
+				return A4(_user$project$ASTUtil_Inspector$actionLambda, config.onPrefixOperator, _elm_lang$core$Basics$identity, _p5._0, context);
 			case 'Operator':
 				return context;
 			case 'Integer':
@@ -19321,7 +19564,9 @@ var _user$project$ASTUtil_Inspector$Config = function (a) {
 													return function (n) {
 														return function (o) {
 															return function (p) {
-																return {onFile: a, onImport: b, onFunction: c, onFunctionSignature: d, onPortDeclaration: e, onTypeAlias: f, onDestructuring: g, onExpression: h, onOperatorApplication: i, onTypeAnnotation: j, onLambda: k, onLetBlock: l, onCase: m, onFunctionOrValue: n, onRecordAccess: o, onRecordUpdate: p};
+																return function (q) {
+																	return {onFile: a, onImport: b, onFunction: c, onFunctionSignature: d, onPortDeclaration: e, onTypeAlias: f, onDestructuring: g, onExpression: h, onOperatorApplication: i, onTypeAnnotation: j, onLambda: k, onLetBlock: l, onCase: m, onFunctionOrValue: n, onPrefixOperator: o, onRecordAccess: p, onRecordUpdate: q};
+																};
 															};
 														};
 													};
@@ -19348,7 +19593,7 @@ var _user$project$ASTUtil_Inspector$Pre = function (a) {
 	return {ctor: 'Pre', _0: a};
 };
 var _user$project$ASTUtil_Inspector$Continue = {ctor: 'Continue'};
-var _user$project$ASTUtil_Inspector$defaultConfig = {onFile: _user$project$ASTUtil_Inspector$Continue, onImport: _user$project$ASTUtil_Inspector$Continue, onFunction: _user$project$ASTUtil_Inspector$Continue, onPortDeclaration: _user$project$ASTUtil_Inspector$Continue, onFunctionSignature: _user$project$ASTUtil_Inspector$Continue, onTypeAnnotation: _user$project$ASTUtil_Inspector$Continue, onTypeAlias: _user$project$ASTUtil_Inspector$Continue, onDestructuring: _user$project$ASTUtil_Inspector$Continue, onExpression: _user$project$ASTUtil_Inspector$Continue, onLambda: _user$project$ASTUtil_Inspector$Continue, onOperatorApplication: _user$project$ASTUtil_Inspector$Continue, onLetBlock: _user$project$ASTUtil_Inspector$Continue, onCase: _user$project$ASTUtil_Inspector$Continue, onFunctionOrValue: _user$project$ASTUtil_Inspector$Continue, onRecordAccess: _user$project$ASTUtil_Inspector$Continue, onRecordUpdate: _user$project$ASTUtil_Inspector$Continue};
+var _user$project$ASTUtil_Inspector$defaultConfig = {onFile: _user$project$ASTUtil_Inspector$Continue, onImport: _user$project$ASTUtil_Inspector$Continue, onFunction: _user$project$ASTUtil_Inspector$Continue, onPortDeclaration: _user$project$ASTUtil_Inspector$Continue, onFunctionSignature: _user$project$ASTUtil_Inspector$Continue, onTypeAnnotation: _user$project$ASTUtil_Inspector$Continue, onTypeAlias: _user$project$ASTUtil_Inspector$Continue, onDestructuring: _user$project$ASTUtil_Inspector$Continue, onExpression: _user$project$ASTUtil_Inspector$Continue, onLambda: _user$project$ASTUtil_Inspector$Continue, onOperatorApplication: _user$project$ASTUtil_Inspector$Continue, onLetBlock: _user$project$ASTUtil_Inspector$Continue, onCase: _user$project$ASTUtil_Inspector$Continue, onFunctionOrValue: _user$project$ASTUtil_Inspector$Continue, onPrefixOperator: _user$project$ASTUtil_Inspector$Continue, onRecordAccess: _user$project$ASTUtil_Inspector$Continue, onRecordUpdate: _user$project$ASTUtil_Inspector$Continue};
 var _user$project$ASTUtil_Inspector$Skip = {ctor: 'Skip'};
 
 var _user$project$ASTUtil_PatternOptimizer$patternRange = function (p) {
@@ -19731,47 +19976,40 @@ var _user$project$ASTUtil_Variables$getDeclarationVars = function (decl) {
 				},
 				_p7._0.constructors);
 		case 'PortDeclaration':
+			var _p10 = _p7._0;
 			return {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
-					_0: {value: _p7._0.name, range: _user$project$AST_Ranges$emptyRange},
+					_0: {value: _p10.name, range: _p10.range},
 					_1: _user$project$ASTUtil_Variables$TopLevel
 				},
 				_1: {ctor: '[]'}
 			};
 		case 'InfixDeclaration':
-			return {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: {value: _p7._0.operator, range: _user$project$AST_Ranges$emptyRange},
-					_1: _user$project$ASTUtil_Variables$TopLevel
-				},
-				_1: {ctor: '[]'}
-			};
+			return {ctor: '[]'};
 		default:
 			return _user$project$ASTUtil_Variables$patternToVars(_p7._0);
 	}
 };
 var _user$project$ASTUtil_Variables$getDeclarationsVars = _elm_lang$core$List$concatMap(_user$project$ASTUtil_Variables$getDeclarationVars);
 var _user$project$ASTUtil_Variables$getLetDeclarationVars = function (decl) {
-	var _p10 = decl;
-	if (_p10.ctor === 'LetFunction') {
+	var _p11 = decl;
+	if (_p11.ctor === 'LetFunction') {
 		return {
 			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: _p10._0.declaration.name, _1: _user$project$ASTUtil_Variables$TopLevel},
+			_0: {ctor: '_Tuple2', _0: _p11._0.declaration.name, _1: _user$project$ASTUtil_Variables$TopLevel},
 			_1: {ctor: '[]'}
 		};
 	} else {
-		return _user$project$ASTUtil_Variables$patternToVars(_p10._0);
+		return _user$project$ASTUtil_Variables$patternToVars(_p11._0);
 	}
 };
 var _user$project$ASTUtil_Variables$getLetDeclarationsVars = _elm_lang$core$List$concatMap(_user$project$ASTUtil_Variables$getLetDeclarationVars);
 var _user$project$ASTUtil_Variables$Imported = {ctor: 'Imported'};
 var _user$project$ASTUtil_Variables$getImportExposedVars = function (e) {
-	var _p11 = e;
-	switch (_p11.ctor) {
+	var _p12 = e;
+	switch (_p12.ctor) {
 		case 'All':
 			return {ctor: '[]'};
 		case 'None':
@@ -19780,14 +20018,14 @@ var _user$project$ASTUtil_Variables$getImportExposedVars = function (e) {
 			return A2(
 				_elm_lang$core$List$concatMap,
 				function (exposed) {
-					var _p12 = exposed;
-					switch (_p12.ctor) {
+					var _p13 = exposed;
+					switch (_p13.ctor) {
 						case 'InfixExpose':
 							return {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: A2(_stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, _p12._0, _p12._1),
+									_0: A2(_stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, _p13._0, _p13._1),
 									_1: _user$project$ASTUtil_Variables$Imported
 								},
 								_1: {ctor: '[]'}
@@ -19797,7 +20035,7 @@ var _user$project$ASTUtil_Variables$getImportExposedVars = function (e) {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: A2(_stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, _p12._0, _p12._1),
+									_0: A2(_stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, _p13._0, _p13._1),
 									_1: _user$project$ASTUtil_Variables$Imported
 								},
 								_1: {ctor: '[]'}
@@ -19807,15 +20045,15 @@ var _user$project$ASTUtil_Variables$getImportExposedVars = function (e) {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: A2(_stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, _p12._0, _p12._1),
+									_0: A2(_stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, _p13._0, _p13._1),
 									_1: _user$project$ASTUtil_Variables$Imported
 								},
 								_1: {ctor: '[]'}
 							};
 						default:
-							var _p15 = _p12._0;
-							var _p13 = _p15.constructors;
-							switch (_p13.ctor) {
+							var _p16 = _p13._0;
+							var _p14 = _p16.constructors;
+							switch (_p14.ctor) {
 								case 'All':
 									return {ctor: '[]'};
 								case 'None':
@@ -19823,7 +20061,7 @@ var _user$project$ASTUtil_Variables$getImportExposedVars = function (e) {
 										ctor: '::',
 										_0: {
 											ctor: '_Tuple2',
-											_0: A2(_stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, _p15.name, _p15.range),
+											_0: A2(_stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, _p16.name, _p16.range),
 											_1: _user$project$ASTUtil_Variables$Imported
 										},
 										_1: {ctor: '[]'}
@@ -19831,7 +20069,7 @@ var _user$project$ASTUtil_Variables$getImportExposedVars = function (e) {
 								default:
 									return A2(
 										_elm_lang$core$List$map,
-										function (_p14) {
+										function (_p15) {
 											return A3(
 												_elm_lang$core$Basics$flip,
 												F2(
@@ -19839,13 +20077,13 @@ var _user$project$ASTUtil_Variables$getImportExposedVars = function (e) {
 														return {ctor: '_Tuple2', _0: v0, _1: v1};
 													}),
 												_user$project$ASTUtil_Variables$Imported,
-												A2(_elm_lang$core$Basics$uncurry, _stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, _p14));
+												A2(_elm_lang$core$Basics$uncurry, _stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, _p15));
 										},
-										_p13._0);
+										_p14._0);
 							}
 					}
 				},
-				_p11._0);
+				_p12._0);
 	}
 };
 var _user$project$ASTUtil_Variables$getImportVars = function (imp) {
@@ -20002,8 +20240,8 @@ var _user$project$Analyser_CodeBase$addSourceFiles = F2(
 	});
 
 var _user$project$Analyser_Configuration$decodeChecks = _elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$bool);
-var _user$project$Analyser_Configuration$checkPropertyAsInt = F3(
-	function (check, prop, _p0) {
+var _user$project$Analyser_Configuration$checkPropertyAs = F4(
+	function (decoder, check, prop, _p0) {
 		var _p1 = _p0;
 		return A2(
 			_elm_lang$core$Maybe$andThen,
@@ -20023,9 +20261,10 @@ var _user$project$Analyser_Configuration$checkPropertyAsInt = F3(
 									_1: {ctor: '[]'}
 								}
 							},
-							_elm_lang$core$Json_Decode$int)),
+							decoder)),
 					_p1._0.raw)));
 	});
+var _user$project$Analyser_Configuration$checkPropertyAsInt = _user$project$Analyser_Configuration$checkPropertyAs(_elm_lang$core$Json_Decode$int);
 var _user$project$Analyser_Configuration$defaultChecks = _elm_lang$core$Dict$fromList(
 	{
 		ctor: '::',
@@ -20939,6 +21178,10 @@ var _user$project$Analyser_FileWatch$fileWatch = _elm_lang$core$Native_Platform.
 				A2(_elm_lang$core$Json_Decode$index, 1, _elm_lang$core$Json_Decode$string));
 		},
 		A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string)));
+var _user$project$Analyser_FileWatch$Person = F2(
+	function (a, b) {
+		return {name: a, age: b};
+	});
 var _user$project$Analyser_FileWatch$Remove = function (a) {
 	return {ctor: 'Remove', _0: a};
 };
@@ -20965,8 +21208,8 @@ var _user$project$Analyser_FileWatch$asFileChange = function (p) {
 	return _elm_lang$core$Native_Utils.crashCase(
 		'Analyser.FileWatch',
 		{
-			start: {line: 21, column: 5},
-			end: {line: 34, column: 18}
+			start: {line: 27, column: 5},
+			end: {line: 40, column: 18}
 		},
 		_p0)(
 		A2(
@@ -21131,6 +21374,10 @@ var _user$project$Analyser_Messages_Types$outdate = function (m) {
 		m,
 		{status: _user$project$Analyser_Messages_Types$Outdated});
 };
+var _user$project$Analyser_Messages_Types$DuplicateRecordFieldUpdate = F3(
+	function (a, b, c) {
+		return {ctor: 'DuplicateRecordFieldUpdate', _0: a, _1: b, _2: c};
+	});
 var _user$project$Analyser_Messages_Types$SingleFieldRecord = F2(
 	function (a, b) {
 		return {ctor: 'SingleFieldRecord', _0: a, _1: b};
@@ -21146,6 +21393,10 @@ var _user$project$Analyser_Messages_Types$CoreArrayUsage = F2(
 var _user$project$Analyser_Messages_Types$NonStaticRegex = F2(
 	function (a, b) {
 		return {ctor: 'NonStaticRegex', _0: a, _1: b};
+	});
+var _user$project$Analyser_Messages_Types$TriggerWord = F3(
+	function (a, b, c) {
+		return {ctor: 'TriggerWord', _0: a, _1: b, _2: c};
 	});
 var _user$project$Analyser_Messages_Types$UnnecessaryPortModule = function (a) {
 	return {ctor: 'UnnecessaryPortModule', _0: a};
@@ -21252,6 +21503,616 @@ var _user$project$Analyser_Messages_Types$UnusedVariable = F3(
 var _user$project$Analyser_Messages_Types$UnreadableSourceFile = function (a) {
 	return {ctor: 'UnreadableSourceFile', _0: a};
 };
+
+var _user$project$Analyser_Fixes_Base$Fixer = F2(
+	function (a, b) {
+		return {canFix: a, fix: b};
+	});
+
+var _user$project$Analyser_Fixes_FileContent$replaceLines = F3(
+	function (_p0, fix, input) {
+		var _p1 = _p0;
+		var lines = A2(_elm_lang$core$String$split, '\n', input);
+		return A2(
+			_elm_lang$core$String$join,
+			'\n',
+			_elm_lang$core$List$concat(
+				{
+					ctor: '::',
+					_0: A2(_elm_lang$core$List$take, _p1._0, lines),
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '::',
+							_0: fix,
+							_1: {ctor: '[]'}
+						},
+						_1: {
+							ctor: '::',
+							_0: A2(_elm_lang$core$List$drop, _p1._1, lines),
+							_1: {ctor: '[]'}
+						}
+					}
+				}));
+	});
+var _user$project$Analyser_Fixes_FileContent$getCharAtLocation = F2(
+	function (_p2, input) {
+		var _p3 = _p2;
+		return A2(
+			_elm_lang$core$Maybe$map,
+			function (_p4) {
+				return A2(
+					_elm_lang$core$String$left,
+					1,
+					A2(_elm_lang$core$String$dropLeft, _p3._1 + 1, _p4));
+			},
+			_elm_lang$core$List$head(
+				A2(
+					_elm_lang$core$List$drop,
+					_p3._0,
+					A2(_elm_lang$core$String$split, '\n', input))));
+	});
+var _user$project$Analyser_Fixes_FileContent$replaceLocationWith = F3(
+	function (_p5, x, input) {
+		var _p6 = _p5;
+		var _p7 = _p6._1;
+		var lineUpdater = function (target) {
+			return _elm_lang$core$String$concat(
+				{
+					ctor: '::',
+					_0: A2(_elm_lang$core$String$left, _p7 + 1, target),
+					_1: {
+						ctor: '::',
+						_0: x,
+						_1: {
+							ctor: '::',
+							_0: A2(_elm_lang$core$String$dropLeft, _p7 + 2, target),
+							_1: {ctor: '[]'}
+						}
+					}
+				});
+		};
+		var rows = A2(_elm_lang$core$String$split, '\n', input);
+		return A2(
+			_elm_lang$core$String$join,
+			'\n',
+			A3(
+				_elm_community$list_extra$List_Extra$updateIfIndex,
+				F2(
+					function (x, y) {
+						return _elm_lang$core$Native_Utils.eq(x, y);
+					})(_p6._0),
+				lineUpdater,
+				rows));
+	});
+var _user$project$Analyser_Fixes_FileContent$updateRange = F3(
+	function (range, content, patch) {
+		var rowPostPartTakeFn = (_elm_lang$core$Native_Utils.cmp(range.end.column, -2) < 1) ? _elm_lang$core$Basics$always('') : _elm_lang$core$String$dropLeft(range.end.column + 2);
+		var rowPrePartTakeFn = (_elm_lang$core$Native_Utils.cmp(range.start.column, -2) < 1) ? _elm_lang$core$Basics$identity : _elm_lang$core$String$left(range.start.column + 1);
+		var afterRows = (_elm_lang$core$Native_Utils.cmp(range.end.column, -2) < 1) ? (range.end.row - 1) : range.end.row;
+		var beforeRows = (_elm_lang$core$Native_Utils.cmp(range.start.column, -2) < 1) ? (range.start.row - 1) : range.start.row;
+		var rows = A2(_elm_lang$core$String$split, '\n', content);
+		var linesBefore = A2(_elm_lang$core$List$take, beforeRows, rows);
+		var rowPrePart = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			A2(
+				_elm_lang$core$Maybe$map,
+				rowPrePartTakeFn,
+				_elm_lang$core$List$head(
+					A2(_elm_lang$core$List$drop, beforeRows, rows))));
+		var newBefore = A2(
+			_elm_lang$core$String$join,
+			'\n',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				linesBefore,
+				{
+					ctor: '::',
+					_0: rowPrePart,
+					_1: {ctor: '[]'}
+				}));
+		var postRows = A2(_elm_lang$core$List$drop, afterRows + 1, rows);
+		var rowPostPart = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			A2(
+				_elm_lang$core$Maybe$map,
+				rowPostPartTakeFn,
+				_elm_lang$core$List$head(
+					A2(_elm_lang$core$List$drop, afterRows, rows))));
+		var newAfter = A2(
+			_elm_lang$core$String$join,
+			'\n',
+			{ctor: '::', _0: rowPostPart, _1: postRows});
+		var toPatch = A2(
+			_elm_lang$core$String$dropRight,
+			_elm_lang$core$String$length(newAfter),
+			A2(
+				_elm_lang$core$String$dropLeft,
+				_elm_lang$core$String$length(newBefore),
+				content));
+		return _elm_lang$core$String$concat(
+			{
+				ctor: '::',
+				_0: newBefore,
+				_1: {
+					ctor: '::',
+					_0: patch(toPatch),
+					_1: {
+						ctor: '::',
+						_0: newAfter,
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _user$project$Analyser_Fixes_FileContent$replaceRangeWith = F3(
+	function (range, newValue, input) {
+		return A3(
+			_user$project$Analyser_Fixes_FileContent$updateRange,
+			range,
+			input,
+			_elm_lang$core$Basics$always(newValue));
+	});
+
+var _user$project$Analyser_Fixes_MultiLineRecordFormatting$replacement = function (_p0) {
+	var _p1 = _p0;
+	return A2(_elm_lang$core$Basics_ops['++'], '\n ', _p1.match);
+};
+var _user$project$Analyser_Fixes_MultiLineRecordFormatting$commaAndIdentifierRegex = _elm_lang$core$Regex$regex(',\\s+[a-z][a-zA-Z0-9_]*\'?\\s+:');
+var _user$project$Analyser_Fixes_MultiLineRecordFormatting$fixContent = F2(
+	function (range, _p2) {
+		var _p3 = _p2;
+		return {
+			ctor: '_Tuple2',
+			_0: _p3._0,
+			_1: A3(
+				_user$project$Analyser_Fixes_FileContent$updateRange,
+				_user$project$Analyser_Messages_Range$asSyntaxRange(range),
+				_p3._1,
+				A3(
+					_elm_lang$core$Regex$replace,
+					_elm_lang$core$Regex$AtMost(1),
+					_user$project$Analyser_Fixes_MultiLineRecordFormatting$commaAndIdentifierRegex,
+					_user$project$Analyser_Fixes_MultiLineRecordFormatting$replacement))
+		};
+	});
+var _user$project$Analyser_Fixes_MultiLineRecordFormatting$fix = F2(
+	function (input, messageData) {
+		var _p4 = messageData;
+		if (_p4.ctor === 'MultiLineRecordFormatting') {
+			return _elm_lang$core$Result$Ok(
+				A2(
+					_elm_lang$core$List$map,
+					function (_p5) {
+						return A2(
+							_user$project$Analyser_Fixes_MultiLineRecordFormatting$fixContent,
+							_p4._1,
+							_Fresheyeball$elm_tuple_extra$Tuple3$init(_p5));
+					},
+					A2(
+						_elm_lang$core$List$filter,
+						function (_p6) {
+							return A2(
+								F2(
+									function (x, y) {
+										return _elm_lang$core$Native_Utils.eq(x, y);
+									}),
+								_p4._0,
+								_Fresheyeball$elm_tuple_extra$Tuple3$first(_p6));
+						},
+						input)));
+		} else {
+			return _elm_lang$core$Result$Err('Invalid message data for fixer UnformattedFile');
+		}
+	});
+var _user$project$Analyser_Fixes_MultiLineRecordFormatting$canFix = function (message) {
+	var _p7 = message;
+	if (_p7.ctor === 'MultiLineRecordFormatting') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$Analyser_Fixes_MultiLineRecordFormatting$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_MultiLineRecordFormatting$canFix, _user$project$Analyser_Fixes_MultiLineRecordFormatting$fix);
+
+var _user$project$Analyser_Fixes_UnformattedFile$fix = F2(
+	function (input, messageData) {
+		var _p0 = messageData;
+		if (_p0.ctor === 'UnformattedFile') {
+			return _elm_lang$core$Result$Ok(
+				A2(_elm_lang$core$List$map, _Fresheyeball$elm_tuple_extra$Tuple3$init, input));
+		} else {
+			return _elm_lang$core$Result$Err('Invalid message data for fixer UnformattedFile');
+		}
+	});
+var _user$project$Analyser_Fixes_UnformattedFile$canFix = function (message) {
+	var _p1 = message;
+	if (_p1.ctor === 'UnformattedFile') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$Analyser_Fixes_UnformattedFile$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnformattedFile$canFix, _user$project$Analyser_Fixes_UnformattedFile$fix);
+
+var _user$project$Analyser_Fixes_UnnecessaryParens$fixContent = F2(
+	function (range, _p0) {
+		var _p1 = _p0;
+		var _p4 = _p1._1;
+		var lines = A2(_elm_lang$core$String$split, '\n', _p4);
+		var _p2 = _user$project$Analyser_Messages_Range$asSyntaxRange(range);
+		var start = _p2.start;
+		var end = _p2.end;
+		var startChar = A2(
+			_user$project$Analyser_Fixes_FileContent$getCharAtLocation,
+			{ctor: '_Tuple2', _0: start.row, _1: start.column},
+			_p4);
+		var endCharLoc = (_elm_lang$core$Native_Utils.cmp(end.column, -2) < 1) ? {
+			ctor: '_Tuple2',
+			_0: end.row - 1,
+			_1: A3(
+				_elm_lang$core$Basics$flip,
+				F2(
+					function (x, y) {
+						return x - y;
+					}),
+				2,
+				_elm_lang$core$String$length(
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						'',
+						_elm_lang$core$List$head(
+							A2(_elm_lang$core$List$drop, end.row - 1, lines)))))
+		} : (_elm_lang$core$Native_Utils.eq(end.column, -1) ? {
+			ctor: '_Tuple2',
+			_0: end.row - 2,
+			_1: A3(
+				_elm_lang$core$Basics$flip,
+				F2(
+					function (x, y) {
+						return x - y;
+					}),
+				2,
+				_elm_lang$core$String$length(
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						'',
+						_elm_lang$core$List$head(
+							A2(_elm_lang$core$List$drop, end.row - 2, lines)))))
+		} : {ctor: '_Tuple2', _0: end.row, _1: end.column - 1});
+		var endChar = A2(_user$project$Analyser_Fixes_FileContent$getCharAtLocation, endCharLoc, _p4);
+		var _p3 = {ctor: '_Tuple2', _0: startChar, _1: endChar};
+		if (((((_p3.ctor === '_Tuple2') && (_p3._0.ctor === 'Just')) && (_p3._0._0 === '(')) && (_p3._1.ctor === 'Just')) && (_p3._1._0 === ')')) {
+			return _elm_lang$core$Result$Ok(
+				A2(
+					F2(
+						function (v0, v1) {
+							return {ctor: '_Tuple2', _0: v0, _1: v1};
+						}),
+					_p1._0,
+					A3(
+						_user$project$Analyser_Fixes_FileContent$replaceLocationWith,
+						endCharLoc,
+						'',
+						A3(
+							_user$project$Analyser_Fixes_FileContent$replaceLocationWith,
+							{ctor: '_Tuple2', _0: start.row, _1: start.column},
+							' ',
+							_p4))));
+		} else {
+			return _elm_lang$core$Result$Err('Could not locate parens to replace');
+		}
+	});
+var _user$project$Analyser_Fixes_UnnecessaryParens$fix = F2(
+	function (input, messageData) {
+		var _p5 = messageData;
+		if (_p5.ctor === 'UnnecessaryParens') {
+			return A2(
+				_elm_lang$core$Maybe$withDefault,
+				_elm_lang$core$Result$Err('Could not find the right file to replace the unnecessary parens'),
+				A2(
+					_elm_lang$core$Maybe$map,
+					_elm_lang$core$Result$map(_elm_lang$core$List$singleton),
+					A2(
+						_elm_lang$core$Maybe$map,
+						function (_p6) {
+							return A2(
+								_user$project$Analyser_Fixes_UnnecessaryParens$fixContent,
+								_p5._1,
+								_Fresheyeball$elm_tuple_extra$Tuple3$init(_p6));
+						},
+						_elm_lang$core$List$head(
+							A2(
+								_elm_lang$core$List$filter,
+								function (_p7) {
+									return A2(
+										F2(
+											function (x, y) {
+												return _elm_lang$core$Native_Utils.eq(x, y);
+											}),
+										_p5._0,
+										_Fresheyeball$elm_tuple_extra$Tuple3$first(_p7));
+								},
+								input)))));
+		} else {
+			return _elm_lang$core$Result$Err('Invalid message data for fixer UnnecessaryParens');
+		}
+	});
+var _user$project$Analyser_Fixes_UnnecessaryParens$canFix = function (message) {
+	var _p8 = message;
+	if (_p8.ctor === 'UnnecessaryParens') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$Analyser_Fixes_UnnecessaryParens$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnnecessaryParens$canFix, _user$project$Analyser_Fixes_UnnecessaryParens$fix);
+
+var _user$project$Analyser_Fixes_UnusedImportAlias$writeNewImport = F3(
+	function (syntaxRange, imp, i) {
+		return A3(
+			_user$project$Analyser_Fixes_FileContent$replaceLines,
+			{ctor: '_Tuple2', _0: syntaxRange.start.row, _1: syntaxRange.end.row},
+			_user$project$ASTUtil_Imports$naiveStringifyImport(imp),
+			i);
+	});
+var _user$project$Analyser_Fixes_UnusedImportAlias$updateImport = F2(
+	function (_p0, range) {
+		var _p1 = _p0;
+		var _p2 = A2(
+			_user$project$ASTUtil_Imports$findImportWithRange,
+			_p1._2,
+			_user$project$Analyser_Messages_Range$asSyntaxRange(range));
+		if (_p2.ctor === 'Just') {
+			var _p3 = _p2._0;
+			return _elm_lang$core$Result$Ok(
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: _p1._0,
+						_1: A3(
+							_user$project$Analyser_Fixes_UnusedImportAlias$writeNewImport,
+							_p3.range,
+							_elm_lang$core$Native_Utils.update(
+								_p3,
+								{moduleAlias: _elm_lang$core$Maybe$Nothing}),
+							_p1._1)
+					},
+					_1: {ctor: '[]'}
+				});
+		} else {
+			return _elm_lang$core$Result$Err('Could not locate import for the target range');
+		}
+	});
+var _user$project$Analyser_Fixes_UnusedImportAlias$fix = F2(
+	function (input, messageData) {
+		var _p4 = messageData;
+		if (_p4.ctor === 'UnusedImportAlias') {
+			var _p5 = _elm_lang$core$List$head(input);
+			if (_p5.ctor === 'Nothing') {
+				return _elm_lang$core$Result$Err('No input for fixer UnusedImportAlias');
+			} else {
+				return A2(_user$project$Analyser_Fixes_UnusedImportAlias$updateImport, _p5._0, _p4._2);
+			}
+		} else {
+			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedImportAlias');
+		}
+	});
+var _user$project$Analyser_Fixes_UnusedImportAlias$canFix = function (message) {
+	var _p6 = message;
+	if (_p6.ctor === 'UnusedImportAlias') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$Analyser_Fixes_UnusedImportAlias$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnusedImportAlias$canFix, _user$project$Analyser_Fixes_UnusedImportAlias$fix);
+
+var _user$project$Analyser_Fixes_UnusedImportedVariable$writeNewImport = F3(
+	function (syntaxRange, imp, i) {
+		return A3(
+			_user$project$Analyser_Fixes_FileContent$replaceLines,
+			{ctor: '_Tuple2', _0: syntaxRange.start.row, _1: syntaxRange.end.row},
+			_user$project$ASTUtil_Imports$naiveStringifyImport(imp),
+			i);
+	});
+var _user$project$Analyser_Fixes_UnusedImportedVariable$removeImport = F2(
+	function (_p0, range) {
+		var _p1 = _p0;
+		var _p2 = A2(
+			_user$project$ASTUtil_Imports$findImportWithRange,
+			_p1._2,
+			_user$project$Analyser_Messages_Range$asSyntaxRange(range));
+		if (_p2.ctor === 'Just') {
+			var _p3 = _p2._0;
+			return _elm_lang$core$Result$Ok(
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: _p1._0,
+						_1: A3(
+							_user$project$Analyser_Fixes_UnusedImportedVariable$writeNewImport,
+							_p3.range,
+							A2(
+								_user$project$ASTUtil_Imports$removeRangeFromImport,
+								_user$project$Analyser_Messages_Range$asSyntaxRange(range),
+								_p3),
+							_p1._1)
+					},
+					_1: {ctor: '[]'}
+				});
+		} else {
+			return _elm_lang$core$Result$Err('Could not locate import for the target range');
+		}
+	});
+var _user$project$Analyser_Fixes_UnusedImportedVariable$fix = F2(
+	function (input, messageData) {
+		var _p4 = messageData;
+		if (_p4.ctor === 'UnusedImportedVariable') {
+			var _p5 = _elm_lang$core$List$head(input);
+			if (_p5.ctor === 'Nothing') {
+				return _elm_lang$core$Result$Err('No input for fixer UnusedImportedVariable');
+			} else {
+				return A2(_user$project$Analyser_Fixes_UnusedImportedVariable$removeImport, _p5._0, _p4._2);
+			}
+		} else {
+			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedImportedVariable');
+		}
+	});
+var _user$project$Analyser_Fixes_UnusedImportedVariable$canFix = function (message) {
+	var _p6 = message;
+	if (_p6.ctor === 'UnusedImportedVariable') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$Analyser_Fixes_UnusedImportedVariable$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnusedImportedVariable$canFix, _user$project$Analyser_Fixes_UnusedImportedVariable$fix);
+
+var _user$project$Analyser_Fixes_UnusedPatternVariable$fixPattern = F2(
+	function (_p0, range) {
+		var _p1 = _p0;
+		var _p2 = A2(
+			_user$project$ASTUtil_Patterns$findParentPattern,
+			_p1._2,
+			_user$project$Analyser_Messages_Range$asSyntaxRange(range));
+		if (_p2.ctor === 'Just') {
+			var _p3 = _p2._0;
+			return _elm_lang$core$Result$Ok(
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: _p1._0,
+						_1: A3(
+							_user$project$Analyser_Fixes_FileContent$replaceRangeWith,
+							_user$project$ASTUtil_PatternOptimizer$patternRange(_p3),
+							_stil4m$elm_syntax$Elm_Writer$write(
+								_stil4m$elm_syntax$Elm_Writer$writePattern(
+									A2(
+										_user$project$ASTUtil_PatternOptimizer$optimize,
+										_user$project$Analyser_Messages_Range$asSyntaxRange(range),
+										_p3))),
+							_p1._1)
+					},
+					_1: {ctor: '[]'}
+				});
+		} else {
+			return _elm_lang$core$Result$Err('Could not find location to replace unused variable in pattern');
+		}
+	});
+var _user$project$Analyser_Fixes_UnusedPatternVariable$fix = F2(
+	function (input, messageData) {
+		var _p4 = messageData;
+		if (_p4.ctor === 'UnusedPatternVariable') {
+			var _p5 = _elm_lang$core$List$head(input);
+			if (_p5.ctor === 'Nothing') {
+				return _elm_lang$core$Result$Err('No input for fixer UnusedPatternVariable');
+			} else {
+				return A2(_user$project$Analyser_Fixes_UnusedPatternVariable$fixPattern, _p5._0, _p4._2);
+			}
+		} else {
+			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedPatternVariable');
+		}
+	});
+var _user$project$Analyser_Fixes_UnusedPatternVariable$canFix = function (message) {
+	var _p6 = message;
+	if (_p6.ctor === 'UnusedPatternVariable') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$Analyser_Fixes_UnusedPatternVariable$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnusedPatternVariable$canFix, _user$project$Analyser_Fixes_UnusedPatternVariable$fix);
+
+var _user$project$Analyser_Fixes_UnusedTypeAlias$removeTypeAlias = F2(
+	function (typeAlias, content) {
+		var end = typeAlias.range.end;
+		var start = A2(
+			_elm_lang$core$Maybe$withDefault,
+			typeAlias.range.start,
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (_p0) {
+					return function (_) {
+						return _.start;
+					}(
+						function (_) {
+							return _.range;
+						}(_p0));
+				},
+				typeAlias.documentation));
+		return A3(
+			_user$project$Analyser_Fixes_FileContent$replaceRangeWith,
+			A2(_stil4m$elm_syntax$Elm_Syntax_Range$Range, start, end),
+			'',
+			content);
+	});
+var _user$project$Analyser_Fixes_UnusedTypeAlias$findTypeAlias = F2(
+	function (range, file) {
+		return _elm_lang$core$List$head(
+			A2(
+				_elm_lang$core$List$filterMap,
+				function (decl) {
+					var _p1 = decl;
+					if (_p1.ctor === 'AliasDecl') {
+						var _p2 = _p1._0;
+						return _elm_lang$core$Native_Utils.eq(
+							_p2.range,
+							_user$project$Analyser_Messages_Range$asSyntaxRange(range)) ? _elm_lang$core$Maybe$Just(_p2) : _elm_lang$core$Maybe$Nothing;
+					} else {
+						return _elm_lang$core$Maybe$Nothing;
+					}
+				},
+				file.declarations));
+	});
+var _user$project$Analyser_Fixes_UnusedTypeAlias$findAndRemoveTypeAlias = F2(
+	function (_p3, range) {
+		var _p4 = _p3;
+		return A2(
+			_elm_lang$core$Maybe$map,
+			function (typeAlias) {
+				return {
+					ctor: '_Tuple2',
+					_0: _p4._0,
+					_1: A2(_user$project$Analyser_Fixes_UnusedTypeAlias$removeTypeAlias, typeAlias, _p4._1)
+				};
+			},
+			A2(_user$project$Analyser_Fixes_UnusedTypeAlias$findTypeAlias, range, _p4._2));
+	});
+var _user$project$Analyser_Fixes_UnusedTypeAlias$fix = F2(
+	function (input, messageData) {
+		var _p5 = messageData;
+		if (_p5.ctor === 'UnusedTypeAlias') {
+			var _p6 = _elm_lang$core$List$head(input);
+			if (_p6.ctor === 'Nothing') {
+				return _elm_lang$core$Result$Err('No input for fixer UnusedTypeAlias');
+			} else {
+				return A2(
+					_elm_lang$core$Result$fromMaybe,
+					'Could not find type alias',
+					A2(
+						_elm_lang$core$Maybe$map,
+						_elm_lang$core$List$singleton,
+						A2(_user$project$Analyser_Fixes_UnusedTypeAlias$findAndRemoveTypeAlias, _p6._0, _p5._2)));
+			}
+		} else {
+			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedTypeAlias');
+		}
+	});
+var _user$project$Analyser_Fixes_UnusedTypeAlias$canFix = function (message) {
+	var _p7 = message;
+	if (_p7.ctor === 'UnusedTypeAlias') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$Analyser_Fixes_UnusedTypeAlias$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnusedTypeAlias$canFix, _user$project$Analyser_Fixes_UnusedTypeAlias$fix);
 
 var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 	var _p0 = m;
@@ -21642,15 +22503,18 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'NonStaticRegex':
-			var _p20 = _p0._1;
+		case 'TriggerWord':
+			var _p20 = _p0._2;
 			var _p19 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Use of `Regex.regex` as non-static in file \"',
+						_0: A2(
+							_elm_lang$core$Basics_ops['++'],
+							'`',
+							A2(_elm_lang$core$Basics_ops['++'], _p0._1, '` should not be used in comments. Found in \"')),
 						_1: {
 							ctor: '::',
 							_0: _p19,
@@ -21678,7 +22542,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: false
 			};
-		case 'CoreArrayUsage':
+		case 'NonStaticRegex':
 			var _p22 = _p0._1;
 			var _p21 = _p0._0;
 			return {
@@ -21686,7 +22550,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Use of `Array` is disadviced. In \"',
+						_0: 'Use of `Regex.regex` as non-static in file \"',
 						_1: {
 							ctor: '::',
 							_0: _p21,
@@ -21714,7 +22578,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: false
 			};
-		case 'DebugLog':
+		case 'CoreArrayUsage':
 			var _p24 = _p0._1;
 			var _p23 = _p0._0;
 			return {
@@ -21722,7 +22586,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Use of Debug.log in file \"',
+						_0: 'Use of `Array` is disadviced. In \"',
 						_1: {
 							ctor: '::',
 							_0: _p23,
@@ -21748,9 +22612,9 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 					_0: _p24,
 					_1: {ctor: '[]'}
 				},
-				_3: true
+				_3: false
 			};
-		case 'DebugCrash':
+		case 'DebugLog':
 			var _p26 = _p0._1;
 			var _p25 = _p0._0;
 			return {
@@ -21758,7 +22622,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Use of Debug.crash in file \"',
+						_0: 'Use of Debug.log in file \"',
 						_1: {
 							ctor: '::',
 							_0: _p25,
@@ -21786,8 +22650,44 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'UnformattedFile':
+		case 'DebugCrash':
+			var _p28 = _p0._1;
 			var _p27 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Use of Debug.crash in file \"',
+						_1: {
+							ctor: '::',
+							_0: _p27,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p28),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p27,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p28,
+					_1: {ctor: '[]'}
+				},
+				_3: true
+			};
+		case 'UnformattedFile':
+			var _p29 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -21796,7 +22696,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Unformatted file \"',
 						_1: {
 							ctor: '::',
-							_0: _p27,
+							_0: _p29,
 							_1: {
 								ctor: '::',
 								_0: '\"',
@@ -21807,14 +22707,14 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p27,
+						_0: _p29,
 						_1: {ctor: '[]'}
 					}),
 				_2: {ctor: '[]'},
 				_3: true
 			};
 		case 'FileLoadFailed':
-			var _p28 = _p0._0;
+			var _p30 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -21823,7 +22723,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_0: 'Could not load file \"',
 						_1: {
 							ctor: '::',
-							_0: _p28,
+							_0: _p30,
 							_1: {
 								ctor: '::',
 								_0: '\" due to: ',
@@ -21838,15 +22738,15 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p28,
+						_0: _p30,
 						_1: {ctor: '[]'}
 					}),
 				_2: {ctor: '[]'},
 				_3: true
 			};
 		case 'DuplicateImport':
-			var _p30 = _p0._2;
-			var _p29 = _p0._0;
+			var _p32 = _p0._2;
+			var _p31 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -21861,7 +22761,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 								_0: '`in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p29,
+									_0: _p31,
 									_1: {
 										ctor: '::',
 										_0: '\" at [ ',
@@ -21870,7 +22770,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 											_0: A2(
 												_elm_lang$core$String$join,
 												' | ',
-												A2(_elm_lang$core$List$map, _user$project$Analyser_Messages_Range$rangeToString, _p30)),
+												A2(_elm_lang$core$List$map, _user$project$Analyser_Messages_Range$rangeToString, _p32)),
 											_1: {
 												ctor: '::',
 												_0: ' ]',
@@ -21885,15 +22785,15 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p29,
+						_0: _p31,
 						_1: {ctor: '[]'}
 					}),
-				_2: _p30,
+				_2: _p32,
 				_3: true
 			};
 		case 'DuplicateImportedVariable':
-			var _p32 = _p0._3;
-			var _p31 = _p0._0;
+			var _p34 = _p0._3;
+			var _p33 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -21914,7 +22814,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 										_0: '`in file \"',
 										_1: {
 											ctor: '::',
-											_0: _p31,
+											_0: _p33,
 											_1: {
 												ctor: '::',
 												_0: '\" at [ ',
@@ -21923,7 +22823,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 													_0: A2(
 														_elm_lang$core$String$join,
 														' | ',
-														A2(_elm_lang$core$List$map, _user$project$Analyser_Messages_Range$rangeToString, _p32)),
+														A2(_elm_lang$core$List$map, _user$project$Analyser_Messages_Range$rangeToString, _p34)),
 													_1: {
 														ctor: '::',
 														_0: ' ]',
@@ -21940,57 +22840,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p31,
-						_1: {ctor: '[]'}
-					}),
-				_2: _p32,
-				_3: true
-			};
-		case 'UnusedImportAlias':
-			var _p34 = _p0._2;
-			var _p33 = _p0._0;
-			return {
-				ctor: '_Tuple4',
-				_0: _elm_lang$core$String$concat(
-					{
-						ctor: '::',
-						_0: 'Unused import alias `',
-						_1: {
-							ctor: '::',
-							_0: A2(_elm_lang$core$String$join, '.', _p0._1),
-							_1: {
-								ctor: '::',
-								_0: '`in file \"',
-								_1: {
-									ctor: '::',
-									_0: _p33,
-									_1: {
-										ctor: '::',
-										_0: '\" at ',
-										_1: {
-											ctor: '::',
-											_0: _user$project$Analyser_Messages_Range$rangeToString(_p34),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}
-						}
-					}),
-				_1: _elm_lang$core$Basics$always(
-					{
-						ctor: '::',
 						_0: _p33,
 						_1: {ctor: '[]'}
 					}),
-				_2: {
-					ctor: '::',
-					_0: _p34,
-					_1: {ctor: '[]'}
-				},
+				_2: _p34,
 				_3: true
 			};
-		case 'UnusedImport':
+		case 'UnusedImportAlias':
 			var _p36 = _p0._2;
 			var _p35 = _p0._0;
 			return {
@@ -21998,7 +22854,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Unused import `',
+						_0: 'Unused import alias `',
 						_1: {
 							ctor: '::',
 							_0: A2(_elm_lang$core$String$join, '.', _p0._1),
@@ -22034,7 +22890,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'UnusedTypeAlias':
+		case 'UnusedImport':
 			var _p38 = _p0._2;
 			var _p37 = _p0._0;
 			return {
@@ -22042,13 +22898,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Type alias `',
+						_0: 'Unused import `',
 						_1: {
 							ctor: '::',
-							_0: _p0._1,
+							_0: A2(_elm_lang$core$String$join, '.', _p0._1),
 							_1: {
 								ctor: '::',
-								_0: '` is not used in file \"',
+								_0: '`in file \"',
 								_1: {
 									ctor: '::',
 									_0: _p37,
@@ -22078,25 +22934,33 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'MultiLineRecordFormatting':
-			var _p40 = _p0._1;
+		case 'UnusedTypeAlias':
+			var _p40 = _p0._2;
 			var _p39 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Record should be formatted over multiple lines in file \"',
+						_0: 'Type alias `',
 						_1: {
 							ctor: '::',
-							_0: _p39,
+							_0: _p0._1,
 							_1: {
 								ctor: '::',
-								_0: '\" at ',
+								_0: '` is not used in file \"',
 								_1: {
 									ctor: '::',
-									_0: _user$project$Analyser_Messages_Range$rangeToString(_p40),
-									_1: {ctor: '[]'}
+									_0: _p39,
+									_1: {
+										ctor: '::',
+										_0: '\" at ',
+										_1: {
+											ctor: '::',
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p40),
+											_1: {ctor: '[]'}
+										}
+									}
 								}
 							}
 						}
@@ -22114,33 +22978,25 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'NoUncurriedPrefix':
-			var _p42 = _p0._2;
+		case 'MultiLineRecordFormatting':
+			var _p42 = _p0._1;
 			var _p41 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Prefix notation for `',
+						_0: 'Record should be formatted over multiple lines in file \"',
 						_1: {
 							ctor: '::',
-							_0: _p0._1,
+							_0: _p41,
 							_1: {
 								ctor: '::',
-								_0: '` is unneeded in file \"',
+								_0: '\" at ',
 								_1: {
 									ctor: '::',
-									_0: _p41,
-									_1: {
-										ctor: '::',
-										_0: '\" at ',
-										_1: {
-											ctor: '::',
-											_0: _user$project$Analyser_Messages_Range$rangeToString(_p42),
-											_1: {ctor: '[]'}
-										}
-									}
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p42),
+									_1: {ctor: '[]'}
 								}
 							}
 						}
@@ -22156,10 +23012,9 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 					_0: _p42,
 					_1: {ctor: '[]'}
 				},
-				_3: false
+				_3: true
 			};
-		case 'RedefineVariable':
-			var _p45 = _p0._3;
+		case 'NoUncurriedPrefix':
 			var _p44 = _p0._2;
 			var _p43 = _p0._0;
 			return {
@@ -22167,31 +23022,23 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Variable `',
+						_0: 'Prefix notation for `',
 						_1: {
 							ctor: '::',
 							_0: _p0._1,
 							_1: {
 								ctor: '::',
-								_0: '` is redefined in file \"',
+								_0: '` is unneeded in file \"',
 								_1: {
 									ctor: '::',
 									_0: _p43,
 									_1: {
 										ctor: '::',
-										_0: '\". At ',
+										_0: '\" at ',
 										_1: {
 											ctor: '::',
 											_0: _user$project$Analyser_Messages_Range$rangeToString(_p44),
-											_1: {
-												ctor: '::',
-												_0: ' and ',
-												_1: {
-													ctor: '::',
-													_0: _user$project$Analyser_Messages_Range$rangeToString(_p45),
-													_1: {ctor: '[]'}
-												}
-											}
+											_1: {ctor: '[]'}
 										}
 									}
 								}
@@ -22207,33 +23054,46 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_2: {
 					ctor: '::',
 					_0: _p44,
-					_1: {
-						ctor: '::',
-						_0: _p45,
-						_1: {ctor: '[]'}
-					}
+					_1: {ctor: '[]'}
 				},
 				_3: false
 			};
-		case 'UseConsOverConcat':
-			var _p47 = _p0._1;
-			var _p46 = _p0._0;
+		case 'RedefineVariable':
+			var _p47 = _p0._3;
+			var _p46 = _p0._2;
+			var _p45 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Use `::` instead of `++` in file \"',
+						_0: 'Variable `',
 						_1: {
 							ctor: '::',
-							_0: _p46,
+							_0: _p0._1,
 							_1: {
 								ctor: '::',
-								_0: '\" at ',
+								_0: '` is redefined in file \"',
 								_1: {
 									ctor: '::',
-									_0: _user$project$Analyser_Messages_Range$rangeToString(_p47),
-									_1: {ctor: '[]'}
+									_0: _p45,
+									_1: {
+										ctor: '::',
+										_0: '\". At ',
+										_1: {
+											ctor: '::',
+											_0: _user$project$Analyser_Messages_Range$rangeToString(_p46),
+											_1: {
+												ctor: '::',
+												_0: ' and ',
+												_1: {
+													ctor: '::',
+													_0: _user$project$Analyser_Messages_Range$rangeToString(_p47),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
 								}
 							}
 						}
@@ -22241,17 +23101,21 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p46,
+						_0: _p45,
 						_1: {ctor: '[]'}
 					}),
 				_2: {
 					ctor: '::',
-					_0: _p47,
-					_1: {ctor: '[]'}
+					_0: _p46,
+					_1: {
+						ctor: '::',
+						_0: _p47,
+						_1: {ctor: '[]'}
+					}
 				},
-				_3: true
+				_3: false
 			};
-		case 'DropConcatOfLists':
+		case 'UseConsOverConcat':
 			var _p49 = _p0._1;
 			var _p48 = _p0._0;
 			return {
@@ -22259,7 +23123,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Joining two literal lists with `++`, but instead you can just join the lists. \"',
+						_0: 'Use `::` instead of `++` in file \"',
 						_1: {
 							ctor: '::',
 							_0: _p48,
@@ -22287,7 +23151,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'DropConsOfItemAndList':
+		case 'DropConcatOfLists':
 			var _p51 = _p0._1;
 			var _p50 = _p0._0;
 			return {
@@ -22295,7 +23159,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Adding an item to the front of a literal list, but instead you can just put it in the list. \"',
+						_0: 'Joining two literal lists with `++`, but instead you can just join the lists. \"',
 						_1: {
 							ctor: '::',
 							_0: _p50,
@@ -22323,9 +23187,45 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: true
 			};
-		case 'LineLengthExceeded':
+		case 'DropConsOfItemAndList':
 			var _p53 = _p0._1;
 			var _p52 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Adding an item to the front of a literal list, but instead you can just put it in the list. \"',
+						_1: {
+							ctor: '::',
+							_0: _p52,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p53),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p52,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p53,
+					_1: {ctor: '[]'}
+				},
+				_3: true
+			};
+		case 'LineLengthExceeded':
+			var _p55 = _p0._1;
+			var _p54 = _p0._0;
 			return {
 				ctor: '_Tuple4',
 				_0: _elm_lang$core$String$concat(
@@ -22335,13 +23235,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$core$Basics$toString(
-								_elm_lang$core$List$length(_p53)),
+								_elm_lang$core$List$length(_p55)),
 							_1: {
 								ctor: '::',
 								_0: ' line(s) in file \"',
 								_1: {
 									ctor: '::',
-									_0: _p52,
+									_0: _p54,
 									_1: {
 										ctor: '::',
 										_0: '\".',
@@ -22354,49 +23254,13 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_1: _elm_lang$core$Basics$always(
 					{
 						ctor: '::',
-						_0: _p52,
-						_1: {ctor: '[]'}
-					}),
-				_2: _p53,
-				_3: false
-			};
-		case 'UnnecessaryListConcat':
-			var _p55 = _p0._1;
-			var _p54 = _p0._0;
-			return {
-				ctor: '_Tuple4',
-				_0: _elm_lang$core$String$concat(
-					{
-						ctor: '::',
-						_0: 'Better merge the arguments of `List.concat` to a single list in file \"',
-						_1: {
-							ctor: '::',
-							_0: _p54,
-							_1: {
-								ctor: '::',
-								_0: '\" at ',
-								_1: {
-									ctor: '::',
-									_0: _user$project$Analyser_Messages_Range$rangeToString(_p55),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}),
-				_1: _elm_lang$core$Basics$always(
-					{
-						ctor: '::',
 						_0: _p54,
 						_1: {ctor: '[]'}
 					}),
-				_2: {
-					ctor: '::',
-					_0: _p55,
-					_1: {ctor: '[]'}
-				},
-				_3: true
+				_2: _p55,
+				_3: false
 			};
-		case 'FunctionInLet':
+		case 'UnnecessaryListConcat':
 			var _p57 = _p0._1;
 			var _p56 = _p0._0;
 			return {
@@ -22404,7 +23268,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Let statement containing functions should be avoided in \"',
+						_0: 'Better merge the arguments of `List.concat` to a single list in file \"',
 						_1: {
 							ctor: '::',
 							_0: _p56,
@@ -22430,9 +23294,9 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 					_0: _p57,
 					_1: {ctor: '[]'}
 				},
-				_3: false
+				_3: true
 			};
-		default:
+		case 'FunctionInLet':
 			var _p59 = _p0._1;
 			var _p58 = _p0._0;
 			return {
@@ -22440,7 +23304,7 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				_0: _elm_lang$core$String$concat(
 					{
 						ctor: '::',
-						_0: 'Record has only one field, you can simply this. In file \"',
+						_0: 'Let statement containing functions should be avoided in \"',
 						_1: {
 							ctor: '::',
 							_0: _p58,
@@ -22468,21 +23332,92 @@ var _user$project$Analyser_Messages_Util$getMessageInfo = function (m) {
 				},
 				_3: false
 			};
+		case 'SingleFieldRecord':
+			var _p61 = _p0._1;
+			var _p60 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Record has only one field, you can simply this. In file \"',
+						_1: {
+							ctor: '::',
+							_0: _p60,
+							_1: {
+								ctor: '::',
+								_0: '\" at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$Analyser_Messages_Range$rangeToString(_p61),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p60,
+						_1: {ctor: '[]'}
+					}),
+				_2: {
+					ctor: '::',
+					_0: _p61,
+					_1: {ctor: '[]'}
+				},
+				_3: false
+			};
+		default:
+			var _p62 = _p0._0;
+			return {
+				ctor: '_Tuple4',
+				_0: _elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'The \'',
+						_1: {
+							ctor: '::',
+							_0: _p0._1,
+							_1: {
+								ctor: '::',
+								_0: '\' field for a record is updated multiple times in one expression in file ',
+								_1: {
+									ctor: '::',
+									_0: _p62,
+									_1: {
+										ctor: '::',
+										_0: '.',
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}),
+				_1: _elm_lang$core$Basics$always(
+					{
+						ctor: '::',
+						_0: _p62,
+						_1: {ctor: '[]'}
+					}),
+				_2: _p0._2,
+				_3: false
+			};
 	}
 };
 var _user$project$Analyser_Messages_Util$canFix = function (m) {
-	var _p60 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var result = _p60._3;
+	var _p63 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var result = _p63._3;
 	return result;
 };
 var _user$project$Analyser_Messages_Util$getRanges = function (m) {
-	var _p61 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var r = _p61._2;
+	var _p64 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var r = _p64._2;
 	return r;
 };
 var _user$project$Analyser_Messages_Util$getFiles = function (m) {
-	var _p62 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p62._1;
+	var _p65 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p65._1;
 	return f(m);
 };
 var _user$project$Analyser_Messages_Util$compareMessage = F2(
@@ -22539,8 +23474,8 @@ var _user$project$Analyser_Messages_Util$compareMessageFile = F2(
 			_user$project$Analyser_Messages_Util$messageFile(b));
 	});
 var _user$project$Analyser_Messages_Util$asString = function (m) {
-	var _p63 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
-	var f = _p63._0;
+	var _p66 = _user$project$Analyser_Messages_Util$getMessageInfo(m);
+	var f = _p66._0;
 	return f;
 };
 var _user$project$Analyser_Messages_Util$markFixing = F2(
@@ -23252,6 +24187,36 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_1: {ctor: '[]'}
 						}
 					}));
+		case 'TriggerWord':
+			return A2(
+				_user$project$Util_Json$encodeTyped,
+				'TriggerWord',
+				_elm_lang$core$Json_Encode$object(
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'file',
+							_1: _elm_lang$core$Json_Encode$string(_p0._0)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'word',
+								_1: _elm_lang$core$Json_Encode$string(_p0._1)
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'range',
+									_1: _user$project$Analyser_Messages_Range$encode(_p0._2)
+								},
+								_1: {ctor: '[]'}
+							}
+						}
+					}));
 		case 'NonStaticRegex':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
@@ -23318,7 +24283,7 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_1: {ctor: '[]'}
 						}
 					}));
-		default:
+		case 'SingleFieldRecord':
 			return A2(
 				_user$project$Util_Json$encodeTyped,
 				'SingleFieldRecord',
@@ -23340,6 +24305,34 @@ var _user$project$Analyser_Messages_Json$encodeMessageData = function (m) {
 							_1: {ctor: '[]'}
 						}
 					}));
+		default:
+			return _elm_lang$core$Json_Encode$object(
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'file',
+						_1: _elm_lang$core$Json_Encode$string(_p0._0)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'fieldName',
+							_1: _elm_lang$core$Json_Encode$string(_p0._1)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'ranges',
+								_1: _elm_lang$core$Json_Encode$list(
+									A2(_elm_lang$core$List$map, _user$project$Analyser_Messages_Range$encode, _p0._2))
+							},
+							_1: {ctor: '[]'}
+						}
+					}
+				});
 	}
 };
 var _user$project$Analyser_Messages_Json$encodeMessageStatus = function (m) {
@@ -23739,31 +24732,64 @@ var _user$project$Analyser_Messages_Json$decodeMessageData = _user$project$Util_
 																													ctor: '::',
 																													_0: {
 																														ctor: '_Tuple2',
-																														_0: 'NonStaticRegex',
-																														_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$NonStaticRegex)
+																														_0: 'TriggerWord',
+																														_1: A4(
+																															_elm_lang$core$Json_Decode$map3,
+																															_user$project$Analyser_Messages_Types$TriggerWord,
+																															_user$project$Analyser_Messages_Json$fileField,
+																															A2(_elm_lang$core$Json_Decode$field, 'word', _elm_lang$core$Json_Decode$string),
+																															A2(_elm_lang$core$Json_Decode$field, 'range', _user$project$Analyser_Messages_Range$decode))
 																													},
 																													_1: {
 																														ctor: '::',
 																														_0: {
 																															ctor: '_Tuple2',
-																															_0: 'CoreArrayUsage',
-																															_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$CoreArrayUsage)
+																															_0: 'NonStaticRegex',
+																															_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$NonStaticRegex)
 																														},
 																														_1: {
 																															ctor: '::',
 																															_0: {
 																																ctor: '_Tuple2',
-																																_0: 'FunctionInLet',
-																																_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$FunctionInLet)
+																																_0: 'CoreArrayUsage',
+																																_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$CoreArrayUsage)
 																															},
 																															_1: {
 																																ctor: '::',
 																																_0: {
 																																	ctor: '_Tuple2',
-																																	_0: 'SingleFieldRecord',
-																																	_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$SingleFieldRecord)
+																																	_0: 'FunctionInLet',
+																																	_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$FunctionInLet)
 																																},
-																																_1: {ctor: '[]'}
+																																_1: {
+																																	ctor: '::',
+																																	_0: {
+																																		ctor: '_Tuple2',
+																																		_0: 'SingleFieldRecord',
+																																		_1: _user$project$Analyser_Messages_Json$decodeFileAndRange(_user$project$Analyser_Messages_Types$SingleFieldRecord)
+																																	},
+																																	_1: {
+																																		ctor: '::',
+																																		_0: {
+																																			ctor: '_Tuple2',
+																																			_0: 'DuplicateRecordFieldUpdate',
+																																			_1: A2(
+																																				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																																				A2(
+																																					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																																					A2(
+																																						_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+																																						_elm_lang$core$Json_Decode$succeed(_user$project$Analyser_Messages_Types$DuplicateRecordFieldUpdate),
+																																						_user$project$Analyser_Messages_Json$fileField),
+																																					A2(_elm_lang$core$Json_Decode$field, 'fieldName', _elm_lang$core$Json_Decode$string)),
+																																				A2(
+																																					_elm_lang$core$Json_Decode$field,
+																																					'ranges',
+																																					_elm_lang$core$Json_Decode$list(_user$project$Analyser_Messages_Range$decode)))
+																																		},
+																																		_1: {ctor: '[]'}
+																																	}
+																																}
 																															}
 																														}
 																													}
@@ -24089,538 +25115,6 @@ var _user$project$Analyser_State$decodeState = A2(
 			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$int))),
 	A2(_elm_lang$core$Json_Decode$field, 'graph', _iosphere$elm_network_graph$Graph_Json$decode));
 
-var _user$project$Analyser_Fixes_FileContent$replaceLines = F3(
-	function (_p0, fix, input) {
-		var _p1 = _p0;
-		var lines = A2(_elm_lang$core$String$split, '\n', input);
-		return A2(
-			_elm_lang$core$String$join,
-			'\n',
-			_elm_lang$core$List$concat(
-				{
-					ctor: '::',
-					_0: A2(_elm_lang$core$List$take, _p1._0, lines),
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '::',
-							_0: fix,
-							_1: {ctor: '[]'}
-						},
-						_1: {
-							ctor: '::',
-							_0: A2(_elm_lang$core$List$drop, _p1._1, lines),
-							_1: {ctor: '[]'}
-						}
-					}
-				}));
-	});
-var _user$project$Analyser_Fixes_FileContent$getCharAtLocation = F2(
-	function (_p2, input) {
-		var _p3 = _p2;
-		return A2(
-			_elm_lang$core$Maybe$map,
-			function (_p4) {
-				return A2(
-					_elm_lang$core$String$left,
-					1,
-					A2(_elm_lang$core$String$dropLeft, _p3._1 + 1, _p4));
-			},
-			_elm_lang$core$List$head(
-				A2(
-					_elm_lang$core$List$drop,
-					_p3._0,
-					A2(_elm_lang$core$String$split, '\n', input))));
-	});
-var _user$project$Analyser_Fixes_FileContent$replaceLocationWith = F3(
-	function (_p5, x, input) {
-		var _p6 = _p5;
-		var _p7 = _p6._1;
-		var lineUpdater = function (target) {
-			return _elm_lang$core$String$concat(
-				{
-					ctor: '::',
-					_0: A2(_elm_lang$core$String$left, _p7 + 1, target),
-					_1: {
-						ctor: '::',
-						_0: x,
-						_1: {
-							ctor: '::',
-							_0: A2(_elm_lang$core$String$dropLeft, _p7 + 2, target),
-							_1: {ctor: '[]'}
-						}
-					}
-				});
-		};
-		var rows = A2(_elm_lang$core$String$split, '\n', input);
-		return A2(
-			_elm_lang$core$String$join,
-			'\n',
-			A3(
-				_elm_community$list_extra$List_Extra$updateIfIndex,
-				F2(
-					function (x, y) {
-						return _elm_lang$core$Native_Utils.eq(x, y);
-					})(_p6._0),
-				lineUpdater,
-				rows));
-	});
-var _user$project$Analyser_Fixes_FileContent$replaceRangeWith = F3(
-	function (range, x, input) {
-		var rowPostPartTakeFn = (_elm_lang$core$Native_Utils.cmp(range.end.column, -2) < 1) ? _elm_lang$core$Basics$always('') : _elm_lang$core$String$dropLeft(range.end.column + 2);
-		var rowPrePartTakeFn = (_elm_lang$core$Native_Utils.cmp(range.start.column, -2) < 1) ? _elm_lang$core$Basics$identity : _elm_lang$core$String$left(range.start.column + 1);
-		var afterRows = (_elm_lang$core$Native_Utils.cmp(range.end.column, -2) < 1) ? (range.end.row - 1) : range.end.row;
-		var beforeRows = (_elm_lang$core$Native_Utils.cmp(range.start.column, -2) < 1) ? (range.start.row - 1) : range.start.row;
-		var rows = A2(_elm_lang$core$String$split, '\n', input);
-		var linesBefore = A2(_elm_lang$core$List$take, beforeRows, rows);
-		var rowPrePart = A2(
-			_elm_lang$core$Maybe$withDefault,
-			'',
-			A2(
-				_elm_lang$core$Maybe$map,
-				rowPrePartTakeFn,
-				_elm_lang$core$List$head(
-					A2(_elm_lang$core$List$drop, beforeRows, rows))));
-		var postRows = A2(_elm_lang$core$List$drop, afterRows + 1, rows);
-		var rowPostPart = A2(
-			_elm_lang$core$Maybe$withDefault,
-			'',
-			A2(
-				_elm_lang$core$Maybe$map,
-				rowPostPartTakeFn,
-				_elm_lang$core$List$head(
-					A2(_elm_lang$core$List$drop, afterRows, rows))));
-		return _elm_lang$core$String$concat(
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$core$String$join,
-					'\n',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						linesBefore,
-						{
-							ctor: '::',
-							_0: rowPrePart,
-							_1: {ctor: '[]'}
-						})),
-				_1: {
-					ctor: '::',
-					_0: x,
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$core$String$join,
-							'\n',
-							{ctor: '::', _0: rowPostPart, _1: postRows}),
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-	});
-
-var _user$project$Analyser_Fixes_Base$Fixer = F2(
-	function (a, b) {
-		return {canFix: a, fix: b};
-	});
-
-var _user$project$Analyser_Fixes_UnnecessaryParens$fixContent = F2(
-	function (range, _p0) {
-		var _p1 = _p0;
-		var _p4 = _p1._1;
-		var lines = A2(_elm_lang$core$String$split, '\n', _p4);
-		var _p2 = _user$project$Analyser_Messages_Range$asSyntaxRange(range);
-		var start = _p2.start;
-		var end = _p2.end;
-		var startChar = A2(
-			_user$project$Analyser_Fixes_FileContent$getCharAtLocation,
-			{ctor: '_Tuple2', _0: start.row, _1: start.column},
-			_p4);
-		var endCharLoc = (_elm_lang$core$Native_Utils.cmp(end.column, -2) < 1) ? {
-			ctor: '_Tuple2',
-			_0: end.row - 1,
-			_1: A3(
-				_elm_lang$core$Basics$flip,
-				F2(
-					function (x, y) {
-						return x - y;
-					}),
-				2,
-				_elm_lang$core$String$length(
-					A2(
-						_elm_lang$core$Maybe$withDefault,
-						'',
-						_elm_lang$core$List$head(
-							A2(_elm_lang$core$List$drop, end.row - 1, lines)))))
-		} : (_elm_lang$core$Native_Utils.eq(end.column, -1) ? {
-			ctor: '_Tuple2',
-			_0: end.row - 2,
-			_1: A3(
-				_elm_lang$core$Basics$flip,
-				F2(
-					function (x, y) {
-						return x - y;
-					}),
-				2,
-				_elm_lang$core$String$length(
-					A2(
-						_elm_lang$core$Maybe$withDefault,
-						'',
-						_elm_lang$core$List$head(
-							A2(_elm_lang$core$List$drop, end.row - 2, lines)))))
-		} : {ctor: '_Tuple2', _0: end.row, _1: end.column - 1});
-		var endChar = A2(_user$project$Analyser_Fixes_FileContent$getCharAtLocation, endCharLoc, _p4);
-		var _p3 = {ctor: '_Tuple2', _0: startChar, _1: endChar};
-		if (((((_p3.ctor === '_Tuple2') && (_p3._0.ctor === 'Just')) && (_p3._0._0 === '(')) && (_p3._1.ctor === 'Just')) && (_p3._1._0 === ')')) {
-			return _elm_lang$core$Result$Ok(
-				A2(
-					F2(
-						function (v0, v1) {
-							return {ctor: '_Tuple2', _0: v0, _1: v1};
-						}),
-					_p1._0,
-					A3(
-						_user$project$Analyser_Fixes_FileContent$replaceLocationWith,
-						endCharLoc,
-						'',
-						A3(
-							_user$project$Analyser_Fixes_FileContent$replaceLocationWith,
-							{ctor: '_Tuple2', _0: start.row, _1: start.column},
-							' ',
-							_p4))));
-		} else {
-			return _elm_lang$core$Result$Err('Could not locate parens to replace');
-		}
-	});
-var _user$project$Analyser_Fixes_UnnecessaryParens$fix = F2(
-	function (input, messageData) {
-		var _p5 = messageData;
-		if (_p5.ctor === 'UnnecessaryParens') {
-			return A2(
-				_elm_lang$core$Maybe$withDefault,
-				_elm_lang$core$Result$Err('Could not find the right file to replace the unnecessary parens'),
-				A2(
-					_elm_lang$core$Maybe$map,
-					_elm_lang$core$Result$map(_elm_lang$core$List$singleton),
-					A2(
-						_elm_lang$core$Maybe$map,
-						function (_p6) {
-							return A2(
-								_user$project$Analyser_Fixes_UnnecessaryParens$fixContent,
-								_p5._1,
-								_Fresheyeball$elm_tuple_extra$Tuple3$init(_p6));
-						},
-						_elm_lang$core$List$head(
-							A2(
-								_elm_lang$core$List$filter,
-								function (_p7) {
-									return A2(
-										F2(
-											function (x, y) {
-												return _elm_lang$core$Native_Utils.eq(x, y);
-											}),
-										_p5._0,
-										_Fresheyeball$elm_tuple_extra$Tuple3$first(_p7));
-								},
-								input)))));
-		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnnecessaryParens');
-		}
-	});
-var _user$project$Analyser_Fixes_UnnecessaryParens$canFix = function (message) {
-	var _p8 = message;
-	if (_p8.ctor === 'UnnecessaryParens') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$Analyser_Fixes_UnnecessaryParens$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnnecessaryParens$canFix, _user$project$Analyser_Fixes_UnnecessaryParens$fix);
-
-var _user$project$Analyser_Fixes_UnusedImportedVariable$writeNewImport = F3(
-	function (syntaxRange, imp, i) {
-		return A3(
-			_user$project$Analyser_Fixes_FileContent$replaceLines,
-			{ctor: '_Tuple2', _0: syntaxRange.start.row, _1: syntaxRange.end.row},
-			_user$project$ASTUtil_Imports$naiveStringifyImport(imp),
-			i);
-	});
-var _user$project$Analyser_Fixes_UnusedImportedVariable$removeImport = F2(
-	function (_p0, range) {
-		var _p1 = _p0;
-		var _p2 = A2(
-			_user$project$ASTUtil_Imports$findImportWithRange,
-			_p1._2,
-			_user$project$Analyser_Messages_Range$asSyntaxRange(range));
-		if (_p2.ctor === 'Just') {
-			var _p3 = _p2._0;
-			return _elm_lang$core$Result$Ok(
-				{
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: _p1._0,
-						_1: A3(
-							_user$project$Analyser_Fixes_UnusedImportedVariable$writeNewImport,
-							_p3.range,
-							A2(
-								_user$project$ASTUtil_Imports$removeRangeFromImport,
-								_user$project$Analyser_Messages_Range$asSyntaxRange(range),
-								_p3),
-							_p1._1)
-					},
-					_1: {ctor: '[]'}
-				});
-		} else {
-			return _elm_lang$core$Result$Err('Could not locate import for the target range');
-		}
-	});
-var _user$project$Analyser_Fixes_UnusedImportedVariable$fix = F2(
-	function (input, messageData) {
-		var _p4 = messageData;
-		if (_p4.ctor === 'UnusedImportedVariable') {
-			var _p5 = _elm_lang$core$List$head(input);
-			if (_p5.ctor === 'Nothing') {
-				return _elm_lang$core$Result$Err('No input for fixer UnusedImportedVariable');
-			} else {
-				return A2(_user$project$Analyser_Fixes_UnusedImportedVariable$removeImport, _p5._0, _p4._2);
-			}
-		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedImportedVariable');
-		}
-	});
-var _user$project$Analyser_Fixes_UnusedImportedVariable$canFix = function (message) {
-	var _p6 = message;
-	if (_p6.ctor === 'UnusedImportedVariable') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$Analyser_Fixes_UnusedImportedVariable$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnusedImportedVariable$canFix, _user$project$Analyser_Fixes_UnusedImportedVariable$fix);
-
-var _user$project$Analyser_Fixes_UnusedImportAlias$writeNewImport = F3(
-	function (syntaxRange, imp, i) {
-		return A3(
-			_user$project$Analyser_Fixes_FileContent$replaceLines,
-			{ctor: '_Tuple2', _0: syntaxRange.start.row, _1: syntaxRange.end.row},
-			_user$project$ASTUtil_Imports$naiveStringifyImport(imp),
-			i);
-	});
-var _user$project$Analyser_Fixes_UnusedImportAlias$updateImport = F2(
-	function (_p0, range) {
-		var _p1 = _p0;
-		var _p2 = A2(
-			_user$project$ASTUtil_Imports$findImportWithRange,
-			_p1._2,
-			_user$project$Analyser_Messages_Range$asSyntaxRange(range));
-		if (_p2.ctor === 'Just') {
-			var _p3 = _p2._0;
-			return _elm_lang$core$Result$Ok(
-				{
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: _p1._0,
-						_1: A3(
-							_user$project$Analyser_Fixes_UnusedImportAlias$writeNewImport,
-							_p3.range,
-							_elm_lang$core$Native_Utils.update(
-								_p3,
-								{moduleAlias: _elm_lang$core$Maybe$Nothing}),
-							_p1._1)
-					},
-					_1: {ctor: '[]'}
-				});
-		} else {
-			return _elm_lang$core$Result$Err('Could not locate import for the target range');
-		}
-	});
-var _user$project$Analyser_Fixes_UnusedImportAlias$fix = F2(
-	function (input, messageData) {
-		var _p4 = messageData;
-		if (_p4.ctor === 'UnusedImportAlias') {
-			var _p5 = _elm_lang$core$List$head(input);
-			if (_p5.ctor === 'Nothing') {
-				return _elm_lang$core$Result$Err('No input for fixer UnusedImportAlias');
-			} else {
-				return A2(_user$project$Analyser_Fixes_UnusedImportAlias$updateImport, _p5._0, _p4._2);
-			}
-		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedImportAlias');
-		}
-	});
-var _user$project$Analyser_Fixes_UnusedImportAlias$canFix = function (message) {
-	var _p6 = message;
-	if (_p6.ctor === 'UnusedImportAlias') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$Analyser_Fixes_UnusedImportAlias$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnusedImportAlias$canFix, _user$project$Analyser_Fixes_UnusedImportAlias$fix);
-
-var _user$project$Analyser_Fixes_UnusedPatternVariable$fixPattern = F2(
-	function (_p0, range) {
-		var _p1 = _p0;
-		var _p2 = A2(
-			_user$project$ASTUtil_Patterns$findParentPattern,
-			_p1._2,
-			_user$project$Analyser_Messages_Range$asSyntaxRange(range));
-		if (_p2.ctor === 'Just') {
-			var _p3 = _p2._0;
-			return _elm_lang$core$Result$Ok(
-				{
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: _p1._0,
-						_1: A3(
-							_user$project$Analyser_Fixes_FileContent$replaceRangeWith,
-							_user$project$ASTUtil_PatternOptimizer$patternRange(_p3),
-							_stil4m$elm_syntax$Elm_Writer$write(
-								_stil4m$elm_syntax$Elm_Writer$writePattern(
-									A2(
-										_user$project$ASTUtil_PatternOptimizer$optimize,
-										_user$project$Analyser_Messages_Range$asSyntaxRange(range),
-										_p3))),
-							_p1._1)
-					},
-					_1: {ctor: '[]'}
-				});
-		} else {
-			return _elm_lang$core$Result$Err('Could not find location to replace unused variable in pattern');
-		}
-	});
-var _user$project$Analyser_Fixes_UnusedPatternVariable$fix = F2(
-	function (input, messageData) {
-		var _p4 = messageData;
-		if (_p4.ctor === 'UnusedPatternVariable') {
-			var _p5 = _elm_lang$core$List$head(input);
-			if (_p5.ctor === 'Nothing') {
-				return _elm_lang$core$Result$Err('No input for fixer UnusedPatternVariable');
-			} else {
-				return A2(_user$project$Analyser_Fixes_UnusedPatternVariable$fixPattern, _p5._0, _p4._2);
-			}
-		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedPatternVariable');
-		}
-	});
-var _user$project$Analyser_Fixes_UnusedPatternVariable$canFix = function (message) {
-	var _p6 = message;
-	if (_p6.ctor === 'UnusedPatternVariable') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$Analyser_Fixes_UnusedPatternVariable$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnusedPatternVariable$canFix, _user$project$Analyser_Fixes_UnusedPatternVariable$fix);
-
-var _user$project$Analyser_Fixes_UnformattedFile$fix = F2(
-	function (input, messageData) {
-		var _p0 = messageData;
-		if (_p0.ctor === 'UnformattedFile') {
-			return _elm_lang$core$Result$Ok(
-				A2(_elm_lang$core$List$map, _Fresheyeball$elm_tuple_extra$Tuple3$init, input));
-		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnformattedFile');
-		}
-	});
-var _user$project$Analyser_Fixes_UnformattedFile$canFix = function (message) {
-	var _p1 = message;
-	if (_p1.ctor === 'UnformattedFile') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$Analyser_Fixes_UnformattedFile$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnformattedFile$canFix, _user$project$Analyser_Fixes_UnformattedFile$fix);
-
-var _user$project$Analyser_Fixes_UnusedTypeAlias$removeTypeAlias = F2(
-	function (typeAlias, content) {
-		var end = typeAlias.range.end;
-		var start = A2(
-			_elm_lang$core$Maybe$withDefault,
-			typeAlias.range.start,
-			A2(
-				_elm_lang$core$Maybe$map,
-				function (_p0) {
-					return function (_) {
-						return _.start;
-					}(
-						function (_) {
-							return _.range;
-						}(_p0));
-				},
-				typeAlias.documentation));
-		return A3(
-			_user$project$Analyser_Fixes_FileContent$replaceRangeWith,
-			A2(_stil4m$elm_syntax$Elm_Syntax_Range$Range, start, end),
-			'',
-			content);
-	});
-var _user$project$Analyser_Fixes_UnusedTypeAlias$findTypeAlias = F2(
-	function (range, file) {
-		return _elm_lang$core$List$head(
-			A2(
-				_elm_lang$core$List$filterMap,
-				function (decl) {
-					var _p1 = decl;
-					if (_p1.ctor === 'AliasDecl') {
-						var _p2 = _p1._0;
-						return _elm_lang$core$Native_Utils.eq(
-							_p2.range,
-							_user$project$Analyser_Messages_Range$asSyntaxRange(range)) ? _elm_lang$core$Maybe$Just(_p2) : _elm_lang$core$Maybe$Nothing;
-					} else {
-						return _elm_lang$core$Maybe$Nothing;
-					}
-				},
-				file.declarations));
-	});
-var _user$project$Analyser_Fixes_UnusedTypeAlias$findAndRemoveTypeAlias = F2(
-	function (_p3, range) {
-		var _p4 = _p3;
-		return A2(
-			_elm_lang$core$Maybe$map,
-			function (typeAlias) {
-				return {
-					ctor: '_Tuple2',
-					_0: _p4._0,
-					_1: A2(_user$project$Analyser_Fixes_UnusedTypeAlias$removeTypeAlias, typeAlias, _p4._1)
-				};
-			},
-			A2(_user$project$Analyser_Fixes_UnusedTypeAlias$findTypeAlias, range, _p4._2));
-	});
-var _user$project$Analyser_Fixes_UnusedTypeAlias$fix = F2(
-	function (input, messageData) {
-		var _p5 = messageData;
-		if (_p5.ctor === 'UnusedTypeAlias') {
-			var _p6 = _elm_lang$core$List$head(input);
-			if (_p6.ctor === 'Nothing') {
-				return _elm_lang$core$Result$Err('No input for fixer UnusedTypeAlias');
-			} else {
-				return A2(
-					_elm_lang$core$Result$fromMaybe,
-					'Could not find type alias',
-					A2(
-						_elm_lang$core$Maybe$map,
-						_elm_lang$core$List$singleton,
-						A2(_user$project$Analyser_Fixes_UnusedTypeAlias$findAndRemoveTypeAlias, _p6._0, _p5._2)));
-			}
-		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedTypeAlias');
-		}
-	});
-var _user$project$Analyser_Fixes_UnusedTypeAlias$canFix = function (message) {
-	var _p7 = message;
-	if (_p7.ctor === 'UnusedTypeAlias') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$Analyser_Fixes_UnusedTypeAlias$fixer = A2(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnusedTypeAlias$canFix, _user$project$Analyser_Fixes_UnusedTypeAlias$fix);
-
 var _user$project$Analyser_Fixer$fixers = {
 	ctor: '::',
 	_0: _user$project$Analyser_Fixes_UnnecessaryParens$fixer,
@@ -24639,7 +25133,11 @@ var _user$project$Analyser_Fixer$fixers = {
 					_1: {
 						ctor: '::',
 						_0: _user$project$Analyser_Fixes_UnusedTypeAlias$fixer,
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: _user$project$Analyser_Fixes_MultiLineRecordFormatting$fixer,
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
@@ -25234,6 +25732,1672 @@ var _user$project$Analyser_Checks_Base$Checker = F2(
 		return {shouldCheck: a, check: b};
 	});
 
+var _user$project$Analyser_Checks_CoreArrayUsage$isArrayImport = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$core$Native_Utils.eq(
+		_p1.moduleName,
+		{
+			ctor: '::',
+			_0: 'Array',
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Analyser_Checks_CoreArrayUsage$scan = F3(
+	function (rangeContext, fileContext, _p2) {
+		return A2(
+			_elm_lang$core$List$take,
+			1,
+			A2(
+				_elm_lang$core$List$map,
+				_user$project$Analyser_Messages_Types$newMessage(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+						_1: {ctor: '[]'}
+					}),
+				A2(
+					_elm_lang$core$List$map,
+					function (_p3) {
+						return A2(
+							_user$project$Analyser_Messages_Types$CoreArrayUsage,
+							fileContext.path,
+							A2(
+								_user$project$Analyser_Messages_Range$build,
+								rangeContext,
+								function (_) {
+									return _.range;
+								}(_p3)));
+					},
+					A2(_elm_lang$core$List$filter, _user$project$Analyser_Checks_CoreArrayUsage$isArrayImport, fileContext.ast.imports))));
+	});
+var _user$project$Analyser_Checks_CoreArrayUsage$checker = {
+	check: _user$project$Analyser_Checks_CoreArrayUsage$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'CoreArrayUsage',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_DuplicateImport$onImport = F3(
+	function (rangeContext, _p0, context) {
+		var _p1 = _p0;
+		var _p4 = _p1.range;
+		var _p3 = _p1.moduleName;
+		var _p2 = A2(_elm_lang$core$Dict$get, _p3, context);
+		if (_p2.ctor === 'Just') {
+			return A3(
+				_elm_lang$core$Dict$update,
+				_p3,
+				_elm_lang$core$Maybe$map(
+					A2(
+						_elm_lang$core$Basics$flip,
+						F2(
+							function (x, y) {
+								return A2(_elm_lang$core$Basics_ops['++'], x, y);
+							}),
+						{
+							ctor: '::',
+							_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p4),
+							_1: {ctor: '[]'}
+						})),
+				context);
+		} else {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p3,
+				{
+					ctor: '::',
+					_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p4),
+					_1: {ctor: '[]'}
+				},
+				context);
+		}
+	});
+var _user$project$Analyser_Checks_DuplicateImport$hasLength = function (f) {
+	return function (_p5) {
+		return f(
+			_elm_lang$core$List$length(_p5));
+	};
+};
+var _user$project$Analyser_Checks_DuplicateImport$scan = F3(
+	function (rangeContext, fileContext, _p6) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$uncurry(
+					_user$project$Analyser_Messages_Types$DuplicateImport(fileContext.path)),
+				_elm_lang$core$Dict$toList(
+					A2(
+						_elm_lang$core$Dict$filter,
+						_elm_lang$core$Basics$always(
+							_user$project$Analyser_Checks_DuplicateImport$hasLength(
+								F2(
+									function (x, y) {
+										return _elm_lang$core$Native_Utils.cmp(x, y) < 0;
+									})(1))),
+						A3(
+							_user$project$ASTUtil_Inspector$inspect,
+							_elm_lang$core$Native_Utils.update(
+								_user$project$ASTUtil_Inspector$defaultConfig,
+								{
+									onImport: _user$project$ASTUtil_Inspector$Post(
+										_user$project$Analyser_Checks_DuplicateImport$onImport(rangeContext)),
+									onFunction: _user$project$ASTUtil_Inspector$Skip
+								}),
+							fileContext.ast,
+							_elm_lang$core$Dict$empty)))));
+	});
+var _user$project$Analyser_Checks_DuplicateImport$checker = {
+	check: _user$project$Analyser_Checks_DuplicateImport$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'DuplicateImport',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_DuplicateImportedVariable$exposingConstructors = function (t) {
+	var _p0 = t;
+	if (_p0.ctor === 'TypeExpose') {
+		var _p1 = _p0._0.constructors;
+		if (_p1.ctor === 'Explicit') {
+			return _p1._0;
+		} else {
+			return {ctor: '[]'};
+		}
+	} else {
+		return {ctor: '[]'};
+	}
+};
+var _user$project$Analyser_Checks_DuplicateImportedVariable$exposingValues = function (t) {
+	var _p2 = t;
+	switch (_p2.ctor) {
+		case 'TypeExpose':
+			var _p3 = _p2._0;
+			return {ctor: '_Tuple2', _0: _p3.name, _1: _p3.range};
+		case 'InfixExpose':
+			return {ctor: '_Tuple2', _0: _p2._0, _1: _p2._1};
+		case 'FunctionExpose':
+			return {ctor: '_Tuple2', _0: _p2._0, _1: _p2._1};
+		default:
+			return {ctor: '_Tuple2', _0: _p2._0, _1: _p2._1};
+	}
+};
+var _user$project$Analyser_Checks_DuplicateImportedVariable$constructorsAndValues = function (imp) {
+	var _p4 = imp.exposingList;
+	switch (_p4.ctor) {
+		case 'None':
+			return {
+				ctor: '_Tuple2',
+				_0: {ctor: '[]'},
+				_1: {ctor: '[]'}
+			};
+		case 'All':
+			return {
+				ctor: '_Tuple2',
+				_0: {ctor: '[]'},
+				_1: {ctor: '[]'}
+			};
+		default:
+			var _p5 = _p4._0;
+			return {
+				ctor: '_Tuple2',
+				_0: A2(_elm_lang$core$List$concatMap, _user$project$Analyser_Checks_DuplicateImportedVariable$exposingConstructors, _p5),
+				_1: A2(_elm_lang$core$List$map, _user$project$Analyser_Checks_DuplicateImportedVariable$exposingValues, _p5)
+			};
+	}
+};
+var _user$project$Analyser_Checks_DuplicateImportedVariable$mergeImportedValue = F2(
+	function (l, entry) {
+		var addPair = F2(
+			function (_p6, d) {
+				var _p7 = _p6;
+				var _p8 = _p7._1;
+				return A3(
+					_elm_lang$core$Dict$update,
+					_p7._0,
+					function (old) {
+						return _elm_lang$core$Maybe$Just(
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								{
+									ctor: '::',
+									_0: _p8,
+									_1: {ctor: '[]'}
+								},
+								A2(
+									_elm_lang$core$Maybe$map,
+									F2(
+										function (x, y) {
+											return {ctor: '::', _0: x, _1: y};
+										})(_p8),
+									old)));
+					},
+					d);
+			});
+		return A3(_elm_lang$core$List$foldl, addPair, entry, l);
+	});
+var _user$project$Analyser_Checks_DuplicateImportedVariable$onImport = F2(
+	function (imp, context) {
+		var _p9 = _user$project$Analyser_Checks_DuplicateImportedVariable$constructorsAndValues(imp);
+		var cs = _p9._0;
+		var vs = _p9._1;
+		return _elm_lang$core$Native_Utils.update(
+			context,
+			{
+				constructors: A3(
+					_elm_lang$core$Dict$update,
+					imp.moduleName,
+					function (_p10) {
+						return _elm_lang$core$Maybe$Just(
+							A2(
+								_user$project$Analyser_Checks_DuplicateImportedVariable$mergeImportedValue,
+								cs,
+								A2(_elm_lang$core$Maybe$withDefault, _elm_lang$core$Dict$empty, _p10)));
+					},
+					context.constructors),
+				functionOrValues: A3(
+					_elm_lang$core$Dict$update,
+					imp.moduleName,
+					function (_p11) {
+						return _elm_lang$core$Maybe$Just(
+							A2(
+								_user$project$Analyser_Checks_DuplicateImportedVariable$mergeImportedValue,
+								vs,
+								A2(_elm_lang$core$Maybe$withDefault, _elm_lang$core$Dict$empty, _p11)));
+					},
+					context.functionOrValues)
+			});
+	});
+var _user$project$Analyser_Checks_DuplicateImportedVariable$findViolations = function (d) {
+	return A2(
+		_elm_lang$core$List$filter,
+		function (_p12) {
+			var _p13 = _p12;
+			return _elm_lang$core$Native_Utils.cmp(
+				_elm_lang$core$List$length(_p13._2),
+				2) > -1;
+		},
+		A2(
+			_elm_lang$core$List$concatMap,
+			function (_p14) {
+				var _p15 = _p14;
+				return A2(
+					_elm_lang$core$List$map,
+					function (_p16) {
+						var _p17 = _p16;
+						return {ctor: '_Tuple3', _0: _p15._0, _1: _p17._0, _2: _p17._1};
+					},
+					_elm_lang$core$Dict$toList(_p15._1));
+			},
+			_elm_lang$core$Dict$toList(d)));
+};
+var _user$project$Analyser_Checks_DuplicateImportedVariable$asMessageData = F3(
+	function (rangeContext, path, _p18) {
+		var _p19 = _p18;
+		return A4(
+			_user$project$Analyser_Messages_Types$DuplicateImportedVariable,
+			path,
+			_p19._0,
+			_p19._1,
+			A2(
+				_elm_lang$core$List$map,
+				_user$project$Analyser_Messages_Range$build(rangeContext),
+				_p19._2));
+	});
+var _user$project$Analyser_Checks_DuplicateImportedVariable$scan = F3(
+	function (rangeContext, fileContext, _p20) {
+		var result = A3(
+			_user$project$ASTUtil_Inspector$inspect,
+			_elm_lang$core$Native_Utils.update(
+				_user$project$ASTUtil_Inspector$defaultConfig,
+				{
+					onImport: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_DuplicateImportedVariable$onImport),
+					onFunction: _user$project$ASTUtil_Inspector$Skip
+				}),
+			fileContext.ast,
+			{constructors: _elm_lang$core$Dict$empty, functionOrValues: _elm_lang$core$Dict$empty});
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				A2(_user$project$Analyser_Checks_DuplicateImportedVariable$asMessageData, rangeContext, fileContext.path),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_user$project$Analyser_Checks_DuplicateImportedVariable$findViolations(result.functionOrValues),
+					_user$project$Analyser_Checks_DuplicateImportedVariable$findViolations(result.constructors))));
+	});
+var _user$project$Analyser_Checks_DuplicateImportedVariable$checker = {
+	check: _user$project$Analyser_Checks_DuplicateImportedVariable$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'DuplicateImportedVariable',
+			_1: {ctor: '[]'}
+		})
+};
+var _user$project$Analyser_Checks_DuplicateImportedVariable$Context = F2(
+	function (a, b) {
+		return {constructors: a, functionOrValues: b};
+	});
+
+var _user$project$Analyser_Checks_DuplicateRecordFieldUpdate$expressionRange = function (_p0) {
+	var _p1 = _p0;
+	return _p1._0;
+};
+var _user$project$Analyser_Checks_DuplicateRecordFieldUpdate$onRecordUpdate = F2(
+	function (_p2, context) {
+		var _p3 = _p2;
+		return A2(
+			F2(
+				function (x, y) {
+					return A2(_elm_lang$core$Basics_ops['++'], x, y);
+				}),
+			context,
+			_elm_lang$core$Dict$toList(
+				A2(
+					_elm_lang$core$Dict$map,
+					F2(
+						function (_p4, v) {
+							return A2(
+								_elm_lang$core$List$map,
+								function (_p5) {
+									return _user$project$Analyser_Checks_DuplicateRecordFieldUpdate$expressionRange(
+										_elm_lang$core$Tuple$second(_p5));
+								},
+								v);
+						}),
+					A2(
+						_elm_lang$core$Dict$filter,
+						F2(
+							function (_p6, v) {
+								return _elm_lang$core$Native_Utils.cmp(
+									_elm_lang$core$List$length(v),
+									1) > 0;
+							}),
+						A2(_elm_community$dict_extra$Dict_Extra$groupBy, _elm_lang$core$Tuple$first, _p3.updates)))));
+	});
+var _user$project$Analyser_Checks_DuplicateRecordFieldUpdate$scan = F3(
+	function (rangeContext, fileContext, _p7) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$uncurry(
+					_user$project$Analyser_Messages_Types$DuplicateRecordFieldUpdate(fileContext.path)),
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$core$Tuple$mapSecond(
+						_elm_lang$core$List$map(
+							_user$project$Analyser_Messages_Range$build(rangeContext))),
+					A3(
+						_user$project$ASTUtil_Inspector$inspect,
+						_elm_lang$core$Native_Utils.update(
+							_user$project$ASTUtil_Inspector$defaultConfig,
+							{
+								onRecordUpdate: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_DuplicateRecordFieldUpdate$onRecordUpdate)
+							}),
+						fileContext.ast,
+						{ctor: '[]'}))));
+	});
+var _user$project$Analyser_Checks_DuplicateRecordFieldUpdate$checker = {
+	check: _user$project$Analyser_Checks_DuplicateRecordFieldUpdate$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'DuplicateRecordFieldUpdate',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_ExposeAll$onFile = F4(
+	function (rangeContext, _p1, file, _p0) {
+		var _p2 = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_stil4m$elm_syntax$Elm_Syntax_Exposing$None,
+			_user$project$AST_Util$fileExposingList(file));
+		switch (_p2.ctor) {
+			case 'None':
+				return {ctor: '[]'};
+			case 'All':
+				return {
+					ctor: '::',
+					_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p2._0),
+					_1: {ctor: '[]'}
+				};
+			default:
+				return A2(
+					_elm_lang$core$List$filterMap,
+					function (y) {
+						var _p3 = y;
+						if (_p3.ctor === 'TypeExpose') {
+							var _p4 = _p3._0.constructors;
+							if (_p4.ctor === 'All') {
+								return _elm_lang$core$Maybe$Just(
+									A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p4._0));
+							} else {
+								return _elm_lang$core$Maybe$Nothing;
+							}
+						} else {
+							return _elm_lang$core$Maybe$Nothing;
+						}
+					},
+					_p2._0);
+		}
+	});
+var _user$project$Analyser_Checks_ExposeAll$scan = F3(
+	function (rangeContext, fileContext, _p5) {
+		var x = A3(
+			_user$project$ASTUtil_Inspector$inspect,
+			_elm_lang$core$Native_Utils.update(
+				_user$project$ASTUtil_Inspector$defaultConfig,
+				{
+					onFile: _user$project$ASTUtil_Inspector$Inner(
+						_user$project$Analyser_Checks_ExposeAll$onFile(rangeContext))
+				}),
+			fileContext.ast,
+			{ctor: '[]'});
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				_user$project$Analyser_Messages_Types$ExposeAll(fileContext.path),
+				x));
+	});
+var _user$project$Analyser_Checks_ExposeAll$checker = {
+	check: _user$project$Analyser_Checks_ExposeAll$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'ExposeAll',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_FunctionInLet$onLetBlock = F3(
+	function ($continue, _p0, context) {
+		return function (after) {
+			return _elm_lang$core$Native_Utils.update(
+				after,
+				{inLetBlock: context.inLetBlock});
+		}(
+			$continue(
+				_elm_lang$core$Native_Utils.update(
+					context,
+					{inLetBlock: true})));
+	});
+var _user$project$Analyser_Checks_FunctionInLet$onFunction = F2(
+	function ($function, context) {
+		var isStatic = _user$project$ASTUtil_Functions$isStatic($function);
+		return ((!isStatic) && context.inLetBlock) ? _elm_lang$core$Native_Utils.update(
+			context,
+			{
+				functions: {ctor: '::', _0: $function, _1: context.functions}
+			}) : context;
+	});
+var _user$project$Analyser_Checks_FunctionInLet$asMessage = F3(
+	function (rangeContext, fileContext, f) {
+		return A2(
+			_user$project$Analyser_Messages_Types$newMessage,
+			{
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_user$project$Analyser_Messages_Types$FunctionInLet,
+				fileContext.path,
+				A2(_user$project$Analyser_Messages_Range$build, rangeContext, f.declaration.name.range)));
+	});
+var _user$project$Analyser_Checks_FunctionInLet$startingContext = {
+	inLetBlock: false,
+	functions: {ctor: '[]'}
+};
+var _user$project$Analyser_Checks_FunctionInLet$scan = F3(
+	function (rangeContext, fileContext, _p1) {
+		return A2(
+			_elm_lang$core$List$map,
+			A2(_user$project$Analyser_Checks_FunctionInLet$asMessage, rangeContext, fileContext),
+			function (_) {
+				return _.functions;
+			}(
+				A3(
+					_user$project$ASTUtil_Inspector$inspect,
+					_elm_lang$core$Native_Utils.update(
+						_user$project$ASTUtil_Inspector$defaultConfig,
+						{
+							onLetBlock: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_FunctionInLet$onLetBlock),
+							onFunction: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_FunctionInLet$onFunction)
+						}),
+					fileContext.ast,
+					_user$project$Analyser_Checks_FunctionInLet$startingContext)));
+	});
+var _user$project$Analyser_Checks_FunctionInLet$checker = {
+	check: _user$project$Analyser_Checks_FunctionInLet$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'FunctionInLet',
+			_1: {ctor: '[]'}
+		})
+};
+var _user$project$Analyser_Checks_FunctionInLet$Context = F2(
+	function (a, b) {
+		return {inLetBlock: a, functions: b};
+	});
+
+var _user$project$Analyser_Checks_ImportAll$onImport = F3(
+	function (rangeContext, imp, context) {
+		return A3(
+			_elm_lang$core$Basics$flip,
+			_elm_lang$core$List$append,
+			context,
+			function () {
+				var _p0 = imp.exposingList;
+				switch (_p0.ctor) {
+					case 'All':
+						return {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: imp.moduleName,
+								_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p0._0)
+							},
+							_1: {ctor: '[]'}
+						};
+					case 'None':
+						return {ctor: '[]'};
+					default:
+						return A2(
+							_elm_lang$core$List$filterMap,
+							function (explicitItem) {
+								var _p1 = explicitItem;
+								if (_p1.ctor === 'TypeExpose') {
+									var _p2 = _p1._0.constructors;
+									if (_p2.ctor === 'All') {
+										return _elm_lang$core$Maybe$Just(
+											{
+												ctor: '_Tuple2',
+												_0: imp.moduleName,
+												_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p2._0)
+											});
+									} else {
+										return _elm_lang$core$Maybe$Nothing;
+									}
+								} else {
+									return _elm_lang$core$Maybe$Nothing;
+								}
+							},
+							_p0._0);
+				}
+			}());
+	});
+var _user$project$Analyser_Checks_ImportAll$scan = F3(
+	function (rangeContext, fileContext, _p3) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$uncurry(
+					_user$project$Analyser_Messages_Types$ImportAll(fileContext.path)),
+				A2(
+					_elm_lang$core$List$sortWith,
+					F2(
+						function (_p5, _p4) {
+							var _p6 = _p5;
+							var _p7 = _p4;
+							return A2(_user$project$Analyser_Messages_Range$orderByStart, _p6._1, _p7._1);
+						}),
+					A3(
+						_user$project$ASTUtil_Inspector$inspect,
+						_elm_lang$core$Native_Utils.update(
+							_user$project$ASTUtil_Inspector$defaultConfig,
+							{
+								onImport: _user$project$ASTUtil_Inspector$Post(
+									_user$project$Analyser_Checks_ImportAll$onImport(rangeContext))
+							}),
+						fileContext.ast,
+						{ctor: '[]'}))));
+	});
+var _user$project$Analyser_Checks_ImportAll$checker = {
+	check: _user$project$Analyser_Checks_ImportAll$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'ImportAll',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_LineLength$scan = F3(
+	function (rangeContext, fileContext, configuration) {
+		var threshold = A2(
+			_elm_lang$core$Maybe$withDefault,
+			150,
+			A3(_user$project$Analyser_Configuration$checkPropertyAsInt, 'LineLengthExceeded', 'threshold', configuration));
+		var longLineRanges = A2(
+			_elm_lang$core$List$map,
+			function (_p0) {
+				var _p1 = _p0;
+				var _p2 = _p1._0;
+				return {
+					start: {row: _p2, column: -1},
+					end: {row: _p2 + 1, column: -2}
+				};
+			},
+			A2(
+				_elm_lang$core$List$filter,
+				function (_p3) {
+					return !A2(
+						_elm_lang$core$String$startsWith,
+						'import',
+						_elm_lang$core$Tuple$second(_p3));
+				},
+				A2(
+					_elm_lang$core$List$filter,
+					function (_p4) {
+						return !A2(
+							_elm_lang$core$String$startsWith,
+							'module',
+							_elm_lang$core$Tuple$second(_p4));
+					},
+					A2(
+						_elm_lang$core$List$filter,
+						function (_p5) {
+							return A2(
+								F2(
+									function (x, y) {
+										return _elm_lang$core$Native_Utils.cmp(x, y) < 0;
+									}),
+								threshold,
+								_elm_lang$core$String$length(
+									_elm_lang$core$Tuple$second(_p5)));
+						},
+						A2(
+							_elm_lang$core$List$indexedMap,
+							F2(
+								function (v0, v1) {
+									return {ctor: '_Tuple2', _0: v0, _1: v1};
+								}),
+							A2(_elm_lang$core$String$split, '\n', fileContext.content))))));
+		return _elm_lang$core$List$isEmpty(longLineRanges) ? {ctor: '[]'} : {
+			ctor: '::',
+			_0: A2(
+				_user$project$Analyser_Messages_Types$newMessage,
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				},
+				A2(
+					_user$project$Analyser_Messages_Types$LineLengthExceeded,
+					fileContext.path,
+					A2(
+						_elm_lang$core$List$map,
+						_user$project$Analyser_Messages_Range$build(rangeContext),
+						longLineRanges))),
+			_1: {ctor: '[]'}
+		};
+	});
+var _user$project$Analyser_Checks_LineLength$checker = {
+	check: _user$project$Analyser_Checks_LineLength$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'LineLengthExceeded',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_ListOperators$deficiencyToMessageData = F3(
+	function (path, configuration, _p0) {
+		var _p1 = _p0;
+		return A2(
+			_elm_lang$core$Maybe$map,
+			function (messageConstructor) {
+				return A2(messageConstructor, path, _p1._1);
+			},
+			function () {
+				var _p2 = _p1._0;
+				switch (_p2.ctor) {
+					case 'DropConcat':
+						return A2(_user$project$Analyser_Configuration$checkEnabled, 'DropConcatOfLists', configuration) ? _elm_lang$core$Maybe$Just(_user$project$Analyser_Messages_Types$DropConcatOfLists) : _elm_lang$core$Maybe$Nothing;
+					case 'DropCons':
+						return A2(_user$project$Analyser_Configuration$checkEnabled, 'DropConsOfItemAndList', configuration) ? _elm_lang$core$Maybe$Just(_user$project$Analyser_Messages_Types$DropConsOfItemAndList) : _elm_lang$core$Maybe$Nothing;
+					default:
+						return A2(_user$project$Analyser_Configuration$checkEnabled, 'UseConsOverConcat', configuration) ? _elm_lang$core$Maybe$Just(_user$project$Analyser_Messages_Types$UseConsOverConcat) : _elm_lang$core$Maybe$Nothing;
+				}
+			}());
+	});
+var _user$project$Analyser_Checks_ListOperators$UseCons = {ctor: 'UseCons'};
+var _user$project$Analyser_Checks_ListOperators$DropCons = {ctor: 'DropCons'};
+var _user$project$Analyser_Checks_ListOperators$DropConcat = {ctor: 'DropConcat'};
+var _user$project$Analyser_Checks_ListOperators$onExpression = F3(
+	function (rangeContext, _p3, context) {
+		var _p4 = _p3;
+		var _p6 = _p4._0;
+		var _p5 = _p4._1;
+		_v3_3:
+		do {
+			if (_p5.ctor === 'OperatorApplication') {
+				switch (_p5._0) {
+					case '::':
+						if ((_p5._3.ctor === '_Tuple2') && (_p5._3._1.ctor === 'ListExpr')) {
+							return {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: _user$project$Analyser_Checks_ListOperators$DropCons,
+									_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p6)
+								},
+								_1: context
+							};
+						} else {
+							break _v3_3;
+						}
+					case '++':
+						if ((_p5._2.ctor === '_Tuple2') && (_p5._2._1.ctor === 'ListExpr')) {
+							if ((_p5._3.ctor === '_Tuple2') && (_p5._3._1.ctor === 'ListExpr')) {
+								return {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: _user$project$Analyser_Checks_ListOperators$DropConcat,
+										_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p6)
+									},
+									_1: context
+								};
+							} else {
+								if ((_p5._2._1._0.ctor === '::') && (_p5._2._1._0._1.ctor === '[]')) {
+									return {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: _user$project$Analyser_Checks_ListOperators$UseCons,
+											_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p6)
+										},
+										_1: context
+									};
+								} else {
+									break _v3_3;
+								}
+							}
+						} else {
+							break _v3_3;
+						}
+					default:
+						break _v3_3;
+				}
+			} else {
+				break _v3_3;
+			}
+		} while(false);
+		return context;
+	});
+var _user$project$Analyser_Checks_ListOperators$scan = F3(
+	function (rangeContext, fileContext, configuration) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$filterMap,
+				A2(_user$project$Analyser_Checks_ListOperators$deficiencyToMessageData, fileContext.path, configuration),
+				A3(
+					_user$project$ASTUtil_Inspector$inspect,
+					_elm_lang$core$Native_Utils.update(
+						_user$project$ASTUtil_Inspector$defaultConfig,
+						{
+							onExpression: _user$project$ASTUtil_Inspector$Post(
+								_user$project$Analyser_Checks_ListOperators$onExpression(rangeContext))
+						}),
+					fileContext.ast,
+					{ctor: '[]'})));
+	});
+var _user$project$Analyser_Checks_ListOperators$checker = {
+	check: _user$project$Analyser_Checks_ListOperators$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'DropConcatOfLists',
+			_1: {
+				ctor: '::',
+				_0: 'DropConsOfItemAndList',
+				_1: {
+					ctor: '::',
+					_0: 'UseConsOverConcat',
+					_1: {ctor: '[]'}
+				}
+			}
+		})
+};
+
+var _user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords = F2(
+	function (rangeContext, x) {
+		var _p0 = x;
+		switch (_p0.ctor) {
+			case 'GenericType':
+				return {ctor: '[]'};
+			case 'Typed':
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords(rangeContext),
+					_p0._2);
+			case 'Unit':
+				return {ctor: '[]'};
+			case 'Tupled':
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords(rangeContext),
+					_p0._0);
+			case 'Record':
+				var _p2 = _p0._0;
+				return {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p0._1),
+						_1: _p2
+					},
+					_1: A2(
+						_elm_lang$core$List$concatMap,
+						function (_p1) {
+							return A2(
+								_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords,
+								rangeContext,
+								_elm_lang$core$Tuple$second(_p1));
+						},
+						_p2)
+				};
+			case 'GenericRecord':
+				var _p4 = _p0._1;
+				return {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p0._2),
+						_1: _p4
+					},
+					_1: A2(
+						_elm_lang$core$List$concatMap,
+						function (_p3) {
+							return A2(
+								_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords,
+								rangeContext,
+								_elm_lang$core$Tuple$second(_p3));
+						},
+						_p4)
+				};
+			default:
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords, rangeContext, _p0._0),
+					A2(_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords, rangeContext, _p0._1));
+		}
+	});
+var _user$project$Analyser_Checks_MultiLineRecordFormatting$typeAnnotationRange = function (x) {
+	var _p5 = x;
+	switch (_p5.ctor) {
+		case 'GenericType':
+			return _p5._1;
+		case 'Typed':
+			return _p5._3;
+		case 'Unit':
+			return _p5._0;
+		case 'Tupled':
+			return _p5._1;
+		case 'Record':
+			return _p5._1;
+		case 'GenericRecord':
+			return _p5._2;
+		default:
+			return _p5._2;
+	}
+};
+var _user$project$Analyser_Checks_MultiLineRecordFormatting$onTypeAlias = F3(
+	function (rangeContext, x, context) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords, rangeContext, x.typeAnnotation),
+			context);
+	});
+var _user$project$Analyser_Checks_MultiLineRecordFormatting$firstTwo = function (def) {
+	var _p6 = def;
+	if ((_p6.ctor === '::') && (_p6._1.ctor === '::')) {
+		return _elm_lang$core$Maybe$Just(
+			{ctor: '_Tuple2', _0: _p6._0, _1: _p6._1._0});
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _user$project$Analyser_Checks_MultiLineRecordFormatting$fieldsOnSameLine = function (_p7) {
+	var _p8 = _p7;
+	return _elm_lang$core$Native_Utils.eq(
+		_user$project$Analyser_Checks_MultiLineRecordFormatting$typeAnnotationRange(
+			_elm_lang$core$Tuple$second(_p8._0)).start.row,
+		_user$project$Analyser_Checks_MultiLineRecordFormatting$typeAnnotationRange(
+			_elm_lang$core$Tuple$second(_p8._1)).start.row);
+};
+var _user$project$Analyser_Checks_MultiLineRecordFormatting$scan = F3(
+	function (rangeContext, fileContext, _p9) {
+		var threshold = 2;
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				function (_p10) {
+					return A2(
+						_user$project$Analyser_Messages_Types$MultiLineRecordFormatting,
+						fileContext.path,
+						_elm_lang$core$Tuple$first(_p10));
+				},
+				A2(
+					_elm_lang$core$List$filter,
+					function (_p11) {
+						return _user$project$Analyser_Checks_MultiLineRecordFormatting$fieldsOnSameLine(
+							_elm_lang$core$Tuple$second(_p11));
+					},
+					A2(
+						_elm_lang$core$List$filterMap,
+						function (_p12) {
+							var _p13 = _p12;
+							return A2(
+								_elm_lang$core$Maybe$map,
+								F2(
+									function (v0, v1) {
+										return {ctor: '_Tuple2', _0: v0, _1: v1};
+									})(_p13._0),
+								_user$project$Analyser_Checks_MultiLineRecordFormatting$firstTwo(_p13._1));
+						},
+						A2(
+							_elm_lang$core$List$filter,
+							function (_p14) {
+								return A2(
+									F2(
+										function (x, y) {
+											return _elm_lang$core$Native_Utils.cmp(x, y) < 1;
+										}),
+									threshold,
+									_elm_lang$core$List$length(
+										_elm_lang$core$Tuple$second(_p14)));
+							},
+							A3(
+								_user$project$ASTUtil_Inspector$inspect,
+								_elm_lang$core$Native_Utils.update(
+									_user$project$ASTUtil_Inspector$defaultConfig,
+									{
+										onTypeAlias: _user$project$ASTUtil_Inspector$Post(
+											_user$project$Analyser_Checks_MultiLineRecordFormatting$onTypeAlias(rangeContext))
+									}),
+								fileContext.ast,
+								{ctor: '[]'}))))));
+	});
+var _user$project$Analyser_Checks_MultiLineRecordFormatting$checker = {
+	check: _user$project$Analyser_Checks_MultiLineRecordFormatting$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'MultiLineRecordFormatting',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_NoDebug$asMessage = F3(
+	function (path, configuration, _p0) {
+		var _p1 = _p0;
+		var _p3 = _p1._1;
+		var _p2 = _p1._0;
+		if (_p2.ctor === 'Log') {
+			return A2(_user$project$Analyser_Configuration$checkEnabled, 'DebugLog', configuration) ? _elm_lang$core$Maybe$Just(
+				A2(_user$project$Analyser_Messages_Types$DebugLog, path, _p3)) : _elm_lang$core$Maybe$Nothing;
+		} else {
+			return A2(_user$project$Analyser_Configuration$checkEnabled, 'DebugCrash', configuration) ? _elm_lang$core$Maybe$Just(
+				A2(_user$project$Analyser_Messages_Types$DebugCrash, path, _p3)) : _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _user$project$Analyser_Checks_NoDebug$Crash = {ctor: 'Crash'};
+var _user$project$Analyser_Checks_NoDebug$Log = {ctor: 'Log'};
+var _user$project$Analyser_Checks_NoDebug$entryForQualifiedExpr = F2(
+	function (moduleName, f) {
+		return _elm_lang$core$Native_Utils.eq(
+			moduleName,
+			{
+				ctor: '::',
+				_0: 'Debug',
+				_1: {ctor: '[]'}
+			}) ? (_elm_lang$core$Native_Utils.eq(f, 'log') ? _elm_lang$core$Maybe$Just(_user$project$Analyser_Checks_NoDebug$Log) : (_elm_lang$core$Native_Utils.eq(f, 'crash') ? _elm_lang$core$Maybe$Just(_user$project$Analyser_Checks_NoDebug$Crash) : _elm_lang$core$Maybe$Nothing)) : _elm_lang$core$Maybe$Nothing;
+	});
+var _user$project$Analyser_Checks_NoDebug$onExpression = F3(
+	function (rangeContext, _p4, context) {
+		var _p5 = _p4;
+		var _p6 = _p5._1;
+		if (_p6.ctor === 'QualifiedExpr') {
+			return A2(
+				_elm_lang$core$Maybe$withDefault,
+				context,
+				A2(
+					_elm_lang$core$Maybe$map,
+					function (_p7) {
+						return A3(
+							_elm_lang$core$Basics$flip,
+							F2(
+								function (x, y) {
+									return {ctor: '::', _0: x, _1: y};
+								}),
+							context,
+							A3(
+								_elm_lang$core$Basics$flip,
+								F2(
+									function (v0, v1) {
+										return {ctor: '_Tuple2', _0: v0, _1: v1};
+									}),
+								A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p5._0),
+								_p7));
+					},
+					A2(_user$project$Analyser_Checks_NoDebug$entryForQualifiedExpr, _p6._0, _p6._1)));
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_NoDebug$scan = F3(
+	function (rangeContext, fileContext, configuration) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$filterMap,
+				A2(_user$project$Analyser_Checks_NoDebug$asMessage, fileContext.path, configuration),
+				A3(
+					_user$project$ASTUtil_Inspector$inspect,
+					_elm_lang$core$Native_Utils.update(
+						_user$project$ASTUtil_Inspector$defaultConfig,
+						{
+							onExpression: _user$project$ASTUtil_Inspector$Post(
+								_user$project$Analyser_Checks_NoDebug$onExpression(rangeContext))
+						}),
+					fileContext.ast,
+					{ctor: '[]'})));
+	});
+var _user$project$Analyser_Checks_NoDebug$checker = {
+	check: _user$project$Analyser_Checks_NoDebug$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'DebugLog',
+			_1: {
+				ctor: '::',
+				_0: 'DebugCrash',
+				_1: {ctor: '[]'}
+			}
+		})
+};
+
+var _user$project$Analyser_Checks_NoTopLevelSignature$onFunction = F4(
+	function (rangeContext, _p0, $function, context) {
+		var _p1 = $function.signature;
+		if (_p1.ctor === 'Nothing') {
+			return {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: $function.declaration.name.value,
+					_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, $function.declaration.name.range)
+				},
+				_1: context
+			};
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_NoTopLevelSignature$scan = F3(
+	function (rangeContext, fileContext, _p2) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$uncurry(
+					_user$project$Analyser_Messages_Types$NoTopLevelSignature(fileContext.path)),
+				A3(
+					_user$project$ASTUtil_Inspector$inspect,
+					_elm_lang$core$Native_Utils.update(
+						_user$project$ASTUtil_Inspector$defaultConfig,
+						{
+							onFunction: _user$project$ASTUtil_Inspector$Inner(
+								_user$project$Analyser_Checks_NoTopLevelSignature$onFunction(rangeContext)),
+							onDestructuring: _user$project$ASTUtil_Inspector$Skip
+						}),
+					fileContext.ast,
+					{ctor: '[]'})));
+	});
+var _user$project$Analyser_Checks_NoTopLevelSignature$checker = {
+	check: _user$project$Analyser_Checks_NoTopLevelSignature$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'NoTopLevelSignature',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_NoUncurriedPrefix$onExpression = F3(
+	function (rangeContext, _p0, context) {
+		var _p1 = _p0;
+		var _p2 = _p1._1;
+		if (_p2.ctor === 'Application') {
+			var _p3 = _p2._0;
+			if ((((((_p3.ctor === '::') && (_p3._0.ctor === '_Tuple2')) && (_p3._0._1.ctor === 'PrefixOperator')) && (_p3._1.ctor === '::')) && (_p3._1._1.ctor === '::')) && (_p3._1._1._1.ctor === '[]')) {
+				var _p4 = _p3._0._1._0;
+				return A2(_elm_lang$core$String$startsWith, ',,', _p4) ? context : {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: _p4,
+						_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p3._0._0)
+					},
+					_1: context
+				};
+			} else {
+				return context;
+			}
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_NoUncurriedPrefix$scan = F3(
+	function (rangeContext, fileContext, _p5) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$uncurry(
+					_user$project$Analyser_Messages_Types$NoUncurriedPrefix(fileContext.path)),
+				A3(
+					_user$project$ASTUtil_Inspector$inspect,
+					_elm_lang$core$Native_Utils.update(
+						_user$project$ASTUtil_Inspector$defaultConfig,
+						{
+							onExpression: _user$project$ASTUtil_Inspector$Post(
+								_user$project$Analyser_Checks_NoUncurriedPrefix$onExpression(rangeContext))
+						}),
+					fileContext.ast,
+					{ctor: '[]'})));
+	});
+var _user$project$Analyser_Checks_NoUncurriedPrefix$checker = {
+	check: _user$project$Analyser_Checks_NoUncurriedPrefix$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'NoUncurriedPrefix',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_NonStaticRegex$addUsedRegex = F2(
+	function (range, context) {
+		return context.staticEnvironment ? context : _elm_lang$core$Native_Utils.update(
+			context,
+			{
+				usages: {ctor: '::', _0: range, _1: context.usages}
+			});
+	});
+var _user$project$Analyser_Checks_NonStaticRegex$onExpressionQualified = F4(
+	function (rangeContext, moduleName, _p0, context) {
+		var _p1 = _p0;
+		var _p2 = _p1._1;
+		if (_p2.ctor === 'QualifiedExpr') {
+			return (_elm_lang$core$Native_Utils.eq(_p2._1, 'regex') && _elm_lang$core$Native_Utils.eq(_p2._0, moduleName)) ? A2(
+				_user$project$Analyser_Checks_NonStaticRegex$addUsedRegex,
+				A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p1._0),
+				context) : context;
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_NonStaticRegex$onExpressionFunctionReference = F3(
+	function (rangeContext, _p3, context) {
+		var _p4 = _p3;
+		var _p5 = _p4._1;
+		if ((_p5.ctor === 'FunctionOrValue') && (_p5._0 === 'regex')) {
+			return A2(
+				_user$project$Analyser_Checks_NonStaticRegex$addUsedRegex,
+				A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p4._0),
+				context);
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_NonStaticRegex$onExpression = F4(
+	function (rangeContext, x, expression, context) {
+		return x.exposesRegex ? A4(
+			_user$project$Analyser_Checks_NonStaticRegex$onExpressionQualified,
+			rangeContext,
+			x.moduleName,
+			expression,
+			A3(_user$project$Analyser_Checks_NonStaticRegex$onExpressionFunctionReference, rangeContext, expression, context)) : A4(_user$project$Analyser_Checks_NonStaticRegex$onExpressionQualified, rangeContext, x.moduleName, expression, context);
+	});
+var _user$project$Analyser_Checks_NonStaticRegex$onFunction = F3(
+	function (inner, $function, context) {
+		if (!_user$project$ASTUtil_Functions$isStatic($function)) {
+			var after = inner(
+				_elm_lang$core$Native_Utils.update(
+					context,
+					{staticEnvironment: false}));
+			return _elm_lang$core$Native_Utils.update(
+				after,
+				{staticEnvironment: context.staticEnvironment});
+		} else {
+			return inner(context);
+		}
+	});
+var _user$project$Analyser_Checks_NonStaticRegex$startingContext = {
+	staticEnvironment: true,
+	usages: {ctor: '[]'}
+};
+var _user$project$Analyser_Checks_NonStaticRegex$findRegexUsagesInFunctions = F3(
+	function (rangeContext, regexImport, fileContext) {
+		return A3(
+			_user$project$ASTUtil_Inspector$inspect,
+			_elm_lang$core$Native_Utils.update(
+				_user$project$ASTUtil_Inspector$defaultConfig,
+				{
+					onFunction: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_NonStaticRegex$onFunction),
+					onExpression: _user$project$ASTUtil_Inspector$Post(
+						A2(_user$project$Analyser_Checks_NonStaticRegex$onExpression, rangeContext, regexImport))
+				}),
+			fileContext.ast,
+			_user$project$Analyser_Checks_NonStaticRegex$startingContext);
+	});
+var _user$project$Analyser_Checks_NonStaticRegex$scan = F3(
+	function (rangeContext, fileContext, _p6) {
+		var regexImport = A3(
+			_user$project$ASTUtil_Imports$buildImportInformation,
+			{
+				ctor: '::',
+				_0: 'Regex',
+				_1: {ctor: '[]'}
+			},
+			'regex',
+			fileContext.ast);
+		var _p7 = regexImport;
+		if (_p7.ctor === 'Nothing') {
+			return {ctor: '[]'};
+		} else {
+			return A2(
+				_elm_lang$core$List$map,
+				_user$project$Analyser_Messages_Types$newMessage(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+						_1: {ctor: '[]'}
+					}),
+				A2(
+					_elm_lang$core$List$map,
+					_user$project$Analyser_Messages_Types$NonStaticRegex(fileContext.path),
+					function (_) {
+						return _.usages;
+					}(
+						A3(_user$project$Analyser_Checks_NonStaticRegex$findRegexUsagesInFunctions, rangeContext, _p7._0, fileContext))));
+		}
+	});
+var _user$project$Analyser_Checks_NonStaticRegex$checker = {
+	check: _user$project$Analyser_Checks_NonStaticRegex$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'NonStaticRegex',
+			_1: {ctor: '[]'}
+		})
+};
+var _user$project$Analyser_Checks_NonStaticRegex$Context = F2(
+	function (a, b) {
+		return {staticEnvironment: a, usages: b};
+	});
+
+var _user$project$Analyser_Checks_OverriddenVariables$visitWithVariablePointers = F3(
+	function (variablePointers, f, _p0) {
+		var _p1 = _p0;
+		var _p4 = _p1._1;
+		var newKnown = A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (a, b) {
+					return A3(_elm_lang$core$Dict$insert, a.value, a.range, b);
+				}),
+			_p4,
+			variablePointers);
+		var _p2 = f(
+			{ctor: '_Tuple2', _0: _p1._0, _1: newKnown});
+		var newRedefines = _p2._0;
+		var redefinedPattern = A2(
+			_elm_lang$core$List$filter,
+			function (_p3) {
+				return A3(
+					_elm_lang$core$Basics$flip,
+					_elm_lang$core$Dict$member,
+					_p4,
+					function (_) {
+						return _.value;
+					}(_p3));
+			},
+			variablePointers);
+		return {
+			ctor: '_Tuple2',
+			_0: A2(
+				_elm_lang$core$Basics_ops['++'],
+				newRedefines,
+				A2(
+					_elm_lang$core$List$filterMap,
+					function (x) {
+						return A2(
+							_elm_lang$core$Maybe$map,
+							function (r) {
+								return {ctor: '_Tuple3', _0: x.value, _1: r, _2: x.range};
+							},
+							A2(_elm_lang$core$Dict$get, x.value, _p4));
+					},
+					redefinedPattern)),
+			_1: _p4
+		};
+	});
+var _user$project$Analyser_Checks_OverriddenVariables$visitWithPatterns = F3(
+	function (patterns, f, context) {
+		return A3(
+			_user$project$Analyser_Checks_OverriddenVariables$visitWithVariablePointers,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$first,
+				A2(_elm_lang$core$List$concatMap, _user$project$ASTUtil_Variables$patternToVars, patterns)),
+			f,
+			context);
+	});
+var _user$project$Analyser_Checks_OverriddenVariables$onLambda = F3(
+	function (f, lambda, context) {
+		return A3(_user$project$Analyser_Checks_OverriddenVariables$visitWithPatterns, lambda.args, f, context);
+	});
+var _user$project$Analyser_Checks_OverriddenVariables$onDestructuring = F3(
+	function (f, _p5, context) {
+		var _p6 = _p5;
+		return A3(
+			_user$project$Analyser_Checks_OverriddenVariables$visitWithVariablePointers,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$first,
+				_user$project$ASTUtil_Variables$patternToVars(_p6._0)),
+			f,
+			context);
+	});
+var _user$project$Analyser_Checks_OverriddenVariables$onFunction = F3(
+	function (f, $function, context) {
+		return A3(
+			_user$project$Analyser_Checks_OverriddenVariables$visitWithVariablePointers,
+			A2(
+				F2(
+					function (x, y) {
+						return {ctor: '::', _0: x, _1: y};
+					}),
+				$function.declaration.name,
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$core$Tuple$first,
+					A2(_elm_lang$core$List$concatMap, _user$project$ASTUtil_Variables$patternToVars, $function.declaration.$arguments))),
+			f,
+			context);
+	});
+var _user$project$Analyser_Checks_OverriddenVariables$onCase = F3(
+	function (f, caze, context) {
+		return A3(
+			_user$project$Analyser_Checks_OverriddenVariables$visitWithVariablePointers,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$first,
+				_user$project$ASTUtil_Variables$patternToVars(
+					_elm_lang$core$Tuple$first(caze))),
+			f,
+			context);
+	});
+var _user$project$Analyser_Checks_OverriddenVariables$scan = F3(
+	function (rangeContext, fileContext, _p7) {
+		var topLevels = _elm_lang$core$Dict$fromList(
+			A2(
+				_elm_lang$core$List$map,
+				function (_p8) {
+					var _p9 = _p8;
+					var _p10 = _p9._0;
+					return {ctor: '_Tuple2', _0: _p10.value, _1: _p10.range};
+				},
+				_user$project$ASTUtil_Variables$getImportsVars(fileContext.ast.imports)));
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				function (_p11) {
+					var _p12 = _p11;
+					return A4(
+						_user$project$Analyser_Messages_Types$RedefineVariable,
+						fileContext.path,
+						_p12._0,
+						A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p12._1),
+						A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p12._2));
+				},
+				_elm_lang$core$Tuple$first(
+					A3(
+						_user$project$ASTUtil_Inspector$inspect,
+						_elm_lang$core$Native_Utils.update(
+							_user$project$ASTUtil_Inspector$defaultConfig,
+							{
+								onFunction: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_OverriddenVariables$onFunction),
+								onLambda: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_OverriddenVariables$onLambda),
+								onCase: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_OverriddenVariables$onCase),
+								onDestructuring: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_OverriddenVariables$onDestructuring)
+							}),
+						fileContext.ast,
+						{
+							ctor: '_Tuple2',
+							_0: {ctor: '[]'},
+							_1: topLevels
+						}))));
+	});
+var _user$project$Analyser_Checks_OverriddenVariables$checker = {
+	check: _user$project$Analyser_Checks_OverriddenVariables$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'RedefineVariable',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_SingleFieldRecord$findPlainRecords = function (x) {
+	var _p0 = x;
+	if (_p0.ctor === 'Record') {
+		return {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: _p0._1, _1: _p0._0},
+			_1: {ctor: '[]'}
+		};
+	} else {
+		return {ctor: '[]'};
+	}
+};
+var _user$project$Analyser_Checks_SingleFieldRecord$onTypeAnnotation = F2(
+	function (x, context) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			_user$project$Analyser_Checks_SingleFieldRecord$findPlainRecords(x),
+			context);
+	});
+var _user$project$Analyser_Checks_SingleFieldRecord$isSingleFieldRecord = function (x) {
+	return _elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$List$length(x),
+		1);
+};
+var _user$project$Analyser_Checks_SingleFieldRecord$scan = F3(
+	function (rangeContext, fileContext, _p1) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				function (_p2) {
+					return A2(
+						_user$project$Analyser_Messages_Types$SingleFieldRecord,
+						fileContext.path,
+						A2(
+							_user$project$Analyser_Messages_Range$build,
+							rangeContext,
+							_elm_lang$core$Tuple$first(_p2)));
+				},
+				A2(
+					_elm_lang$core$List$filter,
+					function (_p3) {
+						return _user$project$Analyser_Checks_SingleFieldRecord$isSingleFieldRecord(
+							_elm_lang$core$Tuple$second(_p3));
+					},
+					A3(
+						_user$project$ASTUtil_Inspector$inspect,
+						_elm_lang$core$Native_Utils.update(
+							_user$project$ASTUtil_Inspector$defaultConfig,
+							{
+								onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_SingleFieldRecord$onTypeAnnotation)
+							}),
+						fileContext.ast,
+						{ctor: '[]'}))));
+	});
+var _user$project$Analyser_Checks_SingleFieldRecord$checker = {
+	check: _user$project$Analyser_Checks_SingleFieldRecord$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'SingleFieldRecord',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_TriggerWords$normalizeWord = _elm_lang$core$String$toLower;
+var _user$project$Analyser_Checks_TriggerWords$splitRegex = _elm_lang$core$Regex$regex('[^\\w]+');
+var _user$project$Analyser_Checks_TriggerWords$withTriggerWord = F2(
+	function (words, _p0) {
+		var _p1 = _p0;
+		var commentWords = _elm_lang$core$Set$fromList(
+			A2(
+				_elm_lang$core$List$map,
+				_user$project$Analyser_Checks_TriggerWords$normalizeWord,
+				A3(_elm_lang$core$Regex$split, _elm_lang$core$Regex$All, _user$project$Analyser_Checks_TriggerWords$splitRegex, _p1._0)));
+		return A2(
+			_elm_lang$core$Maybe$map,
+			function (_p2) {
+				return A3(
+					_elm_lang$core$Basics$flip,
+					F2(
+						function (v0, v1) {
+							return {ctor: '_Tuple2', _0: v0, _1: v1};
+						}),
+					_p1._1,
+					_elm_lang$core$Tuple$first(_p2));
+			},
+			_elm_lang$core$List$head(
+				A2(
+					_elm_lang$core$List$filter,
+					function (_p3) {
+						return A3(
+							_elm_lang$core$Basics$flip,
+							_elm_lang$core$Set$member,
+							commentWords,
+							_elm_lang$core$Tuple$second(_p3));
+					},
+					A2(
+						_elm_lang$core$List$map,
+						function (x) {
+							return {
+								ctor: '_Tuple2',
+								_0: x,
+								_1: _user$project$Analyser_Checks_TriggerWords$normalizeWord(x)
+							};
+						},
+						words))));
+	});
+var _user$project$Analyser_Checks_TriggerWords$defaultTriggerWords = {
+	ctor: '::',
+	_0: 'TODO',
+	_1: {ctor: '[]'}
+};
+var _user$project$Analyser_Checks_TriggerWords$scan = F3(
+	function (rangeContext, fileContext, configuration) {
+		var triggerWords = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_user$project$Analyser_Checks_TriggerWords$defaultTriggerWords,
+			A4(
+				_user$project$Analyser_Configuration$checkPropertyAs,
+				_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+				'TriggerWords',
+				'words',
+				configuration));
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				function (_p4) {
+					return A2(
+						_elm_lang$core$Basics$uncurry,
+						_user$project$Analyser_Messages_Types$TriggerWord(fileContext.path),
+						A2(
+							_elm_lang$core$Tuple$mapSecond,
+							_user$project$Analyser_Messages_Range$build(rangeContext),
+							_p4));
+				},
+				A2(
+					_elm_lang$core$List$filterMap,
+					_user$project$Analyser_Checks_TriggerWords$withTriggerWord(triggerWords),
+					fileContext.ast.comments)));
+	});
+var _user$project$Analyser_Checks_TriggerWords$checker = {
+	check: _user$project$Analyser_Checks_TriggerWords$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'TriggerWords',
+			_1: {ctor: '[]'}
+		})
+};
+
 var _user$project$Analyser_Checks_UnformattedFile$scan = F3(
 	function (_p1, fileContext, _p0) {
 		return fileContext.formatted ? {ctor: '[]'} : {
@@ -25255,6 +27419,743 @@ var _user$project$Analyser_Checks_UnformattedFile$checker = {
 		{
 			ctor: '::',
 			_0: 'UnformattedFile',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_UnnecessaryListConcat$isListExpression = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1._1;
+	if (_p2.ctor === 'ListExpr') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _user$project$Analyser_Checks_UnnecessaryListConcat$onExpression = F3(
+	function (rangeContext, _p3, context) {
+		var _p4 = _p3;
+		var _p5 = _p4._1;
+		if ((((((((((((_p5.ctor === 'Application') && (_p5._0.ctor === '::')) && (_p5._0._0.ctor === '_Tuple2')) && (_p5._0._0._1.ctor === 'QualifiedExpr')) && (_p5._0._0._1._0.ctor === '::')) && (_p5._0._0._1._0._0 === 'List')) && (_p5._0._0._1._0._1.ctor === '[]')) && (_p5._0._0._1._1 === 'concat')) && (_p5._0._1.ctor === '::')) && (_p5._0._1._0.ctor === '_Tuple2')) && (_p5._0._1._0._1.ctor === 'ListExpr')) && (_p5._0._1._1.ctor === '[]')) {
+			return A2(_elm_lang$core$List$all, _user$project$Analyser_Checks_UnnecessaryListConcat$isListExpression, _p5._0._1._0._1._0) ? {
+				ctor: '::',
+				_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p4._0),
+				_1: context
+			} : context;
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnnecessaryListConcat$scan = F3(
+	function (rangeContext, fileContext, _p6) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				_user$project$Analyser_Messages_Types$UnnecessaryListConcat(fileContext.path),
+				A3(
+					_user$project$ASTUtil_Inspector$inspect,
+					_elm_lang$core$Native_Utils.update(
+						_user$project$ASTUtil_Inspector$defaultConfig,
+						{
+							onExpression: _user$project$ASTUtil_Inspector$Post(
+								_user$project$Analyser_Checks_UnnecessaryListConcat$onExpression(rangeContext))
+						}),
+					fileContext.ast,
+					{ctor: '[]'})));
+	});
+var _user$project$Analyser_Checks_UnnecessaryListConcat$checker = {
+	check: _user$project$Analyser_Checks_UnnecessaryListConcat$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'UnnecessaryListConcat',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_UnnecessaryParens$onParenthesizedExpression = F3(
+	function (range, expression, context) {
+		var _p0 = _elm_lang$core$Tuple$second(expression);
+		switch (_p0.ctor) {
+			case 'RecordAccess':
+				return {ctor: '::', _0: range, _1: context};
+			case 'RecordAccessFunction':
+				return {ctor: '::', _0: range, _1: context};
+			case 'RecordUpdateExpression':
+				return {ctor: '::', _0: range, _1: context};
+			case 'RecordExpr':
+				return {ctor: '::', _0: range, _1: context};
+			case 'TupledExpression':
+				return {ctor: '::', _0: range, _1: context};
+			case 'ListExpr':
+				return {ctor: '::', _0: range, _1: context};
+			case 'FunctionOrValue':
+				return {ctor: '::', _0: range, _1: context};
+			case 'Integer':
+				return {ctor: '::', _0: range, _1: context};
+			case 'Floatable':
+				return {ctor: '::', _0: range, _1: context};
+			case 'CharLiteral':
+				return {ctor: '::', _0: range, _1: context};
+			case 'Literal':
+				return {ctor: '::', _0: range, _1: context};
+			case 'QualifiedExpr':
+				return {ctor: '::', _0: range, _1: context};
+			default:
+				return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$operatorHandSideAllowedParens = function (expr) {
+	return A2(
+		_elm_lang$core$List$any,
+		F2(
+			function (x, y) {
+				return y(x);
+			})(expr),
+		{
+			ctor: '::',
+			_0: _user$project$AST_Util$isOperatorApplication,
+			_1: {
+				ctor: '::',
+				_0: _user$project$AST_Util$isIf,
+				_1: {
+					ctor: '::',
+					_0: _user$project$AST_Util$isCase,
+					_1: {
+						ctor: '::',
+						_0: _user$project$AST_Util$isLet,
+						_1: {
+							ctor: '::',
+							_0: _user$project$AST_Util$isLambda,
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Analyser_Checks_UnnecessaryParens$onOperatorApplication = F2(
+	function (_p1, context) {
+		var _p2 = _p1;
+		var fixHandSide = function (_p3) {
+			return A2(
+				_elm_lang$core$Maybe$map,
+				_elm_lang$core$Tuple$first,
+				A2(
+					_elm_community$maybe_extra$Maybe_Extra$filter,
+					function (_p4) {
+						return !_user$project$Analyser_Checks_UnnecessaryParens$operatorHandSideAllowedParens(
+							_elm_lang$core$Tuple$second(_p4));
+					},
+					_user$project$AST_Util$getParenthesized(_p3)));
+		};
+		return A3(
+			_elm_lang$core$Basics$flip,
+			F2(
+				function (x, y) {
+					return A2(_elm_lang$core$Basics_ops['++'], x, y);
+				}),
+			context,
+			A2(
+				_elm_lang$core$List$filterMap,
+				_elm_lang$core$Basics$identity,
+				{
+					ctor: '::',
+					_0: fixHandSide(_p2._2),
+					_1: {
+						ctor: '::',
+						_0: fixHandSide(_p2._3),
+						_1: {ctor: '[]'}
+					}
+				}));
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$onApplication = F2(
+	function (parts, context) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			context,
+			A2(
+				_elm_lang$core$Maybe$map,
+				A2(
+					_elm_lang$core$Basics$flip,
+					F2(
+						function (x, y) {
+							return {ctor: '::', _0: x, _1: y};
+						}),
+					context),
+				A2(
+					_elm_lang$core$Maybe$map,
+					_elm_lang$core$Tuple$first,
+					A2(
+						_elm_community$maybe_extra$Maybe_Extra$filter,
+						function (_p5) {
+							return !_user$project$AST_Util$isOperatorApplication(
+								_elm_lang$core$Tuple$second(_p5));
+						},
+						A2(
+							_elm_lang$core$Maybe$andThen,
+							_user$project$AST_Util$getParenthesized,
+							_elm_lang$core$List$head(parts))))));
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$onIfBlock = F4(
+	function (clause, thenBranch, elseBranch, context) {
+		return A3(
+			_elm_lang$core$Basics$flip,
+			F2(
+				function (x, y) {
+					return A2(_elm_lang$core$Basics_ops['++'], x, y);
+				}),
+			context,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$first,
+				A2(
+					_elm_lang$core$List$filterMap,
+					_user$project$AST_Util$getParenthesized,
+					{
+						ctor: '::',
+						_0: clause,
+						_1: {
+							ctor: '::',
+							_0: thenBranch,
+							_1: {
+								ctor: '::',
+								_0: elseBranch,
+								_1: {ctor: '[]'}
+							}
+						}
+					})));
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$onCaseBlock = F2(
+	function (caseBlock, context) {
+		var _p6 = _user$project$AST_Util$getParenthesized(caseBlock.expression);
+		if (_p6.ctor === 'Just') {
+			return {ctor: '::', _0: _p6._0._0, _1: context};
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$onRecord = F2(
+	function (fields, context) {
+		return A3(
+			_elm_lang$core$Basics$flip,
+			F2(
+				function (x, y) {
+					return A2(_elm_lang$core$Basics_ops['++'], x, y);
+				}),
+			context,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$first,
+				A2(
+					_elm_lang$core$List$filterMap,
+					function (_p7) {
+						return _user$project$AST_Util$getParenthesized(
+							_elm_lang$core$Tuple$second(_p7));
+					},
+					fields)));
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$onTuple = F2(
+	function (exprs, context) {
+		return A3(
+			_elm_lang$core$Basics$flip,
+			F2(
+				function (x, y) {
+					return A2(_elm_lang$core$Basics_ops['++'], x, y);
+				}),
+			context,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$first,
+				A2(_elm_lang$core$List$filterMap, _user$project$AST_Util$getParenthesized, exprs)));
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$onListExpr = F2(
+	function (exprs, context) {
+		return A3(
+			_elm_lang$core$Basics$flip,
+			F2(
+				function (x, y) {
+					return A2(_elm_lang$core$Basics_ops['++'], x, y);
+				}),
+			context,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Tuple$first,
+				A2(_elm_lang$core$List$filterMap, _user$project$AST_Util$getParenthesized, exprs)));
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$onExpression = F2(
+	function (_p8, context) {
+		var _p9 = _p8;
+		var _p10 = _p9._1;
+		switch (_p10.ctor) {
+			case 'ParenthesizedExpression':
+				return A3(_user$project$Analyser_Checks_UnnecessaryParens$onParenthesizedExpression, _p9._0, _p10._0, context);
+			case 'OperatorApplication':
+				return A2(
+					_user$project$Analyser_Checks_UnnecessaryParens$onOperatorApplication,
+					{ctor: '_Tuple4', _0: _p10._0, _1: _p10._1, _2: _p10._2, _3: _p10._3},
+					context);
+			case 'Application':
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onApplication, _p10._0, context);
+			case 'IfBlock':
+				return A4(_user$project$Analyser_Checks_UnnecessaryParens$onIfBlock, _p10._0, _p10._1, _p10._2, context);
+			case 'CaseExpression':
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onCaseBlock, _p10._0, context);
+			case 'RecordExpr':
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onRecord, _p10._0, context);
+			case 'RecordUpdateExpression':
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onRecord, _p10._0.updates, context);
+			case 'TupledExpression':
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onTuple, _p10._0, context);
+			case 'ListExpr':
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onListExpr, _p10._0, context);
+			default:
+				return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$onLambda = F2(
+	function (lambda, context) {
+		var _p11 = lambda.expression;
+		if ((_p11.ctor === '_Tuple2') && (_p11._1.ctor === 'ParenthesizedExpression')) {
+			return {ctor: '::', _0: _p11._0, _1: context};
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$onFunction = F2(
+	function ($function, context) {
+		var _p12 = $function.declaration.expression;
+		if ((_p12.ctor === '_Tuple2') && (_p12._1.ctor === 'ParenthesizedExpression')) {
+			return {ctor: '::', _0: _p12._0, _1: context};
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$scan = F3(
+	function (rangeContext, fileContext, _p13) {
+		var x = A3(
+			_user$project$ASTUtil_Inspector$inspect,
+			_elm_lang$core$Native_Utils.update(
+				_user$project$ASTUtil_Inspector$defaultConfig,
+				{
+					onExpression: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnnecessaryParens$onExpression),
+					onFunction: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnnecessaryParens$onFunction),
+					onLambda: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnnecessaryParens$onLambda)
+				}),
+			fileContext.ast,
+			{ctor: '[]'});
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				function (_p14) {
+					return A2(
+						_user$project$Analyser_Messages_Types$UnnecessaryParens,
+						fileContext.path,
+						A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p14));
+				},
+				A2(_elm_community$list_extra$List_Extra$uniqueBy, _elm_lang$core$Basics$toString, x)));
+	});
+var _user$project$Analyser_Checks_UnnecessaryParens$checker = {
+	check: _user$project$Analyser_Checks_UnnecessaryParens$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'UnnecessaryParens',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_UnnecessaryPortModule$onPortDeclaration = F2(
+	function (_p0, x) {
+		return x + 1;
+	});
+var _user$project$Analyser_Checks_UnnecessaryPortModule$scan = F3(
+	function (_p2, fileContext, _p1) {
+		if (_user$project$AST_Util$isPortModule(fileContext.ast)) {
+			var portDeclCount = A3(
+				_user$project$ASTUtil_Inspector$inspect,
+				_elm_lang$core$Native_Utils.update(
+					_user$project$ASTUtil_Inspector$defaultConfig,
+					{
+						onPortDeclaration: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnnecessaryPortModule$onPortDeclaration)
+					}),
+				fileContext.ast,
+				0);
+			return _elm_lang$core$Native_Utils.eq(portDeclCount, 0) ? {
+				ctor: '::',
+				_0: A2(
+					_user$project$Analyser_Messages_Types$newMessage,
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+						_1: {ctor: '[]'}
+					},
+					_user$project$Analyser_Messages_Types$UnnecessaryPortModule(fileContext.path)),
+				_1: {ctor: '[]'}
+			} : {ctor: '[]'};
+		} else {
+			return {ctor: '[]'};
+		}
+	});
+var _user$project$Analyser_Checks_UnnecessaryPortModule$checker = {
+	check: _user$project$Analyser_Checks_UnnecessaryPortModule$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'UnnecessaryPortModule',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_UnusedImport$onImport = F3(
+	function (rangeContext, imp, context) {
+		return (_elm_lang$core$Native_Utils.eq(imp.moduleAlias, _elm_lang$core$Maybe$Nothing) && _elm_lang$core$Native_Utils.eq(imp.exposingList, _stil4m$elm_syntax$Elm_Syntax_Exposing$None)) ? A3(
+			_elm_lang$core$Dict$insert,
+			imp.moduleName,
+			{
+				ctor: '_Tuple2',
+				_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, imp.range),
+				_1: 0
+			},
+			context) : context;
+	});
+var _user$project$Analyser_Checks_UnusedImport$markUsage = F2(
+	function (key, context) {
+		return A3(
+			_elm_lang$core$Dict$update,
+			key,
+			_elm_lang$core$Maybe$map(
+				_elm_lang$core$Tuple$mapSecond(
+					F2(
+						function (x, y) {
+							return x + y;
+						})(1))),
+			context);
+	});
+var _user$project$Analyser_Checks_UnusedImport$onTypeAnnotation = F2(
+	function (typeAnnotation, context) {
+		var _p0 = typeAnnotation;
+		if (_p0.ctor === 'Typed') {
+			return A2(_user$project$Analyser_Checks_UnusedImport$markUsage, _p0._0, context);
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnusedImport$onExpression = F2(
+	function (expr, context) {
+		var _p1 = _elm_lang$core$Tuple$second(expr);
+		if (_p1.ctor === 'QualifiedExpr') {
+			return A2(_user$project$Analyser_Checks_UnusedImport$markUsage, _p1._0, context);
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnusedImport$onCase = F2(
+	function (_p2, context) {
+		var _p3 = _p2;
+		return A3(
+			_elm_lang$core$List$foldl,
+			_user$project$Analyser_Checks_UnusedImport$markUsage,
+			context,
+			_user$project$AST_Util$patternModuleNames(_p3._0));
+	});
+var _user$project$Analyser_Checks_UnusedImport$scan = F3(
+	function (rangeContext, fileContext, _p4) {
+		var aliases = A3(
+			_user$project$ASTUtil_Inspector$inspect,
+			_elm_lang$core$Native_Utils.update(
+				_user$project$ASTUtil_Inspector$defaultConfig,
+				{
+					onImport: _user$project$ASTUtil_Inspector$Post(
+						_user$project$Analyser_Checks_UnusedImport$onImport(rangeContext))
+				}),
+			fileContext.ast,
+			_elm_lang$core$Dict$empty);
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$uncurry(
+					_user$project$Analyser_Messages_Types$UnusedImport(fileContext.path)),
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$core$Tuple$mapSecond(_elm_lang$core$Tuple$first),
+					A2(
+						_elm_lang$core$List$filter,
+						function (_p5) {
+							return A2(
+								F2(
+									function (x, y) {
+										return _elm_lang$core$Native_Utils.eq(x, y);
+									}),
+								0,
+								_elm_lang$core$Tuple$second(
+									_elm_lang$core$Tuple$second(_p5)));
+						},
+						_elm_lang$core$Dict$toList(
+							A3(
+								_user$project$ASTUtil_Inspector$inspect,
+								_elm_lang$core$Native_Utils.update(
+									_user$project$ASTUtil_Inspector$defaultConfig,
+									{
+										onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImport$onTypeAnnotation),
+										onExpression: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImport$onExpression),
+										onCase: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImport$onCase)
+									}),
+								fileContext.ast,
+								aliases))))));
+	});
+var _user$project$Analyser_Checks_UnusedImport$checker = {
+	check: _user$project$Analyser_Checks_UnusedImport$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'UnusedImport',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_UnusedImportAliases$onImport = F3(
+	function (rangeContext, imp, context) {
+		var _p0 = imp.moduleAlias;
+		if (_p0.ctor === 'Just') {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p0._0,
+				{
+					ctor: '_Tuple2',
+					_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, imp.range),
+					_1: 0
+				},
+				context);
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnusedImportAliases$markUsage = F2(
+	function (key, context) {
+		return A3(
+			_elm_lang$core$Dict$update,
+			key,
+			_elm_lang$core$Maybe$map(
+				_elm_lang$core$Tuple$mapSecond(
+					F2(
+						function (x, y) {
+							return x + y;
+						})(1))),
+			context);
+	});
+var _user$project$Analyser_Checks_UnusedImportAliases$onTypeAnnotation = F2(
+	function (typeAnnotation, context) {
+		var _p1 = typeAnnotation;
+		if (_p1.ctor === 'Typed') {
+			return A2(_user$project$Analyser_Checks_UnusedImportAliases$markUsage, _p1._0, context);
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnusedImportAliases$onExpression = F2(
+	function (expr, context) {
+		var _p2 = _elm_lang$core$Tuple$second(expr);
+		if (_p2.ctor === 'QualifiedExpr') {
+			return A2(_user$project$Analyser_Checks_UnusedImportAliases$markUsage, _p2._0, context);
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnusedImportAliases$onCase = F2(
+	function (_p3, context) {
+		var _p4 = _p3;
+		return A3(
+			_elm_lang$core$List$foldl,
+			_user$project$Analyser_Checks_UnusedImportAliases$markUsage,
+			context,
+			_user$project$AST_Util$patternModuleNames(_p4._0));
+	});
+var _user$project$Analyser_Checks_UnusedImportAliases$scan = F3(
+	function (rangeContext, fileContext, _p5) {
+		var aliases = A3(
+			_user$project$ASTUtil_Inspector$inspect,
+			_elm_lang$core$Native_Utils.update(
+				_user$project$ASTUtil_Inspector$defaultConfig,
+				{
+					onImport: _user$project$ASTUtil_Inspector$Post(
+						_user$project$Analyser_Checks_UnusedImportAliases$onImport(rangeContext))
+				}),
+			fileContext.ast,
+			_elm_lang$core$Dict$empty);
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$uncurry(
+					_user$project$Analyser_Messages_Types$UnusedImportAlias(fileContext.path)),
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$core$Tuple$mapSecond(_elm_lang$core$Tuple$first),
+					A2(
+						_elm_lang$core$List$filter,
+						function (_p6) {
+							return A2(
+								F2(
+									function (x, y) {
+										return _elm_lang$core$Native_Utils.eq(x, y);
+									}),
+								0,
+								_elm_lang$core$Tuple$second(
+									_elm_lang$core$Tuple$second(_p6)));
+						},
+						_elm_lang$core$Dict$toList(
+							A3(
+								_user$project$ASTUtil_Inspector$inspect,
+								_elm_lang$core$Native_Utils.update(
+									_user$project$ASTUtil_Inspector$defaultConfig,
+									{
+										onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImportAliases$onTypeAnnotation),
+										onExpression: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImportAliases$onExpression),
+										onCase: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImportAliases$onCase)
+									}),
+								fileContext.ast,
+								aliases))))));
+	});
+var _user$project$Analyser_Checks_UnusedImportAliases$checker = {
+	check: _user$project$Analyser_Checks_UnusedImportAliases$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'UnusedImportAlias',
+			_1: {ctor: '[]'}
+		})
+};
+
+var _user$project$Analyser_Checks_UnusedTypeAlias$onTypeAlias = F3(
+	function (rangeContext, typeAlias, context) {
+		return A3(
+			_elm_lang$core$Dict$insert,
+			typeAlias.name,
+			{
+				ctor: '_Tuple3',
+				_0: typeAlias.name,
+				_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, typeAlias.range),
+				_2: 0
+			},
+			context);
+	});
+var _user$project$Analyser_Checks_UnusedTypeAlias$markTypeAlias = F2(
+	function (key, context) {
+		return A3(
+			_elm_lang$core$Dict$update,
+			key,
+			_elm_lang$core$Maybe$map(
+				_Fresheyeball$elm_tuple_extra$Tuple3$mapThird(
+					F2(
+						function (x, y) {
+							return x + y;
+						})(1))),
+			context);
+	});
+var _user$project$Analyser_Checks_UnusedTypeAlias$onTypeAnnotation = F2(
+	function (typeAnnotation, context) {
+		var _p0 = typeAnnotation;
+		if ((_p0.ctor === 'Typed') && (_p0._0.ctor === '[]')) {
+			return A2(_user$project$Analyser_Checks_UnusedTypeAlias$markTypeAlias, _p0._1, context);
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_UnusedTypeAlias$onFunctionOrValue = _user$project$Analyser_Checks_UnusedTypeAlias$markTypeAlias;
+var _user$project$Analyser_Checks_UnusedTypeAlias$scan = F3(
+	function (rangeContext, fileContext, _p1) {
+		var collectedAliased = A3(
+			_user$project$ASTUtil_Inspector$inspect,
+			_elm_lang$core$Native_Utils.update(
+				_user$project$ASTUtil_Inspector$defaultConfig,
+				{
+					onTypeAlias: _user$project$ASTUtil_Inspector$Post(
+						_user$project$Analyser_Checks_UnusedTypeAlias$onTypeAlias(rangeContext))
+				}),
+			fileContext.ast,
+			_elm_lang$core$Dict$empty);
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Messages_Types$newMessage(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
+					_1: {ctor: '[]'}
+				}),
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$uncurry(
+					_user$project$Analyser_Messages_Types$UnusedTypeAlias(fileContext.path)),
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$core$Tuple$mapSecond(_Fresheyeball$elm_tuple_extra$Tuple3$second),
+					A2(
+						_elm_lang$core$List$filter,
+						function (_p2) {
+							return !A3(
+								_elm_lang$core$Basics$flip,
+								_stil4m$elm_syntax$Elm_Interface$exposesAlias,
+								fileContext.$interface,
+								_elm_lang$core$Tuple$first(_p2));
+						},
+						A2(
+							_elm_lang$core$List$filter,
+							function (_p3) {
+								return !A2(
+									F2(
+										function (x, y) {
+											return _elm_lang$core$Native_Utils.cmp(x, y) < 0;
+										}),
+									0,
+									_Fresheyeball$elm_tuple_extra$Tuple3$third(
+										_elm_lang$core$Tuple$second(_p3)));
+							},
+							_elm_lang$core$Dict$toList(
+								A3(
+									_user$project$ASTUtil_Inspector$inspect,
+									_elm_lang$core$Native_Utils.update(
+										_user$project$ASTUtil_Inspector$defaultConfig,
+										{
+											onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedTypeAlias$onTypeAnnotation),
+											onFunctionOrValue: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedTypeAlias$onFunctionOrValue)
+										}),
+									fileContext.ast,
+									collectedAliased)))))));
+	});
+var _user$project$Analyser_Checks_UnusedTypeAlias$checker = {
+	check: _user$project$Analyser_Checks_UnusedTypeAlias$scan,
+	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
+		{
+			ctor: '::',
+			_0: 'UnusedTypeAlias',
 			_1: {ctor: '[]'}
 		})
 };
@@ -25307,6 +28208,10 @@ var _user$project$Analyser_Checks_UnusedVariable$addUsedVariable = F2(
 var _user$project$Analyser_Checks_UnusedVariable$onFunctionOrValue = F2(
 	function (x, context) {
 		return A2(_user$project$Analyser_Checks_UnusedVariable$addUsedVariable, x, context);
+	});
+var _user$project$Analyser_Checks_UnusedVariable$onPrefixOperator = F2(
+	function (prefixOperator, context) {
+		return A2(_user$project$Analyser_Checks_UnusedVariable$addUsedVariable, prefixOperator, context);
 	});
 var _user$project$Analyser_Checks_UnusedVariable$onRecordUpdate = F2(
 	function (recordUpdate, context) {
@@ -25595,6 +28500,7 @@ var _user$project$Analyser_Checks_UnusedVariable$scan = F3(
 					onOperatorApplication: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedVariable$onOperatorAppliction),
 					onDestructuring: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedVariable$onDestructuring),
 					onFunctionOrValue: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedVariable$onFunctionOrValue),
+					onPrefixOperator: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedVariable$onPrefixOperator),
 					onRecordUpdate: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedVariable$onRecordUpdate),
 					onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedVariable$onTypeAnnotation)
 				}),
@@ -25691,2250 +28597,6 @@ var _user$project$Analyser_Checks_UnusedVariable$UsedVariableContext = F2(
 		return {poppedScopes: a, activeScopes: b};
 	});
 
-var _user$project$Analyser_Checks_ExposeAll$onFile = F4(
-	function (rangeContext, _p1, file, _p0) {
-		var _p2 = A2(
-			_elm_lang$core$Maybe$withDefault,
-			_stil4m$elm_syntax$Elm_Syntax_Exposing$None,
-			_user$project$AST_Util$fileExposingList(file));
-		switch (_p2.ctor) {
-			case 'None':
-				return {ctor: '[]'};
-			case 'All':
-				return {
-					ctor: '::',
-					_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p2._0),
-					_1: {ctor: '[]'}
-				};
-			default:
-				return A2(
-					_elm_lang$core$List$filterMap,
-					function (y) {
-						var _p3 = y;
-						if (_p3.ctor === 'TypeExpose') {
-							var _p4 = _p3._0.constructors;
-							if (_p4.ctor === 'All') {
-								return _elm_lang$core$Maybe$Just(
-									A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p4._0));
-							} else {
-								return _elm_lang$core$Maybe$Nothing;
-							}
-						} else {
-							return _elm_lang$core$Maybe$Nothing;
-						}
-					},
-					_p2._0);
-		}
-	});
-var _user$project$Analyser_Checks_ExposeAll$scan = F3(
-	function (rangeContext, fileContext, _p5) {
-		var x = A3(
-			_user$project$ASTUtil_Inspector$inspect,
-			_elm_lang$core$Native_Utils.update(
-				_user$project$ASTUtil_Inspector$defaultConfig,
-				{
-					onFile: _user$project$ASTUtil_Inspector$Inner(
-						_user$project$Analyser_Checks_ExposeAll$onFile(rangeContext))
-				}),
-			fileContext.ast,
-			{ctor: '[]'});
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				_user$project$Analyser_Messages_Types$ExposeAll(fileContext.path),
-				x));
-	});
-var _user$project$Analyser_Checks_ExposeAll$checker = {
-	check: _user$project$Analyser_Checks_ExposeAll$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'ExposeAll',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_ImportAll$onImport = F3(
-	function (rangeContext, imp, context) {
-		return A3(
-			_elm_lang$core$Basics$flip,
-			_elm_lang$core$List$append,
-			context,
-			function () {
-				var _p0 = imp.exposingList;
-				switch (_p0.ctor) {
-					case 'All':
-						return {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: imp.moduleName,
-								_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p0._0)
-							},
-							_1: {ctor: '[]'}
-						};
-					case 'None':
-						return {ctor: '[]'};
-					default:
-						return A2(
-							_elm_lang$core$List$filterMap,
-							function (explicitItem) {
-								var _p1 = explicitItem;
-								if (_p1.ctor === 'TypeExpose') {
-									var _p2 = _p1._0.constructors;
-									if (_p2.ctor === 'All') {
-										return _elm_lang$core$Maybe$Just(
-											{
-												ctor: '_Tuple2',
-												_0: imp.moduleName,
-												_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p2._0)
-											});
-									} else {
-										return _elm_lang$core$Maybe$Nothing;
-									}
-								} else {
-									return _elm_lang$core$Maybe$Nothing;
-								}
-							},
-							_p0._0);
-				}
-			}());
-	});
-var _user$project$Analyser_Checks_ImportAll$scan = F3(
-	function (rangeContext, fileContext, _p3) {
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Basics$uncurry(
-					_user$project$Analyser_Messages_Types$ImportAll(fileContext.path)),
-				A2(
-					_elm_lang$core$List$sortWith,
-					F2(
-						function (_p5, _p4) {
-							var _p6 = _p5;
-							var _p7 = _p4;
-							return A2(_user$project$Analyser_Messages_Range$orderByStart, _p6._1, _p7._1);
-						}),
-					A3(
-						_user$project$ASTUtil_Inspector$inspect,
-						_elm_lang$core$Native_Utils.update(
-							_user$project$ASTUtil_Inspector$defaultConfig,
-							{
-								onImport: _user$project$ASTUtil_Inspector$Post(
-									_user$project$Analyser_Checks_ImportAll$onImport(rangeContext))
-							}),
-						fileContext.ast,
-						{ctor: '[]'}))));
-	});
-var _user$project$Analyser_Checks_ImportAll$checker = {
-	check: _user$project$Analyser_Checks_ImportAll$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'ImportAll',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_NoTopLevelSignature$onFunction = F4(
-	function (rangeContext, _p0, $function, context) {
-		var _p1 = $function.signature;
-		if (_p1.ctor === 'Nothing') {
-			return {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: $function.declaration.name.value,
-					_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, $function.declaration.name.range)
-				},
-				_1: context
-			};
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_NoTopLevelSignature$scan = F3(
-	function (rangeContext, fileContext, _p2) {
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Basics$uncurry(
-					_user$project$Analyser_Messages_Types$NoTopLevelSignature(fileContext.path)),
-				A3(
-					_user$project$ASTUtil_Inspector$inspect,
-					_elm_lang$core$Native_Utils.update(
-						_user$project$ASTUtil_Inspector$defaultConfig,
-						{
-							onFunction: _user$project$ASTUtil_Inspector$Inner(
-								_user$project$Analyser_Checks_NoTopLevelSignature$onFunction(rangeContext)),
-							onDestructuring: _user$project$ASTUtil_Inspector$Skip
-						}),
-					fileContext.ast,
-					{ctor: '[]'})));
-	});
-var _user$project$Analyser_Checks_NoTopLevelSignature$checker = {
-	check: _user$project$Analyser_Checks_NoTopLevelSignature$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'NoTopLevelSignature',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_UnnecessaryParens$onParenthesizedExpression = F3(
-	function (range, expression, context) {
-		var _p0 = _elm_lang$core$Tuple$second(expression);
-		switch (_p0.ctor) {
-			case 'RecordAccess':
-				return {ctor: '::', _0: range, _1: context};
-			case 'RecordAccessFunction':
-				return {ctor: '::', _0: range, _1: context};
-			case 'RecordUpdateExpression':
-				return {ctor: '::', _0: range, _1: context};
-			case 'RecordExpr':
-				return {ctor: '::', _0: range, _1: context};
-			case 'TupledExpression':
-				return {ctor: '::', _0: range, _1: context};
-			case 'ListExpr':
-				return {ctor: '::', _0: range, _1: context};
-			case 'FunctionOrValue':
-				return {ctor: '::', _0: range, _1: context};
-			case 'Integer':
-				return {ctor: '::', _0: range, _1: context};
-			case 'Floatable':
-				return {ctor: '::', _0: range, _1: context};
-			case 'CharLiteral':
-				return {ctor: '::', _0: range, _1: context};
-			case 'Literal':
-				return {ctor: '::', _0: range, _1: context};
-			case 'QualifiedExpr':
-				return {ctor: '::', _0: range, _1: context};
-			default:
-				return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$allowedOnLHS = function (expr) {
-	return A2(
-		_elm_lang$core$List$all,
-		F2(
-			function (x, y) {
-				return y(x);
-			})(expr),
-		{
-			ctor: '::',
-			_0: function (_p1) {
-				return !_user$project$AST_Util$isLambda(_p1);
-			},
-			_1: {
-				ctor: '::',
-				_0: function (_p2) {
-					return !_user$project$AST_Util$isCase(_p2);
-				},
-				_1: {
-					ctor: '::',
-					_0: function (_p3) {
-						return !_user$project$AST_Util$isIf(_p3);
-					},
-					_1: {ctor: '[]'}
-				}
-			}
-		});
-};
-var _user$project$Analyser_Checks_UnnecessaryParens$onOperatorApplication = F2(
-	function (_p4, context) {
-		var _p5 = _p4;
-		var fixHandSide = function (f) {
-			return function (_p6) {
-				return A2(
-					_elm_lang$core$Maybe$map,
-					_elm_lang$core$Tuple$first,
-					A2(
-						_elm_community$maybe_extra$Maybe_Extra$filter,
-						function (_p7) {
-							return f(
-								_elm_lang$core$Tuple$second(_p7));
-						},
-						A2(
-							_elm_community$maybe_extra$Maybe_Extra$filter,
-							function (_p8) {
-								return !_user$project$AST_Util$isOperatorApplication(
-									_elm_lang$core$Tuple$second(_p8));
-							},
-							_user$project$AST_Util$getParenthesized(_p6))));
-			};
-		};
-		return A3(
-			_elm_lang$core$Basics$flip,
-			F2(
-				function (x, y) {
-					return A2(_elm_lang$core$Basics_ops['++'], x, y);
-				}),
-			context,
-			A2(
-				_elm_lang$core$List$filterMap,
-				_elm_lang$core$Basics$identity,
-				{
-					ctor: '::',
-					_0: A2(fixHandSide, _user$project$Analyser_Checks_UnnecessaryParens$allowedOnLHS, _p5._2),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							fixHandSide,
-							_elm_lang$core$Basics$always(true),
-							_p5._3),
-						_1: {ctor: '[]'}
-					}
-				}));
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$onApplication = F2(
-	function (parts, context) {
-		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			context,
-			A2(
-				_elm_lang$core$Maybe$map,
-				A2(
-					_elm_lang$core$Basics$flip,
-					F2(
-						function (x, y) {
-							return {ctor: '::', _0: x, _1: y};
-						}),
-					context),
-				A2(
-					_elm_lang$core$Maybe$map,
-					_elm_lang$core$Tuple$first,
-					A2(
-						_elm_community$maybe_extra$Maybe_Extra$filter,
-						function (_p9) {
-							return !_user$project$AST_Util$isOperatorApplication(
-								_elm_lang$core$Tuple$second(_p9));
-						},
-						A2(
-							_elm_lang$core$Maybe$andThen,
-							_user$project$AST_Util$getParenthesized,
-							_elm_lang$core$List$head(parts))))));
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$onIfBlock = F4(
-	function (clause, thenBranch, elseBranch, context) {
-		return A3(
-			_elm_lang$core$Basics$flip,
-			F2(
-				function (x, y) {
-					return A2(_elm_lang$core$Basics_ops['++'], x, y);
-				}),
-			context,
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Tuple$first,
-				A2(
-					_elm_lang$core$List$filterMap,
-					_user$project$AST_Util$getParenthesized,
-					{
-						ctor: '::',
-						_0: clause,
-						_1: {
-							ctor: '::',
-							_0: thenBranch,
-							_1: {
-								ctor: '::',
-								_0: elseBranch,
-								_1: {ctor: '[]'}
-							}
-						}
-					})));
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$onCaseBlock = F2(
-	function (caseBlock, context) {
-		var _p10 = _user$project$AST_Util$getParenthesized(caseBlock.expression);
-		if (_p10.ctor === 'Just') {
-			return {ctor: '::', _0: _p10._0._0, _1: context};
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$onRecord = F2(
-	function (fields, context) {
-		return A3(
-			_elm_lang$core$Basics$flip,
-			F2(
-				function (x, y) {
-					return A2(_elm_lang$core$Basics_ops['++'], x, y);
-				}),
-			context,
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Tuple$first,
-				A2(
-					_elm_lang$core$List$filterMap,
-					function (_p11) {
-						return _user$project$AST_Util$getParenthesized(
-							_elm_lang$core$Tuple$second(_p11));
-					},
-					fields)));
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$onTuple = F2(
-	function (exprs, context) {
-		return A3(
-			_elm_lang$core$Basics$flip,
-			F2(
-				function (x, y) {
-					return A2(_elm_lang$core$Basics_ops['++'], x, y);
-				}),
-			context,
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Tuple$first,
-				A2(_elm_lang$core$List$filterMap, _user$project$AST_Util$getParenthesized, exprs)));
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$onListExpr = F2(
-	function (exprs, context) {
-		return A3(
-			_elm_lang$core$Basics$flip,
-			F2(
-				function (x, y) {
-					return A2(_elm_lang$core$Basics_ops['++'], x, y);
-				}),
-			context,
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Tuple$first,
-				A2(_elm_lang$core$List$filterMap, _user$project$AST_Util$getParenthesized, exprs)));
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$onExpression = F2(
-	function (_p12, context) {
-		var _p13 = _p12;
-		var _p14 = _p13._1;
-		switch (_p14.ctor) {
-			case 'ParenthesizedExpression':
-				return A3(_user$project$Analyser_Checks_UnnecessaryParens$onParenthesizedExpression, _p13._0, _p14._0, context);
-			case 'OperatorApplication':
-				return A2(
-					_user$project$Analyser_Checks_UnnecessaryParens$onOperatorApplication,
-					{ctor: '_Tuple4', _0: _p14._0, _1: _p14._1, _2: _p14._2, _3: _p14._3},
-					context);
-			case 'Application':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onApplication, _p14._0, context);
-			case 'IfBlock':
-				return A4(_user$project$Analyser_Checks_UnnecessaryParens$onIfBlock, _p14._0, _p14._1, _p14._2, context);
-			case 'CaseExpression':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onCaseBlock, _p14._0, context);
-			case 'RecordExpr':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onRecord, _p14._0, context);
-			case 'RecordUpdateExpression':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onRecord, _p14._0.updates, context);
-			case 'TupledExpression':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onTuple, _p14._0, context);
-			case 'ListExpr':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onListExpr, _p14._0, context);
-			default:
-				return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$onLambda = F2(
-	function (lambda, context) {
-		var _p15 = lambda.expression;
-		if ((_p15.ctor === '_Tuple2') && (_p15._1.ctor === 'ParenthesizedExpression')) {
-			return {ctor: '::', _0: _p15._0, _1: context};
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$onFunction = F2(
-	function ($function, context) {
-		var _p16 = $function.declaration.expression;
-		if ((_p16.ctor === '_Tuple2') && (_p16._1.ctor === 'ParenthesizedExpression')) {
-			return {ctor: '::', _0: _p16._0, _1: context};
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$scan = F3(
-	function (rangeContext, fileContext, _p17) {
-		var x = A3(
-			_user$project$ASTUtil_Inspector$inspect,
-			_elm_lang$core$Native_Utils.update(
-				_user$project$ASTUtil_Inspector$defaultConfig,
-				{
-					onExpression: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnnecessaryParens$onExpression),
-					onFunction: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnnecessaryParens$onFunction),
-					onLambda: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnnecessaryParens$onLambda)
-				}),
-			fileContext.ast,
-			{ctor: '[]'});
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				function (_p18) {
-					return A2(
-						_user$project$Analyser_Messages_Types$UnnecessaryParens,
-						fileContext.path,
-						A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p18));
-				},
-				A2(_elm_community$list_extra$List_Extra$uniqueBy, _elm_lang$core$Basics$toString, x)));
-	});
-var _user$project$Analyser_Checks_UnnecessaryParens$checker = {
-	check: _user$project$Analyser_Checks_UnnecessaryParens$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'UnnecessaryParens',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_NoDebug$asMessage = F3(
-	function (path, configuration, _p0) {
-		var _p1 = _p0;
-		var _p3 = _p1._1;
-		var _p2 = _p1._0;
-		if (_p2.ctor === 'Log') {
-			return A2(_user$project$Analyser_Configuration$checkEnabled, 'DebugLog', configuration) ? _elm_lang$core$Maybe$Just(
-				A2(_user$project$Analyser_Messages_Types$DebugLog, path, _p3)) : _elm_lang$core$Maybe$Nothing;
-		} else {
-			return A2(_user$project$Analyser_Configuration$checkEnabled, 'DebugCrash', configuration) ? _elm_lang$core$Maybe$Just(
-				A2(_user$project$Analyser_Messages_Types$DebugCrash, path, _p3)) : _elm_lang$core$Maybe$Nothing;
-		}
-	});
-var _user$project$Analyser_Checks_NoDebug$Crash = {ctor: 'Crash'};
-var _user$project$Analyser_Checks_NoDebug$Log = {ctor: 'Log'};
-var _user$project$Analyser_Checks_NoDebug$entryForQualifiedExpr = F2(
-	function (moduleName, f) {
-		return _elm_lang$core$Native_Utils.eq(
-			moduleName,
-			{
-				ctor: '::',
-				_0: 'Debug',
-				_1: {ctor: '[]'}
-			}) ? (_elm_lang$core$Native_Utils.eq(f, 'log') ? _elm_lang$core$Maybe$Just(_user$project$Analyser_Checks_NoDebug$Log) : (_elm_lang$core$Native_Utils.eq(f, 'crash') ? _elm_lang$core$Maybe$Just(_user$project$Analyser_Checks_NoDebug$Crash) : _elm_lang$core$Maybe$Nothing)) : _elm_lang$core$Maybe$Nothing;
-	});
-var _user$project$Analyser_Checks_NoDebug$onExpression = F3(
-	function (rangeContext, _p4, context) {
-		var _p5 = _p4;
-		var _p6 = _p5._1;
-		if (_p6.ctor === 'QualifiedExpr') {
-			return A2(
-				_elm_lang$core$Maybe$withDefault,
-				context,
-				A2(
-					_elm_lang$core$Maybe$map,
-					function (_p7) {
-						return A3(
-							_elm_lang$core$Basics$flip,
-							F2(
-								function (x, y) {
-									return {ctor: '::', _0: x, _1: y};
-								}),
-							context,
-							A3(
-								_elm_lang$core$Basics$flip,
-								F2(
-									function (v0, v1) {
-										return {ctor: '_Tuple2', _0: v0, _1: v1};
-									}),
-								A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p5._0),
-								_p7));
-					},
-					A2(_user$project$Analyser_Checks_NoDebug$entryForQualifiedExpr, _p6._0, _p6._1)));
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_NoDebug$scan = F3(
-	function (rangeContext, fileContext, configuration) {
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$filterMap,
-				A2(_user$project$Analyser_Checks_NoDebug$asMessage, fileContext.path, configuration),
-				A3(
-					_user$project$ASTUtil_Inspector$inspect,
-					_elm_lang$core$Native_Utils.update(
-						_user$project$ASTUtil_Inspector$defaultConfig,
-						{
-							onExpression: _user$project$ASTUtil_Inspector$Post(
-								_user$project$Analyser_Checks_NoDebug$onExpression(rangeContext))
-						}),
-					fileContext.ast,
-					{ctor: '[]'})));
-	});
-var _user$project$Analyser_Checks_NoDebug$checker = {
-	check: _user$project$Analyser_Checks_NoDebug$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'DebugLog',
-			_1: {
-				ctor: '::',
-				_0: 'DebugCrash',
-				_1: {ctor: '[]'}
-			}
-		})
-};
-
-var _user$project$Analyser_Checks_DuplicateImport$onImport = F3(
-	function (rangeContext, _p0, context) {
-		var _p1 = _p0;
-		var _p4 = _p1.range;
-		var _p3 = _p1.moduleName;
-		var _p2 = A2(_elm_lang$core$Dict$get, _p3, context);
-		if (_p2.ctor === 'Just') {
-			return A3(
-				_elm_lang$core$Dict$update,
-				_p3,
-				_elm_lang$core$Maybe$map(
-					A2(
-						_elm_lang$core$Basics$flip,
-						F2(
-							function (x, y) {
-								return A2(_elm_lang$core$Basics_ops['++'], x, y);
-							}),
-						{
-							ctor: '::',
-							_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p4),
-							_1: {ctor: '[]'}
-						})),
-				context);
-		} else {
-			return A3(
-				_elm_lang$core$Dict$insert,
-				_p3,
-				{
-					ctor: '::',
-					_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p4),
-					_1: {ctor: '[]'}
-				},
-				context);
-		}
-	});
-var _user$project$Analyser_Checks_DuplicateImport$hasLength = function (f) {
-	return function (_p5) {
-		return f(
-			_elm_lang$core$List$length(_p5));
-	};
-};
-var _user$project$Analyser_Checks_DuplicateImport$scan = F3(
-	function (rangeContext, fileContext, _p6) {
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Basics$uncurry(
-					_user$project$Analyser_Messages_Types$DuplicateImport(fileContext.path)),
-				_elm_lang$core$Dict$toList(
-					A2(
-						_elm_lang$core$Dict$filter,
-						_elm_lang$core$Basics$always(
-							_user$project$Analyser_Checks_DuplicateImport$hasLength(
-								F2(
-									function (x, y) {
-										return _elm_lang$core$Native_Utils.cmp(x, y) < 0;
-									})(1))),
-						A3(
-							_user$project$ASTUtil_Inspector$inspect,
-							_elm_lang$core$Native_Utils.update(
-								_user$project$ASTUtil_Inspector$defaultConfig,
-								{
-									onImport: _user$project$ASTUtil_Inspector$Post(
-										_user$project$Analyser_Checks_DuplicateImport$onImport(rangeContext)),
-									onFunction: _user$project$ASTUtil_Inspector$Skip
-								}),
-							fileContext.ast,
-							_elm_lang$core$Dict$empty)))));
-	});
-var _user$project$Analyser_Checks_DuplicateImport$checker = {
-	check: _user$project$Analyser_Checks_DuplicateImport$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'DuplicateImport',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_UnusedTypeAlias$onTypeAlias = F3(
-	function (rangeContext, typeAlias, context) {
-		return A3(
-			_elm_lang$core$Dict$insert,
-			typeAlias.name,
-			{
-				ctor: '_Tuple3',
-				_0: typeAlias.name,
-				_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, typeAlias.range),
-				_2: 0
-			},
-			context);
-	});
-var _user$project$Analyser_Checks_UnusedTypeAlias$markTypeAlias = F2(
-	function (key, context) {
-		return A3(
-			_elm_lang$core$Dict$update,
-			key,
-			_elm_lang$core$Maybe$map(
-				_Fresheyeball$elm_tuple_extra$Tuple3$mapThird(
-					F2(
-						function (x, y) {
-							return x + y;
-						})(1))),
-			context);
-	});
-var _user$project$Analyser_Checks_UnusedTypeAlias$onTypeAnnotation = F2(
-	function (typeAnnotation, context) {
-		var _p0 = typeAnnotation;
-		if ((_p0.ctor === 'Typed') && (_p0._0.ctor === '[]')) {
-			return A2(_user$project$Analyser_Checks_UnusedTypeAlias$markTypeAlias, _p0._1, context);
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnusedTypeAlias$onFunctionOrValue = _user$project$Analyser_Checks_UnusedTypeAlias$markTypeAlias;
-var _user$project$Analyser_Checks_UnusedTypeAlias$scan = F3(
-	function (rangeContext, fileContext, _p1) {
-		var collectedAliased = A3(
-			_user$project$ASTUtil_Inspector$inspect,
-			_elm_lang$core$Native_Utils.update(
-				_user$project$ASTUtil_Inspector$defaultConfig,
-				{
-					onTypeAlias: _user$project$ASTUtil_Inspector$Post(
-						_user$project$Analyser_Checks_UnusedTypeAlias$onTypeAlias(rangeContext))
-				}),
-			fileContext.ast,
-			_elm_lang$core$Dict$empty);
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Basics$uncurry(
-					_user$project$Analyser_Messages_Types$UnusedTypeAlias(fileContext.path)),
-				A2(
-					_elm_lang$core$List$map,
-					_elm_lang$core$Tuple$mapSecond(_Fresheyeball$elm_tuple_extra$Tuple3$second),
-					A2(
-						_elm_lang$core$List$filter,
-						function (_p2) {
-							return !A3(
-								_elm_lang$core$Basics$flip,
-								_stil4m$elm_syntax$Elm_Interface$exposesAlias,
-								fileContext.$interface,
-								_elm_lang$core$Tuple$first(_p2));
-						},
-						A2(
-							_elm_lang$core$List$filter,
-							function (_p3) {
-								return !A2(
-									F2(
-										function (x, y) {
-											return _elm_lang$core$Native_Utils.cmp(x, y) < 0;
-										}),
-									0,
-									_Fresheyeball$elm_tuple_extra$Tuple3$third(
-										_elm_lang$core$Tuple$second(_p3)));
-							},
-							_elm_lang$core$Dict$toList(
-								A3(
-									_user$project$ASTUtil_Inspector$inspect,
-									_elm_lang$core$Native_Utils.update(
-										_user$project$ASTUtil_Inspector$defaultConfig,
-										{
-											onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedTypeAlias$onTypeAnnotation),
-											onFunctionOrValue: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedTypeAlias$onFunctionOrValue)
-										}),
-									fileContext.ast,
-									collectedAliased)))))));
-	});
-var _user$project$Analyser_Checks_UnusedTypeAlias$checker = {
-	check: _user$project$Analyser_Checks_UnusedTypeAlias$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'UnusedTypeAlias',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_OverriddenVariables$visitWithVariablePointers = F3(
-	function (variablePointers, f, _p0) {
-		var _p1 = _p0;
-		var _p4 = _p1._1;
-		var newKnown = A3(
-			_elm_lang$core$List$foldl,
-			F2(
-				function (a, b) {
-					return A3(_elm_lang$core$Dict$insert, a.value, a.range, b);
-				}),
-			_p4,
-			variablePointers);
-		var _p2 = f(
-			{ctor: '_Tuple2', _0: _p1._0, _1: newKnown});
-		var newRedefines = _p2._0;
-		var redefinedPattern = A2(
-			_elm_lang$core$List$filter,
-			function (_p3) {
-				return A3(
-					_elm_lang$core$Basics$flip,
-					_elm_lang$core$Dict$member,
-					_p4,
-					function (_) {
-						return _.value;
-					}(_p3));
-			},
-			variablePointers);
-		return {
-			ctor: '_Tuple2',
-			_0: A2(
-				_elm_lang$core$Basics_ops['++'],
-				newRedefines,
-				A2(
-					_elm_lang$core$List$filterMap,
-					function (x) {
-						return A2(
-							_elm_lang$core$Maybe$map,
-							function (r) {
-								return {ctor: '_Tuple3', _0: x.value, _1: r, _2: x.range};
-							},
-							A2(_elm_lang$core$Dict$get, x.value, _p4));
-					},
-					redefinedPattern)),
-			_1: _p4
-		};
-	});
-var _user$project$Analyser_Checks_OverriddenVariables$visitWithPatterns = F3(
-	function (patterns, f, context) {
-		return A3(
-			_user$project$Analyser_Checks_OverriddenVariables$visitWithVariablePointers,
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Tuple$first,
-				A2(_elm_lang$core$List$concatMap, _user$project$ASTUtil_Variables$patternToVars, patterns)),
-			f,
-			context);
-	});
-var _user$project$Analyser_Checks_OverriddenVariables$onLambda = F3(
-	function (f, lambda, context) {
-		return A3(_user$project$Analyser_Checks_OverriddenVariables$visitWithPatterns, lambda.args, f, context);
-	});
-var _user$project$Analyser_Checks_OverriddenVariables$onDestructuring = F3(
-	function (f, _p5, context) {
-		var _p6 = _p5;
-		return A3(
-			_user$project$Analyser_Checks_OverriddenVariables$visitWithVariablePointers,
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Tuple$first,
-				_user$project$ASTUtil_Variables$patternToVars(_p6._0)),
-			f,
-			context);
-	});
-var _user$project$Analyser_Checks_OverriddenVariables$onFunction = F3(
-	function (f, $function, context) {
-		return A3(
-			_user$project$Analyser_Checks_OverriddenVariables$visitWithVariablePointers,
-			A2(
-				F2(
-					function (x, y) {
-						return {ctor: '::', _0: x, _1: y};
-					}),
-				$function.declaration.name,
-				A2(
-					_elm_lang$core$List$map,
-					_elm_lang$core$Tuple$first,
-					A2(_elm_lang$core$List$concatMap, _user$project$ASTUtil_Variables$patternToVars, $function.declaration.$arguments))),
-			f,
-			context);
-	});
-var _user$project$Analyser_Checks_OverriddenVariables$onCase = F3(
-	function (f, caze, context) {
-		return A3(
-			_user$project$Analyser_Checks_OverriddenVariables$visitWithVariablePointers,
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Tuple$first,
-				_user$project$ASTUtil_Variables$patternToVars(
-					_elm_lang$core$Tuple$first(caze))),
-			f,
-			context);
-	});
-var _user$project$Analyser_Checks_OverriddenVariables$scan = F3(
-	function (rangeContext, fileContext, _p7) {
-		var topLevels = _elm_lang$core$Dict$fromList(
-			A2(
-				_elm_lang$core$List$map,
-				function (_p8) {
-					var _p9 = _p8;
-					var _p10 = _p9._0;
-					return {ctor: '_Tuple2', _0: _p10.value, _1: _p10.range};
-				},
-				_user$project$ASTUtil_Variables$getImportsVars(fileContext.ast.imports)));
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				function (_p11) {
-					var _p12 = _p11;
-					return A4(
-						_user$project$Analyser_Messages_Types$RedefineVariable,
-						fileContext.path,
-						_p12._0,
-						A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p12._1),
-						A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p12._2));
-				},
-				_elm_lang$core$Tuple$first(
-					A3(
-						_user$project$ASTUtil_Inspector$inspect,
-						_elm_lang$core$Native_Utils.update(
-							_user$project$ASTUtil_Inspector$defaultConfig,
-							{
-								onFunction: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_OverriddenVariables$onFunction),
-								onLambda: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_OverriddenVariables$onLambda),
-								onCase: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_OverriddenVariables$onCase),
-								onDestructuring: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_OverriddenVariables$onDestructuring)
-							}),
-						fileContext.ast,
-						{
-							ctor: '_Tuple2',
-							_0: {ctor: '[]'},
-							_1: topLevels
-						}))));
-	});
-var _user$project$Analyser_Checks_OverriddenVariables$checker = {
-	check: _user$project$Analyser_Checks_OverriddenVariables$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'RedefineVariable',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_NoUncurriedPrefix$onExpression = F3(
-	function (rangeContext, _p0, context) {
-		var _p1 = _p0;
-		var _p2 = _p1._1;
-		if (_p2.ctor === 'Application') {
-			var _p3 = _p2._0;
-			if ((((((_p3.ctor === '::') && (_p3._0.ctor === '_Tuple2')) && (_p3._0._1.ctor === 'PrefixOperator')) && (_p3._1.ctor === '::')) && (_p3._1._1.ctor === '::')) && (_p3._1._1._1.ctor === '[]')) {
-				var _p4 = _p3._0._1._0;
-				return A2(_elm_lang$core$String$startsWith, ',,', _p4) ? context : {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: _p4,
-						_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p3._0._0)
-					},
-					_1: context
-				};
-			} else {
-				return context;
-			}
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_NoUncurriedPrefix$scan = F3(
-	function (rangeContext, fileContext, _p5) {
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Basics$uncurry(
-					_user$project$Analyser_Messages_Types$NoUncurriedPrefix(fileContext.path)),
-				A3(
-					_user$project$ASTUtil_Inspector$inspect,
-					_elm_lang$core$Native_Utils.update(
-						_user$project$ASTUtil_Inspector$defaultConfig,
-						{
-							onExpression: _user$project$ASTUtil_Inspector$Post(
-								_user$project$Analyser_Checks_NoUncurriedPrefix$onExpression(rangeContext))
-						}),
-					fileContext.ast,
-					{ctor: '[]'})));
-	});
-var _user$project$Analyser_Checks_NoUncurriedPrefix$checker = {
-	check: _user$project$Analyser_Checks_NoUncurriedPrefix$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'NoUncurriedPrefix',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_UnusedImportAliases$onImport = F3(
-	function (rangeContext, imp, context) {
-		var _p0 = imp.moduleAlias;
-		if (_p0.ctor === 'Just') {
-			return A3(
-				_elm_lang$core$Dict$insert,
-				_p0._0,
-				{
-					ctor: '_Tuple2',
-					_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, imp.range),
-					_1: 0
-				},
-				context);
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnusedImportAliases$markUsage = F2(
-	function (key, context) {
-		return A3(
-			_elm_lang$core$Dict$update,
-			key,
-			_elm_lang$core$Maybe$map(
-				_elm_lang$core$Tuple$mapSecond(
-					F2(
-						function (x, y) {
-							return x + y;
-						})(1))),
-			context);
-	});
-var _user$project$Analyser_Checks_UnusedImportAliases$onTypeAnnotation = F2(
-	function (typeAnnotation, context) {
-		var _p1 = typeAnnotation;
-		if (_p1.ctor === 'Typed') {
-			return A2(_user$project$Analyser_Checks_UnusedImportAliases$markUsage, _p1._0, context);
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnusedImportAliases$onExpression = F2(
-	function (expr, context) {
-		var _p2 = _elm_lang$core$Tuple$second(expr);
-		if (_p2.ctor === 'QualifiedExpr') {
-			return A2(_user$project$Analyser_Checks_UnusedImportAliases$markUsage, _p2._0, context);
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnusedImportAliases$onCase = F2(
-	function (_p3, context) {
-		var _p4 = _p3;
-		return A3(
-			_elm_lang$core$List$foldl,
-			_user$project$Analyser_Checks_UnusedImportAliases$markUsage,
-			context,
-			_user$project$AST_Util$patternModuleNames(_p4._0));
-	});
-var _user$project$Analyser_Checks_UnusedImportAliases$scan = F3(
-	function (rangeContext, fileContext, _p5) {
-		var aliases = A3(
-			_user$project$ASTUtil_Inspector$inspect,
-			_elm_lang$core$Native_Utils.update(
-				_user$project$ASTUtil_Inspector$defaultConfig,
-				{
-					onImport: _user$project$ASTUtil_Inspector$Post(
-						_user$project$Analyser_Checks_UnusedImportAliases$onImport(rangeContext))
-				}),
-			fileContext.ast,
-			_elm_lang$core$Dict$empty);
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Basics$uncurry(
-					_user$project$Analyser_Messages_Types$UnusedImportAlias(fileContext.path)),
-				A2(
-					_elm_lang$core$List$map,
-					_elm_lang$core$Tuple$mapSecond(_elm_lang$core$Tuple$first),
-					A2(
-						_elm_lang$core$List$filter,
-						function (_p6) {
-							return A2(
-								F2(
-									function (x, y) {
-										return _elm_lang$core$Native_Utils.eq(x, y);
-									}),
-								0,
-								_elm_lang$core$Tuple$second(
-									_elm_lang$core$Tuple$second(_p6)));
-						},
-						_elm_lang$core$Dict$toList(
-							A3(
-								_user$project$ASTUtil_Inspector$inspect,
-								_elm_lang$core$Native_Utils.update(
-									_user$project$ASTUtil_Inspector$defaultConfig,
-									{
-										onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImportAliases$onTypeAnnotation),
-										onExpression: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImportAliases$onExpression),
-										onCase: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImportAliases$onCase)
-									}),
-								fileContext.ast,
-								aliases))))));
-	});
-var _user$project$Analyser_Checks_UnusedImportAliases$checker = {
-	check: _user$project$Analyser_Checks_UnusedImportAliases$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'UnusedImportAlias',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_UnusedImport$onImport = F3(
-	function (rangeContext, imp, context) {
-		return (_elm_lang$core$Native_Utils.eq(imp.moduleAlias, _elm_lang$core$Maybe$Nothing) && _elm_lang$core$Native_Utils.eq(imp.exposingList, _stil4m$elm_syntax$Elm_Syntax_Exposing$None)) ? A3(
-			_elm_lang$core$Dict$insert,
-			imp.moduleName,
-			{
-				ctor: '_Tuple2',
-				_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, imp.range),
-				_1: 0
-			},
-			context) : context;
-	});
-var _user$project$Analyser_Checks_UnusedImport$markUsage = F2(
-	function (key, context) {
-		return A3(
-			_elm_lang$core$Dict$update,
-			key,
-			_elm_lang$core$Maybe$map(
-				_elm_lang$core$Tuple$mapSecond(
-					F2(
-						function (x, y) {
-							return x + y;
-						})(1))),
-			context);
-	});
-var _user$project$Analyser_Checks_UnusedImport$onTypeAnnotation = F2(
-	function (typeAnnotation, context) {
-		var _p0 = typeAnnotation;
-		if (_p0.ctor === 'Typed') {
-			return A2(_user$project$Analyser_Checks_UnusedImport$markUsage, _p0._0, context);
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnusedImport$onExpression = F2(
-	function (expr, context) {
-		var _p1 = _elm_lang$core$Tuple$second(expr);
-		if (_p1.ctor === 'QualifiedExpr') {
-			return A2(_user$project$Analyser_Checks_UnusedImport$markUsage, _p1._0, context);
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnusedImport$onCase = F2(
-	function (_p2, context) {
-		var _p3 = _p2;
-		return A3(
-			_elm_lang$core$List$foldl,
-			_user$project$Analyser_Checks_UnusedImport$markUsage,
-			context,
-			_user$project$AST_Util$patternModuleNames(_p3._0));
-	});
-var _user$project$Analyser_Checks_UnusedImport$scan = F3(
-	function (rangeContext, fileContext, _p4) {
-		var aliases = A3(
-			_user$project$ASTUtil_Inspector$inspect,
-			_elm_lang$core$Native_Utils.update(
-				_user$project$ASTUtil_Inspector$defaultConfig,
-				{
-					onImport: _user$project$ASTUtil_Inspector$Post(
-						_user$project$Analyser_Checks_UnusedImport$onImport(rangeContext))
-				}),
-			fileContext.ast,
-			_elm_lang$core$Dict$empty);
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Basics$uncurry(
-					_user$project$Analyser_Messages_Types$UnusedImport(fileContext.path)),
-				A2(
-					_elm_lang$core$List$map,
-					_elm_lang$core$Tuple$mapSecond(_elm_lang$core$Tuple$first),
-					A2(
-						_elm_lang$core$List$filter,
-						function (_p5) {
-							return A2(
-								F2(
-									function (x, y) {
-										return _elm_lang$core$Native_Utils.eq(x, y);
-									}),
-								0,
-								_elm_lang$core$Tuple$second(
-									_elm_lang$core$Tuple$second(_p5)));
-						},
-						_elm_lang$core$Dict$toList(
-							A3(
-								_user$project$ASTUtil_Inspector$inspect,
-								_elm_lang$core$Native_Utils.update(
-									_user$project$ASTUtil_Inspector$defaultConfig,
-									{
-										onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImport$onTypeAnnotation),
-										onExpression: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImport$onExpression),
-										onCase: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedImport$onCase)
-									}),
-								fileContext.ast,
-								aliases))))));
-	});
-var _user$project$Analyser_Checks_UnusedImport$checker = {
-	check: _user$project$Analyser_Checks_UnusedImport$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'UnusedImport',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_ListOperators$deficiencyToMessageData = F3(
-	function (path, configuration, _p0) {
-		var _p1 = _p0;
-		return A2(
-			_elm_lang$core$Maybe$map,
-			function (messageConstructor) {
-				return A2(messageConstructor, path, _p1._1);
-			},
-			function () {
-				var _p2 = _p1._0;
-				switch (_p2.ctor) {
-					case 'DropConcat':
-						return A2(_user$project$Analyser_Configuration$checkEnabled, 'DropConcatOfLists', configuration) ? _elm_lang$core$Maybe$Just(_user$project$Analyser_Messages_Types$DropConcatOfLists) : _elm_lang$core$Maybe$Nothing;
-					case 'DropCons':
-						return A2(_user$project$Analyser_Configuration$checkEnabled, 'DropConsOfItemAndList', configuration) ? _elm_lang$core$Maybe$Just(_user$project$Analyser_Messages_Types$DropConsOfItemAndList) : _elm_lang$core$Maybe$Nothing;
-					default:
-						return A2(_user$project$Analyser_Configuration$checkEnabled, 'UseConsOverConcat', configuration) ? _elm_lang$core$Maybe$Just(_user$project$Analyser_Messages_Types$UseConsOverConcat) : _elm_lang$core$Maybe$Nothing;
-				}
-			}());
-	});
-var _user$project$Analyser_Checks_ListOperators$UseCons = {ctor: 'UseCons'};
-var _user$project$Analyser_Checks_ListOperators$DropCons = {ctor: 'DropCons'};
-var _user$project$Analyser_Checks_ListOperators$DropConcat = {ctor: 'DropConcat'};
-var _user$project$Analyser_Checks_ListOperators$onExpression = F3(
-	function (rangeContext, _p3, context) {
-		var _p4 = _p3;
-		var _p6 = _p4._0;
-		var _p5 = _p4._1;
-		_v3_3:
-		do {
-			if (_p5.ctor === 'OperatorApplication') {
-				switch (_p5._0) {
-					case '::':
-						if ((_p5._3.ctor === '_Tuple2') && (_p5._3._1.ctor === 'ListExpr')) {
-							return {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: _user$project$Analyser_Checks_ListOperators$DropCons,
-									_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p6)
-								},
-								_1: context
-							};
-						} else {
-							break _v3_3;
-						}
-					case '++':
-						if ((_p5._2.ctor === '_Tuple2') && (_p5._2._1.ctor === 'ListExpr')) {
-							if ((_p5._3.ctor === '_Tuple2') && (_p5._3._1.ctor === 'ListExpr')) {
-								return {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: _user$project$Analyser_Checks_ListOperators$DropConcat,
-										_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p6)
-									},
-									_1: context
-								};
-							} else {
-								if ((_p5._2._1._0.ctor === '::') && (_p5._2._1._0._1.ctor === '[]')) {
-									return {
-										ctor: '::',
-										_0: {
-											ctor: '_Tuple2',
-											_0: _user$project$Analyser_Checks_ListOperators$UseCons,
-											_1: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p6)
-										},
-										_1: context
-									};
-								} else {
-									break _v3_3;
-								}
-							}
-						} else {
-							break _v3_3;
-						}
-					default:
-						break _v3_3;
-				}
-			} else {
-				break _v3_3;
-			}
-		} while(false);
-		return context;
-	});
-var _user$project$Analyser_Checks_ListOperators$scan = F3(
-	function (rangeContext, fileContext, configuration) {
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$filterMap,
-				A2(_user$project$Analyser_Checks_ListOperators$deficiencyToMessageData, fileContext.path, configuration),
-				A3(
-					_user$project$ASTUtil_Inspector$inspect,
-					_elm_lang$core$Native_Utils.update(
-						_user$project$ASTUtil_Inspector$defaultConfig,
-						{
-							onExpression: _user$project$ASTUtil_Inspector$Post(
-								_user$project$Analyser_Checks_ListOperators$onExpression(rangeContext))
-						}),
-					fileContext.ast,
-					{ctor: '[]'})));
-	});
-var _user$project$Analyser_Checks_ListOperators$checker = {
-	check: _user$project$Analyser_Checks_ListOperators$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'DropConcatOfLists',
-			_1: {
-				ctor: '::',
-				_0: 'DropConsOfItemAndList',
-				_1: {
-					ctor: '::',
-					_0: 'UseConsOverConcat',
-					_1: {ctor: '[]'}
-				}
-			}
-		})
-};
-
-var _user$project$Analyser_Checks_LineLength$scan = F3(
-	function (rangeContext, fileContext, configuration) {
-		var threshold = A2(
-			_elm_lang$core$Maybe$withDefault,
-			150,
-			A3(_user$project$Analyser_Configuration$checkPropertyAsInt, 'LineLengthExceeded', 'threshold', configuration));
-		var longLineRanges = A2(
-			_elm_lang$core$List$map,
-			function (_p0) {
-				var _p1 = _p0;
-				var _p2 = _p1._0;
-				return {
-					start: {row: _p2, column: -1},
-					end: {row: _p2 + 1, column: -2}
-				};
-			},
-			A2(
-				_elm_lang$core$List$filter,
-				function (_p3) {
-					return !A2(
-						_elm_lang$core$String$startsWith,
-						'import',
-						_elm_lang$core$Tuple$second(_p3));
-				},
-				A2(
-					_elm_lang$core$List$filter,
-					function (_p4) {
-						return !A2(
-							_elm_lang$core$String$startsWith,
-							'module',
-							_elm_lang$core$Tuple$second(_p4));
-					},
-					A2(
-						_elm_lang$core$List$filter,
-						function (_p5) {
-							return A2(
-								F2(
-									function (x, y) {
-										return _elm_lang$core$Native_Utils.cmp(x, y) < 0;
-									}),
-								threshold,
-								_elm_lang$core$String$length(
-									_elm_lang$core$Tuple$second(_p5)));
-						},
-						A2(
-							_elm_lang$core$List$indexedMap,
-							F2(
-								function (v0, v1) {
-									return {ctor: '_Tuple2', _0: v0, _1: v1};
-								}),
-							A2(_elm_lang$core$String$split, '\n', fileContext.content))))));
-		return _elm_lang$core$List$isEmpty(longLineRanges) ? {ctor: '[]'} : {
-			ctor: '::',
-			_0: A2(
-				_user$project$Analyser_Messages_Types$newMessage,
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				},
-				A2(
-					_user$project$Analyser_Messages_Types$LineLengthExceeded,
-					fileContext.path,
-					A2(
-						_elm_lang$core$List$map,
-						_user$project$Analyser_Messages_Range$build(rangeContext),
-						longLineRanges))),
-			_1: {ctor: '[]'}
-		};
-	});
-var _user$project$Analyser_Checks_LineLength$checker = {
-	check: _user$project$Analyser_Checks_LineLength$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'LineLengthExceeded',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_UnnecessaryListConcat$isListExpression = function (_p0) {
-	var _p1 = _p0;
-	var _p2 = _p1._1;
-	if (_p2.ctor === 'ListExpr') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$Analyser_Checks_UnnecessaryListConcat$onExpression = F3(
-	function (rangeContext, _p3, context) {
-		var _p4 = _p3;
-		var _p5 = _p4._1;
-		if ((((((((((((_p5.ctor === 'Application') && (_p5._0.ctor === '::')) && (_p5._0._0.ctor === '_Tuple2')) && (_p5._0._0._1.ctor === 'QualifiedExpr')) && (_p5._0._0._1._0.ctor === '::')) && (_p5._0._0._1._0._0 === 'List')) && (_p5._0._0._1._0._1.ctor === '[]')) && (_p5._0._0._1._1 === 'concat')) && (_p5._0._1.ctor === '::')) && (_p5._0._1._0.ctor === '_Tuple2')) && (_p5._0._1._0._1.ctor === 'ListExpr')) && (_p5._0._1._1.ctor === '[]')) {
-			return A2(_elm_lang$core$List$all, _user$project$Analyser_Checks_UnnecessaryListConcat$isListExpression, _p5._0._1._0._1._0) ? {
-				ctor: '::',
-				_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p4._0),
-				_1: context
-			} : context;
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_UnnecessaryListConcat$scan = F3(
-	function (rangeContext, fileContext, _p6) {
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				_user$project$Analyser_Messages_Types$UnnecessaryListConcat(fileContext.path),
-				A3(
-					_user$project$ASTUtil_Inspector$inspect,
-					_elm_lang$core$Native_Utils.update(
-						_user$project$ASTUtil_Inspector$defaultConfig,
-						{
-							onExpression: _user$project$ASTUtil_Inspector$Post(
-								_user$project$Analyser_Checks_UnnecessaryListConcat$onExpression(rangeContext))
-						}),
-					fileContext.ast,
-					{ctor: '[]'})));
-	});
-var _user$project$Analyser_Checks_UnnecessaryListConcat$checker = {
-	check: _user$project$Analyser_Checks_UnnecessaryListConcat$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'UnnecessaryListConcat',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords = F2(
-	function (rangeContext, x) {
-		var _p0 = x;
-		switch (_p0.ctor) {
-			case 'GenericType':
-				return {ctor: '[]'};
-			case 'Typed':
-				return A2(
-					_elm_lang$core$List$concatMap,
-					_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords(rangeContext),
-					_p0._2);
-			case 'Unit':
-				return {ctor: '[]'};
-			case 'Tupled':
-				return A2(
-					_elm_lang$core$List$concatMap,
-					_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords(rangeContext),
-					_p0._0);
-			case 'Record':
-				var _p2 = _p0._0;
-				return {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p0._1),
-						_1: _p2
-					},
-					_1: A2(
-						_elm_lang$core$List$concatMap,
-						function (_p1) {
-							return A2(
-								_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords,
-								rangeContext,
-								_elm_lang$core$Tuple$second(_p1));
-						},
-						_p2)
-				};
-			case 'GenericRecord':
-				var _p4 = _p0._1;
-				return {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p0._2),
-						_1: _p4
-					},
-					_1: A2(
-						_elm_lang$core$List$concatMap,
-						function (_p3) {
-							return A2(
-								_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords,
-								rangeContext,
-								_elm_lang$core$Tuple$second(_p3));
-						},
-						_p4)
-				};
-			default:
-				return A2(
-					_elm_lang$core$Basics_ops['++'],
-					A2(_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords, rangeContext, _p0._0),
-					A2(_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords, rangeContext, _p0._1));
-		}
-	});
-var _user$project$Analyser_Checks_MultiLineRecordFormatting$typeAnnotationRange = function (x) {
-	var _p5 = x;
-	switch (_p5.ctor) {
-		case 'GenericType':
-			return _p5._1;
-		case 'Typed':
-			return _p5._3;
-		case 'Unit':
-			return _p5._0;
-		case 'Tupled':
-			return _p5._1;
-		case 'Record':
-			return _p5._1;
-		case 'GenericRecord':
-			return _p5._2;
-		default:
-			return _p5._2;
-	}
-};
-var _user$project$Analyser_Checks_MultiLineRecordFormatting$onTypeAlias = F3(
-	function (rangeContext, x, context) {
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			A2(_user$project$Analyser_Checks_MultiLineRecordFormatting$findRecords, rangeContext, x.typeAnnotation),
-			context);
-	});
-var _user$project$Analyser_Checks_MultiLineRecordFormatting$firstTwo = function (def) {
-	var _p6 = def;
-	if ((_p6.ctor === '::') && (_p6._1.ctor === '::')) {
-		return _elm_lang$core$Maybe$Just(
-			{ctor: '_Tuple2', _0: _p6._0, _1: _p6._1._0});
-	} else {
-		return _elm_lang$core$Maybe$Nothing;
-	}
-};
-var _user$project$Analyser_Checks_MultiLineRecordFormatting$fieldsOnSameLine = function (_p7) {
-	var _p8 = _p7;
-	return _elm_lang$core$Native_Utils.eq(
-		_user$project$Analyser_Checks_MultiLineRecordFormatting$typeAnnotationRange(
-			_elm_lang$core$Tuple$second(_p8._0)).start.row,
-		_user$project$Analyser_Checks_MultiLineRecordFormatting$typeAnnotationRange(
-			_elm_lang$core$Tuple$second(_p8._1)).start.row);
-};
-var _user$project$Analyser_Checks_MultiLineRecordFormatting$scan = F3(
-	function (rangeContext, fileContext, _p9) {
-		var threshold = 2;
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				function (_p10) {
-					return A2(
-						_user$project$Analyser_Messages_Types$MultiLineRecordFormatting,
-						fileContext.path,
-						_elm_lang$core$Tuple$first(_p10));
-				},
-				A2(
-					_elm_lang$core$List$filter,
-					function (_p11) {
-						return _user$project$Analyser_Checks_MultiLineRecordFormatting$fieldsOnSameLine(
-							_elm_lang$core$Tuple$second(_p11));
-					},
-					A2(
-						_elm_lang$core$List$filterMap,
-						function (_p12) {
-							var _p13 = _p12;
-							return A2(
-								_elm_lang$core$Maybe$map,
-								F2(
-									function (v0, v1) {
-										return {ctor: '_Tuple2', _0: v0, _1: v1};
-									})(_p13._0),
-								_user$project$Analyser_Checks_MultiLineRecordFormatting$firstTwo(_p13._1));
-						},
-						A2(
-							_elm_lang$core$List$filter,
-							function (_p14) {
-								return A2(
-									F2(
-										function (x, y) {
-											return _elm_lang$core$Native_Utils.cmp(x, y) < 1;
-										}),
-									threshold,
-									_elm_lang$core$List$length(
-										_elm_lang$core$Tuple$second(_p14)));
-							},
-							A3(
-								_user$project$ASTUtil_Inspector$inspect,
-								_elm_lang$core$Native_Utils.update(
-									_user$project$ASTUtil_Inspector$defaultConfig,
-									{
-										onTypeAlias: _user$project$ASTUtil_Inspector$Post(
-											_user$project$Analyser_Checks_MultiLineRecordFormatting$onTypeAlias(rangeContext))
-									}),
-								fileContext.ast,
-								{ctor: '[]'}))))));
-	});
-var _user$project$Analyser_Checks_MultiLineRecordFormatting$checker = {
-	check: _user$project$Analyser_Checks_MultiLineRecordFormatting$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'MultiLineRecordFormatting',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_UnnecessaryPortModule$onPortDeclaration = F2(
-	function (_p0, x) {
-		return x + 1;
-	});
-var _user$project$Analyser_Checks_UnnecessaryPortModule$scan = F3(
-	function (_p2, fileContext, _p1) {
-		if (_user$project$AST_Util$isPortModule(fileContext.ast)) {
-			var portDeclCount = A3(
-				_user$project$ASTUtil_Inspector$inspect,
-				_elm_lang$core$Native_Utils.update(
-					_user$project$ASTUtil_Inspector$defaultConfig,
-					{
-						onPortDeclaration: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnnecessaryPortModule$onPortDeclaration)
-					}),
-				fileContext.ast,
-				0);
-			return _elm_lang$core$Native_Utils.eq(portDeclCount, 0) ? {
-				ctor: '::',
-				_0: A2(
-					_user$project$Analyser_Messages_Types$newMessage,
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-						_1: {ctor: '[]'}
-					},
-					_user$project$Analyser_Messages_Types$UnnecessaryPortModule(fileContext.path)),
-				_1: {ctor: '[]'}
-			} : {ctor: '[]'};
-		} else {
-			return {ctor: '[]'};
-		}
-	});
-var _user$project$Analyser_Checks_UnnecessaryPortModule$checker = {
-	check: _user$project$Analyser_Checks_UnnecessaryPortModule$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'UnnecessaryPortModule',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_NonStaticRegex$addUsedRegex = F2(
-	function (range, context) {
-		return context.staticEnvironment ? context : _elm_lang$core$Native_Utils.update(
-			context,
-			{
-				usages: {ctor: '::', _0: range, _1: context.usages}
-			});
-	});
-var _user$project$Analyser_Checks_NonStaticRegex$onExpressionQualified = F4(
-	function (rangeContext, moduleName, _p0, context) {
-		var _p1 = _p0;
-		var _p2 = _p1._1;
-		if (_p2.ctor === 'QualifiedExpr') {
-			return (_elm_lang$core$Native_Utils.eq(_p2._1, 'regex') && _elm_lang$core$Native_Utils.eq(_p2._0, moduleName)) ? A2(
-				_user$project$Analyser_Checks_NonStaticRegex$addUsedRegex,
-				A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p1._0),
-				context) : context;
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_NonStaticRegex$onExpressionFunctionReference = F3(
-	function (rangeContext, _p3, context) {
-		var _p4 = _p3;
-		var _p5 = _p4._1;
-		if ((_p5.ctor === 'FunctionOrValue') && (_p5._0 === 'regex')) {
-			return A2(
-				_user$project$Analyser_Checks_NonStaticRegex$addUsedRegex,
-				A2(_user$project$Analyser_Messages_Range$build, rangeContext, _p4._0),
-				context);
-		} else {
-			return context;
-		}
-	});
-var _user$project$Analyser_Checks_NonStaticRegex$onExpression = F4(
-	function (rangeContext, x, expression, context) {
-		return x.exposesRegex ? A4(
-			_user$project$Analyser_Checks_NonStaticRegex$onExpressionQualified,
-			rangeContext,
-			x.moduleName,
-			expression,
-			A3(_user$project$Analyser_Checks_NonStaticRegex$onExpressionFunctionReference, rangeContext, expression, context)) : A4(_user$project$Analyser_Checks_NonStaticRegex$onExpressionQualified, rangeContext, x.moduleName, expression, context);
-	});
-var _user$project$Analyser_Checks_NonStaticRegex$onFunction = F3(
-	function (inner, $function, context) {
-		if (!_user$project$ASTUtil_Functions$isStatic($function)) {
-			var after = inner(
-				_elm_lang$core$Native_Utils.update(
-					context,
-					{staticEnvironment: false}));
-			return _elm_lang$core$Native_Utils.update(
-				after,
-				{staticEnvironment: context.staticEnvironment});
-		} else {
-			return inner(context);
-		}
-	});
-var _user$project$Analyser_Checks_NonStaticRegex$startingContext = {
-	staticEnvironment: true,
-	usages: {ctor: '[]'}
-};
-var _user$project$Analyser_Checks_NonStaticRegex$findRegexUsagesInFunctions = F3(
-	function (rangeContext, regexImport, fileContext) {
-		return A3(
-			_user$project$ASTUtil_Inspector$inspect,
-			_elm_lang$core$Native_Utils.update(
-				_user$project$ASTUtil_Inspector$defaultConfig,
-				{
-					onFunction: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_NonStaticRegex$onFunction),
-					onExpression: _user$project$ASTUtil_Inspector$Post(
-						A2(_user$project$Analyser_Checks_NonStaticRegex$onExpression, rangeContext, regexImport))
-				}),
-			fileContext.ast,
-			_user$project$Analyser_Checks_NonStaticRegex$startingContext);
-	});
-var _user$project$Analyser_Checks_NonStaticRegex$scan = F3(
-	function (rangeContext, fileContext, _p6) {
-		var regexImport = A3(
-			_user$project$ASTUtil_Imports$buildImportInformation,
-			{
-				ctor: '::',
-				_0: 'Regex',
-				_1: {ctor: '[]'}
-			},
-			'regex',
-			fileContext.ast);
-		var _p7 = regexImport;
-		if (_p7.ctor === 'Nothing') {
-			return {ctor: '[]'};
-		} else {
-			return A2(
-				_elm_lang$core$List$map,
-				_user$project$Analyser_Messages_Types$newMessage(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-						_1: {ctor: '[]'}
-					}),
-				A2(
-					_elm_lang$core$List$map,
-					_user$project$Analyser_Messages_Types$NonStaticRegex(fileContext.path),
-					function (_) {
-						return _.usages;
-					}(
-						A3(_user$project$Analyser_Checks_NonStaticRegex$findRegexUsagesInFunctions, rangeContext, _p7._0, fileContext))));
-		}
-	});
-var _user$project$Analyser_Checks_NonStaticRegex$checker = {
-	check: _user$project$Analyser_Checks_NonStaticRegex$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'NonStaticRegex',
-			_1: {ctor: '[]'}
-		})
-};
-var _user$project$Analyser_Checks_NonStaticRegex$Context = F2(
-	function (a, b) {
-		return {staticEnvironment: a, usages: b};
-	});
-
-var _user$project$Analyser_Checks_CoreArrayUsage$isArrayImport = function (_p0) {
-	var _p1 = _p0;
-	return _elm_lang$core$Native_Utils.eq(
-		_p1.moduleName,
-		{
-			ctor: '::',
-			_0: 'Array',
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$Analyser_Checks_CoreArrayUsage$scan = F3(
-	function (rangeContext, fileContext, _p2) {
-		return A2(
-			_elm_lang$core$List$take,
-			1,
-			A2(
-				_elm_lang$core$List$map,
-				_user$project$Analyser_Messages_Types$newMessage(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-						_1: {ctor: '[]'}
-					}),
-				A2(
-					_elm_lang$core$List$map,
-					function (_p3) {
-						return A2(
-							_user$project$Analyser_Messages_Types$CoreArrayUsage,
-							fileContext.path,
-							A2(
-								_user$project$Analyser_Messages_Range$build,
-								rangeContext,
-								function (_) {
-									return _.range;
-								}(_p3)));
-					},
-					A2(_elm_lang$core$List$filter, _user$project$Analyser_Checks_CoreArrayUsage$isArrayImport, fileContext.ast.imports))));
-	});
-var _user$project$Analyser_Checks_CoreArrayUsage$checker = {
-	check: _user$project$Analyser_Checks_CoreArrayUsage$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'CoreArrayUsage',
-			_1: {ctor: '[]'}
-		})
-};
-
-var _user$project$Analyser_Checks_FunctionInLet$onLetBlock = F3(
-	function ($continue, _p0, context) {
-		return function (after) {
-			return _elm_lang$core$Native_Utils.update(
-				after,
-				{inLetBlock: context.inLetBlock});
-		}(
-			$continue(
-				_elm_lang$core$Native_Utils.update(
-					context,
-					{inLetBlock: true})));
-	});
-var _user$project$Analyser_Checks_FunctionInLet$onFunction = F2(
-	function ($function, context) {
-		var isStatic = _user$project$ASTUtil_Functions$isStatic($function);
-		return ((!isStatic) && context.inLetBlock) ? _elm_lang$core$Native_Utils.update(
-			context,
-			{
-				functions: {ctor: '::', _0: $function, _1: context.functions}
-			}) : context;
-	});
-var _user$project$Analyser_Checks_FunctionInLet$asMessage = F3(
-	function (rangeContext, fileContext, f) {
-		return A2(
-			_user$project$Analyser_Messages_Types$newMessage,
-			{
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-				_1: {ctor: '[]'}
-			},
-			A2(
-				_user$project$Analyser_Messages_Types$FunctionInLet,
-				fileContext.path,
-				A2(_user$project$Analyser_Messages_Range$build, rangeContext, f.declaration.name.range)));
-	});
-var _user$project$Analyser_Checks_FunctionInLet$startingContext = {
-	inLetBlock: false,
-	functions: {ctor: '[]'}
-};
-var _user$project$Analyser_Checks_FunctionInLet$scan = F3(
-	function (rangeContext, fileContext, _p1) {
-		return A2(
-			_elm_lang$core$List$map,
-			A2(_user$project$Analyser_Checks_FunctionInLet$asMessage, rangeContext, fileContext),
-			function (_) {
-				return _.functions;
-			}(
-				A3(
-					_user$project$ASTUtil_Inspector$inspect,
-					_elm_lang$core$Native_Utils.update(
-						_user$project$ASTUtil_Inspector$defaultConfig,
-						{
-							onLetBlock: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_FunctionInLet$onLetBlock),
-							onFunction: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_FunctionInLet$onFunction)
-						}),
-					fileContext.ast,
-					_user$project$Analyser_Checks_FunctionInLet$startingContext)));
-	});
-var _user$project$Analyser_Checks_FunctionInLet$checker = {
-	check: _user$project$Analyser_Checks_FunctionInLet$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'FunctionInLet',
-			_1: {ctor: '[]'}
-		})
-};
-var _user$project$Analyser_Checks_FunctionInLet$Context = F2(
-	function (a, b) {
-		return {inLetBlock: a, functions: b};
-	});
-
-var _user$project$Analyser_Checks_DuplicateImportedVariable$exposingConstructors = function (t) {
-	var _p0 = t;
-	if (_p0.ctor === 'TypeExpose') {
-		var _p1 = _p0._0.constructors;
-		if (_p1.ctor === 'Explicit') {
-			return _p1._0;
-		} else {
-			return {ctor: '[]'};
-		}
-	} else {
-		return {ctor: '[]'};
-	}
-};
-var _user$project$Analyser_Checks_DuplicateImportedVariable$exposingValues = function (t) {
-	var _p2 = t;
-	switch (_p2.ctor) {
-		case 'TypeExpose':
-			var _p3 = _p2._0;
-			return {ctor: '_Tuple2', _0: _p3.name, _1: _p3.range};
-		case 'InfixExpose':
-			return {ctor: '_Tuple2', _0: _p2._0, _1: _p2._1};
-		case 'FunctionExpose':
-			return {ctor: '_Tuple2', _0: _p2._0, _1: _p2._1};
-		default:
-			return {ctor: '_Tuple2', _0: _p2._0, _1: _p2._1};
-	}
-};
-var _user$project$Analyser_Checks_DuplicateImportedVariable$constructorsAndValues = function (imp) {
-	var _p4 = imp.exposingList;
-	switch (_p4.ctor) {
-		case 'None':
-			return {
-				ctor: '_Tuple2',
-				_0: {ctor: '[]'},
-				_1: {ctor: '[]'}
-			};
-		case 'All':
-			return {
-				ctor: '_Tuple2',
-				_0: {ctor: '[]'},
-				_1: {ctor: '[]'}
-			};
-		default:
-			var _p5 = _p4._0;
-			return {
-				ctor: '_Tuple2',
-				_0: A2(_elm_lang$core$List$concatMap, _user$project$Analyser_Checks_DuplicateImportedVariable$exposingConstructors, _p5),
-				_1: A2(_elm_lang$core$List$map, _user$project$Analyser_Checks_DuplicateImportedVariable$exposingValues, _p5)
-			};
-	}
-};
-var _user$project$Analyser_Checks_DuplicateImportedVariable$mergeImportedValue = F2(
-	function (l, entry) {
-		var addPair = F2(
-			function (_p6, d) {
-				var _p7 = _p6;
-				var _p8 = _p7._1;
-				return A3(
-					_elm_lang$core$Dict$update,
-					_p7._0,
-					function (old) {
-						return _elm_lang$core$Maybe$Just(
-							A2(
-								_elm_lang$core$Maybe$withDefault,
-								{
-									ctor: '::',
-									_0: _p8,
-									_1: {ctor: '[]'}
-								},
-								A2(
-									_elm_lang$core$Maybe$map,
-									F2(
-										function (x, y) {
-											return {ctor: '::', _0: x, _1: y};
-										})(_p8),
-									old)));
-					},
-					d);
-			});
-		return A3(_elm_lang$core$List$foldl, addPair, entry, l);
-	});
-var _user$project$Analyser_Checks_DuplicateImportedVariable$onImport = F2(
-	function (imp, context) {
-		var _p9 = _user$project$Analyser_Checks_DuplicateImportedVariable$constructorsAndValues(imp);
-		var cs = _p9._0;
-		var vs = _p9._1;
-		return _elm_lang$core$Native_Utils.update(
-			context,
-			{
-				constructors: A3(
-					_elm_lang$core$Dict$update,
-					imp.moduleName,
-					function (_p10) {
-						return _elm_lang$core$Maybe$Just(
-							A2(
-								_user$project$Analyser_Checks_DuplicateImportedVariable$mergeImportedValue,
-								cs,
-								A2(_elm_lang$core$Maybe$withDefault, _elm_lang$core$Dict$empty, _p10)));
-					},
-					context.constructors),
-				functionOrValues: A3(
-					_elm_lang$core$Dict$update,
-					imp.moduleName,
-					function (_p11) {
-						return _elm_lang$core$Maybe$Just(
-							A2(
-								_user$project$Analyser_Checks_DuplicateImportedVariable$mergeImportedValue,
-								vs,
-								A2(_elm_lang$core$Maybe$withDefault, _elm_lang$core$Dict$empty, _p11)));
-					},
-					context.functionOrValues)
-			});
-	});
-var _user$project$Analyser_Checks_DuplicateImportedVariable$findViolations = function (d) {
-	return A2(
-		_elm_lang$core$List$filter,
-		function (_p12) {
-			var _p13 = _p12;
-			return _elm_lang$core$Native_Utils.cmp(
-				_elm_lang$core$List$length(_p13._2),
-				2) > -1;
-		},
-		A2(
-			_elm_lang$core$List$concatMap,
-			function (_p14) {
-				var _p15 = _p14;
-				return A2(
-					_elm_lang$core$List$map,
-					function (_p16) {
-						var _p17 = _p16;
-						return {ctor: '_Tuple3', _0: _p15._0, _1: _p17._0, _2: _p17._1};
-					},
-					_elm_lang$core$Dict$toList(_p15._1));
-			},
-			_elm_lang$core$Dict$toList(d)));
-};
-var _user$project$Analyser_Checks_DuplicateImportedVariable$asMessageData = F3(
-	function (rangeContext, path, _p18) {
-		var _p19 = _p18;
-		return A4(
-			_user$project$Analyser_Messages_Types$DuplicateImportedVariable,
-			path,
-			_p19._0,
-			_p19._1,
-			A2(
-				_elm_lang$core$List$map,
-				_user$project$Analyser_Messages_Range$build(rangeContext),
-				_p19._2));
-	});
-var _user$project$Analyser_Checks_DuplicateImportedVariable$scan = F3(
-	function (rangeContext, fileContext, _p20) {
-		var result = A3(
-			_user$project$ASTUtil_Inspector$inspect,
-			_elm_lang$core$Native_Utils.update(
-				_user$project$ASTUtil_Inspector$defaultConfig,
-				{
-					onImport: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_DuplicateImportedVariable$onImport),
-					onFunction: _user$project$ASTUtil_Inspector$Skip
-				}),
-			fileContext.ast,
-			{constructors: _elm_lang$core$Dict$empty, functionOrValues: _elm_lang$core$Dict$empty});
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				A2(_user$project$Analyser_Checks_DuplicateImportedVariable$asMessageData, rangeContext, fileContext.path),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_user$project$Analyser_Checks_DuplicateImportedVariable$findViolations(result.functionOrValues),
-					_user$project$Analyser_Checks_DuplicateImportedVariable$findViolations(result.constructors))));
-	});
-var _user$project$Analyser_Checks_DuplicateImportedVariable$checker = {
-	check: _user$project$Analyser_Checks_DuplicateImportedVariable$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'DuplicateImportedVariable',
-			_1: {ctor: '[]'}
-		})
-};
-var _user$project$Analyser_Checks_DuplicateImportedVariable$Context = F2(
-	function (a, b) {
-		return {constructors: a, functionOrValues: b};
-	});
-
-var _user$project$Analyser_Checks_SingleFieldRecord$findPlainRecords = function (x) {
-	var _p0 = x;
-	if (_p0.ctor === 'Record') {
-		return {
-			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: _p0._1, _1: _p0._0},
-			_1: {ctor: '[]'}
-		};
-	} else {
-		return {ctor: '[]'};
-	}
-};
-var _user$project$Analyser_Checks_SingleFieldRecord$onTypeAnnotation = F2(
-	function (x, context) {
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			_user$project$Analyser_Checks_SingleFieldRecord$findPlainRecords(x),
-			context);
-	});
-var _user$project$Analyser_Checks_SingleFieldRecord$isSingleFieldRecord = function (x) {
-	return _elm_lang$core$Native_Utils.eq(
-		_elm_lang$core$List$length(x),
-		1);
-};
-var _user$project$Analyser_Checks_SingleFieldRecord$scan = F3(
-	function (rangeContext, fileContext, _p1) {
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Analyser_Messages_Types$newMessage(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: fileContext.sha1, _1: fileContext.path},
-					_1: {ctor: '[]'}
-				}),
-			A2(
-				_elm_lang$core$List$map,
-				function (_p2) {
-					return A2(
-						_user$project$Analyser_Messages_Types$SingleFieldRecord,
-						fileContext.path,
-						A2(
-							_user$project$Analyser_Messages_Range$build,
-							rangeContext,
-							_elm_lang$core$Tuple$first(_p2)));
-				},
-				A2(
-					_elm_lang$core$List$filter,
-					function (_p3) {
-						return _user$project$Analyser_Checks_SingleFieldRecord$isSingleFieldRecord(
-							_elm_lang$core$Tuple$second(_p3));
-					},
-					A3(
-						_user$project$ASTUtil_Inspector$inspect,
-						_elm_lang$core$Native_Utils.update(
-							_user$project$ASTUtil_Inspector$defaultConfig,
-							{
-								onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_SingleFieldRecord$onTypeAnnotation)
-							}),
-						fileContext.ast,
-						{ctor: '[]'}))));
-	});
-var _user$project$Analyser_Checks_SingleFieldRecord$checker = {
-	check: _user$project$Analyser_Checks_SingleFieldRecord$scan,
-	shouldCheck: _user$project$Analyser_Checks_Base$keyBasedChecker(
-		{
-			ctor: '::',
-			_0: 'SingleFieldRecord',
-			_1: {ctor: '[]'}
-		})
-};
-
 var _user$project$Inspection$inspectFileContext = F3(
 	function (configuration, enabledChecks, fileContext) {
 		var rangeContext = _user$project$Analyser_Messages_Range$context(fileContext.content);
@@ -28013,8 +28675,16 @@ var _user$project$Inspection$checkers = {
 																						_0: _user$project$Analyser_Checks_UnformattedFile$checker,
 																						_1: {
 																							ctor: '::',
-																							_0: _user$project$Analyser_Checks_SingleFieldRecord$checker,
-																							_1: {ctor: '[]'}
+																							_0: _user$project$Analyser_Checks_DuplicateRecordFieldUpdate$checker,
+																							_1: {
+																								ctor: '::',
+																								_0: _user$project$Analyser_Checks_SingleFieldRecord$checker,
+																								_1: {
+																									ctor: '::',
+																									_0: _user$project$Analyser_Checks_TriggerWords$checker,
+																									_1: {ctor: '[]'}
+																								}
+																							}
 																						}
 																					}
 																				}
@@ -28211,30 +28881,38 @@ var _user$project$Analyser$FixerStage = function (a) {
 };
 var _user$project$Analyser$handleNextStep = function (_p5) {
 	var _p6 = _p5;
-	var _p12 = _p6._0;
-	var _p11 = _p6;
-	var _p7 = _p12.stage;
+	var _p13 = _p6._0;
+	var _p12 = _p6;
+	var _p7 = _p13.stage;
 	if (_p7.ctor === 'Finished') {
-		var _p8 = _user$project$Analyser_State$nextTask(_p12.state);
+		var _p8 = _user$project$Analyser_State$nextTask(_p13.state);
 		if (_p8.ctor === 'Nothing') {
-			return _p11;
+			return _p12;
 		} else {
+			var _p11 = _p8._0._1;
 			var _p10 = _p8._0._0;
-			var _p9 = A2(_user$project$Analyser_Fixer$init, _p8._0._1, _p10);
+			var _p9 = A2(_user$project$Analyser_Fixer$init, _p11, _p10);
 			if (_p9.ctor === 'Nothing') {
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
-						_p12,
+						_p13,
 						{state: _p10}),
-					_1: _elm_lang$core$Platform_Cmd$none
+					_1: _user$project$Util_Logger$info(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'Could not fix message: \'',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(_p11),
+								'\'.')))
 				};
 			} else {
 				return _user$project$Analyser$doSendState(
 					{
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
-							_p12,
+							_p13,
 							{
 								state: _p9._0._2,
 								stage: _user$project$Analyser$FixerStage(_p9._0._0)
@@ -28253,7 +28931,7 @@ var _user$project$Analyser$handleNextStep = function (_p5) {
 			}
 		}
 	} else {
-		return _p11;
+		return _p12;
 	}
 };
 var _user$project$Analyser$finishProcess = F3(
@@ -28304,11 +28982,11 @@ var _user$project$Analyser$SourceLoadingStage = function (a) {
 	return {ctor: 'SourceLoadingStage', _0: a};
 };
 var _user$project$Analyser$startSourceLoading = F2(
-	function (files, _p13) {
-		var _p14 = _p13;
-		var _p15 = function () {
-			var _p16 = files;
-			if (_p16.ctor === '[]') {
+	function (files, _p14) {
+		var _p15 = _p14;
+		var _p16 = function () {
+			var _p17 = files;
+			if (_p17.ctor === '[]') {
 				return {ctor: '_Tuple2', _0: _user$project$Analyser$Finished, _1: _elm_lang$core$Platform_Cmd$none};
 			} else {
 				return A2(
@@ -28317,15 +28995,15 @@ var _user$project$Analyser$startSourceLoading = F2(
 					A2(
 						_elm_lang$core$Tuple$mapFirst,
 						_user$project$Analyser$SourceLoadingStage,
-						_user$project$Analyser_SourceLoadingStage$init(_p16)));
+						_user$project$Analyser_SourceLoadingStage$init(_p17)));
 			}
 		}();
-		var nextStage = _p15._0;
-		var stageCmds = _p15._1;
+		var nextStage = _p16._0;
+		var stageCmds = _p16._1;
 		return {
 			ctor: '_Tuple2',
 			_0: _elm_lang$core$Native_Utils.update(
-				_p14._0,
+				_p15._0,
 				{stage: nextStage}),
 			_1: _elm_lang$core$Platform_Cmd$batch(
 				{
@@ -28333,7 +29011,7 @@ var _user$project$Analyser$startSourceLoading = F2(
 					_0: stageCmds,
 					_1: {
 						ctor: '::',
-						_0: _p14._1,
+						_0: _p15._1,
 						_1: {ctor: '[]'}
 					}
 				})
@@ -28341,12 +29019,12 @@ var _user$project$Analyser$startSourceLoading = F2(
 	});
 var _user$project$Analyser$onFixerMsg = F3(
 	function (x, stage, model) {
-		var _p17 = A2(
+		var _p18 = A2(
 			_elm_lang$core$Tuple$mapSecond,
 			_elm_lang$core$Platform_Cmd$map(_user$project$Analyser$FixerMsg),
 			A3(_user$project$Analyser_Fixer$update, model.codeBase, x, stage));
-		var newFixerModel = _p17._0;
-		var fixerCmds = _p17._1;
+		var newFixerModel = _p18._0;
+		var fixerCmds = _p18._1;
 		return _user$project$Analyser_Fixer$isDone(newFixerModel) ? (_user$project$Analyser_Fixer$succeeded(newFixerModel) ? {
 			ctor: '_Tuple2',
 			_0: _elm_lang$core$Native_Utils.update(
@@ -28369,9 +29047,9 @@ var _user$project$Analyser$onFixerMsg = F3(
 	});
 var _user$project$Analyser$onSourceLoadingStageMsg = F3(
 	function (x, stage, model) {
-		var _p18 = A2(_user$project$Analyser_SourceLoadingStage$update, x, stage);
-		var newStage = _p18._0;
-		var cmds = _p18._1;
+		var _p19 = A2(_user$project$Analyser_SourceLoadingStage$update, x, stage);
+		var newStage = _p19._0;
+		var cmds = _p19._1;
 		return _user$project$Analyser_SourceLoadingStage$isDone(newStage) ? A3(_user$project$Analyser$finishProcess, newStage, cmds, model) : {
 			ctor: '_Tuple2',
 			_0: _elm_lang$core$Native_Utils.update(
@@ -28387,9 +29065,9 @@ var _user$project$Analyser$DependencyLoadingStage = function (a) {
 };
 var _user$project$Analyser$onDependencyLoadingStageMsg = F3(
 	function (x, stage, model) {
-		var _p19 = A2(_user$project$Analyser_DependencyLoadingStage$update, x, stage);
-		var newStage = _p19._0;
-		var cmds = _p19._1;
+		var _p20 = A2(_user$project$Analyser_DependencyLoadingStage$update, x, stage);
+		var newStage = _p20._0;
+		var cmds = _p20._1;
 		return _user$project$Analyser_DependencyLoadingStage$isDone(newStage) ? A2(
 			_user$project$Analyser$startSourceLoading,
 			model.context.sourceFiles,
@@ -28440,8 +29118,8 @@ var _user$project$Analyser$init = function (server) {
 };
 var _user$project$Analyser$update = F2(
 	function (msg, model) {
-		var _p20 = msg;
-		switch (_p20.ctor) {
+		var _p21 = msg;
+		switch (_p21.ctor) {
 			case 'OnFixMessage':
 				return _user$project$Analyser$handleNextStep(
 					{
@@ -28449,27 +29127,27 @@ var _user$project$Analyser$update = F2(
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								state: A2(_user$project$Analyser_State$addFixToQueue, _p20._0, model.state)
+								state: A2(_user$project$Analyser_State$addFixToQueue, _p21._0, model.state)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					});
 			case 'Reset':
 				return _user$project$Analyser$init(model.server);
 			case 'OnContext':
-				var _p23 = _p20._0;
-				var _p21 = _user$project$Analyser_DependencyLoadingStage$init(_p23.interfaceFiles);
-				var stage = _p21._0;
-				var cmds = _p21._1;
-				var _p22 = _user$project$Analyser_Configuration$fromString(_p23.configuration);
-				var configuration = _p22._0;
-				var messages = _p22._1;
+				var _p24 = _p21._0;
+				var _p22 = _user$project$Analyser_DependencyLoadingStage$init(_p24.interfaceFiles);
+				var stage = _p22._0;
+				var cmds = _p22._1;
+				var _p23 = _user$project$Analyser_Configuration$fromString(_p24.configuration);
+				var configuration = _p23._0;
+				var messages = _p23._1;
 				return _user$project$Analyser$doSendState(
 					{
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								context: _p23,
+								context: _p24,
 								configuration: configuration,
 								stage: _user$project$Analyser$DependencyLoadingStage(stage)
 							}),
@@ -28481,23 +29159,23 @@ var _user$project$Analyser$update = F2(
 							})
 					});
 			case 'DependencyLoadingStageMsg':
-				var _p24 = model.stage;
-				if (_p24.ctor === 'DependencyLoadingStage') {
-					return A3(_user$project$Analyser$onDependencyLoadingStageMsg, _p20._0, _p24._0, model);
+				var _p25 = model.stage;
+				if (_p25.ctor === 'DependencyLoadingStage') {
+					return A3(_user$project$Analyser$onDependencyLoadingStageMsg, _p21._0, _p25._0, model);
 				} else {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
 			case 'SourceLoadingStageMsg':
-				var _p25 = model.stage;
-				if (_p25.ctor === 'SourceLoadingStage') {
-					return A3(_user$project$Analyser$onSourceLoadingStageMsg, _p20._0, _p25._0, model);
+				var _p26 = model.stage;
+				if (_p26.ctor === 'SourceLoadingStage') {
+					return A3(_user$project$Analyser$onSourceLoadingStageMsg, _p21._0, _p26._0, model);
 				} else {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
 			case 'FixerMsg':
-				var _p26 = model.stage;
-				if (_p26.ctor === 'FixerStage') {
-					return A3(_user$project$Analyser$onFixerMsg, _p20._0, _p26._0, model);
+				var _p27 = model.stage;
+				if (_p27.ctor === 'FixerStage') {
+					return A3(_user$project$Analyser$onFixerMsg, _p21._0, _p27._0, model);
 				} else {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
@@ -28517,38 +29195,38 @@ var _user$project$Analyser$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					}) : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			default:
-				if (_p20._0.ctor === 'Update') {
-					var _p27 = _p20._0._0;
+				if (_p21._0.ctor === 'Update') {
+					var _p28 = _p21._0._0;
 					return _user$project$Analyser$doSendState(
 						{
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
 								{
-									state: A2(_user$project$Analyser_State$outdateMessagesForFile, _p27, model.state),
-									changedFiles: {ctor: '::', _0: _p27, _1: model.changedFiles}
+									state: A2(_user$project$Analyser_State$outdateMessagesForFile, _p28, model.state),
+									changedFiles: {ctor: '::', _0: _p28, _1: model.changedFiles}
 								}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						});
 				} else {
-					var _p29 = _p20._0._0;
+					var _p30 = _p21._0._0;
 					return _user$project$Analyser$doSendState(
 						{
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
 								{
-									state: A2(_user$project$Analyser_State$removeMessagesForFile, _p29, model.state),
+									state: A2(_user$project$Analyser_State$removeMessagesForFile, _p30, model.state),
 									changedFiles: A2(
 										_elm_lang$core$List$filter,
-										function (_p28) {
+										function (_p29) {
 											return !A2(
 												F2(
 													function (x, y) {
 														return _elm_lang$core$Native_Utils.eq(x, y);
 													}),
-												_p29,
-												_p28);
+												_p30,
+												_p29);
 										},
 										model.changedFiles)
 								}),
@@ -28556,7 +29234,7 @@ var _user$project$Analyser$update = F2(
 								A2(
 									_elm_lang$core$Basics_ops['++'],
 									'File was removed: \'',
-									A2(_elm_lang$core$Basics_ops['++'], _p29, '\'. Removing known messages.')))
+									A2(_elm_lang$core$Basics_ops['++'], _p30, '\'. Removing known messages.')))
 						});
 				}
 		}
