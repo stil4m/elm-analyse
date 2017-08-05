@@ -1,10 +1,10 @@
 module Analyser.Checks.NonStaticRegexTests exposing (..)
 
-import Analyser.Checks.NonStaticRegex as NonStaticRegex
 import Analyser.Checks.CheckTestUtil as CTU
+import Analyser.Checks.NonStaticRegex as NonStaticRegex
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (..)
-import Analyser.Messages.Range as Range
 
 
 usedRegexWithStaticWithoutImport : ( String, String, List MessageData )

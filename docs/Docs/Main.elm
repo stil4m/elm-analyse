@@ -1,15 +1,15 @@
 module Docs.Main exposing (..)
 
-import Html exposing (..)
-import Docs.Page as Page exposing (Page(..))
-import Navigation exposing (Location)
-import Docs.MsgDoc
-import Docs.Home
 import Bootstrap.Navbar
-import Docs.Menu
 import Docs.Changelog as Changelog
 import Docs.Configuration as Configuration
 import Docs.Features as Features
+import Docs.Home
+import Docs.Menu
+import Docs.MsgDoc
+import Docs.Page as Page exposing (Page(..))
+import Html exposing (..)
+import Navigation exposing (Location)
 
 
 main : Program Never Model Msg
@@ -57,12 +57,12 @@ init location =
         ( content, contentCmds ) =
             contentFromPage page
     in
-        ( { page = page
-          , menu = menu
-          , content = content
-          }
-        , Cmd.batch [ menuCmds, contentCmds ]
-        )
+    ( { page = page
+      , menu = menu
+      , content = content
+      }
+    , Cmd.batch [ menuCmds, contentCmds ]
+    )
 
 
 contentFromPage : Page -> ( Content, Cmd Msg )
@@ -79,9 +79,9 @@ contentFromPage page =
                 ( changelogModel, cmds ) =
                     Changelog.init
             in
-                ( ChangelogContent changelogModel
-                , Cmd.map ChangelogMsg cmds
-                )
+            ( ChangelogContent changelogModel
+            , Cmd.map ChangelogMsg cmds
+            )
 
         Features ->
             ( FeaturesContent, Cmd.none )

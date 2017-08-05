@@ -1,12 +1,12 @@
 module GraphBuilder exposing (run)
 
+import Analyser.CodeBase exposing (CodeBase)
 import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.Files.Types exposing (LoadedSourceFiles)
 import Graph exposing (Graph)
 import Graph.Edge as Edge exposing (Edge)
 import Graph.Node as Node exposing (Node)
 import Set
-import Analyser.CodeBase exposing (CodeBase)
 
 
 run : CodeBase -> LoadedSourceFiles -> Graph Node
@@ -38,7 +38,7 @@ run codeBase sources =
         edges =
             Edge.filterForIdentifiers identifiers allEdges
     in
-        Graph.init edges nodes
+    Graph.init edges nodes
 
 
 edgesInFile : FileContext -> List Edge
@@ -54,7 +54,7 @@ edgesInFile file =
                         |> List.map .moduleName
                         |> List.map Node.identifierFromName
             in
-                List.map (\to -> Edge from to) imports
+            List.map (\to -> Edge from to) imports
 
         Nothing ->
             []

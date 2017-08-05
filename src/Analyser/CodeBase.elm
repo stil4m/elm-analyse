@@ -1,4 +1,4 @@
-module Analyser.CodeBase exposing (CodeBase, init, dependencies, setDependencies, sourceFiles, addSourceFiles, mergeLoadedSourceFiles, processContext)
+module Analyser.CodeBase exposing (CodeBase, addSourceFiles, dependencies, init, mergeLoadedSourceFiles, processContext, setDependencies, sourceFiles)
 
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Dict exposing (Dict)

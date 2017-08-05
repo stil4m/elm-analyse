@@ -1,8 +1,8 @@
 module Docs.Features exposing (view)
 
+import Docs.Html as DocsHtml
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Docs.Html as DocsHtml
 
 
 view : Html msg
@@ -71,8 +71,6 @@ packageCycles : Html msg
 packageCycles =
     div []
         [ h2 [] [ text "Package Cycles" ]
-
-        -- TODO
         , i [] [ text "Documentation is coming soon" ]
         ]
 
@@ -81,8 +79,6 @@ editorIntegration : Html msg
 editorIntegration =
     div []
         [ h2 [] [ text "Editor Integration" ]
-
-        -- TODO
         , i [] [ text "Documentation is coming soon" ]
         ]
 

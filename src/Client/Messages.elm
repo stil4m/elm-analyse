@@ -2,7 +2,7 @@ module Client.Messages exposing (viewAll)
 
 import Analyser.Messages.Types exposing (Message, MessageStatus(Fixing, Outdated))
 import Analyser.Messages.Util as Messages
-import Html exposing (Html, li, div, a, strong, text, span, ul)
+import Html exposing (Html, a, div, li, span, strong, text, ul)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 

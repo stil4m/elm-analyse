@@ -1,13 +1,13 @@
 module Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
 
+import Dict
 import Elm.Dependency exposing (Dependency)
 import Elm.Interface exposing (Exposed(..), Interface)
-import Dict
-import Json.Encode as JE exposing (Value)
+import Elm.Syntax.Infix as Infix
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
+import Json.Encode as JE exposing (Value)
 import Util.Json exposing (decodeTyped, encodeTyped)
-import Elm.Syntax.Infix as Infix
 
 
 deserialiseDependency : String -> Maybe Dependency

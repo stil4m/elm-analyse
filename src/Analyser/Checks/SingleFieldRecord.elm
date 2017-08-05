@@ -1,13 +1,13 @@
 module Analyser.Checks.SingleFieldRecord exposing (checker)
 
-import Analyser.FileContext exposing (FileContext)
-import Elm.Syntax.TypeAnnotation exposing (..)
-import Analyser.Configuration exposing (Configuration)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
-import Analyser.Messages.Types exposing (Message, MessageData(SingleFieldRecord), newMessage)
 import ASTUtil.Inspector as Inspector exposing (..)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Range as Range exposing (RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(SingleFieldRecord), newMessage)
 import Elm.Syntax.Range as Syntax
+import Elm.Syntax.TypeAnnotation exposing (..)
 
 
 checker : Checker

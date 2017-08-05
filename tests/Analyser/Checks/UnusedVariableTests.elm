@@ -3,11 +3,10 @@ module Analyser.Checks.UnusedVariableTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Files.Types exposing (..)
+import Analyser.Messages.Range as Range
+import Analyser.Messages.Types exposing (..)
 import Dict exposing (Dict)
 import Test exposing (..)
-import Analyser.Messages.Types exposing (..)
-import Analyser.Checks.CheckTestUtil
-import Analyser.Messages.Range as Range
 
 
 table : OperatorTable
@@ -22,11 +21,10 @@ withUnusedVariableInFunction =
 
 bar x y z = x + z
 """
-    , [ (UnusedVariable "./foo.elm" "y" <|
+    , [ UnusedVariable "./foo.elm" "y" <|
             Range.manual
                 { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
                 { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
-        )
       ]
     )
 
@@ -42,11 +40,10 @@ x =
   in
     2
 """
-    , [ (UnusedVariable "./foo.elm" "y" <|
+    , [ UnusedVariable "./foo.elm" "y" <|
             Range.manual
                 { start = { row = 4, column = 4 }, end = { row = 4, column = 5 } }
                 { start = { row = 4, column = 3 }, end = { row = 4, column = 4 } }
-        )
       ]
     )
 
@@ -301,7 +298,7 @@ foo (Blue c) =
 
 exposeOperator : ( String, String, List MessageData )
 exposeOperator =
-    ( "usedImportedVariableAsOpaque"
+    ( "exposeOperator"
     , """module Foo exposing ((@@))
 
 
@@ -458,36 +455,57 @@ x y =
     )
 
 
+{-| Issue #96
+-}
+usedBinaryImportedFunctionUsedAsPrefix : ( String, String, List MessageData )
+usedBinaryImportedFunctionUsedAsPrefix =
+    ( "usedBinaryImportedFunctionUsedAsPrefix"
+    , """module Foo exposing (..)
+
+import List.Extra exposing ((!!))
+
+getItemAtIndex : Int -> Maybe String
+getItemAtIndex index =
+    let
+        someList =
+            [ "a", "b", "c" ]
+    in
+    (!!) someList index
+    """
+    , []
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedVariable"
         UnusedVariable.checker
         [ unusedImportedType
-
-        -- , withUnusedVariableInFunction
-        -- , unusedInLetExpression
-        -- , unusedFunction
-        -- , usedVariableInCaseExpression
-        -- , usedVariableAsRecordUpdate
-        -- , usedVariableInAllDeclaration
-        -- , usedValueConstructor
-        -- , unusedValueConstructor
-        -- , exposedValueConstructor
-        -- , onlyUsedInSelf
-        -- , usedOperator
-        -- , unusedOperator
-        -- , unusedImportedOperator
-        -- , destructuringSameName
-        -- , unusedInEffectModule
-        -- , unusedImportedVariable
-        -- , usedImportedVariableInPatterMatch
-        -- , usedImportedVariableAsOpaque
-        -- , exposeOperator
-        -- , unusedInCasePattern
-        -- , unusedInCasePatternAsSingle
-        -- , unusedButDestructuredWithSameNameInList
-        -- , unusedButDestructuredWithSameNameInTuple
-        -- , unusedButDestructuredWithSameNameInRecord
-        -- , unusedButDestructuredWithSameNameInAs
-        -- , usedInDestructuringLet
+        , withUnusedVariableInFunction
+        , unusedInLetExpression
+        , unusedFunction
+        , usedVariableInCaseExpression
+        , usedVariableAsRecordUpdate
+        , usedVariableInAllDeclaration
+        , usedValueConstructor
+        , unusedValueConstructor
+        , exposedValueConstructor
+        , onlyUsedInSelf
+        , usedOperator
+        , unusedOperator
+        , unusedImportedOperator
+        , destructuringSameName
+        , unusedInEffectModule
+        , unusedImportedVariable
+        , usedImportedVariableInPatterMatch
+        , usedImportedVariableAsOpaque
+        , exposeOperator
+        , unusedInCasePattern
+        , unusedInCasePatternAsSingle
+        , unusedButDestructuredWithSameNameInList
+        , unusedButDestructuredWithSameNameInTuple
+        , unusedButDestructuredWithSameNameInRecord
+        , unusedButDestructuredWithSameNameInAs
+        , usedInDestructuringLet
+        , usedBinaryImportedFunctionUsedAsPrefix
         ]

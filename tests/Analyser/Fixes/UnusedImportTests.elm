@@ -1,9 +1,9 @@
 module Analyser.Fixes.UnusedImportTests exposing (all)
 
-import Test exposing (Test, describe, test)
-import Analyser.Fixes.UnusedImport exposing (fixer)
 import Analyser.Checks.UnusedImport exposing (checker)
 import Analyser.Fixes.TestUtil exposing (testFix)
+import Analyser.Fixes.UnusedImport exposing (fixer)
+import Test exposing (Test, describe, test)
 
 
 unusedImport : ( String, String, String )
@@ -48,7 +48,7 @@ f =
 
 all : Test
 all =
-    testFix "Analyser.Fixes.UnusedImportTests"
+    testFix "Analyser.Fixes.UnusedImport"
         checker
         fixer
         [ unusedImport

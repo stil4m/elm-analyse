@@ -2,9 +2,9 @@ module Analyser.Checks.NoDebugTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NoDebug as NoDebug
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
-import Analyser.Messages.Range as Range
 
 
 debugCrash : ( String, String, List MessageData )
@@ -51,7 +51,7 @@ foo x = x
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.NoDebugTests"
+    CTU.build "Analyser.Checks.NoDebug"
         NoDebug.checker
         [ debugCrash
         , debugLog

@@ -1,10 +1,10 @@
 module Analyser.Files.FileContent exposing (FileContent, RefeshedAST, asRawFile)
 
+import Elm.Json.Decode as Elm
 import Elm.Parser as Parser
 import Elm.RawFile exposing (RawFile)
-import Elm.Json.Decode as Elm
-import Maybe.Extra as Maybe
 import Json.Decode
+import Maybe.Extra as Maybe
 import Result.Extra as Result
 
 
@@ -35,11 +35,10 @@ loadedFileFromContent : FileContent -> Result String RawFile
 loadedFileFromContent fileContent =
     case fileContent.content of
         Just content ->
-            (Parser.parse content
+            Parser.parse content
                 |> Result.map Ok
                 |> Result.mapError (List.head >> Maybe.withDefault "" >> Err)
                 |> Result.merge
-            )
 
         Nothing ->
             Err "No file content"

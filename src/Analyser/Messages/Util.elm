@@ -1,7 +1,7 @@
 module Analyser.Messages.Util exposing (..)
 
+import Analyser.Messages.Range as Ranges exposing (Range, emptyRange, rangeToString)
 import Analyser.Messages.Types exposing (..)
-import Analyser.Messages.Range as Ranges exposing (Range, rangeToString, emptyRange)
 
 
 type alias CanFix =
@@ -18,10 +18,10 @@ blockForShas shas message =
         shouldBlock =
             List.any (flip List.member shas) (List.map Tuple.first message.files)
     in
-        if shouldBlock then
-            { message | status = Blocked }
-        else
-            message
+    if shouldBlock then
+        { message | status = Blocked }
+    else
+        message
 
 
 markFixing : Int -> Message -> Message
@@ -38,7 +38,7 @@ asString m =
         ( f, _, _, _ ) =
             getMessageInfo m
     in
-        f
+    f
 
 
 messageFile : Message -> String
@@ -70,12 +70,12 @@ compareMessage a b =
         bFile =
             getFiles a.data |> List.head |> Maybe.withDefault ""
     in
-        if aFile == bFile then
-            Ranges.compareRangeStarts
-                (getRanges a.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
-                (getRanges b.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
-        else
-            compare aFile bFile
+    if aFile == bFile then
+        Ranges.compareRangeStarts
+            (getRanges a.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
+            (getRanges b.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
+    else
+        compare aFile bFile
 
 
 getFiles : MessageData -> List String
@@ -84,7 +84,7 @@ getFiles m =
         ( _, f, _, _ ) =
             getMessageInfo m
     in
-        f m
+    f m
 
 
 getRanges : MessageData -> List Range
@@ -93,7 +93,7 @@ getRanges m =
         ( _, _, r, _ ) =
             getMessageInfo m
     in
-        r
+    r
 
 
 canFix : MessageData -> Bool
@@ -102,7 +102,7 @@ canFix m =
         ( _, _, _, result ) =
             getMessageInfo m
     in
-        result
+    result
 
 
 getMessageInfo : MessageData -> MessageInfo
@@ -227,6 +227,18 @@ getMessageInfo m =
             , always [ fileName ]
             , [ range ]
             , True
+            )
+
+        TriggerWord fileName triggerWord range ->
+            ( String.concat
+                [ "`" ++ triggerWord ++ "` should not be used in comments. Found in \""
+                , fileName
+                , "\" at "
+                , rangeToString range
+                ]
+            , always [ fileName ]
+            , [ range ]
+            , False
             )
 
         NonStaticRegex fileName range ->
@@ -498,5 +510,18 @@ getMessageInfo m =
                 ]
             , always [ fileName ]
             , [ range ]
+            , False
+            )
+
+        Analyser.Messages.Types.DuplicateRecordFieldUpdate fileName fieldName ranges ->
+            ( String.concat
+                [ "The '"
+                , fieldName
+                , "' field for a record is updated multiple times in one expression in file "
+                , fileName
+                , "."
+                ]
+            , always [ fileName ]
+            , ranges
             , False
             )

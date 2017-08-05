@@ -1,10 +1,10 @@
 module Analyser.Checks.ExposeAllTests exposing (..)
 
-import Analyser.Checks.ExposeAll as ExposeAll
-import Test exposing (..)
-import Analyser.Messages.Types exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
+import Analyser.Checks.ExposeAll as ExposeAll
 import Analyser.Messages.Range as Range
+import Analyser.Messages.Types exposing (..)
+import Test exposing (..)
 
 
 exposingAll : ( String, String, List MessageData )
@@ -14,11 +14,10 @@ exposingAll =
 
 foo = 1
 """
-    , [ (ExposeAll "./foo.elm" <|
+    , [ ExposeAll "./foo.elm" <|
             Range.manual
                 { start = { row = 0, column = 21 }, end = { row = 0, column = 23 } }
                 { start = { row = 1, column = 21 }, end = { row = 1, column = 23 } }
-        )
       ]
     )
 
@@ -41,11 +40,10 @@ exposingAllConstructors =
 
 type Color = Blue | Red
 """
-    , [ (ExposeAll "./foo.elm" <|
+    , [ ExposeAll "./foo.elm" <|
             Range.manual
                 { start = { row = 0, column = 27 }, end = { row = 0, column = 29 } }
                 { start = { row = 1, column = 27 }, end = { row = 1, column = 29 } }
-        )
       ]
     )
 
@@ -63,7 +61,7 @@ type Color = Blue | Red
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.ExposeAllTests"
+    CTU.build "Analyser.Checks.ExposeAll"
         ExposeAll.checker
         [ exposingAll
         , exposingStrict

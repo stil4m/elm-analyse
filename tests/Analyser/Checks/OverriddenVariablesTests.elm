@@ -2,9 +2,9 @@ module Analyser.Checks.OverriddenVariablesTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.OverriddenVariables as OverriddenVariables
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (MessageData(RedefineVariable))
 import Test exposing (..)
-import Analyser.Messages.Range as Range
 
 
 redefineImportedFunction : ( String, String, List MessageData )
@@ -138,7 +138,7 @@ import Bar exposing (name,age)
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.OverriddenVariablesTests"
+    CTU.build "Analyser.Checks.OverriddenVariables"
         OverriddenVariables.checker
         [ redefineImportedFunction
         , redefineInLet

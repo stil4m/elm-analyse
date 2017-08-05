@@ -1,8 +1,8 @@
-module Analyser.Messages.Json exposing (serialiseMessage, encodeMessage, decodeMessage)
+module Analyser.Messages.Json exposing (decodeMessage, encodeMessage, serialiseMessage)
 
 import Analyser.Messages.Range as Range exposing (Range)
-import Elm.Syntax.Base as AST
 import Analyser.Messages.Types exposing (Message, MessageData(..), MessageStatus(..))
+import Elm.Syntax.Base as AST
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
 import Json.Encode as JE
@@ -137,10 +137,17 @@ decodeMessageData =
         , ( "DropConcatOfLists", decodeFileAndRange DropConcatOfLists )
         , ( "DropConsOfItemAndList", decodeFileAndRange DropConsOfItemAndList )
         , ( "UnnecessaryListConcat", decodeFileAndRange UnnecessaryListConcat )
+        , ( "TriggerWord", JD.map3 TriggerWord fileField (JD.field "word" JD.string) (JD.field "range" Range.decode) )
         , ( "NonStaticRegex", decodeFileAndRange NonStaticRegex )
         , ( "CoreArrayUsage", decodeFileAndRange CoreArrayUsage )
         , ( "FunctionInLet", decodeFileAndRange FunctionInLet )
         , ( "SingleFieldRecord", decodeFileAndRange SingleFieldRecord )
+        , ( "DuplicateRecordFieldUpdate"
+          , JD.succeed DuplicateRecordFieldUpdate
+                |: fileField
+                |: JD.field "fieldName" JD.string
+                |: JD.field "ranges" (JD.list Range.decode)
+          )
         ]
 
 
@@ -387,6 +394,14 @@ encodeMessageData m =
                     , ( "ranges", JE.list (List.map Range.encode ranges) )
                     ]
 
+        TriggerWord file word range ->
+            encodeTyped "TriggerWord" <|
+                JE.object
+                    [ ( "file", JE.string file )
+                    , ( "word", JE.string word )
+                    , ( "range", Range.encode range )
+                    ]
+
         NonStaticRegex file range ->
             encodeTyped "NonStaticRegex" <|
                 JE.object
@@ -414,3 +429,10 @@ encodeMessageData m =
                     [ ( "file", JE.string fileName )
                     , ( "range", Range.encode range )
                     ]
+
+        DuplicateRecordFieldUpdate fileName fieldName ranges ->
+            JE.object
+                [ ( "file", JE.string fileName )
+                , ( "fieldName", JE.string fieldName )
+                , ( "ranges", JE.list <| List.map Range.encode ranges )
+                ]

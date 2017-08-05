@@ -1,10 +1,10 @@
 module Analyser.Checks.FunctionInLetTests exposing (all)
 
-import Analyser.Checks.FunctionInLet as FunctionInLet
-import Test exposing (Test)
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), newMessage)
+import Analyser.Checks.FunctionInLet as FunctionInLet
 import Analyser.Messages.Range as Range
+import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), newMessage)
+import Test exposing (Test)
 
 
 functionInLet : ( String, String, List MessageData )

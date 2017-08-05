@@ -3,8 +3,8 @@ module Client.Graph.PackageDependencies exposing (Model, Msg, init, update, view
 import Analyser.State exposing (State)
 import Dict exposing (Dict)
 import Graph exposing (Graph)
-import Graph.Node exposing (Node)
 import Graph.Edge exposing (Edge)
+import Graph.Node exposing (Node)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events as Html
@@ -41,9 +41,9 @@ init { graph } =
                 |> Set.toList
                 |> List.sort
     in
-        ( Model names relations Nothing graph
-        , Cmd.none
-        )
+    ( Model names relations Nothing graph
+    , Cmd.none
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -102,10 +102,9 @@ interPackageRelationTable ( from, to ) rels =
                     ]
 
                 _ ->
-                    (rels
+                    rels
                         |> List.map (\( a, b ) -> a ++ " -> " ++ b)
                         |> List.map (\x -> Html.tr [] [ Html.td [] [ Html.text x ] ])
-                    )
         ]
 
 
@@ -126,22 +125,22 @@ headerNameTd x =
         height =
             200
     in
-        Html.th
+    Html.th
+        [ Html.style
+            [ ( "height", toString height ++ "px" )
+            , ( "text-align", "left" )
+            , ( "whitespace", "nowrap" )
+            , ( "width", "30px" )
+            ]
+        ]
+        [ Html.div
             [ Html.style
-                [ ( "height", toString height ++ "px" )
-                , ( "text-align", "left" )
-                , ( "whitespace", "nowrap" )
+                [ ( "transform", "rotate(-90deg) translate(" ++ toString (negate height + 40) ++ "px, 0px)" )
                 , ( "width", "30px" )
                 ]
             ]
-            [ Html.div
-                [ Html.style
-                    [ ( "transform", "rotate(-90deg) translate(" ++ toString (negate height + 40) ++ "px, 0px)" )
-                    , ( "width", "30px" )
-                    ]
-                ]
-                [ packageNameHtml x ]
-            ]
+            [ packageNameHtml x ]
+        ]
 
 
 asNameTd : String -> Html msg
@@ -171,16 +170,16 @@ packageContentTd from to relations selected =
                 else
                     ""
         in
-            Html.td
-                [ Html.class styleClass
-                , Html.style [ ( "text-align", "center" ) ]
-                , Html.onClick (Select from to)
-                ]
-                [ Dict.get ( from, to ) relations
-                    |> Maybe.map (List.length >> toString)
-                    |> Maybe.withDefault ""
-                    |> Html.text
-                ]
+        Html.td
+            [ Html.class styleClass
+            , Html.style [ ( "text-align", "center" ) ]
+            , Html.onClick (Select from to)
+            ]
+            [ Dict.get ( from, to ) relations
+                |> Maybe.map (List.length >> toString)
+                |> Maybe.withDefault ""
+                |> Html.text
+            ]
 
 
 edgeToPackageRel : Edge -> ( ( String, String ), ( String, String ) )
@@ -198,9 +197,9 @@ edgeToPackageRel edge =
         toPackage =
             toList |> List.init |> Maybe.withDefault [] |> String.join "."
     in
-        ( ( fromPackage, toPackage )
-        , ( fromList |> String.join ".", toList |> String.join "." )
-        )
+    ( ( fromPackage, toPackage )
+    , ( fromList |> String.join ".", toList |> String.join "." )
+    )
 
 
 packageListRelationAsBag : List ( ( String, String ), ( String, String ) ) -> PackageFileRelations

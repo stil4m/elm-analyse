@@ -1,8 +1,8 @@
-port module AnalyserPorts exposing (sendMessagesAsJson, sendMessagesAsStrings, sendStateAsJson, onReset, onFixMessage)
+port module AnalyserPorts exposing (onFixMessage, onReset, sendMessagesAsJson, sendMessagesAsStrings, sendStateAsJson)
 
+import Analyser.Messages.Json as Messages
 import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
-import Analyser.Messages.Json as Messages
 import Analyser.State exposing (State, encodeState)
 import Json.Encode as JE
 

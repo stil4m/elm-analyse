@@ -69,10 +69,12 @@ type MessageData
     | LineLengthExceeded FileName (List Range)
     | MultiLineRecordFormatting FileName Range
     | UnnecessaryPortModule FileName
+    | TriggerWord FileName String Range
     | NonStaticRegex FileName Range
     | CoreArrayUsage FileName Range
     | FunctionInLet FileName Range
     | SingleFieldRecord FileName Range
+    | DuplicateRecordFieldUpdate FileName String (List Range)
 
 
 type alias GetFiles =

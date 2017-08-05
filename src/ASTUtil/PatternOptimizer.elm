@@ -1,7 +1,7 @@
 module ASTUtil.PatternOptimizer exposing (optimize, patternRange)
 
-import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Range exposing (Range)
 
 
 emptyRange : Range
@@ -38,22 +38,22 @@ optimize range pattern =
                     cleaned =
                         List.map (optimize range) xs
                 in
-                    if List.all isAllPattern cleaned then
-                        AllPattern emptyRange
-                    else
-                        TuplePattern cleaned r
+                if List.all isAllPattern cleaned then
+                    AllPattern emptyRange
+                else
+                    TuplePattern cleaned r
 
             RecordPattern inner r ->
                 let
                     cleaned =
                         List.filter (.range >> (/=) range) inner
                 in
-                    case cleaned of
-                        [] ->
-                            AllPattern emptyRange
+                case cleaned of
+                    [] ->
+                        AllPattern emptyRange
 
-                        xs ->
-                            RecordPattern xs r
+                    xs ->
+                        RecordPattern xs r
 
             UnConsPattern left right r ->
                 UnConsPattern (optimize range left) (optimize range right) r

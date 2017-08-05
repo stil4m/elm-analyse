@@ -12,7 +12,7 @@
   },
   "scripts": {
     "check-prettier": "sh ./prettier-check.sh",
-    "elm-format": "./node_modules/.bin/elm-format --validate src/ tests/",
+    "elm-format": "./node_modules/.bin/elm-format --validate src/ tests/ docs/",
     "self-check": "node \"./js/bin/index.js\"",
     "test": "./node_modules/.bin/elm-test",
     "build": "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\"",
@@ -42,8 +42,8 @@
   },
   "devDependencies": {
     "elm": "0.18.0",
-    "elm-format": "0.6.1-alpha",
-    "elm-test": "0.18.2",
+    "elm-format": "0.7.0-exp",
+    "elm-test": "0.18.7",
     "gulp": "3.9.1",
     "gulp-elm": "0.6.1",
     "gulp-replace": "0.5.4",

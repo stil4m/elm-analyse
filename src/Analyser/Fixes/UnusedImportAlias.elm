@@ -1,13 +1,13 @@
 module Analyser.Fixes.UnusedImportAlias exposing (fixer)
 
-import Analyser.Messages.Types exposing (MessageData(UnusedImportAlias))
 import ASTUtil.Imports as Imports
-import Analyser.Fixes.FileContent as FileContent
 import Analyser.Fixes.Base exposing (Fixer)
-import Elm.Syntax.File exposing (..)
-import Elm.Syntax.Range as Syntax
-import Elm.Syntax.Module exposing (..)
+import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Types exposing (MessageData(UnusedImportAlias))
+import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Range as Syntax
 
 
 fixer : Fixer

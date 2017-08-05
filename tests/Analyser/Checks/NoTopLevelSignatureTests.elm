@@ -1,10 +1,10 @@
 module Analyser.Checks.NoTopLevelSignatureTests exposing (..)
 
-import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
 import Analyser.Checks.CheckTestUtil as CTU
+import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (..)
-import Analyser.Messages.Range as Range
 
 
 noSignature : ( String, String, List MessageData )
@@ -15,11 +15,10 @@ noSignature =
 
 foo = 1
 """
-    , [ (NoTopLevelSignature "./foo.elm" "foo" <|
+    , [ NoTopLevelSignature "./foo.elm" "foo" <|
             Range.manual
                 { start = { row = 3, column = 0 }, end = { row = 3, column = 3 } }
                 { start = { row = 3, column = -1 }, end = { row = 3, column = 2 } }
-        )
       ]
     )
 
@@ -69,7 +68,7 @@ foo = 1
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.ExposeAllTests"
+    CTU.build "Analyser.Checks.NoTopLevelSignature"
         NoTopLevelSignature.checker
         [ noSignature
         , noSignatureInLet

@@ -1,14 +1,14 @@
 module Analyser.Checks.ImportAll exposing (checker)
 
-import Elm.Syntax.Module exposing (..)
-import Elm.Syntax.Base exposing (..)
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(ImportAll), newMessage)
-import ASTUtil.Inspector as Inspector exposing (defaultConfig, Order(Post))
-import Analyser.Configuration exposing (Configuration)
+import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
-import Elm.Syntax.Exposing exposing (..)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(ImportAll), newMessage)
+import Elm.Syntax.Base exposing (..)
+import Elm.Syntax.Exposing exposing (..)
+import Elm.Syntax.Module exposing (..)
 
 
 checker : Checker

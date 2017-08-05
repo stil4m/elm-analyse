@@ -1,15 +1,15 @@
 module Analyser.Checks.NonStaticRegex exposing (checker)
 
+import ASTUtil.Functions
+import ASTUtil.Imports as Imports exposing (FunctionReference)
+import ASTUtil.Inspector as Inspector exposing (Order(Inner, Post), defaultConfig)
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(NonStaticRegex), newMessage)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(NonStaticRegex), newMessage)
-import ASTUtil.Inspector as Inspector exposing (Order(Post, Inner), defaultConfig)
-import Analyser.Configuration exposing (Configuration)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
-import ASTUtil.Imports as Imports exposing (FunctionReference)
-import ASTUtil.Functions
 
 
 type alias Context =
@@ -34,15 +34,15 @@ scan rangeContext fileContext _ =
         regexImport =
             Imports.buildImportInformation [ "Regex" ] "regex" fileContext.ast
     in
-        case regexImport of
-            Nothing ->
-                []
+    case regexImport of
+        Nothing ->
+            []
 
-            Just regexImport ->
-                findRegexUsagesInFunctions rangeContext regexImport fileContext
-                    |> .usages
-                    |> List.map (NonStaticRegex fileContext.path)
-                    |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+        Just regexImport ->
+            findRegexUsagesInFunctions rangeContext regexImport fileContext
+                |> .usages
+                |> List.map (NonStaticRegex fileContext.path)
+                |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 {-| Inspect all functions to verify if the enviroments changes from static to dynamic, and check all expressions for regex usages.
@@ -73,7 +73,7 @@ onFunction inner function context =
             after =
                 inner { context | staticEnvironment = False }
         in
-            { after | staticEnvironment = context.staticEnvironment }
+        { after | staticEnvironment = context.staticEnvironment }
     else
         inner context
 

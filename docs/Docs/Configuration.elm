@@ -1,9 +1,9 @@
 module Docs.Configuration exposing (..)
 
-import Html exposing (..)
-import Html.Attributes exposing (class, href)
 import Docs.Html as DocsHtml
 import Docs.Page as Page exposing (..)
+import Html exposing (..)
+import Html.Attributes exposing (class, href)
 
 
 view : Html a
@@ -106,5 +106,10 @@ configurationProperties =
       , property = "threshold"
       , description = "Defines the maximum line length"
       , defaultValue = "150"
+      }
+    , { check = "TriggerWords"
+      , property = "words"
+      , description = "Array of words that would trigger a violation."
+      , defaultValue = "[ \"todo\" ]"
       }
     ]

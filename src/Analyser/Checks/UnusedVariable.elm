@@ -1,23 +1,23 @@
 module Analyser.Checks.UnusedVariable exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Elm.Syntax.File exposing (..)
-import Elm.Syntax.Range as Syntax
-import Elm.Syntax.Module exposing (..)
-import Elm.Syntax.Base exposing (..)
-import Elm.Syntax.Pattern exposing (..)
-import Elm.Syntax.Infix exposing (..)
-import Elm.Syntax.Expression exposing (..)
-import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(Typed))
-import Analyser.FileContext exposing (FileContext)
-import Elm.Interface as Interface
-import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable, UnusedTopLevel, UnusedImportedVariable, UnusedPatternVariable), newMessage)
-import Dict exposing (Dict)
-import ASTUtil.Inspector as Inspector exposing (defaultConfig, Order(Inner, Pre, Post))
-import ASTUtil.Variables exposing (VariableType(Imported, Defined, Pattern, TopLevel), getTopLevels, patternToVars, patternToVarsInner, getLetDeclarationsVars, patternToUsedVars, withoutTopLevel)
-import Tuple3
-import Analyser.Configuration as Configuration exposing (Configuration)
+import ASTUtil.Inspector as Inspector exposing (Order(Inner, Post, Pre), defaultConfig)
+import ASTUtil.Variables exposing (VariableType(Defined, Imported, Pattern, TopLevel), getLetDeclarationsVars, getTopLevels, patternToUsedVars, patternToVars, patternToVarsInner, withoutTopLevel)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration as Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(UnusedImportedVariable, UnusedPatternVariable, UnusedTopLevel, UnusedVariable), newMessage)
+import Dict exposing (Dict)
+import Elm.Interface as Interface
+import Elm.Syntax.Base exposing (..)
+import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Infix exposing (..)
+import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Range as Syntax
+import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(Typed))
+import Tuple3
 
 
 checker : Checker
@@ -56,6 +56,7 @@ scan rangeContext fileContext configuration =
                     , onOperatorApplication = Post onOperatorAppliction
                     , onDestructuring = Post onDestructuring
                     , onFunctionOrValue = Post onFunctionOrValue
+                    , onPrefixOperator = Post onPrefixOperator
                     , onRecordUpdate = Post onRecordUpdate
                     , onTypeAnnotation = Post onTypeAnnotation
                 }
@@ -85,7 +86,7 @@ scan rangeContext fileContext configuration =
                 |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType fileContext.path configuration t x (Range.build rangeContext y))
                 |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
     in
-        unusedVariables ++ unusedTopLevels
+    unusedVariables ++ unusedTopLevels
 
 
 forVariableType : String -> Configuration -> VariableType -> String -> Range -> Maybe MessageData
@@ -123,7 +124,7 @@ filterByModuleType fileContext =
             filterForEffectModule
 
         _ ->
-            (always True)
+            always True
 
 
 filterForEffectModule : ( String, ( Int, VariableType, Syntax.Range ) ) -> Bool
@@ -141,7 +142,7 @@ pushScope vars x =
                 |> Dict.fromList
                 |> (,) []
     in
-        { x | activeScopes = y :: x.activeScopes }
+    { x | activeScopes = y :: x.activeScopes }
 
 
 popScope : UsedVariableContext -> UsedVariableContext
@@ -217,6 +218,11 @@ onFunctionOrValue x context =
     addUsedVariable x context
 
 
+onPrefixOperator : String -> UsedVariableContext -> UsedVariableContext
+onPrefixOperator prefixOperator context =
+    addUsedVariable prefixOperator context
+
+
 onRecordUpdate : RecordUpdate -> UsedVariableContext -> UsedVariableContext
 onRecordUpdate recordUpdate context =
     addUsedVariable recordUpdate.name context
@@ -243,15 +249,16 @@ onFunction f function context =
         postContext =
             context
                 |> maskVariable function.declaration.name.value
-                |> \c ->
-                    function.declaration.arguments
-                        |> List.concatMap patternToVars
-                        |> flip pushScope c
-                        |> f
-                        |> popScope
-                        |> unMaskVariable function.declaration.name.value
+                |> (\c ->
+                        function.declaration.arguments
+                            |> List.concatMap patternToVars
+                            |> flip pushScope c
+                            |> f
+                            |> popScope
+                            |> unMaskVariable function.declaration.name.value
+                   )
     in
-        List.foldl addUsedVariable postContext used
+    List.foldl addUsedVariable postContext used
 
 
 onLambda : (UsedVariableContext -> UsedVariableContext) -> Lambda -> UsedVariableContext -> UsedVariableContext
@@ -265,7 +272,7 @@ onLambda f lambda context =
         postContext =
             f preContext
     in
-        postContext |> popScope
+    postContext |> popScope
 
 
 onLetBlock : (UsedVariableContext -> UsedVariableContext) -> LetBlock -> UsedVariableContext -> UsedVariableContext
@@ -297,7 +304,7 @@ onCase f caze context =
                 |> f
                 |> popScope
     in
-        List.foldl addUsedVariable postContext used
+    List.foldl addUsedVariable postContext used
 
 
 onTypeAnnotation : TypeAnnotation -> UsedVariableContext -> UsedVariableContext

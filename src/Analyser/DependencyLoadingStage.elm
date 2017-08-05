@@ -1,4 +1,4 @@
-module Analyser.DependencyLoadingStage exposing (Model, Msg, init, isDone, getDependencies, update, subscriptions)
+module Analyser.DependencyLoadingStage exposing (Model, Msg, getDependencies, init, isDone, subscriptions, update)
 
 import Analyser.Files.DependencyLoader as DependencyLoader
 import Analyser.Files.Types exposing (Version)
@@ -47,18 +47,18 @@ loadNextDependency (( Model m, cmds ) as input) =
                 List.head m.queue
                     |> Maybe.map DependencyLoader.init
         in
-            ( Model
-                { m
-                    | queue = List.drop 1 m.queue
-                    , activeLoader = Maybe.map Tuple.first nextLoaderPair
-                }
-            , Cmd.batch
-                [ cmds
-                , nextLoaderPair
-                    |> Maybe.map (Tuple.second >> Cmd.map DependencyLoaderMsg)
-                    |> Maybe.withDefault Cmd.none
-                ]
-            )
+        ( Model
+            { m
+                | queue = List.drop 1 m.queue
+                , activeLoader = Maybe.map Tuple.first nextLoaderPair
+            }
+        , Cmd.batch
+            [ cmds
+            , nextLoaderPair
+                |> Maybe.map (Tuple.second >> Cmd.map DependencyLoaderMsg)
+                |> Maybe.withDefault Cmd.none
+            ]
+        )
 
 
 subscriptions : Model -> Sub Msg

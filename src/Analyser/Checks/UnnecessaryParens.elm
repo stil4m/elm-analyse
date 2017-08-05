@@ -1,17 +1,17 @@
 module Analyser.Checks.UnnecessaryParens exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (RangeContext)
-import Elm.Syntax.Range as Syntax
-import Elm.Syntax.Infix exposing (..)
-import Elm.Syntax.Expression exposing (..)
-import AST.Util exposing (getParenthesized, isOperatorApplication, isLambda, isIf, isCase)
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens), newMessage)
+import AST.Util exposing (getParenthesized, isCase, isIf, isLambda, isLet, isOperatorApplication)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
-import Maybe.Extra as Maybe
-import List.Extra as List
-import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Range as Range exposing (RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens), newMessage)
+import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.Infix exposing (..)
+import Elm.Syntax.Range as Syntax
+import List.Extra as List
+import Maybe.Extra as Maybe
 
 
 checker : Checker
@@ -35,10 +35,10 @@ scan rangeContext fileContext _ =
                 fileContext.ast
                 []
     in
-        x
-            |> List.uniqueBy toString
-            |> List.map (Range.build rangeContext >> UnnecessaryParens fileContext.path)
-            |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+    x
+        |> List.uniqueBy toString
+        |> List.map (Range.build rangeContext >> UnnecessaryParens fileContext.path)
+        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 onFunction : Function -> Context -> Context
@@ -148,26 +148,22 @@ onApplication parts context =
 onOperatorApplication : ( String, InfixDirection, Expression, Expression ) -> Context -> Context
 onOperatorApplication ( _, _, left, right ) context =
     let
-        fixHandSide f =
+        fixHandSide =
             getParenthesized
-                >> Maybe.filter (Tuple.second >> isOperatorApplication >> not)
-                >> Maybe.filter (Tuple.second >> f)
+                >> Maybe.filter (Tuple.second >> operatorHandSideAllowedParens >> not)
                 >> Maybe.map Tuple.first
     in
-        [ fixHandSide allowedOnLHS left
-        , fixHandSide (always True) right
-        ]
-            |> List.filterMap identity
-            |> flip (++) context
+    [ fixHandSide left
+    , fixHandSide right
+    ]
+        |> List.filterMap identity
+        |> flip (++) context
 
 
-allowedOnLHS : Expression -> Bool
-allowedOnLHS expr =
-    List.all ((|>) expr)
-        [ isLambda >> not
-        , isCase >> not
-        , isIf >> not
-        ]
+operatorHandSideAllowedParens : Expression -> Bool
+operatorHandSideAllowedParens expr =
+    List.any ((|>) expr)
+        [ isOperatorApplication, isIf, isCase, isLet, isLambda ]
 
 
 onParenthesizedExpression : Syntax.Range -> Expression -> Context -> Context

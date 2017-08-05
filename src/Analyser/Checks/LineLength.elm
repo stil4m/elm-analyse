@@ -1,10 +1,10 @@
 module Analyser.Checks.LineLength exposing (checker)
 
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(LineLengthExceeded), newMessage)
-import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration as Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Range as Range exposing (RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(LineLengthExceeded), newMessage)
 
 
 checker : Checker
@@ -29,10 +29,10 @@ scan rangeContext fileContext configuration =
                 |> List.filter (Tuple.second >> String.startsWith "import" >> not)
                 |> List.map (\( x, _ ) -> { start = { row = x, column = -1 }, end = { row = x + 1, column = -2 } })
     in
-        if List.isEmpty longLineRanges then
-            []
-        else
-            [ newMessage
-                [ ( fileContext.sha1, fileContext.path ) ]
-                (LineLengthExceeded fileContext.path (List.map (Range.build rangeContext) longLineRanges))
-            ]
+    if List.isEmpty longLineRanges then
+        []
+    else
+        [ newMessage
+            [ ( fileContext.sha1, fileContext.path ) ]
+            (LineLengthExceeded fileContext.path (List.map (Range.build rangeContext) longLineRanges))
+        ]

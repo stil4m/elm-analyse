@@ -1,8 +1,8 @@
 port module Analyser.Files.FileLoader exposing (Msg, init, subscriptions, update)
 
-import Elm.Json.Encode
-import Analyser.Files.Types exposing (LoadedSourceFile)
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
+import Analyser.Files.Types exposing (LoadedSourceFile)
+import Elm.Json.Encode
 import Json.Encode
 import Result
 import Util.Logger as Logger
@@ -50,6 +50,6 @@ update msg =
                     else
                         Cmd.none
             in
-                ( ( fileContent, fileLoad )
-                , cmd
-                )
+            ( ( fileContent, fileLoad )
+            , cmd
+            )

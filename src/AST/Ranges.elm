@@ -1,6 +1,6 @@
-module AST.Ranges exposing (rangeToString, getRange, emptyRange, orderByStart, containsRange, compareRangeStarts)
+module AST.Ranges exposing (compareRangeStarts, containsRange, emptyRange, getRange, orderByStart, rangeToString)
 
-import Elm.Syntax.Range exposing (Range, Location)
+import Elm.Syntax.Range exposing (Location, Range)
 
 
 orderByStart : Range -> Range -> Order
@@ -25,8 +25,8 @@ getRange ranges =
         ends =
             List.map .end ranges |> sortLocations |> List.reverse
     in
-        Maybe.map2 Range (List.head starts) (List.head ends)
-            |> Maybe.withDefault emptyRange
+    Maybe.map2 Range (List.head starts) (List.head ends)
+        |> Maybe.withDefault emptyRange
 
 
 emptyRange : Range

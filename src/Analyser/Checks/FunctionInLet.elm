@@ -1,13 +1,13 @@
 module Analyser.Checks.FunctionInLet exposing (checker)
 
+import ASTUtil.Functions
+import ASTUtil.Inspector as Inspector exposing (Order(Inner, Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), newMessage)
-import ASTUtil.Inspector as Inspector exposing (Order(Post, Inner), defaultConfig)
-import Elm.Syntax.Expression exposing (..)
-import ASTUtil.Functions
 import Analyser.Messages.Range as Range exposing (RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(FunctionInLet), newMessage)
+import Elm.Syntax.Expression exposing (..)
 
 
 type alias Context =
@@ -53,14 +53,14 @@ onFunction function context =
         isStatic =
             ASTUtil.Functions.isStatic function
     in
-        if not isStatic && context.inLetBlock then
-            { context | functions = function :: context.functions }
-        else
-            context
+    if not isStatic && context.inLetBlock then
+        { context | functions = function :: context.functions }
+    else
+        context
 
 
 onLetBlock : (Context -> Context) -> LetBlock -> Context -> Context
 onLetBlock continue _ context =
     { context | inLetBlock = True }
         |> continue
-        |> \after -> { after | inLetBlock = context.inLetBlock }
+        |> (\after -> { after | inLetBlock = context.inLetBlock })

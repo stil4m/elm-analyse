@@ -1,11 +1,11 @@
 module Analyser.Fixes.UnnecessaryParens exposing (fixer)
 
-import Analyser.Messages.Types exposing (MessageData(UnnecessaryParens))
+import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Range as Range exposing (Range)
+import Analyser.Messages.Types exposing (MessageData(UnnecessaryParens))
 import Elm.Syntax.File exposing (..)
 import Tuple3
-import Analyser.Fixes.FileContent as FileContent
-import Analyser.Fixes.Base exposing (Fixer)
 
 
 fixer : Fixer
@@ -76,13 +76,13 @@ fixContent range ( fileName, content ) =
         endChar =
             FileContent.getCharAtLocation endCharLoc content
     in
-        case ( startChar, endChar ) of
-            ( Just "(", Just ")" ) ->
-                content
-                    |> FileContent.replaceLocationWith ( start.row, start.column ) " "
-                    |> FileContent.replaceLocationWith endCharLoc ""
-                    |> (,) fileName
-                    |> Ok
+    case ( startChar, endChar ) of
+        ( Just "(", Just ")" ) ->
+            content
+                |> FileContent.replaceLocationWith ( start.row, start.column ) " "
+                |> FileContent.replaceLocationWith endCharLoc ""
+                |> (,) fileName
+                |> Ok
 
-            _ ->
-                Err "Could not locate parens to replace"
+        _ ->
+            Err "Could not locate parens to replace"

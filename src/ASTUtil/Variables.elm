@@ -1,14 +1,13 @@
 module ASTUtil.Variables exposing (..)
 
-import AST.Ranges exposing (emptyRange)
-import Elm.Syntax.Range exposing (Range)
-import Elm.Syntax.File exposing (..)
-import Elm.Syntax.Module exposing (..)
-import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.Base exposing (..)
-import Elm.Syntax.Pattern exposing (..)
 import Elm.Syntax.Declaration exposing (..)
 import Elm.Syntax.Exposing exposing (..)
+import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Range exposing (Range)
 
 
 type VariableType
@@ -29,7 +28,7 @@ withoutTopLevel =
                 _ ->
                     pair
     in
-        List.map f
+    List.map f
 
 
 getTopLevels : File -> List ( VariablePointer, VariableType )
@@ -91,7 +90,6 @@ getImportExposedVars e =
                                     None ->
                                         [ ( VariablePointer exposedType.name exposedType.range, Imported ) ]
 
-                                    --TODO
                                     Explicit constructors ->
                                         constructors |> List.map (uncurry VariablePointer >> flip (,) Imported)
                     )
@@ -107,15 +105,13 @@ getDeclarationVars decl =
             []
 
         TypeDecl t ->
-            (List.map (\{ name, range } -> ( { value = name, range = range }, TopLevel )) t.constructors)
+            List.map (\{ name, range } -> ( { value = name, range = range }, TopLevel )) t.constructors
 
         PortDeclaration p ->
-            --TODO Range + Test
-            [ ( { value = p.name, range = emptyRange }, TopLevel ) ]
+            [ ( { value = p.name, range = p.range }, TopLevel ) ]
 
-        InfixDeclaration i ->
-            --TODO Range + Test
-            [ ( { value = i.operator, range = emptyRange }, TopLevel ) ]
+        InfixDeclaration _ ->
+            []
 
         Destructuring pattern _ ->
             patternToVars pattern
@@ -199,54 +195,54 @@ patternToVarsInner isFirst p =
         recur =
             patternToVarsInner False
     in
-        case p of
-            TuplePattern t _ ->
-                List.concatMap recur t
+    case p of
+        TuplePattern t _ ->
+            List.concatMap recur t
 
-            RecordPattern r _ ->
-                List.map (flip (,) Pattern) r
+        RecordPattern r _ ->
+            List.map (flip (,) Pattern) r
 
-            UnConsPattern l r _ ->
-                recur l ++ recur r
+        UnConsPattern l r _ ->
+            recur l ++ recur r
 
-            ListPattern l _ ->
-                List.concatMap recur l
+        ListPattern l _ ->
+            List.concatMap recur l
 
-            VarPattern x r ->
-                [ ( { value = x, range = r }
-                  , if isFirst then
-                        Defined
-                    else
-                        Pattern
-                  )
-                ]
+        VarPattern x r ->
+            [ ( { value = x, range = r }
+              , if isFirst then
+                    Defined
+                else
+                    Pattern
+              )
+            ]
 
-            NamedPattern _ args _ ->
-                List.concatMap recur args
+        NamedPattern _ args _ ->
+            List.concatMap recur args
 
-            AsPattern sub name _ ->
-                ( name, Pattern ) :: recur sub
+        AsPattern sub name _ ->
+            ( name, Pattern ) :: recur sub
 
-            ParenthesizedPattern sub _ ->
-                recur sub
+        ParenthesizedPattern sub _ ->
+            recur sub
 
-            QualifiedNamePattern _ _ ->
-                []
+        QualifiedNamePattern _ _ ->
+            []
 
-            AllPattern _ ->
-                []
+        AllPattern _ ->
+            []
 
-            UnitPattern _ ->
-                []
+        UnitPattern _ ->
+            []
 
-            CharPattern _ _ ->
-                []
+        CharPattern _ _ ->
+            []
 
-            StringPattern _ _ ->
-                []
+        StringPattern _ _ ->
+            []
 
-            IntPattern _ _ ->
-                []
+        IntPattern _ _ ->
+            []
 
-            FloatPattern _ _ ->
-                []
+        FloatPattern _ _ ->
+            []

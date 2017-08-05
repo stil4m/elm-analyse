@@ -1,12 +1,12 @@
-module AST.Util exposing (fileExposingList, isPortModule, fileModuleName, getParenthesized, isOperatorApplication, isLambda, isIf, isCase, moduleExposingList, patternModuleNames)
+module AST.Util exposing (fileExposingList, fileModuleName, getParenthesized, isCase, isIf, isLambda, isLet, isOperatorApplication, isPortModule, moduleExposingList, patternModuleNames)
 
-import Elm.Syntax.File exposing (File)
-import Elm.Syntax.Expression exposing (Expression, InnerExpression(OperatorApplication, ParenthesizedExpression, LambdaExpression, IfBlock, CaseExpression))
-import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Base exposing (ModuleName)
-import Elm.Syntax.Pattern exposing (Pattern(..))
-import Elm.Syntax.Module exposing (Module(NormalModule, PortModule, EffectModule, NoModule))
 import Elm.Syntax.Exposing exposing (..)
+import Elm.Syntax.Expression exposing (Expression, InnerExpression(CaseExpression, IfBlock, LambdaExpression, LetExpression, OperatorApplication, ParenthesizedExpression))
+import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Module exposing (Module(EffectModule, NoModule, NormalModule, PortModule))
+import Elm.Syntax.Pattern exposing (Pattern(..))
+import Elm.Syntax.Range exposing (Range)
 
 
 moduleExposingList : Module -> Exposing TopLevelExpose
@@ -77,6 +77,16 @@ isLambda ( _, e ) =
             False
 
 
+isLet : Expression -> Bool
+isLet ( _, e ) =
+    case e of
+        LetExpression _ ->
+            True
+
+        _ ->
+            False
+
+
 isIf : Expression -> Bool
 isIf ( _, e ) =
     case e of
@@ -121,7 +131,7 @@ patternModuleNames : Pattern -> List ModuleName
 patternModuleNames p =
     case p of
         TuplePattern xs _ ->
-            (List.concatMap patternModuleNames xs)
+            List.concatMap patternModuleNames xs
 
         RecordPattern _ _ ->
             []
@@ -130,7 +140,7 @@ patternModuleNames p =
             patternModuleNames left ++ patternModuleNames right
 
         ListPattern xs _ ->
-            (List.concatMap patternModuleNames xs)
+            List.concatMap patternModuleNames xs
 
         NamedPattern qualifiedNameRef subPatterns _ ->
             qualifiedNameRef.moduleName :: List.concatMap patternModuleNames subPatterns

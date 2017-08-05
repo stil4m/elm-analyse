@@ -39,11 +39,16 @@ defaultChecks =
         [ ( "FunctionInLet", False ) ]
 
 
-checkPropertyAsInt : String -> String -> Configuration -> Maybe Int
-checkPropertyAsInt check prop (Configuration { raw }) =
-    JD.decodeString (maybe (at [ check, prop ] int)) raw
+checkPropertyAs : Decoder a -> String -> String -> Configuration -> Maybe a
+checkPropertyAs decoder check prop (Configuration { raw }) =
+    JD.decodeString (maybe (at [ check, prop ] decoder)) raw
         |> Result.toMaybe
         |> Maybe.andThen identity
+
+
+checkPropertyAsInt : String -> String -> Configuration -> Maybe Int
+checkPropertyAsInt =
+    checkPropertyAs JD.int
 
 
 defaultConfiguration : Configuration

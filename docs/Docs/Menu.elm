@@ -1,9 +1,9 @@
 module Docs.Menu exposing (..)
 
 import Bootstrap.Navbar as Navbar
-import Html.Attributes exposing (href)
+import Docs.Page as Page exposing (Page(Changelog, Configuration, Features, Home, Messages))
 import Html exposing (text)
-import Docs.Page as Page exposing (Page(Features, Configuration, Changelog, Home, Messages))
+import Html.Attributes exposing (href)
 
 
 menu : (Navbar.State -> msg) -> Navbar.State -> Html.Html msg

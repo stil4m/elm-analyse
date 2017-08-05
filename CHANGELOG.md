@@ -1,5 +1,15 @@
 # elm-analyse changelog
 
+## 0.11.0 (XXXX-XX-XX)
+
+* [Issue #52](https://github.com/stil4m/elm-analyse/issues/52) Checks: Check comments for words that should not be there
+* [Issue #91](https://github.com/stil4m/elm-analyse/issues/91) Fixers: Auto-fix MultiLineRecordFormatting
+* [Issue #96](https://github.com/stil4m/elm-analyse/issues/96) Bug: (!!) recognised as a used function
+* [Issue #97](https://github.com/stil4m/elm-analyse/issues/97) Checks: Duplicate field updates in record update syntax 
+* [Issue #98](https://github.com/stil4m/elm-analyse/issues/98) Apply elm-format 0.7.0
+* [Issue #99](https://github.com/stil4m/elm-analyse/issues/99) Bump elm-test to 4.X.X.
+
+
 ## 0.10.0 (2017-08-03)
 
 * [Issue #82](https://github.com/stil4m/elm-analyse/issues/82) Setup documentation with GitHub Pages

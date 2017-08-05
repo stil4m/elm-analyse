@@ -1,15 +1,15 @@
 port module Analyser.Files.DependencyLoader exposing (..)
 
-import Analyser.Files.Types exposing (Version, LoadedSourceFile, LoadedFileData)
-import Elm.Interface as Interface
-import Elm.Dependency exposing (Dependency)
-import Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
-import Result
-import Dict
-import Util.Logger as Logger
-import Result.Extra as Result
-import Elm.RawFile as RawFile exposing (RawFile)
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
+import Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
+import Analyser.Files.Types exposing (LoadedFileData, LoadedSourceFile, Version)
+import Dict
+import Elm.Dependency exposing (Dependency)
+import Elm.Interface as Interface
+import Elm.RawFile as RawFile exposing (RawFile)
+import Result
+import Result.Extra as Result
+import Util.Logger as Logger
 
 
 port loadRawDependency : ( String, Version ) -> Cmd msg
@@ -100,22 +100,22 @@ update msg model =
                     loadedFiles =
                         List.map dependencyFileInterface files
                 in
-                    if not <| List.all Result.isOk loadedFiles then
-                        ( { model | result = Just (Err "Could not load all dependency files") }
-                        , Cmd.none
+                if not <| List.all Result.isOk loadedFiles then
+                    ( { model | result = Just (Err "Could not load all dependency files") }
+                    , Cmd.none
+                    )
+                else
+                    let
+                        dependency =
+                            buildDependency model loadedFiles
+                    in
+                    ( { model | result = Just (Ok dependency) }
+                    , storeRawDependency
+                        ( dependency.name
+                        , dependency.version
+                        , serialiseDependency dependency
                         )
-                    else
-                        let
-                            dependency =
-                                buildDependency model loadedFiles
-                        in
-                            ( { model | result = Just (Ok dependency) }
-                            , storeRawDependency
-                                ( dependency.name
-                                , dependency.version
-                                , serialiseDependency dependency
-                                )
-                            )
+                    )
 
 
 buildDependency : Model -> List (Result x LoadedFileData) -> Dependency
@@ -133,7 +133,7 @@ buildDependency model loadedFiles =
                     )
                 |> Dict.fromList
     in
-        Dependency model.name model.version interfaces
+    Dependency model.name model.version interfaces
 
 
 dependencyFileInterface : FileContent -> Result String LoadedFileData

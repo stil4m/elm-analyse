@@ -1,7 +1,7 @@
 module Analyser.Fixes.Base exposing (..)
 
-import Elm.Syntax.File exposing (..)
 import Analyser.Messages.Types exposing (MessageData)
+import Elm.Syntax.File exposing (..)
 
 
 type alias Fixer =

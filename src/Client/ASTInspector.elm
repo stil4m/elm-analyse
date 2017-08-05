@@ -1,13 +1,13 @@
 module ASTInspector exposing (main)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
-import Elm.Parser as Parser
-import Elm.Syntax.File exposing (File)
 import CssFrameworks
 import CssFrameworks.Bootstrap
 import Elm.Json.Encode as Elm
+import Elm.Parser as Parser
+import Elm.Syntax.File exposing (File)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onInput)
 import Json.Encode as JE
 
 

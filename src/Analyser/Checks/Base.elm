@@ -1,9 +1,9 @@
-module Analyser.Checks.Base exposing (Checker, keyBasedChecker, foo)
+module Analyser.Checks.Base exposing (Checker, foo, keyBasedChecker)
 
 import Analyser.Configuration exposing (Configuration, checkEnabled)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Range exposing (RangeContext)
+import Analyser.Messages.Types exposing (Message)
 
 
 type alias Checker =

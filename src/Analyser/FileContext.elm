@@ -1,12 +1,12 @@
 module Analyser.FileContext exposing (FileContext, build)
 
+import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Elm.Interface as Interface exposing (Interface)
-import Elm.Syntax.Base exposing (ModuleName)
-import Elm.Syntax.File exposing (File)
 import Elm.Processing as Processing exposing (ProcessContext)
 import Elm.RawFile as RawFile
-import Analyser.CodeBase as CodeBase exposing (CodeBase)
+import Elm.Syntax.Base exposing (ModuleName)
+import Elm.Syntax.File exposing (File)
 
 
 type alias FileContext =
@@ -26,7 +26,7 @@ build codeBase selected =
         moduleIndex =
             CodeBase.processContext codeBase
     in
-        List.filterMap (buildForFile moduleIndex) selected
+    List.filterMap (buildForFile moduleIndex) selected
 
 
 buildForFile : ProcessContext -> LoadedSourceFile -> Maybe FileContext

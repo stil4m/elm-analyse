@@ -1,10 +1,10 @@
 module Client.StaticStatePage exposing (..)
 
 import Analyser.State as State exposing (State)
-import Html exposing (Html)
-import RemoteData as RD exposing (RemoteData)
-import Http
 import Client.LoadingScreen as LoadingScreen
+import Html exposing (Html)
+import Http
+import RemoteData as RD exposing (RemoteData)
 
 
 type alias StaticPage subModel subMsg =
@@ -47,12 +47,12 @@ update msg model =
                         Nothing ->
                             ( Nothing, Cmd.none )
             in
-                ( { model
-                    | state = newState
-                    , subModel = newSubModel
-                  }
-                , Cmd.map ProxyMsg subModelMsgs
-                )
+            ( { model
+                | state = newState
+                , subModel = newSubModel
+              }
+            , Cmd.map ProxyMsg subModelMsgs
+            )
 
         ProxyMsg subMsg ->
             case model.subModel of
@@ -64,9 +64,9 @@ update msg model =
                         ( newSubModel, subModelMsgs ) =
                             model.staticPage.update subMsg subModel
                     in
-                        ( { model | subModel = Just newSubModel }
-                        , Cmd.map ProxyMsg subModelMsgs
-                        )
+                    ( { model | subModel = Just newSubModel }
+                    , Cmd.map ProxyMsg subModelMsgs
+                    )
 
 
 view : Model subModel subMsg -> Html (Msg subMsg)

@@ -1,15 +1,15 @@
-module Client.DashBoard.DashBoard exposing (Model, Msg, subscriptions, init, update, view)
+module Client.DashBoard.DashBoard exposing (Model, Msg, init, subscriptions, update, view)
 
 import Analyser.State as State exposing (State)
-import Html exposing (Html, div, text, h3)
+import Client.Components.MessageList as MessageList
+import Client.LoadingScreen as LoadingScreen
+import Client.Socket exposing (dashboardAddress)
+import Html exposing (Html, div, h3, text)
 import Json.Decode as JD
+import Navigation exposing (Location)
 import RemoteData as RD exposing (RemoteData)
 import Time
 import WebSocket as WS
-import Navigation exposing (Location)
-import Client.Socket exposing (dashboardAddress)
-import Client.Components.MessageList as MessageList
-import Client.LoadingScreen as LoadingScreen
 
 
 type alias Model =

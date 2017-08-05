@@ -1,15 +1,15 @@
 module Analyser.Checks.SingleFieldRecordTests exposing (all)
 
-import Analyser.Checks.SingleFieldRecord as SingleFieldRecord
-import Test exposing (Test)
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Messages.Types exposing (Message, MessageData(SingleFieldRecord), newMessage)
+import Analyser.Checks.SingleFieldRecord as SingleFieldRecord
 import Analyser.Messages.Range as Range
+import Analyser.Messages.Types exposing (Message, MessageData(SingleFieldRecord), newMessage)
+import Test exposing (Test)
 
 
 singleField : ( String, String, List MessageData )
 singleField =
-    ( "singleLineSingleField"
+    ( "singleField"
     , """module Bar exposing (Foo)
 
 type alias Foo =
@@ -25,7 +25,7 @@ type alias Foo =
 
 singleFieldGeneric : ( String, String, List MessageData )
 singleFieldGeneric =
-    ( "singleLineSingleField"
+    ( "singleFieldGeneric"
     , """module Bar exposing (Foo)
 
 type alias Foo a =
@@ -37,7 +37,7 @@ type alias Foo a =
 
 multiField : ( String, String, List MessageData )
 multiField =
-    ( "multiLineMultiField"
+    ( "multiField"
     , """module Bar exposing (Foo)
 
 type alias Foo =
@@ -51,7 +51,7 @@ type alias Foo =
 
 singleFieldNested : ( String, String, List MessageData )
 singleFieldNested =
-    ( "multiLineMultiFieldWithNested"
+    ( "singleFieldNested"
     , """module Bar exposing (Foo)
 
 type alias Foo =

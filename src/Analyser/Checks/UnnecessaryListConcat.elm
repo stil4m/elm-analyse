@@ -1,12 +1,12 @@
 module Analyser.Checks.UnnecessaryListConcat exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Elm.Syntax.Expression exposing (..)
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryListConcat), newMessage)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
-import Analyser.Configuration exposing (Configuration)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryListConcat), newMessage)
+import Elm.Syntax.Expression exposing (..)
 
 
 checker : Checker

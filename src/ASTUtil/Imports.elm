@@ -1,11 +1,12 @@
-module ASTUtil.Imports exposing (FunctionReference, findImportWithRange, buildImportInformation, naiveStringifyImport, removeRangeFromImport)
+module ASTUtil.Imports exposing (FunctionReference, buildImportInformation, findImportWithRange, naiveStringifyImport, removeRangeFromImport)
 
-import Elm.Syntax.Range exposing (Range)
+import AST.Ranges as Ranges
+import Elm.Syntax.Base exposing (..)
+import Elm.Syntax.Exposing as Exposing exposing (..)
 import Elm.Syntax.File exposing (..)
 import Elm.Syntax.Module exposing (..)
-import Elm.Syntax.Exposing as Exposing exposing (..)
-import Elm.Syntax.Base exposing (..)
-import AST.Ranges as Ranges
+import Elm.Syntax.Range exposing (Range)
+import List.Extra as List
 
 
 type alias FunctionReference =
@@ -57,23 +58,32 @@ stringifyExposingList exp =
 
         Explicit explicits ->
             " exposing "
-                ++ case explicits of
-                    [] ->
-                        ""
+                ++ (case explicits of
+                        [] ->
+                            ""
 
-                    _ ->
-                        let
-                            --TODO
-                            areOnDifferentLines =
-                                False
+                        xs ->
+                            let
+                                areOnDifferentLines =
+                                    rangesOnDifferentLines (List.map Exposing.topLevelExposeRange xs)
 
-                            seperator =
-                                if areOnDifferentLines then
-                                    "\n    , "
-                                else
-                                    ", "
-                        in
+                                seperator =
+                                    if areOnDifferentLines then
+                                        "\n    , "
+                                    else
+                                        ", "
+                            in
                             "(" ++ (List.map stringifyExpose explicits |> String.join seperator) ++ ")"
+                   )
+
+
+rangesOnDifferentLines : List Range -> Bool
+rangesOnDifferentLines ranges =
+    let
+        starts =
+            List.map (.start >> .row) ranges
+    in
+    List.length (List.unique starts) == List.length starts
 
 
 stringifyExpose : TopLevelExpose -> String
@@ -95,31 +105,31 @@ stringifyExpose expose =
 stringifyExposedType : ExposedType -> String
 stringifyExposedType { name, constructors } =
     name
-        ++ case constructors of
-            None ->
-                ""
+        ++ (case constructors of
+                None ->
+                    ""
 
-            All _ ->
-                "(..)"
+                All _ ->
+                    "(..)"
 
-            Explicit explicits ->
-                case explicits of
-                    [] ->
-                        ""
+                Explicit explicits ->
+                    case explicits of
+                        [] ->
+                            ""
 
-                    _ ->
-                        let
-                            --TODO
-                            areOnDifferentLines =
-                                False
+                        xs ->
+                            let
+                                areOnDifferentLines =
+                                    rangesOnDifferentLines (List.map Tuple.second xs)
 
-                            seperator =
-                                if areOnDifferentLines then
-                                    "\n    , "
-                                else
-                                    ", "
-                        in
+                                seperator =
+                                    if areOnDifferentLines then
+                                        "\n    , "
+                                    else
+                                        ", "
+                            in
                             "(" ++ (String.join seperator <| List.map Tuple.first explicits) ++ ")"
+           )
 
 
 removeRangeFromImport : Range -> Import -> Import

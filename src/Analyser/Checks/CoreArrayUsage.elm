@@ -1,11 +1,11 @@
 module Analyser.Checks.CoreArrayUsage exposing (checker)
 
+import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Types exposing (Message, MessageData(CoreArrayUsage), newMessage)
 import Elm.Syntax.Module exposing (Import)
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Configuration exposing (Configuration)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 
 
 checker : Checker

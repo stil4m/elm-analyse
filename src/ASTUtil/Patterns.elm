@@ -51,13 +51,12 @@ findParentPattern file range =
                         Nothing
                 )
     in
-        Inspector.inspect
-            { defaultConfig
-              -- TODO Collect all pattern locations. Extract this to another place?
-                | onFunction = Pre onFunction
-                , onCase = Pre onCase
-                , onLambda = Pre onLambda
-                , onDestructuring = Pre onDestructuring
-            }
-            file
-            Nothing
+    Inspector.inspect
+        { defaultConfig
+            | onFunction = Pre onFunction
+            , onCase = Pre onCase
+            , onLambda = Pre onLambda
+            , onDestructuring = Pre onDestructuring
+        }
+        file
+        Nothing

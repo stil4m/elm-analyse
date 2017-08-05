@@ -1,17 +1,17 @@
 module Client.Components.FileTree exposing (Model, Msg, init, subscriptions, update, view)
 
-import Navigation exposing (Location)
-import Html exposing (..)
-import Html.Attributes exposing (class, style, type_, checked)
-import Html.Events exposing (onClick)
-import Json.Decode as JD exposing (string, list)
-import Analyser.State as State exposing (State)
 import Analyser.Messages.Types exposing (Message)
-import Http
-import WebSocket as WS
-import Client.Socket exposing (dashboardAddress)
-import Time
+import Analyser.State as State exposing (State)
 import Client.Components.MessageList as MessageList
+import Client.Socket exposing (dashboardAddress)
+import Html exposing (..)
+import Html.Attributes exposing (checked, class, style, type_)
+import Html.Events exposing (onClick)
+import Http
+import Json.Decode as JD exposing (list, string)
+import Navigation exposing (Location)
+import Time
+import WebSocket as WS
 
 
 type alias Model =
@@ -76,7 +76,7 @@ updateFileIndex model =
         buildTree state tree =
             List.map (\file -> ( file, messagesForFile file state )) tree
     in
-        { model | fileIndex = Maybe.map2 buildTree model.state model.tree }
+    { model | fileIndex = Maybe.map2 buildTree model.state model.tree }
 
 
 updateMessageList : Model -> Model
@@ -153,37 +153,37 @@ view m =
                 , text fileName
                 ]
     in
-        div []
-            [ div [ class "checkbox" ]
-                [ label []
-                    [ input
-                        [ type_ "checkbox"
-                        , checked m.hideGoodFiles
-                        , onClick ToggleHideGoodFiles
-                        ]
-                        []
-                    , text "Only show files with messages"
+    div []
+        [ div [ class "checkbox" ]
+            [ label []
+                [ input
+                    [ type_ "checkbox"
+                    , checked m.hideGoodFiles
+                    , onClick ToggleHideGoodFiles
                     ]
+                    []
+                , text "Only show files with messages"
                 ]
-            , hr [] []
-            , case m.fileIndex of
-                Just fileIndex ->
-                    div [ class "row", style [ ( "padding-top", "10px" ) ] ]
-                        [ div [ class "col-md-6 col-sm-6" ]
-                            [ div [ class "list-group" ]
-                                (fileIndex
-                                    |> List.filter allowFile
-                                    |> List.map asItem
-                                )
-                            ]
-                        , div [ class "col-md-6 col-sm-6" ]
-                            [ if m.selectedFile == Nothing then
-                                div [] []
-                              else
-                                MessageList.view m.messageList |> Html.map MessageListMsg
-                            ]
-                        ]
-
-                _ ->
-                    div [] []
             ]
+        , hr [] []
+        , case m.fileIndex of
+            Just fileIndex ->
+                div [ class "row", style [ ( "padding-top", "10px" ) ] ]
+                    [ div [ class "col-md-6 col-sm-6" ]
+                        [ div [ class "list-group" ]
+                            (fileIndex
+                                |> List.filter allowFile
+                                |> List.map asItem
+                            )
+                        ]
+                    , div [ class "col-md-6 col-sm-6" ]
+                        [ if m.selectedFile == Nothing then
+                            div [] []
+                          else
+                            MessageList.view m.messageList |> Html.map MessageListMsg
+                        ]
+                    ]
+
+            _ ->
+                div [] []
+        ]

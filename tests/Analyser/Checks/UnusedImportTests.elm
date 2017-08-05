@@ -2,9 +2,9 @@ module Analyser.Checks.UnusedImportTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImport as UnusedImport
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
-import Analyser.Messages.Range as Range
 
 
 usedAsQualified : ( String, String, List MessageData )
@@ -84,7 +84,7 @@ foo = 1
 
 unusedButHasExposing : ( String, String, List MessageData )
 unusedButHasExposing =
-    ( "unusedButHasAlias"
+    ( "unusedButHasExposing"
     , """module Foo exposing (..)
 
 import Bar exposing (baz)
@@ -98,7 +98,7 @@ foo = 1
 
 unusedImport : ( String, String, List MessageData )
 unusedImport =
-    ( "unusedButHasAlias"
+    ( "unusedImport"
     , """module Foo exposing (..)
 
 import Bar

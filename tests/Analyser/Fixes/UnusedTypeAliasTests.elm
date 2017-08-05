@@ -1,9 +1,9 @@
 module Analyser.Fixes.UnusedTypeAliasTests exposing (all)
 
-import Test exposing (Test, describe, test)
-import Analyser.Fixes.UnusedTypeAlias exposing (fixer)
 import Analyser.Checks.UnusedTypeAlias exposing (checker)
 import Analyser.Fixes.TestUtil exposing (testFix)
+import Analyser.Fixes.UnusedTypeAlias exposing (fixer)
+import Test exposing (Test, describe, test)
 
 
 unusedTypeAlias : ( String, String, String )

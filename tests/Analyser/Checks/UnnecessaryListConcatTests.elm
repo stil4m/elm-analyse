@@ -1,10 +1,10 @@
 module Analyser.Checks.UnnecessaryListConcatTests exposing (..)
 
-import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
 import Analyser.Checks.CheckTestUtil as CTU
+import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
+import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (..)
-import Analyser.Messages.Range as Range
 
 
 couldMerge : ( String, String, List MessageData )

@@ -1,14 +1,14 @@
 module Analyser.Checks.ExposeAll exposing (checker)
 
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Elm.Syntax.File exposing (..)
 import AST.Util
-import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Types exposing (Message, MessageData(ExposeAll), newMessage)
-import ASTUtil.Inspector as Inspector exposing (defaultConfig, Order(Inner))
-import Analyser.Configuration exposing (Configuration)
+import ASTUtil.Inspector as Inspector exposing (Order(Inner), defaultConfig)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Configuration exposing (Configuration)
+import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Range as Range exposing (Range, RangeContext)
+import Analyser.Messages.Types exposing (Message, MessageData(ExposeAll), newMessage)
 import Elm.Syntax.Exposing exposing (..)
+import Elm.Syntax.File exposing (..)
 
 
 checker : Checker
@@ -32,9 +32,9 @@ scan rangeContext fileContext _ =
                 fileContext.ast
                 []
     in
-        x
-            |> List.map (ExposeAll fileContext.path)
-            |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+    x
+        |> List.map (ExposeAll fileContext.path)
+        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 onFile : RangeContext -> (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
