@@ -1,217 +1,43 @@
-port module Client.Graph.Graph
+module Client.Graph.Graph
     exposing
         ( Model
-        , Msg
         , init
-        , removeCmd
-        , update
         , view
         )
 
 import Analyser.State exposing (State)
-import Client.Graph.Node as Node
 import Client.Graph.Table as Table
 import Client.Graph.Widgets as Widgets
-import Client.LoadingScreen as LoadingScreen
-import Client.View.BreadCrumb as BreadCrumb
-import Client.View.Panel as Panel
-import Dict
-import Graph exposing (Graph)
-import Graph.Colored.Color exposing (ColorDict)
-import Graph.Colored.Decorator as GraphDecorator
-import Graph.Colored.Graph as ColoredGraph exposing (ColoredGraph)
-import Graph.Node as Node exposing (Node)
+import Graph
 import Html exposing (Html)
 import Html.Attributes as Html
-import Html.Events exposing (onClick)
 import Html.Lazy
-import Json.Decode exposing (Value)
-import List.Extra as List
-
-
--- port for sending strings out to JavaScript
-
-
-port updateGraph : ( String, Value ) -> Cmd msg
-
-
-port removeGraph : String -> Cmd msg
-
-
-removeCmd : Cmd msg
-removeCmd =
-    removeGraph graphElementId
-
-
-type alias Filter =
-    List String
+import ModuleGraph exposing (ModuleGraph)
 
 
 type alias Model =
-    { state : Maybe State
-    , graph : Maybe ColoredGraph
-    , colors : ColorDict
-    , filter : Filter
-    }
+    ModuleGraph
 
 
-type Msg
-    = SetFilter (List String)
-
-
-withNewState : State -> Model -> Model
-withNewState state m =
-    -- Update state, reset filter, and update Graph
-    withGraph { m | state = Just state, filter = [] } state.graph
-
-
-init : State -> ( Model, Cmd Msg )
+init : State -> ( Model, Cmd msg )
 init state =
-    let
-        newModel =
-            { state = Nothing, graph = Nothing, colors = Dict.empty, filter = [] }
-                |> withNewState state
-    in
-    newModel ! [ cmdForUpdatedGraph newModel.graph ]
+    ( state.graph, Cmd.none )
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        SetFilter filter ->
-            let
-                newModelWithFilter =
-                    { model | filter = filter }
-            in
-            case model.state of
-                Nothing ->
-                    newModelWithFilter ! []
-
-                Just state ->
-                    let
-                        modelWithNewGraph =
-                            Graph.filter (\node -> List.take (List.length filter) node.name == filter) state.graph
-                                |> withGraph newModelWithFilter
-                    in
-                    modelWithNewGraph ! [ cmdForUpdatedGraph modelWithNewGraph.graph ]
-
-
-graphElementId : String
-graphElementId =
-    "sigmaGraph"
-
-
-cmdForUpdatedGraph : Maybe ColoredGraph -> Cmd Msg
-cmdForUpdatedGraph maybeGraph =
-    case maybeGraph of
-        Nothing ->
-            Cmd.none
-
-        Just graph ->
-            updateGraph ( graphElementId, ColoredGraph.encode graph )
-
-
-withGraph : Model -> Graph Node -> Model
-withGraph model graph =
-    let
-        ( colors, coloredGraph ) =
-            GraphDecorator.coloredGraph (1 + List.length model.filter) graph
-    in
-    { model | graph = Just coloredGraph, colors = colors }
-
-
-view : Model -> Html Msg
-view m =
-    let
-        maybeGraph =
-            Maybe.map .graph m.state
-    in
+view : Model -> Html msg
+view model =
     Html.div []
-        [ LoadingScreen.viewStateFromMaybe m.state (\_ -> Html.text "")
-        , Html.h3 [] [ Html.text "Module Graph" ]
+        [ Html.h3 [] [ Html.text "Modules" ]
         , Html.div [ Html.class "row" ]
-            (widgets maybeGraph)
+            (widgets model)
         , Html.div [ Html.class "row" ]
-            [ Panel.viewWithFooter Panel.WidthFull
-                "Graph"
-                (Panel.documentationButton "ModuleGraph.md")
-                (Html.div [ Html.id graphElementId ] [])
-                (Just (legend m.filter m.colors))
-            ]
-        , Html.div [ Html.class "row" ]
-            [ Maybe.map (Html.Lazy.lazy (Table.view 20)) maybeGraph
-                |> Maybe.withDefault (Html.text "")
+            [ Html.Lazy.lazy (Table.view 20) model
             ]
         ]
 
 
-widgets : Maybe (Graph Node) -> List (Html msg)
-widgets maybeGraph =
-    case maybeGraph of
-        Just graph ->
-            [ Widgets.countModules graph.nodes
-            , Widgets.countImports graph.edges
-            ]
-
-        Nothing ->
-            [ Html.text "" ]
-
-
-legend : Filter -> ColorDict -> Html Msg
-legend filter colors =
-    let
-        names =
-            Dict.keys colors
-                |> List.sort
-
-        entries =
-            List.filterMap (legendEntry colors) names
-
-        breadCrumb =
-            if List.isEmpty filter then
-                Html.text ""
-            else
-                breadCrumbsForFilter filter
-                    |> BreadCrumb.view (List.last filter |> Maybe.withDefault "Current Filter")
-    in
-    Html.div [ Html.class "graph__legend" ]
-        [ breadCrumb
-        , Html.ul [] entries
-        ]
-
-
-legendEntry : ColorDict -> List String -> Maybe (Html Msg)
-legendEntry colors names =
-    case Dict.get names colors of
-        Just color ->
-            Html.li
-                [ Html.style [ ( "color", color ) ], onClick (SetFilter names) ]
-                [ Html.text (Node.nameToString names) ]
-                |> Just
-
-        Nothing ->
-            Nothing
-
-
-breadCrumbsForFilter : Filter -> List (BreadCrumb.Item Msg)
-breadCrumbsForFilter filter =
-    -- From a filter [A,B,C] build crumbs [[A], [A, B]]
-    { title = "All"
-    , msg = SetFilter []
-    , color = ""
-    }
-        :: (List.inits filter
-                |> -- drop the first (empty) item generated by inits
-                   List.drop 1
-                |> -- drop the last entry
-                   List.take (List.length filter - 1)
-                |> List.map breadCrumbItem
-           )
-
-
-breadCrumbItem : List String -> BreadCrumb.Item Msg
-breadCrumbItem nodeName =
-    { title = List.last nodeName |> Maybe.withDefault ""
-    , msg = SetFilter nodeName
-    , color = ""
-    }
+widgets : ModuleGraph -> List (Html msg)
+widgets graph =
+    [ Widgets.countModules (Graph.nodes graph)
+    , Widgets.countImports (Graph.edges graph)
+    ]

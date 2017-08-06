@@ -16,7 +16,8 @@
     "self-check": "node \"./js/bin/index.js\"",
     "test": "./node_modules/.bin/elm-test",
     "build": "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\"",
-    "pr-check": "npm install && npm run check-prettier && npm run elm-format && npm run test && npm run build && npm run self-check"
+    "pr-check": "npm install && npm run check-prettier && npm run elm-format && npm run test && npm run build && npm run self-check",
+    "server": "node \"./js/bin/index.js\" -s"
   },
   "author": "Mats Stijlaart",
   "license": "MIT",

@@ -3,13 +3,12 @@ module GraphBuilder exposing (run)
 import Analyser.CodeBase exposing (CodeBase)
 import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.Files.Types exposing (LoadedSourceFiles)
-import Graph exposing (Graph)
-import Graph.Edge as Edge exposing (Edge)
-import Graph.Node as Node exposing (Node)
-import Set
+import Dict
+import Graph exposing (Edge, Node)
+import ModuleGraph exposing (ModuleGraph)
 
 
-run : CodeBase -> LoadedSourceFiles -> Graph Node
+run : CodeBase -> LoadedSourceFiles -> ModuleGraph
 run codeBase sources =
     let
         files =
@@ -19,42 +18,24 @@ run codeBase sources =
             List.filterMap .moduleName files
 
         nodes =
-            List.map Node.fromName moduleNames
+            moduleNames |> List.indexedMap (\n x -> Node n x)
 
-        identifiers =
-            List.map .identifier nodes
-                |> Set.fromList
+        indexedModuleNames =
+            nodes |> List.map (\{ id, label } -> ( String.join "." label, id )) |> Dict.fromList
 
-        allEdges =
-            List.map edgesInFile files
-                |> List.concat
-
-        {-
-           Edges to external nodes (i.e. dependencies outside of the scope of
-           this app, such as Core and external packages) must be filtered out
-           in order to create a valid graph (as these dependencies are not
-           represented in the files and hence are missing from the nodes).
-        -}
         edges =
-            Edge.filterForIdentifiers identifiers allEdges
+            List.concatMap (edgesInFile indexedModuleNames) files
     in
-    Graph.init edges nodes
+    Graph.fromNodesAndEdges nodes edges
 
 
-edgesInFile : FileContext -> List Edge
-edgesInFile file =
-    case file.moduleName of
+edgesInFile : Dict.Dict String Int -> FileContext -> List (Edge (List String))
+edgesInFile moduleIndex file =
+    case file.moduleName |> Maybe.andThen (String.join "." >> flip Dict.get moduleIndex) of
         Just fromModule ->
-            let
-                from =
-                    Node.identifierFromName fromModule
-
-                imports =
-                    file.ast.imports
-                        |> List.map .moduleName
-                        |> List.map Node.identifierFromName
-            in
-            List.map (\to -> Edge from to) imports
+            file.ast.imports
+                |> List.filterMap (.moduleName >> String.join "." >> flip Dict.get moduleIndex)
+                |> List.map (\x -> Edge fromModule x (file.moduleName |> Maybe.withDefault []))
 
         Nothing ->
             []

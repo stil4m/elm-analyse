@@ -2,13 +2,12 @@ module Client.Graph.PackageDependencies exposing (Model, Msg, init, update, view
 
 import Analyser.State exposing (State)
 import Dict exposing (Dict)
-import Graph exposing (Graph)
-import Graph.Edge exposing (Edge)
-import Graph.Node exposing (Node)
+import Graph exposing (Edge)
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Events as Html
 import List.Extra as List
+import ModuleGraph exposing (ModuleGraph)
 import Set
 
 
@@ -16,7 +15,7 @@ type alias Model =
     { names : List String
     , relations : PackageFileRelations
     , selected : Maybe ( String, String )
-    , graph : Graph Node
+    , graph : ModuleGraph
     }
 
 
@@ -32,7 +31,7 @@ init : State -> ( Model, Cmd Msg )
 init { graph } =
     let
         relations =
-            packageListRelationAsBag (List.map edgeToPackageRel graph.edges)
+            packageListRelationAsBag (List.map (edgeToPackageRel graph) (Graph.edges graph))
 
         names =
             Dict.keys relations
@@ -182,14 +181,18 @@ packageContentTd from to relations selected =
             ]
 
 
-edgeToPackageRel : Edge -> ( ( String, String ), ( String, String ) )
-edgeToPackageRel edge =
+edgeToPackageRel : ModuleGraph -> Edge (List String) -> ( ( String, String ), ( String, String ) )
+edgeToPackageRel graph edge =
     let
         fromList =
-            String.split "-" edge.from
+            Graph.get edge.from graph
+                |> Maybe.map (.node >> .label)
+                |> Maybe.withDefault []
 
         toList =
-            String.split "-" edge.to
+            Graph.get edge.to graph
+                |> Maybe.map (.node >> .label)
+                |> Maybe.withDefault []
 
         fromPackage =
             fromList |> List.init |> Maybe.withDefault [] |> String.join "."
