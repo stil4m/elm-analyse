@@ -67,7 +67,7 @@ function dependencyFiles(directory, dep, version) {
     );
 
     const exposedModules = depPackageFile["exposed-modules"].map(
-        x => "/" + x.replace(".", "/") + ".elm"
+        x => "/" + x.replace(new RegExp("\\.", "g"), "/") + ".elm"
     );
     return unfilteredTargetFiles.filter(function(x) {
         return exposedModules.filter(e => x.endsWith(e))[0];

@@ -270,12 +270,13 @@ finishProcess newStage cmds model =
         messages =
             Inspection.run newCodeBase includedSources model.configuration
 
-        newModules =
+        ( unusedDeps, newModules ) =
             Analyser.Modules.build newCodeBase (CodeBase.sourceFiles newCodeBase)
 
         newState =
             State.finishWithNewMessages messages model.state
                 |> State.updateModules newModules
+                |> State.updateUnusedDependencies (List.map .name unusedDeps)
 
         newModel =
             { model
@@ -286,7 +287,7 @@ finishProcess newStage cmds model =
     in
     ( newModel
     , Cmd.batch
-        [ AnalyserPorts.sendReport { messages = newState.messages, modules = newState.modules }
+        [ AnalyserPorts.sendReport { messages = newState.messages, modules = newState.modules, unusedDependencies = newState.unusedDependencies }
         , AnalyserPorts.sendStateValue newState
         , Cmd.map SourceLoadingStageMsg cmds
         ]

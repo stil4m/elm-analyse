@@ -10,7 +10,9 @@ module.exports = function(config) {
     app.ports.sendReportValue.subscribe(function(report) {
         const reporter = require("./reporter");
         reporter(config.format, report);
-        process.exit(report.messages.length > 0 ? 1 : 0);
+        const fail =
+            report.messages.length > 0 || report.unusedDependencies.length > 0;
+        process.exit(fail ? 1 : 0);
     });
 
     loggingPorts(app, config, directory);

@@ -1,8 +1,10 @@
 module Analyser.Modules exposing (Modules, build, decode, empty, encode)
 
+import Analyser.Checks.UnusedDependency as UnusedDependency
 import Analyser.CodeBase exposing (CodeBase)
 import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.Files.Types exposing (LoadedSourceFiles)
+import Elm.Dependency exposing (Dependency)
 import Elm.Syntax.Base exposing (ModuleName)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
@@ -22,15 +24,17 @@ empty =
     }
 
 
-build : CodeBase -> LoadedSourceFiles -> Modules
+build : CodeBase -> LoadedSourceFiles -> ( List Dependency, Modules )
 build codeBase sources =
     let
         files =
             FileContext.build codeBase sources
     in
-    { projectModules = List.filterMap .moduleName files
-    , dependencies = List.concatMap edgesInFile files
-    }
+    ( UnusedDependency.check codeBase files
+    , { projectModules = List.filterMap .moduleName files
+      , dependencies = List.concatMap edgesInFile files
+      }
+    )
 
 
 edgesInFile : FileContext -> List ( List String, List String )

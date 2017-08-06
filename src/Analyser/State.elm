@@ -14,6 +14,7 @@ import List.Extra as List
 
 type alias State =
     { messages : List Message
+    , unusedDependencies : List String
     , idCount : Int
     , status : Status
     , queue : List Task
@@ -34,6 +35,7 @@ type Status
 initialState : State
 initialState =
     { messages = []
+    , unusedDependencies = []
     , idCount = 0
     , status = Initialising
     , queue = []
@@ -116,6 +118,11 @@ outdateMessagesForFile fileName state =
     }
 
 
+updateUnusedDependencies : List String -> State -> State
+updateUnusedDependencies deps state =
+    { state | unusedDependencies = deps }
+
+
 finishWithNewMessages : List Message -> State -> State
 finishWithNewMessages messages s =
     let
@@ -143,6 +150,7 @@ decodeState : Decoder State
 decodeState =
     JD.succeed State
         |: JD.field "messages" (JD.list decodeMessage)
+        |: JD.field "unusedDependencies" (JD.list JD.string)
         |: JD.field "idCount" JD.int
         |: JD.field "status" decodeStatus
         |: JD.field "queue" (JD.list JD.int)
@@ -153,6 +161,7 @@ encodeState : State -> Value
 encodeState state =
     JE.object
         [ ( "messages", JE.list (List.map encodeMessage state.messages) )
+        , ( "unusedDependencies", JE.list (List.map JE.string state.unusedDependencies) )
         , ( "idCount", JE.int state.idCount )
         , ( "status", encodeStatus state.status )
         , ( "queue", JE.list (List.map JE.int state.queue) )
