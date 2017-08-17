@@ -3,8 +3,11 @@ module.exports = function(app, elm, expressWs) {
         status: "initialising",
         idCount: 0,
         queue: [],
-        messages: []
+        messages: [],
+        modules: []
     };
+
+    var report = null;
 
     function renderState() {
         return JSON.stringify(state);
@@ -21,14 +24,21 @@ module.exports = function(app, elm, expressWs) {
         });
     });
 
-    elm.ports.sendState.subscribe(function(stateString) {
-        state = JSON.parse(stateString);
+    elm.ports.sendReportValue.subscribe(function(newReport) {
+        report = newReport;
+    });
+
+    elm.ports.sendState.subscribe(function(newState) {
+        state = newState;
         expressWs.getWss().clients.forEach(x => x.send(renderState()));
     });
 
     return {
         getState: function() {
             return state;
+        },
+        getReport: function() {
+            return report;
         }
     };
 };

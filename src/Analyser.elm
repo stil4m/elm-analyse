@@ -8,10 +8,10 @@ import Analyser.FileWatch as FileWatch exposing (FileChange(Remove, Update))
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Analyser.Fixer as Fixer
 import Analyser.Messages.Util as Messages
+import Analyser.Modules
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import Analyser.State as State exposing (State)
 import AnalyserPorts
-import GraphBuilder
 import Inspection
 import Platform exposing (programWithFlags)
 import Time
@@ -172,7 +172,7 @@ onFixerMsg x stage model =
         if Fixer.succeeded newFixerModel then
             ( { model | stage = Finished }, fixerCmds )
         else
-            startSourceLoading (Messages.getFiles (Fixer.message newFixerModel).data)
+            startSourceLoading (Messages.messageFiles (Fixer.message newFixerModel))
                 ( model, fixerCmds )
     else
         ( { model | stage = FixerStage newFixerModel }
@@ -226,7 +226,7 @@ handleNextStep (( model, cmds ) as input) =
 doSendState : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 doSendState ( model, cmds ) =
     ( model
-    , Cmd.batch [ cmds, AnalyserPorts.sendStateAsJson model.state ]
+    , Cmd.batch [ cmds, AnalyserPorts.sendStateValue model.state ]
     )
 
 
@@ -270,12 +270,12 @@ finishProcess newStage cmds model =
         messages =
             Inspection.run newCodeBase includedSources model.configuration
 
-        newGraph =
-            GraphBuilder.run newCodeBase (CodeBase.sourceFiles newCodeBase)
+        newModules =
+            Analyser.Modules.build newCodeBase (CodeBase.sourceFiles newCodeBase)
 
         newState =
             State.finishWithNewMessages messages model.state
-                |> State.updateGraph newGraph
+                |> State.updateModules newModules
 
         newModel =
             { model
@@ -286,9 +286,8 @@ finishProcess newStage cmds model =
     in
     ( newModel
     , Cmd.batch
-        [ AnalyserPorts.sendMessagesAsStrings newState.messages
-        , AnalyserPorts.sendMessagesAsJson newState.messages
-        , AnalyserPorts.sendStateAsJson newState
+        [ AnalyserPorts.sendReport { messages = newState.messages, modules = newState.modules }
+        , AnalyserPorts.sendStateValue newState
         , Cmd.map SourceLoadingStageMsg cmds
         ]
     )

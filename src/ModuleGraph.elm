@@ -7,17 +7,38 @@ import Json.Encode as JE exposing (Value)
 
 
 type alias ModuleGraph =
-    Graph (List String) (List String)
+    Graph Node Node
+
+
+type alias Node =
+    { text : String
+    , moduleName : List String
+    }
+
+
+nodeFromModuleName : List String -> Node
+nodeFromModuleName x =
+    { text = String.join "." x, moduleName = x }
+
+
+decodeNode : Decoder Node
+decodeNode =
+    JD.list JD.string |> JD.map nodeFromModuleName
+
+
+encodeNode : Node -> Value
+encodeNode =
+    .moduleName >> List.map JE.string >> JE.list
 
 
 decode : Decoder ModuleGraph
 decode =
-    Graph.Json.decode (JD.list JD.string) (JD.list JD.string)
+    Graph.Json.decode decodeNode decodeNode
 
 
 encode : ModuleGraph -> Value
 encode =
-    Graph.Json.encode (List.map JE.string >> JE.list) (List.map JE.string >> JE.list)
+    Graph.Json.encode encodeNode encodeNode
 
 
 empty : ModuleGraph

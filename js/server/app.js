@@ -2,6 +2,7 @@ var express = require("express");
 var app = express();
 var expressWs = require("express-ws")(app);
 const fs = require("fs");
+const _ = require("lodash");
 const fileGatherer = require("../util/file-gatherer");
 app.use(
     express.static(__dirname + "/../public", {
@@ -9,7 +10,7 @@ app.use(
     })
 );
 
-module.exports = function(config) {
+module.exports = function(config, info) {
     console.log("Elm Analyser server starting with config:");
     console.log(config);
 
@@ -32,8 +33,18 @@ module.exports = function(config) {
         res.send(x.sourceFiles);
     });
 
+    app.get("/info", function(req, res) {
+        const copy = _.cloneDeep(info);
+        copy.config = config;
+        res.send(copy);
+    });
+
     app.get("/state", function(req, res) {
         res.send(dashboard.getState());
+    });
+
+    app.get("/report", function(req, res) {
+        res.send(dashboard.getReport());
     });
 
     app.listen(config.port, function() {

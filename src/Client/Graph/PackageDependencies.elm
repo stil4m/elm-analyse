@@ -1,6 +1,7 @@
 module Client.Graph.PackageDependencies exposing (Model, Msg, init, update, view)
 
 import Analyser.State exposing (State)
+import Client.GraphBuilder
 import Dict exposing (Dict)
 import Graph exposing (Edge)
 import Html exposing (Html)
@@ -28,8 +29,11 @@ type Msg
 
 
 init : State -> ( Model, Cmd Msg )
-init { graph } =
+init { modules } =
     let
+        graph =
+            Client.GraphBuilder.run modules
+
         relations =
             packageListRelationAsBag (List.map (edgeToPackageRel graph) (Graph.edges graph))
 
@@ -181,17 +185,17 @@ packageContentTd from to relations selected =
             ]
 
 
-edgeToPackageRel : ModuleGraph -> Edge (List String) -> ( ( String, String ), ( String, String ) )
+edgeToPackageRel : ModuleGraph -> Edge ModuleGraph.Node -> ( ( String, String ), ( String, String ) )
 edgeToPackageRel graph edge =
     let
         fromList =
             Graph.get edge.from graph
-                |> Maybe.map (.node >> .label)
+                |> Maybe.map (.node >> .label >> .moduleName)
                 |> Maybe.withDefault []
 
         toList =
             Graph.get edge.to graph
-                |> Maybe.map (.node >> .label)
+                |> Maybe.map (.node >> .label >> .moduleName)
                 |> Maybe.withDefault []
 
         fromPackage =

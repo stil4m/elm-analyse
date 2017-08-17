@@ -21,16 +21,16 @@ view count graph =
 topListInAndOut : Int -> ModuleGraph -> Html msg
 topListInAndOut count graph =
     let
-        nodeContexts : List (NodeContext (List String) (List String))
+        nodeContexts : List (NodeContext ModuleGraph.Node ModuleGraph.Node)
         nodeContexts =
             Graph.nodes graph
                 |> List.filterMap (\x -> Graph.get x.id graph)
 
-        topImportees : List (NodeContext (List String) (List String))
+        topImportees : List (NodeContext ModuleGraph.Node ModuleGraph.Node)
         topImportees =
             List.sortBy (.outgoing >> IntDict.size >> (*) -1) nodeContexts
 
-        topImported : List (NodeContext (List String) (List String))
+        topImported : List (NodeContext ModuleGraph.Node ModuleGraph.Node)
         topImported =
             List.sortBy (.incoming >> IntDict.size >> (*) -1) nodeContexts
 
@@ -49,7 +49,7 @@ topListInAndOut count graph =
         ]
 
 
-topList : List (NodeContext (List String) (List String)) -> Html msg
+topList : List (NodeContext ModuleGraph.Node ModuleGraph.Node) -> Html msg
 topList nodeContexts =
     Html.table [ Html.class "table" ]
         [ Html.thead []
@@ -63,7 +63,7 @@ topList nodeContexts =
             (List.map
                 (\nodeContext ->
                     Html.tr []
-                        [ Html.td [] [ Html.text (String.join "." nodeContext.node.label) ]
+                        [ Html.td [] [ Html.text nodeContext.node.label.text ]
                         , Html.td [] [ Html.text (toString (IntDict.size nodeContext.incoming)) ]
                         , Html.td [] [ Html.text (toString (IntDict.size nodeContext.outgoing)) ]
                         ]

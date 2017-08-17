@@ -4,7 +4,7 @@ import AST.Ranges as AstRanges
 import Dict exposing (Dict)
 import Elm.Syntax.Range as Syntax exposing (Location)
 import Json.Decode as JD exposing (Decoder)
-import Json.Encode as JE exposing (Value)
+import Json.Encode exposing (Value)
 
 
 type Range
@@ -26,11 +26,8 @@ toTuple (Range r _) =
 
 
 encode : Range -> Value
-encode (Range real parsed) =
-    JE.object
-        [ ( "real", Syntax.encode real )
-        , ( "parsed", Syntax.encode parsed )
-        ]
+encode (Range real _) =
+    Syntax.encode real
 
 
 startLine : Range -> Int
@@ -40,9 +37,7 @@ startLine (Range real _) =
 
 decode : Decoder Range
 decode =
-    JD.map2 Range
-        (JD.field "real" Syntax.decode)
-        (JD.field "parsed" Syntax.decode)
+    Syntax.decode |> JD.map (\x -> Range x x)
 
 
 rangeToString : Range -> String

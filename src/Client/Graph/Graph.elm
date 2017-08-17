@@ -8,7 +8,9 @@ module Client.Graph.Graph
 import Analyser.State exposing (State)
 import Client.Graph.Table as Table
 import Client.Graph.Widgets as Widgets
+import Client.GraphBuilder
 import Graph
+import Graph.GraphViz
 import Html exposing (Html)
 import Html.Attributes as Html
 import Html.Lazy
@@ -21,7 +23,7 @@ type alias Model =
 
 init : State -> ( Model, Cmd msg )
 init state =
-    ( state.graph, Cmd.none )
+    ( Client.GraphBuilder.run state.modules, Cmd.none )
 
 
 view : Model -> Html msg
@@ -32,6 +34,11 @@ view model =
             (widgets model)
         , Html.div [ Html.class "row" ]
             [ Html.Lazy.lazy (Table.view 20) model
+            ]
+        , Html.div [ Html.class "row" ]
+            [ Html.h2 [] [ Html.text "DOT file" ]
+            , Html.pre []
+                [ Html.text (Graph.GraphViz.output model) ]
             ]
         ]
 
