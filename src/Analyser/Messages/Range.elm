@@ -1,4 +1,4 @@
-module Analyser.Messages.Range exposing (Range, RangeContext, asSyntaxRange, build, compareRangeStarts, context, decode, emptyRange, encode, manual, orderByStart, rangeToString, toTuple)
+module Analyser.Messages.Range exposing (Range, RangeContext, asSyntaxRange, build, compareRangeStarts, context, decode, emptyRange, encode, manual, orderByStart, rangeToString, startLine, toTuple)
 
 import AST.Ranges as AstRanges
 import Dict exposing (Dict)
@@ -31,6 +31,11 @@ encode (Range real parsed) =
         [ ( "real", Syntax.encode real )
         , ( "parsed", Syntax.encode parsed )
         ]
+
+
+startLine : Range -> Int
+startLine (Range real _) =
+    real.start.row
 
 
 decode : Decoder Range

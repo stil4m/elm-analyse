@@ -1,6 +1,6 @@
 module Analyser.Messages.Util exposing (..)
 
-import Analyser.Messages.Range as Ranges exposing (Range, emptyRange, rangeToString)
+import Analyser.Messages.Range as Ranges exposing (Range, emptyRange, rangeToString, startLine)
 import Analyser.Messages.Types exposing (..)
 
 
@@ -466,9 +466,9 @@ getMessageInfo m =
 
         LineLengthExceeded fileName ranges ->
             ( String.concat
-                [ "Line length exceeded on "
-                , toString (List.length ranges)
-                , " line(s) in file \""
+                [ "Line length exceeded on line(s) "
+                , toString (List.map startLine ranges)
+                , " in file \""
                 , fileName
                 , "\"."
                 ]
