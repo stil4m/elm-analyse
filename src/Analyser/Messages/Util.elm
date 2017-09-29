@@ -503,7 +503,7 @@ getMessageInfo m =
 
         SingleFieldRecord fileName range ->
             ( String.concat
-                [ "Record has only one field, you can simply this. In file \""
+                [ "Record has only one field, you can simplify this. In file \""
                 , fileName
                 , "\" at "
                 , rangeToString range
