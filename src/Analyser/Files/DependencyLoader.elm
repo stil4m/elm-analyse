@@ -55,7 +55,7 @@ init ( name, version ) =
       }
     , Cmd.batch
         [ loadRawDependency ( name, version )
-        , Logger.info ("Load dependency " ++ name ++ version)
+        , Logger.info ("Load dependency " ++ name ++ " " ++ version)
         ]
     )
 
