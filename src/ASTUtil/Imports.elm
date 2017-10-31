@@ -32,7 +32,7 @@ buildImportInformation moduleName function file =
         |> Maybe.map
             (\i ->
                 { moduleName = Maybe.withDefault i.moduleName i.moduleAlias
-                , exposesRegex = Exposing.exposesFunction function i.exposingList
+                , exposesRegex = Maybe.map (Exposing.exposesFunction function) i.exposingList |> Maybe.withDefault False
                 }
             )
 
@@ -47,16 +47,16 @@ naiveStringifyImport imp =
         ]
 
 
-stringifyExposingList : Exposing TopLevelExpose -> String
+stringifyExposingList : Maybe (Exposing TopLevelExpose) -> String
 stringifyExposingList exp =
     case exp of
-        None ->
+        Nothing ->
             ""
 
-        All _ ->
+        Just (All _) ->
             " exposing (..)"
 
-        Explicit explicits ->
+        Just (Explicit explicits) ->
             " exposing "
                 ++ (case explicits of
                         [] ->
@@ -106,13 +106,13 @@ stringifyExposedType : ExposedType -> String
 stringifyExposedType { name, constructors } =
     name
         ++ (case constructors of
-                None ->
+                Nothing ->
                     ""
 
-                All _ ->
+                Just (All _) ->
                     "(..)"
 
-                Explicit explicits ->
+                Just (Explicit explicits) ->
                     case explicits of
                         [] ->
                             ""
@@ -134,28 +134,25 @@ stringifyExposedType { name, constructors } =
 
 removeRangeFromImport : Range -> Import -> Import
 removeRangeFromImport range imp =
-    { imp | exposingList = removeRangeFromExposingList range imp.exposingList }
+    { imp | exposingList = Maybe.andThen (removeRangeFromExposingList range) imp.exposingList }
 
 
-removeRangeFromExposingList : Range -> Exposing TopLevelExpose -> Exposing TopLevelExpose
+removeRangeFromExposingList : Range -> Exposing TopLevelExpose -> Maybe (Exposing TopLevelExpose)
 removeRangeFromExposingList range exp =
     case exp of
-        None ->
-            None
-
         All r ->
             if r == range then
-                None
+                Nothing
             else
-                All r
+                Just (All r)
 
         Explicit exposedTypes ->
             case List.filterMap (removeRangeFromExpose range) exposedTypes of
                 [] ->
-                    None
+                    Nothing
 
                 x ->
-                    Explicit x
+                    Just (Explicit x)
 
 
 removeRangeFromExpose : Range -> TopLevelExpose -> Maybe TopLevelExpose
@@ -182,25 +179,22 @@ removeRangeFromExpose range expose =
         TypeExpose exposedType ->
             Just <|
                 TypeExpose <|
-                    { exposedType | constructors = removeRangeFromConstructors range exposedType.constructors }
+                    { exposedType | constructors = Maybe.andThen (removeRangeFromConstructors range) exposedType.constructors }
 
 
-removeRangeFromConstructors : Range -> Exposing ValueConstructorExpose -> Exposing ValueConstructorExpose
+removeRangeFromConstructors : Range -> Exposing ValueConstructorExpose -> Maybe (Exposing ValueConstructorExpose)
 removeRangeFromConstructors range exp =
     case exp of
-        None ->
-            None
-
         All r ->
             if r == range then
-                None
+                Nothing
             else
-                All r
+                Just (All r)
 
         Explicit pairs ->
             case List.filter (Tuple.second >> (/=) range) pairs of
                 [] ->
-                    None
+                    Nothing
 
                 x ->
-                    Explicit x
+                    Just (Explicit x)

@@ -59,16 +59,16 @@ getImportVars imp =
     getImportExposedVars imp.exposingList
 
 
-getImportExposedVars : Exposing TopLevelExpose -> List ( VariablePointer, VariableType )
+getImportExposedVars : Maybe (Exposing TopLevelExpose) -> List ( VariablePointer, VariableType )
 getImportExposedVars e =
     case e of
-        All _ ->
+        Just (All _) ->
             []
 
-        None ->
+        Nothing ->
             []
 
-        Explicit l ->
+        Just (Explicit l) ->
             l
                 |> List.concatMap
                     (\exposed ->
@@ -84,13 +84,13 @@ getImportExposedVars e =
 
                             TypeExpose exposedType ->
                                 case exposedType.constructors of
-                                    All _ ->
+                                    Just (All _) ->
                                         []
 
-                                    None ->
+                                    Nothing ->
                                         [ ( VariablePointer exposedType.name exposedType.range, Imported ) ]
 
-                                    Explicit constructors ->
+                                    Just (Explicit constructors) ->
                                         constructors |> List.map (uncurry VariablePointer >> flip (,) Imported)
                     )
 

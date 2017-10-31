@@ -39,10 +39,7 @@ scan rangeContext fileContext _ =
 
 onFile : RangeContext -> (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
 onFile rangeContext _ file _ =
-    case AST.Util.fileExposingList file |> Maybe.withDefault None of
-        None ->
-            []
-
+    case AST.Util.fileExposingList file of
         All x ->
             [ Range.build rangeContext x ]
 
@@ -53,7 +50,7 @@ onFile rangeContext _ file _ =
                         case y of
                             TypeExpose exposedType ->
                                 case exposedType.constructors of
-                                    All allRange ->
+                                    Just (All allRange) ->
                                         Just (Range.build rangeContext allRange)
 
                                     _ ->

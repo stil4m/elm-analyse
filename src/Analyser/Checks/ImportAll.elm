@@ -37,20 +37,20 @@ onImport : RangeContext -> Import -> ExposeAllContext -> ExposeAllContext
 onImport rangeContext imp context =
     flip List.append context <|
         case imp.exposingList of
-            All range ->
+            Just (All range) ->
                 [ ( imp.moduleName, Range.build rangeContext range ) ]
 
-            None ->
+            Nothing ->
                 []
 
-            Explicit explicitList ->
+            Just (Explicit explicitList) ->
                 explicitList
                     |> List.filterMap
                         (\explicitItem ->
                             case explicitItem of
                                 TypeExpose exposedType ->
                                     case exposedType.constructors of
-                                        All range ->
+                                        Just (All range) ->
                                             Just ( imp.moduleName, Range.build rangeContext range )
 
                                         _ ->

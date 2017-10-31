@@ -26,7 +26,7 @@ foo =
 couldMerge2 : ( String, String, List MessageData )
 couldMerge2 =
     ( "couldMerge2"
-    , """
+    , """module Bar exposing (..)
 
 foo x =
   case x of

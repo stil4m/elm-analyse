@@ -4,7 +4,7 @@ import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.Exposing exposing (..)
 import Elm.Syntax.Expression exposing (Expression, InnerExpression(CaseExpression, IfBlock, LambdaExpression, LetExpression, OperatorApplication, ParenthesizedExpression))
 import Elm.Syntax.File exposing (File)
-import Elm.Syntax.Module exposing (Module(EffectModule, NoModule, NormalModule, PortModule))
+import Elm.Syntax.Module exposing (Module(EffectModule, NormalModule, PortModule))
 import Elm.Syntax.Pattern exposing (Pattern(..))
 import Elm.Syntax.Range exposing (Range)
 
@@ -21,9 +21,6 @@ moduleExposingList m =
         EffectModule x ->
             x.exposingList
 
-        NoModule ->
-            None
-
 
 isPortModule : File -> Bool
 isPortModule file =
@@ -35,36 +32,30 @@ isPortModule file =
             False
 
 
-fileExposingList : File -> Maybe (Exposing TopLevelExpose)
+fileExposingList : File -> Exposing TopLevelExpose
 fileExposingList file =
     case file.moduleDefinition of
         NormalModule x ->
-            Just x.exposingList
+            x.exposingList
 
         PortModule x ->
-            Just x.exposingList
+            x.exposingList
 
         EffectModule x ->
-            Just x.exposingList
-
-        NoModule ->
-            Nothing
+            x.exposingList
 
 
-fileModuleName : File -> Maybe ModuleName
+fileModuleName : File -> ModuleName
 fileModuleName file =
     case file.moduleDefinition of
         NormalModule x ->
-            Just x.moduleName
+            x.moduleName
 
         PortModule x ->
-            Just x.moduleName
+            x.moduleName
 
         EffectModule x ->
-            Just x.moduleName
-
-        NoModule ->
-            Nothing
+            x.moduleName
 
 
 isLambda : Expression -> Bool

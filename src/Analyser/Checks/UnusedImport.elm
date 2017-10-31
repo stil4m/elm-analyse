@@ -9,7 +9,6 @@ import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Analyser.Messages.Types exposing (Message, MessageData(UnusedImport), newMessage)
 import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (..)
-import Elm.Syntax.Exposing exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.TypeAnnotation exposing (..)
@@ -58,7 +57,7 @@ markUsage key context =
 
 onImport : RangeContext -> Import -> Context -> Context
 onImport rangeContext imp context =
-    if imp.moduleAlias == Nothing && imp.exposingList == None then
+    if imp.moduleAlias == Nothing && imp.exposingList == Nothing then
         Dict.insert imp.moduleName ( Range.build rangeContext imp.range, 0 ) context
     else
         context
