@@ -72,7 +72,7 @@ encode e =
 
 encodeDependency : ( ModuleName, ModuleName ) -> JE.Value
 encodeDependency ( x, y ) =
-    JE.list [ encodeModuleName x, encodeModuleName x ]
+    JE.list [ encodeModuleName x, encodeModuleName y ]
 
 
 decodeDependency : Decoder ( ModuleName, ModuleName )

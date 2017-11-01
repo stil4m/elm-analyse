@@ -31,7 +31,6 @@
         "evancz/elm-markdown": "3.0.2 <= v < 4.0.0",
         "evancz/url-parser": "2.0.1 <= v < 3.0.0",
         "gampleman/elm-visualization": "1.4.0 <= v < 2.0.0",
-"jamesmacaulay/elm-json-bidirectional": "1.1.0 <= v < 2.0.0",
         "krisajenkins/elm-dialog": "4.0.2 <= v < 5.0.0",
         "krisajenkins/remotedata": "4.3.0 <= v < 5.0.0",
         "rundis/elm-bootstrap": "3.0.0 <= v < 4.0.0",
