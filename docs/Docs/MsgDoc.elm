@@ -842,24 +842,24 @@ view maybeKey =
         maybeMessageDoc =
             Maybe.andThen forKey maybeKey
     in
-        Grid.container [ Html.style [ ( "padding-top", "20px" ), ( "margin-bottom", "60px" ) ] ]
-            [ Grid.row []
-                [ Grid.col []
-                    [ h1 [] [ text "Checks" ]
-                    , hr [] []
-                    ]
-                ]
-            , Grid.row []
-                [ Grid.col [ Col.md4, Col.sm5 ]
-                    [ messagesMenu maybeMessageDoc ]
-                , Grid.col [ Col.md8, Col.sm7 ]
-                    [ maybeMessageDoc
-                        |> Maybe.map viewDoc
-                        |> Maybe.withDefault
-                            (div [] [])
-                    ]
+    Grid.container [ Html.style [ ( "padding-top", "20px" ), ( "margin-bottom", "60px" ) ] ]
+        [ Grid.row []
+            [ Grid.col []
+                [ h1 [] [ text "Checks" ]
+                , hr [] []
                 ]
             ]
+        , Grid.row []
+            [ Grid.col [ Col.md4, Col.sm5 ]
+                [ messagesMenu maybeMessageDoc ]
+            , Grid.col [ Col.md8, Col.sm7 ]
+                [ maybeMessageDoc
+                    |> Maybe.map viewDoc
+                    |> Maybe.withDefault
+                        (div [] [])
+                ]
+            ]
+        ]
 
 
 viewDoc : MsgDoc -> Html msg
@@ -868,18 +868,18 @@ viewDoc d =
         mess =
             getMessage d
     in
-        div []
-            [ h1 []
-                [ text d.name
-                ]
-            , p []
-                [ small []
-                    [ code [] [ text d.key ] ]
-                ]
-            , p [] [ text d.shortDescription ]
-            , viewArguments d
-            , viewExample d mess
+    div []
+        [ h1 []
+            [ text d.name
             ]
+        , p []
+            [ small []
+                [ code [] [ text d.key ] ]
+            ]
+        , p [] [ text d.shortDescription ]
+        , viewArguments d
+        , viewExample d mess
+        ]
 
 
 viewExample : MsgDoc -> Message -> Html msg
@@ -910,12 +910,12 @@ getMessage d =
                     getMessages (String.trim d.input) checker
                         |> Maybe.andThen List.head
             in
-                case m of
-                    Just mess ->
-                        M.newMessage [ ( "abcdef01234567890", "./Foo.elm" ) ] mess
+            case m of
+                Just mess ->
+                    M.newMessage [ ( "abcdef01234567890", "./Foo.elm" ) ] mess
 
-                    Nothing ->
-                        SafeDebug.crash "Something is wrong"
+                Nothing ->
+                    SafeDebug.crash "Something is wrong"
 
 
 exampleMsgJson : Message -> Html msg
