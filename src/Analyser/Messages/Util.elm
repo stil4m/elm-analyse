@@ -18,10 +18,10 @@ blockForShas shas message =
         shouldBlock =
             List.any (flip List.member shas) (List.map Tuple.first message.files)
     in
-    if shouldBlock then
-        { message | status = Blocked }
-    else
-        message
+        if shouldBlock then
+            { message | status = Blocked }
+        else
+            message
 
 
 markFixing : Int -> Message -> Message
@@ -38,7 +38,7 @@ asString m =
         ( f, _, _ ) =
             getMessageInfo m
     in
-    f
+        f
 
 
 messageFile : Message -> String
@@ -75,12 +75,12 @@ compareMessage a b =
         bFile =
             messageFile b
     in
-    if aFile == bFile then
-        Ranges.compareRangeStarts
-            (getRanges a.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
-            (getRanges b.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
-    else
-        compare aFile bFile
+        if aFile == bFile then
+            Ranges.compareRangeStarts
+                (getRanges a.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
+                (getRanges b.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
+        else
+            compare aFile bFile
 
 
 getRanges : MessageData -> List Range
@@ -89,7 +89,7 @@ getRanges m =
         ( _, r, _ ) =
             getMessageInfo m
     in
-    r
+        r
 
 
 canFix : MessageData -> Bool
@@ -98,7 +98,7 @@ canFix m =
         ( _, _, result ) =
             getMessageInfo m
     in
-    result
+        result
 
 
 getMessageInfo : MessageData -> MessageInfo
@@ -461,7 +461,7 @@ getMessageInfo m =
 
         SingleFieldRecord fileName range ->
             ( String.concat
-                [ "Record has only one field, you can simplify this. In file \""
+                [ "Record has only one field. Use the field's type or introduce a Type. In file \""
                 , fileName
                 , "\" at "
                 , rangeToString range
