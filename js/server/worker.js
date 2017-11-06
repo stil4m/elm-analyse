@@ -6,8 +6,8 @@ module.exports = function worker(config) {
     var Elm = require("../backend-elm.js");
     var app = Elm.Analyser.worker(true);
 
-    app.ports.sendMessages.subscribe(function(x) {
-        console.log("Found " + x.length + " message(s)");
+    app.ports.sendReportValue.subscribe(function(report) {
+        console.log("Found " + report.messages.length + " message(s)");
     });
 
     loggingPorts(app, config, directory);

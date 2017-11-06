@@ -26,7 +26,7 @@ view l =
                 [ ul [ class "nav in" ]
                     [ menuItem l "#dashboard" "Dashboard" "dashboard"
                     , menuItem l "#tree" "Tree" "files-o"
-                    , menuItem l "#module-graph" "Module graph" "cubes"
+                    , menuItem l "#modules" "Modules" "cubes"
                     , menuItem l "#package-dependencies" "Package Dependencies" "crosshairs"
                     ]
                 ]

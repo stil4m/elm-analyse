@@ -86,32 +86,7 @@ editorIntegration =
 moduleGraph : Html msg
 moduleGraph =
     div []
-        [ h2 [] [ text "Module Graph" ]
-        , h3 [] [ text "Graph" ]
-        , div [ class "row" ]
-            [ div [ class "col" ]
-                [ p []
-                    [ text "The graph shows you all modules in your code base. Each dot represent one module. Mouseover a module to reveal its name or zoom in to view more labels."
-                    ]
-                , p []
-                    [ text "The color of each dot is determined by the module's namespace. The first component of each module's name determines the color: e.g. Module "
-                    , code [] [ text "A.1" ]
-                    , text " and "
-                    , code [] [ text "A.2" ]
-                    , text " will receive one color, B.1 another."
-                    ]
-                , p []
-                    [ text "The size of each module is determine by the number of in- and outbound connections (i.e. how often it is imported and how many module it imports)."
-                    ]
-                , p []
-                    [ text "You can click a module to highlight only the modules direcly related to it. Click a module's namespace in the legend to limit the graph (and table below) to include only modules of that namespace and their internal relation."
-                    ]
-                ]
-            , div [ class "col col-md-5 col-sm-6" ]
-                [ img [ class "img-fluid", src "https://raw.githubusercontent.com/stil4m/elm-analyse/master/images/module-graph.png" ] []
-                ]
-            ]
-        , h3 [] [ text "Top importees and importers" ]
+        [ h2 [] [ text "Modules" ]
         , p [] [ text "The list of top importees and importers shows you the modules in the analysed code base that import the most modules and that are imported the most." ]
         , p [] [ text "Reducing the centrality of individual modules can be beneficial for a few reasons:" ]
         , ul []

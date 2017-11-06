@@ -1,6 +1,6 @@
 {
   "name": "elm-analyse",
-  "version": "0.11.0",
+  "version": "0.12.0-dev",
   "description": "A tool that allows you analyse your Elm code and identifies deficiencies and best practices.",
   "repository": {
     "type": "git",
@@ -16,7 +16,8 @@
     "self-check": "node \"./js/bin/index.js\"",
     "test": "./node_modules/.bin/elm-test",
     "build": "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\"",
-    "pr-check": "npm install && npm run check-prettier && npm run elm-format && npm run test && npm run build && npm run self-check"
+    "pr-check": "npm install && npm run check-prettier && npm run elm-format && npm run test && npm run build && npm run self-check",
+    "server": "node \"./js/bin/index.js\" -s"
   },
   "author": "Mats Stijlaart",
   "license": "MIT",

@@ -45,7 +45,7 @@ show m _ =
     , Http.request
         { method = "GET"
         , headers = []
-        , url = "/file?file=" ++ (String.join "," <| List.map Http.encodeUri (Messages.getFiles m.data))
+        , url = "/file?file=" ++ (String.join "," <| List.map Http.encodeUri <| Messages.messageFiles m)
         , body = Http.emptyBody
         , expect = Http.expectString
         , timeout = Nothing

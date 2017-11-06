@@ -11,14 +11,27 @@ var args = minimist(process.argv.slice(2), {
         version: "v"
     },
     boolean: ["serve", "help", "version"],
-    string: ["port", "elm-format-path"]
+    string: ["port", "elm-format-path", "format"]
 });
 
 (function() {
+    const elmAnalyseVersion = require(path.join(
+        __dirname,
+        "../..",
+        "package.json"
+    )).version;
+    const info = {
+        version: elmAnalyseVersion
+    };
+
     const elmFormatPath = args["elm-format-path"] || "elm-format";
+
+    const validFormats = ["json", "human"];
+
     const config = {
         port: args.port || 3000,
-        elmFormatPath: elmFormatPath
+        elmFormatPath: elmFormatPath,
+        format: validFormats.indexOf(args.format) != -1 ? args.format : "human"
     };
 
     if (args.help) {
@@ -42,13 +55,14 @@ var args = minimist(process.argv.slice(2), {
         console.log(
             "   --elm-format-path   Path to elm-format. Defaults to `elm-format`."
         );
+        console.log(
+            "   --output            Output format for CLI. Defaults to 'human'. Options 'human'|'json'"
+        );
         process.exit(1);
     }
 
     if (args.version) {
-        console.log(
-            require(path.join(__dirname, "../..", "package.json")).version
-        );
+        console.log(elmAnalyseVersion);
         process.exit(0);
     }
 
@@ -73,9 +87,9 @@ var args = minimist(process.argv.slice(2), {
 
     if (args.serve) {
         var server = require("../server/app.js");
-        server(config);
+        server(config, info);
         return;
     }
     var analyser = require("../analyser.js");
-    analyser(config);
+    analyser(config, info);
 })();

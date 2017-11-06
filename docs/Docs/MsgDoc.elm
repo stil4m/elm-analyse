@@ -440,7 +440,7 @@ main =
 
 noUncurriedPrefix : MsgDoc
 noUncurriedPrefix =
-    { name = "No Uncurried Prefix"
+    { name = "Fully Applied Operator as Prefix"
     , shortDescription = "It's not needed to use an operator in prefix notation when you apply both arguments directly."
     , key = "NoUncurriedPrefix"
     , arguments =

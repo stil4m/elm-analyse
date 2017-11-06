@@ -1,11 +1,11 @@
 module Analyser.State exposing (..)
 
+-- import ModuleGraph exposing (ModuleGraph)
+
 import Analyser.Messages.Json exposing (decodeMessage, encodeMessage)
 import Analyser.Messages.Types as Messages exposing (Message, MessageId, MessageStatus(Applicable))
 import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing)
-import Graph exposing (Graph)
-import Graph.Json as Graph
-import Graph.Node exposing (Node)
+import Analyser.Modules exposing (Modules)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
 import Json.Encode as JE exposing (Value)
@@ -17,7 +17,7 @@ type alias State =
     , idCount : Int
     , status : Status
     , queue : List Task
-    , graph : Graph Node
+    , modules : Modules
     }
 
 
@@ -37,7 +37,7 @@ initialState =
     , idCount = 0
     , status = Initialising
     , queue = []
-    , graph = Graph.empty
+    , modules = Analyser.Modules.empty
     }
 
 
@@ -134,9 +134,9 @@ finishWithNewMessages messages s =
         |> sortMessages
 
 
-updateGraph : Graph Node -> State -> State
-updateGraph newGraph s =
-    { s | graph = newGraph }
+updateModules : Modules -> State -> State
+updateModules newModules s =
+    { s | modules = newModules }
 
 
 decodeState : Decoder State
@@ -146,7 +146,7 @@ decodeState =
         |: JD.field "idCount" JD.int
         |: JD.field "status" decodeStatus
         |: JD.field "queue" (JD.list JD.int)
-        |: JD.field "graph" Graph.decode
+        |: JD.field "modules" Analyser.Modules.decode
 
 
 encodeState : State -> Value
@@ -156,8 +156,13 @@ encodeState state =
         , ( "idCount", JE.int state.idCount )
         , ( "status", encodeStatus state.status )
         , ( "queue", JE.list (List.map JE.int state.queue) )
-        , ( "graph", Graph.encode state.graph )
+        , ( "modules", Analyser.Modules.encode state.modules )
         ]
+
+
+encodeLabel : List String -> Value
+encodeLabel =
+    List.map JE.string >> JE.list
 
 
 decodeStatus : Decoder Status

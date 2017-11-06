@@ -1,10 +1,10 @@
-module Analyser.Messages.Range exposing (Range, RangeContext, asSyntaxRange, build, compareRangeStarts, context, decode, emptyRange, encode, manual, orderByStart, rangeToString, toTuple)
+module Analyser.Messages.Range exposing (Range, RangeContext, asSyntaxRange, build, compareRangeStarts, context, decode, emptyRange, encode, manual, orderByStart, rangeToString, startLine, toTuple)
 
 import AST.Ranges as AstRanges
 import Dict exposing (Dict)
 import Elm.Syntax.Range as Syntax exposing (Location)
 import Json.Decode as JD exposing (Decoder)
-import Json.Encode as JE exposing (Value)
+import Json.Encode exposing (Value)
 
 
 type Range
@@ -26,18 +26,18 @@ toTuple (Range r _) =
 
 
 encode : Range -> Value
-encode (Range real parsed) =
-    JE.object
-        [ ( "real", Syntax.encode real )
-        , ( "parsed", Syntax.encode parsed )
-        ]
+encode (Range real _) =
+    Syntax.encode real
+
+
+startLine : Range -> Int
+startLine (Range real _) =
+    real.start.row
 
 
 decode : Decoder Range
 decode =
-    JD.map2 Range
-        (JD.field "real" Syntax.decode)
-        (JD.field "parsed" Syntax.decode)
+    Syntax.decode |> JD.map (\x -> Range x x)
 
 
 rangeToString : Range -> String

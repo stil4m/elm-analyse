@@ -36,18 +36,18 @@ packageDependenciesPage =
 
 
 type alias ModuleGraphPage =
-    StaticStatePage.Model Graph.Model Graph.Msg
+    StaticStatePage.Model Graph.Model ()
 
 
 type alias ModuleGraphPageMsg =
-    StaticStatePage.Msg Graph.Msg
+    StaticStatePage.Msg ()
 
 
 moduleGraphPage : ( ModuleGraphPage, Cmd ModuleGraphPageMsg )
 moduleGraphPage =
     StaticStatePage.init
         { view = Graph.view
-        , update = Graph.update
+        , update = \() model -> ( model, Cmd.none )
         , init = Graph.init
         }
 

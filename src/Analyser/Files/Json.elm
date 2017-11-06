@@ -60,23 +60,24 @@ encodeInterface =
 
 encodeExposedInterface : Exposed -> Value
 encodeExposedInterface x =
-    case x of
-        Function s ->
-            encodeTyped "function" (JE.string s)
+    JE.object <|
+        case x of
+            Function s ->
+                encodeTyped "function" (JE.string s)
 
-        Type ( name, constructors ) ->
-            encodeTyped "type_"
-                (JE.object
-                    [ ( "name", JE.string name )
-                    , ( "constructors", JE.list <| List.map JE.string constructors )
-                    ]
-                )
+            Type ( name, constructors ) ->
+                encodeTyped "type_"
+                    (JE.object
+                        [ ( "name", JE.string name )
+                        , ( "constructors", JE.list <| List.map JE.string constructors )
+                        ]
+                    )
 
-        Alias s ->
-            encodeTyped "alias" (JE.string s)
+            Alias s ->
+                encodeTyped "alias" (JE.string s)
 
-        Operator s ->
-            encodeTyped "operator" (Infix.encode s)
+            Operator s ->
+                encodeTyped "operator" (Infix.encode s)
 
 
 decodeInterface : Decoder Interface

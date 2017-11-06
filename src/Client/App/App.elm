@@ -4,7 +4,6 @@ import Client.App.Menu
 import Client.App.Models exposing (Content(DashBoardContent, FileTreeContent, GraphContent, PackageDependenciesContent), Model, ModuleGraphPageMsg, Msg(..), PackageDependenciesPageMsg, moduleGraphPage, packageDependenciesPage)
 import Client.Components.FileTree as FileTree
 import Client.DashBoard.DashBoard as DashBoard
-import Client.Graph.Graph as Graph
 import Client.Socket exposing (controlAddress)
 import Client.StaticStatePage as StaticStatePage
 import Html exposing (div)
@@ -45,7 +44,7 @@ onLocation l =
                 |> Tuple.mapFirst (\x -> { content = FileTreeContent x, location = l })
                 |> Tuple.mapSecond (Cmd.map FileTreeMsg)
 
-        "#module-graph" ->
+        "#modules" ->
             moduleGraphPage
                 |> Tuple.mapFirst (\x -> { content = GraphContent x, location = l })
                 |> Tuple.mapSecond (Cmd.map GraphMsg)
@@ -86,18 +85,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnLocation l ->
-            let
-                ( newModel, cmd ) =
-                    onLocation l
-
-                removeGraphCmd =
-                    if newModel.location.hash /= "#module-graph" then
-                        -- attempt to remove graph if we are not in graph view
-                        Graph.removeCmd
-                    else
-                        Cmd.none
-            in
-            newModel ! [ cmd, removeGraphCmd ]
+            onLocation l
 
         Refresh ->
             ( model

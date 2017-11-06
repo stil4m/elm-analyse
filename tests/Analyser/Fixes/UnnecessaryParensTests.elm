@@ -9,14 +9,14 @@ import Test exposing (Test, describe, test)
 fixInFile : ( String, String, String )
 fixInFile =
     ( "fixInFile"
-    , """module Foo
+    , """module Foo exposing (..)
 
 f =
     (1)
 
 g =
     2"""
-    , """module Foo
+    , """module Foo exposing (..)
 
 f =
      1
@@ -29,11 +29,11 @@ g =
 fixOnLastLineWithoutNewLine : ( String, String, String )
 fixOnLastLineWithoutNewLine =
     ( "fixOnLastLineWithoutNewLine"
-    , """module Foo
+    , """module Foo exposing (..)
 
 f =
   (1)"""
-    , """module Foo
+    , """module Foo exposing (..)
 
 f =
    1"""
@@ -43,12 +43,12 @@ f =
 fixOnLastLineWithNewLine : ( String, String, String )
 fixOnLastLineWithNewLine =
     ( "fixOnLastLineWithNewLine"
-    , """module Foo
+    , """module Foo exposing (..)
 
 f =
     (1)
 """
-    , """module Foo
+    , """module Foo exposing (..)
 
 f =
      1

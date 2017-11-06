@@ -90,13 +90,13 @@ mergeImportedValue l entry =
 constructorsAndValues : Import -> ( List ( String, Syntax.Range ), List ( String, Syntax.Range ) )
 constructorsAndValues imp =
     case imp.exposingList of
-        None ->
+        Nothing ->
             ( [], [] )
 
-        All _ ->
+        Just (All _) ->
             ( [], [] )
 
-        Explicit xs ->
+        Just (Explicit xs) ->
             ( List.concatMap exposingConstructors xs
             , List.map exposingValues xs
             )
@@ -123,7 +123,7 @@ exposingConstructors t =
     case t of
         TypeExpose s ->
             case s.constructors of
-                Explicit xs ->
+                Just (Explicit xs) ->
                     xs
 
                 _ ->

@@ -1,19 +1,14 @@
-port module AnalyserPorts exposing (onFixMessage, onReset, sendMessagesAsJson, sendMessagesAsStrings, sendStateAsJson)
+port module AnalyserPorts exposing (onFixMessage, onReset, sendReport, sendStateValue)
 
-import Analyser.Messages.Json as Messages
-import Analyser.Messages.Types exposing (Message)
-import Analyser.Messages.Util as Messages
+import Analyser.Report as Report exposing (Report)
 import Analyser.State exposing (State, encodeState)
-import Json.Encode as JE
+import Json.Encode exposing (Value)
 
 
-port messagesAsJson : List String -> Cmd msg
+port sendReportValue : Value -> Cmd msg
 
 
-port sendMessages : List String -> Cmd msg
-
-
-port sendState : String -> Cmd msg
+port sendState : Value -> Cmd msg
 
 
 port onReset : (Bool -> msg) -> Sub msg
@@ -22,16 +17,11 @@ port onReset : (Bool -> msg) -> Sub msg
 port onFixMessage : (Int -> msg) -> Sub msg
 
 
-sendStateAsJson : State -> Cmd msg
-sendStateAsJson =
-    sendState << JE.encode 0 << encodeState
+sendReport : Report -> Cmd msg
+sendReport =
+    sendReportValue << Report.encode
 
 
-sendMessagesAsJson : List Message -> Cmd msg
-sendMessagesAsJson =
-    List.map Messages.serialiseMessage >> messagesAsJson
-
-
-sendMessagesAsStrings : List Message -> Cmd msg
-sendMessagesAsStrings =
-    List.map (.data >> Messages.asString) >> sendMessages
+sendStateValue : State -> Cmd msg
+sendStateValue =
+    sendState << encodeState

@@ -7,16 +7,10 @@ module.exports = function(config) {
 
     var app = Elm.Analyser.worker(false);
 
-    app.ports.sendMessages.subscribe(function(x) {
-        if (x.length == 0) {
-            console.log("No messages. Everything seems ok!");
-        } else {
-            console.log("Messages:");
-            console.log("---------");
-            x.forEach(y => console.log(y));
-
-            process.exit(1);
-        }
+    app.ports.sendReportValue.subscribe(function(report) {
+        const reporter = require("./reporter");
+        reporter(config.format, report);
+        process.exit(report.messages.length > 0 ? 1 : 0);
     });
 
     loggingPorts(app, config, directory);

@@ -1,33 +1,38 @@
 module Client.Graph.Table exposing (view)
 
-import Client.Graph.Node as Node
 import Client.View.Panel as Panel
-import Dict exposing (Dict)
-import Graph exposing (Graph)
-import Graph.Degree as Degree exposing (Degree)
-import Graph.Node as Node exposing (Node)
+import Graph exposing (NodeContext)
 import Html exposing (Html)
 import Html.Attributes as Html
+import IntDict
+import ModuleGraph exposing (ModuleGraph)
 
 
 {-| Provides a list view showing the `count` top imported and importing modules.
 -}
-view : Int -> Graph Node -> Html msg
+view : Int -> ModuleGraph -> Html msg
 view count graph =
-    if List.isEmpty graph.nodes then
+    if Graph.isEmpty graph then
         Html.text ""
     else
         topListInAndOut count graph
 
 
-topListInAndOut : Int -> Graph Node -> Html msg
+topListInAndOut : Int -> ModuleGraph -> Html msg
 topListInAndOut count graph =
     let
-        topDegrees =
-            Degree.topDegrees graph
+        nodeContexts : List (NodeContext ModuleGraph.Node ModuleGraph.Node)
+        nodeContexts =
+            Graph.nodes graph
+                |> List.filterMap (\x -> Graph.get x.id graph)
 
-        nodesDict =
-            Node.dictFromList graph.nodes
+        topImportees : List (NodeContext ModuleGraph.Node ModuleGraph.Node)
+        topImportees =
+            List.sortBy (.outgoing >> IntDict.size >> (*) -1) nodeContexts
+
+        topImported : List (NodeContext ModuleGraph.Node ModuleGraph.Node)
+        topImported =
+            List.sortBy (.incoming >> IntDict.size >> (*) -1) nodeContexts
 
         documentationButton anchor =
             Panel.documentationButton ("ModuleGraph.md#" ++ anchor)
@@ -36,16 +41,16 @@ topListInAndOut count graph =
         [ Panel.view Panel.WidthHalf
             "Top importees"
             (documentationButton "top-importees")
-            (topList nodesDict (List.take count topDegrees.incoming))
+            (topList (List.take count topImportees))
         , Panel.view Panel.WidthHalf
             "Top importers"
             (documentationButton "top-importers")
-            (topList nodesDict (List.take count topDegrees.outgoing))
+            (topList (List.take count topImported))
         ]
 
 
-topList : Dict Node.Identifier Node -> List ( Node.Identifier, Degree.InOut Degree ) -> Html msg
-topList nodesDict list =
+topList : List (NodeContext ModuleGraph.Node ModuleGraph.Node) -> Html msg
+topList nodeContexts =
     Html.table [ Html.class "table" ]
         [ Html.thead []
             [ Html.tr []
@@ -56,22 +61,13 @@ topList nodesDict list =
             ]
         , Html.tbody []
             (List.map
-                (\( identifier, degrees ) ->
-                    let
-                        node =
-                            Dict.get identifier nodesDict
-
-                        nameString =
-                            Maybe.map .name node
-                                |> Maybe.map Node.nameToString
-                                |> Maybe.withDefault identifier
-                    in
+                (\nodeContext ->
                     Html.tr []
-                        [ Html.td [] [ Html.text nameString ]
-                        , Html.td [] [ Html.text (toString degrees.incoming) ]
-                        , Html.td [] [ Html.text (toString degrees.outgoing) ]
+                        [ Html.td [] [ Html.text nodeContext.node.label.text ]
+                        , Html.td [] [ Html.text (toString (IntDict.size nodeContext.incoming)) ]
+                        , Html.td [] [ Html.text (toString (IntDict.size nodeContext.outgoing)) ]
                         ]
                 )
-                list
+                nodeContexts
             )
         ]

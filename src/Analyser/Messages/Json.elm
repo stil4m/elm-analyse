@@ -2,6 +2,7 @@ module Analyser.Messages.Json exposing (decodeMessage, encodeMessage, serialiseM
 
 import Analyser.Messages.Range as Range exposing (Range)
 import Analyser.Messages.Types exposing (Message, MessageData(..), MessageStatus(..))
+import Analyser.Messages.Util
 import Elm.Syntax.Base as AST
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
@@ -53,7 +54,7 @@ decodeMessage =
         |: JD.field "id" JD.int
         |: JD.field "status" decodeMessageStatus
         |: JD.field "files" (JD.list decodeMessageFile)
-        |: JD.field "data" decodeMessageData
+        |: decodeMessageData
 
 
 decodeMessageStatus : Decoder MessageStatus
@@ -81,16 +82,19 @@ decodeMessageStatus =
 
 decodeMessageFile : Decoder ( String, String )
 decodeMessageFile =
-    JD.succeed (,)
-        |: JD.field "sha1" JD.string
-        |: JD.field "path" JD.string
+    JD.string |> JD.map ((,) "")
+
+
+
+-- JD.succeed (,)
+--     |: JD.field "sha1" JD.string
+--     |: JD.field "path" JD.string
 
 
 decodeMessageData : Decoder MessageData
 decodeMessageData =
     decodeTyped
-        [ ( "UnreadableSourceFile", JD.string |> JD.map UnreadableSourceFile )
-        , ( "UnusedVariable", decodeFileVarNameAndRange UnusedVariable )
+        [ ( "UnusedVariable", decodeFileVarNameAndRange UnusedVariable )
         , ( "UnusedTopLevel", decodeFileVarNameAndRange UnusedTopLevel )
         , ( "UnusedImportedVariable", decodeFileVarNameAndRange UnusedImportedVariable )
         , ( "UnusedPatternVariable", decodeFileVarNameAndRange UnusedPatternVariable )
@@ -158,22 +162,23 @@ serialiseMessage =
 
 encodeMessage : Message -> JE.Value
 encodeMessage m =
-    JE.object
+    JE.object <|
         [ ( "id", JE.int m.id )
         , ( "status", encodeMessageStatus m.status )
+        , ( "message", JE.string <| Analyser.Messages.Util.asString m.data )
         , ( "files"
           , JE.list <|
-                List.map
-                    (\( s, p ) ->
-                        JE.object
-                            [ ( "path", JE.string p )
-                            , ( "sha1", JE.string s )
-                            ]
-                    )
+                List.map (Tuple.second >> JE.string)
+                    -- (\( s, p ) ->
+                    -- JE.object
+                    -- [ ( "path",  )
+                    -- , ( "sha1", JE.string s )
+                    -- ]
+                    -- )
                     m.files
           )
-        , ( "data", encodeMessageData m.data )
         ]
+            ++ encodeMessageData m.data
 
 
 encodeMessageStatus : MessageStatus -> JE.Value
@@ -193,12 +198,9 @@ encodeMessageStatus m =
                 "fixing"
 
 
-encodeMessageData : MessageData -> JE.Value
+encodeMessageData : MessageData -> List ( String, JE.Value )
 encodeMessageData m =
     case m of
-        UnreadableSourceFile s ->
-            encodeTyped "UnreadableSourceFile" (JE.string s)
-
         UnusedVariable file varName range ->
             encodeTyped "UnusedVariable" <|
                 JE.object
@@ -431,8 +433,9 @@ encodeMessageData m =
                     ]
 
         DuplicateRecordFieldUpdate fileName fieldName ranges ->
-            JE.object
-                [ ( "file", JE.string fileName )
-                , ( "fieldName", JE.string fieldName )
-                , ( "ranges", JE.list <| List.map Range.encode ranges )
-                ]
+            encodeTyped "DuplicateRecordFieldUpdate" <|
+                JE.object
+                    [ ( "file", JE.string fileName )
+                    , ( "fieldName", JE.string fieldName )
+                    , ( "ranges", JE.list <| List.map Range.encode ranges )
+                    ]
