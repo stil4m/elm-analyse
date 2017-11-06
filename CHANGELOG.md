@@ -1,11 +1,24 @@
 # elm-analyse changelog
 
+## 0.12.0 (2017-11-06)
+
+Due to #102 there is a breaking change in the data format of the checks. Things such as editor integration or CI integration could break when upgrading to this version.
+
+* [Issue #102](https://github.com/stil4m/elm-analyse/issues/102) Make CLI output machine parsable
+* [Issue #103](https://github.com/stil4m/elm-analyse/issues/103) Add line numbers to 'LineLengthExceeded' check.
+* [Issue #104](https://github.com/stil4m/elm-analyse/issues/104) Link to docs for all supported checks.
+* [Issue #108](https://github.com/stil4m/elm-analyse/issues/108) Fix grammar errors in check description
+* [Issue #109](https://github.com/stil4m/elm-analyse/issues/109) Change wording for 'No Uncurried Prefix' check
+* [PR #110](https://github.com/stil4m/elm-analyse/issues/110) Fix grammar errors in check description. Thanks to [@Ruudieboy](https://github.com/Ruudieboy)
+* [PR #111](https://github.com/stil4m/elm-analyse/issues/111) Better readable human readable CLI output. Thanks to [@andys8](https://github.com/andys8)
+* [Issue #112](https://github.com/stil4m/elm-analyse/issues/112) Duplicate imports break module graph rendering
+
 ## 0.11.0 (2017-08-05)
 
 * [Issue #52](https://github.com/stil4m/elm-analyse/issues/52) Checks: Check comments for words that should not be there
 * [Issue #91](https://github.com/stil4m/elm-analyse/issues/91) Fixers: Auto-fix MultiLineRecordFormatting
 * [Issue #96](https://github.com/stil4m/elm-analyse/issues/96) Bug: (!!) recognised as a used function
-* [Issue #97](https://github.com/stil4m/elm-analyse/issues/97) Checks: Duplicate field updates in record update syntax 
+* [Issue #97](https://github.com/stil4m/elm-analyse/issues/97) Checks: Duplicate field updates in record update syntax
 * [Issue #98](https://github.com/stil4m/elm-analyse/issues/98) Apply elm-format 0.7.0
 * [Issue #99](https://github.com/stil4m/elm-analyse/issues/99) Bump elm-test to 4.X.X.
 
