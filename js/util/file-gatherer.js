@@ -10,6 +10,7 @@ function isRealElmPaths(sourceDir, filePath) {
 }
 
 function includedInFileSet(path) {
+    console.log("path included?", path);
     if (!path.match(/\.elm$/)) {
         return false;
     }
@@ -23,7 +24,8 @@ function targetFilesForPathAndPackage(directory, path, pack) {
     const targetFiles = _.uniq(
         _.flatten(
             packTargetDirs.map(x => {
-                const sourceDir = path + "/" + x;
+                const sourceDir = _path.normalize(path + "/" + x);
+                console.log(sourceDir);
                 const exists = fs.existsSync(sourceDir);
                 if (!exists) {
                     return [];
@@ -32,7 +34,12 @@ function targetFilesForPathAndPackage(directory, path, pack) {
                 const dirFiles = find
                     .fileSync(/\.elm$/, sourceDir)
                     .filter(x => {
-                        const relativePath = x.replace(path, "");
+                        const resolvedX = _path.resolve(x);
+                        const resolvedPath = _path.resolve(path);
+                        const relativePath = resolvedX.replace(
+                            resolvedPath,
+                            ""
+                        );
                         return includedInFileSet(relativePath) && x.length > 0;
                     });
                 return dirFiles.filter(x => isRealElmPaths(sourceDir, x));
@@ -52,7 +59,7 @@ function targetFilesForPathAndPackage(directory, path, pack) {
         }
 
         const result = dirParts.map(_ => "../").join() + sParts.join("/");
-        return result;
+        return _path.normalize(result);
     });
     return targetFiles;
 }
@@ -66,9 +73,11 @@ function dependencyFiles(directory, dep, version) {
         depPackageFile
     );
 
-    const exposedModules = depPackageFile["exposed-modules"].map(
-        x => "/" + x.replace(new RegExp("\\.", "g"), "/") + ".elm"
+    const exposedModules = depPackageFile["exposed-modules"].map(x =>
+        _path.normalize("/" + x.replace(new RegExp("\\.", "g"), "/") + ".elm")
     );
+    console.log(exposedModules);
+    console.log(unfilteredTargetFiles);
     return unfilteredTargetFiles.filter(function(x) {
         return exposedModules.filter(e => x.endsWith(e))[0];
     });

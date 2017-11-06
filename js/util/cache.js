@@ -1,51 +1,61 @@
 const fs = require("fs");
 const fsExtra = require("fs-extra");
 const osHomedir = require("os-homedir");
+const path = require("path");
+const cachePath = path.resolve("elm-stuff", ".elm-analyse");
+const packageJsonPath = path.resolve(__dirname, "..", "..", "package.json");
+const elmAnalyseVersion = require(packageJsonPath).version;
 
-const cachePath = "./elm-stuff/.elm-analyse";
-const elmAnalyseVersion = require("../../package.json").version;
 var major;
 if (elmAnalyseVersion.split(".")[0] === "0") {
     major = "0." + elmAnalyseVersion.split(".")[1];
 } else {
     major = elmAnalyseVersion.split(".")[0];
 }
-const globalCachePath = osHomedir() + "/.elm-analyse/" + major;
+const globalCachePath = path.resolve(osHomedir(), ".elm-analyse", major);
 
 function readDependencyJson(dependency, version, cb) {
     //TODO Error handling
+
     fs.readFile(
-        globalCachePath +
-            "/interfaces/" +
-            dependency +
-            "/" +
-            version +
-            "/dependency.json",
+        path.resolve(
+            globalCachePath,
+            "interfaces",
+            dependency,
+            version,
+            "dependency.json"
+        ),
         cb
     );
 }
 
 function storeShaJson(sha1, content) {
     fs.writeFile(
-        cachePath + "/_shas/" + sha1 + ".json",
+        path.resolve(cachePath, "_shas", sha1 + ".json"),
         content,
         function() {}
     );
 }
 
 function storeDependencyJson(dependency, version, content) {
-    const targetDir =
-        globalCachePath + "/interfaces/" + dependency + "/" + version;
+    const targetDir = path.resolve(
+        globalCachePath,
+        "interfaces",
+        dependency,
+        version
+    );
+    const targetPath = path.resolve(targetDir, "dependency.json");
+
     fsExtra.ensureDirSync(targetDir);
-    fs.writeFile(targetDir + "/dependency.json", content, function() {});
+    fs.writeFile(targetPath, content, function() {});
 }
 
 function elmCachePathForSha(sha) {
-    return cachePath + "/_shas/" + sha + ".elma";
+    return path.resolve(cachePath, "_shas", sha + ".elma");
 }
 
 function astCachePathForSha(sha) {
-    return cachePath + "/_shas/" + sha + ".json";
+    return path.resolve(cachePath, "_shas", sha + ".json");
 }
 
 function hasAstForSha(sha) {
@@ -57,7 +67,7 @@ function readAstForSha(sha) {
 }
 
 function setupShaFolder() {
-    fsExtra.ensureDirSync(cachePath + "/_shas");
+    fsExtra.ensureDirSync(path.resolve(cachePath, "_shas"));
 }
 
 module.exports = {
