@@ -1,5 +1,10 @@
 # elm-analyse changelog
 
+
+## 0.12.1 (2017-11-06)
+
+Fix help message (`elm-analyse --help`)
+
 ## 0.12.0 (2017-11-06)
 
 Due to #102 there is a breaking change in the data format of the checks. Things such as editor integration or CI integration could break when upgrading to this version.
