@@ -31,7 +31,7 @@ view =
                     , text " does this by looking at the code in your project determine the structure and parsing the files."
                     , text " "
                     , text "You can find out more on this in the "
-                    , a [ href (Page.hash Features) ] [ text "Features" ]
+                    , a [ href (Page.hash (Features Nothing)) ] [ text "Features" ]
                     , text " and "
                     , a [ href (Page.hash (Messages Nothing)) ] [ text "Checks" ]
                     , text " sections."

@@ -9,7 +9,7 @@ type Page
     = Home
     | Messages (Maybe String)
     | Changelog
-    | Features
+    | Features (Maybe String)
     | Configuration
     | NotFound
 
@@ -21,7 +21,8 @@ route =
         , Url.map (String.Extra.nonEmpty >> Messages) (Url.s "messages" </> Url.string)
         , Url.map (Messages Nothing) (Url.s "messages")
         , Url.map Changelog (Url.s "changelog")
-        , Url.map Features (Url.s "features")
+        , Url.map (Features << Just) (Url.s "features" </> Url.string)
+        , Url.map (Features Nothing) (Url.s "features")
         , Url.map Configuration (Url.s "configuration")
         ]
 
@@ -49,8 +50,13 @@ hash p =
         Changelog ->
             "#/changelog"
 
-        Features ->
-            "#/features"
+        Features sub ->
+            case sub of
+                Just s ->
+                    "#/features/" ++ s
+
+                Nothing ->
+                    "#/features"
 
         Configuration ->
             "#/configuration"

@@ -83,8 +83,10 @@ contentFromPage page =
             , Cmd.map ChangelogMsg cmds
             )
 
-        Features ->
-            ( FeaturesContent, Cmd.none )
+        Features _ ->
+            ( FeaturesContent
+            , Cmd.none
+            )
 
         Configuration ->
             ( ConfigurationContent, Cmd.none )

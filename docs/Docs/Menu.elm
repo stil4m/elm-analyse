@@ -14,7 +14,7 @@ menu m state =
         |> Navbar.brand [ href (Page.hash Home) ] [ text "Elm Analyse" ]
         |> Navbar.items
             [ Navbar.itemLink
-                [ href (Page.hash Features) ]
+                [ href (Page.hash (Features Nothing)) ]
                 [ text "Features" ]
             , Navbar.itemLink
                 [ href (Page.hash (Messages Nothing)) ]

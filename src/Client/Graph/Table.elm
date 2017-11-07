@@ -33,18 +33,15 @@ topListInAndOut count graph =
         topImported : List (NodeContext ModuleGraph.Node ModuleGraph.Node)
         topImported =
             List.sortBy (.incoming >> IntDict.size >> (*) -1) nodeContexts
-
-        documentationButton anchor =
-            Panel.documentationButton ("ModuleGraph.md#" ++ anchor)
     in
     Html.div []
         [ Panel.view Panel.WidthHalf
             "Top importees"
-            (documentationButton "top-importees")
+            (Panel.documentationButton "top-importees")
             (topList (List.take count topImportees))
         , Panel.view Panel.WidthHalf
             "Top importers"
-            (documentationButton "top-importers")
+            (Panel.documentationButton "top-importers")
             (topList (List.take count topImported))
         ]
 

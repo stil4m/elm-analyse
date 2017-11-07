@@ -43,7 +43,7 @@ toUrl route =
                     "dashboard"
 
                 Modules ->
-                    "moduels"
+                    "modules"
 
                 Messages ->
                     "messages"

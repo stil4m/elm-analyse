@@ -26,7 +26,7 @@ type HeaderButton
 
 documentationButton : String -> HeaderButton
 documentationButton path =
-    Documentation ("https://github.com/stil4m/elm-analyse/blob/master/docs/" ++ path)
+    Documentation ("https://stil4m.github.io/elm-analyse/#features/" ++ path)
 
 
 view : Width -> String -> HeaderButton -> Html msg -> Html msg
