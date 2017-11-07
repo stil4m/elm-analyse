@@ -27,8 +27,9 @@ view l =
                     [ menuItem l "#dashboard" "Dashboard" "dashboard"
                     , menuItem l "#messages" "All Messages" "list"
                     , menuItem l "#tree" "Tree" "files-o"
+                    , menuItem l "#dependencies" "Dependencies" "arrows"
                     , menuItem l "#modules" "Modules" "cubes"
-                    , menuItem l "#package-dependencies" "Package Dependencies" "crosshairs"
+                    , menuItem l "#package-dependencies" "Module Dependencies" "crosshairs"
                     ]
                 ]
             ]

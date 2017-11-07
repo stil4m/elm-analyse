@@ -1,9 +1,9 @@
 module Client.App.Models
     exposing
-        ( Content(DashboardContent, FileTreeContent, GraphContent, MessagesPageContent, PackageDependenciesContent)
+        ( Content(DashboardContent, DependenciesPageContent, FileTreeContent, GraphContent, MessagesPageContent, PackageDependenciesContent)
         , Model
         , ModuleGraphPageMsg
-        , Msg(DashboardMsg, FileTreeMsg, GraphMsg, MessagesPageMsg, OnLocation, PackageDependenciesMsg, Refresh)
+        , Msg(DashboardMsg, DependenciesPageMsg, FileTreeMsg, GraphMsg, MessagesPageMsg, OnLocation, PackageDependenciesMsg, Refresh)
         , PackageDependenciesPage
         , PackageDependenciesPageMsg
         , moduleGraphPage
@@ -12,6 +12,7 @@ module Client.App.Models
 
 import Client.Components.FileTree as FileTree
 import Client.Dashboard as Dashboard
+import Client.DependenciesPage as DependenciesPage
 import Client.Graph.Graph as Graph
 import Client.Graph.PackageDependencies as PackageDependencies
 import Client.MessagesPage as MessagesPage
@@ -56,6 +57,7 @@ moduleGraphPage =
 type Msg
     = MessagesPageMsg MessagesPage.Msg
     | DashboardMsg Dashboard.Msg
+    | DependenciesPageMsg DependenciesPage.Msg
     | GraphMsg ModuleGraphPageMsg
     | FileTreeMsg FileTree.Msg
     | PackageDependenciesMsg PackageDependenciesPageMsg
@@ -72,6 +74,7 @@ type alias Model =
 type Content
     = MessagesPageContent MessagesPage.Model
     | DashboardContent Dashboard.Model
+    | DependenciesPageContent DependenciesPage.Model
     | FileTreeContent FileTree.Model
     | GraphContent ModuleGraphPage
     | PackageDependenciesContent PackageDependenciesPage

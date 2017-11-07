@@ -1,9 +1,10 @@
 module Client.App.App exposing (init, subscriptions, update, view)
 
 import Client.App.Menu
-import Client.App.Models exposing (Content(DashboardContent, FileTreeContent, GraphContent, MessagesPageContent, PackageDependenciesContent), Model, ModuleGraphPageMsg, Msg(..), PackageDependenciesPageMsg, moduleGraphPage, packageDependenciesPage)
+import Client.App.Models exposing (Content(DashboardContent, DependenciesPageContent, FileTreeContent, GraphContent, MessagesPageContent, PackageDependenciesContent), Model, ModuleGraphPageMsg, Msg(..), PackageDependenciesPageMsg, moduleGraphPage, packageDependenciesPage)
 import Client.Components.FileTree as FileTree
 import Client.Dashboard as Dashboard
+import Client.DependenciesPage as DependenciesPage
 import Client.MessagesPage as MessagesPage
 import Client.Socket exposing (controlAddress)
 import Client.StaticStatePage as StaticStatePage
@@ -31,6 +32,9 @@ subscriptions model =
 
             DashboardContent sub ->
                 Dashboard.subscriptions model.location sub |> Sub.map DashboardMsg
+
+            DependenciesPageContent sub ->
+                DependenciesPage.subscriptions model.location sub |> Sub.map DependenciesPageMsg
         , WS.keepAlive (controlAddress model.location)
         ]
 
@@ -63,6 +67,11 @@ onLocation l =
                 |> Tuple.mapFirst (\x -> { content = MessagesPageContent x, location = l })
                 |> Tuple.mapSecond (Cmd.map MessagesPageMsg)
 
+        "#dependencies" ->
+            DependenciesPage.init l
+                |> Tuple.mapFirst (\x -> { content = DependenciesPageContent x, location = l })
+                |> Tuple.mapSecond (Cmd.map DependenciesPageMsg)
+
         _ ->
             Dashboard.init l
                 |> Tuple.mapFirst (\x -> { content = DashboardContent x, location = l })
@@ -89,6 +98,9 @@ view m =
 
                 DashboardContent subModel ->
                     Dashboard.view subModel |> Html.map DashboardMsg
+
+                DependenciesPageContent subModel ->
+                    DependenciesPage.view subModel |> Html.map DependenciesPageMsg
             ]
         ]
 
@@ -119,6 +131,21 @@ update msg model =
         DashboardMsg subMsg ->
             onDashboardMsg subMsg model
 
+        DependenciesPageMsg subMsg ->
+            onDependenciesPage subMsg model
+
+
+onDependenciesPage : DependenciesPage.Msg -> Model -> ( Model, Cmd Msg )
+onDependenciesPage subMsg model =
+    case model.content of
+        DependenciesPageContent subModel ->
+            DependenciesPage.update model.location subMsg subModel
+                |> Tuple.mapFirst (\x -> { model | content = DependenciesPageContent x })
+                |> Tuple.mapSecond (Cmd.map DependenciesPageMsg)
+
+        _ ->
+            ( model, Cmd.none )
+
 
 onPackageDependenciesMsg : PackageDependenciesPageMsg -> Model -> ( Model, Cmd Msg )
 onPackageDependenciesMsg subMsg model =
@@ -129,7 +156,7 @@ onPackageDependenciesMsg subMsg model =
                 |> Tuple.mapSecond (Cmd.map PackageDependenciesMsg)
 
         _ ->
-            model ! []
+            ( model, Cmd.none )
 
 
 onFileTreeMsg : FileTree.Msg -> Model -> ( Model, Cmd Msg )
@@ -141,7 +168,7 @@ onFileTreeMsg subMsg model =
                 |> Tuple.mapSecond (Cmd.map FileTreeMsg)
 
         _ ->
-            model ! []
+            ( model, Cmd.none )
 
 
 onDashboardMsg : Dashboard.Msg -> Model -> ( Model, Cmd Msg )
@@ -153,7 +180,7 @@ onDashboardMsg subMsg model =
                 |> Tuple.mapSecond (Cmd.map DashboardMsg)
 
         _ ->
-            model ! []
+            ( model, Cmd.none )
 
 
 onMessagesPageMsg : MessagesPage.Msg -> Model -> ( Model, Cmd Msg )
@@ -165,7 +192,7 @@ onMessagesPageMsg subMsg model =
                 |> Tuple.mapSecond (Cmd.map MessagesPageMsg)
 
         _ ->
-            model ! []
+            ( model, Cmd.none )
 
 
 onGraphMsg : ModuleGraphPageMsg -> Model -> ( Model, Cmd Msg )
@@ -177,4 +204,4 @@ onGraphMsg subMsg model =
                 |> Tuple.mapSecond (Cmd.map GraphMsg)
 
         _ ->
-            model ! []
+            ( model, Cmd.none )
