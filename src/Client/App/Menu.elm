@@ -1,6 +1,7 @@
 module Client.App.Menu exposing (view)
 
 import Client.App.Models exposing (Msg(Refresh))
+import Client.Routing as Routing
 import Html exposing (Html, a, button, div, form, i, li, nav, text, ul)
 import Html.Attributes exposing (attribute, class, href, style, type_)
 import Html.Events exposing (onClick)
@@ -24,29 +25,28 @@ view l =
         , div [ class "navbar-default sidebar", attribute "role" "navigation" ]
             [ div [ class "sidebar-nav" ]
                 [ ul [ class "nav in" ]
-                    [ menuItem l "#dashboard" "Dashboard" "dashboard"
-                    , menuItem l "#messages" "All Messages" "list"
-                    , menuItem l "#tree" "Tree" "files-o"
-                    , menuItem l "#dependencies" "Dependencies" "arrows"
-                    , menuItem l "#modules" "Modules" "cubes"
-                    , menuItem l "#package-dependencies" "Module Dependencies" "crosshairs"
+                    [ menuItem l Routing.Dashboard "Dashboard" "dashboard"
+                    , menuItem l Routing.Messages "All Messages" "list"
+                    , menuItem l Routing.FileTree "Tree" "files-o"
+                    , menuItem l Routing.Dependencies "Dependencies" "arrows"
+                    , menuItem l Routing.Modules "Modules" "cubes"
                     ]
                 ]
             ]
         ]
 
 
-isActiveClass : Location -> String -> String
-isActiveClass l s =
-    if s == l.hash || (l.hash == "" && s == "#dashboard") then
+isActiveClass : Location -> Routing.Route -> String
+isActiveClass l r =
+    if Routing.fromLocation l == r then
         "active"
     else
         ""
 
 
-menuItem : Location -> String -> String -> String -> Html msg
-menuItem location path name icon =
-    li [ class (isActiveClass location path) ]
-        [ a [ href path ]
+menuItem : Location -> Routing.Route -> String -> String -> Html msg
+menuItem location route name icon =
+    li [ class (isActiveClass location route) ]
+        [ a [ href (Routing.toUrl route) ]
             [ i [ class ("fa fa-" ++ icon ++ " fa-fw") ] [], text " ", text name ]
         ]

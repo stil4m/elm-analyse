@@ -1,6 +1,6 @@
 module Client.App.Models
     exposing
-        ( Content(DashboardContent, DependenciesPageContent, FileTreeContent, GraphContent, MessagesPageContent, PackageDependenciesContent)
+        ( Content(DashboardContent, DependenciesPageContent, FileTreeContent, GraphContent, MessagesPageContent, NotFound, PackageDependenciesContent)
         , Model
         , ModuleGraphPageMsg
         , Msg(DashboardMsg, DependenciesPageMsg, FileTreeMsg, GraphMsg, MessagesPageMsg, OnLocation, PackageDependenciesMsg, Refresh)
@@ -78,3 +78,4 @@ type Content
     | FileTreeContent FileTree.Model
     | GraphContent ModuleGraphPage
     | PackageDependenciesContent PackageDependenciesPage
+    | NotFound

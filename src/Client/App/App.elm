@@ -1,11 +1,12 @@
 module Client.App.App exposing (init, subscriptions, update, view)
 
 import Client.App.Menu
-import Client.App.Models exposing (Content(DashboardContent, DependenciesPageContent, FileTreeContent, GraphContent, MessagesPageContent, PackageDependenciesContent), Model, ModuleGraphPageMsg, Msg(..), PackageDependenciesPageMsg, moduleGraphPage, packageDependenciesPage)
+import Client.App.Models exposing (Content(DashboardContent, DependenciesPageContent, FileTreeContent, GraphContent, MessagesPageContent, NotFound, PackageDependenciesContent), Model, ModuleGraphPageMsg, Msg(..), PackageDependenciesPageMsg, moduleGraphPage, packageDependenciesPage)
 import Client.Components.FileTree as FileTree
 import Client.Dashboard as Dashboard
 import Client.DependenciesPage as DependenciesPage
 import Client.MessagesPage as MessagesPage
+import Client.Routing as Routing
 import Client.Socket exposing (controlAddress)
 import Client.StaticStatePage as StaticStatePage
 import Html exposing (div)
@@ -35,6 +36,9 @@ subscriptions model =
 
             DependenciesPageContent sub ->
                 DependenciesPage.subscriptions model.location sub |> Sub.map DependenciesPageMsg
+
+            Client.App.Models.NotFound ->
+                Sub.none
         , WS.keepAlive (controlAddress model.location)
         ]
 
@@ -46,36 +50,43 @@ init =
 
 onLocation : Location -> ( Model, Cmd Msg )
 onLocation l =
-    case l.hash of
-        "#tree" ->
+    let
+        route =
+            Routing.fromLocation l
+    in
+    case route of
+        Routing.FileTree ->
             FileTree.init l
                 |> Tuple.mapFirst (\x -> { content = FileTreeContent x, location = l })
                 |> Tuple.mapSecond (Cmd.map FileTreeMsg)
 
-        "#modules" ->
+        Routing.Modules ->
             moduleGraphPage
                 |> Tuple.mapFirst (\x -> { content = GraphContent x, location = l })
                 |> Tuple.mapSecond (Cmd.map GraphMsg)
 
-        "#package-dependencies" ->
+        Routing.PackageDependencies ->
             packageDependenciesPage
                 |> Tuple.mapFirst (\x -> { content = PackageDependenciesContent x, location = l })
                 |> Tuple.mapSecond (Cmd.map PackageDependenciesMsg)
 
-        "#messages" ->
+        Routing.Messages ->
             MessagesPage.init l
                 |> Tuple.mapFirst (\x -> { content = MessagesPageContent x, location = l })
                 |> Tuple.mapSecond (Cmd.map MessagesPageMsg)
 
-        "#dependencies" ->
+        Routing.Dependencies ->
             DependenciesPage.init l
                 |> Tuple.mapFirst (\x -> { content = DependenciesPageContent x, location = l })
                 |> Tuple.mapSecond (Cmd.map DependenciesPageMsg)
 
-        _ ->
+        Routing.Dashboard ->
             Dashboard.init l
                 |> Tuple.mapFirst (\x -> { content = DashboardContent x, location = l })
                 |> Tuple.mapSecond (Cmd.map DashboardMsg)
+
+        Routing.NotFound ->
+            ( { content = NotFound, location = l }, Cmd.none )
 
 
 view : Model -> Html.Html Msg
@@ -101,6 +112,9 @@ view m =
 
                 DependenciesPageContent subModel ->
                     DependenciesPage.view subModel |> Html.map DependenciesPageMsg
+
+                NotFound ->
+                    Html.h3 [] [ Html.text "Not Found" ]
             ]
         ]
 
