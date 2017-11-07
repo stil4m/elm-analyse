@@ -1,4 +1,4 @@
-module Client.DashBoard.DashBoard exposing (Model, Msg, init, subscriptions, update, view)
+module Client.MessagesPage exposing (Model, Msg, init, subscriptions, update, view)
 
 import Analyser.State as State exposing (State)
 import Client.Components.MessageList as MessageList

@@ -10,7 +10,6 @@ function isRealElmPaths(sourceDir, filePath) {
 }
 
 function includedInFileSet(path) {
-    console.log("path included?", path);
     if (!path.match(/\.elm$/)) {
         return false;
     }
@@ -25,7 +24,6 @@ function targetFilesForPathAndPackage(directory, path, pack) {
         _.flatten(
             packTargetDirs.map(x => {
                 const sourceDir = _path.normalize(path + "/" + x);
-                console.log(sourceDir);
                 const exists = fs.existsSync(sourceDir);
                 if (!exists) {
                     return [];
@@ -76,8 +74,6 @@ function dependencyFiles(directory, dep, version) {
     const exposedModules = depPackageFile["exposed-modules"].map(x =>
         _path.normalize("/" + x.replace(new RegExp("\\.", "g"), "/") + ".elm")
     );
-    console.log(exposedModules);
-    console.log(unfilteredTargetFiles);
     return unfilteredTargetFiles.filter(function(x) {
         return exposedModules.filter(e => x.endsWith(e))[0];
     });

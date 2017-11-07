@@ -13,7 +13,7 @@ type Category
 
 view : Category -> String -> String -> a -> Html msg
 view category title icon value =
-    Html.div [ Html.class "col-lg-3 col-md-6" ]
+    Html.div [ Html.class "col-lg-6 col-md-6" ]
         [ Html.div [ Html.class ("panel panel-" ++ colorForCategory category) ]
             [ Html.div [ Html.class "panel-heading" ]
                 [ Html.div [ Html.class "row" ]

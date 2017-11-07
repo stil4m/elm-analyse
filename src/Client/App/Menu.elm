@@ -18,13 +18,14 @@ view l =
                 [ class "navbar-form navbar-right" ]
                 [ button
                     [ type_ "button", class "btn btn-default", onClick Refresh ]
-                    [ text "Refresh" ]
+                    [ text "Re-analyse" ]
                 ]
             ]
         , div [ class "navbar-default sidebar", attribute "role" "navigation" ]
             [ div [ class "sidebar-nav" ]
                 [ ul [ class "nav in" ]
                     [ menuItem l "#dashboard" "Dashboard" "dashboard"
+                    , menuItem l "#messages" "All Messages" "list"
                     , menuItem l "#tree" "Tree" "files-o"
                     , menuItem l "#modules" "Modules" "cubes"
                     , menuItem l "#package-dependencies" "Package Dependencies" "crosshairs"

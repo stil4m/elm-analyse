@@ -1,9 +1,10 @@
 module Client.App.App exposing (init, subscriptions, update, view)
 
 import Client.App.Menu
-import Client.App.Models exposing (Content(DashBoardContent, FileTreeContent, GraphContent, PackageDependenciesContent), Model, ModuleGraphPageMsg, Msg(..), PackageDependenciesPageMsg, moduleGraphPage, packageDependenciesPage)
+import Client.App.Models exposing (Content(DashboardContent, FileTreeContent, GraphContent, MessagesPageContent, PackageDependenciesContent), Model, ModuleGraphPageMsg, Msg(..), PackageDependenciesPageMsg, moduleGraphPage, packageDependenciesPage)
 import Client.Components.FileTree as FileTree
-import Client.DashBoard.DashBoard as DashBoard
+import Client.Dashboard as Dashboard
+import Client.MessagesPage as MessagesPage
 import Client.Socket exposing (controlAddress)
 import Client.StaticStatePage as StaticStatePage
 import Html exposing (div)
@@ -16,8 +17,8 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ case model.content of
-            DashBoardContent sub ->
-                DashBoard.subscriptions model.location sub |> Sub.map DashBoardMsg
+            MessagesPageContent sub ->
+                MessagesPage.subscriptions model.location sub |> Sub.map MessagesPageMsg
 
             GraphContent _ ->
                 Sub.none
@@ -27,6 +28,9 @@ subscriptions model =
 
             PackageDependenciesContent _ ->
                 Sub.none
+
+            DashboardContent sub ->
+                Dashboard.subscriptions model.location sub |> Sub.map DashboardMsg
         , WS.keepAlive (controlAddress model.location)
         ]
 
@@ -54,10 +58,15 @@ onLocation l =
                 |> Tuple.mapFirst (\x -> { content = PackageDependenciesContent x, location = l })
                 |> Tuple.mapSecond (Cmd.map PackageDependenciesMsg)
 
+        "#messages" ->
+            MessagesPage.init l
+                |> Tuple.mapFirst (\x -> { content = MessagesPageContent x, location = l })
+                |> Tuple.mapSecond (Cmd.map MessagesPageMsg)
+
         _ ->
-            DashBoard.init l
-                |> Tuple.mapFirst (\x -> { content = DashBoardContent x, location = l })
-                |> Tuple.mapSecond (Cmd.map DashBoardMsg)
+            Dashboard.init l
+                |> Tuple.mapFirst (\x -> { content = DashboardContent x, location = l })
+                |> Tuple.mapSecond (Cmd.map DashboardMsg)
 
 
 view : Model -> Html.Html Msg
@@ -66,8 +75,8 @@ view m =
         [ Client.App.Menu.view m.location
         , div [ id "page-wrapper" ]
             [ case m.content of
-                DashBoardContent subModel ->
-                    DashBoard.view subModel |> Html.map DashBoardMsg
+                MessagesPageContent subModel ->
+                    MessagesPage.view subModel |> Html.map MessagesPageMsg
 
                 GraphContent subModel ->
                     StaticStatePage.view subModel |> Html.map GraphMsg
@@ -77,6 +86,9 @@ view m =
 
                 PackageDependenciesContent subModel ->
                     StaticStatePage.view subModel |> Html.map PackageDependenciesMsg
+
+                DashboardContent subModel ->
+                    Dashboard.view subModel |> Html.map DashboardMsg
             ]
         ]
 
@@ -92,8 +104,8 @@ update msg model =
             , WS.send (controlAddress model.location) "reload"
             )
 
-        DashBoardMsg subMsg ->
-            onDashBoardMsg subMsg model
+        MessagesPageMsg subMsg ->
+            onMessagesPageMsg subMsg model
 
         GraphMsg subMsg ->
             onGraphMsg subMsg model
@@ -103,6 +115,9 @@ update msg model =
 
         PackageDependenciesMsg subMsg ->
             onPackageDependenciesMsg subMsg model
+
+        DashboardMsg subMsg ->
+            onDashboardMsg subMsg model
 
 
 onPackageDependenciesMsg : PackageDependenciesPageMsg -> Model -> ( Model, Cmd Msg )
@@ -129,13 +144,25 @@ onFileTreeMsg subMsg model =
             model ! []
 
 
-onDashBoardMsg : DashBoard.Msg -> Model -> ( Model, Cmd Msg )
-onDashBoardMsg subMsg model =
+onDashboardMsg : Dashboard.Msg -> Model -> ( Model, Cmd Msg )
+onDashboardMsg subMsg model =
     case model.content of
-        DashBoardContent subModel ->
-            DashBoard.update model.location subMsg subModel
-                |> Tuple.mapFirst (\x -> { model | content = DashBoardContent x })
-                |> Tuple.mapSecond (Cmd.map DashBoardMsg)
+        DashboardContent subModel ->
+            Dashboard.update model.location subMsg subModel
+                |> Tuple.mapFirst (\x -> { model | content = DashboardContent x })
+                |> Tuple.mapSecond (Cmd.map DashboardMsg)
+
+        _ ->
+            model ! []
+
+
+onMessagesPageMsg : MessagesPage.Msg -> Model -> ( Model, Cmd Msg )
+onMessagesPageMsg subMsg model =
+    case model.content of
+        MessagesPageContent subModel ->
+            MessagesPage.update model.location subMsg subModel
+                |> Tuple.mapFirst (\x -> { model | content = MessagesPageContent x })
+                |> Tuple.mapSecond (Cmd.map MessagesPageMsg)
 
         _ ->
             model ! []
