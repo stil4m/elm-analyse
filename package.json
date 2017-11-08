@@ -48,7 +48,7 @@
     "gulp": "3.9.1",
     "gulp-elm": "0.6.1",
     "gulp-replace": "0.5.4",
-    "prettier": "1.4.4",
+    "prettier": "1.7.0",
     "run-sequence": "1.2.2"
   }
 }
