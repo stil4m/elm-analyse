@@ -1,27 +1,27 @@
-const fs = require("fs");
-const fileGatherer = require("../util/file-gatherer");
+const fs = require('fs');
+const fileGatherer = require('../util/file-gatherer');
 
-const cp = require("child_process");
-const cache = require("./cache");
+const cp = require('child_process');
+const cache = require('./cache');
 
 module.exports = function(app, config, directory) {
-    const fileReader = require("../fileReader")(config);
+    const fileReader = require('../fileReader')(config);
 
     function checkedSubscribe(key, f) {
         if (app.ports[key]) {
             app.ports[key].subscribe(f);
         } else {
-            console.log("WARN: Port ", key, " is not defined");
+            console.log('WARN: Port ', key, ' is not defined');
         }
     }
 
-    checkedSubscribe("loadContext", function(_x) {
+    checkedSubscribe('loadContext', function(_x) {
         const input = fileGatherer.gather(directory);
         var configuration;
         try {
-            configuration = fs.readFileSync("./elm-analyse.json").toString();
+            configuration = fs.readFileSync('./elm-analyse.json').toString();
         } catch (e) {
-            configuration = "";
+            configuration = '';
         }
         const data = {
             sourceFiles: input.sourceFiles,
@@ -34,25 +34,25 @@ module.exports = function(app, config, directory) {
         }, 5);
     });
 
-    checkedSubscribe("storeAstForSha", function(x) {
+    checkedSubscribe('storeAstForSha', function(x) {
         const sha1 = x[0];
         const content = x[1];
         cache.storeShaJson(sha1, content);
     });
 
-    checkedSubscribe("loadFile", function(x) {
+    checkedSubscribe('loadFile', function(x) {
         fileReader(directory, x, function(result) {
             app.ports.fileContent.send(result);
         });
     });
 
-    checkedSubscribe("loadRawDependency", function(x) {
+    checkedSubscribe('loadRawDependency', function(x) {
         var dependency = x[0];
         var version = x[1];
         cache.readDependencyJson(dependency, version, function(err, content) {
             if (err) {
                 //TODO
-                app.ports.onRawDependency.send([dependency, version, "" + x]);
+                app.ports.onRawDependency.send([dependency, version, '' + x]);
             } else {
                 app.ports.onRawDependency.send([
                     dependency,
@@ -63,11 +63,11 @@ module.exports = function(app, config, directory) {
         });
     });
 
-    checkedSubscribe("storeRawDependency", function(x) {
+    checkedSubscribe('storeRawDependency', function(x) {
         cache.storeDependencyJson(x[0], x[1], x[2]);
     });
 
-    checkedSubscribe("loadDependencyFiles", function(dep) {
+    checkedSubscribe('loadDependencyFiles', function(dep) {
         var depName = dep[0];
         var version = dep[1];
         var result = fileGatherer.getDependencyFiles(
@@ -88,7 +88,7 @@ module.exports = function(app, config, directory) {
             },
             function(e) {
                 console.log(
-                    "Error when loading files for loadDependencyFiles:",
+                    'Error when loading files for loadDependencyFiles:',
                     dep
                 );
                 console.log(e);
@@ -96,7 +96,7 @@ module.exports = function(app, config, directory) {
         );
     });
 
-    checkedSubscribe("loadFileContentWithShas", function(files) {
+    checkedSubscribe('loadFileContentWithShas', function(files) {
         const promises = files.map(
             fileName =>
                 new Promise(function(accept) {
@@ -111,29 +111,29 @@ module.exports = function(app, config, directory) {
             },
             function(e) {
                 console.log(
-                    "Error when loading files for loadFileContentWithShas:"
+                    'Error when loading files for loadFileContentWithShas:'
                 );
                 console.log(e);
             }
         );
     });
 
-    checkedSubscribe("storeFiles", function(files) {
+    checkedSubscribe('storeFiles', function(files) {
         var promises = files.map(file => {
             return new Promise(function(accept) {
                 fs.writeFile(file[0], file[1], function(_err) {
-                    console.log("Written file", file[0], "...");
+                    console.log('Written file', file[0], '...');
                     try {
                         cp.execSync(
-                            config.elmFormatPath + " --yes " + file[0],
+                            config.elmFormatPath + ' --yes ' + file[0],
                             {
                                 stdio: []
                             }
                         );
-                        console.log("Formatted file", file[0]);
+                        console.log('Formatted file', file[0]);
                         accept();
                     } catch (e) {
-                        console.log("Could not formatted file", file[0]);
+                        console.log('Could not formatted file', file[0]);
                         accept();
                     }
                 });
