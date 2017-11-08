@@ -1,0 +1,10 @@
+[**.js]
+indent_style = space
+indent_size = 4
+quote_type = single
+
+[**.json]
+indent_size = 2
+
+[elm-package.json]
+indent_size = 4

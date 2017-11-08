@@ -15,7 +15,7 @@ module.exports = function(app, config, directory) {
         }
     }
 
-    checkedSubscribe('loadContext', function(_x) {
+    checkedSubscribe('loadContext', function() {
         const input = fileGatherer.gather(directory);
         var configuration;
         try {
@@ -121,7 +121,7 @@ module.exports = function(app, config, directory) {
     checkedSubscribe('storeFiles', function(files) {
         var promises = files.map(file => {
             return new Promise(function(accept) {
-                fs.writeFile(file[0], file[1], function(_err) {
+                fs.writeFile(file[0], file[1], function() {
                     console.log('Written file', file[0], '...');
                     try {
                         cp.execSync(

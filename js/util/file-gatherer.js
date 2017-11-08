@@ -56,7 +56,7 @@ function targetFilesForPathAndPackage(directory, path, pack) {
             }
         }
 
-        const result = dirParts.map(_ => '../').join() + sParts.join('/');
+        const result = dirParts.map(() => '../').join() + sParts.join('/');
         return _path.normalize(result);
     });
     return targetFiles;

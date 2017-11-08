@@ -56,7 +56,7 @@ var args = minimist(process.argv.slice(2), {
             '   --elm-format-path   Path to elm-format. Defaults to `elm-format`.'
         );
         console.log(
-            "   --format            Output format for CLI. Defaults to 'human'. Options 'human'|'json'"
+            '   --format            Output format for CLI. Defaults to "human". Options "human"|"json"'
         );
         process.exit(1);
     }
