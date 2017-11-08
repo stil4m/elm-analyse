@@ -1,6 +1,6 @@
 module Client.Components.MessageList exposing (..)
 
-import Analyser.Messages.Types exposing (Message)
+import Analyser.Messages.Types exposing (GroupedMessages, Message)
 import Client.Components.ActiveMessageDialog as ActiveMessageDialog
 import Client.Messages as M
 import Html exposing (Html, div, text)
@@ -9,7 +9,7 @@ import Navigation exposing (Location)
 
 
 type alias Model =
-    { messages : List Message
+    { messages : GroupedMessages
     , active : ActiveMessageDialog.Model
     }
 
@@ -19,12 +19,12 @@ type Msg
     | ActiveMessageDialogMsg ActiveMessageDialog.Msg
 
 
-init : List Message -> Model
+init : GroupedMessages -> Model
 init m =
     Model m ActiveMessageDialog.init
 
 
-withMessages : List Message -> Model -> Model
+withMessages : GroupedMessages -> Model -> Model
 withMessages x m =
     { m | messages = x }
 
@@ -46,7 +46,7 @@ update location msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ if List.isEmpty model.messages then
+        [ if Dict.isEmpty model.messages then
             div [ class "alert alert-success" ] [ text "No messages" ]
           else
             M.viewAll Focus model.messages

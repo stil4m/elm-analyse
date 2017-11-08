@@ -1,6 +1,6 @@
 module Client.Components.FileTree exposing (Model, Msg, init, subscriptions, update, view)
 
-import Analyser.Messages.Types exposing (Message)
+import Analyser.Messages.Types exposing (GroupedMessages, Message, groupByType)
 import Analyser.State as State exposing (State)
 import Client.Components.MessageList as MessageList
 import Client.Socket exposing (dashboardAddress)
@@ -44,7 +44,7 @@ init location =
       , state = Nothing
       , fileIndex = Nothing
       , selectedFile = Nothing
-      , messageList = MessageList.init []
+      , messageList = MessageList.init Dict.empty
       }
     , Cmd.batch
         [ Http.get "/tree" (list string) |> Http.send OnFileTree
@@ -123,7 +123,7 @@ update location msg model =
                 |> Tuple.mapSecond (Cmd.map MessageListMsg)
 
 
-messagesForSelectedFile : Model -> List Message
+messagesForSelectedFile : Model -> GroupedMessages
 messagesForSelectedFile m =
     case m.fileIndex of
         Just fileIndex ->
@@ -132,9 +132,10 @@ messagesForSelectedFile m =
                 |> List.head
                 |> Maybe.map Tuple.second
                 |> Maybe.withDefault []
+                |> groupByType
 
         _ ->
-            []
+            Dict.empty
 
 
 view : Model -> Html Msg
