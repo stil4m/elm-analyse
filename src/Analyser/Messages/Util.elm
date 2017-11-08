@@ -470,7 +470,7 @@ getMessageInfo m =
             , False
             )
 
-        Analyser.Messages.Types.DuplicateRecordFieldUpdate fileName fieldName ranges ->
+        DuplicateRecordFieldUpdate fileName fieldName ranges ->
             ( String.concat
                 [ "The '"
                 , fieldName

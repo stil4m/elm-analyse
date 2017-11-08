@@ -1,13 +1,14 @@
 module Client.Messages exposing (viewAll)
 
-import Analyser.Messages.Types exposing (Message, MessageStatus(Fixing, Outdated))
+import Analyser.Messages.Types exposing (GroupedMessages, Message, MessageStatus(Fixing, Outdated))
 import Analyser.Messages.Util as Messages
-import Html exposing (Html, a, div, li, span, strong, text, ul)
+import Dict
+import Html exposing (Html, a, div, h5, li, span, strong, text, ul)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 
 
-viewAll : (Message -> a) -> List Message -> Html a
+viewAll : (Message -> a) -> GroupedMessages -> Html a
 viewAll f messages =
     ul
         [ style
@@ -15,7 +16,13 @@ viewAll f messages =
             , ( "padding", "0" )
             ]
         ]
-        (List.indexedMap (\n x -> view (f x) n x) messages)
+        (messages
+            |> Dict.map
+                (\title m ->
+                    div [] (h5 [] [ text title ] :: List.indexedMap (\n x -> view (f x) n x) m)
+                )
+            |> Dict.values
+        )
 
 
 view : a -> Int -> Message -> Html a

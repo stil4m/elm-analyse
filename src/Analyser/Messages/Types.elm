@@ -1,7 +1,10 @@
 module Analyser.Messages.Types exposing (..)
 
 import Analyser.Messages.Range exposing (Range)
+import Dict exposing (Dict)
+import Dict.Extra as Dict
 import Elm.Syntax.Base exposing (ModuleName)
+import List.Extra as List
 
 
 type alias MessageId =
@@ -14,6 +17,10 @@ type alias Sha1 =
 
 type alias FileName =
     String
+
+
+type alias GroupedMessages =
+    Dict String (List Message)
 
 
 type alias Message =
@@ -39,6 +46,20 @@ type MessageStatus
     | Blocked
     | Fixing
     | Applicable
+
+
+groupByType : List Message -> GroupedMessages
+groupByType messages =
+    messages
+        |> Dict.groupBy (\m -> String.split " " (toString m.data) |> List.head |> Maybe.withDefault "")
+
+
+groupByFileName : List Message -> GroupedMessages
+groupByFileName messages =
+    messages
+        |> List.concatMap (\m -> List.map (\f -> ( Tuple.second f, m )) m.files)
+        |> Dict.groupBy Tuple.first
+        |> Dict.map (\_ v -> List.map Tuple.second v)
 
 
 type MessageData
