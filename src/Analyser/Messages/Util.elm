@@ -175,7 +175,7 @@ getMessageInfo m =
             ( String.concat
                 [ "Importing all from module `"
                 , String.join "." moduleName
-                , "`in file \""
+                , "` in file \""
                 , fileName
                 , "\" at "
                 , rangeToString range
@@ -288,7 +288,7 @@ getMessageInfo m =
             ( String.concat
                 [ "Duplicate import for module `"
                 , String.join "." moduleName
-                , "`in file \""
+                , "` in file \""
                 , fileName
                 , "\" at [ "
                 , String.join " | " (List.map rangeToString ranges)
@@ -304,7 +304,7 @@ getMessageInfo m =
                 , name
                 , "` imported multiple times module `"
                 , String.join "." moduleName
-                , "`in file \""
+                , "` in file \""
                 , fileName
                 , "\" at [ "
                 , String.join " | " (List.map rangeToString ranges)
@@ -318,7 +318,7 @@ getMessageInfo m =
             ( String.concat
                 [ "Unused import alias `"
                 , String.join "." moduleName
-                , "`in file \""
+                , "` in file \""
                 , fileName
                 , "\" at "
                 , rangeToString range
