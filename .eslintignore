@@ -1,0 +1,6 @@
+node_modules/**
+elm-stuff/**
+target/**
+js/backend-elm.js
+js/public/client-elm.js
+docs/docs.js

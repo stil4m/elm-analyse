@@ -3,12 +3,12 @@ module.exports = report => {
     const unusedDependencies = report.unusedDependencies;
     if (messages.length > 0) {
         console.log();
-        console.log("Messages:");
+        console.log('Messages:');
         messages.forEach(x => console.log(x.message));
     }
     if (unusedDependencies.length > 0) {
         console.log();
-        console.log("Unused dependencies:");
-        unusedDependencies.forEach(dep => console.log("- " + dep));
+        console.log('Unused dependencies:');
+        unusedDependencies.forEach(dep => console.log('- ' + dep));
     }
 };

@@ -6,7 +6,7 @@ node_js:
 
 matrix:
   fast_finish: true
-  
+
 cache:
   directories:
   - node_modules
@@ -16,7 +16,7 @@ install:
   - |
     if [ ! -d sysconfcpus/bin ];
     then
-      git clone https://github.com/obmarg/libsysconfcpus.git; 
+      git clone https://github.com/obmarg/libsysconfcpus.git;
       cd libsysconfcpus;
       ./configure --prefix=$TRAVIS_BUILD_DIR/sysconfcpus;
       make && make install;
@@ -27,3 +27,4 @@ install:
 script:
   - sh ./prettier-check.sh
   - $TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 npm run test
+  - $TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 npm run build

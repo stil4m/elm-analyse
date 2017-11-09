@@ -1,6 +1,6 @@
 module.exports = function(app, elm, expressWs) {
     var state = {
-        status: "initialising",
+        status: 'initialising',
         idCount: 0,
         queue: [],
         messages: [],
@@ -13,13 +13,13 @@ module.exports = function(app, elm, expressWs) {
         return JSON.stringify(state);
     }
 
-    app.ws("/state", function(ws, _req) {
+    app.ws('/state', function(ws) {
         ws.send(renderState());
-        ws.on("message", function(_msg) {
+        ws.on('message', function() {
             ws.send(renderState());
         });
-        ws.on("error", function(_msg) {
-            console.log("WARN: Socket not gracefully closed");
+        ws.on('error', function() {
+            console.log('WARN: Socket not gracefully closed');
             console.log(ws.connection);
         });
     });

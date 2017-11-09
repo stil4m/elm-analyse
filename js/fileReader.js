@@ -1,14 +1,14 @@
 // Reference the module
-const normalizeNewline = require("normalize-newline");
-const fs = require("fs");
-const cp = require("child_process");
-const cache = require("./util/cache");
-const sums = require("sums");
+const normalizeNewline = require('normalize-newline');
+const fs = require('fs');
+const cp = require('child_process');
+const cache = require('./util/cache');
+const sums = require('sums');
 
 module.exports = function(config) {
     function isFormatted(path) {
         try {
-            cp.execSync(config.elmFormatPath + " --validate " + path, {
+            cp.execSync(config.elmFormatPath + ' --validate ' + path, {
                 stdio: []
             });
 
@@ -55,7 +55,7 @@ module.exports = function(config) {
     }
 
     function readFile(directory, path, cb) {
-        var real = directory + "/" + path;
+        var real = directory + '/' + path;
 
         sums
             .checksum(fs.createReadStream(real))

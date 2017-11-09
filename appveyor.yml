@@ -11,10 +11,11 @@ install:
 
 # Post-install test scripts.
 test_script:
-  - npm run check-prettier
-  - npm run elm-format
-  - npm run test
+  - npm run js:validate-format
+  - npm run js:lint
+  - npm run elm:validate-format
+  - npm run elm:test
   - npm run build
-  - npm run self-check
+  - npm run elm:lint
 
 build: off
