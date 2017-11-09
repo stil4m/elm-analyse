@@ -73,6 +73,9 @@ Checks can be enable or configured based on your preferences. For this see the [
 If you have feature ideas or checks that you wish to see, please create an issue.
 Please check that you do not create duplicate issues or a check for which we [already have a report](https://github.com/stil4m/elm-analyse/issues/10).
 
+## Contributing
+
+Please see [the docs](https://stil4m.github.io/elm-analyse/#/contributing)
 ---
 
 ## Library Setup

@@ -1,7 +1,7 @@
 module Docs.Menu exposing (..)
 
 import Bootstrap.Navbar as Navbar
-import Docs.Page as Page exposing (Page(Changelog, Configuration, Features, Home, Messages))
+import Docs.Page as Page exposing (Page(Changelog, Configuration, Contributing, Features, Home, Messages))
 import Html exposing (text)
 import Html.Attributes exposing (href)
 
@@ -22,6 +22,9 @@ menu m state =
             , Navbar.itemLink
                 [ href (Page.hash Configuration) ]
                 [ text "Configuration" ]
+            , Navbar.itemLink
+                [ href (Page.hash Contributing) ]
+                [ text "Contributing" ]
             , Navbar.itemLink
                 [ href (Page.hash Changelog) ]
                 [ text "Changelog" ]

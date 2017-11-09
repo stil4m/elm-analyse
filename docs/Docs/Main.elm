@@ -3,6 +3,7 @@ module Docs.Main exposing (..)
 import Bootstrap.Navbar
 import Docs.Changelog as Changelog
 import Docs.Configuration as Configuration
+import Docs.Contributing as Contributing
 import Docs.Features as Features
 import Docs.Home
 import Docs.Menu
@@ -36,6 +37,7 @@ type Content
     | MessagesContent (Maybe String)
     | ConfigurationContent
     | FeaturesContent
+    | ContributingContent
 
 
 type alias Model =
@@ -94,6 +96,9 @@ contentFromPage page =
         NotFound ->
             ( NoContent, Cmd.none )
 
+        Contributing ->
+            ( ContributingContent, Cmd.none )
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -148,6 +153,9 @@ body model =
 
         ConfigurationContent ->
             Configuration.view
+
+        ContributingContent ->
+            Contributing.view
 
 
 header : Html msg

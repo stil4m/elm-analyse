@@ -1,4 +1,4 @@
-module Docs.Page exposing (Page(Changelog, Configuration, Features, Home, Messages, NotFound), hash, nextPage)
+module Docs.Page exposing (Page(Changelog, Configuration, Contributing, Features, Home, Messages, NotFound), hash, nextPage)
 
 import Navigation exposing (Location)
 import String.Extra
@@ -12,6 +12,7 @@ type Page
     | Features (Maybe String)
     | Configuration
     | NotFound
+    | Contributing
 
 
 route : Parser (Page -> a) a
@@ -23,6 +24,7 @@ route =
         , Url.map Changelog (Url.s "changelog")
         , Url.map (Features << Just) (Url.s "features" </> Url.string)
         , Url.map (Features Nothing) (Url.s "features")
+        , Url.map Contributing (Url.s "contributing")
         , Url.map Configuration (Url.s "configuration")
         ]
 
@@ -60,3 +62,6 @@ hash p =
 
         Configuration ->
             "#/configuration"
+
+        Contributing ->
+            "#/contributing"
