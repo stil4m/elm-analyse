@@ -4,6 +4,7 @@ import Analyser.Messages.Types exposing (GroupedMessages, Message, groupByType)
 import Analyser.State as State exposing (State)
 import Client.Components.MessageList as MessageList
 import Client.Socket exposing (dashboardAddress)
+import Dict
 import Html exposing (..)
 import Html.Attributes exposing (checked, class, style, type_)
 import Html.Events exposing (onClick)
