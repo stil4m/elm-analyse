@@ -3,6 +3,7 @@ module Client.Components.MessageList exposing (..)
 import Analyser.Messages.Types exposing (GroupedMessages, Message)
 import Client.Components.ActiveMessageDialog as ActiveMessageDialog
 import Client.Messages as M
+import Dict
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
 import Navigation exposing (Location)

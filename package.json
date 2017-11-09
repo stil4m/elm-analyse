@@ -15,14 +15,23 @@
     "js:lint": "eslint js",
     "js:validate-format": "sh ./prettier-check.sh",
     "js:format": "sh ./prettier-run.sh",
-    "elm-format": "./node_modules/.bin/elm-format --validate src/ tests/ docs/",
-    "self-check": "node \"./js/bin/index.js\"",
-    "test": "./node_modules/.bin/elm-test",
+    "elm:test": "./node_modules/.bin/elm-test",
+    "elm:format": "./node_modules/.bin/elm-format --yes src/ tests/ docs/",
+    "elm:validate-format":
+      "./node_modules/.bin/elm-format --validate src/ tests/ docs/",
+    "elm:lint": "node \"./js/bin/index.js\"",
+    "dev:docs":
+      "elm-live --port=3002 --dir=docs docs/Docs/Main.elm --output docs/docs.js",
+    "dev:client":
+      "elm-live --port=3001 --dir=js/public src/Client.elm --output js/public/client.js",
     "build":
       "./node_modules/.bin/elm-package install -y && \"./node_modules/.bin/gulp\"",
-    "pr-check":
-      "npm install && npm run check-prettier && npm run elm-format && npm run test && npm run build && npm run self-check",
-    "server": "node \"./js/bin/index.js\" -s"
+    "pr:check":
+      "npm install && npm run js:lint && npm run elm:validate-format && npm run elm:test && npm run build && npm run elm:lint",
+    "dev:build-server": "./node_modules/.bin/gulp elm-backend",
+    "dev:run-server": "node \"./js/bin/index.js\" -s",
+    "dev:server":
+      "./node_modules/.bin/nodemon --watch src --ext elm --exec \"npm run dev:build-server && npm run dev:run-server\""
   },
   "author": "Mats Stijlaart",
   "license": "MIT",
@@ -43,6 +52,8 @@
     "sums": "0.2.4"
   },
   "devDependencies": {
+    "chokidar": "1.7.0",
+    "chokidar-cli": "1.2.0",
     "elm": "0.18.0",
     "elm-format": "0.7.0-exp",
     "elm-test": "0.18.7",
@@ -50,6 +61,7 @@
     "gulp": "3.9.1",
     "gulp-elm": "0.6.1",
     "gulp-replace": "0.5.4",
+    "nodemon": "1.12.1",
     "prettier": "1.7.0",
     "run-sequence": "1.2.2"
   }
