@@ -34,6 +34,18 @@ module.exports = function(app, config, directory) {
         }, 5);
     });
 
+    checkedSubscribe('loadPackageInfo', function() {
+        require('./dependencies').getDependencies(function(data) {
+            data.forEach(pack => {
+                pack.versions = pack.versions.map(v =>
+                    v.split('.').map(i => parseInt(i))
+                );
+            });
+
+            app.ports.onPackageInfo.send([data[0]]);
+        });
+    });
+
     checkedSubscribe('storeAstForSha', function(x) {
         const sha1 = x[0];
         const content = x[1];

@@ -14,6 +14,7 @@ import Analyser.State as State exposing (State)
 import AnalyserPorts
 import Inspection
 import Platform exposing (programWithFlags)
+import Registry exposing (Registry)
 import Time
 import Util.Logger as Logger
 
@@ -26,6 +27,7 @@ type alias Model =
     , state : State
     , changedFiles : List String
     , server : Bool
+    , registry : Registry
     }
 
 
@@ -55,21 +57,32 @@ main =
 
 init : Bool -> ( Model, Cmd Msg )
 init server =
+    let
+        ( registry, registryCmds ) =
+            Registry.init
+    in
     reset
-        { context = ContextLoader.emptyContext
-        , stage = Finished
-        , configuration = Configuration.defaultConfiguration
-        , codeBase = CodeBase.init
+        ( { context = ContextLoader.emptyContext
+          , stage = Finished
+          , configuration = Configuration.defaultConfiguration
+          , codeBase = CodeBase.init
+          , state = State.initialState
+          , changedFiles = []
+          , server = server
+          , registry = registry
+          }
+        , registryCmds
+        )
+
+
+reset : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+reset ( model, cmds ) =
+    ( { model
+        | stage = ContextLoadingStage
         , state = State.initialState
-        , changedFiles = []
-        , server = server
-        }
-
-
-reset : Model -> ( Model, Cmd Msg )
-reset model =
-    ( { model | stage = ContextLoadingStage, state = State.initialState, codeBase = CodeBase.init }
-    , ContextLoader.loadContext ()
+        , codeBase = CodeBase.init
+      }
+    , Cmd.batch [ ContextLoader.loadContext (), cmds ]
     )
         |> doSendState
 

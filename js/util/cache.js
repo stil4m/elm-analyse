@@ -14,6 +14,34 @@ if (elmAnalyseVersion.split('.')[0] === '0') {
 }
 const globalCachePath = path.resolve(osHomedir(), '.elm-analyse', major);
 
+function readPackageDependencyInfo(cb) {
+    fs.readFile(path.resolve(globalCachePath, 'all-packages.json'), function(
+        err,
+        data
+    ) {
+        if (err) {
+            cb(err);
+        } else {
+            const s = data.toString();
+            var parsed;
+            try {
+                parsed = JSON.parse(s);
+            } catch (e) {
+                cb(e);
+                return;
+            }
+            cb(null, parsed);
+        }
+    });
+}
+
+function storePackageDependencyInfo(data) {
+    fs.writeFile(
+        path.resolve(globalCachePath, 'all-packages.json'),
+        JSON.stringify(data),
+        function() {}
+    );
+}
 function readDependencyJson(dependency, version, cb) {
     //TODO Error handling
 
@@ -73,6 +101,8 @@ function setupShaFolder() {
 module.exports = {
     storeShaJson: storeShaJson,
     readDependencyJson: readDependencyJson,
+    readPackageDependencyInfo: readPackageDependencyInfo,
+    storePackageDependencyInfo: storePackageDependencyInfo,
     storeDependencyJson: storeDependencyJson,
     hasAstForSha: hasAstForSha,
     elmCachePathForSha: elmCachePathForSha,
