@@ -2,13 +2,14 @@ module Client.Graph.Graph
     exposing
         ( Model
         , init
+        , onNewState
         , view
         )
 
-import Analyser.State exposing (State)
 import Client.Graph.Table as Table
 import Client.Graph.Widgets as Widgets
 import Client.GraphBuilder
+import Client.State
 import Graph
 import Graph.GraphViz
 import Html exposing (Html)
@@ -17,30 +18,45 @@ import Html.Lazy
 import ModuleGraph exposing (ModuleGraph)
 
 
-type alias Model =
-    ModuleGraph
+type Model
+    = Model (Maybe ModuleGraph)
 
 
-init : State -> ( Model, Cmd msg )
+init : Client.State.State -> Model
 init state =
-    ( Client.GraphBuilder.run state.modules, Cmd.none )
+    state
+        |> Client.State.toMaybe
+        |> Maybe.map (.modules >> Client.GraphBuilder.run)
+        |> Model
 
 
-view : Model -> Html msg
-view model =
-    Html.div []
-        [ Html.h3 [] [ Html.text "Modules" ]
-        , Html.div [ Html.class "row" ]
-            (widgets model)
-        , Html.div [ Html.class "row" ]
-            [ Html.Lazy.lazy (Table.view 20) model
-            ]
-        , Html.div [ Html.class "row" ]
-            [ Html.h2 [] [ Html.text "DOT file" ]
-            , Html.pre []
-                [ Html.text (Graph.GraphViz.output model) ]
-            ]
-        ]
+onNewState : Client.State.State -> Model -> Model
+onNewState state _ =
+    init state
+
+
+view : Client.State.State -> Model -> Html msg
+view s (Model g) =
+    Client.State.view s <|
+        \_ ->
+            case g of
+                Nothing ->
+                    Html.div [] []
+
+                Just graph ->
+                    Html.div []
+                        [ Html.h3 [] [ Html.text "Modules" ]
+                        , Html.div [ Html.class "row" ]
+                            (widgets graph)
+                        , Html.div [ Html.class "row" ]
+                            [ Html.Lazy.lazy (Table.view 20) graph
+                            ]
+                        , Html.div [ Html.class "row" ]
+                            [ Html.h2 [] [ Html.text "DOT file" ]
+                            , Html.pre []
+                                [ Html.text (Graph.GraphViz.output graph) ]
+                            ]
+                        ]
 
 
 widgets : ModuleGraph -> List (Html msg)

@@ -1,117 +1,141 @@
-module Client.App.App exposing (init, subscriptions, update, view)
+module Client.App.App exposing (Model, Msg(OnLocation), init, subscriptions, update, view)
 
 import Client.App.Menu
-import Client.App.Models exposing (Content(DashboardContent, DependenciesPageContent, FileTreeContent, GraphContent, MessagesPageContent, NotFound, PackageDependenciesContent), Model, ModuleGraphPageMsg, Msg(..), PackageDependenciesPageMsg, moduleGraphPage, packageDependenciesPage)
 import Client.Components.FileTree as FileTree
 import Client.Dashboard as Dashboard
 import Client.DependenciesPage as DependenciesPage
+import Client.Graph.Graph as Graph
+import Client.Graph.PackageDependencies as PackageDependencies
 import Client.MessagesPage as MessagesPage
 import Client.Routing as Routing
 import Client.Socket exposing (controlAddress)
-import Client.StaticStatePage as StaticStatePage
+import Client.State exposing (State)
 import Html exposing (div)
 import Html.Attributes exposing (id)
 import Navigation exposing (Location)
+import RemoteData
+import Time
 import WebSocket as WS
+
+
+type Msg
+    = MessagesPageMsg MessagesPage.Msg
+    | FileTreeMsg FileTree.Msg
+    | PackageDependenciesMsg PackageDependencies.Msg
+    | Refresh
+    | OnLocation Location
+    | Tick
+    | NewState State
+
+
+type alias Model =
+    { location : Location
+    , content : Content
+    , state : State
+    }
+
+
+type Content
+    = MessagesPageContent MessagesPage.Model
+    | DashboardContent
+    | DependenciesPageContent
+    | FileTreeContent FileTree.Model
+    | GraphContent Graph.Model
+    | PackageDependenciesContent PackageDependencies.Model
+    | NotFound
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ case model.content of
+        [ Client.State.listen model.location |> Sub.map NewState
+        , Time.every (Time.second * 10) (always Tick)
+        , case model.content of
             MessagesPageContent sub ->
-                MessagesPage.subscriptions model.location sub |> Sub.map MessagesPageMsg
+                MessagesPage.subscriptions sub |> Sub.map MessagesPageMsg
 
             GraphContent _ ->
                 Sub.none
 
             FileTreeContent sub ->
-                FileTree.subscriptions model.location sub |> Sub.map FileTreeMsg
+                FileTree.subscriptions sub |> Sub.map FileTreeMsg
 
             PackageDependenciesContent _ ->
                 Sub.none
 
-            DashboardContent sub ->
-                Dashboard.subscriptions model.location sub |> Sub.map DashboardMsg
+            DashboardContent ->
+                Sub.none
 
-            DependenciesPageContent sub ->
-                DependenciesPage.subscriptions model.location sub |> Sub.map DependenciesPageMsg
+            DependenciesPageContent ->
+                Sub.none
 
-            Client.App.Models.NotFound ->
+            NotFound ->
                 Sub.none
         , WS.keepAlive (controlAddress model.location)
         ]
 
 
 init : Location -> ( Model, Cmd Msg )
-init =
-    onLocation
+init l =
+    onLocation l { location = l, content = NotFound, state = RemoteData.Loading }
 
 
-onLocation : Location -> ( Model, Cmd Msg )
-onLocation l =
+onLocation : Location -> Model -> ( Model, Cmd Msg )
+onLocation l model =
     let
         route =
             Routing.fromLocation l
     in
     case route of
         Routing.FileTree ->
-            FileTree.init l
-                |> Tuple.mapFirst (\x -> { content = FileTreeContent x, location = l })
+            FileTree.init
+                |> Tuple.mapFirst (\x -> { model | content = FileTreeContent x, location = l })
                 |> Tuple.mapSecond (Cmd.map FileTreeMsg)
 
         Routing.Modules ->
-            moduleGraphPage
-                |> Tuple.mapFirst (\x -> { content = GraphContent x, location = l })
-                |> Tuple.mapSecond (Cmd.map GraphMsg)
+            ( { model | content = GraphContent (Graph.init model.state), location = l }, Cmd.none )
 
         Routing.PackageDependencies ->
-            packageDependenciesPage
-                |> Tuple.mapFirst (\x -> { content = PackageDependenciesContent x, location = l })
-                |> Tuple.mapSecond (Cmd.map PackageDependenciesMsg)
+            ( { model | content = PackageDependenciesContent (PackageDependencies.init model.state), location = l }
+            , Cmd.none
+            )
 
         Routing.Messages ->
-            MessagesPage.init l
-                |> Tuple.mapFirst (\x -> { content = MessagesPageContent x, location = l })
-                |> Tuple.mapSecond (Cmd.map MessagesPageMsg)
+            ( { model | content = MessagesPageContent (MessagesPage.init model.state), location = l }, Cmd.none )
 
         Routing.Dependencies ->
-            DependenciesPage.init l
-                |> Tuple.mapFirst (\x -> { content = DependenciesPageContent x, location = l })
-                |> Tuple.mapSecond (Cmd.map DependenciesPageMsg)
+            ( { model | content = DependenciesPageContent, location = l }, Cmd.none )
 
         Routing.Dashboard ->
-            Dashboard.init l
-                |> Tuple.mapFirst (\x -> { content = DashboardContent x, location = l })
-                |> Tuple.mapSecond (Cmd.map DashboardMsg)
+            ( { model | content = DashboardContent, location = l }, Cmd.none )
 
         Routing.NotFound ->
-            ( { content = NotFound, location = l }, Cmd.none )
+            ( { model | content = NotFound, location = l }, Cmd.none )
 
 
 view : Model -> Html.Html Msg
 view m =
     div []
-        [ Client.App.Menu.view m.location
+        [ Client.App.Menu.view Refresh m.location
         , div [ id "page-wrapper" ]
             [ case m.content of
                 MessagesPageContent subModel ->
-                    MessagesPage.view subModel |> Html.map MessagesPageMsg
+                    MessagesPage.view m.state subModel |> Html.map MessagesPageMsg
 
                 GraphContent subModel ->
-                    StaticStatePage.view subModel |> Html.map GraphMsg
+                    Graph.view m.state subModel
 
                 FileTreeContent subModel ->
                     FileTree.view subModel |> Html.map FileTreeMsg
 
                 PackageDependenciesContent subModel ->
-                    StaticStatePage.view subModel |> Html.map PackageDependenciesMsg
+                    PackageDependencies.view subModel |> Html.map PackageDependenciesMsg
 
-                DashboardContent subModel ->
-                    Dashboard.view subModel |> Html.map DashboardMsg
+                DashboardContent ->
+                    Dashboard.view m.state
 
-                DependenciesPageContent subModel ->
-                    DependenciesPage.view subModel |> Html.map DependenciesPageMsg
+                DependenciesPageContent ->
+                    DependenciesPage.view m.state
 
                 NotFound ->
                     Html.h3 [] [ Html.text "Not Found" ]
@@ -119,11 +143,46 @@ view m =
         ]
 
 
+onNewState : State -> Model -> Model
+onNewState s model =
+    { model | state = s, content = updateStateInContent s model.content }
+
+
+updateStateInContent : State -> Content -> Content
+updateStateInContent state content =
+    case content of
+        MessagesPageContent sub ->
+            MessagesPageContent (MessagesPage.onNewState state sub)
+
+        DashboardContent ->
+            content
+
+        DependenciesPageContent ->
+            content
+
+        FileTreeContent sub ->
+            FileTreeContent (FileTree.onNewState state sub)
+
+        GraphContent sub ->
+            GraphContent (Graph.onNewState state sub)
+
+        PackageDependenciesContent sub ->
+            PackageDependenciesContent (PackageDependencies.onNewState state sub)
+
+        NotFound ->
+            content
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnLocation l ->
-            onLocation l
+            onLocation l model
+
+        Tick ->
+            ( model
+            , Client.State.tick model.location
+            )
 
         Refresh ->
             ( model
@@ -133,65 +192,33 @@ update msg model =
         MessagesPageMsg subMsg ->
             onMessagesPageMsg subMsg model
 
-        GraphMsg subMsg ->
-            onGraphMsg subMsg model
-
         FileTreeMsg subMsg ->
             onFileTreeMsg subMsg model
 
         PackageDependenciesMsg subMsg ->
-            onPackageDependenciesMsg subMsg model
+            ( onPackageDependenciesMsg subMsg model, Cmd.none )
 
-        DashboardMsg subMsg ->
-            onDashboardMsg subMsg model
-
-        DependenciesPageMsg subMsg ->
-            onDependenciesPage subMsg model
+        NewState state ->
+            ( onNewState state model, Cmd.none )
 
 
-onDependenciesPage : DependenciesPage.Msg -> Model -> ( Model, Cmd Msg )
-onDependenciesPage subMsg model =
-    case model.content of
-        DependenciesPageContent subModel ->
-            DependenciesPage.update model.location subMsg subModel
-                |> Tuple.mapFirst (\x -> { model | content = DependenciesPageContent x })
-                |> Tuple.mapSecond (Cmd.map DependenciesPageMsg)
-
-        _ ->
-            ( model, Cmd.none )
-
-
-onPackageDependenciesMsg : PackageDependenciesPageMsg -> Model -> ( Model, Cmd Msg )
+onPackageDependenciesMsg : PackageDependencies.Msg -> Model -> Model
 onPackageDependenciesMsg subMsg model =
     case model.content of
         PackageDependenciesContent subModel ->
-            StaticStatePage.update subMsg subModel
-                |> Tuple.mapFirst (\x -> { model | content = PackageDependenciesContent x })
-                |> Tuple.mapSecond (Cmd.map PackageDependenciesMsg)
+            { model | content = PackageDependenciesContent (PackageDependencies.update subMsg subModel) }
 
         _ ->
-            ( model, Cmd.none )
+            model
 
 
 onFileTreeMsg : FileTree.Msg -> Model -> ( Model, Cmd Msg )
 onFileTreeMsg subMsg model =
     case model.content of
         FileTreeContent subModel ->
-            FileTree.update model.location subMsg subModel
+            FileTree.update model.state model.location subMsg subModel
                 |> Tuple.mapFirst (\x -> { model | content = FileTreeContent x })
                 |> Tuple.mapSecond (Cmd.map FileTreeMsg)
-
-        _ ->
-            ( model, Cmd.none )
-
-
-onDashboardMsg : Dashboard.Msg -> Model -> ( Model, Cmd Msg )
-onDashboardMsg subMsg model =
-    case model.content of
-        DashboardContent subModel ->
-            Dashboard.update model.location subMsg subModel
-                |> Tuple.mapFirst (\x -> { model | content = DashboardContent x })
-                |> Tuple.mapSecond (Cmd.map DashboardMsg)
 
         _ ->
             ( model, Cmd.none )
@@ -201,21 +228,9 @@ onMessagesPageMsg : MessagesPage.Msg -> Model -> ( Model, Cmd Msg )
 onMessagesPageMsg subMsg model =
     case model.content of
         MessagesPageContent subModel ->
-            MessagesPage.update model.location subMsg subModel
+            MessagesPage.update model.state model.location subMsg subModel
                 |> Tuple.mapFirst (\x -> { model | content = MessagesPageContent x })
                 |> Tuple.mapSecond (Cmd.map MessagesPageMsg)
-
-        _ ->
-            ( model, Cmd.none )
-
-
-onGraphMsg : ModuleGraphPageMsg -> Model -> ( Model, Cmd Msg )
-onGraphMsg subMsg model =
-    case model.content of
-        GraphContent subModel ->
-            StaticStatePage.update subMsg subModel
-                |> Tuple.mapFirst (\x -> { model | content = GraphContent x })
-                |> Tuple.mapSecond (Cmd.map GraphMsg)
 
         _ ->
             ( model, Cmd.none )

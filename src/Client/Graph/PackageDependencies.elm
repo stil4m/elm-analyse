@@ -1,7 +1,9 @@
-module Client.Graph.PackageDependencies exposing (Model, Msg, init, update, view)
+module Client.Graph.PackageDependencies exposing (Model, Msg, init, onNewState, update, view)
 
 import Analyser.State exposing (State)
 import Client.GraphBuilder
+import Client.LoadingScreen
+import Client.State
 import Dict exposing (Dict)
 import Graph exposing (Edge)
 import Html exposing (Html)
@@ -9,10 +11,15 @@ import Html.Attributes as Html
 import Html.Events as Html
 import List.Extra as List
 import ModuleGraph exposing (ModuleGraph)
+import RemoteData exposing (RemoteData)
 import Set
 
 
 type alias Model =
+    RemoteData String InnerModel
+
+
+type alias InnerModel =
     { names : List String
     , relations : PackageFileRelations
     , selected : Maybe ( String, String )
@@ -28,8 +35,18 @@ type Msg
     = Select String String
 
 
-init : State -> ( Model, Cmd Msg )
-init { modules } =
+init : Client.State.State -> Model
+init s =
+    RemoteData.map innerInit s
+
+
+onNewState : Client.State.State -> Model -> Model
+onNewState s _ =
+    init s
+
+
+innerInit : State -> InnerModel
+innerInit { modules } =
     let
         graph =
             Client.GraphBuilder.run modules
@@ -44,31 +61,29 @@ init { modules } =
                 |> Set.toList
                 |> List.sort
     in
-    ( Model names relations Nothing graph
-    , Cmd.none
-    )
+    InnerModel names relations Nothing graph
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
     case msg of
         Select from to ->
-            ( { model | selected = Just ( from, to ) }
-            , Cmd.none
-            )
+            RemoteData.map (\inner -> { inner | selected = Just ( from, to ) }) model
 
 
 view : Model -> Html Msg
-view { names, relations, selected } =
-    Html.div []
-        [ Html.table [ Html.class "table table-condensed" ]
-            [ Html.tbody []
-                (Html.tr [] (Html.td [] [] :: List.map headerNameTd names)
-                    :: List.map (\x -> packageCycleRow x names relations selected) names
-                )
-            ]
-        , Maybe.map (interPackageRelationsTable relations) selected |> Maybe.withDefault (Html.div [] [])
-        ]
+view model =
+    Client.LoadingScreen.viewRemoteData model <|
+        \{ names, relations, selected } ->
+            Html.div []
+                [ Html.table [ Html.class "table table-condensed" ]
+                    [ Html.tbody []
+                        (Html.tr [] (Html.td [] [] :: List.map headerNameTd names)
+                            :: List.map (\x -> packageCycleRow x names relations selected) names
+                        )
+                    ]
+                , Maybe.map (interPackageRelationsTable relations) selected |> Maybe.withDefault (Html.div [] [])
+                ]
 
 
 interPackageRelationsTable : PackageFileRelations -> ( String, String ) -> Html a

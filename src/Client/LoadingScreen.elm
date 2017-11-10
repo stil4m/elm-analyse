@@ -5,17 +5,14 @@ import Html exposing (Html, div, text)
 import RemoteData as RD exposing (RemoteData)
 
 
-viewStateFromRemoteData : RemoteData a State -> (State -> Html msg) -> Html msg
-viewStateFromRemoteData rd f =
+viewRemoteData : RemoteData a b -> (b -> Html msg) -> Html msg
+viewRemoteData rd f =
     case rd of
         RD.Loading ->
             text "Loading..."
 
         RD.Success state ->
-            if State.isBusy state then
-                text "Loading..."
-            else
-                f state
+            f state
 
         RD.Failure e ->
             div []
@@ -27,14 +24,29 @@ viewStateFromRemoteData rd f =
             div [] []
 
 
-viewStateFromMaybe : Maybe State -> (State -> Html msg) -> Html msg
-viewStateFromMaybe maybeState f =
-    case maybeState of
+viewMaybe : Maybe b -> (b -> Html msg) -> Html msg
+viewMaybe m f =
+    case m of
         Nothing ->
             text "Loading..."
 
-        Just state ->
-            if State.isBusy state then
-                text "Loading..."
-            else
-                f state
+        Just x ->
+            f x
+
+
+viewStateFromRemoteData : RemoteData a State -> (State -> Html msg) -> Html msg
+viewStateFromRemoteData rd f =
+    viewRemoteData rd (viewState f)
+
+
+viewState : (State -> Html msg) -> State -> Html msg
+viewState f state =
+    if State.isBusy state then
+        text "Loading..."
+    else
+        f state
+
+
+viewStateFromMaybe : Maybe State -> (State -> Html msg) -> Html msg
+viewStateFromMaybe maybeState f =
+    viewMaybe maybeState (viewState f)

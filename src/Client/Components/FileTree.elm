@@ -1,24 +1,20 @@
-module Client.Components.FileTree exposing (Model, Msg, init, subscriptions, update, view)
+module Client.Components.FileTree exposing (Model, Msg, init, onNewState, subscriptions, update, view)
 
 import Analyser.Messages.Types exposing (GroupedMessages, Message, groupByType)
-import Analyser.State as State exposing (State)
 import Client.Components.MessageList as MessageList
-import Client.Socket exposing (dashboardAddress)
+import Client.State
 import Dict
 import Html exposing (..)
 import Html.Attributes exposing (checked, class, style, type_)
 import Html.Events exposing (onClick)
 import Http
-import Json.Decode as JD exposing (list, string)
+import Json.Decode as JD
 import Navigation exposing (Location)
-import Time
-import WebSocket as WS
 
 
 type alias Model =
     { hideGoodFiles : Bool
     , tree : Maybe (List String)
-    , state : Maybe State
     , fileIndex : Maybe FileIndex
     , selectedFile : Maybe String
     , messageList : MessageList.Model
@@ -32,52 +28,44 @@ type alias FileIndex =
 type Msg
     = OnFileTree (Result Http.Error (List String))
     | MessageListMsg MessageList.Msg
-    | NewState (Result String State)
     | OnSelectFile String
-    | Tick
     | ToggleHideGoodFiles
 
 
-init : Location -> ( Model, Cmd Msg )
-init location =
+init : ( Model, Cmd Msg )
+init =
     ( { tree = Nothing
       , hideGoodFiles = True
-      , state = Nothing
       , fileIndex = Nothing
       , selectedFile = Nothing
       , messageList = MessageList.init Dict.empty
       }
     , Cmd.batch
-        [ Http.get "/tree" (list string) |> Http.send OnFileTree
-        , WS.send (dashboardAddress location) "ping"
+        [ Http.get "/tree" (JD.list JD.string) |> Http.send OnFileTree
         ]
     )
 
 
-subscriptions : Location -> Model -> Sub Msg
-subscriptions location model =
-    Sub.batch
-        [ WS.listen (dashboardAddress location) (JD.decodeString State.decodeState >> NewState)
-        , Time.every (Time.second * 10) (always Tick)
-        , MessageList.subscriptions model.messageList |> Sub.map MessageListMsg
-        ]
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    MessageList.subscriptions model.messageList |> Sub.map MessageListMsg
 
 
-updateFileIndex : Model -> Model
-updateFileIndex model =
+updateFileIndex : Maybe (List Message) -> Model -> Model
+updateFileIndex maybeMessages model =
     let
-        messagesForFile file state =
-            state.messages
+        messagesForFile file messages =
+            messages
                 |> List.filter
-                    (\messages ->
-                        List.map Tuple.second messages.files
+                    (\ms ->
+                        List.map Tuple.second ms.files
                             |> List.member file
                     )
 
-        buildTree state tree =
-            List.map (\file -> ( file, messagesForFile file state )) tree
+        buildTree messages tree =
+            List.map (\file -> ( file, messagesForFile file messages )) tree
     in
-    { model | fileIndex = Maybe.map2 buildTree model.state model.tree }
+    { model | fileIndex = Maybe.map2 buildTree maybeMessages model.tree }
 
 
 updateMessageList : Model -> Model
@@ -85,13 +73,26 @@ updateMessageList m =
     { m | messageList = MessageList.withMessages (messagesForSelectedFile m) m.messageList }
 
 
-update : Location -> Msg -> Model -> ( Model, Cmd Msg )
-update location msg model =
+onNewState : Client.State.State -> Model -> Model
+onNewState s model =
+    let
+        x : Maybe (List Message)
+        x =
+            Client.State.toMaybe s |> Maybe.map .messages
+    in
+    updateFileIndex x model
+        |> updateMessageList
+
+
+update : Client.State.State -> Location -> Msg -> Model -> ( Model, Cmd Msg )
+update state location msg model =
     case msg of
         OnFileTree x ->
             case x of
                 Ok value ->
-                    ( { model | tree = Just value } |> updateFileIndex
+                    ( updateFileIndex
+                        (Client.State.toMaybe state |> Maybe.map .messages)
+                        { model | tree = Just value }
                     , Cmd.none
                     )
 
@@ -99,16 +100,6 @@ update location msg model =
                     ( model
                     , Cmd.none
                     )
-
-        NewState s ->
-            ( { model | state = Result.toMaybe s } |> updateFileIndex |> updateMessageList
-            , Cmd.none
-            )
-
-        Tick ->
-            ( model
-            , WS.send (dashboardAddress location) "ping"
-            )
 
         OnSelectFile x ->
             ( { model | selectedFile = Just x } |> updateMessageList, Cmd.none )

@@ -1,6 +1,5 @@
 module Client.App.Menu exposing (view)
 
-import Client.App.Models exposing (Msg(Refresh))
 import Client.Routing as Routing
 import Html exposing (Html, a, button, div, form, i, li, nav, text, ul)
 import Html.Attributes exposing (attribute, class, href, style, type_)
@@ -8,8 +7,8 @@ import Html.Events exposing (onClick)
 import Navigation exposing (Location)
 
 
-view : Location -> Html Msg
-view l =
+view : msg -> Location -> Html msg
+view refresh l =
     nav [ class "navbar navbar-default navbar-static-top", attribute "role" "navigation", style [ ( "margin-bottom", "0" ) ] ]
         [ div [ class "navbar-header" ]
             [ a
@@ -18,7 +17,7 @@ view l =
             , form
                 [ class "navbar-form navbar-right" ]
                 [ button
-                    [ type_ "button", class "btn btn-default", onClick Refresh ]
+                    [ type_ "button", class "btn btn-default", onClick refresh ]
                     [ text "Re-analyse" ]
                 ]
             ]

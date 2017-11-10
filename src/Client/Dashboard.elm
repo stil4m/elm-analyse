@@ -1,61 +1,20 @@
-module Client.Dashboard exposing (..)
+module Client.Dashboard exposing (view)
 
-import Analyser.State as State exposing (State)
-import Client.LoadingScreen as LoadingScreen
+import Analyser.State as State
 import Client.Routing as Routing
-import Client.Socket exposing (dashboardAddress)
+import Client.State
 import Client.View.Widget as Widget
 import Html exposing (Html, div)
 import Html.Attributes
-import Json.Decode as JD
-import Navigation exposing (Location)
-import RemoteData as RD exposing (RemoteData)
-import Time
-import WebSocket as WS
 
 
-type alias Model =
-    RemoteData String State
+view : Client.State.State -> Html msg
+view state =
+    Client.State.view state <|
+        viewState
 
 
-type Msg
-    = NewMsg (Result String State)
-    | Tick
-
-
-subscriptions : Location -> Model -> Sub Msg
-subscriptions location _ =
-    Sub.batch
-        [ WS.listen (dashboardAddress location) (JD.decodeString State.decodeState >> NewMsg)
-        , Time.every (Time.second * 10) (always Tick)
-        ]
-
-
-init : Location -> ( Model, Cmd Msg )
-init location =
-    ( RD.Loading
-    , WS.send (dashboardAddress location) "ping"
-    )
-
-
-update : Location -> Msg -> Model -> ( Model, Cmd Msg )
-update location msg model =
-    case msg of
-        Tick ->
-            ( model
-            , WS.send (dashboardAddress location) "ping"
-            )
-
-        NewMsg x ->
-            ( RD.fromResult x, Cmd.none )
-
-
-view : Model -> Html Msg
-view model =
-    LoadingScreen.viewStateFromRemoteData model viewState
-
-
-viewState : State -> Html Msg
+viewState : State.State -> Html msg
 viewState state =
     div [ Html.Attributes.style [ ( "padding-top", "20px" ) ] ]
         [ Html.div [ Html.Attributes.class "row" ]
@@ -81,7 +40,7 @@ viewState state =
         ]
 
 
-listValueWidget : String -> List a -> Html Msg
+listValueWidget : String -> List a -> Html msg
 listValueWidget title x =
     let
         ( t, i ) =

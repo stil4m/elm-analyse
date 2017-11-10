@@ -1,32 +1,25 @@
-module Client.MessagesPage exposing (Model, Msg, init, subscriptions, update, view)
+module Client.MessagesPage exposing (Model, Msg, init, onNewState, subscriptions, update, view)
 
 import Analyser.Messages.Types exposing (GroupedMessages, groupByFileName, groupByType)
-import Analyser.State as State exposing (State)
 import Client.Components.MessageList as MessageList
 import Client.LoadingScreen as LoadingScreen
-import Client.Socket exposing (dashboardAddress)
+import Client.State exposing (State)
 import Dict
 import Html exposing (Html, button, div, h3, text)
 import Html.Attributes exposing (class, classList, type_)
 import Html.Events exposing (onClick)
-import Json.Decode as JD
 import Navigation exposing (Location)
-import RemoteData as RD exposing (RemoteData)
-import Time
-import WebSocket as WS
+import RemoteData as RD
 
 
 type alias Model =
-    { state : RemoteData String State
-    , messageList : MessageList.Model
+    { messageList : MessageList.Model
     , messageGrouper : MessageGrouper
     }
 
 
 type Msg
-    = NewMsg (Result String State)
-    | Tick
-    | MessageListMsg MessageList.Msg
+    = MessageListMsg MessageList.Msg
     | GroupBy MessageGrouper
 
 
@@ -35,79 +28,63 @@ type MessageGrouper
     | GroupByType
 
 
-subscriptions : Location -> Model -> Sub Msg
-subscriptions location model =
-    Sub.batch
-        [ WS.listen (dashboardAddress location) (JD.decodeString State.decodeState >> NewMsg)
-        , Time.every (Time.second * 10) (always Tick)
-        , MessageList.subscriptions model.messageList |> Sub.map MessageListMsg
-        ]
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    MessageList.subscriptions model.messageList |> Sub.map MessageListMsg
 
 
-init : Location -> ( Model, Cmd Msg )
-init location =
-    ( { state = RD.Loading
-      , messageList = MessageList.init Dict.empty
-      , messageGrouper = GroupByFileName
-      }
-    , WS.send (dashboardAddress location) "ping"
-    )
+init : State -> Model
+init state =
+    { messageList = buildMessageList state GroupByFileName (MessageList.init Dict.empty)
+    , messageGrouper = GroupByFileName
+    }
 
 
-groupMessages : Model -> GroupedMessages
-groupMessages m =
-    case m.state of
-        RD.Success state ->
-            case m.messageGrouper of
-                GroupByFileName ->
-                    groupByFileName state.messages
-
-                GroupByType ->
-                    groupByType state.messages
-
-        _ ->
-            Dict.empty
+onNewState : Client.State.State -> Model -> Model
+onNewState s _ =
+    init s
 
 
-update : Location -> Msg -> Model -> ( Model, Cmd Msg )
-update location msg model =
-    case msg of
-        Tick ->
-            ( model
-            , WS.send (dashboardAddress location) "ping"
+groupMessages : State -> MessageGrouper -> GroupedMessages
+groupMessages s m =
+    s
+        |> RD.map
+            (\state ->
+                case m of
+                    GroupByFileName ->
+                        groupByFileName state.messages
+
+                    GroupByType ->
+                        groupByType state.messages
             )
+        |> RD.withDefault Dict.empty
 
-        NewMsg x ->
-            case x of
-                Ok o ->
-                    ( { model
-                        | state = RD.Success o
-                        , messageList = MessageList.withMessages (groupMessages model) model.messageList
-                      }
-                    , Cmd.none
-                    )
 
-                Err e ->
-                    ( { model | state = RD.Failure e }
-                    , Cmd.none
-                    )
+buildMessageList : State -> MessageGrouper -> MessageList.Model -> MessageList.Model
+buildMessageList s grouper old =
+    MessageList.withMessages (groupMessages s grouper) old
 
+
+update : State -> Location -> Msg -> Model -> ( Model, Cmd Msg )
+update state location msg model =
+    case msg of
         MessageListMsg subMsg ->
             MessageList.update location subMsg model.messageList
                 |> Tuple.mapFirst (\x -> { model | messageList = x })
                 |> Tuple.mapSecond (Cmd.map MessageListMsg)
 
         GroupBy messageGrouper ->
-            let
-                newModel =
-                    { model | messageGrouper = messageGrouper }
-            in
-            ( { newModel | messageList = MessageList.withMessages (groupMessages newModel) model.messageList }, Cmd.none )
+            ( { model
+                | messageGrouper = messageGrouper
+                , messageList = buildMessageList state messageGrouper model.messageList
+              }
+            , Cmd.none
+            )
 
 
-view : Model -> Html Msg
-view m =
-    LoadingScreen.viewStateFromRemoteData m.state <|
+view : State -> Model -> Html Msg
+view state m =
+    LoadingScreen.viewStateFromRemoteData state <|
         \_ ->
             div []
                 [ div [ class "clearfix" ]
