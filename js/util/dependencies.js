@@ -1,7 +1,6 @@
 const request = require('request');
 const cache = require('./cache');
 const fetchDependencies = function(cb) {
-    console.log('fetchDependencies"');
     request.get('http://package.elm-lang.org/all-packages', function(
         err,
         response,
@@ -35,23 +34,24 @@ const updatePackageDependencyInfo = function(cb, defaultValue) {
 };
 
 const isOutdated = function(timestamp) {
-    console.log('TODO: Is outdated:', timestamp);
-    return false;
-    // const barrier = new Date().getTime() - 1000 * 60 * 60;
-    // return timestamp < barrier;
+    const barrier = new Date().getTime() - 1000 * 60 * 60;
+    return timestamp < barrier;
 };
 
 const getDependencies = function(cb) {
     cache.readPackageDependencyInfo(function(err, cached) {
         if (err) {
-            console.log('No cache!');
+            console.log(
+                'Fetching package information from package.elm-lang.org.'
+            );
             updatePackageDependencyInfo(cb, null);
         } else {
             if (isOutdated(cached.timestamp)) {
-                console.log('Cache invalidated!');
+                console.log(
+                    'Cached package information invalidated. Fetching new data from package.elm-lang.org'
+                );
                 updatePackageDependencyInfo(cb, cached.data);
             } else {
-                console.log('Provide cached!');
                 cb(cached.data);
             }
         }
