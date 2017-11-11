@@ -41,8 +41,8 @@ init state =
 
 
 onNewState : Client.State.State -> Model -> Model
-onNewState s _ =
-    init s
+onNewState s model =
+    { model | messageList = buildMessageList s model.messageGrouper model.messageList }
 
 
 groupMessages : State -> MessageGrouper -> GroupedMessages

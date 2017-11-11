@@ -17,6 +17,8 @@ view =
         , editorIntegration
         , hr [] []
         , moduleGraph
+        , hr [] []
+        , dependencyInformation
         ]
 
 
@@ -106,6 +108,38 @@ moduleGraph =
             , div [ class "col" ]
                 [ h4 [ id "top-importers" ] [ text "Top importers" ]
                 , p [] [ text "Typical candidates are your app's update function. These usually import many sub modules. These modules tend to become very powerful. Again you can try to reduce the number of imports by trying to delegate function subroutines to separate modules. This makes sense if individual functions are responsible for multiple imports." ]
+                ]
+            ]
+        ]
+
+
+dependencyInformation : Html msg
+dependencyInformation =
+    div []
+        [ h2 [] [ text "Dependency Information" ]
+        , div [ class "row" ]
+            [ div [ class "col" ]
+                [ p []
+                    [ text "Dependencies may evolve and you may start to use your dependencies differently than before. "
+                    , text "Elm Analyser will help you get insight into this."
+                    ]
+                , p []
+                    [ text "Firstly, the elm-analyse checker will exit with a non-zero exit code when you have dependencies specified in your elm-package.json that you do not use."
+                    ]
+                , p []
+                    [ text "Secondly, the GUI will show in a simple table what the state of your dependencies are."
+                    ]
+                ]
+            , div [ class "col col-5 col-sm-6 col-md-8" ]
+                [ div [ class "row" ]
+                    [ div [ class "col-12" ]
+                        [ a
+                            [ href "https://raw.githubusercontent.com/stil4m/elm-analyse/master/images/dependency-info.png"
+                            , target "_blank"
+                            ]
+                            [ img [ class "img-fluid", src "https://raw.githubusercontent.com/stil4m/elm-analyse/master/images/dependency-info.png" ] [] ]
+                        ]
+                    ]
                 ]
             ]
         ]

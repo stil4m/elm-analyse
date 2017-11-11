@@ -1,11 +1,10 @@
 module Analyser.State exposing (..)
 
--- import ModuleGraph exposing (ModuleGraph)
-
 import Analyser.Messages.Json exposing (decodeMessage, encodeMessage)
 import Analyser.Messages.Types as Messages exposing (Message, MessageId, MessageStatus(Applicable))
 import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing)
 import Analyser.Modules exposing (Modules)
+import Analyser.State.Dependencies exposing (Dependencies)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
 import Json.Encode as JE exposing (Value)
@@ -14,7 +13,7 @@ import List.Extra as List
 
 type alias State =
     { messages : List Message
-    , unusedDependencies : List String
+    , dependencies : Dependencies
     , idCount : Int
     , status : Status
     , queue : List Task
@@ -35,7 +34,7 @@ type Status
 initialState : State
 initialState =
     { messages = []
-    , unusedDependencies = []
+    , dependencies = Analyser.State.Dependencies.none
     , idCount = 0
     , status = Initialising
     , queue = []
@@ -118,11 +117,6 @@ outdateMessagesForFile fileName state =
     }
 
 
-updateUnusedDependencies : List String -> State -> State
-updateUnusedDependencies deps state =
-    { state | unusedDependencies = deps }
-
-
 finishWithNewMessages : List Message -> State -> State
 finishWithNewMessages messages s =
     let
@@ -141,6 +135,11 @@ finishWithNewMessages messages s =
         |> sortMessages
 
 
+withDependencies : Dependencies -> State -> State
+withDependencies dep state =
+    { state | dependencies = dep }
+
+
 updateModules : Modules -> State -> State
 updateModules newModules s =
     { s | modules = newModules }
@@ -150,7 +149,7 @@ decodeState : Decoder State
 decodeState =
     JD.succeed State
         |: JD.field "messages" (JD.list decodeMessage)
-        |: JD.field "unusedDependencies" (JD.list JD.string)
+        |: JD.field "dependencies" Analyser.State.Dependencies.decode
         |: JD.field "idCount" JD.int
         |: JD.field "status" decodeStatus
         |: JD.field "queue" (JD.list JD.int)
@@ -161,7 +160,7 @@ encodeState : State -> Value
 encodeState state =
     JE.object
         [ ( "messages", JE.list (List.map encodeMessage state.messages) )
-        , ( "unusedDependencies", JE.list (List.map JE.string state.unusedDependencies) )
+        , ( "dependencies", Analyser.State.Dependencies.encode state.dependencies )
         , ( "idCount", JE.int state.idCount )
         , ( "status", encodeStatus state.status )
         , ( "queue", JE.list (List.map JE.int state.queue) )

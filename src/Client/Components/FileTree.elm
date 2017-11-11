@@ -76,11 +76,12 @@ updateMessageList m =
 onNewState : Client.State.State -> Model -> Model
 onNewState s model =
     let
-        x : Maybe (List Message)
-        x =
-            Client.State.toMaybe s |> Maybe.map .messages
+        messages =
+            s
+                |> Client.State.toMaybe
+                |> Maybe.map .messages
     in
-    updateFileIndex x model
+    updateFileIndex messages model
         |> updateMessageList
 
 

@@ -1,4 +1,4 @@
-module Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
+module Analyser.Files.Json exposing (decodeDependency, deserialiseDependency, encodeDependency, serialiseDependency)
 
 import Dict
 import Elm.Dependency exposing (Dependency)
