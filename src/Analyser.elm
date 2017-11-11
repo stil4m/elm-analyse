@@ -11,8 +11,10 @@ import Analyser.Messages.Util as Messages
 import Analyser.Modules
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import Analyser.State as State exposing (State)
+import Analyser.State.Dependencies
 import AnalyserPorts
 import Inspection
+import Json.Encode exposing (Value)
 import Platform exposing (programWithFlags)
 import Registry exposing (Registry)
 import Time
@@ -50,17 +52,19 @@ type Stage
     | Finished
 
 
-main : Program Bool Model Msg
+type alias Flags =
+    { server : Bool
+    , registry : Value
+    }
+
+
+main : Program Flags Model Msg
 main =
     programWithFlags { init = init, update = update, subscriptions = subscriptions }
 
 
-init : Bool -> ( Model, Cmd Msg )
-init server =
-    let
-        ( registry, registryCmds ) =
-            Registry.init
-    in
+init : Flags -> ( Model, Cmd Msg )
+init flags =
     reset
         ( { context = ContextLoader.emptyContext
           , stage = Finished
@@ -68,10 +72,10 @@ init server =
           , codeBase = CodeBase.init
           , state = State.initialState
           , changedFiles = []
-          , server = server
-          , registry = registry
+          , server = flags.server
+          , registry = Registry.fromValue flags.registry
           }
-        , registryCmds
+        , Cmd.none
         )
 
 
@@ -97,7 +101,7 @@ update msg model =
                 |> handleNextStep
 
         Reset ->
-            init model.server
+            reset ( model, Cmd.none )
 
         OnContext context ->
             let
@@ -286,10 +290,13 @@ finishProcess newStage cmds model =
         ( unusedDeps, newModules ) =
             Analyser.Modules.build newCodeBase (CodeBase.sourceFiles newCodeBase)
 
+        deps =
+            Analyser.State.Dependencies.init (List.map .name unusedDeps) (CodeBase.dependencies newCodeBase) model.registry
+
         newState =
             State.finishWithNewMessages messages model.state
                 |> State.updateModules newModules
-                |> State.updateUnusedDependencies (List.map .name unusedDeps)
+                |> State.withDependencies deps
 
         newModel =
             { model
@@ -300,7 +307,11 @@ finishProcess newStage cmds model =
     in
     ( newModel
     , Cmd.batch
-        [ AnalyserPorts.sendReport { messages = newState.messages, modules = newState.modules, unusedDependencies = newState.unusedDependencies }
+        [ AnalyserPorts.sendReport
+            { messages = newState.messages
+            , modules = newState.modules
+            , unusedDependencies = newState.dependencies.unused
+            }
         , AnalyserPorts.sendStateValue newState
         , Cmd.map SourceLoadingStageMsg cmds
         ]

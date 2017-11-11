@@ -1,7 +1,8 @@
-module Registry.Version exposing (Version, decode, fromString, isMajorUpgrade, order)
+module Registry.Version exposing (Version, asString, decode, encode, fromString, isMajorUpgrade, order)
 
-import Json.Decode as JD exposing (Decoder, Value)
-import Json.Decode.Extra exposing ((|:))
+import Json.Decode as JD exposing (Decoder)
+import Json.Decode.Extra
+import Json.Encode as JE exposing (Value)
 
 
 type Version
@@ -41,3 +42,13 @@ fromStrings ( x, y, z ) =
 decode : Decoder Version
 decode =
     JD.string |> JD.andThen (fromString >> Json.Decode.Extra.fromResult)
+
+
+asString : Version -> String
+asString (Version a b c) =
+    String.join "." [ toString a, toString b, toString c ]
+
+
+encode : Version -> Value
+encode =
+    JE.string << asString

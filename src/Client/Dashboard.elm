@@ -33,7 +33,7 @@ viewState state =
                     [ listValueWidget "Messages" state.messages
                     ]
                 , Html.a [ Html.Attributes.href (Routing.toUrl Routing.Dependencies) ]
-                    [ listValueWidget "Unused dependencies" state.unusedDependencies
+                    [ listValueWidget "Unused dependencies" state.dependencies.unused
                     ]
                 ]
             ]
