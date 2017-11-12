@@ -30,7 +30,8 @@
     "pr:check":
       "npm install && npm run js:lint && npm run elm:validate-format && npm run elm:test && npm run build && npm run elm:lint",
     "dev:build-server": "./node_modules/.bin/gulp elm-backend",
-
+    "dev:build-editor":
+      "elm-make src/Editor.elm --output editor/elm.js && noderify editor/editor.js > js/public/editor-elm.js",
     "run:server": "node \"./js/bin/index.js\" -s",
     "dev:server":
       "./node_modules/.bin/nodemon --watch src --ext elm --exec \"npm run dev:build-server && npm run run:server\""
@@ -51,9 +52,11 @@
     "node-watch": "0.5.5",
     "normalize-newline": "3.0.0",
     "os-homedir": "1.0.2",
-    "sums": "0.2.4"
+    "sums": "0.2.4",
+    "ws": "3.3.1"
   },
   "devDependencies": {
+    "bufferutil": "3.0.3",
     "chokidar": "1.7.0",
     "chokidar-cli": "1.2.0",
     "elm": "0.18.0",
@@ -65,7 +68,9 @@
     "gulp-elm": "0.6.1",
     "gulp-replace": "0.5.4",
     "nodemon": "1.12.1",
+    "noderify": "3.0.2",
     "prettier": "1.7.0",
-    "run-sequence": "1.2.2"
+    "run-sequence": "1.2.2",
+    "utf-8-validate": "3.0.4"
   }
 }

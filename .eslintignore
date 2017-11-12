@@ -3,4 +3,5 @@ elm-stuff/**
 target/**
 js/backend-elm.js
 js/public/client-elm.js
+js/public/editor-elm.js
 docs/docs.js
