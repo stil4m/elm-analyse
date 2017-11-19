@@ -54,7 +54,7 @@ module.exports = function() {
         }
     };
 };
-//
+// //
 // const editor = module.exports();
 // const cancel = editor.onState(function(s) {
 //     console.log('On Client');
