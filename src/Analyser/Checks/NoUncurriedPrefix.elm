@@ -13,6 +13,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "NoUncurriedPrefix" ]
+    , key = "NoUncurriedPrefix"
+    , name = "Fully Applied Operator as Prefix"
+    , description = "It's not needed to use an operator in prefix notation when you apply both arguments directly."
     }
 
 

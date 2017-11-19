@@ -15,6 +15,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "ImportAll" ]
+    , key = "ImportAll"
+    , name = "Import All"
+    , description = "When other people read your code, it would be nice if the origin of a used function can be traced back to the providing module."
     }
 
 

@@ -1,21 +1,21 @@
-module Analyser.Checks.UnnecessaryListConcat exposing (checker)
+module Analyser.Checks.UseConsOverConcat exposing (checker)
 
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryListConcat), newMessage)
+import Analyser.Messages.Types exposing (Message, MessageData(UseConsOverConcat), newMessage)
 import Elm.Syntax.Expression exposing (..)
 
 
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "UnnecessaryListConcat" ]
-    , key = "UnnecessaryListConcat"
-    , name = "Unnecessary List Concat"
-    , description = "You should not use 'List.concat' to concatenate literal lists. Just join the lists together."
+    , shouldCheck = keyBasedChecker [ "UseConsOverConcat" ]
+    , key = "UseConsOverConcat"
+    , name = "Use Cons Over Concat"
+    , description = "If you concatenate two lists, but the right hand side is a single element list, then you should use the cons operator."
     }
 
 
@@ -31,28 +31,15 @@ scan rangeContext fileContext _ =
         }
         fileContext.ast
         []
-        |> List.map (UnnecessaryListConcat fileContext.path)
+        |> List.map (UseConsOverConcat fileContext.path)
         |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
-
-
-isListExpression : Expression -> Bool
-isListExpression ( _, inner ) =
-    case inner of
-        ListExpr _ ->
-            True
-
-        _ ->
-            False
 
 
 onExpression : RangeContext -> Expression -> Context -> Context
 onExpression rangeContext ( r, inner ) context =
     case inner of
-        Application [ ( _, QualifiedExpr [ "List" ] "concat" ), ( _, ListExpr args ) ] ->
-            if List.all isListExpression args then
-                Range.build rangeContext r :: context
-            else
-                context
+        OperatorApplication "++" _ ( _, ListExpr [ _ ] ) _ ->
+            Range.build rangeContext r :: context
 
         _ ->
             context

@@ -14,6 +14,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "UnnecessaryPortModule" ]
+    , key = "UnnecessaryPortModule"
+    , name = "Unnecessary Port Module"
+    , description = "Dont use the port keyword if you do not need it."
     }
 
 

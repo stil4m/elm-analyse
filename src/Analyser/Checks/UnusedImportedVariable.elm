@@ -1,13 +1,13 @@
-module Analyser.Checks.UnusedVariable exposing (checker)
+module Analyser.Checks.UnusedImportedVariable exposing (checker)
 
-import ASTUtil.Variables exposing (VariableType(Defined))
+import ASTUtil.Variables exposing (VariableType(Imported))
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Checks.Variables as Variables
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable), newMessage)
-import Dict exposing (Dict)
+import Analyser.Messages.Types exposing (Message, MessageData(UnusedImportedVariable), newMessage)
+import Dict
 import Elm.Interface as Interface
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Range as Syntax
@@ -17,31 +17,16 @@ import Tuple3
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "UnusedVariable" ]
-    , key = "UnusedVariable"
-    , name = "Unused Variable"
-    , description = "Variables that are not used could be removed or marked as _ to avoid unnecessary noise."
-    }
-
-
-type alias Scope =
-    Dict String ( Int, VariableType, Syntax.Range )
-
-
-type alias ActiveScope =
-    ( List String, Scope )
-
-
-type alias UsedVariableContext =
-    { poppedScopes : List Scope
-    , activeScopes : List ActiveScope
+    , shouldCheck = keyBasedChecker [ "UnusedImportedVariable" ]
+    , key = "UnusedImportedVariable"
+    , name = "Unused Imported Variable"
+    , description = "When a function is imported from a module but is unused, it is better to remove it."
     }
 
 
 scan : RangeContext -> FileContext -> Configuration -> List Message
 scan rangeContext fileContext _ =
     let
-        x : UsedVariableContext
         x =
             Variables.collect fileContext
 
@@ -74,8 +59,8 @@ scan rangeContext fileContext _ =
 forVariableType : String -> VariableType -> String -> Range -> Maybe MessageData
 forVariableType path variableType variableName range =
     case variableType of
-        Defined ->
-            Just (UnusedVariable path variableName range)
+        Imported ->
+            Just (UnusedImportedVariable path variableName range)
 
         _ ->
             Nothing

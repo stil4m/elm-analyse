@@ -25,6 +25,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "FunctionInLet" ]
+    , key = "FunctionInLet"
+    , name = "Function In Let"
+    , description = "In a let statement you can define variables and functions in their own scope. But you are already in the scope of a module. Just define the functions you want on a top-level. There is no not much need to define functions in let statements."
     }
 
 

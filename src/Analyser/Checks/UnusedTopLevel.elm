@@ -1,12 +1,12 @@
-module Analyser.Checks.UnusedVariable exposing (checker)
+module Analyser.Checks.UnusedTopLevel exposing (checker)
 
-import ASTUtil.Variables exposing (VariableType(Defined))
+import ASTUtil.Variables exposing (VariableType(TopLevel))
 import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
 import Analyser.Checks.Variables as Variables
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable), newMessage)
+import Analyser.Messages.Types exposing (Message, MessageData(UnusedTopLevel), newMessage)
 import Dict exposing (Dict)
 import Elm.Interface as Interface
 import Elm.Syntax.Module exposing (..)
@@ -17,10 +17,10 @@ import Tuple3
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "UnusedVariable" ]
-    , key = "UnusedVariable"
-    , name = "Unused Variable"
-    , description = "Variables that are not used could be removed or marked as _ to avoid unnecessary noise."
+    , shouldCheck = keyBasedChecker [ "UnusedTopLevel" ]
+    , key = "UnusedTopLevel"
+    , name = "Unused Top Level"
+    , description = "Functions and values that are unused in a module and not exported are dead code."
     }
 
 
@@ -74,8 +74,8 @@ scan rangeContext fileContext _ =
 forVariableType : String -> VariableType -> String -> Range -> Maybe MessageData
 forVariableType path variableType variableName range =
     case variableType of
-        Defined ->
-            Just (UnusedVariable path variableName range)
+        TopLevel ->
+            Just (UnusedTopLevel path variableName range)
 
         _ ->
             Nothing

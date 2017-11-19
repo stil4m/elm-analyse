@@ -15,6 +15,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "ExposeAll" ]
+    , key = "ExposeAll"
+    , name = "Expose All"
+    , description = "You want to be clear about the API that a module defines."
     }
 
 

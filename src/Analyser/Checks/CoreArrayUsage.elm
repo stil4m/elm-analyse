@@ -12,6 +12,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "CoreArrayUsage" ]
+    , key = "CoreArrayUsage"
+    , name = "Core Array Usage"
+    , description = "Arrays dont work well in 0.18. Try Skinney/elm-array-exploration for now."
     }
 
 

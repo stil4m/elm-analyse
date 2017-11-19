@@ -22,6 +22,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "NonStaticRegex" ]
+    , key = "NonStaticRegex"
+    , name = "Non Static Regex"
+    , description = "Define regexes as top level to avoid run time exceptions."
     }
 
 

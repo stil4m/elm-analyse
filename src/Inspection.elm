@@ -2,6 +2,10 @@ module Inspection exposing (run)
 
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
+import Analyser.Checks.DebugCrash as DebugCrash
+import Analyser.Checks.DebugLog as DebugLog
+import Analyser.Checks.DropConcatOfLists as DropConcatOfLists
+import Analyser.Checks.DropConsOfItemAndList as DropConsOfItemAndList
 import Analyser.Checks.DuplicateImport as DuplicateImport
 import Analyser.Checks.DuplicateImportedVariable as DuplicateImportedVariable
 import Analyser.Checks.DuplicateRecordFieldUpdate as DuplicateRecordFieldUpdate
@@ -9,9 +13,7 @@ import Analyser.Checks.ExposeAll as ExposeAll
 import Analyser.Checks.FunctionInLet as FunctionInLet
 import Analyser.Checks.ImportAll as ImportAll
 import Analyser.Checks.LineLength as LineLength
-import Analyser.Checks.ListOperators as ListOperators
 import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
-import Analyser.Checks.NoDebug as NoDebug
 import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 import Analyser.Checks.NonStaticRegex as NonStaticRegex
@@ -24,8 +26,12 @@ import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 import Analyser.Checks.UnnecessaryPortModule as UnnecessaryPortModule
 import Analyser.Checks.UnusedImport as UnusedImport
 import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
+import Analyser.Checks.UnusedImportedVariable as UnusedImportedVariable
+import Analyser.Checks.UnusedPatternVariable as UnusedPatternVariable
+import Analyser.Checks.UnusedTopLevel as UnusedTopLevel
 import Analyser.Checks.UnusedTypeAlias as UnusedTypeAlias
 import Analyser.Checks.UnusedVariable as UnusedVariable
+import Analyser.Checks.UseConsOverConcat as UseConsOverConcat
 import Analyser.CodeBase exposing (CodeBase)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext as FileContext
@@ -38,11 +44,15 @@ import Result.Extra
 checkers : List Checker
 checkers =
     [ UnusedVariable.checker
+    , UnusedImportedVariable.checker
+    , UnusedPatternVariable.checker
+    , UnusedTopLevel.checker
     , ExposeAll.checker
     , ImportAll.checker
     , NoTopLevelSignature.checker
     , UnnecessaryParens.checker
-    , NoDebug.checker
+    , DebugLog.checker
+    , DebugCrash.checker
     , DuplicateImport.checker
     , DuplicateImportedVariable.checker
     , UnusedTypeAlias.checker
@@ -50,7 +60,9 @@ checkers =
     , NoUncurriedPrefix.checker
     , UnusedImportAliases.checker
     , UnusedImport.checker
-    , ListOperators.checker
+    , UseConsOverConcat.checker
+    , DropConcatOfLists.checker
+    , DropConsOfItemAndList.checker
     , LineLength.checker
     , UnnecessaryListConcat.checker
     , MultiLineRecordFormatting.checker

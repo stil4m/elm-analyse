@@ -18,6 +18,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "UnnecessaryParens" ]
+    , key = "UnnecessaryParens"
+    , name = "Unnecessary Parens"
+    , description = "If you want parenthesis, then you might want to look into Lisp."
     }
 
 

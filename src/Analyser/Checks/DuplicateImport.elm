@@ -15,6 +15,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "DuplicateImport" ]
+    , key = "DuplicateImport"
+    , name = "Duplicate Import"
+    , description = "You are importing the same module twice."
     }
 
 

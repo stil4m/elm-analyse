@@ -11,6 +11,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "LineLengthExceeded" ]
+    , key = "LineLengthExceeded"
+    , name = "Line Length Exceeded"
+    , description = "This check will mark files that contain lines that exceed over 150 characters (see 'check-specific-configuration' below to change the maximum line length)."
     }
 
 

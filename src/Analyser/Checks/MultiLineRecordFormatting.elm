@@ -15,6 +15,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "MultiLineRecordFormatting" ]
+    , key = "MultiLineRecordFormatting"
+    , name = "MultiLine Record Formatting"
+    , description = "Records in type aliases should be formatted on multiple lines to help the reader."
     }
 
 

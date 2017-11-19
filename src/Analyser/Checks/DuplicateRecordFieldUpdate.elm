@@ -16,6 +16,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "DuplicateRecordFieldUpdate" ]
+    , key = "DuplicateRecordFieldUpdate"
+    , name = "Duplicate Record Field Update"
+    , description = "You only want to update a field once in the record update syntax. Doing twice may only cause bugs."
     }
 
 

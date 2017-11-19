@@ -15,6 +15,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "TriggerWords" ]
+    , key = "TriggerWords"
+    , name = "Trigger Words"
+    , description = "Comments can tell you what that you have to put your code a bit more attention. You should resolve things as 'TODO' and such."
     }
 
 

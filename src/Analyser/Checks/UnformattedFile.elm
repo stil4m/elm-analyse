@@ -11,6 +11,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "UnformattedFile" ]
+    , key = "UnformattedFile"
+    , name = "Unformatted File"
+    , description = "File is not formatted correctly"
     }
 
 

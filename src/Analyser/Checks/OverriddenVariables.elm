@@ -18,6 +18,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "RedefineVariable" ]
+    , key = "RedefineVariable"
+    , name = "Redefine Variable"
+    , description = "You should not redefine a variable in a new lexical scope. This is confusing and may lead to bugs."
     }
 
 

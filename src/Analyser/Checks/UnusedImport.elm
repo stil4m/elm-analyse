@@ -18,6 +18,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "UnusedImport" ]
+    , key = "UnusedImport"
+    , name = "Unused Import"
+    , description = "Imports that have no meaning should be removed."
     }
 
 

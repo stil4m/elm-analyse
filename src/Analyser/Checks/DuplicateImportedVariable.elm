@@ -17,6 +17,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "DuplicateImportedVariable" ]
+    , key = "DuplicateImportedVariable"
+    , name = "Duplicate Imported Variable"
+    , description = "Importing a variable twice from the same module is noise. Remove this."
     }
 
 

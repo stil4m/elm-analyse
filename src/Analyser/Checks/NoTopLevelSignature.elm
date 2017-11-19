@@ -13,6 +13,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "NoTopLevelSignature" ]
+    , key = "NoTopLevelSignature"
+    , name = "No Top Level Signature"
+    , description = "We want our readers to understand our code. Adding a signature is part of this."
     }
 
 

@@ -14,6 +14,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "SingleFieldRecord" ]
+    , key = "SingleFieldRecord"
+    , name = "Single Field Record"
+    , description = "Using a record is obsolete if you only plan to store a single field in it."
     }
 
 

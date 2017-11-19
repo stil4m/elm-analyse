@@ -18,6 +18,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "UnusedImportAlias" ]
+    , key = "UnusedImportAlias"
+    , name = "Unused Import Alias"
+    , description = "You defined an alias for an import (import Foo as F), but it turns out you never use it."
     }
 
 

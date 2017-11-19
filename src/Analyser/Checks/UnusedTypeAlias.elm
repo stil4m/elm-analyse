@@ -17,6 +17,9 @@ checker : Checker
 checker =
     { check = scan
     , shouldCheck = keyBasedChecker [ "UnusedTypeAlias" ]
+    , key = "UnusedTypeAlias"
+    , name = "Unused Type Alias"
+    , description = "You defined a type alias, but you do not use it in any signature or expose it."
     }
 
 
