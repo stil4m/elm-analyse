@@ -2,25 +2,29 @@ module Analyser.Checks.UnnecessaryPortModule exposing (checker)
 
 import AST.Util
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range exposing (RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryPortModule), newMessage)
+import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
 
 
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "UnnecessaryPortModule" ]
-    , key = "UnnecessaryPortModule"
-    , name = "Unnecessary Port Module"
-    , description = "Dont use the port keyword if you do not need it."
+    , info =
+        { key = "UnnecessaryPortModule"
+        , name = "Unnecessary Port Module"
+        , description = "Dont use the port keyword if you do not need it."
+        , schema =
+            Schema.schema
+        }
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan _ fileContext _ =
     if AST.Util.isPortModule fileContext.ast then
         let
@@ -31,10 +35,7 @@ scan _ fileContext _ =
                     0
         in
         if portDeclCount == 0 then
-            [ newMessage
-                [ ( fileContext.sha1, fileContext.path ) ]
-                (UnnecessaryPortModule fileContext.path)
-            ]
+            [ Data.init "Module defined a `port` module, but is does not declare ports. It may be better to remove these." ]
         else
             []
     else

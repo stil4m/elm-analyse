@@ -1,11 +1,12 @@
 module Analyser.Checks.DuplicateImportedVariable exposing (checker)
 
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(DuplicateImportedVariable), newMessage)
+import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.Exposing exposing (Exposing(..), TopLevelExpose(..))
@@ -16,10 +17,16 @@ import Elm.Syntax.Range as Syntax
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "DuplicateImportedVariable" ]
-    , key = "DuplicateImportedVariable"
-    , name = "Duplicate Imported Variable"
-    , description = "Importing a variable twice from the same module is noise. Remove this."
+    , info =
+        { key = "DuplicateImportedVariable"
+        , name = "Duplicate Imported Variable"
+        , description = "Importing a variable twice from the same module is noise. Remove this."
+        , schema =
+            Schema.schema
+                |> Schema.rangeListProp "ranges"
+                |> Schema.varProp "varName"
+                |> Schema.moduleProp "moduleName"
+        }
     }
 
 
@@ -29,7 +36,7 @@ type alias Context =
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan rangeContext fileContext _ =
     let
         result =
@@ -42,13 +49,29 @@ scan rangeContext fileContext _ =
                 { constructors = Dict.empty, functionOrValues = Dict.empty }
     in
     (findViolations result.functionOrValues ++ findViolations result.constructors)
-        |> List.map (asMessageData rangeContext fileContext.path)
-        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+        |> List.map (asMessageData rangeContext)
 
 
-asMessageData : RangeContext -> String -> ( ModuleName, String, List Syntax.Range ) -> MessageData
-asMessageData rangeContext path ( a, b, rs ) =
-    DuplicateImportedVariable path a b (List.map (Range.build rangeContext) rs)
+asMessageData : RangeContext -> ( ModuleName, String, List Syntax.Range ) -> MessageData
+asMessageData rangeContext ( a, b, rs ) =
+    let
+        ranges =
+            List.map (Range.build rangeContext) rs
+    in
+    Data.init
+        (String.concat
+            [ "Variable `"
+            , b
+            , "` imported multiple times module `"
+            , String.join "." a
+            , "` at [ "
+            , String.join " | " (List.map Range.asString ranges)
+            , " ]"
+            ]
+        )
+        |> Data.addModuleName "moduleName" a
+        |> Data.addVarName "varName" b
+        |> Data.addRanges "ranges" ranges
 
 
 findViolations : Dict ModuleName (Dict String (List Syntax.Range)) -> List ( ModuleName, String, List Syntax.Range )

@@ -8,6 +8,7 @@ const fetchDependencies = function(cb) {
     ) {
         if (err) {
             cb(null);
+            return;
         }
         var cbValue;
         try {
@@ -21,6 +22,7 @@ const fetchDependencies = function(cb) {
 
 const updatePackageDependencyInfo = function(cb, defaultValue) {
     fetchDependencies(function(result) {
+        console.log('Fetched dependencies');
         if (result == null) {
             cb(defaultValue);
             return;

@@ -3,6 +3,7 @@ module Analyser.SourceLoadingStage exposing (Model, Msg, init, isDone, parsedFil
 import Analyser.Files.FileLoader as FileLoader
 import Analyser.Files.Types exposing (LoadedSourceFile, LoadedSourceFiles)
 import List.Extra
+import Set exposing (Set)
 
 
 type Model
@@ -10,11 +11,12 @@ type Model
 
 
 type Msg
-    = FileLoaderMsg FileLoader.Msg
+    = FileLoaderMsg String FileLoader.Msg
 
 
 type alias State =
-    { filesToLoad : Maybe ( String, List String )
+    { filesToLoad : List String
+    , loadingFiles : Set String
     , parsedFiles : List LoadedSourceFile
     }
 
@@ -22,7 +24,8 @@ type alias State =
 init : List String -> ( Model, Cmd Msg )
 init input =
     ( Model
-        { filesToLoad = List.Extra.uncons input
+        { filesToLoad = input
+        , loadingFiles = Set.empty
         , parsedFiles = []
         }
     , Cmd.none
@@ -32,7 +35,7 @@ init input =
 
 isDone : Model -> Bool
 isDone (Model model) =
-    model.filesToLoad == Nothing
+    List.isEmpty model.filesToLoad && Set.isEmpty model.loadingFiles
 
 
 parsedFiles : Model -> LoadedSourceFiles
@@ -43,38 +46,35 @@ parsedFiles (Model model) =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg (Model state) =
     case msg of
-        FileLoaderMsg subMsg ->
-            state.filesToLoad
-                |> Maybe.map
-                    (\( _, rest ) ->
-                        let
-                            ( fileLoad, cmd ) =
-                                FileLoader.update subMsg
-                        in
-                        ( Model
-                            { state
-                                | filesToLoad = List.Extra.uncons rest
-                                , parsedFiles = fileLoad :: state.parsedFiles
-                            }
-                        , Cmd.map FileLoaderMsg cmd
-                        )
-                    )
-                |> Maybe.map loadNextFile
-                |> Maybe.withDefault (Model state ! [])
+        FileLoaderMsg name subMsg ->
+            let
+                ( fileLoad, cmd ) =
+                    FileLoader.update subMsg
+            in
+            ( Model
+                { state
+                    | loadingFiles = Set.remove name state.loadingFiles
+                    , parsedFiles = fileLoad :: state.parsedFiles
+                }
+            , Cmd.map (FileLoaderMsg name) cmd
+            )
+                |> loadNextFile
 
 
 loadNextFile : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 loadNextFile ( Model model, msgs ) =
-    model.filesToLoad
+    List.Extra.uncons model.filesToLoad
         |> Maybe.map
-            (\( next, _ ) ->
-                ( Model model
-                , Cmd.batch [ msgs, Cmd.map FileLoaderMsg <| FileLoader.init next ]
+            (\( next, rest ) ->
+                ( Model { model | loadingFiles = Set.insert next model.loadingFiles, filesToLoad = rest }
+                , Cmd.batch [ msgs, Cmd.map (FileLoaderMsg next) <| FileLoader.init next ]
                 )
             )
         |> Maybe.withDefault ( Model model, msgs )
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    FileLoader.subscriptions |> Sub.map FileLoaderMsg
+subscriptions (Model model) =
+    Set.toList model.loadingFiles
+        |> List.map (\n -> FileLoader.subscriptions |> Sub.map (FileLoaderMsg n))
+        |> Sub.batch

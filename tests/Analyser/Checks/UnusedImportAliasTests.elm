@@ -1,9 +1,9 @@
-module Analyser.Checks.UnusedImportAliasesTests exposing (..)
+module Analyser.Checks.UnusedImportAliasTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
-import Analyser.Checks.UnusedImportAliases as UnusedImportAliases
+import Analyser.Checks.UnusedImportAlias as UnusedImportAlias
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range
-import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 
@@ -16,10 +16,13 @@ import Bar as B
 
 foo = (+) 1 2
 """
-    , [ UnusedImportAlias "./foo.elm" [ "B" ] <|
-            Range.manual
-                { start = { row = 2, column = 0 }, end = { row = 2, column = 15 } }
-                { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+    , [ Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "B" ]
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 2, column = 0 }, end = { row = 2, column = 15 } }
+                    { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+                )
       ]
     )
 
@@ -87,8 +90,8 @@ type alias Thing = { name : B.Name }
 
 all : Test
 all =
-    CTU.build "Analyser.Checks.UnusedImportAliases"
-        UnusedImportAliases.checker
+    CTU.build "Analyser.Checks.UnusedImportAlias"
+        UnusedImportAlias.checker
         [ noUsageForAlias
         , usedAsQualified
         , usedAsQualifiedInPattern

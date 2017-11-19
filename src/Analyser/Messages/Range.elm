@@ -1,4 +1,4 @@
-module Analyser.Messages.Range exposing (Range, RangeContext, asSyntaxRange, build, compareRangeStarts, context, decode, emptyRange, encode, manual, orderByStart, rangeToString, startLine, toTuple)
+module Analyser.Messages.Range exposing (Range, RangeContext, asString, asSyntaxRange, build, compareRangeStarts, context, decode, emptyRange, encode, manual, orderByStart, startLine, toTuple)
 
 import AST.Ranges as AstRanges
 import Dict exposing (Dict)
@@ -40,8 +40,8 @@ decode =
     Syntax.decode |> JD.map (\x -> Range x x)
 
 
-rangeToString : Range -> String
-rangeToString (Range real _) =
+asString : Range -> String
+asString (Range real _) =
     AstRanges.rangeToString real
 
 

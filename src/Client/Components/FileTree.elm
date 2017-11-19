@@ -57,10 +57,7 @@ updateFileIndex maybeMessages model =
         messagesForFile file messages =
             messages
                 |> List.filter
-                    (\ms ->
-                        List.map Tuple.second ms.files
-                            |> List.member file
-                    )
+                    (\ms -> ms.file.path == file)
 
         buildTree messages tree =
             List.map (\file -> ( file, messagesForFile file messages )) tree

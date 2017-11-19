@@ -1,28 +1,29 @@
 module Analyser.Checks.UnformattedFile exposing (checker)
 
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range exposing (RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnformattedFile), newMessage)
+import Analyser.Messages.Schema as Schema
 
 
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "UnformattedFile" ]
-    , key = "UnformattedFile"
-    , name = "Unformatted File"
-    , description = "File is not formatted correctly"
+    , info =
+        { key = "UnformattedFile"
+        , name = "Unformatted File"
+        , description = "File is not formatted correctly"
+        , schema =
+            Schema.schema
+        }
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan _ fileContext _ =
     if fileContext.formatted then
         []
     else
-        [ newMessage
-            [ ( fileContext.sha1, fileContext.path ) ]
-            (UnformattedFile fileContext.path)
-        ]
+        [ Data.init "Unformatted file" ]

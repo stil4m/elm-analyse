@@ -1,12 +1,13 @@
 module Analyser.Checks.UnusedVariable exposing (checker)
 
 import ASTUtil.Variables exposing (VariableType(Defined))
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Checks.Variables as Variables
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnusedVariable), newMessage)
+import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Interface as Interface
 import Elm.Syntax.Module exposing (..)
@@ -17,10 +18,15 @@ import Tuple3
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "UnusedVariable" ]
-    , key = "UnusedVariable"
-    , name = "Unused Variable"
-    , description = "Variables that are not used could be removed or marked as _ to avoid unnecessary noise."
+    , info =
+        { key = "UnusedVariable"
+        , name = "Unused Variable"
+        , description = "Variables that are not used could be removed or marked as _ to avoid unnecessary noise."
+        , schema =
+            Schema.schema
+                |> Schema.varProp "varName"
+                |> Schema.rangeProp "range"
+        }
     }
 
 
@@ -38,7 +44,7 @@ type alias UsedVariableContext =
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan rangeContext fileContext _ =
     let
         x : UsedVariableContext
@@ -53,8 +59,7 @@ scan rangeContext fileContext _ =
             x.poppedScopes
                 |> List.concatMap Dict.toList
                 |> onlyUnused
-                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType fileContext.path t x (Range.build rangeContext y))
-                |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType t x (Range.build rangeContext y))
 
         unusedTopLevels =
             x.activeScopes
@@ -65,20 +70,33 @@ scan rangeContext fileContext _ =
                 |> onlyUnused
                 |> List.filter (filterByModuleType fileContext)
                 |> List.filter (Tuple.first >> flip Interface.exposesFunction fileContext.interface >> not)
-                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType fileContext.path t x (Range.build rangeContext y))
-                |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType t x (Range.build rangeContext y))
     in
     unusedVariables ++ unusedTopLevels
 
 
-forVariableType : String -> VariableType -> String -> Range -> Maybe MessageData
-forVariableType path variableType variableName range =
+forVariableType : VariableType -> String -> Range -> Maybe MessageData
+forVariableType variableType variableName range =
     case variableType of
         Defined ->
-            Just (UnusedVariable path variableName range)
+            Just (buildMessageData variableName range)
 
         _ ->
             Nothing
+
+
+buildMessageData : String -> Range -> MessageData
+buildMessageData varName range =
+    Data.init
+        (String.concat
+            [ "Unused variable `"
+            , varName
+            , "` at "
+            , Range.asString range
+            ]
+        )
+        |> Data.addVarName "varName" varName
+        |> Data.addRange "range" range
 
 
 filterByModuleType : FileContext -> ( String, ( Int, VariableType, Syntax.Range ) ) -> Bool

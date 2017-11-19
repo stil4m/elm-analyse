@@ -2,6 +2,7 @@ module Analyser.Checks.UnnecessaryListConcatTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (..)
@@ -15,10 +16,12 @@ couldMerge =
 foo =
     List.concat [ [1], [2] ]
 """
-    , [ UnnecessaryListConcat "./foo.elm" <|
-            Range.manual
-                { start = { row = 3, column = 4 }, end = { row = 3, column = 28 } }
-                { start = { row = 3, column = 3 }, end = { row = 4, column = -2 } }
+    , [ Data.init "foo"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 3, column = 4 }, end = { row = 3, column = 28 } }
+                    { start = { row = 3, column = 3 }, end = { row = 4, column = -2 } }
+                )
       ]
     )
 
@@ -42,10 +45,12 @@ foo x =
         , True
         )
   """
-    , [ UnnecessaryListConcat "./foo.elm" <|
-            Range.manual
-                { start = { row = 11, column = 18 }, end = { row = 11, column = 50 } }
-                { start = { row = 11, column = 17 }, end = { row = 11, column = 49 } }
+    , [ Data.init "foo"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 11, column = 18 }, end = { row = 11, column = 50 } }
+                    { start = { row = 11, column = 17 }, end = { row = 11, column = 49 } }
+                )
       ]
     )
 

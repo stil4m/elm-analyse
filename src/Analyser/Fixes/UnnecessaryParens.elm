@@ -1,45 +1,33 @@
 module Analyser.Fixes.UnnecessaryParens exposing (fixer)
 
+import Analyser.Checks.UnnecessaryParens as UnnecessaryParensCheck
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.FileContent as FileContent
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (Range)
-import Analyser.Messages.Types exposing (MessageData(UnnecessaryParens))
 import Elm.Syntax.File exposing (..)
-import Tuple3
 
 
 fixer : Fixer
 fixer =
-    Fixer canFix fix
+    Fixer (.key <| .info <| UnnecessaryParensCheck.checker)
+        fix
+        "Remove and format"
 
 
-canFix : MessageData -> Bool
-canFix message =
-    case message of
-        UnnecessaryParens _ _ ->
-            True
-
-        _ ->
-            False
-
-
-fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
+fix : ( String, File ) -> MessageData -> Result String String
 fix input messageData =
-    case messageData of
-        UnnecessaryParens fileName range ->
+    case Data.getRange "range" messageData of
+        Just range ->
             input
-                |> List.filter (Tuple3.first >> (==) fileName)
-                |> List.head
-                |> Maybe.map (Tuple3.init >> fixContent range)
-                |> Maybe.map (Result.map List.singleton)
-                |> Maybe.withDefault (Err "Could not find the right file to replace the unnecessary parens")
+                |> (Tuple.first >> fixContent range)
 
-        _ ->
+        Nothing ->
             Err "Invalid message data for fixer UnnecessaryParens"
 
 
-fixContent : Range -> ( String, String ) -> Result String ( String, String )
-fixContent range ( fileName, content ) =
+fixContent : Range -> String -> Result String String
+fixContent range content =
     let
         { start, end } =
             Range.asSyntaxRange range
@@ -81,7 +69,6 @@ fixContent range ( fileName, content ) =
             content
                 |> FileContent.replaceLocationWith ( start.row, start.column ) " "
                 |> FileContent.replaceLocationWith endCharLoc ""
-                |> (,) fileName
                 |> Ok
 
         _ ->

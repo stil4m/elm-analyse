@@ -1,7 +1,7 @@
 module Client.Messages exposing (viewAll)
 
+import Analyser.Messages.Data as Data
 import Analyser.Messages.Types exposing (GroupedMessages, Message, MessageStatus(Fixing, Outdated))
-import Analyser.Messages.Util as Messages
 import Dict
 import Html exposing (Html, a, div, h5, li, span, strong, text, ul)
 import Html.Attributes exposing (style)
@@ -63,6 +63,6 @@ view focus n x =
                 ]
             , span
                 [ style [ ( "display", "table-cell" ) ] ]
-                [ text <| Messages.asString x.data ]
+                [ text <| Data.description x.data ]
             ]
         ]

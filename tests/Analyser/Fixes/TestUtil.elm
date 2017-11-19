@@ -1,7 +1,7 @@
 module Analyser.Fixes.TestUtil exposing (testFix)
 
 import Analyser.Checks.Base exposing (Checker)
-import Analyser.Configuration as Configuration exposing (Configuration)
+import Analyser.Configuration as Configuration
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Messages.Range as Range
 import Elm.Interface as Interface
@@ -21,8 +21,10 @@ analyseAndFix checker fixer input rawFile f =
             , moduleName = RawFile.moduleName rawFile
             , ast = f
             , content = input
-            , path = "./Foo.elm"
-            , sha1 = "xxx"
+            , file =
+                { path = "./Foo.elm"
+                , version = "xxx"
+                }
             , formatted = True
             }
 
@@ -34,16 +36,15 @@ analyseAndFix checker fixer input rawFile f =
             Err "No message"
 
         x :: _ ->
-            fixer.fix [ ( fileContext.path, fileContext.content, fileContext.ast ) ] x.data
-                |> Result.map (List.head >> Maybe.map Tuple.second >> Maybe.withDefault "")
+            fixer.fix ( fileContext.content, fileContext.ast ) x
 
 
 testFix : String -> Checker -> Fixer -> List ( String, String, String ) -> Test
 testFix name checker fixer triples =
     describe name <|
         List.map
-            (\( name, input, output ) ->
-                test name <|
+            (\( testName, input, output ) ->
+                test testName <|
                     \() ->
                         Parser.parse input
                             |> Result.mapError (always "Parse Failed")

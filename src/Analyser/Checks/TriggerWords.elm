@@ -1,10 +1,11 @@
 module Analyser.Checks.TriggerWords exposing (checker)
 
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(TriggerWord), newMessage)
+import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Range as Syntax
 import Json.Decode as JD
 import Regex
@@ -14,10 +15,15 @@ import Set
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "TriggerWords" ]
-    , key = "TriggerWords"
-    , name = "Trigger Words"
-    , description = "Comments can tell you what that you have to put your code a bit more attention. You should resolve things as 'TODO' and such."
+    , info =
+        { key = "TriggerWords"
+        , name = "Trigger Words"
+        , description = "Comments can tell you what that you have to put your code a bit more attention. You should resolve things as 'TODO' and such."
+        , schema =
+            Schema.schema
+                |> Schema.varProp "word"
+                |> Schema.rangeProp "range"
+        }
     }
 
 
@@ -26,7 +32,7 @@ defaultTriggerWords =
     [ "TODO" ]
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan rangeContext fileContext configuration =
     let
         triggerWords =
@@ -35,8 +41,20 @@ scan rangeContext fileContext configuration =
     in
     fileContext.ast.comments
         |> List.filterMap (withTriggerWord triggerWords)
-        |> List.map (Tuple.mapSecond (Range.build rangeContext) >> uncurry (TriggerWord fileContext.path))
-        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+        |> List.map (Tuple.mapSecond (Range.build rangeContext))
+        |> List.map buildMessage
+
+
+buildMessage : ( String, Range.Range ) -> MessageData
+buildMessage ( word, range ) =
+    Data.init
+        (String.concat
+            [ "`" ++ word ++ "` should not be used in comments. Found at "
+            , Range.asString range
+            ]
+        )
+        |> Data.addVarName "word" word
+        |> Data.addRange "range" range
 
 
 splitRegex : Regex.Regex

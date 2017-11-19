@@ -3,15 +3,12 @@
     "summary": "Sample Elm Test",
     "repository": "https://github.com/user/project.git",
     "license": "BSD-3-Clause",
-    "source-directories": [
-        ".",
-        "../src"
-    ],
+    "source-directories": [".", "../src"],
     "exposed-modules": [],
     "dependencies": {
         "Fresheyeball/elm-tuple-extra": "3.0.0 <= v < 4.0.0",
         "elm-community/dict-extra": "2.2.0 <= v < 3.0.0",
-        "elm-community/elm-test": "4.0.0 <= v < 5.0.0",
+        "elm-community/elm-test": "4.2.0 <= v < 5.0.0",
         "elm-community/json-extra": "2.0.0 <= v < 3.0.0",
         "elm-community/list-extra": "6.0.0 <= v < 7.0.0",
         "elm-community/maybe-extra": "3.1.0 <= v < 4.0.0",

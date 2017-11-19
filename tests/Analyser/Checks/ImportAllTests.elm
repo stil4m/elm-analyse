@@ -2,8 +2,8 @@ module Analyser.Checks.ImportAllTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.ImportAll as ImportAll
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range
-import Analyser.Messages.Types exposing (..)
 import Test exposing (..)
 
 
@@ -15,10 +15,13 @@ importAll =
 import Foo exposing (..)
 
 """
-    , [ ImportAll "./foo.elm" [ "Foo" ] <|
-            Range.manual
-                { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
-                { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
+    , [ Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "Foo" ]
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
+                    { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
+                )
       ]
     )
 
@@ -32,14 +35,20 @@ import Foo exposing (..)
 import Baz exposing (..)
 
 """
-    , [ ImportAll "./foo.elm" [ "Foo" ] <|
-            Range.manual
-                { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
-                { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
-      , ImportAll "./foo.elm" [ "Baz" ] <|
-            Range.manual
-                { start = { row = 3, column = 21 }, end = { row = 3, column = 23 } }
-                { start = { row = 3, column = 20 }, end = { row = 3, column = 22 } }
+    , [ Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "Baz" ]
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 3, column = 21 }, end = { row = 3, column = 23 } }
+                    { start = { row = 3, column = 20 }, end = { row = 3, column = 22 } }
+                )
+      , Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "Foo" ]
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
+                    { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
+                )
       ]
     )
 
@@ -52,21 +61,6 @@ importStrict =
 import Foo exposing (foo)
 """
     , []
-    )
-
-
-importAllConstructors : ( String, String, List MessageData )
-importAllConstructors =
-    ( "importAllConstructors"
-    , """module Bar exposing (foo)
-
-import Foo exposing (Bar(..))
-"""
-    , [ ImportAll "./foo.elm" [ "Foo" ] <|
-            Range.manual
-                { start = { row = 2, column = 25 }, end = { row = 2, column = 27 } }
-                { start = { row = 2, column = 24 }, end = { row = 2, column = 26 } }
-      ]
     )
 
 
@@ -88,6 +82,5 @@ all =
         [ importAll
         , importAllMultiple
         , importStrict
-        , importAllConstructors
         , importConstructorsStrict
         ]

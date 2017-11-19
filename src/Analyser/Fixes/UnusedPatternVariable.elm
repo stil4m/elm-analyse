@@ -2,58 +2,41 @@ module Analyser.Fixes.UnusedPatternVariable exposing (fixer)
 
 import ASTUtil.PatternOptimizer as PatternOptimizer
 import ASTUtil.Patterns as Patterns
+import Analyser.Checks.UnusedPatternVariable as UnusedPatternVariableCheck
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.FileContent as FileContent
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (Range)
-import Analyser.Messages.Types exposing (MessageData(UnusedPatternVariable))
 import Elm.Syntax.File exposing (File)
 import Elm.Writer as Writer
 
 
 fixer : Fixer
 fixer =
-    Fixer canFix fix
+    Fixer (.key <| .info <| UnusedPatternVariableCheck.checker) fix "Optimize pattern and format"
 
 
-canFix : MessageData -> Bool
-canFix message =
-    case message of
-        UnusedPatternVariable _ _ _ ->
-            True
-
-        _ ->
-            False
-
-
-fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
+fix : ( String, File ) -> MessageData -> Result String String
 fix input messageData =
-    case messageData of
-        UnusedPatternVariable _ _ range ->
-            case List.head input of
-                Nothing ->
-                    Err "No input for fixer UnusedPatternVariable"
+    case Data.getRange "range" messageData of
+        Just range ->
+            fixPattern input range
 
-                Just triple ->
-                    fixPattern triple range
-
-        _ ->
+        Nothing ->
             Err "Invalid message data for fixer UnusedPatternVariable"
 
 
-fixPattern : ( String, String, File ) -> Range -> Result String (List ( String, String ))
-fixPattern ( fileName, content, ast ) range =
+fixPattern : ( String, File ) -> Range -> Result String String
+fixPattern ( content, ast ) range =
     case Patterns.findParentPattern ast (Range.asSyntaxRange range) of
         Just parentPattern ->
-            Ok
-                [ ( fileName
-                  , FileContent.replaceRangeWith
-                        (PatternOptimizer.patternRange parentPattern)
-                        (Writer.writePattern (PatternOptimizer.optimize (Range.asSyntaxRange range) parentPattern)
-                            |> Writer.write
-                        )
-                        content
-                  )
-                ]
+            Ok <|
+                FileContent.replaceRangeWith
+                    (PatternOptimizer.patternRange parentPattern)
+                    (Writer.writePattern (PatternOptimizer.optimize (Range.asSyntaxRange range) parentPattern)
+                        |> Writer.write
+                    )
+                    content
 
         Nothing ->
             Err "Could not find location to replace unused variable in pattern"

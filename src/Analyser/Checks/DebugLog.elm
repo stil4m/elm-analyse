@@ -1,36 +1,39 @@
 module Analyser.Checks.DebugLog exposing (checker)
 
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(DebugLog), newMessage)
+import Analyser.Messages.Data as Data exposing (MessageData)
+import Analyser.Messages.Range as Range exposing (RangeContext)
+import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
 
 
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "DebugLog" ]
-    , key = "DebugLog"
-    , name = "Debug Log"
-    , description = "This is nice for development, but you do not want to ship this to package users or your end users."
+    , info =
+        { key = "DebugLog"
+        , name = "Debug Log"
+        , description = "This is nice for development, but you do not want to ship this to package users or your end users."
+        , schema =
+            Schema.schema
+                |> Schema.rangeProp "range"
+        }
     }
 
 
 type alias Context =
-    List Range
+    List MessageData
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan rangeContext fileContext _ =
     Inspector.inspect
         { defaultConfig | onExpression = Post (onExpression rangeContext) }
         fileContext.ast
         []
-        |> List.map (DebugLog fileContext.path)
-        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 onExpression : RangeContext -> Expression -> Context -> Context
@@ -38,7 +41,19 @@ onExpression rangeContext ( range, expression ) context =
     case expression of
         QualifiedExpr moduleName f ->
             if entryForQualifiedExpr moduleName f then
-                Range.build rangeContext range :: context
+                let
+                    r =
+                        Range.build rangeContext range
+                in
+                (Data.init
+                    (String.concat
+                        [ "Use of Debug.log at "
+                        , Range.asString r
+                        ]
+                    )
+                    |> Data.addRange "range" r
+                )
+                    :: context
             else
                 context
 

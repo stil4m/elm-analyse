@@ -1,5 +1,6 @@
 module Client.State exposing (State, listen, tick, toMaybe, view)
 
+import Analyser.Checks
 import Analyser.State as AS
 import Client.LoadingScreen as LoadingScreen
 import Client.Socket exposing (dashboardAddress)
@@ -16,7 +17,7 @@ type alias State =
 
 listen : Location -> Sub State
 listen location =
-    WS.listen (dashboardAddress location) (JD.decodeString AS.decodeState >> RemoteData.fromResult)
+    WS.listen (dashboardAddress location) (JD.decodeString (AS.decodeState Analyser.Checks.schemas) >> RemoteData.fromResult)
 
 
 tick : Location -> Cmd msg
