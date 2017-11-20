@@ -30,7 +30,8 @@
         "pr:check":
             "npm install && npm run js:lint && npm run elm:validate-format && npm run elm:test && npm run build && npm run elm:lint",
         "dev:build-server": "./node_modules/.bin/gulp elm-backend",
-        "dev:build-editor": "node build-editor.js",
+        "dev:build-editor":
+            "elm-make src/Editor.elm --output editor/elm.js && node build-editor.js",
         "run:server": "node \"./js/bin/index.js\" -s",
         "dev:server":
             "./node_modules/.bin/nodemon --watch src --ext elm --exec \"npm run dev:build-server && npm run run:server\""
