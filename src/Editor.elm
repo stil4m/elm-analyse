@@ -5,6 +5,7 @@ import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util
 import Analyser.State exposing (State)
 import Dict exposing (Dict)
+import Dict.Extra
 import Json.Decode as JD
 import Json.Encode as JE exposing (Value)
 
@@ -38,7 +39,7 @@ encodeEditorData editorData =
         [ ( "progress", Analyser.State.encodeStatus editorData.progress )
         , ( "files"
           , editorData.files
-                |> Dict.map (\k v -> encodeEditorMessage v)
+                |> Dict.map (\k v -> JE.list <| List.map encodeEditorMessage v)
                 |> Dict.toList
                 |> JE.object
           )
@@ -86,7 +87,7 @@ type alias EditorMessage =
 
 type alias EditorData =
     { progress : Analyser.State.Status
-    , files : Dict String EditorMessage
+    , files : Dict String (List EditorMessage)
     }
 
 
@@ -150,10 +151,12 @@ editorFileMessages m =
 buildEditorData : State -> EditorData
 buildEditorData state =
     let
+        editorFiles : Dict String (List EditorMessage)
         editorFiles =
             state.messages
                 |> List.concatMap editorFileMessages
-                |> Dict.fromList
+                |> Dict.Extra.groupBy Tuple.first
+                |> Dict.map (\_ v -> List.map Tuple.second v)
     in
     { progress = state.status
     , files = editorFiles
