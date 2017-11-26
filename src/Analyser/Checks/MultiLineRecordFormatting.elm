@@ -1,11 +1,12 @@
 module Analyser.Checks.MultiLineRecordFormatting exposing (checker)
 
 import ASTUtil.Inspector as Inspector exposing (..)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting), newMessage)
+import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Range as Syntax
 import Elm.Syntax.TypeAlias exposing (..)
 import Elm.Syntax.TypeAnnotation exposing (..)
@@ -14,11 +15,18 @@ import Elm.Syntax.TypeAnnotation exposing (..)
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "MultiLineRecordFormatting" ]
+    , info =
+        { key = "MultiLineRecordFormatting"
+        , name = "MultiLine Record Formatting"
+        , description = "Records in type aliases should be formatted on multiple lines to help the reader."
+        , schema =
+            Schema.schema
+                |> Schema.rangeProp "range"
+        }
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan rangeContext fileContext _ =
     let
         threshold =
@@ -31,8 +39,18 @@ scan rangeContext fileContext _ =
         |> List.filter (Tuple.second >> List.length >> (<=) threshold)
         |> List.filterMap (\( range, fields ) -> firstTwo fields |> Maybe.map ((,) range))
         |> List.filter (Tuple.second >> fieldsOnSameLine)
-        |> List.map (Tuple.first >> MultiLineRecordFormatting fileContext.path)
-        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+        |> List.map (Tuple.first >> buildMessageData)
+
+
+buildMessageData : Range -> MessageData
+buildMessageData r =
+    Data.init
+        (String.concat
+            [ "Record should be formatted over multiple lines at "
+            , Range.asString r
+            ]
+        )
+        |> Data.addRange "range" r
 
 
 fieldsOnSameLine : ( RecordField, RecordField ) -> Bool

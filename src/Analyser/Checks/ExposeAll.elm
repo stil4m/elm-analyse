@@ -2,11 +2,12 @@ module Analyser.Checks.ExposeAll exposing (checker)
 
 import AST.Util
 import ASTUtil.Inspector as Inspector exposing (Order(Inner), defaultConfig)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(ExposeAll), newMessage)
+import Analyser.Messages.Data as Data exposing (MessageData)
+import Analyser.Messages.Range as Range exposing (RangeContext)
+import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Exposing exposing (..)
 import Elm.Syntax.File exposing (..)
 
@@ -14,48 +15,45 @@ import Elm.Syntax.File exposing (..)
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "ExposeAll" ]
+    , info =
+        { key = "ExposeAll"
+        , name = "Expose All"
+        , description = "You want to be clear about the API that a module defines."
+        , schema =
+            Schema.schema
+                |> Schema.rangeProp "range"
+        }
     }
 
 
 type alias ExposeAllContext =
-    List Range
+    List MessageData
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan rangeContext fileContext _ =
-    let
-        x : ExposeAllContext
-        x =
-            Inspector.inspect
-                { defaultConfig | onFile = Inner (onFile rangeContext) }
-                fileContext.ast
-                []
-    in
-    x
-        |> List.map (ExposeAll fileContext.path)
-        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+    Inspector.inspect
+        { defaultConfig | onFile = Inner (onFile rangeContext) }
+        fileContext.ast
+        []
 
 
 onFile : RangeContext -> (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
 onFile rangeContext _ file _ =
     case AST.Util.fileExposingList file of
         All x ->
-            [ Range.build rangeContext x ]
+            let
+                range =
+                    Range.build rangeContext x
+            in
+            [ Data.init
+                (String.concat
+                    [ "Exposing all at "
+                    , Range.asString range
+                    ]
+                )
+                |> Data.addRange "range" range
+            ]
 
-        Explicit x ->
-            x
-                |> List.filterMap
-                    (\y ->
-                        case y of
-                            TypeExpose exposedType ->
-                                case exposedType.constructors of
-                                    Just (All allRange) ->
-                                        Just (Range.build rangeContext allRange)
-
-                                    _ ->
-                                        Nothing
-
-                            _ ->
-                                Nothing
-                    )
+        Explicit _ ->
+            []

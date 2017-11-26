@@ -2,8 +2,8 @@ module Analyser.Checks.NonStaticRegexTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NonStaticRegex as NonStaticRegex
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range
-import Analyser.Messages.Types exposing (..)
 import Test exposing (..)
 
 
@@ -55,10 +55,12 @@ import Regex
 foo a =
     Regex.regex a
 """
-    , [ NonStaticRegex "./foo.elm" <|
-            Range.manual
-                { start = { row = 5, column = 4 }, end = { row = 5, column = 15 } }
-                { start = { row = 5, column = 3 }, end = { row = 5, column = 14 } }
+    , [ Data.init "foo"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 5, column = 4 }, end = { row = 5, column = 15 } }
+                    { start = { row = 5, column = 3 }, end = { row = 5, column = 14 } }
+                )
       ]
     )
 
@@ -87,10 +89,12 @@ import Regex exposing (regex)
 foo a =
     regex a
 """
-    , [ NonStaticRegex "./foo.elm" <|
-            Range.manual
-                { start = { row = 5, column = 4 }, end = { row = 5, column = 9 } }
-                { start = { row = 5, column = 3 }, end = { row = 5, column = 8 } }
+    , [ Data.init "foo"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 5, column = 4 }, end = { row = 5, column = 9 } }
+                    { start = { row = 5, column = 3 }, end = { row = 5, column = 8 } }
+                )
       ]
     )
 
@@ -131,10 +135,12 @@ import Regex as R
 foo a =
     R.regex a
 """
-    , [ NonStaticRegex "./foo.elm" <|
-            Range.manual
-                { start = { row = 5, column = 4 }, end = { row = 5, column = 11 } }
-                { start = { row = 5, column = 3 }, end = { row = 5, column = 10 } }
+    , [ Data.init "foo"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 5, column = 4 }, end = { row = 5, column = 11 } }
+                    { start = { row = 5, column = 3 }, end = { row = 5, column = 10 } }
+                )
       ]
     )
 

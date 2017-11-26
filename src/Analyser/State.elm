@@ -1,6 +1,7 @@
 module Analyser.State exposing (..)
 
 import Analyser.Messages.Json exposing (decodeMessage, encodeMessage)
+import Analyser.Messages.Schemas exposing (Schemas)
 import Analyser.Messages.Types as Messages exposing (Message, MessageId, MessageStatus(Applicable))
 import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing)
 import Analyser.Modules exposing (Modules)
@@ -81,7 +82,7 @@ startFixing message state =
         | status = Fixing
         , messages =
             state.messages
-                |> List.map (blockForShas (List.map Tuple.first message.files))
+                |> List.map (blockForShas message.file.version)
                 |> List.map (markFixing message.id)
     }
 
@@ -145,10 +146,10 @@ updateModules newModules s =
     { s | modules = newModules }
 
 
-decodeState : Decoder State
-decodeState =
+decodeState : Schemas -> Decoder State
+decodeState schemas =
     JD.succeed State
-        |: JD.field "messages" (JD.list decodeMessage)
+        |: JD.field "messages" (JD.list (decodeMessage schemas))
         |: JD.field "dependencies" Analyser.State.Dependencies.decode
         |: JD.field "idCount" JD.int
         |: JD.field "status" decodeStatus

@@ -1,10 +1,11 @@
 module Analyser.Fixes.UnusedImportAlias exposing (fixer)
 
 import ASTUtil.Imports as Imports
+import Analyser.Checks.UnusedImportAlias as UnusedImportAliasCheck
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.FileContent as FileContent
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (Range)
-import Analyser.Messages.Types exposing (MessageData(UnusedImportAlias))
 import Elm.Syntax.File exposing (..)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Range as Syntax
@@ -12,43 +13,25 @@ import Elm.Syntax.Range as Syntax
 
 fixer : Fixer
 fixer =
-    Fixer canFix fix
+    Fixer (.key <| .info <| UnusedImportAliasCheck.checker) fix "Remove alias and format"
 
 
-canFix : MessageData -> Bool
-canFix message =
-    case message of
-        UnusedImportAlias _ _ _ ->
-            True
-
-        _ ->
-            False
-
-
-fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
+fix : ( String, File ) -> MessageData -> Result String String
 fix input messageData =
-    case messageData of
-        UnusedImportAlias _ _ range ->
-            case List.head input of
-                Nothing ->
-                    Err "No input for fixer UnusedImportAlias"
+    case Data.getRange "range" messageData of
+        Just range ->
+            updateImport input range
 
-                Just triple ->
-                    updateImport triple range
-
-        _ ->
+        Nothing ->
             Err "Invalid message data for fixer UnusedImportAlias"
 
 
-updateImport : ( String, String, File ) -> Range -> Result String (List ( String, String ))
-updateImport ( fileName, content, ast ) range =
+updateImport : ( String, File ) -> Range -> Result String String
+updateImport ( content, ast ) range =
     case Imports.findImportWithRange ast (Range.asSyntaxRange range) of
         Just imp ->
-            Ok
-                [ ( fileName
-                  , writeNewImport imp.range { imp | moduleAlias = Nothing } content
-                  )
-                ]
+            Ok <|
+                writeNewImport imp.range { imp | moduleAlias = Nothing } content
 
         Nothing ->
             Err "Could not locate import for the target range"

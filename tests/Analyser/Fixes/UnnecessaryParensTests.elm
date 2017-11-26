@@ -1,9 +1,9 @@
 module Analyser.Fixes.UnnecessaryParensTests exposing (all)
 
-import Analyser.Checks.UnnecessaryParens exposing (checker)
+import Analyser.Checks.UnnecessaryParens
 import Analyser.Fixes.TestUtil exposing (testFix)
-import Analyser.Fixes.UnnecessaryParens exposing (fixer)
-import Test exposing (Test, describe, test)
+import Analyser.Fixes.UnnecessaryParens
+import Test exposing (Test)
 
 
 fixInFile : ( String, String, String )

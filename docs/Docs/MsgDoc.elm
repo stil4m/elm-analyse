@@ -1,34 +1,45 @@
 module Docs.MsgDoc exposing (allMessages, forKey, view)
 
-import Analyser.Checks.Base exposing (Checker)
-import Analyser.Checks.CoreArrayUsage
+import Analyser.Checks.Base exposing (Checker, CheckerInfo)
+import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
+import Analyser.Checks.DebugCrash
+import Analyser.Checks.DebugLog
+import Analyser.Checks.DropConcatOfLists
+import Analyser.Checks.DropConsOfItemAndList
 import Analyser.Checks.DuplicateImport
 import Analyser.Checks.DuplicateImportedVariable
 import Analyser.Checks.DuplicateRecordFieldUpdate
 import Analyser.Checks.ExposeAll
+import Analyser.Checks.FileLoadFailed as FileLoadFailed
 import Analyser.Checks.FunctionInLet
 import Analyser.Checks.ImportAll
 import Analyser.Checks.LineLength
-import Analyser.Checks.ListOperators
 import Analyser.Checks.MultiLineRecordFormatting
-import Analyser.Checks.NoDebug
 import Analyser.Checks.NoTopLevelSignature
 import Analyser.Checks.NoUncurriedPrefix
 import Analyser.Checks.NonStaticRegex
 import Analyser.Checks.OverriddenVariables
 import Analyser.Checks.SingleFieldRecord
 import Analyser.Checks.TriggerWords
+import Analyser.Checks.UnformattedFile as UnformattedFile
 import Analyser.Checks.UnnecessaryListConcat
 import Analyser.Checks.UnnecessaryParens
 import Analyser.Checks.UnnecessaryPortModule
 import Analyser.Checks.UnusedImport
-import Analyser.Checks.UnusedImportAliases
+import Analyser.Checks.UnusedImportAlias
+import Analyser.Checks.UnusedImportedVariable
+import Analyser.Checks.UnusedPatternVariable
+import Analyser.Checks.UnusedTopLevel
 import Analyser.Checks.UnusedTypeAlias
 import Analyser.Checks.UnusedVariable
+import Analyser.Checks.UseConsOverConcat
 import Analyser.Configuration as Configuration exposing (Configuration)
+import Analyser.FileRef exposing (FileRef)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Json as J
 import Analyser.Messages.Range as Range
-import Analyser.Messages.Types as M exposing (Message, MessageData(..))
+import Analyser.Messages.Schema as Schema
+import Analyser.Messages.Types as M exposing (Message)
 import Analyser.Messages.Util
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
@@ -51,26 +62,10 @@ type MsgExample
     | Dynamic Checker
 
 
-type PropertyValue
-    = Range
-    | FileName
-    | VariableName
-    | RangeList
-    | ModuleName
-    | ErrorMessage
-
-
-type alias MsgProperty =
-    ( String, PropertyValue )
-
-
 type alias MsgDoc =
-    { name : String
-    , arguments : List MsgProperty
-    , shortDescription : String
-    , example : MsgExample
+    { example : MsgExample
     , input : String
-    , key : String
+    , info : CheckerInfo
     }
 
 
@@ -114,20 +109,13 @@ allMessages =
 forKey : String -> Maybe MsgDoc
 forKey x =
     allMessages
-        |> List.filter (.key >> (==) x)
+        |> List.filter (.info >> .key >> (==) x)
         |> List.head
 
 
 triggerWords : MsgDoc
 triggerWords =
-    { name = "Trigger Words"
-    , shortDescription = "Comments can tell you what that you have to put your code a bit more attention. You should resolve things as 'TODO' and such."
-    , key = "TriggerWords"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "word", VariableName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.TriggerWords.checker
     , example = Dynamic Analyser.Checks.TriggerWords.checker
     , input = """
 module Foo exposing (sum)
@@ -142,14 +130,7 @@ sum x y =
 
 duplicateRecordFieldUpdate : MsgDoc
 duplicateRecordFieldUpdate =
-    { name = "Duplicate Record Field Update"
-    , shortDescription = "You only want to update a field once in the record update syntax. Doing twice may only cause bugs."
-    , key = "DuplicateRecordFieldUpdate"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "fieldName", VariableName )
-        , ( "ranges", RangeList )
-        ]
+    { info = .info Analyser.Checks.DuplicateRecordFieldUpdate.checker
     , example = Dynamic Analyser.Checks.DuplicateRecordFieldUpdate.checker
     , input = """
 module Person exposing (Person, changeName)
@@ -165,13 +146,7 @@ changeName person =
 
 lineLengthExceeded : MsgDoc
 lineLengthExceeded =
-    { name = "Line Length Exceeded"
-    , shortDescription = "This check will mark files that contain lines that exceed over 150 characters (see 'check-specific-configuration' below to change the maximum line length)."
-    , key = "LineLengthExceeded"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "ranges", RangeList )
-        ]
+    { info = .info Analyser.Checks.LineLength.checker
     , example = Dynamic Analyser.Checks.LineLength.checker
     , input = """
 module Foo exposing (foo)
@@ -187,13 +162,7 @@ foo x =
 
 functionInLet : MsgDoc
 functionInLet =
-    { name = "Function In Let"
-    , shortDescription = "In a let statement you can define variables and functions in their own scope. But you are already in the scope of a module. Just define the functions you want on a top-level. There is no not much need to define functions in let statements."
-    , key = "FunctionInLet"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.FunctionInLet.checker
     , example = Dynamic Analyser.Checks.FunctionInLet.checker
     , input = """
 port module Foo exposing (foo)
@@ -212,14 +181,8 @@ foo x =
 
 coreArrayUsage : MsgDoc
 coreArrayUsage =
-    { name = "Core Array Usage"
-    , shortDescription = "Arrays dont work well in 0.18. Try Skinney/elm-array-exploration for now."
-    , key = "CoreArrayUsage"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
-    , example = Dynamic Analyser.Checks.CoreArrayUsage.checker
+    { info = .info CoreArrayUsage.checker
+    , example = Dynamic CoreArrayUsage.checker
     , input = """
 port module Foo exposing (foo)
 
@@ -233,13 +196,7 @@ foo x =
 
 nonStaticRegex : MsgDoc
 nonStaticRegex =
-    { name = "Non Static Regex"
-    , shortDescription = "Define regexes as top level to avoid run time exceptions."
-    , key = "NonStaticRegex"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.NonStaticRegex.checker
     , example = Dynamic Analyser.Checks.NonStaticRegex.checker
     , input = """
 port module Foo exposing (foo)
@@ -257,12 +214,7 @@ foo x =
 
 unnecessaryPortModule : MsgDoc
 unnecessaryPortModule =
-    { name = "Unnecessary Port Module"
-    , shortDescription = "Dont use the port keyword if you do not need it."
-    , key = "UnnecessaryPortModule"
-    , arguments =
-        [ ( "file", FileName )
-        ]
+    { info = .info Analyser.Checks.UnnecessaryPortModule.checker
     , example = Dynamic Analyser.Checks.UnnecessaryPortModule.checker
     , input = """
 port module Foo exposing (notAPort)
@@ -275,13 +227,7 @@ notAPort = 1
 
 multiLineRecordFormatting : MsgDoc
 multiLineRecordFormatting =
-    { name = "MultiLine Record Formatting"
-    , shortDescription = "Records in type aliases should be formatted on multiple lines to help the reader."
-    , key = "MultiLineRecordFormatting"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.MultiLineRecordFormatting.checker
     , example = Dynamic Analyser.Checks.MultiLineRecordFormatting.checker
     , input = """
 module Foo exposing (Person)
@@ -294,13 +240,7 @@ type alias Person =
 
 unnecessaryListConcat : MsgDoc
 unnecessaryListConcat =
-    { name = "Unnecessary List Concat"
-    , shortDescription = "You should not use 'List.concat' to concatenate literal lists. Just join the lists together."
-    , key = "UnnecessaryListConcat"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.UnnecessaryListConcat.checker
     , example = Dynamic Analyser.Checks.UnnecessaryListConcat.checker
     , input = """
 module Foo exposing (foo)
@@ -314,14 +254,8 @@ foo =
 
 dropConsOfItemAndList : MsgDoc
 dropConsOfItemAndList =
-    { name = "Drop Cons Of Item And List"
-    , shortDescription = "If you cons an item to a literal list (x :x [1, 2, 3]), then you can just put the item into the list."
-    , key = "DropConsOfItemAndList"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
-    , example = Dynamic Analyser.Checks.ListOperators.checker
+    { info = .info Analyser.Checks.DropConsOfItemAndList.checker
+    , example = Dynamic Analyser.Checks.DropConsOfItemAndList.checker
     , input = """
 module Foo exposing (foo)
 
@@ -334,14 +268,8 @@ foo =
 
 dropConcatOfLists : MsgDoc
 dropConcatOfLists =
-    { name = "Drop Concat Of Lists"
-    , shortDescription = "If you concatenate two lists ([...] ++ [...]), then you can merge them into one list."
-    , key = "DropConcatOfLists"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
-    , example = Dynamic Analyser.Checks.ListOperators.checker
+    { info = .info Analyser.Checks.DropConcatOfLists.checker
+    , example = Dynamic Analyser.Checks.DropConcatOfLists.checker
     , input = """
 module Foo exposing (foo)
 
@@ -354,14 +282,8 @@ foo =
 
 useConsOverConcat : MsgDoc
 useConsOverConcat =
-    { name = "Use Cons Over Concat"
-    , shortDescription = "If you concatenate two lists, but the right hand side is a single element list, then you should use the cons operator."
-    , key = "UseConsOverConcat"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
-    , example = Dynamic Analyser.Checks.ListOperators.checker
+    { info = .info Analyser.Checks.DropConcatOfLists.checker
+    , example = Dynamic Analyser.Checks.UseConsOverConcat.checker
     , input = """
 module Foo exposing (foo)
 
@@ -374,13 +296,7 @@ foo =
 
 singleFieldRecord : MsgDoc
 singleFieldRecord =
-    { name = "Single Field Record"
-    , shortDescription = "Using a record is obsolete if you only plan to store a single field in it."
-    , key = "SingleFieldRecord"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.SingleFieldRecord.checker
     , example = Dynamic Analyser.Checks.SingleFieldRecord.checker
     , input = """
 module Foo exposing (Model)
@@ -393,14 +309,7 @@ type Model =
 
 unusedImport : MsgDoc
 unusedImport =
-    { name = "Unused Import"
-    , shortDescription = "Imports that have no meaning should be removed."
-    , key = "UnusedImport"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "moduleName", ModuleName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.UnusedImport.checker
     , example = Dynamic Analyser.Checks.UnusedImport.checker
     , input = """
 module Foo exposing (main)
@@ -417,15 +326,8 @@ main =
 
 unusedImportAlias : MsgDoc
 unusedImportAlias =
-    { name = "Unused Import Alias"
-    , shortDescription = "You defined an alias for an import (import Foo as F), but it turns out you never use it."
-    , key = "UnusedImportAlias"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "moduleName", ModuleName )
-        , ( "range", Range )
-        ]
-    , example = Dynamic Analyser.Checks.UnusedImportAliases.checker
+    { info = .info Analyser.Checks.UnusedImportAlias.checker
+    , example = Dynamic Analyser.Checks.UnusedImportAlias.checker
     , input = """
 module Foo exposing (main)
 
@@ -440,14 +342,7 @@ main =
 
 noUncurriedPrefix : MsgDoc
 noUncurriedPrefix =
-    { name = "Fully Applied Operator as Prefix"
-    , shortDescription = "It's not needed to use an operator in prefix notation when you apply both arguments directly."
-    , key = "NoUncurriedPrefix"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "varName", VariableName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.NoUncurriedPrefix.checker
     , example = Dynamic Analyser.Checks.NoUncurriedPrefix.checker
     , input = """
 module Foo exposing (main)
@@ -461,15 +356,7 @@ hello =
 
 redefineVariable : MsgDoc
 redefineVariable =
-    { name = "Redefine Variable"
-    , shortDescription = "You should not redefine a variable in a new lexical scope. This is confusing and may lead to bugs."
-    , key = "RedefineVariable"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "varName", VariableName )
-        , ( "range1", Range )
-        , ( "range2", Range )
-        ]
+    { info = .info Analyser.Checks.OverriddenVariables.checker
     , example = Dynamic Analyser.Checks.OverriddenVariables.checker
     , input = """
 module Foo exposing (main)
@@ -487,14 +374,7 @@ foo x =
 
 unusedTypeAlias : MsgDoc
 unusedTypeAlias =
-    { name = "Unused Type Alias"
-    , shortDescription = "You defined a type alias, but you do not use it in any signature or expose it."
-    , key = "UnusedTypeAlias"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "varName", VariableName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.UnusedTypeAlias.checker
     , example = Dynamic Analyser.Checks.UnusedTypeAlias.checker
     , input = """
 module Foo exposing (main)
@@ -513,15 +393,7 @@ main =
 
 duplicateImportedVariable : MsgDoc
 duplicateImportedVariable =
-    { name = "Duplicate Imported Variable"
-    , shortDescription = "Importing a variable twice from the same module is noise. Remove this."
-    , key = "DuplicateImportedVariable"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "moduleName", ModuleName )
-        , ( "varName", VariableName )
-        , ( "ranges", RangeList )
-        ]
+    { info = .info Analyser.Checks.DuplicateImportedVariable.checker
     , example = Dynamic Analyser.Checks.DuplicateImportedVariable.checker
     , input = """
 module Foo exposing (main)
@@ -537,14 +409,7 @@ main =
 
 duplicateImport : MsgDoc
 duplicateImport =
-    { name = "Duplicate Import"
-    , shortDescription = "You are importing the same module twice."
-    , key = "DuplicateImport"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "moduleName", ModuleName )
-        , ( "ranges", RangeList )
-        ]
+    { info = .info Analyser.Checks.DuplicateImport.checker
     , example = Dynamic Analyser.Checks.DuplicateImport.checker
     , input = """
 module Foo exposing (main)
@@ -562,14 +427,8 @@ main =
 
 debugCrash : MsgDoc
 debugCrash =
-    { name = "Debug Crash"
-    , shortDescription = "You may not want to ship this to your end users."
-    , key = "DebugCrash"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
-    , example = Dynamic Analyser.Checks.NoDebug.checker
+    { info = .info Analyser.Checks.DebugCrash.checker
+    , example = Dynamic Analyser.Checks.DebugCrash.checker
     , input = """
 module Foo exposing (foo)
 
@@ -581,14 +440,8 @@ foo =
 
 debugLog : MsgDoc
 debugLog =
-    { name = "Debug Log"
-    , shortDescription = "This is nice for development, but you do not want to ship this to package users or your end users."
-    , key = "DebugLog"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
-    , example = Dynamic Analyser.Checks.NoDebug.checker
+    { info = .info Analyser.Checks.DebugLog.checker
+    , example = Dynamic Analyser.Checks.DebugLog.checker
     , input = """
 module Foo exposing (foo)
 
@@ -601,13 +454,7 @@ foo =
 
 unnecessaryParens : MsgDoc
 unnecessaryParens =
-    { name = "Unnecessary Parens"
-    , shortDescription = "If you want parenthesis, then you might want to look into Lisp."
-    , key = "UnnecessaryParens"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.UnnecessaryParens.checker
     , example = Dynamic Analyser.Checks.UnnecessaryParens.checker
     , input = """
 module Foo exposing (someCall)
@@ -623,14 +470,7 @@ algorithmsAllowed =
 
 noTopLevelSignature : MsgDoc
 noTopLevelSignature =
-    { name = "No Top Level Signature"
-    , shortDescription = "We want our readers to understand our code. Adding a signature is part of this."
-    , key = "NoTopLevelSignature"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "varName", VariableName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.NoTopLevelSignature.checker
     , example = Dynamic Analyser.Checks.NoTopLevelSignature.checker
     , input = """
 module Foo exposing (foo)
@@ -643,13 +483,7 @@ foo =
 
 exposeAll : MsgDoc
 exposeAll =
-    { name = "Expose All"
-    , shortDescription = "You want to be clear about the API that a module defines."
-    , key = "ExposeAll"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.ExposeAll.checker
     , example = Dynamic Analyser.Checks.ExposeAll.checker
     , input = """
 module Foo exposing (..)
@@ -663,15 +497,8 @@ foo =
 
 unusedPatternVariable : MsgDoc
 unusedPatternVariable =
-    { name = "Unused Pattern Variable"
-    , shortDescription = "Variables in pattern matching that are unused should be replaced with '_' to avoid unnecessary noise."
-    , key = "UnusedPatternVariable"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "varName", VariableName )
-        , ( "range", Range )
-        ]
-    , example = Dynamic Analyser.Checks.UnusedVariable.checker
+    { info = .info Analyser.Checks.UnusedPatternVariable.checker
+    , example = Dynamic Analyser.Checks.UnusedPatternVariable.checker
     , input = """
 module Foo exposing (thing)
 
@@ -688,15 +515,8 @@ sayHello {name, age} = "Hello " ++ name
 
 unusedImportedVariable : MsgDoc
 unusedImportedVariable =
-    { name = "Unused Imported Variable"
-    , shortDescription = "When a function is imported from a module but is unused, it is better to remove it."
-    , key = "UnusedImportedVariable"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "varName", VariableName )
-        , ( "range", Range )
-        ]
-    , example = Dynamic Analyser.Checks.UnusedVariable.checker
+    { info = .info Analyser.Checks.UnusedImportedVariable.checker
+    , example = Dynamic Analyser.Checks.UnusedImportedVariable.checker
     , input = """
 module Foo exposing (thing)
 
@@ -711,15 +531,8 @@ main =
 
 unusedTopLevel : MsgDoc
 unusedTopLevel =
-    { name = "Unused Top Level"
-    , shortDescription = "Functions and values that are unused in a module and not exported are dead code."
-    , key = "UnusedTopLevel"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "varName", VariableName )
-        , ( "range", Range )
-        ]
-    , example = Dynamic Analyser.Checks.UnusedVariable.checker
+    { info = .info Analyser.Checks.UnusedTopLevel.checker
+    , example = Dynamic Analyser.Checks.UnusedTopLevel.checker
     , input = """
 module Foo exposing (thing)
 
@@ -736,14 +549,7 @@ unusedThing x =
 
 unusedVariable : MsgDoc
 unusedVariable =
-    { name = "Unused Variable"
-    , shortDescription = "Variables that are not used could be removed or marked as _ to avoid unnecessary noise."
-    , key = "UnusedVariable"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "varName", VariableName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.UnusedVariable.checker
     , example = Dynamic Analyser.Checks.UnusedVariable.checker
     , input = """
 module Foo exposing (f)
@@ -757,14 +563,14 @@ foo x =
 
 fileLoadFailed : MsgDoc
 fileLoadFailed =
-    { name = "File Load Failed"
-    , shortDescription = "We could not analyse this file..."
-    , key = "FileLoadFailed"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "message", ErrorMessage )
-        ]
-    , example = Fixed (M.newMessage [ ( "abcdef01234567890", "./Foo.elm" ) ] (FileLoadFailed "./Foo.elm" "Could not parse file"))
+    { info = .info FileLoadFailed.checker
+    , example =
+        Fixed
+            (M.newMessage
+                (FileRef "abcdef01234567890" "./Foo.elm")
+                "Could not load file due to: Somebody did an 'rm -rf /' on your system."
+                (Data.init "" |> Data.addErrorMessage "message" "Could not parse file")
+            )
     , input = """
 """
     }
@@ -772,13 +578,8 @@ fileLoadFailed =
 
 unformattedFile : MsgDoc
 unformattedFile =
-    { name = "Unformatted File"
-    , shortDescription = "File is not formatted correctly"
-    , key = "UnformattedFile"
-    , arguments =
-        [ ( "file", FileName )
-        ]
-    , example = Fixed (M.newMessage [ ( "abcdef01234567890", "./Foo.elm" ) ] (UnformattedFile "./Foo.elm"))
+    { info = .info UnformattedFile.checker
+    , example = Dynamic UnformattedFile.checker
     , input = """
 module Foo exposing (foo)
 
@@ -794,14 +595,7 @@ helloWorld =
 
 importAll : MsgDoc
 importAll =
-    { name = "Import All"
-    , shortDescription = "When other people read your code, it would be nice if the origin of a used function can be traced back to the providing module."
-    , key = "ImportAll"
-    , arguments =
-        [ ( "file", FileName )
-        , ( "moduleName", ModuleName )
-        , ( "range", Range )
-        ]
+    { info = .info Analyser.Checks.ImportAll.checker
     , example = Dynamic Analyser.Checks.ImportAll.checker
     , input = """
 module Foo exposing (bar)
@@ -815,7 +609,7 @@ foo = text "Hello world!"
 
 sortedMessages : List MsgDoc
 sortedMessages =
-    List.sortBy .name allMessages
+    List.sortBy (.info >> .name) allMessages
 
 
 messagesMenu : Maybe MsgDoc -> Html msg
@@ -825,12 +619,12 @@ messagesMenu y =
             (\x ->
                 if Just x == y then
                     ListGroup.li [ ListGroup.active ]
-                        [ text x.name
+                        [ text x.info.name
                         ]
                 else
                     ListGroup.li []
-                        [ a [ Html.href (Page.hash (Messages (Just x.key))) ]
-                            [ text x.name ]
+                        [ a [ Html.href (Page.hash (Messages (Just x.info.key))) ]
+                            [ text x.info.name ]
                         ]
             )
         |> ListGroup.ul
@@ -855,8 +649,7 @@ view maybeKey =
             , Grid.col [ Col.md8, Col.sm7 ]
                 [ maybeMessageDoc
                     |> Maybe.map viewDoc
-                    |> Maybe.withDefault
-                        (div [] [])
+                    |> Maybe.withDefault (div [] [])
                 ]
             ]
         ]
@@ -870,13 +663,13 @@ viewDoc d =
     in
     div []
         [ h1 []
-            [ text d.name
+            [ text d.info.name
             ]
         , p []
             [ small []
-                [ code [] [ text d.key ] ]
+                [ code [] [ text d.info.key ] ]
             ]
-        , p [] [ text d.shortDescription ]
+        , p [] [ text d.info.description ]
         , viewArguments d
         , viewExample d mess
         ]
@@ -906,13 +699,14 @@ getMessage d =
 
         Dynamic checker ->
             let
+                m : Maybe MessageData
                 m =
                     getMessages (String.trim d.input) checker
                         |> Maybe.andThen List.head
             in
             case m of
                 Just mess ->
-                    M.newMessage [ ( "abcdef01234567890", "./Foo.elm" ) ] mess
+                    M.newMessage (FileRef "abcdef01234567890" "./Foo.elm") checker.info.key mess
 
                 Nothing ->
                     SafeDebug.crash "Something is wrong"
@@ -935,13 +729,12 @@ getMessages input checker =
                 , moduleName = RawFile.moduleName rawFile
                 , ast = Processing.process Processing.init rawFile
                 , content = input
-                , path = "./foo.elm"
+                , file = { path = "./foo.elm", version = "" }
                 , formatted = False
-                , sha1 = ""
                 }
             )
         |> Result.toMaybe
-        |> Maybe.map (flip (checker.check (Range.context input)) docConfiguration >> List.map .data)
+        |> Maybe.map (flip (checker.check (Range.context input)) docConfiguration)
 
 
 docConfiguration : Configuration
@@ -954,36 +747,5 @@ viewArguments : MsgDoc -> Html msg
 viewArguments d =
     div []
         [ h2 [] [ text "Arguments" ]
-        , ul []
-            (List.map viewArgument d.arguments)
+        , Schema.viewSchema d.info.schema
         ]
-
-
-viewArgument : MsgProperty -> Html msg
-viewArgument ( name, t ) =
-    li []
-        [ code []
-            [ text name, text " : ", viewPropertyType t ]
-        ]
-
-
-viewPropertyType : PropertyValue -> Html msg
-viewPropertyType p =
-    case p of
-        Range ->
-            text "Range"
-
-        FileName ->
-            text "File"
-
-        VariableName ->
-            text "Variable"
-
-        RangeList ->
-            text "[Range]"
-
-        ModuleName ->
-            text "ModuleName"
-
-        ErrorMessage ->
-            text "ErrorMessage"

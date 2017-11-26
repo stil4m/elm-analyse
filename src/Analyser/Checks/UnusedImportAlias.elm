@@ -1,12 +1,13 @@
-module Analyser.Checks.UnusedImportAliases exposing (checker)
+module Analyser.Checks.UnusedImportAlias exposing (checker)
 
 import AST.Util as Util
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnusedImportAlias), newMessage)
+import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
@@ -17,7 +18,15 @@ import Elm.Syntax.TypeAnnotation exposing (..)
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "UnusedImportAlias" ]
+    , info =
+        { key = "UnusedImportAlias"
+        , name = "Unused Import Alias"
+        , description = "You defined an alias for an import (import Foo as F), but it turns out you never use it."
+        , schema =
+            Schema.schema
+                |> Schema.moduleProp "moduleName"
+                |> Schema.rangeProp "range"
+        }
     }
 
 
@@ -25,7 +34,7 @@ type alias Context =
     Dict ModuleName ( Range, Int )
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan rangeContext fileContext _ =
     let
         aliases : Context
@@ -46,8 +55,21 @@ scan rangeContext fileContext _ =
         |> Dict.toList
         |> List.filter (Tuple.second >> Tuple.second >> (==) 0)
         |> List.map (Tuple.mapSecond Tuple.first)
-        |> List.map (uncurry (UnusedImportAlias fileContext.path))
-        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+        |> List.map buildMessageData
+
+
+buildMessageData : ( ModuleName, Range ) -> MessageData
+buildMessageData ( moduleName, range ) =
+    Data.init
+        (String.concat
+            [ "Unused import alias `"
+            , String.join "." moduleName
+            , "` at "
+            , Range.asString range
+            ]
+        )
+        |> Data.addModuleName "moduleName" moduleName
+        |> Data.addRange "range" range
 
 
 markUsage : ModuleName -> Context -> Context

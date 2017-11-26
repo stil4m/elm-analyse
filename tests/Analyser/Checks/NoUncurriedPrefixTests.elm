@@ -2,8 +2,8 @@ module Analyser.Checks.NoUncurriedPrefixTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range
-import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 
@@ -14,10 +14,13 @@ prefixAsApplicationWithTwoArgs =
 
 foo = (+) 1 2
 """
-    , [ NoUncurriedPrefix "./foo.elm" "+" <|
-            Range.manual
-                { start = { row = 2, column = 6 }, end = { row = 2, column = 9 } }
-                { start = { row = 2, column = 5 }, end = { row = 2, column = 8 } }
+    , [ Data.init "foo"
+            |> Data.addVarName "varName" "+"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 2, column = 6 }, end = { row = 2, column = 9 } }
+                    { start = { row = 2, column = 5 }, end = { row = 2, column = 8 } }
+                )
       ]
     )
 

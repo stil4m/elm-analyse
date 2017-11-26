@@ -2,8 +2,8 @@ module Analyser.Checks.DuplicateImportedVariableTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DuplicateImportedVariable as DuplicateImportedVariable
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range
-import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 
@@ -16,16 +16,17 @@ import Html exposing (Html, text, Html)
 
 foo = 1
 """
-    , [ DuplicateImportedVariable "./foo.elm"
-            [ "Html" ]
-            "Html"
-            [ Range.manual
-                { start = { row = 2, column = 34 }, end = { row = 2, column = 38 } }
-                { start = { row = 2, column = 33 }, end = { row = 2, column = 37 } }
-            , Range.manual
-                { start = { row = 2, column = 22 }, end = { row = 2, column = 26 } }
-                { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
-            ]
+    , [ Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "Html" ]
+            |> Data.addVarName "varName" "Html"
+            |> Data.addRanges "ranges"
+                [ Range.manual
+                    { start = { row = 2, column = 34 }, end = { row = 2, column = 38 } }
+                    { start = { row = 2, column = 33 }, end = { row = 2, column = 37 } }
+                , Range.manual
+                    { start = { row = 2, column = 22 }, end = { row = 2, column = 26 } }
+                    { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
+                ]
       ]
     )
 
@@ -40,16 +41,17 @@ import Html as H exposing (Html)
 
 foo = 1
 """
-    , [ DuplicateImportedVariable "./foo.elm"
-            [ "Html" ]
-            "Html"
-            [ Range.manual
-                { start = { row = 3, column = 27 }, end = { row = 3, column = 31 } }
-                { start = { row = 3, column = 26 }, end = { row = 3, column = 30 } }
-            , Range.manual
-                { start = { row = 2, column = 22 }, end = { row = 2, column = 26 } }
-                { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
-            ]
+    , [ Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "Html" ]
+            |> Data.addVarName "varName" "Html"
+            |> Data.addRanges "ranges"
+                [ Range.manual
+                    { start = { row = 3, column = 27 }, end = { row = 3, column = 31 } }
+                    { start = { row = 3, column = 26 }, end = { row = 3, column = 30 } }
+                , Range.manual
+                    { start = { row = 2, column = 22 }, end = { row = 2, column = 26 } }
+                    { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
+                ]
       ]
     )
 
@@ -76,16 +78,17 @@ import Maybe exposing (Maybe(Just, Just))
 
 foo = 1
 """
-    , [ DuplicateImportedVariable "./foo.elm"
-            [ "Maybe" ]
-            "Just"
-            [ Range.manual
-                { start = { row = 2, column = 35 }, end = { row = 2, column = 39 } }
-                { start = { row = 2, column = 34 }, end = { row = 2, column = 38 } }
-            , Range.manual
-                { start = { row = 2, column = 29 }, end = { row = 2, column = 33 } }
-                { start = { row = 2, column = 28 }, end = { row = 2, column = 32 } }
-            ]
+    , [ Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "Maybe" ]
+            |> Data.addVarName "varName" "Just"
+            |> Data.addRanges "ranges"
+                [ Range.manual
+                    { start = { row = 2, column = 35 }, end = { row = 2, column = 39 } }
+                    { start = { row = 2, column = 34 }, end = { row = 2, column = 38 } }
+                , Range.manual
+                    { start = { row = 2, column = 29 }, end = { row = 2, column = 33 } }
+                    { start = { row = 2, column = 28 }, end = { row = 2, column = 32 } }
+                ]
       ]
     )
 

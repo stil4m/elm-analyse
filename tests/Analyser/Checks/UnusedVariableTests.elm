@@ -3,9 +3,9 @@ module Analyser.Checks.UnusedVariableTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Files.Types exposing (..)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range
-import Analyser.Messages.Types exposing (..)
-import Dict exposing (Dict)
+import Dict
 import Test exposing (..)
 
 
@@ -21,10 +21,13 @@ withUnusedVariableInFunction =
 
 bar x y z = x + z
 """
-    , [ UnusedVariable "./foo.elm" "y" <|
-            Range.manual
-                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
-                { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+    , [ Data.init "foo"
+            |> Data.addVarName "varName" "y"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
+                    { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+                )
       ]
     )
 
@@ -40,29 +43,13 @@ x =
   in
     2
 """
-    , [ UnusedVariable "./foo.elm" "y" <|
-            Range.manual
-                { start = { row = 4, column = 4 }, end = { row = 4, column = 5 } }
-                { start = { row = 4, column = 3 }, end = { row = 4, column = 4 } }
-      ]
-    )
-
-
-unusedFunction : ( String, String, List MessageData )
-unusedFunction =
-    ( "unusedFunction"
-    , """module Bar exposing (foo)
-
-foo = some
-
-baz = 2
-
-some = 1
-"""
-    , [ UnusedTopLevel "./foo.elm" "baz" <|
-            Range.manual
-                { start = { row = 4, column = 0 }, end = { row = 4, column = 3 } }
-                { start = { row = 4, column = -1 }, end = { row = 4, column = 2 } }
+    , [ Data.init "foo"
+            |> Data.addVarName "varName" "y"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 4, column = 4 }, end = { row = 4, column = 5 } }
+                    { start = { row = 4, column = 3 }, end = { row = 4, column = 4 } }
+                )
       ]
     )
 
@@ -124,22 +111,6 @@ foo = Thing
     )
 
 
-unusedValueConstructor : ( String, String, List MessageData )
-unusedValueConstructor =
-    ( "unusedValueConstructor"
-    , """module Bar exposing (foo,Some(Thing))
-
-type Some = Thing | Other
-
-"""
-    , [ UnusedTopLevel "./foo.elm" "Other" <|
-            Range.manual
-                { start = { row = 2, column = 20 }, end = { row = 2, column = 25 } }
-                { start = { row = 2, column = 19 }, end = { row = 3, column = -2 } }
-      ]
-    )
-
-
 exposedValueConstructor : ( String, String, List MessageData )
 exposedValueConstructor =
     ( "exposedValueConstructor"
@@ -150,24 +121,6 @@ type Some = Thing
 foo = 1
 """
     , []
-    )
-
-
-onlyUsedInSelf : ( String, String, List MessageData )
-onlyUsedInSelf =
-    ( "onlyUsedInSelf"
-    , """module Bar exposing (foo,Some(Thing))
-type Some = Thing
-
-foo = 1
-
-bar = bar + foo
-"""
-    , [ UnusedTopLevel "./foo.elm" "bar" <|
-            Range.manual
-                { start = { row = 5, column = 0 }, end = { row = 5, column = 3 } }
-                { start = { row = 5, column = -1 }, end = { row = 5, column = 2 } }
-      ]
     )
 
 
@@ -183,42 +136,6 @@ foo =
     1 &> 2
 """
     , []
-    )
-
-
-unusedOperator : ( String, String, List MessageData )
-unusedOperator =
-    ( "unusedOperator"
-    , """module Bar exposing (foo)
-
-foo = 1
-
-(&>) _ b = b
-
-"""
-    , [ UnusedTopLevel "./foo.elm" "&>" <|
-            Range.manual
-                { start = { row = 4, column = 0 }, end = { row = 4, column = 4 } }
-                { start = { row = 4, column = -1 }, end = { row = 4, column = 3 } }
-      ]
-    )
-
-
-unusedImportedOperator : ( String, String, List MessageData )
-unusedImportedOperator =
-    ( "unusedImportedOperator"
-    , """module Bar exposing (foo)
-
-import Foo exposing ((!!))
-
-foo = 1
-
-"""
-    , [ UnusedImportedVariable "./foo.elm" "!!" <|
-            Range.manual
-                { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
-                { start = { row = 2, column = 20 }, end = { row = 2, column = 24 } }
-      ]
     )
 
 
@@ -246,23 +163,6 @@ foo = 1
 init = 2
 """
     , []
-    )
-
-
-unusedImportedVariable : ( String, String, List MessageData )
-unusedImportedVariable =
-    ( "unusedImportedVariable"
-    , """module Foo exposing (foo)
-
-import Html exposing (div)
-
-foo = 1
-"""
-    , [ UnusedImportedVariable "./foo.elm" "div" <|
-            Range.manual
-                { start = { row = 2, column = 22 }, end = { row = 2, column = 25 } }
-                { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
-      ]
     )
 
 
@@ -309,44 +209,6 @@ exposeOperator =
     )
 
 
-unusedInCasePattern : ( String, String, List MessageData )
-unusedInCasePattern =
-    ( "unusedInCasePattern"
-    , """module Foo exposing (foo)
-
-
-foo x =
-  case x of
-    Just y ->
-      1
-"""
-    , [ UnusedPatternVariable "./foo.elm" "y" <|
-            Range.manual
-                { start = { row = 5, column = 9 }, end = { row = 5, column = 10 } }
-                { start = { row = 5, column = 8 }, end = { row = 5, column = 9 } }
-      ]
-    )
-
-
-unusedInCasePatternAsSingle : ( String, String, List MessageData )
-unusedInCasePatternAsSingle =
-    ( "unusedInCasePatternAsSingle"
-    , """module Foo exposing (foo)
-
-
-foo x =
-  case x of
-    y ->
-      1
-"""
-    , [ UnusedPatternVariable "./foo.elm" "y" <|
-            Range.manual
-                { start = { row = 5, column = 4 }, end = { row = 5, column = 5 } }
-                { start = { row = 5, column = 3 }, end = { row = 5, column = 4 } }
-      ]
-    )
-
-
 unusedButDestructuredWithSameNameInList : ( String, String, List MessageData )
 unusedButDestructuredWithSameNameInList =
     ( "unusedButDestructuredWithSameNameInList"
@@ -357,10 +219,13 @@ foo x y=
     [y] ->
       y
 """
-    , [ UnusedVariable "./foo.elm" "y" <|
-            Range.manual
-                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
-                { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+    , [ Data.init "foo"
+            |> Data.addVarName "varName" "y"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
+                    { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+                )
       ]
     )
 
@@ -375,10 +240,13 @@ foo x y=
     (y,_) ->
       y
 """
-    , [ UnusedVariable "./foo.elm" "y" <|
-            Range.manual
-                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
-                { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+    , [ Data.init "foo"
+            |> Data.addVarName "varName" "y"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
+                    { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+                )
       ]
     )
 
@@ -393,10 +261,13 @@ foo x y=
     {y} ->
       y
 """
-    , [ UnusedVariable "./foo.elm" "y" <|
-            Range.manual
-                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
-                { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+    , [ Data.init "foo"
+            |> Data.addVarName "varName" "y"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
+                    { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+                )
       ]
     )
 
@@ -411,10 +282,13 @@ foo x y=
     ((1,2) as y) ->
       y
 """
-    , [ UnusedVariable "./foo.elm" "y" <|
-            Range.manual
-                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
-                { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+    , [ Data.init "foo"
+            |> Data.addVarName "varName" "y"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
+                    { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+                )
       ]
     )
 
@@ -433,25 +307,6 @@ x =
     1
     """
     , []
-    )
-
-
-unusedImportedType : ( String, String, List MessageData )
-unusedImportedType =
-    ( "unusedImportedType"
-    , """module Foo exposing (..)
-
-import Some exposing (Thing, Other)
-
-x : Int -> Other
-x y =
-  Some.other y
-    """
-    , [ UnusedImportedVariable "./foo.elm" "Thing" <|
-            Range.manual
-                { start = { row = 2, column = 22 }, end = { row = 2, column = 27 } }
-                { start = { row = 2, column = 21 }, end = { row = 2, column = 26 } }
-      ]
     )
 
 
@@ -480,28 +335,19 @@ all : Test
 all =
     CTU.build "Analyser.Checks.UnusedVariable"
         UnusedVariable.checker
-        [ unusedImportedType
-        , withUnusedVariableInFunction
+        [ withUnusedVariableInFunction
         , unusedInLetExpression
-        , unusedFunction
         , usedVariableInCaseExpression
         , usedVariableAsRecordUpdate
         , usedVariableInAllDeclaration
         , usedValueConstructor
-        , unusedValueConstructor
         , exposedValueConstructor
-        , onlyUsedInSelf
         , usedOperator
-        , unusedOperator
-        , unusedImportedOperator
         , destructuringSameName
         , unusedInEffectModule
-        , unusedImportedVariable
         , usedImportedVariableInPatterMatch
         , usedImportedVariableAsOpaque
         , exposeOperator
-        , unusedInCasePattern
-        , unusedInCasePatternAsSingle
         , unusedButDestructuredWithSameNameInList
         , unusedButDestructuredWithSameNameInTuple
         , unusedButDestructuredWithSameNameInRecord

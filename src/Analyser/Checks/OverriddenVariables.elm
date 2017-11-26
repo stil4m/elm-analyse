@@ -2,11 +2,12 @@ module Analyser.Checks.OverriddenVariables exposing (checker)
 
 import ASTUtil.Inspector as Inspector exposing (Order(Inner), defaultConfig)
 import ASTUtil.Variables exposing (getImportsVars, patternToVars)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(RedefineVariable), newMessage)
+import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
@@ -17,7 +18,16 @@ import Elm.Syntax.Range as Syntax
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "RedefineVariable" ]
+    , info =
+        { key = "RedefineVariable"
+        , name = "Redefine Variable"
+        , description = "You should not redefine a variable in a new lexical scope. This is confusing and may lead to bugs."
+        , schema =
+            Schema.schema
+                |> Schema.rangeProp "range1"
+                |> Schema.rangeProp "range2"
+                |> Schema.varProp "varName"
+        }
     }
 
 
@@ -29,7 +39,7 @@ type alias Redefine =
     ( String, Syntax.Range, Syntax.Range )
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan rangeContext fileContext _ =
     let
         topLevels : Dict String Syntax.Range
@@ -48,8 +58,22 @@ scan rangeContext fileContext _ =
         fileContext.ast
         ( [], topLevels )
         |> Tuple.first
-        |> List.map (\( n, r1, r2 ) -> RedefineVariable fileContext.path n (Range.build rangeContext r1) (Range.build rangeContext r2))
-        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+        |> List.map
+            (\( n, r1, r2 ) ->
+                Data.init
+                    (String.concat
+                        [ "Variable `"
+                        , n
+                        , "` is redefined at "
+                        , Range.asString (Range.build rangeContext r1)
+                        , " and "
+                        , Range.asString (Range.build rangeContext r2)
+                        ]
+                    )
+                    |> Data.addVarName "varName" n
+                    |> Data.addRange "range1" (Range.build rangeContext r1)
+                    |> Data.addRange "range2" (Range.build rangeContext r2)
+            )
 
 
 visitWithVariablePointers : List VariablePointer -> (Context -> Context) -> Context -> Context

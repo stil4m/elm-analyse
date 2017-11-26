@@ -3,11 +3,12 @@ module Analyser.Checks.NonStaticRegex exposing (checker)
 import ASTUtil.Functions
 import ASTUtil.Imports as Imports exposing (FunctionReference)
 import ASTUtil.Inspector as Inspector exposing (Order(Inner, Post), defaultConfig)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(NonStaticRegex), newMessage)
+import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
 
@@ -21,14 +22,21 @@ type alias Context =
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "NonStaticRegex" ]
+    , info =
+        { key = "NonStaticRegex"
+        , name = "Non Static Regex"
+        , description = "Define regexes as top level to avoid run time exceptions."
+        , schema =
+            Schema.schema
+                |> Schema.rangeProp "range"
+        }
     }
 
 
 {-| Find out if `Regex.regex` and in what manner.
 If it is imported the dynamic usages should inspected and then transformed into messages.
 -}
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan rangeContext fileContext _ =
     let
         regexImport =
@@ -41,8 +49,16 @@ scan rangeContext fileContext _ =
         Just regexImport ->
             findRegexUsagesInFunctions rangeContext regexImport fileContext
                 |> .usages
-                |> List.map (NonStaticRegex fileContext.path)
-                |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+                |> List.map
+                    (\r ->
+                        Data.init
+                            (String.concat
+                                [ "Use of `Regex.regex` as non-static at "
+                                , Range.asString r
+                                ]
+                            )
+                            |> Data.addRange "range" r
+                    )
 
 
 {-| Inspect all functions to verify if the enviroments changes from static to dynamic, and check all expressions for regex usages.

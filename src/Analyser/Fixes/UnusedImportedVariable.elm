@@ -1,10 +1,11 @@
 module Analyser.Fixes.UnusedImportedVariable exposing (fixer)
 
 import ASTUtil.Imports as Imports
+import Analyser.Checks.UnusedImportedVariable as UnusedImportedVariableCheck
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.FileContent as FileContent
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (Range)
-import Analyser.Messages.Types exposing (MessageData(UnusedImportedVariable))
 import Elm.Syntax.File exposing (..)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Range as Syntax
@@ -12,43 +13,27 @@ import Elm.Syntax.Range as Syntax
 
 fixer : Fixer
 fixer =
-    Fixer canFix fix
+    Fixer (.key <| .info <| UnusedImportedVariableCheck.checker)
+        fix
+        "Remove variable from from import list and format"
 
 
-canFix : MessageData -> Bool
-canFix message =
-    case message of
-        UnusedImportedVariable _ _ _ ->
-            True
-
-        _ ->
-            False
-
-
-fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
+fix : ( String, File ) -> MessageData -> Result String String
 fix input messageData =
-    case messageData of
-        UnusedImportedVariable _ _ range ->
-            case List.head input of
-                Nothing ->
-                    Err "No input for fixer UnusedImportedVariable"
+    case Data.getRange "range" messageData of
+        Just range ->
+            removeImport input range
 
-                Just triple ->
-                    removeImport triple range
-
-        _ ->
+        Nothing ->
             Err "Invalid message data for fixer UnusedImportedVariable"
 
 
-removeImport : ( String, String, File ) -> Range -> Result String (List ( String, String ))
-removeImport ( fileName, content, ast ) range =
+removeImport : ( String, File ) -> Range -> Result String String
+removeImport ( content, ast ) range =
     case Imports.findImportWithRange ast (Range.asSyntaxRange range) of
         Just imp ->
-            Ok
-                [ ( fileName
-                  , writeNewImport imp.range (Imports.removeRangeFromImport (Range.asSyntaxRange range) imp) content
-                  )
-                ]
+            Ok <|
+                writeNewImport imp.range (Imports.removeRangeFromImport (Range.asSyntaxRange range) imp) content
 
         Nothing ->
             Err "Could not locate import for the target range"

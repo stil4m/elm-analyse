@@ -189,7 +189,7 @@ onFixerMsg x stage model =
         if Fixer.succeeded newFixerModel then
             ( { model | stage = Finished }, fixerCmds )
         else
-            startSourceLoading (Messages.messageFiles (Fixer.message newFixerModel))
+            startSourceLoading [ Messages.messageFile (Fixer.message newFixerModel) ]
                 ( model, fixerCmds )
     else
         ( { model | stage = FixerStage newFixerModel }

@@ -1,23 +1,21 @@
-module Analyser.Checks.Base exposing (Checker, foo, keyBasedChecker)
+module Analyser.Checks.Base exposing (Checker, CheckerInfo)
 
-import Analyser.Configuration exposing (Configuration, checkEnabled)
+import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Data exposing (MessageData)
 import Analyser.Messages.Range exposing (RangeContext)
-import Analyser.Messages.Types exposing (Message)
+import Analyser.Messages.Schema exposing (Schema)
 
 
 type alias Checker =
-    { shouldCheck : Configuration -> Bool
-    , check : RangeContext -> FileContext -> Configuration -> List Message
+    { check : RangeContext -> FileContext -> Configuration -> List MessageData
+    , info : CheckerInfo
     }
 
 
-foo : Int
-foo =
-    Maybe.map ((+) 1) (Just 1)
-        |> Maybe.withDefault 0
-
-
-keyBasedChecker : List String -> Configuration -> Bool
-keyBasedChecker keys configuration =
-    List.any (flip checkEnabled configuration) keys
+type alias CheckerInfo =
+    { key : String
+    , name : String
+    , description : String
+    , schema : Schema
+    }

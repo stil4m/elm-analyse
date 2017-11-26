@@ -1,5 +1,6 @@
-module Analyser.Files.FileContent exposing (FileContent, RefeshedAST, asRawFile)
+module Analyser.Files.FileContent exposing (FileContent, RefeshedAST, asFileRef, asRawFile)
 
+import Analyser.FileRef exposing (FileRef)
 import Elm.Json.Decode as Elm
 import Elm.Parser as Parser
 import Elm.RawFile exposing (RawFile)
@@ -10,6 +11,11 @@ import Result.Extra as Result
 
 type alias RefeshedAST =
     Bool
+
+
+asFileRef : FileContent -> FileRef
+asFileRef x =
+    { path = x.path, version = x.sha1 |> Maybe.withDefault "" }
 
 
 type alias FileContent =

@@ -1,14 +1,17 @@
 module Client.Components.ActiveMessageDialog exposing (Model, Msg, init, show, subscriptions, update, view)
 
+import Analyser.Fixers as Fixers
+import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Messages.Data as Data
 import Analyser.Messages.Range exposing (Range)
-import Analyser.Messages.Types exposing (Message, MessageData(MultiLineRecordFormatting, UnformattedFile, UnnecessaryParens, UnusedImportAlias, UnusedImportedVariable, UnusedPatternVariable, UnusedTypeAlias))
+import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
 import Client.Highlight as Highlight
 import Client.Socket as Socket
 import Dialog exposing (Config)
 import Html exposing (Html, button, div, h3, i, text)
 import Html.Attributes exposing (class, style)
-import Html.Events exposing (onClick)
+import Html.Events
 import Http exposing (Error)
 import Keyboard
 import Navigation exposing (Location)
@@ -39,13 +42,13 @@ show : Message -> Model -> ( Model, Cmd Msg )
 show m _ =
     ( Just
         { message = m
-        , ranges = Messages.getRanges m.data
+        , ranges = Data.getRanges m.data
         , codeBlock = RD.Loading
         }
     , Http.request
         { method = "GET"
         , headers = []
-        , url = "/file?file=" ++ (String.join "," <| List.map Http.encodeUri <| Messages.messageFiles m)
+        , url = "/file?file=" ++ (Http.encodeUri <| Messages.messageFile m)
         , body = Http.emptyBody
         , expect = Http.expectString
         , timeout = Nothing
@@ -117,86 +120,26 @@ dialogConfig state =
     , containerClass = Just "message-dialog"
     , header = Just dialogHeader
     , body = Just <| dialogBody state
-    , footer = footer state
+    , footer = Just (footer state.message)
     }
 
 
-footer : State -> Maybe (Html Msg)
-footer state =
-    if not (Messages.canFix state.message.data) then
-        Nothing
-    else
-        Just (fixableFooter state.message)
+footer : Message -> Html Msg
+footer message =
+    Fixers.getFixer message
+        |> Maybe.map fixableFooter
+        |> Maybe.withDefault (i [] [ text "Fix has to be implemented. Pull requests are welcome." ])
 
 
-fixableFooter : Message -> Html Msg
-fixableFooter message =
-    case message.data of
-        UnnecessaryParens _ _ ->
-            div []
-                [ button
-                    [ class "btn btn-success"
-                    , onClick Fix
-                    ]
-                    [ text "Remove and format" ]
-                ]
-
-        UnusedImportedVariable _ varName _ ->
-            div []
-                [ button
-                    [ class "btn btn-success"
-                    , onClick Fix
-                    ]
-                    [ text ("Remove '" ++ varName ++ "' from import list and format") ]
-                ]
-
-        UnformattedFile _ ->
-            div []
-                [ button
-                    [ class "btn btn-success"
-                    , onClick Fix
-                    ]
-                    [ text "Format" ]
-                ]
-
-        UnusedImportAlias _ moduleName _ ->
-            div []
-                [ button
-                    [ class "btn btn-success"
-                    , onClick Fix
-                    ]
-                    [ text <| "Remove alias '" ++ String.join "." moduleName ++ "' and format" ]
-                ]
-
-        UnusedTypeAlias _ aliasName _ ->
-            div []
-                [ button
-                    [ class "btn btn-success"
-                    , onClick Fix
-                    ]
-                    [ text <| "Remove type alias '" ++ aliasName ++ "' and format" ]
-                ]
-
-        UnusedPatternVariable _ _ _ ->
-            div []
-                [ button
-                    [ class "btn btn-success"
-                    , onClick Fix
-                    ]
-                    [ text <| "Optimize pattern and format" ]
-                ]
-
-        MultiLineRecordFormatting _ _ ->
-            div []
-                [ button
-                    [ class "btn btn-success"
-                    , onClick Fix
-                    ]
-                    [ text <| "Rewrite over multiple lines and format" ]
-                ]
-
-        _ ->
-            i [] [ text "Fix has to be implemented. Pull requests are welcome." ]
+fixableFooter : Fixer -> Html Msg
+fixableFooter fixer =
+    div []
+        [ button
+            [ class "btn btn-success"
+            , Html.Events.onClick Fix
+            ]
+            [ text fixer.description ]
+        ]
 
 
 dialogBody : State -> Html Msg
@@ -221,7 +164,7 @@ viewWithFileContent state x =
     div [ style [ ( "max-height", "400px" ), ( "overflow", "scroll" ) ] ]
         [ div []
             (List.map (Highlight.highlightedPre 3 x) state.ranges)
-        , text <| Messages.asString state.message.data
+        , text <| Data.description state.message.data
         ]
 
 

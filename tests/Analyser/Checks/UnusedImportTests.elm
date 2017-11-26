@@ -2,8 +2,8 @@ module Analyser.Checks.UnusedImportTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImport as UnusedImport
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range
-import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 
@@ -106,10 +106,13 @@ import Bar
 foo = 1
 
 """
-    , [ UnusedImport "./foo.elm" [ "Bar" ] <|
-            Range.manual
-                { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
-                { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+    , [ Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "Bar" ]
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
+                    { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+                )
       ]
     )
 

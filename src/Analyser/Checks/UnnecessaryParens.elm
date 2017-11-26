@@ -2,11 +2,12 @@ module Analyser.Checks.UnnecessaryParens exposing (checker)
 
 import AST.Util exposing (getParenthesized, isCase, isIf, isLambda, isLet, isOperatorApplication)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range exposing (RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(UnnecessaryParens), newMessage)
+import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.Infix exposing (..)
 import Elm.Syntax.Range as Syntax
@@ -17,7 +18,14 @@ import Maybe.Extra as Maybe
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "UnnecessaryParens" ]
+    , info =
+        { key = "UnnecessaryParens"
+        , name = "Unnecessary Parens"
+        , description = "If you want parenthesis, then you might want to look into Lisp."
+        , schema =
+            Schema.schema
+                |> Schema.rangeProp "range"
+        }
     }
 
 
@@ -25,7 +33,7 @@ type alias Context =
     List Syntax.Range
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan rangeContext fileContext _ =
     let
         x : Context
@@ -37,8 +45,18 @@ scan rangeContext fileContext _ =
     in
     x
         |> List.uniqueBy toString
-        |> List.map (Range.build rangeContext >> UnnecessaryParens fileContext.path)
-        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
+        |> List.map (Range.build rangeContext >> buildMessage)
+
+
+buildMessage : Range.Range -> MessageData
+buildMessage r =
+    Data.init
+        (String.concat
+            [ "Unnecessary parens at "
+            , Range.asString r
+            ]
+        )
+        |> Data.addRange "range" r
 
 
 onFunction : Function -> Context -> Context
@@ -140,6 +158,7 @@ onApplication parts context =
     List.head parts
         |> Maybe.andThen getParenthesized
         |> Maybe.filter (Tuple.second >> isOperatorApplication >> not)
+        |> Maybe.filter (Tuple.second >> isCase >> not)
         |> Maybe.map Tuple.first
         |> Maybe.map (flip (::) context)
         |> Maybe.withDefault context

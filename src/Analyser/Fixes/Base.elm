@@ -1,10 +1,11 @@
 module Analyser.Fixes.Base exposing (..)
 
-import Analyser.Messages.Types exposing (MessageData)
+import Analyser.Messages.Data exposing (MessageData)
 import Elm.Syntax.File exposing (..)
 
 
 type alias Fixer =
-    { canFix : MessageData -> Bool
-    , fix : List ( String, String, File ) -> MessageData -> Result String (List ( String, String ))
+    { canFix : String
+    , fix : ( String, File ) -> MessageData -> Result String String
+    , description : String
     }

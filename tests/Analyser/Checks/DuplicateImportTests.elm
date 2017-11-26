@@ -2,8 +2,8 @@ module Analyser.Checks.DuplicateImportTests exposing (all)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DuplicateImport as DuplicateImport
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range
-import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
 
@@ -33,15 +33,16 @@ import Baz
 
 foo = 1
 """
-    , [ DuplicateImport "./foo.elm"
-            [ "Baz" ]
-            [ Range.manual
-                { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
-                { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
-            , Range.manual
-                { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
-                { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
-            ]
+    , [ Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "Baz" ]
+            |> Data.addRanges "ranges"
+                [ Range.manual
+                    { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
+                    { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+                , Range.manual
+                    { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
+                    { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
+                ]
       ]
     )
 
@@ -57,18 +58,19 @@ import Baz
 
 foo = 1
 """
-    , [ DuplicateImport "./foo.elm"
-            [ "Baz" ]
-            [ Range.manual
-                { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
-                { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
-            , Range.manual
-                { start = { row = 3, column = 0 }, end = { row = 3, column = 10 } }
-                { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } }
-            , Range.manual
-                { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
-                { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
-            ]
+    , [ Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "Baz" ]
+            |> Data.addRanges "ranges"
+                [ Range.manual
+                    { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
+                    { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+                , Range.manual
+                    { start = { row = 3, column = 0 }, end = { row = 3, column = 10 } }
+                    { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } }
+                , Range.manual
+                    { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
+                    { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
+                ]
       ]
     )
 
@@ -85,23 +87,25 @@ import John
 
 foo = 1
 """
-    , [ DuplicateImport "./foo.elm"
-            [ "Baz" ]
-            [ Range.manual
-                { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
-                { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
-            , Range.manual { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
-                { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
-            ]
-      , DuplicateImport "./foo.elm"
-            [ "John" ]
-            [ Range.manual
-                { start = { row = 3, column = 0 }, end = { row = 3, column = 11 } }
-                { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } }
-            , Range.manual
-                { start = { row = 5, column = 0 }, end = { row = 5, column = 11 } }
-                { start = { row = 5, column = -1 }, end = { row = 6, column = -2 } }
-            ]
+    , [ Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "Baz" ]
+            |> Data.addRanges "ranges"
+                [ Range.manual
+                    { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
+                    { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
+                , Range.manual { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
+                    { start = { row = 4, column = -1 }, end = { row = 5, column = -2 } }
+                ]
+      , Data.init "foo"
+            |> Data.addModuleName "moduleName" [ "John" ]
+            |> Data.addRanges "ranges"
+                [ Range.manual
+                    { start = { row = 3, column = 0 }, end = { row = 3, column = 11 } }
+                    { start = { row = 3, column = -1 }, end = { row = 4, column = -2 } }
+                , Range.manual
+                    { start = { row = 5, column = 0 }, end = { row = 5, column = 11 } }
+                    { start = { row = 5, column = -1 }, end = { row = 6, column = -2 } }
+                ]
       ]
     )
 

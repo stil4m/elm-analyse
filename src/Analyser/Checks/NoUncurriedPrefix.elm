@@ -1,26 +1,32 @@
 module Analyser.Checks.NoUncurriedPrefix exposing (checker)
 
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
-import Analyser.Checks.Base exposing (Checker, keyBasedChecker)
+import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
-import Analyser.Messages.Types exposing (Message, MessageData(NoUncurriedPrefix), newMessage)
+import Analyser.Messages.Data as Data exposing (MessageData)
+import Analyser.Messages.Range as Range exposing (RangeContext)
+import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
 
 
 checker : Checker
 checker =
     { check = scan
-    , shouldCheck = keyBasedChecker [ "NoUncurriedPrefix" ]
+    , info =
+        { key = "NoUncurriedPrefix"
+        , name = "Fully Applied Operator as Prefix"
+        , description = "It's not needed to use an operator in prefix notation when you apply both arguments directly."
+        , schema = Schema.schema |> Schema.rangeProp "range" |> Schema.varProp "varName"
+        }
     }
 
 
 type alias Context =
-    List ( String, Range )
+    List MessageData
 
 
-scan : RangeContext -> FileContext -> Configuration -> List Message
+scan : RangeContext -> FileContext -> Configuration -> List MessageData
 scan rangeContext fileContext _ =
     Inspector.inspect
         { defaultConfig
@@ -28,8 +34,6 @@ scan rangeContext fileContext _ =
         }
         fileContext.ast
         []
-        |> List.map (uncurry (NoUncurriedPrefix fileContext.path))
-        |> List.map (newMessage [ ( fileContext.sha1, fileContext.path ) ])
 
 
 onExpression : RangeContext -> Expression -> Context -> Context
@@ -41,7 +45,22 @@ onExpression rangeContext ( _, expression ) context =
                     if String.startsWith ",," x then
                         context
                     else
-                        ( x, Range.build rangeContext r ) :: context
+                        let
+                            range =
+                                Range.build rangeContext r
+                        in
+                        (Data.init
+                            (String.concat
+                                [ "Prefix notation for `"
+                                , x
+                                , "` is unneeded in at "
+                                , Range.asString range
+                                ]
+                            )
+                            |> Data.addVarName "varName" x
+                            |> Data.addRange "range" range
+                        )
+                            :: context
 
                 _ ->
                     context

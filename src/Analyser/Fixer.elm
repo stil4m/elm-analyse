@@ -1,39 +1,35 @@
 port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, isDone, message, subscriptions, succeeded, update)
 
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
+import Analyser.FileRef exposing (FileRef)
+import Analyser.Fixers
 import Analyser.Fixes.Base exposing (Fixer)
-import Analyser.Fixes.MultiLineRecordFormatting as MultiLineRecordFormatting
-import Analyser.Fixes.UnformattedFile as UnformattedFileFixer
-import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
-import Analyser.Fixes.UnusedImportAlias as UnusedImportAliasFixer
-import Analyser.Fixes.UnusedImportedVariable as UnusedImportedVariableFixer
-import Analyser.Fixes.UnusedPatternVariable as UnusedPatternVariableFixer
-import Analyser.Fixes.UnusedTypeAlias as UnusedTypeAliasFixer
+import Analyser.Messages.Data as Data
 import Analyser.Messages.Types exposing (Message)
-import Analyser.Messages.Util as Messages
 import Analyser.State as State exposing (State)
 import Elm.Parser as Parser
 import Elm.Processing as Processing
-import Tuple3
 
 
-port storeFiles : List ( String, String ) -> Cmd msg
+port storeFiles : ( String, String ) -> Cmd msg
 
 
 port onStoredFiles : (Bool -> msg) -> Sub msg
 
 
-port loadFileContentWithShas : List String -> Cmd msg
+port loadFileContentWithSha : String -> Cmd msg
 
 
-port onFileContentWithShas : (List FileTriple -> msg) -> Sub msg
+port onFileContentWithShas : (FileLoad -> msg) -> Sub msg
 
 
 port sendFixResult : FixResult -> Cmd msg
 
 
-type alias FileTriple =
-    ( String, String, String )
+type alias FileLoad =
+    { file : FileRef
+    , content : String
+    }
 
 
 type alias FixResult =
@@ -43,7 +39,7 @@ type alias FixResult =
 
 
 type Msg
-    = LoadedFileContent (List FileTriple)
+    = LoadedFileContent FileLoad
     | Stored Bool
 
 
@@ -63,11 +59,11 @@ init x state =
 
 initWithMessage : Message -> State -> Maybe ( Model, Cmd Msg, State )
 initWithMessage message state =
-    getFixer message
+    Analyser.Fixers.getFixer message
         |> Maybe.map
             (\fixer ->
                 ( Model { message = message, fixer = fixer, done = False, success = True }
-                , loadFileContentWithShas (List.map Tuple.second message.files)
+                , loadFileContentWithSha message.file.path
                 , State.startFixing message state
                 )
             )
@@ -92,7 +88,7 @@ update : CodeBase -> Msg -> Model -> ( Model, Cmd Msg )
 update codeBase msg (Model model) =
     case msg of
         LoadedFileContent reference ->
-            if not (fileHashesEqual reference model.message) then
+            if not (fileHashEqual reference model.message) then
                 ( Model { model | done = True, success = False }
                 , sendFixResult
                     { success = False
@@ -101,23 +97,21 @@ update codeBase msg (Model model) =
                 )
             else
                 let
-                    fixData =
+                    changedContent =
                         reference
-                            |> List.filterMap
-                                (\( _, path, content ) ->
-                                    Parser.parse content
+                            |> (\fileLoad ->
+                                    Parser.parse fileLoad.content
                                         |> Result.map (Processing.process (CodeBase.processContext codeBase))
-                                        |> Result.map ((,,) path content)
+                                        |> Result.map ((,) fileLoad.content)
                                         |> Result.toMaybe
-                                )
-
-                    changedFiles =
-                        model.fixer.fix fixData model.message.data
+                               )
+                            |> Result.fromMaybe "Could not parse file"
+                            |> Result.andThen (\x -> model.fixer.fix x model.message.data)
                 in
-                case changedFiles of
-                    Ok patched ->
+                case changedContent of
+                    Ok newContent ->
                         ( Model model
-                        , storeFiles patched
+                        , storeFiles ( model.message.file.path, newContent )
                         )
 
                     Err e ->
@@ -132,32 +126,14 @@ update codeBase msg (Model model) =
             ( Model { model | done = True }
             , sendFixResult
                 { success = True
-                , message = "Fixed message: " ++ Messages.asString model.message.data
+                , message = "Fixed message: " ++ Data.description model.message.data
                 }
             )
 
 
-fileHashesEqual : List FileTriple -> Message -> Bool
-fileHashesEqual reference message =
-    List.sortBy Tuple.first (List.map Tuple3.init reference) == List.sortBy Tuple.first message.files
-
-
-getFixer : Message -> Maybe Fixer
-getFixer m =
-    List.filter (\x -> x.canFix m.data) fixers
-        |> List.head
-
-
-fixers : List Fixer
-fixers =
-    [ UnnecessaryParensFixer.fixer
-    , UnusedImportedVariableFixer.fixer
-    , UnusedImportAliasFixer.fixer
-    , UnusedPatternVariableFixer.fixer
-    , UnformattedFileFixer.fixer
-    , UnusedTypeAliasFixer.fixer
-    , MultiLineRecordFormatting.fixer
-    ]
+fileHashEqual : FileLoad -> Message -> Bool
+fileHashEqual reference message =
+    reference.file == message.file
 
 
 subscriptions : Model -> Sub Msg

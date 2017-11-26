@@ -96,18 +96,18 @@ module.exports = function(app, config, directory) {
         );
     });
 
-    checkedSubscribe('loadFileContentWithShas', function(files) {
-        const promises = files.map(
-            fileName =>
-                new Promise(function(accept) {
-                    fileReader(directory, fileName, accept);
-                })
-        );
-        Promise.all(promises).then(
-            function(pairs) {
-                app.ports.onFileContentWithShas.send(
-                    pairs.map(x => [x.sha1, x.path, x.content])
-                );
+    checkedSubscribe('loadFileContentWithSha', function(fileName) {
+        new Promise(function(accept) {
+            fileReader(directory, fileName, accept);
+        }).then(
+            function(pair) {
+                app.ports.onFileContentWithShas.send({
+                    file: {
+                        version: pair.sha1,
+                        path: pair.path
+                    },
+                    content: pair.content
+                });
             },
             function(e) {
                 console.log(
@@ -118,28 +118,22 @@ module.exports = function(app, config, directory) {
         );
     });
 
-    checkedSubscribe('storeFiles', function(files) {
-        var promises = files.map(file => {
-            return new Promise(function(accept) {
-                fs.writeFile(file[0], file[1], function() {
-                    console.log('Written file', file[0], '...');
-                    try {
-                        cp.execSync(
-                            config.elmFormatPath + ' --yes ' + file[0],
-                            {
-                                stdio: []
-                            }
-                        );
-                        console.log('Formatted file', file[0]);
-                        accept();
-                    } catch (e) {
-                        console.log('Could not formatted file', file[0]);
-                        accept();
-                    }
-                });
+    checkedSubscribe('storeFiles', function(file) {
+        new Promise(function(accept) {
+            fs.writeFile(file[0], file[1], function() {
+                console.log('Written file', file[0], '...');
+                try {
+                    cp.execSync(config.elmFormatPath + ' --yes ' + file[0], {
+                        stdio: []
+                    });
+                    console.log('Formatted file', file[0]);
+                    accept();
+                } catch (e) {
+                    console.log('Could not formated file', file[0]);
+                    accept();
+                }
             });
-        });
-        Promise.all(promises).then(function() {
+        }).then(function() {
             app.ports.onStoredFiles.send(true);
         });
     });

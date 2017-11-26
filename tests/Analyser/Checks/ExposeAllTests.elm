@@ -2,8 +2,8 @@ module Analyser.Checks.ExposeAllTests exposing (..)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.ExposeAll as ExposeAll
+import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Range as Range
-import Analyser.Messages.Types exposing (..)
 import Test exposing (..)
 
 
@@ -14,10 +14,12 @@ exposingAll =
 
 foo = 1
 """
-    , [ ExposeAll "./foo.elm" <|
-            Range.manual
-                { start = { row = 0, column = 21 }, end = { row = 0, column = 23 } }
-                { start = { row = 1, column = 21 }, end = { row = 1, column = 23 } }
+    , [ Data.init "foo"
+            |> Data.addRange "range"
+                (Range.manual
+                    { start = { row = 0, column = 21 }, end = { row = 0, column = 23 } }
+                    { start = { row = 1, column = 21 }, end = { row = 1, column = 23 } }
+                )
       ]
     )
 
@@ -30,21 +32,6 @@ exposingStrict =
 foo = 1
 """
     , []
-    )
-
-
-exposingAllConstructors : ( String, String, List MessageData )
-exposingAllConstructors =
-    ( "exposingAllConstructors"
-    , """module Bar exposing (Color(..))
-
-type Color = Blue | Red
-"""
-    , [ ExposeAll "./foo.elm" <|
-            Range.manual
-                { start = { row = 0, column = 27 }, end = { row = 0, column = 29 } }
-                { start = { row = 1, column = 27 }, end = { row = 1, column = 29 } }
-      ]
     )
 
 
@@ -65,6 +52,5 @@ all =
         ExposeAll.checker
         [ exposingAll
         , exposingStrict
-        , exposingAllConstructors
         , exposingStrictConstructors
         ]
