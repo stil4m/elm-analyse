@@ -3,7 +3,6 @@ module Analyser.Checks.ImportAllTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.ImportAll as ImportAll
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Test exposing (..)
 
 
@@ -18,10 +17,7 @@ import Foo exposing (..)
     , [ Data.init "foo"
             |> Data.addModuleName "moduleName" [ "Foo" ]
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
-                    { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
-                )
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
       ]
     )
 
@@ -38,17 +34,11 @@ import Baz exposing (..)
     , [ Data.init "foo"
             |> Data.addModuleName "moduleName" [ "Baz" ]
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 3, column = 21 }, end = { row = 3, column = 23 } }
-                    { start = { row = 3, column = 20 }, end = { row = 3, column = 22 } }
-                )
+                { start = { row = 3, column = 21 }, end = { row = 3, column = 23 } }
       , Data.init "foo"
             |> Data.addModuleName "moduleName" [ "Foo" ]
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
-                    { start = { row = 2, column = 20 }, end = { row = 2, column = 22 } }
-                )
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
       ]
     )
 

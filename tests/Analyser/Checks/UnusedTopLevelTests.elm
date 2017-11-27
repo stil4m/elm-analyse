@@ -4,7 +4,6 @@ import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedTopLevel as UnusedTopLevel
 import Analyser.Files.Types exposing (..)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Dict
 import Test exposing (..)
 
@@ -28,10 +27,7 @@ some = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "baz"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 4, column = 0 }, end = { row = 4, column = 3 } }
-                    { start = { row = 4, column = -1 }, end = { row = 4, column = 2 } }
-                )
+                { start = { row = 4, column = 0 }, end = { row = 4, column = 3 } }
       ]
     )
 
@@ -104,10 +100,7 @@ type Some = Thing | Other
     , [ Data.init "foo"
             |> Data.addVarName "varName" "Other"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 20 }, end = { row = 2, column = 25 } }
-                    { start = { row = 2, column = 19 }, end = { row = 3, column = -2 } }
-                )
+                { start = { row = 2, column = 20 }, end = { row = 2, column = 25 } }
       ]
     )
 
@@ -138,10 +131,7 @@ bar = bar + foo
     , [ Data.init "foo"
             |> Data.addVarName "varName" "bar"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 5, column = 0 }, end = { row = 5, column = 3 } }
-                    { start = { row = 5, column = -1 }, end = { row = 5, column = 2 } }
-                )
+                { start = { row = 5, column = 0 }, end = { row = 5, column = 3 } }
       ]
     )
 
@@ -174,10 +164,7 @@ foo = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "&>"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 4, column = 0 }, end = { row = 4, column = 4 } }
-                    { start = { row = 4, column = -1 }, end = { row = 4, column = 3 } }
-                )
+                { start = { row = 4, column = 0 }, end = { row = 4, column = 4 } }
       ]
     )
 

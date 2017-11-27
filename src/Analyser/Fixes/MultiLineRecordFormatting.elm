@@ -4,8 +4,8 @@ import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormattingChe
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Range exposing (Range)
 import Regex
 
 
@@ -38,6 +38,6 @@ replacement { match } =
 fixContent : Range -> String -> String
 fixContent range content =
     FileContent.updateRange
-        (Range.asSyntaxRange range)
+        range
         content
         (Regex.replace (Regex.AtMost 1) commaAndIdentifierRegex replacement)

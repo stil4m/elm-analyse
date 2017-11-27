@@ -6,8 +6,8 @@ import Analyser.Checks.UnusedPatternVariable as UnusedPatternVariableCheck
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Range exposing (Range)
 import Elm.Writer as Writer
 
 
@@ -28,12 +28,12 @@ fix input messageData =
 
 fixPattern : ( String, File ) -> Range -> Result String String
 fixPattern ( content, ast ) range =
-    case Patterns.findParentPattern ast (Range.asSyntaxRange range) of
+    case Patterns.findParentPattern ast range of
         Just parentPattern ->
             Ok <|
                 FileContent.replaceRangeWith
                     (PatternOptimizer.patternRange parentPattern)
-                    (Writer.writePattern (PatternOptimizer.optimize (Range.asSyntaxRange range) parentPattern)
+                    (Writer.writePattern (PatternOptimizer.optimize range parentPattern)
                         |> Writer.write
                     )
                     content

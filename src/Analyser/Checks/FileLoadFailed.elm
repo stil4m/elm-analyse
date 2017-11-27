@@ -4,7 +4,6 @@ import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data exposing (MessageData)
-import Analyser.Messages.Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Debug as SafeDebug
 
@@ -23,6 +22,6 @@ checker =
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan _ _ _ =
+scan : FileContext -> Configuration -> List MessageData
+scan _ _ =
     SafeDebug.crash "Something is completely wrong"

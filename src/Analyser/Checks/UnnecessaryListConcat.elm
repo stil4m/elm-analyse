@@ -1,11 +1,11 @@
 module Analyser.Checks.UnnecessaryListConcat exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
 
@@ -28,11 +28,11 @@ type alias Context =
     List MessageData
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     Inspector.inspect
         { defaultConfig
-            | onExpression = Post (onExpression rangeContext)
+            | onExpression = Post onExpression
         }
         fileContext.ast
         []
@@ -48,19 +48,19 @@ isListExpression ( _, inner ) =
             False
 
 
-onExpression : RangeContext -> Expression -> Context -> Context
-onExpression rangeContext ( r, inner ) context =
+onExpression : Expression -> Context -> Context
+onExpression ( r, inner ) context =
     case inner of
         Application [ ( _, QualifiedExpr [ "List" ] "concat" ), ( _, ListExpr args ) ] ->
             if List.all isListExpression args then
                 let
                     range =
-                        Range.build rangeContext r
+                        r
                 in
                 (Data.init
                     (String.concat
                         [ "Better merge the arguments of `List.concat` to a single list at "
-                        , Range.asString range
+                        , Range.rangeToString range
                         ]
                     )
                     |> Data.addRange "range" range

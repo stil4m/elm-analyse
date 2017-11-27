@@ -4,7 +4,6 @@ import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 
 
@@ -22,8 +21,8 @@ checker =
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext configuration =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext configuration =
     let
         threshold =
             Configuration.checkPropertyAsInt "LineLengthExceeded" "threshold" configuration
@@ -42,12 +41,12 @@ scan rangeContext fileContext configuration =
     else
         [ let
             rs =
-                List.map (Range.build rangeContext) longLineRanges
+                longLineRanges
           in
           Data.init
             (String.concat
                 [ "Line length exceeded on line(s) "
-                , toString (List.map Range.startLine rs)
+                , toString (List.map (.start >> .row) rs)
                 , "\"."
                 ]
             )

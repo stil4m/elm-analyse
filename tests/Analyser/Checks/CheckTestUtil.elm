@@ -4,18 +4,12 @@ import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (defaultConfiguration)
 import Analyser.Files.FileContent exposing (FileContent)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Elm.Interface as Interface
 import Elm.Parser
 import Elm.Processing as Processing
 import Elm.RawFile as RawFile
-import Elm.Syntax.Range as Syntax
 import Expect
 import Test exposing (Test, describe, test)
-
-
-type alias RangeConstructor =
-    Syntax.Range -> Range.Range
 
 
 fileContentFromInput : String -> FileContent
@@ -31,13 +25,13 @@ fileContentFromInput input =
 
 getMessages : String -> Checker -> Maybe (List MessageData)
 getMessages input checker =
-    Elm.Parser.parse input
+    Elm.Parser.parse (String.trim input)
         |> Result.map
             (\rawFile ->
                 { interface = Interface.build rawFile
                 , moduleName = RawFile.moduleName rawFile
                 , ast = Processing.process Processing.init rawFile
-                , content = ""
+                , content = String.trim input
                 , file =
                     { path = "./foo.elm"
                     , version = ""
@@ -46,7 +40,7 @@ getMessages input checker =
                 }
             )
         |> Result.toMaybe
-        |> Maybe.map (flip (checker.check (Range.context input)) defaultConfiguration)
+        |> Maybe.map (flip checker.check defaultConfiguration)
         |> Maybe.map (List.map (Data.withDescription "foo"))
 
 

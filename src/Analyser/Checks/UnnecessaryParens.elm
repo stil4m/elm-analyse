@@ -1,16 +1,16 @@
 module Analyser.Checks.UnnecessaryParens exposing (checker)
 
+import AST.Ranges as Range
 import AST.Util exposing (getParenthesized, isCase, isIf, isLambda, isLet, isOperatorApplication)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.Infix exposing (..)
-import Elm.Syntax.Range as Syntax
+import Elm.Syntax.Range as Syntax exposing (Range)
 import List.Extra as List
 import Maybe.Extra as Maybe
 
@@ -33,8 +33,8 @@ type alias Context =
     List Syntax.Range
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     let
         x : Context
         x =
@@ -45,15 +45,15 @@ scan rangeContext fileContext _ =
     in
     x
         |> List.uniqueBy toString
-        |> List.map (Range.build rangeContext >> buildMessage)
+        |> List.map buildMessage
 
 
-buildMessage : Range.Range -> MessageData
+buildMessage : Range -> MessageData
 buildMessage r =
     Data.init
         (String.concat
             [ "Unnecessary parens at "
-            , Range.asString r
+            , Range.rangeToString r
             ]
         )
         |> Data.addRange "range" r

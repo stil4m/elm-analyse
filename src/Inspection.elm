@@ -9,7 +9,6 @@ import Analyser.FileContext as FileContext
 import Analyser.Files.FileContent as FileContent
 import Analyser.Files.Types exposing (LoadedSourceFiles)
 import Analyser.Messages.Data as Data
-import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (Message, newMessage)
 import Result.Extra
 
@@ -60,10 +59,6 @@ run codeBase includedSources configuration =
 
 inspectFileContext : Configuration -> List Checker -> FileContext.FileContext -> List Message
 inspectFileContext configuration enabledChecks fileContext =
-    let
-        rangeContext =
-            Range.context fileContext.content
-    in
     enabledChecks
-        |> List.concatMap (\c -> List.map ((,) c) (c.check rangeContext fileContext configuration))
+        |> List.concatMap (\c -> List.map ((,) c) (c.check fileContext configuration))
         |> List.map (\( c, data ) -> newMessage fileContext.file c.info.key data)

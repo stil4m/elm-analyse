@@ -3,12 +3,11 @@ module Analyser.Checks.Base exposing (Checker, CheckerInfo)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data exposing (MessageData)
-import Analyser.Messages.Range exposing (RangeContext)
 import Analyser.Messages.Schema exposing (Schema)
 
 
 type alias Checker =
-    { check : RangeContext -> FileContext -> Configuration -> List MessageData
+    { check : FileContext -> Configuration -> List MessageData
     , info : CheckerInfo
     }
 

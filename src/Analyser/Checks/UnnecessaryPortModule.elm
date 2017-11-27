@@ -6,7 +6,6 @@ import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
 
@@ -24,8 +23,8 @@ checker =
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan _ fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     if AST.Util.isPortModule fileContext.ast then
         let
             portDeclCount =

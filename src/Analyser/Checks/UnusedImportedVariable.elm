@@ -1,17 +1,17 @@
 module Analyser.Checks.UnusedImportedVariable exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Variables exposing (VariableType(Imported))
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Checks.Variables as Variables
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Analyser.Messages.Schema as Schema
 import Dict
 import Elm.Interface as Interface
 import Elm.Syntax.Module exposing (..)
-import Elm.Syntax.Range as Syntax
+import Elm.Syntax.Range as Syntax exposing (Range)
 import Tuple3
 
 
@@ -30,8 +30,8 @@ checker =
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     let
         x =
             Variables.collect fileContext
@@ -44,7 +44,7 @@ scan rangeContext fileContext _ =
             x.poppedScopes
                 |> List.concatMap Dict.toList
                 |> onlyUnused
-                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType t x (Range.build rangeContext y))
+                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType t x y)
 
         unusedTopLevels =
             x.activeScopes
@@ -55,7 +55,7 @@ scan rangeContext fileContext _ =
                 |> onlyUnused
                 |> List.filter (filterByModuleType fileContext)
                 |> List.filter (Tuple.first >> flip Interface.exposesFunction fileContext.interface >> not)
-                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType t x (Range.build rangeContext y))
+                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType t x y)
     in
     unusedVariables ++ unusedTopLevels
 
@@ -70,7 +70,7 @@ forVariableType variableType variableName range =
                         [ "Unused imported variable `"
                         , variableName
                         , "` at "
-                        , Range.asString range
+                        , Range.rangeToString range
                         ]
                     )
                     |> Data.addRange "range" range

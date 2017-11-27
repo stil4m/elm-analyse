@@ -4,7 +4,6 @@ import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImportedVariable as UnusedImportedVariable
 import Analyser.Files.Types exposing (..)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Dict
 import Test exposing (..)
 
@@ -112,10 +111,7 @@ foo = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "!!"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
-                    { start = { row = 2, column = 20 }, end = { row = 2, column = 24 } }
-                )
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
       ]
     )
 
@@ -159,10 +155,7 @@ foo = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "div"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 22 }, end = { row = 2, column = 25 } }
-                    { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
-                )
+                { start = { row = 2, column = 22 }, end = { row = 2, column = 25 } }
       ]
     )
 
@@ -241,10 +234,7 @@ x y =
     , [ Data.init "foo"
             |> Data.addVarName "varName" "Thing"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 22 }, end = { row = 2, column = 27 } }
-                    { start = { row = 2, column = 21 }, end = { row = 2, column = 26 } }
-                )
+                { start = { row = 2, column = 22 }, end = { row = 2, column = 27 } }
       ]
     )
 

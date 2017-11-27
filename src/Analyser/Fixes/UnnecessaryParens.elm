@@ -4,8 +4,8 @@ import Analyser.Checks.UnnecessaryParens as UnnecessaryParensCheck
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Range exposing (Range)
 
 
 fixer : Fixer
@@ -30,7 +30,7 @@ fixContent : Range -> String -> Result String String
 fixContent range content =
     let
         { start, end } =
-            Range.asSyntaxRange range
+            range
 
         startChar =
             FileContent.getCharAtLocation ( start.row, start.column ) content

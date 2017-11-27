@@ -1,12 +1,12 @@
 module Analyser.Checks.ExposeAll exposing (checker)
 
+import AST.Ranges as Range
 import AST.Util
 import ASTUtil.Inspector as Inspector exposing (Order(Inner), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Exposing exposing (..)
 import Elm.Syntax.File exposing (..)
@@ -30,26 +30,26 @@ type alias ExposeAllContext =
     List MessageData
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     Inspector.inspect
-        { defaultConfig | onFile = Inner (onFile rangeContext) }
+        { defaultConfig | onFile = Inner onFile }
         fileContext.ast
         []
 
 
-onFile : RangeContext -> (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
-onFile rangeContext _ file _ =
+onFile : (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
+onFile _ file _ =
     case AST.Util.fileExposingList file of
         All x ->
             let
                 range =
-                    Range.build rangeContext x
+                    x
             in
             [ Data.init
                 (String.concat
                     [ "Exposing all at "
-                    , Range.asString range
+                    , Range.rangeToString range
                     ]
                 )
                 |> Data.addRange "range" range

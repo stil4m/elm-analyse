@@ -3,7 +3,6 @@ module Analyser.Checks.NonStaticRegexTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NonStaticRegex as NonStaticRegex
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Test exposing (..)
 
 
@@ -57,10 +56,7 @@ foo a =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 5, column = 4 }, end = { row = 5, column = 15 } }
-                    { start = { row = 5, column = 3 }, end = { row = 5, column = 14 } }
-                )
+                { start = { row = 5, column = 4 }, end = { row = 5, column = 15 } }
       ]
     )
 
@@ -91,10 +87,7 @@ foo a =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 5, column = 4 }, end = { row = 5, column = 9 } }
-                    { start = { row = 5, column = 3 }, end = { row = 5, column = 8 } }
-                )
+                { start = { row = 5, column = 4 }, end = { row = 5, column = 9 } }
       ]
     )
 
@@ -137,10 +130,7 @@ foo a =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 5, column = 4 }, end = { row = 5, column = 11 } }
-                    { start = { row = 5, column = 3 }, end = { row = 5, column = 10 } }
-                )
+                { start = { row = 5, column = 4 }, end = { row = 5, column = 11 } }
       ]
     )
 

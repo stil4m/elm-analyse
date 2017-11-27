@@ -4,7 +4,6 @@ import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Files.Types exposing (..)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Dict
 import Test exposing (..)
 
@@ -24,10 +23,7 @@ bar x y z = x + z
     , [ Data.init "foo"
             |> Data.addVarName "varName" "y"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
-                    { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
-                )
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
       ]
     )
 
@@ -46,10 +42,7 @@ x =
     , [ Data.init "foo"
             |> Data.addVarName "varName" "y"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 4, column = 4 }, end = { row = 4, column = 5 } }
-                    { start = { row = 4, column = 3 }, end = { row = 4, column = 4 } }
-                )
+                { start = { row = 4, column = 4 }, end = { row = 4, column = 5 } }
       ]
     )
 
@@ -222,10 +215,7 @@ foo x y=
     , [ Data.init "foo"
             |> Data.addVarName "varName" "y"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
-                    { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
-                )
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
       ]
     )
 
@@ -243,10 +233,7 @@ foo x y=
     , [ Data.init "foo"
             |> Data.addVarName "varName" "y"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
-                    { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
-                )
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
       ]
     )
 
@@ -264,10 +251,7 @@ foo x y=
     , [ Data.init "foo"
             |> Data.addVarName "varName" "y"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
-                    { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
-                )
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
       ]
     )
 
@@ -285,10 +269,7 @@ foo x y=
     , [ Data.init "foo"
             |> Data.addVarName "varName" "y"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
-                    { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
-                )
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
       ]
     )
 

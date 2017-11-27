@@ -1,17 +1,18 @@
 module Analyser.Checks.UnusedImport exposing (checker)
 
+import AST.Ranges as Range
 import AST.Util as Util
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Range as Range exposing (Range)
 import Elm.Syntax.TypeAnnotation exposing (..)
 
 
@@ -34,13 +35,13 @@ type alias Context =
     Dict ModuleName ( Range, Int )
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     let
         aliases : Context
         aliases =
             Inspector.inspect
-                { defaultConfig | onImport = Post (onImport rangeContext) }
+                { defaultConfig | onImport = Post onImport }
                 fileContext.ast
                 Dict.empty
     in
@@ -65,7 +66,7 @@ buildMessage ( moduleName, range ) =
             [ "Unused import `"
             , String.join "." moduleName
             , "` at "
-            , Range.asString range
+            , Range.rangeToString range
             ]
         )
         |> Data.addRange "range" range
@@ -77,10 +78,10 @@ markUsage key context =
     Dict.update key (Maybe.map (Tuple.mapSecond ((+) 1))) context
 
 
-onImport : RangeContext -> Import -> Context -> Context
-onImport rangeContext imp context =
+onImport : Import -> Context -> Context
+onImport imp context =
     if imp.moduleAlias == Nothing && imp.exposingList == Nothing then
-        Dict.insert imp.moduleName ( Range.build rangeContext imp.range, 0 ) context
+        Dict.insert imp.moduleName ( imp.range, 0 ) context
     else
         context
 

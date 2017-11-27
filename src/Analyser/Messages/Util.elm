@@ -1,8 +1,9 @@
 module Analyser.Messages.Util exposing (..)
 
+import AST.Ranges as AstRanges
 import Analyser.Messages.Data as Data
-import Analyser.Messages.Range as Ranges exposing (Range, emptyRange)
 import Analyser.Messages.Types exposing (..)
+import Elm.Syntax.Range exposing (Range, emptyRange)
 
 
 type alias CanFix =
@@ -41,7 +42,7 @@ firstRange a =
 
 compareMessageLocation : Message -> Message -> Order
 compareMessageLocation a b =
-    Ranges.orderByStart (firstRange a) (firstRange b)
+    AstRanges.orderByStart (firstRange a) (firstRange b)
 
 
 compareMessageFile : Message -> Message -> Order
@@ -59,8 +60,8 @@ compareMessage a b =
             messageFile b
     in
     if aFile == bFile then
-        Ranges.compareRangeStarts
-            (Data.getRanges a.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
-            (Data.getRanges b.data |> List.head |> Maybe.withDefault Ranges.emptyRange)
+        AstRanges.compareRangeStarts
+            (Data.getRanges a.data |> List.head |> Maybe.withDefault emptyRange)
+            (Data.getRanges b.data |> List.head |> Maybe.withDefault emptyRange)
     else
         compare aFile bFile

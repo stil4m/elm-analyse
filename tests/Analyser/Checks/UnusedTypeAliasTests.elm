@@ -3,8 +3,7 @@ module Analyser.Checks.UnusedTypeAliasTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedTypeAlias as UnusedTypeAlias
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
-import Test exposing (Test)
+import Test exposing (Test, only)
 
 
 unusedButExposed : ( String, String, List MessageData )
@@ -106,10 +105,7 @@ foo = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "Person"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 0 }, end = { row = 2, column = 47 } }
-                    { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
-                )
+                { start = { row = 2, column = 0 }, end = { row = 2, column = 47 } }
       ]
     )
 

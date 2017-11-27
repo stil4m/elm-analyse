@@ -1,11 +1,11 @@
 module Analyser.Checks.DebugLog exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
 
@@ -28,30 +28,26 @@ type alias Context =
     List MessageData
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     Inspector.inspect
-        { defaultConfig | onExpression = Post (onExpression rangeContext) }
+        { defaultConfig | onExpression = Post onExpression }
         fileContext.ast
         []
 
 
-onExpression : RangeContext -> Expression -> Context -> Context
-onExpression rangeContext ( range, expression ) context =
+onExpression : Expression -> Context -> Context
+onExpression ( range, expression ) context =
     case expression of
         QualifiedExpr moduleName f ->
             if entryForQualifiedExpr moduleName f then
-                let
-                    r =
-                        Range.build rangeContext range
-                in
                 (Data.init
                     (String.concat
                         [ "Use of Debug.log at "
-                        , Range.asString r
+                        , Range.rangeToString range
                         ]
                     )
-                    |> Data.addRange "range" r
+                    |> Data.addRange "range" range
                 )
                     :: context
             else

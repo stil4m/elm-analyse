@@ -3,12 +3,12 @@ module Client.Components.ActiveMessageDialog exposing (Model, Msg, init, show, s
 import Analyser.Fixers as Fixers
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Messages.Data as Data
-import Analyser.Messages.Range exposing (Range)
 import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
 import Client.Highlight as Highlight
 import Client.Socket as Socket
 import Dialog exposing (Config)
+import Elm.Syntax.Range exposing (Range)
 import Html exposing (Html, button, div, h3, i, text)
 import Html.Attributes exposing (class, style)
 import Html.Events

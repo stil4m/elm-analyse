@@ -1,13 +1,13 @@
 module Analyser.Checks.MultiLineRecordFormatting exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Inspector as Inspector exposing (..)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Analyser.Messages.Schema as Schema
-import Elm.Syntax.Range as Syntax
+import Elm.Syntax.Range as Syntax exposing (Range)
 import Elm.Syntax.TypeAlias exposing (..)
 import Elm.Syntax.TypeAnnotation exposing (..)
 
@@ -26,14 +26,14 @@ checker =
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     let
         threshold =
             2
     in
     Inspector.inspect
-        { defaultConfig | onTypeAlias = Post (onTypeAlias rangeContext) }
+        { defaultConfig | onTypeAlias = Post onTypeAlias }
         fileContext.ast
         []
         |> List.filter (Tuple.second >> List.length >> (<=) threshold)
@@ -47,7 +47,7 @@ buildMessageData r =
     Data.init
         (String.concat
             [ "Record should be formatted over multiple lines at "
-            , Range.asString r
+            , Range.rangeToString r
             ]
         )
         |> Data.addRange "range" r
@@ -68,9 +68,9 @@ firstTwo def =
             Nothing
 
 
-onTypeAlias : RangeContext -> TypeAlias -> List ( Range, RecordDefinition ) -> List ( Range, RecordDefinition )
-onTypeAlias rangeContext x context =
-    findRecords rangeContext x.typeAnnotation ++ context
+onTypeAlias : TypeAlias -> List ( Range, RecordDefinition ) -> List ( Range, RecordDefinition )
+onTypeAlias x context =
+    findRecords x.typeAnnotation ++ context
 
 
 typeAnnotationRange : TypeAnnotation -> Syntax.Range
@@ -98,26 +98,26 @@ typeAnnotationRange x =
             r
 
 
-findRecords : RangeContext -> TypeAnnotation -> List ( Range, RecordDefinition )
-findRecords rangeContext x =
+findRecords : TypeAnnotation -> List ( Range, RecordDefinition )
+findRecords x =
     case x of
         GenericType _ _ ->
             []
 
         Typed _ _ args _ ->
-            List.concatMap (findRecords rangeContext) args
+            List.concatMap findRecords args
 
         Unit _ ->
             []
 
         Tupled inner _ ->
-            List.concatMap (findRecords rangeContext) inner
+            List.concatMap findRecords inner
 
         Record fields r ->
-            ( Range.build rangeContext r, fields ) :: List.concatMap (Tuple.second >> findRecords rangeContext) fields
+            ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
 
         GenericRecord _ fields r ->
-            ( Range.build rangeContext r, fields ) :: List.concatMap (Tuple.second >> findRecords rangeContext) fields
+            ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
 
         FunctionTypeAnnotation left right _ ->
-            findRecords rangeContext left ++ findRecords rangeContext right
+            findRecords left ++ findRecords right

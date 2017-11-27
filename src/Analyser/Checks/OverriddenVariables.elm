@@ -1,12 +1,12 @@
 module Analyser.Checks.OverriddenVariables exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Inspector as Inspector exposing (Order(Inner), defaultConfig)
 import ASTUtil.Variables exposing (getImportsVars, patternToVars)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (..)
@@ -39,8 +39,8 @@ type alias Redefine =
     ( String, Syntax.Range, Syntax.Range )
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     let
         topLevels : Dict String Syntax.Range
         topLevels =
@@ -65,14 +65,14 @@ scan rangeContext fileContext _ =
                         [ "Variable `"
                         , n
                         , "` is redefined at "
-                        , Range.asString (Range.build rangeContext r1)
+                        , Range.rangeToString r1
                         , " and "
-                        , Range.asString (Range.build rangeContext r2)
+                        , Range.rangeToString r2
                         ]
                     )
                     |> Data.addVarName "varName" n
-                    |> Data.addRange "range1" (Range.build rangeContext r1)
-                    |> Data.addRange "range2" (Range.build rangeContext r2)
+                    |> Data.addRange "range1" r1
+                    |> Data.addRange "range2" r2
             )
 
 

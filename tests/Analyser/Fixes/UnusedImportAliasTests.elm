@@ -2,11 +2,10 @@ module Analyser.Fixes.UnusedImportAliasTests exposing (all)
 
 import Analyser.Fixes.UnusedImportAlias exposing (fixer)
 import Analyser.Messages.Data as Data
-import Analyser.Messages.Range as Range
 import Elm.Parser as Parser
 import Elm.Processing as Processing
 import Expect
-import Test exposing (Test, describe, test)
+import Test exposing (Test, describe, only, test)
 
 
 all : Test
@@ -37,10 +36,7 @@ foo = bar 1
                             (Data.init "Foo Bar"
                                 |> Data.addModuleName "moduleName" [ "Bar" ]
                                 |> Data.addRange "range"
-                                    (Range.manual
-                                        { start = { row = 2, column = 0 }, end = { row = 2, column = 37 } }
-                                        { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
-                                    )
+                                    { start = { row = 2, column = 0 }, end = { row = 2, column = 37 } }
                             )
                             |> Expect.equal
                                 (Ok output)

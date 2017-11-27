@@ -1,5 +1,6 @@
 module Analyser.Checks.NonStaticRegex exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Functions
 import ASTUtil.Imports as Imports exposing (FunctionReference)
 import ASTUtil.Inspector as Inspector exposing (Order(Inner, Post), defaultConfig)
@@ -7,10 +8,10 @@ import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.Range as Range exposing (Range)
 
 
 type alias Context =
@@ -36,8 +37,8 @@ checker =
 {-| Find out if `Regex.regex` and in what manner.
 If it is imported the dynamic usages should inspected and then transformed into messages.
 -}
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     let
         regexImport =
             Imports.buildImportInformation [ "Regex" ] "regex" fileContext.ast
@@ -47,14 +48,14 @@ scan rangeContext fileContext _ =
             []
 
         Just regexImport ->
-            findRegexUsagesInFunctions rangeContext regexImport fileContext
+            findRegexUsagesInFunctions regexImport fileContext
                 |> .usages
                 |> List.map
                     (\r ->
                         Data.init
                             (String.concat
                                 [ "Use of `Regex.regex` as non-static at "
-                                , Range.asString r
+                                , Range.rangeToString r
                                 ]
                             )
                             |> Data.addRange "range" r
@@ -63,12 +64,12 @@ scan rangeContext fileContext _ =
 
 {-| Inspect all functions to verify if the enviroments changes from static to dynamic, and check all expressions for regex usages.
 -}
-findRegexUsagesInFunctions : RangeContext -> FunctionReference -> FileContext -> Context
-findRegexUsagesInFunctions rangeContext regexImport fileContext =
+findRegexUsagesInFunctions : FunctionReference -> FileContext -> Context
+findRegexUsagesInFunctions regexImport fileContext =
     Inspector.inspect
         { defaultConfig
             | onFunction = Inner onFunction
-            , onExpression = Post (onExpression rangeContext regexImport)
+            , onExpression = Post (onExpression regexImport)
         }
         fileContext.ast
         startingContext
@@ -94,13 +95,13 @@ onFunction inner function context =
         inner context
 
 
-onExpression : RangeContext -> FunctionReference -> Expression -> Context -> Context
-onExpression rangeContext x expression context =
+onExpression : FunctionReference -> Expression -> Context -> Context
+onExpression x expression context =
     if x.exposesRegex then
-        onExpressionFunctionReference rangeContext expression context
-            |> onExpressionQualified rangeContext x.moduleName expression
+        onExpressionFunctionReference expression context
+            |> onExpressionQualified x.moduleName expression
     else
-        onExpressionQualified rangeContext x.moduleName expression context
+        onExpressionQualified x.moduleName expression context
 
 
 addUsedRegex : Range -> Context -> Context
@@ -113,12 +114,12 @@ addUsedRegex range context =
 
 {-| Check if regex in a qualified expression (with either the module name or the alias for the module)
 -}
-onExpressionQualified : RangeContext -> ModuleName -> Expression -> Context -> Context
-onExpressionQualified rangeContext moduleName ( range, inner ) context =
+onExpressionQualified : ModuleName -> Expression -> Context -> Context
+onExpressionQualified moduleName ( range, inner ) context =
     case inner of
         QualifiedExpr m f ->
             if f == "regex" && m == moduleName then
-                addUsedRegex (Range.build rangeContext range) context
+                addUsedRegex range context
             else
                 context
 
@@ -126,11 +127,11 @@ onExpressionQualified rangeContext moduleName ( range, inner ) context =
             context
 
 
-onExpressionFunctionReference : RangeContext -> Expression -> Context -> Context
-onExpressionFunctionReference rangeContext ( range, inner ) context =
+onExpressionFunctionReference : Expression -> Context -> Context
+onExpressionFunctionReference ( range, inner ) context =
     case inner of
         FunctionOrValue "regex" ->
-            addUsedRegex (Range.build rangeContext range) context
+            addUsedRegex range context
 
         _ ->
             context

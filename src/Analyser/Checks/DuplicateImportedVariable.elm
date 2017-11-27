@@ -1,11 +1,11 @@
 module Analyser.Checks.DuplicateImportedVariable exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (ModuleName)
@@ -36,8 +36,8 @@ type alias Context =
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     let
         result =
             Inspector.inspect
@@ -49,15 +49,11 @@ scan rangeContext fileContext _ =
                 { constructors = Dict.empty, functionOrValues = Dict.empty }
     in
     (findViolations result.functionOrValues ++ findViolations result.constructors)
-        |> List.map (asMessageData rangeContext)
+        |> List.map asMessageData
 
 
-asMessageData : RangeContext -> ( ModuleName, String, List Syntax.Range ) -> MessageData
-asMessageData rangeContext ( a, b, rs ) =
-    let
-        ranges =
-            List.map (Range.build rangeContext) rs
-    in
+asMessageData : ( ModuleName, String, List Syntax.Range ) -> MessageData
+asMessageData ( a, b, rs ) =
     Data.init
         (String.concat
             [ "Variable `"
@@ -65,13 +61,13 @@ asMessageData rangeContext ( a, b, rs ) =
             , "` imported multiple times module `"
             , String.join "." a
             , "` at [ "
-            , String.join " | " (List.map Range.asString ranges)
+            , String.join " | " (List.map Range.rangeToString rs)
             , " ]"
             ]
         )
         |> Data.addModuleName "moduleName" a
         |> Data.addVarName "varName" b
-        |> Data.addRanges "ranges" ranges
+        |> Data.addRanges "ranges" rs
 
 
 findViolations : Dict ModuleName (Dict String (List Syntax.Range)) -> List ( ModuleName, String, List Syntax.Range )

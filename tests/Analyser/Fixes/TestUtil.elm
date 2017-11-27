@@ -3,7 +3,6 @@ module Analyser.Fixes.TestUtil exposing (testFix)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration as Configuration
 import Analyser.Fixes.Base exposing (Fixer)
-import Analyser.Messages.Range as Range
 import Elm.Interface as Interface
 import Elm.Parser as Parser
 import Elm.Processing as Processing
@@ -29,7 +28,7 @@ analyseAndFix checker fixer input rawFile f =
             }
 
         x =
-            checker.check (Range.context input) fileContext Configuration.defaultConfiguration
+            checker.check fileContext Configuration.defaultConfiguration
     in
     case x of
         [] ->

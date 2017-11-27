@@ -5,10 +5,9 @@ import Analyser.Checks.UnusedImportedVariable as UnusedImportedVariableCheck
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (Range)
 import Elm.Syntax.File exposing (..)
 import Elm.Syntax.Module exposing (..)
-import Elm.Syntax.Range as Syntax
+import Elm.Syntax.Range as Syntax exposing (Range)
 
 
 fixer : Fixer
@@ -30,10 +29,10 @@ fix input messageData =
 
 removeImport : ( String, File ) -> Range -> Result String String
 removeImport ( content, ast ) range =
-    case Imports.findImportWithRange ast (Range.asSyntaxRange range) of
+    case Imports.findImportWithRange ast range of
         Just imp ->
             Ok <|
-                writeNewImport imp.range (Imports.removeRangeFromImport (Range.asSyntaxRange range) imp) content
+                writeNewImport imp.range (Imports.removeRangeFromImport range imp) content
 
         Nothing ->
             Err "Could not locate import for the target range"

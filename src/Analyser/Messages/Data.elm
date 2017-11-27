@@ -1,10 +1,10 @@
 module Analyser.Messages.Data exposing (MessageData, addErrorMessage, addFileName, addModuleName, addRange, addRanges, addVarName, conformToSchema, decode, description, encode, firstRange, getRange, getRanges, init, withDescription)
 
-import Analyser.Messages.Range as Range exposing (Range)
 import Analyser.Messages.Schema as Schema exposing (Schema)
 import Dict exposing (Dict)
 import Dict.Extra
 import Elm.Syntax.Base exposing (ModuleName)
+import Elm.Syntax.Range as Range exposing (Range)
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE
 

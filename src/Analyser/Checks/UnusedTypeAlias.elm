@@ -1,14 +1,15 @@
 module Analyser.Checks.UnusedTypeAlias exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Interface as Interface
+import Elm.Syntax.Range as Range exposing (Range)
 import Elm.Syntax.TypeAlias exposing (..)
 import Elm.Syntax.TypeAnnotation exposing (..)
 import Tuple3
@@ -33,13 +34,13 @@ type alias Context =
     Dict String ( String, Range, Int )
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     let
         collectedAliased : Context
         collectedAliased =
             Inspector.inspect
-                { defaultConfig | onTypeAlias = Post (onTypeAlias rangeContext) }
+                { defaultConfig | onTypeAlias = Post onTypeAlias }
                 fileContext.ast
                 Dict.empty
     in
@@ -64,7 +65,7 @@ buildMessageData ( varName, range ) =
             [ "Type alias `"
             , varName
             , "` is not used at "
-            , Range.asString range
+            , Range.rangeToString range
             ]
         )
         |> Data.addVarName "varName" varName
@@ -91,6 +92,6 @@ onFunctionOrValue =
     markTypeAlias
 
 
-onTypeAlias : RangeContext -> TypeAlias -> Context -> Context
-onTypeAlias rangeContext typeAlias context =
-    Dict.insert typeAlias.name ( typeAlias.name, Range.build rangeContext typeAlias.range, 0 ) context
+onTypeAlias : TypeAlias -> Context -> Context
+onTypeAlias typeAlias context =
+    Dict.insert typeAlias.name ( typeAlias.name, typeAlias.range, 0 ) context

@@ -3,7 +3,7 @@ module Analyser.Fixes.UnnecessaryParensTests exposing (all)
 import Analyser.Checks.UnnecessaryParens
 import Analyser.Fixes.TestUtil exposing (testFix)
 import Analyser.Fixes.UnnecessaryParens
-import Test exposing (Test)
+import Test exposing (Test, only)
 
 
 fixInFile : ( String, String, String )

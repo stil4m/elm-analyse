@@ -1,11 +1,11 @@
 module Analyser.Checks.ImportAll exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Exposing exposing (..)
 import Elm.Syntax.Module exposing (..)
@@ -30,29 +30,29 @@ type alias ExposeAllContext =
     List MessageData
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     Inspector.inspect
-        { defaultConfig | onImport = Post (onImport rangeContext) }
+        { defaultConfig | onImport = Post onImport }
         fileContext.ast
         []
 
 
-onImport : RangeContext -> Import -> ExposeAllContext -> ExposeAllContext
-onImport rangeContext imp context =
+onImport : Import -> ExposeAllContext -> ExposeAllContext
+onImport imp context =
     flip List.append context <|
         case imp.exposingList of
             Just (All range) ->
                 let
                     r =
-                        Range.build rangeContext range
+                        range
                 in
                 [ Data.init
                     (String.concat
                         [ "Importing all from module `"
                         , String.join "." imp.moduleName
                         , "` at "
-                        , Range.asString r
+                        , Range.rangeToString r
                         ]
                     )
                     |> Data.addRange "range" r
