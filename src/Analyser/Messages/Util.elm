@@ -331,7 +331,7 @@ getMessageInfo m =
             ( String.concat
                 [ "Unused import `"
                 , String.join "." moduleName
-                , "`in file \""
+                , "` in file \""
                 , fileName
                 , "\" at "
                 , rangeToString range
