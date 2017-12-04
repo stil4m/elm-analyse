@@ -3,7 +3,6 @@ module Analyser.Checks.UnusedImportAliasTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImportAlias as UnusedImportAlias
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Test exposing (Test)
 
 
@@ -19,10 +18,7 @@ foo = (+) 1 2
     , [ Data.init "foo"
             |> Data.addModuleName "moduleName" [ "B" ]
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 0 }, end = { row = 2, column = 15 } }
-                    { start = { row = 2, column = -1 }, end = { row = 3, column = -2 } }
-                )
+                { start = { row = 2, column = 0 }, end = { row = 2, column = 15 } }
       ]
     )
 

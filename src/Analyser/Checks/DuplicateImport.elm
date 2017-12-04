@@ -1,15 +1,16 @@
 module Analyser.Checks.DuplicateImport exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (Range, RangeContext)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.Range as Range exposing (Range)
 
 
 checker : Checker
@@ -34,7 +35,7 @@ buildData ( m, rs ) =
             [ "Duplicate import for module `"
             , String.join "." m
             , "`` at [ "
-            , String.join " | " (List.map Range.asString rs)
+            , String.join " | " (List.map Range.rangeToString rs)
             , " ]"
             ]
         )
@@ -46,11 +47,11 @@ type alias Context =
     Dict ModuleName (List Range)
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     Inspector.inspect
         { defaultConfig
-            | onImport = Post (onImport rangeContext)
+            | onImport = Post onImport
             , onFunction = Skip
         }
         fileContext.ast
@@ -65,11 +66,11 @@ hasLength f =
     List.length >> f
 
 
-onImport : RangeContext -> Import -> Context -> Context
-onImport rangeContext { moduleName, range } context =
+onImport : Import -> Context -> Context
+onImport { moduleName, range } context =
     case Dict.get moduleName context of
         Just _ ->
-            Dict.update moduleName (Maybe.map (flip (++) [ Range.build rangeContext range ])) context
+            Dict.update moduleName (Maybe.map (flip (++) [ range ])) context
 
         Nothing ->
-            Dict.insert moduleName [ Range.build rangeContext range ] context
+            Dict.insert moduleName [ range ] context

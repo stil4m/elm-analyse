@@ -3,7 +3,6 @@ module Analyser.Checks.DebugLogTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DebugLog as DebugLog
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Analyser.Messages.Types exposing (..)
 import Test exposing (Test)
 
@@ -17,10 +16,7 @@ foo x = Debug.log "This is X" x
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 8 }, end = { row = 2, column = 17 } }
-                    { start = { row = 2, column = 7 }, end = { row = 2, column = 16 } }
-                )
+                { start = { row = 2, column = 8 }, end = { row = 2, column = 17 } }
       ]
     )
 

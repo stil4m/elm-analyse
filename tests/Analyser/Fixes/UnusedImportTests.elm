@@ -3,7 +3,7 @@ module Analyser.Fixes.UnusedImportTests exposing (all)
 import Analyser.Checks.UnusedImport exposing (checker)
 import Analyser.Fixes.TestUtil exposing (testFix)
 import Analyser.Fixes.UnusedImport exposing (fixer)
-import Test exposing (Test)
+import Test exposing (Test, only)
 
 
 unusedImport : ( String, String, String )

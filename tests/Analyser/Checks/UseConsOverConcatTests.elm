@@ -3,7 +3,6 @@ module Analyser.Checks.UseConsOverConcatTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UseConsOverConcat as UseConsOverConcat
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Test exposing (..)
 
 
@@ -31,10 +30,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 4, column = 4 }, end = { row = 4, column = 14 } }
-                    { start = { row = 4, column = 3 }, end = { row = 5, column = -2 } }
-                )
+                { start = { row = 4, column = 4 }, end = { row = 4, column = 14 } }
       ]
     )
 

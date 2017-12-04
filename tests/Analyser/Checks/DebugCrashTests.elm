@@ -3,7 +3,6 @@ module Analyser.Checks.DebugCrashTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DebugCrash as DebugCrash
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Test exposing (Test)
 
 
@@ -17,10 +16,7 @@ foo = Debug.crash "NOOO"
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 2, column = 6 }, end = { row = 2, column = 17 } }
-                    { start = { row = 2, column = 5 }, end = { row = 2, column = 16 } }
-                )
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 17 } }
       ]
     )
 

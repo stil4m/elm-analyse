@@ -12,31 +12,19 @@ updateRange range content patch =
                 |> String.split "\n"
 
         beforeRows =
-            if range.start.column <= -2 then
-                range.start.row - 1
-            else
-                range.start.row
+            range.start.row
 
         afterRows =
-            if range.end.column <= -2 then
-                range.end.row - 1
-            else
-                range.end.row
+            range.end.row
 
         linesBefore =
             List.take beforeRows rows
 
         rowPrePartTakeFn =
-            if range.start.column <= -2 then
-                identity
-            else
-                String.left (range.start.column + 1)
+            String.left range.start.column
 
         rowPostPartTakeFn =
-            if range.end.column <= -2 then
-                always ""
-            else
-                String.dropLeft (range.end.column + 2)
+            String.dropLeft (range.end.column + 1)
 
         rowPrePart =
             List.drop beforeRows rows
@@ -85,9 +73,9 @@ replaceLocationWith ( row, column ) x input =
 
         lineUpdater target =
             String.concat
-                [ String.left (column + 1) target
+                [ String.left column target
                 , x
-                , String.dropLeft (column + 2) target
+                , String.dropLeft (column + 1) target
                 ]
     in
     rows
@@ -101,7 +89,7 @@ getCharAtLocation ( row, column ) input =
         |> String.split "\n"
         |> List.drop row
         |> List.head
-        |> Maybe.map (String.dropLeft (column + 1) >> String.left 1)
+        |> Maybe.map (String.dropLeft column >> String.left 1)
 
 
 replaceLines : ( Int, Int ) -> String -> String -> String
@@ -114,5 +102,5 @@ replaceLines ( start, end ) fix input =
         List.concat
             [ List.take start lines
             , [ fix ]
-            , List.drop end lines
+            , List.drop (end + 1) lines
             ]

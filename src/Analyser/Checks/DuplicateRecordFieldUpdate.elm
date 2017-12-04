@@ -5,11 +5,11 @@ import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Dict
 import Dict.Extra as Dict
 import Elm.Syntax.Expression exposing (Expression, RecordUpdate)
+import Elm.Syntax.Range as Range
 
 
 checker : Checker
@@ -31,22 +31,22 @@ type alias Context =
     List MessageData
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     Inspector.inspect
         { defaultConfig
-            | onRecordUpdate = Post (onRecordUpdate rangeContext)
+            | onRecordUpdate = Post onRecordUpdate
         }
         fileContext.ast
         []
 
 
-onRecordUpdate : RangeContext -> RecordUpdate -> Context -> Context
-onRecordUpdate rangeContext { updates } context =
+onRecordUpdate : RecordUpdate -> Context -> Context
+onRecordUpdate { updates } context =
     updates
         |> Dict.groupBy Tuple.first
         |> Dict.filter (\_ v -> List.length v > 1)
-        |> Dict.map (\_ v -> List.map (Tuple.second >> expressionRange rangeContext) v)
+        |> Dict.map (\_ v -> List.map (Tuple.second >> expressionRange) v)
         |> Dict.toList
         |> List.map buildMessageData
         |> (++) context
@@ -65,6 +65,6 @@ buildMessageData ( fieldName, ranges ) =
         |> Data.addRanges "ranges" ranges
 
 
-expressionRange : RangeContext -> Expression -> Range.Range
-expressionRange rangeContext ( r, _ ) =
-    Range.build rangeContext r
+expressionRange : Expression -> Range.Range
+expressionRange ( r, _ ) =
+    r

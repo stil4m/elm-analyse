@@ -37,7 +37,6 @@ import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.FileRef exposing (FileRef)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Json as J
-import Analyser.Messages.Range as Range
 import Analyser.Messages.Schema as Schema
 import Analyser.Messages.Types as M exposing (Message)
 import Analyser.Messages.Util
@@ -734,7 +733,7 @@ getMessages input checker =
                 }
             )
         |> Result.toMaybe
-        |> Maybe.map (flip (checker.check (Range.context input)) docConfiguration)
+        |> Maybe.map (flip checker.check docConfiguration)
 
 
 docConfiguration : Configuration

@@ -1,12 +1,12 @@
 module Analyser.Checks.TriggerWords exposing (checker)
 
+import AST.Ranges as Range
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
-import Elm.Syntax.Range as Syntax
+import Elm.Syntax.Range as Syntax exposing (Range)
 import Json.Decode as JD
 import Regex
 import Set
@@ -32,8 +32,8 @@ defaultTriggerWords =
     [ "TODO" ]
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext configuration =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext configuration =
     let
         triggerWords =
             Configuration.checkPropertyAs (JD.list JD.string) "TriggerWords" "words" configuration
@@ -41,16 +41,15 @@ scan rangeContext fileContext configuration =
     in
     fileContext.ast.comments
         |> List.filterMap (withTriggerWord triggerWords)
-        |> List.map (Tuple.mapSecond (Range.build rangeContext))
         |> List.map buildMessage
 
 
-buildMessage : ( String, Range.Range ) -> MessageData
+buildMessage : ( String, Range ) -> MessageData
 buildMessage ( word, range ) =
     Data.init
         (String.concat
             [ "`" ++ word ++ "` should not be used in comments. Found at "
-            , Range.asString range
+            , Range.rangeToString range
             ]
         )
         |> Data.addVarName "word" word

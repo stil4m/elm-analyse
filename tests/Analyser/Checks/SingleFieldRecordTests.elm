@@ -3,7 +3,6 @@ module Analyser.Checks.SingleFieldRecordTests exposing (all)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.SingleFieldRecord as SingleFieldRecord
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Test exposing (Test)
 
 
@@ -17,10 +16,7 @@ type alias Foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 3, column = 2 }, end = { row = 3, column = 13 } }
-                    { start = { row = 3, column = 1 }, end = { row = 4, column = -2 } }
-                )
+                { start = { row = 3, column = 2 }, end = { row = 3, column = 13 } }
       ]
     )
 
@@ -63,10 +59,7 @@ type alias Foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 4, column = 8 }, end = { row = 4, column = 22 } }
-                    { start = { row = 4, column = 7 }, end = { row = 5, column = -2 } }
-                )
+                { start = { row = 4, column = 8 }, end = { row = 4, column = 22 } }
       ]
     )
 
@@ -81,10 +74,7 @@ type Foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 3, column = 6 }, end = { row = 3, column = 17 } }
-                    { start = { row = 3, column = 5 }, end = { row = 4, column = -2 } }
-                )
+                { start = { row = 3, column = 6 }, end = { row = 3, column = 17 } }
       ]
     )
 

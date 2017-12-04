@@ -3,7 +3,6 @@ module Analyser.Checks.OverriddenVariablesTests exposing (..)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Test exposing (..)
 
 
@@ -19,15 +18,9 @@ foo bar = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "bar"
             |> Data.addRange "range1"
-                (Range.manual
-                    { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
-                    { start = { row = 2, column = 20 }, end = { row = 2, column = 23 } }
-                )
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
             |> Data.addRange "range2"
-                (Range.manual
-                    { start = { row = 4, column = 4 }, end = { row = 4, column = 7 } }
-                    { start = { row = 4, column = 3 }, end = { row = 4, column = 6 } }
-                )
+                { start = { row = 4, column = 4 }, end = { row = 4, column = 7 } }
       ]
     )
 
@@ -47,15 +40,9 @@ foo bar =
     , [ Data.init "foo"
             |> Data.addVarName "varName" "bar"
             |> Data.addRange "range1"
-                (Range.manual
-                    { start = { row = 2, column = 4 }, end = { row = 2, column = 7 } }
-                    { start = { row = 2, column = 3 }, end = { row = 2, column = 6 } }
-                )
+                { start = { row = 2, column = 4 }, end = { row = 2, column = 7 } }
             |> Data.addRange "range2"
-                (Range.manual
-                    { start = { row = 4, column = 4 }, end = { row = 4, column = 7 } }
-                    { start = { row = 4, column = 3 }, end = { row = 4, column = 6 } }
-                )
+                { start = { row = 4, column = 4 }, end = { row = 4, column = 7 } }
       ]
     )
 
@@ -73,15 +60,9 @@ foo bar =
     , [ Data.init "foo"
             |> Data.addVarName "varName" "bar"
             |> Data.addRange "range1"
-                (Range.manual
-                    { start = { row = 2, column = 4 }, end = { row = 2, column = 7 } }
-                    { start = { row = 2, column = 3 }, end = { row = 2, column = 6 } }
-                )
+                { start = { row = 2, column = 4 }, end = { row = 2, column = 7 } }
             |> Data.addRange "range2"
-                (Range.manual
-                    { start = { row = 4, column = 6 }, end = { row = 4, column = 9 } }
-                    { start = { row = 4, column = 5 }, end = { row = 4, column = 8 } }
-                )
+                { start = { row = 4, column = 6 }, end = { row = 4, column = 9 } }
       ]
     )
 
@@ -98,15 +79,9 @@ bar = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "bar"
             |> Data.addRange "range1"
-                (Range.manual
-                    { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
-                    { start = { row = 2, column = 20 }, end = { row = 2, column = 23 } }
-                )
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
             |> Data.addRange "range2"
-                (Range.manual
-                    { start = { row = 4, column = 0 }, end = { row = 4, column = 3 } }
-                    { start = { row = 4, column = -1 }, end = { row = 4, column = 2 } }
-                )
+                { start = { row = 4, column = 0 }, end = { row = 4, column = 3 } }
       ]
     )
 
@@ -123,27 +98,15 @@ import Bar exposing (name,age)
     , [ Data.init "foo"
             |> Data.addVarName "varName" "age"
             |> Data.addRange "range1"
-                (Range.manual
-                    { start = { row = 2, column = 26 }, end = { row = 2, column = 29 } }
-                    { start = { row = 2, column = 25 }, end = { row = 2, column = 28 } }
-                )
+                { start = { row = 2, column = 26 }, end = { row = 2, column = 29 } }
             |> Data.addRange "range2"
-                (Range.manual
-                    { start = { row = 4, column = 1 }, end = { row = 4, column = 4 } }
-                    { start = { row = 4, column = 0 }, end = { row = 4, column = 3 } }
-                )
+                { start = { row = 4, column = 1 }, end = { row = 4, column = 4 } }
       , Data.init "foo"
             |> Data.addVarName "varName" "name"
             |> Data.addRange "range1"
-                (Range.manual
-                    { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
-                    { start = { row = 2, column = 20 }, end = { row = 2, column = 24 } }
-                )
+                { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
             |> Data.addRange "range2"
-                (Range.manual
-                    { start = { row = 4, column = 5 }, end = { row = 4, column = 9 } }
-                    { start = { row = 4, column = 4 }, end = { row = 4, column = 8 } }
-                )
+                { start = { row = 4, column = 5 }, end = { row = 4, column = 9 } }
       ]
     )
 

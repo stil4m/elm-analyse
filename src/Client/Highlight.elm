@@ -1,6 +1,6 @@
 module Client.Highlight exposing (..)
 
-import Analyser.Messages.Range as Range exposing (Range)
+import Elm.Syntax.Range exposing (Range)
 import Html exposing (Html, pre, span, text)
 import Html.Attributes exposing (id, style)
 
@@ -8,8 +8,8 @@ import Html.Attributes exposing (id, style)
 beforeHighlight : Int -> List String -> Range -> String
 beforeHighlight rowsAround targetRows range =
     let
-        ( startRow, startColumn, _, _ ) =
-            Range.toTuple range
+        ( startRow, startColumn ) =
+            ( range.start.row, range.start.column )
 
         uiStartRow =
             max 0 (startRow - rowsAround)
@@ -30,8 +30,8 @@ beforeHighlight rowsAround targetRows range =
 afterHighlight : Int -> List String -> Range -> String
 afterHighlight rowsAround targetRows range =
     let
-        ( startRow, _, endRow, endColumn ) =
-            Range.toTuple range
+        ( startRow, endRow, endColumn ) =
+            ( range.start.row, range.end.row, range.end.column )
 
         uiStartRow =
             max 0 (startRow - rowsAround)
@@ -61,7 +61,7 @@ highlightedString : Int -> List String -> Range -> String
 highlightedString rowsAround targetRows range =
     let
         ( startRow, startColumn, endRow, endColumn ) =
-            Range.toTuple range
+            ( range.start.row, range.start.column, range.end.row, range.end.column )
 
         uiStartRow =
             max 0 (startRow - rowsAround)
@@ -116,8 +116,8 @@ highlightedString rowsAround targetRows range =
 highlightedPre : Int -> String -> Range -> Html msg
 highlightedPre rowsAround content range =
     let
-        ( startRow, _, endRow, _ ) =
-            Range.toTuple range
+        ( startRow, endRow ) =
+            ( range.start.row, range.end.row )
 
         target =
             String.split "\n" content

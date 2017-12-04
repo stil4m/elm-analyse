@@ -2,11 +2,10 @@ module Analyser.Fixes.UnusedImportedVariableTests exposing (all)
 
 import Analyser.Fixes.UnusedImportedVariable exposing (fixer)
 import Analyser.Messages.Data as Data
-import Analyser.Messages.Range as Range
 import Elm.Parser as Parser
 import Elm.Processing as Processing
 import Expect
-import Test exposing (Test, describe, test)
+import Test exposing (Test, describe, only, test)
 
 
 all : Test
@@ -37,10 +36,7 @@ foo = bar 1
                             (Data.init "Foo"
                                 |> Data.addVarName "varName" "other"
                                 |> Data.addRange "range"
-                                    (Range.manual
-                                        { start = { row = 2, column = 26 }, end = { row = 2, column = 31 } }
-                                        { start = { row = 2, column = 25 }, end = { row = 2, column = 30 } }
-                                    )
+                                    { start = { row = 2, column = 26 }, end = { row = 2, column = 31 } }
                             )
                             |> Expect.equal (Ok output)
 

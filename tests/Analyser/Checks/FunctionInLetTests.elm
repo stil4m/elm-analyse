@@ -3,7 +3,6 @@ module Analyser.Checks.FunctionInLetTests exposing (all)
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.FunctionInLet as FunctionInLet
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range
 import Test exposing (Test)
 
 
@@ -21,10 +20,7 @@ foo x =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                (Range.manual
-                    { start = { row = 4, column = 6 }, end = { row = 4, column = 7 } }
-                    { start = { row = 4, column = 5 }, end = { row = 4, column = 6 } }
-                )
+                { start = { row = 4, column = 6 }, end = { row = 4, column = 7 } }
       ]
     )
 

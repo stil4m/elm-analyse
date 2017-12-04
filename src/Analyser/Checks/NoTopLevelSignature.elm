@@ -1,11 +1,11 @@
 module Analyser.Checks.NoTopLevelSignature exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Inspector as Inspector exposing (Order(Inner, Skip), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
 
@@ -22,28 +22,28 @@ checker =
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     Inspector.inspect
-        { defaultConfig | onFunction = Inner (onFunction rangeContext), onDestructuring = Skip }
+        { defaultConfig | onFunction = Inner onFunction, onDestructuring = Skip }
         fileContext.ast
         []
 
 
-onFunction : RangeContext -> (List MessageData -> List MessageData) -> Function -> List MessageData -> List MessageData
-onFunction rangeContext _ function context =
+onFunction : (List MessageData -> List MessageData) -> Function -> List MessageData -> List MessageData
+onFunction _ function context =
     case function.signature of
         Nothing ->
             let
                 r =
-                    Range.build rangeContext function.declaration.name.range
+                    function.declaration.name.range
             in
             (Data.init
                 (String.concat
                     [ "No signature for top level definition `"
                     , function.declaration.name.value
                     , "` at "
-                    , Range.asString r
+                    , Range.rangeToString r
                     ]
                 )
                 |> Data.addVarName "varName" function.declaration.name.value

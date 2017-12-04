@@ -1,12 +1,12 @@
 module Analyser.Checks.FunctionInLet exposing (checker)
 
+import AST.Ranges as Range
 import ASTUtil.Functions
 import ASTUtil.Inspector as Inspector exposing (Order(Inner, Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Analyser.Messages.Range as Range exposing (RangeContext)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
 
@@ -36,8 +36,8 @@ checker =
     }
 
 
-scan : RangeContext -> FileContext -> Configuration -> List MessageData
-scan rangeContext fileContext _ =
+scan : FileContext -> Configuration -> List MessageData
+scan fileContext _ =
     Inspector.inspect
         { defaultConfig
             | onLetBlock = Inner onLetBlock
@@ -46,19 +46,19 @@ scan rangeContext fileContext _ =
         fileContext.ast
         startingContext
         |> .functions
-        |> List.map (asMessage rangeContext)
+        |> List.map asMessage
 
 
-asMessage : RangeContext -> Function -> MessageData
-asMessage rangeContext f =
+asMessage : Function -> MessageData
+asMessage f =
     let
         range =
-            Range.build rangeContext f.declaration.name.range
+            f.declaration.name.range
     in
     Data.init
         (String.concat
             [ "Let statement containing functions should be avoided at "
-            , Range.asString range
+            , Range.rangeToString range
             ]
         )
         |> Data.addRange "range" range
