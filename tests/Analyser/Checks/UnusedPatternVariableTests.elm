@@ -182,7 +182,7 @@ foo x =
     , [ Data.init "foo"
             |> Data.addVarName "varName" "y"
             |> Data.addRange "range"
-                { start = { row = 5, column = 9 }, end = { row = 5, column = 10 } }
+                { start = { row = 5, column = 8 }, end = { row = 5, column = 9 } }
       ]
     )
 
@@ -201,7 +201,7 @@ foo x =
     , [ Data.init "foo"
             |> Data.addVarName "varName" "y"
             |> Data.addRange "range"
-                { start = { row = 5, column = 4 }, end = { row = 5, column = 5 } }
+                { start = { row = 5, column = 3 }, end = { row = 5, column = 4 } }
       ]
     )
 

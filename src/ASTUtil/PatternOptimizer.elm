@@ -74,7 +74,7 @@ optimize range (( r, pattern ) as input) =
                 else
                     case optimize range subPattern of
                         ( r, AllPattern ) ->
-                            ( r, VarPattern asPointer.value )
+                            ( asPointer.range, VarPattern asPointer.value )
 
                         other ->
                             ( r, AsPattern other asPointer )
