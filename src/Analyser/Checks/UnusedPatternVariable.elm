@@ -17,6 +17,7 @@ import Elm.Syntax.Infix exposing (..)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Pattern exposing (..)
 import Elm.Syntax.Range as Syntax exposing (Range)
+import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(Typed))
 import Tuple3
 
@@ -228,7 +229,7 @@ onRecordUpdate recordUpdate context =
     addUsedVariable recordUpdate.name context
 
 
-onOperatorAppliction : ( String, InfixDirection, Expression, Expression ) -> UsedVariableContext -> UsedVariableContext
+onOperatorAppliction : ( String, InfixDirection, Ranged Expression, Ranged Expression ) -> UsedVariableContext -> UsedVariableContext
 onOperatorAppliction ( op, _, _, _ ) context =
     addUsedVariable op context
 
@@ -284,7 +285,7 @@ onLetBlock f letBlock context =
         |> popScope
 
 
-onDestructuring : ( Pattern, Expression ) -> UsedVariableContext -> UsedVariableContext
+onDestructuring : ( Ranged Pattern, Ranged Expression ) -> UsedVariableContext -> UsedVariableContext
 onDestructuring ( pattern, _ ) context =
     List.foldl addUsedVariable
         context
@@ -307,10 +308,10 @@ onCase f caze context =
     List.foldl addUsedVariable postContext used
 
 
-onTypeAnnotation : TypeAnnotation -> UsedVariableContext -> UsedVariableContext
-onTypeAnnotation t c =
+onTypeAnnotation : Ranged TypeAnnotation -> UsedVariableContext -> UsedVariableContext
+onTypeAnnotation ( _, t ) c =
     case t of
-        Typed [] name _ _ ->
+        Typed [] name _ ->
             addUsedVariable name c
 
         _ ->

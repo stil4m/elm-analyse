@@ -11,6 +11,7 @@ import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.Infix exposing (..)
 import Elm.Syntax.Range as Syntax exposing (Range)
+import Elm.Syntax.Ranged exposing (Ranged)
 import List.Extra as List
 import Maybe.Extra as Maybe
 
@@ -79,7 +80,7 @@ onLambda lambda context =
             context
 
 
-onExpression : Expression -> Context -> Context
+onExpression : Ranged Expression -> Context -> Context
 onExpression ( range, expression ) context =
     case expression of
         ParenthesizedExpression inner ->
@@ -113,21 +114,21 @@ onExpression ( range, expression ) context =
             context
 
 
-onListExpr : List Expression -> Context -> Context
+onListExpr : List (Ranged Expression) -> Context -> Context
 onListExpr exprs context =
     List.filterMap getParenthesized exprs
         |> List.map Tuple.first
         |> flip (++) context
 
 
-onTuple : List Expression -> Context -> Context
+onTuple : List (Ranged Expression) -> Context -> Context
 onTuple exprs context =
     List.filterMap getParenthesized exprs
         |> List.map Tuple.first
         |> flip (++) context
 
 
-onRecord : List ( String, Expression ) -> Context -> Context
+onRecord : List ( String, Ranged Expression ) -> Context -> Context
 onRecord fields context =
     fields
         |> List.filterMap (Tuple.second >> getParenthesized)
@@ -145,7 +146,7 @@ onCaseBlock caseBlock context =
             context
 
 
-onIfBlock : Expression -> Expression -> Expression -> Context -> Context
+onIfBlock : Ranged Expression -> Ranged Expression -> Ranged Expression -> Context -> Context
 onIfBlock clause thenBranch elseBranch context =
     [ clause, thenBranch, elseBranch ]
         |> List.filterMap getParenthesized
@@ -153,7 +154,7 @@ onIfBlock clause thenBranch elseBranch context =
         |> flip (++) context
 
 
-onApplication : List Expression -> Context -> Context
+onApplication : List (Ranged Expression) -> Context -> Context
 onApplication parts context =
     List.head parts
         |> Maybe.andThen getParenthesized
@@ -164,9 +165,10 @@ onApplication parts context =
         |> Maybe.withDefault context
 
 
-onOperatorApplication : ( String, InfixDirection, Expression, Expression ) -> Context -> Context
+onOperatorApplication : ( String, InfixDirection, Ranged Expression, Ranged Expression ) -> Context -> Context
 onOperatorApplication ( _, _, left, right ) context =
     let
+        fixHandSide : Ranged Expression -> Maybe Syntax.Range
         fixHandSide =
             getParenthesized
                 >> Maybe.filter (Tuple.second >> operatorHandSideAllowedParens >> not)
@@ -179,15 +181,15 @@ onOperatorApplication ( _, _, left, right ) context =
         |> flip (++) context
 
 
-operatorHandSideAllowedParens : Expression -> Bool
+operatorHandSideAllowedParens : Ranged Expression -> Bool
 operatorHandSideAllowedParens expr =
     List.any ((|>) expr)
         [ isOperatorApplication, isIf, isCase, isLet, isLambda ]
 
 
-onParenthesizedExpression : Syntax.Range -> Expression -> Context -> Context
-onParenthesizedExpression range expression context =
-    case Tuple.second expression of
+onParenthesizedExpression : Syntax.Range -> Ranged Expression -> Context -> Context
+onParenthesizedExpression range ( r, expression ) context =
+    case expression of
         RecordAccess _ _ ->
             range :: context
 

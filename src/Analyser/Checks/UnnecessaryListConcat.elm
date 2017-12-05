@@ -8,6 +8,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.Ranged exposing (Ranged)
 
 
 checker : Checker
@@ -38,7 +39,7 @@ scan fileContext _ =
         []
 
 
-isListExpression : Expression -> Bool
+isListExpression : Ranged Expression -> Bool
 isListExpression ( _, inner ) =
     case inner of
         ListExpr _ ->
@@ -48,7 +49,7 @@ isListExpression ( _, inner ) =
             False
 
 
-onExpression : Expression -> Context -> Context
+onExpression : Ranged Expression -> Context -> Context
 onExpression ( r, inner ) context =
     case inner of
         Application [ ( _, QualifiedExpr [ "List" ] "concat" ), ( _, ListExpr args ) ] ->

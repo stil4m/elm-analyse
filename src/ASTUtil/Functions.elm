@@ -10,7 +10,7 @@ isStatic function =
         False
     else if function.declaration.operatorDefinition then
         False
-    else if Maybe.withDefault False <| Maybe.map isFunctionSignature function.signature then
+    else if Maybe.withDefault False <| Maybe.map (Tuple.second >> isFunctionSignature) function.signature then
         False
     else
         True
@@ -18,13 +18,13 @@ isStatic function =
 
 isFunctionSignature : FunctionSignature -> Bool
 isFunctionSignature { typeAnnotation } =
-    isFunctionTypeAnnotation typeAnnotation
+    isFunctionTypeAnnotation (Tuple.second typeAnnotation)
 
 
 isFunctionTypeAnnotation : TypeAnnotation -> Bool
 isFunctionTypeAnnotation typeAnnotation =
     case typeAnnotation of
-        FunctionTypeAnnotation _ _ _ ->
+        FunctionTypeAnnotation _ _ ->
             True
 
         _ ->

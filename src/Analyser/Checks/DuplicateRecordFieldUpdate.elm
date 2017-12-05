@@ -46,7 +46,7 @@ onRecordUpdate { updates } context =
     updates
         |> Dict.groupBy Tuple.first
         |> Dict.filter (\_ v -> List.length v > 1)
-        |> Dict.map (\_ v -> List.map (Tuple.second >> expressionRange) v)
+        |> Dict.map (\_ v -> List.map (Tuple.second >> Tuple.first) v)
         |> Dict.toList
         |> List.map buildMessageData
         |> (++) context
@@ -63,8 +63,3 @@ buildMessageData ( fieldName, ranges ) =
         )
         |> Data.addVarName "fieldName" fieldName
         |> Data.addRanges "ranges" ranges
-
-
-expressionRange : Expression -> Range.Range
-expressionRange ( r, _ ) =
-    r

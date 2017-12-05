@@ -7,6 +7,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Range as Syntax exposing (Range)
+import Elm.Syntax.Ranged exposing (Ranged)
 import Json.Decode as JD
 import Regex
 import Set
@@ -61,8 +62,8 @@ splitRegex =
     Regex.regex "[^\\w]+"
 
 
-withTriggerWord : List String -> ( String, Syntax.Range ) -> Maybe ( String, Syntax.Range )
-withTriggerWord words ( commentText, range ) =
+withTriggerWord : List String -> Ranged String -> Maybe ( String, Syntax.Range )
+withTriggerWord words ( range, commentText ) =
     let
         commentWords =
             Regex.split Regex.All splitRegex commentText

@@ -13,6 +13,7 @@ import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.Pattern exposing (..)
 import Elm.Syntax.Range as Syntax
+import Elm.Syntax.Ranged exposing (Ranged)
 
 
 checker : Checker
@@ -99,12 +100,12 @@ visitWithVariablePointers variablePointers f ( redefines, known ) =
     )
 
 
-visitWithPatterns : List Pattern -> (Context -> Context) -> Context -> Context
+visitWithPatterns : List (Ranged Pattern) -> (Context -> Context) -> Context -> Context
 visitWithPatterns patterns f context =
     visitWithVariablePointers (patterns |> List.concatMap patternToVars |> List.map Tuple.first) f context
 
 
-onDestructuring : (Context -> Context) -> ( Pattern, Expression ) -> Context -> Context
+onDestructuring : (Context -> Context) -> ( Ranged Pattern, Ranged Expression ) -> Context -> Context
 onDestructuring f ( pattern, _ ) context =
     visitWithVariablePointers
         (pattern |> patternToVars |> List.map Tuple.first)
