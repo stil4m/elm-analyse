@@ -143,7 +143,7 @@ exposingValues ( r, t ) =
 
 
 exposingConstructors : Ranged TopLevelExpose -> List (Ranged String)
-exposingConstructors ( r, t ) =
+exposingConstructors ( _, t ) =
     case t of
         TypeExpose s ->
             case s.constructors of

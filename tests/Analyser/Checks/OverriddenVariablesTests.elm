@@ -20,7 +20,7 @@ foo bar = 1
             |> Data.addRange "range1"
                 { start = { row = 2, column = 21 }, end = { row = 2, column = 24 } }
             |> Data.addRange "range2"
-                { start = { row = 4, column = 3 }, end = { row = 4, column = 6 } }
+                { start = { row = 4, column = 4 }, end = { row = 4, column = 7 } }
       ]
     )
 
@@ -40,7 +40,7 @@ foo bar =
     , [ Data.init "foo"
             |> Data.addVarName "varName" "bar"
             |> Data.addRange "range1"
-                { start = { row = 2, column = 3 }, end = { row = 2, column = 6 } }
+                { start = { row = 2, column = 4 }, end = { row = 2, column = 7 } }
             |> Data.addRange "range2"
                 { start = { row = 4, column = 4 }, end = { row = 4, column = 7 } }
       ]
@@ -60,9 +60,9 @@ foo bar =
     , [ Data.init "foo"
             |> Data.addVarName "varName" "bar"
             |> Data.addRange "range1"
-                { start = { row = 2, column = 3 }, end = { row = 2, column = 6 } }
+                { start = { row = 2, column = 4 }, end = { row = 2, column = 7 } }
             |> Data.addRange "range2"
-                { start = { row = 4, column = 5 }, end = { row = 4, column = 8 } }
+                { start = { row = 4, column = 6 }, end = { row = 4, column = 9 } }
       ]
     )
 

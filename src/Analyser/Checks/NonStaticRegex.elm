@@ -12,7 +12,7 @@ import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.Range as Range exposing (Range)
-import Elm.Syntax.Ranged as Ranged exposing (Ranged)
+import Elm.Syntax.Ranged exposing (Ranged)
 
 
 type alias Context =

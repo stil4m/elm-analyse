@@ -75,7 +75,7 @@ onTypeAlias ( _, x ) context =
 
 
 typeAnnotationRange : Ranged TypeAnnotation -> Syntax.Range
-typeAnnotationRange ( r, x ) =
+typeAnnotationRange ( r, _ ) =
     r
 
 

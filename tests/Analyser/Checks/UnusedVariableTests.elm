@@ -23,7 +23,7 @@ bar x y z = x + z
     , [ Data.init "foo"
             |> Data.addVarName "varName" "y"
             |> Data.addRange "range"
-                { start = { row = 2, column = 5 }, end = { row = 2, column = 6 } }
+                { start = { row = 2, column = 6 }, end = { row = 2, column = 7 } }
       ]
     )
 

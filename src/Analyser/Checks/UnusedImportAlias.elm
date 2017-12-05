@@ -90,7 +90,7 @@ onImport imp context =
 
 
 onTypeAnnotation : Ranged TypeAnnotation -> Context -> Context
-onTypeAnnotation ( r, typeAnnotation ) context =
+onTypeAnnotation ( _, typeAnnotation ) context =
     case typeAnnotation of
         Typed moduleName _ _ ->
             markUsage moduleName context

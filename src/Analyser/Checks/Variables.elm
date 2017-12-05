@@ -225,7 +225,7 @@ onCase f caze context =
 
 
 onTypeAnnotation : Ranged TypeAnnotation -> UsedVariableContext -> UsedVariableContext
-onTypeAnnotation ( r, t ) c =
+onTypeAnnotation ( _, t ) c =
     case t of
         Typed [] name _ ->
             addUsedVariable name c

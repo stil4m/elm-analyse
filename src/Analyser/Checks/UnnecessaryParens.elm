@@ -188,7 +188,7 @@ operatorHandSideAllowedParens expr =
 
 
 onParenthesizedExpression : Syntax.Range -> Ranged Expression -> Context -> Context
-onParenthesizedExpression range ( r, expression ) context =
+onParenthesizedExpression range ( _, expression ) context =
     case expression of
         RecordAccess _ _ ->
             range :: context

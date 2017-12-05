@@ -2,7 +2,7 @@ module ASTUtil.Imports exposing (FunctionReference, buildImportInformation, find
 
 import AST.Ranges as Ranges
 import Elm.Syntax.Base exposing (..)
-import Elm.Syntax.Exposing as Exposing exposing (..)
+import Elm.Syntax.Exposing exposing (..)
 import Elm.Syntax.File exposing (..)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Range exposing (Range)

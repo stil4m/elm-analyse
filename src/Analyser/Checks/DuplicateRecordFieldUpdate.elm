@@ -8,7 +8,7 @@ import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Dict
 import Dict.Extra as Dict
-import Elm.Syntax.Expression exposing (Expression, RecordUpdate)
+import Elm.Syntax.Expression exposing (RecordUpdate)
 import Elm.Syntax.Range as Range
 
 

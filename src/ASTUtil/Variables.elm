@@ -193,7 +193,7 @@ patternToVars =
 
 
 patternToVarsInner : Bool -> Ranged Pattern -> List ( VariablePointer, VariableType )
-patternToVarsInner isFirst ( r, p ) =
+patternToVarsInner isFirst ( range, p ) =
     let
         recur =
             patternToVarsInner False
@@ -212,7 +212,7 @@ patternToVarsInner isFirst ( r, p ) =
             List.concatMap recur l
 
         VarPattern x ->
-            [ ( { value = x, range = r }
+            [ ( { value = x, range = range }
               , if isFirst then
                     Defined
                 else
