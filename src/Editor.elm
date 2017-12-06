@@ -31,7 +31,7 @@ port editorMessages : Value -> Cmd msg
 
 sendEditorData : EditorData -> Cmd msg
 sendEditorData x =
-    JE.string (toString x) |> editorMessages
+    editorMessages (encodeEditorData x)
 
 
 encodeEditorData : EditorData -> Value
@@ -40,7 +40,7 @@ encodeEditorData editorData =
         [ ( "progress", Analyser.State.encodeStatus editorData.progress )
         , ( "files"
           , editorData.files
-                |> Dict.map (\k v -> JE.list <| List.map encodeEditorMessage v)
+                |> Dict.map (\_ v -> JE.list <| List.map encodeEditorMessage v)
                 |> Dict.toList
                 |> JE.object
           )
@@ -54,7 +54,7 @@ encodeEditorMessage editorMessage =
         , ( "location"
           , JE.object
                 [ ( "file", JE.string editorMessage.location.file )
-                , ( "postition", encodePosition editorMessage.location.position )
+                , ( "position", encodePosition editorMessage.location.position )
                 ]
           )
         , ( "excerpt", JE.string editorMessage.excerpt )
@@ -109,18 +109,8 @@ init flags =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     stateListener (JD.decodeValue (Analyser.State.decodeState Analyser.Checks.schemas) >> OnState)
-
-
-wsAddress : Flags -> String
-wsAddress flags =
-    "ws://"
-        ++ flags.serverHost
-        ++ ":"
-        ++ toString flags.serverPort
-        ++ "/state"
-        |> Debug.log "Url"
 
 
 editorFileMessages : Message -> List ( String, EditorMessage )

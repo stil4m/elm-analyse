@@ -21,7 +21,8 @@ var args = minimist(process.argv.slice(2), {
         'package.json'
     )).version;
     const info = {
-        version: elmAnalyseVersion
+        version: elmAnalyseVersion,
+        cwd: process.cwd()
     };
 
     const elmFormatPath = args['elm-format-path'] || 'elm-format';
