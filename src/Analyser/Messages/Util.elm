@@ -1,17 +1,9 @@
-module Analyser.Messages.Util exposing (..)
+module Analyser.Messages.Util exposing (blockForShas, compareMessageFile, compareMessageLocation, firstRange, markFixing, messageFile)
 
 import AST.Ranges as AstRanges
 import Analyser.Messages.Data as Data
 import Analyser.Messages.Types exposing (..)
 import Elm.Syntax.Range exposing (Range, emptyRange)
-
-
-type alias CanFix =
-    Bool
-
-
-type alias MessageInfo =
-    ( String, List Range, CanFix )
 
 
 blockForShas : String -> Message -> Message
@@ -48,20 +40,3 @@ compareMessageLocation a b =
 compareMessageFile : Message -> Message -> Order
 compareMessageFile a b =
     compare (messageFile a) (messageFile b)
-
-
-compareMessage : Message -> Message -> Order
-compareMessage a b =
-    let
-        aFile =
-            messageFile a
-
-        bFile =
-            messageFile b
-    in
-    if aFile == bFile then
-        AstRanges.compareRangeStarts
-            (Data.getRanges a.data |> List.head |> Maybe.withDefault emptyRange)
-            (Data.getRanges b.data |> List.head |> Maybe.withDefault emptyRange)
-    else
-        compare aFile bFile

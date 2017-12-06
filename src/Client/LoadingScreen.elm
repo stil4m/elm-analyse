@@ -1,4 +1,4 @@
-module Client.LoadingScreen exposing (..)
+module Client.LoadingScreen exposing (viewRemoteData, viewStateFromRemoteData)
 
 import Analyser.State as State exposing (State)
 import Html exposing (Html, div, text)
@@ -24,16 +24,6 @@ viewRemoteData rd f =
             div [] []
 
 
-viewMaybe : Maybe b -> (b -> Html msg) -> Html msg
-viewMaybe m f =
-    case m of
-        Nothing ->
-            text "Loading..."
-
-        Just x ->
-            f x
-
-
 viewStateFromRemoteData : RemoteData a State -> (State -> Html msg) -> Html msg
 viewStateFromRemoteData rd f =
     viewRemoteData rd (viewState f)
@@ -45,8 +35,3 @@ viewState f state =
         text "Loading..."
     else
         f state
-
-
-viewStateFromMaybe : Maybe State -> (State -> Html msg) -> Html msg
-viewStateFromMaybe maybeState f =
-    viewMaybe maybeState (viewState f)

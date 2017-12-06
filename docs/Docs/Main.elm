@@ -1,4 +1,4 @@
-module Docs.Main exposing (..)
+module Docs.Main exposing (main)
 
 import Bootstrap.Navbar
 import Docs.Changelog as Changelog
@@ -156,17 +156,3 @@ body model =
 
         ContributingContent ->
             Contributing.view
-
-
-header : Html msg
-header =
-    div []
-        [ h1 [] [ text "header" ]
-        ]
-
-
-footer : Html msg
-footer =
-    div []
-        [ text "Footer"
-        ]

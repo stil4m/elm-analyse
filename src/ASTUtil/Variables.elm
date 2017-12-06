@@ -1,4 +1,14 @@
-module ASTUtil.Variables exposing (..)
+module ASTUtil.Variables
+    exposing
+        ( VariableType(Defined, Imported, Pattern, TopLevel)
+        , getImportsVars
+        , getLetDeclarationsVars
+        , getTopLevels
+        , patternToUsedVars
+        , patternToVars
+        , patternToVarsInner
+        , withoutTopLevel
+        )
 
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Declaration exposing (..)

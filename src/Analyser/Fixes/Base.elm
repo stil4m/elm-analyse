@@ -1,4 +1,4 @@
-module Analyser.Fixes.Base exposing (..)
+module Analyser.Fixes.Base exposing (Fixer)
 
 import Analyser.Messages.Data exposing (MessageData)
 import Elm.Syntax.File exposing (..)

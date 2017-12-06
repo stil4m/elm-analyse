@@ -1,4 +1,4 @@
-module Client.Components.MessageList exposing (..)
+module Client.Components.MessageList exposing (Model, Msg, init, subscriptions, update, view, withMessages)
 
 import Analyser.Messages.Types exposing (GroupedMessages, Message)
 import Client.Components.ActiveMessageDialog as ActiveMessageDialog

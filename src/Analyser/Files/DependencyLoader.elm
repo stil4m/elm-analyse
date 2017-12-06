@@ -1,4 +1,4 @@
-port module Analyser.Files.DependencyLoader exposing (..)
+port module Analyser.Files.DependencyLoader exposing (Model, Msg, getResult, init, subscriptions, update)
 
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
 import Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
@@ -32,10 +32,6 @@ type Msg
     | LoadedDependencyFiles ( String, Version, List FileContent )
 
 
-type alias RefeshedAST =
-    Bool
-
-
 type alias Model =
     { name : String
     , version : Version
@@ -58,11 +54,6 @@ init ( name, version ) =
         , Logger.info ("Load dependency " ++ name ++ " " ++ version)
         ]
     )
-
-
-getDependency : Model -> ( String, Version )
-getDependency m =
-    ( m.name, m.version )
 
 
 subscriptions : Model -> Sub Msg

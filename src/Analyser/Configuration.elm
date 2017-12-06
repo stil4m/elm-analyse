@@ -1,14 +1,8 @@
-module Analyser.Configuration exposing (..)
+module Analyser.Configuration exposing (Configuration, checkEnabled, checkPropertyAs, defaultConfiguration, fromString, isPathExcluded)
 
 import Dict exposing (Dict)
 import Json.Decode as JD exposing (..)
 import Json.Decode.Extra exposing ((|:))
-
-
-type Val
-    = I Int
-    | S String
-    | B Bool
 
 
 type Configuration
@@ -44,11 +38,6 @@ checkPropertyAs decoder check prop (Configuration { raw }) =
     JD.decodeString (maybe (at [ check, prop ] decoder)) raw
         |> Result.toMaybe
         |> Maybe.andThen identity
-
-
-checkPropertyAsInt : String -> String -> Configuration -> Maybe Int
-checkPropertyAsInt =
-    checkPropertyAs JD.int
 
 
 defaultConfiguration : Configuration

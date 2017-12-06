@@ -1,4 +1,4 @@
-module Analyser.Fixes.FileContent exposing (..)
+module Analyser.Fixes.FileContent exposing (getCharAtLocation, replaceLines, replaceLocationWith, replaceRangeWith, updateRange)
 
 import Elm.Syntax.Range exposing (Range)
 import List.Extra as List

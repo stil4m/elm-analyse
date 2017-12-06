@@ -1,4 +1,4 @@
-module Analyser.Messages.Types exposing (..)
+module Analyser.Messages.Types exposing (GroupedMessages, Message, MessageId, MessageStatus(..), groupByFileName, groupByType, newMessage, outdate)
 
 import Analyser.FileRef exposing (FileRef)
 import Analyser.Messages.Data as Data
@@ -8,10 +8,6 @@ import Dict.Extra as Dict
 
 type alias MessageId =
     Int
-
-
-type alias FileName =
-    String
 
 
 type alias GroupedMessages =

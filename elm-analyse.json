@@ -1,6 +1,5 @@
 {
   "checks" : {
-    "ExposeAll": false,
     "ImportAll": false,
     "LineLengthExceeded": false
   },

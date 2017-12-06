@@ -1,4 +1,4 @@
-module Analyser.State exposing (..)
+module Analyser.State exposing (State, addFixToQueue, decodeState, encodeState, finishWithNewMessages, getMessage, initialState, isBusy, nextTask, outdateMessagesForFile, removeMessagesForFile, startFixing, updateModules, withDependencies)
 
 import Analyser.Messages.Json exposing (decodeMessage, encodeMessage)
 import Analyser.Messages.Schemas exposing (Schemas)
@@ -167,11 +167,6 @@ encodeState state =
         , ( "queue", JE.list (List.map JE.int state.queue) )
         , ( "modules", Analyser.Modules.encode state.modules )
         ]
-
-
-encodeLabel : List String -> Value
-encodeLabel =
-    List.map JE.string >> JE.list
 
 
 decodeStatus : Decoder Status

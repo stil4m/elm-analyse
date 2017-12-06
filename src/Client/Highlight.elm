@@ -1,4 +1,4 @@
-module Client.Highlight exposing (..)
+module Client.Highlight exposing (highlightedPre)
 
 import Elm.Syntax.Range exposing (Range)
 import Html exposing (Html, pre, span, text)

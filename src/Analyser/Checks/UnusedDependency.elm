@@ -1,4 +1,4 @@
-module Analyser.Checks.UnusedDependency exposing (..)
+module Analyser.Checks.UnusedDependency exposing (check)
 
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.FileContext exposing (FileContext)

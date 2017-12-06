@@ -1,4 +1,4 @@
-module Docs.Configuration exposing (..)
+module Docs.Configuration exposing (view)
 
 import Docs.Html as DocsHtml
 import Docs.Page as Page exposing (..)
