@@ -13,7 +13,6 @@ import Analyser.Checks.ExposeAll
 import Analyser.Checks.FileLoadFailed as FileLoadFailed
 import Analyser.Checks.FunctionInLet
 import Analyser.Checks.ImportAll
-import Analyser.Checks.LineLength
 import Analyser.Checks.MultiLineRecordFormatting
 import Analyser.Checks.NoTopLevelSignature
 import Analyser.Checks.NoUncurriedPrefix
@@ -99,7 +98,6 @@ allMessages =
     , unusedVariable
     , importAll
     , singleFieldRecord
-    , lineLengthExceeded
     , duplicateRecordFieldUpdate
     , triggerWords
     ]
@@ -139,22 +137,6 @@ type alias Person = { name : String }
 changeName : Person -> Person
 changeName person =
     { person | name = "John", name = "Jane" }
-"""
-    }
-
-
-lineLengthExceeded : MsgDoc
-lineLengthExceeded =
-    { info = .info Analyser.Checks.LineLength.checker
-    , example = Dynamic Analyser.Checks.LineLength.checker
-    , input = """
-module Foo exposing (foo)
-
-import Html exposing (..)
-
-foo : Int -> Int
-foo x =
-    div [] [ div [] [ span [] [ text "Hello" ,  span [] [ i [] [ text "Hello" ] ] ] ] ]
 """
     }
 
@@ -738,7 +720,7 @@ getMessages input checker =
 
 docConfiguration : Configuration
 docConfiguration =
-    Configuration.fromString "{\"LineLengthExceeded\":{\"threshold\":80}}"
+    Configuration.fromString "{}"
         |> Tuple.first
 
 

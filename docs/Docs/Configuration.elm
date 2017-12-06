@@ -102,12 +102,7 @@ type alias ConfigurationProperty =
 
 configurationProperties : List ConfigurationProperty
 configurationProperties =
-    [ { check = "LineLengthExceeded"
-      , property = "threshold"
-      , description = "Defines the maximum line length"
-      , defaultValue = "150"
-      }
-    , { check = "TriggerWords"
+    [ { check = "TriggerWords"
       , property = "words"
       , description = "Array of words that would trigger a violation."
       , defaultValue = "[ \"todo\" ]"
