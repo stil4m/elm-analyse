@@ -4,7 +4,7 @@ module.exports = report => {
     if (messages.length > 0) {
         console.log();
         console.log('Messages:');
-        messages.forEach(x => console.log(x.message));
+        messages.forEach(x => console.log(x.data.description));
     }
     if (unusedDependencies.length > 0) {
         console.log();

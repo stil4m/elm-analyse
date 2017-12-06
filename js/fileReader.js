@@ -1,22 +1,11 @@
 // Reference the module
 const normalizeNewline = require('normalize-newline');
 const fs = require('fs');
-const cp = require('child_process');
 const cache = require('./util/cache');
 const sums = require('sums');
 
 module.exports = function(config) {
-    function isFormatted(path) {
-        try {
-            cp.execSync(config.elmFormatPath + ' --validate ' + path, {
-                stdio: []
-            });
-
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }
+    const formatService = require('./util/format-service')(config);
 
     function errorResponse(path) {
         return {
@@ -40,7 +29,7 @@ module.exports = function(config) {
                 const normalized = normalizeNewline(originalContent);
                 const fullPath = cache.elmCachePathForSha(checksum);
                 fs.writeFileSync(fullPath, normalized);
-                const formatted = isFormatted(fullPath);
+                const formatted = formatService(fullPath);
 
                 accept({
                     success: true,
@@ -70,7 +59,7 @@ module.exports = function(config) {
                             path: path,
                             sha1: checksum,
                             content: fs.readFileSync(fullPath).toString(),
-                            formatted: isFormatted(fullPath),
+                            formatted: formatService(fullPath),
                             ast: cache.readAstForSha(checksum)
                         };
                     }
