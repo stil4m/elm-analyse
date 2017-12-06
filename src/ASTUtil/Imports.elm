@@ -1,10 +1,10 @@
 module ASTUtil.Imports exposing (FunctionReference, buildImportInformation, findImportWithRange, naiveStringifyImport, removeRangeFromImport)
 
 import AST.Ranges as Ranges
-import Elm.Syntax.Base exposing (..)
-import Elm.Syntax.Exposing exposing (..)
-import Elm.Syntax.File exposing (..)
-import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Base exposing (ModuleName)
+import Elm.Syntax.Exposing exposing (ExposedType, Exposing(..), TopLevelExpose(..), ValueConstructorExpose)
+import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Module exposing (Import)
 import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 import List.Extra as List

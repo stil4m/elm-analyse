@@ -1,7 +1,7 @@
 module Docs.Changelog exposing (Model, Msg, init, update, view)
 
 import Docs.Html as DocsHtml
-import Html exposing (..)
+import Html exposing (Html)
 import Http
 import Markdown
 import RemoteData as RD exposing (RemoteData)
@@ -38,14 +38,14 @@ view (Model model) =
     DocsHtml.content
         [ case model of
             RD.Loading ->
-                text "Loading..."
+                Html.text "Loading..."
 
             RD.Success x ->
                 Markdown.toHtml [] x
 
             RD.Failure _ ->
-                text "Something went wrong"
+                Html.text "Something went wrong"
 
             RD.NotAsked ->
-                div [] []
+                Html.div [] []
         ]

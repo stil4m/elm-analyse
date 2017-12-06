@@ -9,7 +9,7 @@ import Docs.Home
 import Docs.Menu
 import Docs.MsgDoc
 import Docs.Page as Page exposing (Page(..))
-import Html exposing (..)
+import Html exposing (Html)
 import Navigation exposing (Location)
 
 
@@ -124,7 +124,7 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div
+    Html.div
         []
         [ Docs.Menu.menu MenuMsg model.menu
         , body model
@@ -138,7 +138,7 @@ body model =
             Docs.Home.view
 
         MessagesContent m ->
-            div []
+            Html.div []
                 [ Docs.MsgDoc.view m
                 ]
 
@@ -146,7 +146,7 @@ body model =
             Changelog.view x |> Html.map ChangelogMsg
 
         NoContent ->
-            div [] [ text "NotFound!" ]
+            Html.div [] [ Html.text "NotFound!" ]
 
         FeaturesContent ->
             Features.view

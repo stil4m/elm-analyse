@@ -4,8 +4,8 @@ import Analyser.Messages.Types exposing (GroupedMessages, Message, groupByType)
 import Client.Components.MessageList as MessageList
 import Client.State
 import Dict
-import Html exposing (..)
-import Html.Attributes exposing (checked, class, style, type_)
+import Html exposing (Html)
+import Html.Attributes
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as JD
@@ -138,43 +138,47 @@ view m =
                 True
 
         asItem ( fileName, messages ) =
-            a
-                [ class "list-group-item", onClick (OnSelectFile fileName) ]
-                [ span [ class "badge" ] [ text <| toString (List.length messages) ]
-                , text fileName
+            Html.a
+                [ Html.Attributes.class "list-group-item", onClick (OnSelectFile fileName) ]
+                [ Html.span [ Html.Attributes.class "badge" ]
+                    [ Html.text <| toString (List.length messages) ]
+                , Html.text fileName
                 ]
     in
-    div []
-        [ div [ class "checkbox" ]
-            [ label []
-                [ input
-                    [ type_ "checkbox"
-                    , checked m.hideGoodFiles
+    Html.div []
+        [ Html.div [ Html.Attributes.class "checkbox" ]
+            [ Html.label []
+                [ Html.input
+                    [ Html.Attributes.type_ "checkbox"
+                    , Html.Attributes.checked m.hideGoodFiles
                     , onClick ToggleHideGoodFiles
                     ]
                     []
-                , text "Only show files with messages"
+                , Html.text "Only show files with messages"
                 ]
             ]
-        , hr [] []
+        , Html.hr [] []
         , case m.fileIndex of
             Just fileIndex ->
-                div [ class "row", style [ ( "padding-top", "10px" ) ] ]
-                    [ div [ class "col-md-6 col-sm-6" ]
-                        [ div [ class "list-group" ]
+                Html.div
+                    [ Html.Attributes.class "row"
+                    , Html.Attributes.style [ ( "padding-top", "10px" ) ]
+                    ]
+                    [ Html.div [ Html.Attributes.class "col-md-6 col-sm-6" ]
+                        [ Html.div [ Html.Attributes.class "list-group" ]
                             (fileIndex
                                 |> List.filter allowFile
                                 |> List.map asItem
                             )
                         ]
-                    , div [ class "col-md-6 col-sm-6" ]
+                    , Html.div [ Html.Attributes.class "col-md-6 col-sm-6" ]
                         [ if m.selectedFile == Nothing then
-                            div [] []
+                            Html.div [] []
                           else
                             MessageList.view m.messageList |> Html.map MessageListMsg
                         ]
                     ]
 
             _ ->
-                div [] []
+                Html.div [] []
         ]

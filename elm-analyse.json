@@ -1,9 +1,8 @@
 {
-  "checks" : {
-    "ImportAll": false,
-    "LineLengthExceeded": false
+  "checks": {
+    "ImportAll": false
   },
-  "TriggerWords" : {
-      "words" : ["todo", "fix"]
+  "TriggerWords": {
+    "words": ["todo", "fix"]
   }
 }

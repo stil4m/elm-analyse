@@ -1,7 +1,7 @@
 module AST.Util exposing (fileExposingList, fileModuleName, getParenthesized, isCase, isIf, isLambda, isLet, isOperatorApplication, isPortModule, moduleExposingList, patternModuleNames)
 
 import Elm.Syntax.Base exposing (ModuleName)
-import Elm.Syntax.Exposing exposing (..)
+import Elm.Syntax.Exposing exposing (Exposing, TopLevelExpose)
 import Elm.Syntax.Expression exposing (Expression(CaseExpression, IfBlock, LambdaExpression, LetExpression, OperatorApplication, ParenthesizedExpression))
 import Elm.Syntax.File exposing (File)
 import Elm.Syntax.Module exposing (Module(EffectModule, NormalModule, PortModule))

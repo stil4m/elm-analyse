@@ -50,7 +50,7 @@ import Elm.Interface as Interface
 import Elm.Parser
 import Elm.Processing as Processing
 import Elm.RawFile as RawFile
-import Html exposing (..)
+import Html exposing (Html)
 import Html.Attributes as Html
 import Json.Encode
 
@@ -581,7 +581,7 @@ importAll =
     , input = """
 module Foo exposing (bar)
 
-import Html exposing (..)
+import Html exposing (Html)
 
 foo = text "Hello world!"
 """
@@ -600,12 +600,12 @@ messagesMenu y =
             (\x ->
                 if Just x == y then
                     ListGroup.li [ ListGroup.active ]
-                        [ text x.info.name
+                        [ Html.text x.info.name
                         ]
                 else
                     ListGroup.li []
-                        [ a [ Html.href (Page.hash (Messages (Just x.info.key))) ]
-                            [ text x.info.name ]
+                        [ Html.a [ Html.href (Page.hash (Messages (Just x.info.key))) ]
+                            [ Html.text x.info.name ]
                         ]
             )
         |> ListGroup.ul
@@ -620,8 +620,8 @@ view maybeKey =
     Grid.container [ Html.style [ ( "padding-top", "20px" ), ( "margin-bottom", "60px" ) ] ]
         [ Grid.row []
             [ Grid.col []
-                [ h1 [] [ text "Checks" ]
-                , hr [] []
+                [ Html.h1 [] [ Html.text "Checks" ]
+                , Html.hr [] []
                 ]
             ]
         , Grid.row []
@@ -630,7 +630,7 @@ view maybeKey =
             , Grid.col [ Col.md8, Col.sm7 ]
                 [ maybeMessageDoc
                     |> Maybe.map viewDoc
-                    |> Maybe.withDefault (div [] [])
+                    |> Maybe.withDefault (Html.div [] [])
                 ]
             ]
         ]
@@ -642,15 +642,15 @@ viewDoc d =
         mess =
             getMessage d
     in
-    div []
-        [ h1 []
-            [ text d.info.name
+    Html.div []
+        [ Html.h1 []
+            [ Html.text d.info.name
             ]
-        , p []
-            [ small []
-                [ code [] [ text d.info.key ] ]
+        , Html.p []
+            [ Html.small []
+                [ Html.code [] [ Html.text d.info.key ] ]
             ]
-        , p [] [ text d.info.description ]
+        , Html.p [] [ Html.text d.info.description ]
         , viewArguments d
         , viewExample d mess
         ]
@@ -658,16 +658,16 @@ viewDoc d =
 
 viewExample : MsgDoc -> Message -> Html msg
 viewExample d mess =
-    div []
-        [ h2 [] [ text "Example" ]
-        , h3 [] [ text "Source file" ]
+    Html.div []
+        [ Html.h2 [] [ Html.text "Example" ]
+        , Html.h3 [] [ Html.text "Source file" ]
         , DocsHtml.pre
             [ Client.Highlight.highlightedPre
                 100
                 (String.trim d.input)
                 (Analyser.Messages.Util.firstRange mess)
             ]
-        , h3 [] [ text "Message Json" ]
+        , Html.h3 [] [ Html.text "Message Json" ]
         , exampleMsgJson mess
         ]
 
@@ -696,7 +696,7 @@ getMessage d =
 exampleMsgJson : Message -> Html msg
 exampleMsgJson m =
     DocsHtml.pre
-        [ text <|
+        [ Html.text <|
             Json.Encode.encode 4 (J.encodeMessage m)
         ]
 
@@ -726,7 +726,7 @@ docConfiguration =
 
 viewArguments : MsgDoc -> Html msg
 viewArguments d =
-    div []
-        [ h2 [] [ text "Arguments" ]
+    Html.div []
+        [ Html.h2 [] [ Html.text "Arguments" ]
         , Schema.viewSchema d.info.schema
         ]
