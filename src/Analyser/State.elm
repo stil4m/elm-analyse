@@ -1,4 +1,22 @@
-module Analyser.State exposing (State, addFixToQueue, decodeState, encodeState, finishWithNewMessages, getMessage, initialState, isBusy, nextTask, outdateMessagesForFile, removeMessagesForFile, startFixing, updateModules, withDependencies)
+module Analyser.State
+    exposing
+        ( State
+        , Status
+        , addFixToQueue
+        , decodeState
+        , encodeState
+        , encodeStatus
+        , finishWithNewMessages
+        , getMessage
+        , initialState
+        , isBusy
+        , nextTask
+        , outdateMessagesForFile
+        , removeMessagesForFile
+        , startFixing
+        , updateModules
+        , withDependencies
+        )
 
 import Analyser.Messages.Json exposing (decodeMessage, encodeMessage)
 import Analyser.Messages.Schemas exposing (Schemas)

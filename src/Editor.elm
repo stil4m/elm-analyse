@@ -1,11 +1,12 @@
 port module Editor exposing (main)
 
-import Analyser.Messages.Range
+import Analyser.Checks
+import Analyser.Messages.Data
 import Analyser.Messages.Types exposing (Message)
-import Analyser.Messages.Util
 import Analyser.State exposing (State)
 import Dict exposing (Dict)
 import Dict.Extra
+import Elm.Syntax.Range
 import Json.Decode as JD
 import Json.Encode as JE exposing (Value)
 
@@ -109,7 +110,7 @@ init flags =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    stateListener (JD.decodeValue Analyser.State.decodeState >> OnState)
+    stateListener (JD.decodeValue (Analyser.State.decodeState Analyser.Checks.schemas) >> OnState)
 
 
 wsAddress : Flags -> String
@@ -125,27 +126,19 @@ wsAddress flags =
 editorFileMessages : Message -> List ( String, EditorMessage )
 editorFileMessages m =
     let
-        editorMessage : String -> Analyser.Messages.Range.Range -> EditorMessage
+        editorMessage : String -> Elm.Syntax.Range.Range -> EditorMessage
         editorMessage f r =
-            let
-                ( r1, r2, r3, r4 ) =
-                    Analyser.Messages.Range.toTuple r
-            in
             { severity = "info"
             , location =
                 { file = f
-                , position = ( ( r1, r2 ), ( r3, r4 ) )
+                , position = ( ( r.start.row, r.start.column ), ( r.end.row, r.end.column ) )
                 }
-            , excerpt = "TODO"
-            , description = "TODO"
+            , excerpt = Analyser.Messages.Data.description m.data
+            , description = Analyser.Messages.Data.description m.data
             }
     in
-    m.files
-        |> List.concatMap
-            (\( sha, f ) ->
-                Analyser.Messages.Util.getRanges m.data
-                    |> List.map (\r -> ( f, editorMessage f r ))
-            )
+    Analyser.Messages.Data.getRanges m.data
+        |> List.map (\r -> ( m.file.path, editorMessage m.file.path r ))
 
 
 buildEditorData : State -> EditorData
