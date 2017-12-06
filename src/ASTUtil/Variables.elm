@@ -8,6 +8,7 @@ import Elm.Syntax.File exposing (..)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Pattern exposing (..)
 import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Ranged exposing (Ranged)
 
 
 type VariableType
@@ -39,12 +40,12 @@ getTopLevels file =
         ]
 
 
-getDeclarationsVars : List Declaration -> List ( VariablePointer, VariableType )
+getDeclarationsVars : List (Ranged Declaration) -> List ( VariablePointer, VariableType )
 getDeclarationsVars =
     List.concatMap getDeclarationVars
 
 
-getLetDeclarationsVars : List LetDeclaration -> List ( VariablePointer, VariableType )
+getLetDeclarationsVars : List (Ranged LetDeclaration) -> List ( VariablePointer, VariableType )
 getLetDeclarationsVars =
     List.concatMap getLetDeclarationVars
 
@@ -59,7 +60,7 @@ getImportVars imp =
     getImportExposedVars imp.exposingList
 
 
-getImportExposedVars : Maybe (Exposing TopLevelExpose) -> List ( VariablePointer, VariableType )
+getImportExposedVars : Maybe (Exposing (Ranged TopLevelExpose)) -> List ( VariablePointer, VariableType )
 getImportExposedVars e =
     case e of
         Just (All _) ->
@@ -71,15 +72,15 @@ getImportExposedVars e =
         Just (Explicit l) ->
             l
                 |> List.concatMap
-                    (\exposed ->
+                    (\( r, exposed ) ->
                         case exposed of
-                            InfixExpose x r ->
+                            InfixExpose x ->
                                 [ ( VariablePointer x r, Imported ) ]
 
-                            FunctionExpose x r ->
+                            FunctionExpose x ->
                                 [ ( VariablePointer x r, Imported ) ]
 
-                            TypeOrAliasExpose x r ->
+                            TypeOrAliasExpose x ->
                                 [ ( VariablePointer x r, Imported ) ]
 
                             TypeExpose exposedType ->
@@ -88,15 +89,17 @@ getImportExposedVars e =
                                         []
 
                                     Nothing ->
-                                        [ ( VariablePointer exposedType.name exposedType.range, Imported ) ]
+                                        [ ( VariablePointer exposedType.name r, Imported ) ]
 
                                     Just (Explicit constructors) ->
-                                        constructors |> List.map (uncurry VariablePointer >> flip (,) Imported)
+                                        constructors
+                                            |> List.map (uncurry (flip VariablePointer))
+                                            |> List.map (flip (,) Imported)
                     )
 
 
-getDeclarationVars : Declaration -> List ( VariablePointer, VariableType )
-getDeclarationVars decl =
+getDeclarationVars : Ranged Declaration -> List ( VariablePointer, VariableType )
+getDeclarationVars ( r, decl ) =
     case decl of
         FuncDecl f ->
             [ ( f.declaration.name, TopLevel ) ]
@@ -108,7 +111,7 @@ getDeclarationVars decl =
             List.map (\{ name, range } -> ( { value = name, range = range }, TopLevel )) t.constructors
 
         PortDeclaration p ->
-            [ ( { value = p.name, range = p.range }, TopLevel ) ]
+            [ ( { value = p.name, range = r }, TopLevel ) ]
 
         InfixDeclaration _ ->
             []
@@ -117,8 +120,8 @@ getDeclarationVars decl =
             patternToVars pattern
 
 
-getLetDeclarationVars : LetDeclaration -> List ( VariablePointer, VariableType )
-getLetDeclarationVars decl =
+getLetDeclarationVars : Ranged LetDeclaration -> List ( VariablePointer, VariableType )
+getLetDeclarationVars ( _, decl ) =
     case decl of
         LetFunction f ->
             [ ( f.declaration.name, TopLevel ) ]
@@ -127,52 +130,52 @@ getLetDeclarationVars decl =
             patternToVars pattern
 
 
-patternToUsedVars : Pattern -> List VariablePointer
-patternToUsedVars p =
+patternToUsedVars : Ranged Pattern -> List VariablePointer
+patternToUsedVars ( range, p ) =
     case p of
-        TuplePattern t _ ->
+        TuplePattern t ->
             List.concatMap patternToUsedVars t
 
-        UnConsPattern l r _ ->
+        UnConsPattern l r ->
             patternToUsedVars l ++ patternToUsedVars r
 
-        ListPattern l _ ->
+        ListPattern l ->
             List.concatMap patternToUsedVars l
 
-        NamedPattern qualifiedNameRef args range ->
+        NamedPattern qualifiedNameRef args ->
             qualifiedNameUsedVars qualifiedNameRef range ++ List.concatMap patternToUsedVars args
 
-        AsPattern sub _ _ ->
+        AsPattern sub _ ->
             patternToUsedVars sub
 
-        ParenthesizedPattern sub _ ->
+        ParenthesizedPattern sub ->
             patternToUsedVars sub
 
-        QualifiedNamePattern x range ->
+        QualifiedNamePattern x ->
             qualifiedNameUsedVars x range
 
-        RecordPattern _ _ ->
+        RecordPattern _ ->
             []
 
-        VarPattern _ _ ->
+        VarPattern _ ->
             []
 
-        AllPattern _ ->
+        AllPattern ->
             []
 
-        UnitPattern _ ->
+        UnitPattern ->
             []
 
-        CharPattern _ _ ->
+        CharPattern _ ->
             []
 
-        StringPattern _ _ ->
+        StringPattern _ ->
             []
 
-        IntPattern _ _ ->
+        IntPattern _ ->
             []
 
-        FloatPattern _ _ ->
+        FloatPattern _ ->
             []
 
 
@@ -184,32 +187,32 @@ qualifiedNameUsedVars { moduleName, name } range =
         []
 
 
-patternToVars : Pattern -> List ( VariablePointer, VariableType )
+patternToVars : Ranged Pattern -> List ( VariablePointer, VariableType )
 patternToVars =
     patternToVarsInner True
 
 
-patternToVarsInner : Bool -> Pattern -> List ( VariablePointer, VariableType )
-patternToVarsInner isFirst p =
+patternToVarsInner : Bool -> Ranged Pattern -> List ( VariablePointer, VariableType )
+patternToVarsInner isFirst ( range, p ) =
     let
         recur =
             patternToVarsInner False
     in
     case p of
-        TuplePattern t _ ->
+        TuplePattern t ->
             List.concatMap recur t
 
-        RecordPattern r _ ->
+        RecordPattern r ->
             List.map (flip (,) Pattern) r
 
-        UnConsPattern l r _ ->
+        UnConsPattern l r ->
             recur l ++ recur r
 
-        ListPattern l _ ->
+        ListPattern l ->
             List.concatMap recur l
 
-        VarPattern x r ->
-            [ ( { value = x, range = r }
+        VarPattern x ->
+            [ ( { value = x, range = range }
               , if isFirst then
                     Defined
                 else
@@ -217,32 +220,32 @@ patternToVarsInner isFirst p =
               )
             ]
 
-        NamedPattern _ args _ ->
+        NamedPattern _ args ->
             List.concatMap recur args
 
-        AsPattern sub name _ ->
+        AsPattern sub name ->
             ( name, Pattern ) :: recur sub
 
-        ParenthesizedPattern sub _ ->
+        ParenthesizedPattern sub ->
             recur sub
 
-        QualifiedNamePattern _ _ ->
+        QualifiedNamePattern _ ->
             []
 
-        AllPattern _ ->
+        AllPattern ->
             []
 
-        UnitPattern _ ->
+        UnitPattern ->
             []
 
-        CharPattern _ _ ->
+        CharPattern _ ->
             []
 
-        StringPattern _ _ ->
+        StringPattern _ ->
             []
 
-        IntPattern _ _ ->
+        IntPattern _ ->
             []
 
-        FloatPattern _ _ ->
+        FloatPattern _ ->
             []

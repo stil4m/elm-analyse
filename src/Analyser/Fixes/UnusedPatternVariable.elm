@@ -32,7 +32,7 @@ fixPattern ( content, ast ) range =
         Just parentPattern ->
             Ok <|
                 FileContent.replaceRangeWith
-                    (PatternOptimizer.patternRange parentPattern)
+                    (Tuple.first parentPattern)
                     (Writer.writePattern (PatternOptimizer.optimize range parentPattern)
                         |> Writer.write
                     )

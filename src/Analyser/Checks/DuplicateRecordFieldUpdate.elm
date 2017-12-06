@@ -8,7 +8,7 @@ import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Dict
 import Dict.Extra as Dict
-import Elm.Syntax.Expression exposing (Expression, RecordUpdate)
+import Elm.Syntax.Expression exposing (RecordUpdate)
 import Elm.Syntax.Range as Range
 
 
@@ -46,7 +46,7 @@ onRecordUpdate { updates } context =
     updates
         |> Dict.groupBy Tuple.first
         |> Dict.filter (\_ v -> List.length v > 1)
-        |> Dict.map (\_ v -> List.map (Tuple.second >> expressionRange) v)
+        |> Dict.map (\_ v -> List.map (Tuple.second >> Tuple.first) v)
         |> Dict.toList
         |> List.map buildMessageData
         |> (++) context
@@ -63,8 +63,3 @@ buildMessageData ( fieldName, ranges ) =
         )
         |> Data.addVarName "fieldName" fieldName
         |> Data.addRanges "ranges" ranges
-
-
-expressionRange : Expression -> Range.Range
-expressionRange ( r, _ ) =
-    r

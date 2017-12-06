@@ -8,6 +8,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Range as Syntax exposing (Range)
+import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAlias exposing (..)
 import Elm.Syntax.TypeAnnotation exposing (..)
 
@@ -68,56 +69,36 @@ firstTwo def =
             Nothing
 
 
-onTypeAlias : TypeAlias -> List ( Range, RecordDefinition ) -> List ( Range, RecordDefinition )
-onTypeAlias x context =
+onTypeAlias : Ranged TypeAlias -> List ( Range, RecordDefinition ) -> List ( Range, RecordDefinition )
+onTypeAlias ( _, x ) context =
     findRecords x.typeAnnotation ++ context
 
 
-typeAnnotationRange : TypeAnnotation -> Syntax.Range
-typeAnnotationRange x =
+typeAnnotationRange : Ranged TypeAnnotation -> Syntax.Range
+typeAnnotationRange ( r, _ ) =
+    r
+
+
+findRecords : Ranged TypeAnnotation -> List ( Range, RecordDefinition )
+findRecords ( r, x ) =
     case x of
-        GenericType _ r ->
-            r
-
-        Typed _ _ _ r ->
-            r
-
-        Unit r ->
-            r
-
-        Tupled _ r ->
-            r
-
-        Record _ r ->
-            r
-
-        GenericRecord _ _ r ->
-            r
-
-        FunctionTypeAnnotation _ _ r ->
-            r
-
-
-findRecords : TypeAnnotation -> List ( Range, RecordDefinition )
-findRecords x =
-    case x of
-        GenericType _ _ ->
+        GenericType _ ->
             []
 
-        Typed _ _ args _ ->
+        Typed _ _ args ->
             List.concatMap findRecords args
 
-        Unit _ ->
+        Unit ->
             []
 
-        Tupled inner _ ->
+        Tupled inner ->
             List.concatMap findRecords inner
 
-        Record fields r ->
+        Record fields ->
             ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
 
-        GenericRecord _ fields r ->
+        GenericRecord _ fields ->
             ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
 
-        FunctionTypeAnnotation left right _ ->
+        FunctionTypeAnnotation left right ->
             findRecords left ++ findRecords right

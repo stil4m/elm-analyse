@@ -8,6 +8,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Range as Syntax
+import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAnnotation exposing (..)
 
 
@@ -50,15 +51,15 @@ isSingleFieldRecord x =
     List.length x == 1
 
 
-onTypeAnnotation : TypeAnnotation -> List ( Syntax.Range, RecordDefinition ) -> List ( Syntax.Range, RecordDefinition )
+onTypeAnnotation : Ranged TypeAnnotation -> List ( Syntax.Range, RecordDefinition ) -> List ( Syntax.Range, RecordDefinition )
 onTypeAnnotation x context =
     findPlainRecords x ++ context
 
 
-findPlainRecords : TypeAnnotation -> List ( Syntax.Range, RecordDefinition )
-findPlainRecords x =
+findPlainRecords : Ranged TypeAnnotation -> List ( Syntax.Range, RecordDefinition )
+findPlainRecords ( r, x ) =
     case x of
-        Record fields r ->
+        Record fields ->
             [ ( r, fields ) ]
 
         _ ->

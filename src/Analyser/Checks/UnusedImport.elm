@@ -13,6 +13,7 @@ import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.Module exposing (..)
 import Elm.Syntax.Range as Range exposing (Range)
+import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAnnotation exposing (..)
 
 
@@ -86,17 +87,17 @@ onImport imp context =
         context
 
 
-onTypeAnnotation : TypeAnnotation -> Context -> Context
-onTypeAnnotation typeAnnotation context =
+onTypeAnnotation : Ranged TypeAnnotation -> Context -> Context
+onTypeAnnotation ( _, typeAnnotation ) context =
     case typeAnnotation of
-        Typed moduleName _ _ _ ->
+        Typed moduleName _ _ ->
             markUsage moduleName context
 
         _ ->
             context
 
 
-onExpression : Expression -> Context -> Context
+onExpression : Ranged Expression -> Context -> Context
 onExpression expr context =
     case Tuple.second expr of
         QualifiedExpr moduleName _ ->

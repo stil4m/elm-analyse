@@ -12,6 +12,7 @@ import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Base exposing (..)
 import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.Range as Range exposing (Range)
+import Elm.Syntax.Ranged exposing (Ranged)
 
 
 type alias Context =
@@ -95,7 +96,7 @@ onFunction inner function context =
         inner context
 
 
-onExpression : FunctionReference -> Expression -> Context -> Context
+onExpression : FunctionReference -> Ranged Expression -> Context -> Context
 onExpression x expression context =
     if x.exposesRegex then
         onExpressionFunctionReference expression context
@@ -114,7 +115,7 @@ addUsedRegex range context =
 
 {-| Check if regex in a qualified expression (with either the module name or the alias for the module)
 -}
-onExpressionQualified : ModuleName -> Expression -> Context -> Context
+onExpressionQualified : ModuleName -> Ranged Expression -> Context -> Context
 onExpressionQualified moduleName ( range, inner ) context =
     case inner of
         QualifiedExpr m f ->
@@ -127,7 +128,7 @@ onExpressionQualified moduleName ( range, inner ) context =
             context
 
 
-onExpressionFunctionReference : Expression -> Context -> Context
+onExpressionFunctionReference : Ranged Expression -> Context -> Context
 onExpressionFunctionReference ( range, inner ) context =
     case inner of
         FunctionOrValue "regex" ->

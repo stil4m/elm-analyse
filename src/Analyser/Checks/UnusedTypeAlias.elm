@@ -10,6 +10,7 @@ import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Interface as Interface
 import Elm.Syntax.Range as Range exposing (Range)
+import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAlias exposing (..)
 import Elm.Syntax.TypeAnnotation exposing (..)
 import Tuple3
@@ -77,10 +78,10 @@ markTypeAlias key context =
     Dict.update key (Maybe.map (Tuple3.mapThird ((+) 1))) context
 
 
-onTypeAnnotation : TypeAnnotation -> Context -> Context
-onTypeAnnotation typeAnnotation context =
+onTypeAnnotation : Ranged TypeAnnotation -> Context -> Context
+onTypeAnnotation ( _, typeAnnotation ) context =
     case typeAnnotation of
-        Typed [] x _ _ ->
+        Typed [] x _ ->
             markTypeAlias x context
 
         _ ->
@@ -92,6 +93,6 @@ onFunctionOrValue =
     markTypeAlias
 
 
-onTypeAlias : TypeAlias -> Context -> Context
-onTypeAlias typeAlias context =
-    Dict.insert typeAlias.name ( typeAlias.name, typeAlias.range, 0 ) context
+onTypeAlias : Ranged TypeAlias -> Context -> Context
+onTypeAlias ( range, typeAlias ) context =
+    Dict.insert typeAlias.name ( typeAlias.name, range, 0 ) context

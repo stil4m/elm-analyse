@@ -1,7 +1,8 @@
-module ASTUtil.PatternOptimizer exposing (optimize, patternRange)
+module ASTUtil.PatternOptimizer exposing (optimize)
 
 import Elm.Syntax.Pattern exposing (..)
 import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Ranged exposing (Ranged)
 
 
 emptyRange : Range
@@ -9,146 +10,95 @@ emptyRange =
     { start = { row = 0, column = 0 }, end = { row = 0, column = 0 } }
 
 
-replaceWithAllIfRangeMatches : Pattern -> Range -> Range -> Pattern
-replaceWithAllIfRangeMatches p x y =
+replaceWithAllIfRangeMatches : Ranged Pattern -> Range -> Range -> Ranged Pattern
+replaceWithAllIfRangeMatches ( some, p ) x y =
     if x == y then
-        AllPattern emptyRange
+        ( emptyRange, AllPattern )
     else
-        p
+        ( some, p )
 
 
-isAllPattern : Pattern -> Bool
+isAllPattern : Ranged Pattern -> Bool
 isAllPattern p =
-    case p of
-        AllPattern _ ->
+    case Tuple.second p of
+        AllPattern ->
             True
 
         _ ->
             False
 
 
-optimize : Range -> Pattern -> Pattern
-optimize range pattern =
-    if patternRange pattern == range then
-        AllPattern emptyRange
+optimize : Range -> Ranged Pattern -> Ranged Pattern
+optimize range (( r, pattern ) as input) =
+    if r == range then
+        ( emptyRange, AllPattern )
     else
         case pattern of
-            TuplePattern xs r ->
+            TuplePattern xs ->
                 let
                     cleaned =
                         List.map (optimize range) xs
                 in
                 if List.all isAllPattern cleaned then
-                    AllPattern emptyRange
+                    ( emptyRange, AllPattern )
                 else
-                    TuplePattern cleaned r
+                    ( r, TuplePattern cleaned )
 
-            RecordPattern inner r ->
+            RecordPattern inner ->
                 let
                     cleaned =
                         List.filter (.range >> (/=) range) inner
                 in
                 case cleaned of
                     [] ->
-                        AllPattern emptyRange
+                        ( emptyRange, AllPattern )
 
                     xs ->
-                        RecordPattern xs r
+                        ( r, RecordPattern xs )
 
-            UnConsPattern left right r ->
-                UnConsPattern (optimize range left) (optimize range right) r
+            UnConsPattern left right ->
+                ( r, UnConsPattern (optimize range left) (optimize range right) )
 
-            ListPattern xs r ->
-                ListPattern (List.map (optimize range) xs) r
+            ListPattern xs ->
+                ( r, ListPattern (List.map (optimize range) xs) )
 
-            NamedPattern qnr inner r ->
-                NamedPattern qnr (List.map (optimize range) inner) r
+            NamedPattern qnr inner ->
+                ( r, NamedPattern qnr (List.map (optimize range) inner) )
 
-            QualifiedNamePattern _ r ->
-                replaceWithAllIfRangeMatches pattern range r
+            QualifiedNamePattern _ ->
+                replaceWithAllIfRangeMatches input range r
 
-            AsPattern subPattern asPointer r ->
+            AsPattern subPattern asPointer ->
                 if asPointer.range == range then
                     subPattern
                 else
                     case optimize range subPattern of
-                        AllPattern _ ->
-                            VarPattern asPointer.value asPointer.range
+                        ( _, AllPattern ) ->
+                            ( asPointer.range, VarPattern asPointer.value )
 
                         other ->
-                            AsPattern other asPointer r
+                            ( r, AsPattern other asPointer )
 
-            ParenthesizedPattern inner r ->
-                ParenthesizedPattern (optimize range inner) r
+            ParenthesizedPattern inner ->
+                ( r, ParenthesizedPattern (optimize range inner) )
 
-            VarPattern _ _ ->
-                pattern
+            VarPattern _ ->
+                input
 
-            AllPattern _ ->
-                pattern
+            AllPattern ->
+                input
 
-            UnitPattern _ ->
-                pattern
+            UnitPattern ->
+                input
 
-            CharPattern _ _ ->
-                pattern
+            CharPattern _ ->
+                input
 
-            StringPattern _ _ ->
-                pattern
+            StringPattern _ ->
+                input
 
-            IntPattern _ _ ->
-                pattern
+            IntPattern _ ->
+                input
 
-            FloatPattern _ _ ->
-                pattern
-
-
-{-| TODO Should be moved to different file
--}
-patternRange : Pattern -> Range
-patternRange p =
-    case p of
-        VarPattern _ r ->
-            r
-
-        AllPattern r ->
-            r
-
-        UnitPattern r ->
-            r
-
-        CharPattern _ r ->
-            r
-
-        StringPattern _ r ->
-            r
-
-        IntPattern _ r ->
-            r
-
-        FloatPattern _ r ->
-            r
-
-        TuplePattern _ r ->
-            r
-
-        RecordPattern _ r ->
-            r
-
-        UnConsPattern _ _ r ->
-            r
-
-        ListPattern _ r ->
-            r
-
-        NamedPattern _ _ r ->
-            r
-
-        QualifiedNamePattern _ r ->
-            r
-
-        AsPattern _ _ r ->
-            r
-
-        ParenthesizedPattern _ r ->
-            r
+            FloatPattern _ ->
+                input

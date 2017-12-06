@@ -12,6 +12,7 @@ import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.Exposing exposing (Exposing(..), TopLevelExpose(..))
 import Elm.Syntax.Module exposing (Import)
 import Elm.Syntax.Range as Syntax
+import Elm.Syntax.Ranged exposing (Ranged)
 
 
 checker : Checker
@@ -93,10 +94,10 @@ onImport imp context =
     }
 
 
-mergeImportedValue : List ( String, Syntax.Range ) -> Dict String (List Syntax.Range) -> Dict String (List Syntax.Range)
+mergeImportedValue : List (Ranged String) -> Dict String (List Syntax.Range) -> Dict String (List Syntax.Range)
 mergeImportedValue l entry =
     let
-        addPair ( k, v ) d =
+        addPair ( v, k ) d =
             Dict.update k
                 (\old ->
                     old
@@ -109,7 +110,7 @@ mergeImportedValue l entry =
     List.foldl addPair entry l
 
 
-constructorsAndValues : Import -> ( List ( String, Syntax.Range ), List ( String, Syntax.Range ) )
+constructorsAndValues : Import -> ( List (Ranged String), List (Ranged String) )
 constructorsAndValues imp =
     case imp.exposingList of
         Nothing ->
@@ -124,24 +125,25 @@ constructorsAndValues imp =
             )
 
 
-exposingValues : TopLevelExpose -> ( String, Syntax.Range )
-exposingValues t =
-    case t of
-        TypeExpose s ->
-            ( s.name, s.range )
+exposingValues : Ranged TopLevelExpose -> Ranged String
+exposingValues ( r, t ) =
+    (,) r <|
+        case t of
+            TypeExpose s ->
+                s.name
 
-        InfixExpose s r ->
-            ( s, r )
+            InfixExpose s ->
+                s
 
-        FunctionExpose s r ->
-            ( s, r )
+            FunctionExpose s ->
+                s
 
-        TypeOrAliasExpose s r ->
-            ( s, r )
+            TypeOrAliasExpose s ->
+                s
 
 
-exposingConstructors : TopLevelExpose -> List ( String, Syntax.Range )
-exposingConstructors t =
+exposingConstructors : Ranged TopLevelExpose -> List (Ranged String)
+exposingConstructors ( _, t ) =
     case t of
         TypeExpose s ->
             case s.constructors of
