@@ -47,8 +47,9 @@ view =
                     ]
                 , Html.text "The installation can easily be installed running one of the following commandos:"
                 , DocsHtml.pre
-                    [ Html.text """npm install -g elm-install
-yarn global add elm-analyse""" ]
+                    [ Html.text """npm install -g elm-analyse""" ]
+                , DocsHtml.pre
+                    [ Html.text """yarn global add elm-analyse""" ]
                 ]
             , Html.hr [] []
             , Html.div []
