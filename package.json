@@ -53,7 +53,8 @@
     "normalize-newline": "3.0.0",
     "os-homedir": "1.0.2",
     "sums": "0.2.4",
-    "ws": "3.3.1"
+    "ws": "3.3.1",
+    "request": "2.83.0"
   },
   "devDependencies": {
     "bufferutil": "3.0.3",
