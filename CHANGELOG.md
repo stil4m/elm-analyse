@@ -1,5 +1,18 @@
 # elm-analyse changelog
 
+## 0.13.0 (2017-12-10)
+
+* [Issue #128](https://github.com/stil4m/elm-analyse/issues/128) Drop line length check
+* [Issue #123](https://github.com/stil4m/elm-analyse/issues/123) Better documentation about output formats
+* [Issue #127](https://github.com/stil4m/elm-analyse/issues/127) Cache elm-format results
+* [Issue #126](https://github.com/stil4m/elm-analyse/issues/126) Bump elm-syntax to v3.X.X
+* [Issue #119](https://github.com/stil4m/elm-analyse/issues/119) Add dependency information to client
+* [Issue #107](https://github.com/stil4m/elm-analyse/issues/107) Detect Unused Packages.
+* [PR #122](https://github.com/stil4m/elm-analyse/pull/122) Docs: Fix typo, split installation commands. Thanks to @brasilikum
+* [PR #114](https://github.com/stil4m/elm-analyse/pull/114) Improve log messages by adding missing spaces. Thanks to @andys8
+* [PR #120](https://github.com/stil4m/elm-analyse/pull/120) Group messages in front-end by file or type. Thanks to @stejanse
+
+
 
 ## 0.12.1 (2017-11-06)
 
