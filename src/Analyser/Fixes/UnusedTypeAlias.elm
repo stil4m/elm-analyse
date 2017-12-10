@@ -4,11 +4,11 @@ import Analyser.Checks.UnusedTypeAlias as UnusedTypeAliasCheck
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Elm.Syntax.Declaration exposing (..)
-import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Declaration exposing (Declaration(AliasDecl))
+import Elm.Syntax.File exposing (File)
 import Elm.Syntax.Range as Syntax exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
-import Elm.Syntax.TypeAlias exposing (..)
+import Elm.Syntax.TypeAlias exposing (TypeAlias)
 
 
 fixer : Fixer

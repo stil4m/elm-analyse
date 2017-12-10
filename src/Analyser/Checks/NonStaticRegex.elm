@@ -9,8 +9,8 @@ import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
-import Elm.Syntax.Base exposing (..)
-import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.Base exposing (ModuleName)
+import Elm.Syntax.Expression exposing (Expression(..), Function)
 import Elm.Syntax.Range as Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 

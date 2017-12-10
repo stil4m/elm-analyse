@@ -1,6 +1,5 @@
 {
   "checks": {
-    "ImportAll": false
   },
   "TriggerWords": {
     "words": ["todo", "fix"]

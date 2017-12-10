@@ -9,9 +9,9 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
-import Elm.Syntax.Base exposing (..)
-import Elm.Syntax.Expression exposing (..)
-import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Base exposing (VariablePointer)
+import Elm.Syntax.Expression exposing (Case, Expression(..), Function, Lambda)
+import Elm.Syntax.Pattern exposing (Pattern)
 import Elm.Syntax.Range as Syntax
 import Elm.Syntax.Ranged exposing (Ranged)
 

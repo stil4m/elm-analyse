@@ -1,7 +1,7 @@
 module Analyser.Checks.MultiLineRecordFormatting exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (..)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
@@ -9,8 +9,8 @@ import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Range as Syntax exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
-import Elm.Syntax.TypeAlias exposing (..)
-import Elm.Syntax.TypeAnnotation exposing (..)
+import Elm.Syntax.TypeAlias exposing (TypeAlias)
+import Elm.Syntax.TypeAnnotation exposing (RecordDefinition, RecordField, TypeAnnotation(..))
 
 
 checker : Checker

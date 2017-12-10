@@ -8,8 +8,8 @@ import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
-import Elm.Syntax.Exposing exposing (..)
-import Elm.Syntax.File exposing (..)
+import Elm.Syntax.Exposing exposing (Exposing(..))
+import Elm.Syntax.File exposing (File)
 
 
 checker : Checker

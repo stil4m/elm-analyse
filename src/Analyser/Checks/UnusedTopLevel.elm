@@ -10,7 +10,7 @@ import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Interface as Interface
-import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Module exposing (Module(..))
 import Elm.Syntax.Range as Syntax exposing (Range)
 import Tuple3
 

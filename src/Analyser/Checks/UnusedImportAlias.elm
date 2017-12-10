@@ -9,12 +9,12 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
-import Elm.Syntax.Base exposing (..)
-import Elm.Syntax.Expression exposing (..)
-import Elm.Syntax.Module exposing (..)
+import Elm.Syntax.Base exposing (ModuleName)
+import Elm.Syntax.Expression exposing (Case, Expression(..))
+import Elm.Syntax.Module exposing (Import)
 import Elm.Syntax.Range as Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
-import Elm.Syntax.TypeAnnotation exposing (..)
+import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
 
 
 checker : Checker

@@ -8,8 +8,8 @@ import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
-import Elm.Syntax.Expression exposing (..)
-import Elm.Syntax.Infix exposing (..)
+import Elm.Syntax.Expression exposing (CaseBlock, Expression(..), Function, Lambda)
+import Elm.Syntax.Infix exposing (InfixDirection)
 import Elm.Syntax.Range as Syntax exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 import List.Extra as List

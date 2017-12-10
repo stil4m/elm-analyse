@@ -1,15 +1,15 @@
 module ASTUtil.Inspector exposing (Config, Order(Continue, Inner, Post, Pre, Skip), defaultConfig, inspect)
 
-import Elm.Syntax.Declaration exposing (..)
-import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.Declaration exposing (Declaration(..))
+import Elm.Syntax.Expression exposing (Case, Expression(..), Function, FunctionSignature, Lambda, LetBlock, LetDeclaration(..), RecordUpdate)
 import Elm.Syntax.File exposing (File)
-import Elm.Syntax.Infix exposing (..)
-import Elm.Syntax.Module exposing (..)
-import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Infix exposing (InfixDirection)
+import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.Pattern exposing (Pattern(..))
 import Elm.Syntax.Ranged exposing (Ranged)
-import Elm.Syntax.Type exposing (..)
-import Elm.Syntax.TypeAlias exposing (..)
-import Elm.Syntax.TypeAnnotation exposing (..)
+import Elm.Syntax.Type exposing (Type, ValueConstructor)
+import Elm.Syntax.TypeAlias exposing (TypeAlias)
+import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
 
 
 type Order context x

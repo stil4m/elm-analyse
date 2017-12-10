@@ -1,7 +1,7 @@
 module Analyser.Configuration exposing (Configuration, checkEnabled, checkPropertyAs, defaultConfiguration, fromString, isPathExcluded)
 
 import Dict exposing (Dict)
-import Json.Decode as JD exposing (..)
+import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra exposing ((|:))
 
 
@@ -35,7 +35,7 @@ defaultChecks =
 
 checkPropertyAs : Decoder a -> String -> String -> Configuration -> Maybe a
 checkPropertyAs decoder check prop (Configuration { raw }) =
-    JD.decodeString (maybe (at [ check, prop ] decoder)) raw
+    JD.decodeString (JD.maybe (JD.at [ check, prop ] decoder)) raw
         |> Result.toMaybe
         |> Maybe.andThen identity
 
@@ -82,12 +82,12 @@ fromString input =
 
 decodeConfiguration : String -> Decoder Configuration
 decodeConfiguration raw =
-    succeed (ConfigurationInner raw)
-        |: oneOf [ field "checks" decodeChecks, succeed Dict.empty ]
-        |: oneOf [ field "excludedPaths" (list string), succeed [] ]
-        |> map Configuration
+    JD.succeed (ConfigurationInner raw)
+        |: JD.oneOf [ JD.field "checks" decodeChecks, JD.succeed Dict.empty ]
+        |: JD.oneOf [ JD.field "excludedPaths" (JD.list JD.string), JD.succeed [] ]
+        |> JD.map Configuration
 
 
 decodeChecks : Decoder (Dict String Bool)
 decodeChecks =
-    dict bool
+    JD.dict JD.bool

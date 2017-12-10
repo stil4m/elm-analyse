@@ -2,7 +2,7 @@ module Analyser.Messages.Util exposing (blockForShas, compareMessageFile, compar
 
 import AST.Ranges as AstRanges
 import Analyser.Messages.Data as Data
-import Analyser.Messages.Types exposing (..)
+import Analyser.Messages.Types exposing (Message, MessageStatus(..))
 import Elm.Syntax.Range exposing (Range, emptyRange)
 
 

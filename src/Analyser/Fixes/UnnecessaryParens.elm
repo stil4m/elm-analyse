@@ -4,7 +4,7 @@ import Analyser.Checks.UnnecessaryParens as UnnecessaryParensCheck
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Elm.Syntax.File exposing (..)
+import Elm.Syntax.File exposing (File)
 import Elm.Syntax.Range exposing (Range)
 
 

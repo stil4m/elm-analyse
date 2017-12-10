@@ -10,13 +10,13 @@ module ASTUtil.Variables
         , withoutTopLevel
         )
 
-import Elm.Syntax.Base exposing (..)
-import Elm.Syntax.Declaration exposing (..)
-import Elm.Syntax.Exposing exposing (..)
-import Elm.Syntax.Expression exposing (..)
-import Elm.Syntax.File exposing (..)
-import Elm.Syntax.Module exposing (..)
-import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Base exposing (VariablePointer)
+import Elm.Syntax.Declaration exposing (Declaration(..))
+import Elm.Syntax.Exposing exposing (Exposing(..), TopLevelExpose(..))
+import Elm.Syntax.Expression exposing (Expression(..), LetDeclaration(LetDestructuring, LetFunction))
+import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.Pattern exposing (Pattern(..), QualifiedNameRef)
 import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 

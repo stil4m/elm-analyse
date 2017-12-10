@@ -2,9 +2,9 @@ module ASTUtil.Patterns exposing (findParentPattern)
 
 import AST.Ranges as Ranges
 import ASTUtil.Inspector as Inspector exposing (Order(Pre), defaultConfig)
-import Elm.Syntax.Expression exposing (..)
-import Elm.Syntax.File exposing (..)
-import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Expression exposing (Case, Expression(..), Function, Lambda)
+import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Pattern exposing (Pattern(..))
 import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 import Maybe.Extra as Maybe

@@ -8,7 +8,7 @@ import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
-import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.Expression exposing (Expression(..), Function, LetBlock)
 
 
 type alias Context =

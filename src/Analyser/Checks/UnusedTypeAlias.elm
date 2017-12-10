@@ -11,8 +11,8 @@ import Dict exposing (Dict)
 import Elm.Interface as Interface
 import Elm.Syntax.Range as Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
-import Elm.Syntax.TypeAlias exposing (..)
-import Elm.Syntax.TypeAnnotation exposing (..)
+import Elm.Syntax.TypeAlias exposing (TypeAlias)
+import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
 import Tuple3
 
 

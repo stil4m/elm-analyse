@@ -1,6 +1,6 @@
 module ASTUtil.PatternOptimizer exposing (optimize)
 
-import Elm.Syntax.Pattern exposing (..)
+import Elm.Syntax.Pattern exposing (Pattern(..))
 import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 
