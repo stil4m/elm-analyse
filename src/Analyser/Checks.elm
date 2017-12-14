@@ -1,6 +1,7 @@
 module Analyser.Checks exposing (all, schemas)
 
 import Analyser.Checks.Base exposing (Checker)
+import Analyser.Checks.BooleanCase as BooleanCase
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.DebugCrash as DebugCrash
 import Analyser.Checks.DebugLog as DebugLog
@@ -71,4 +72,5 @@ all =
     , DuplicateRecordFieldUpdate.checker
     , SingleFieldRecord.checker
     , TriggerWords.checker
+    , BooleanCase.checker
     ]

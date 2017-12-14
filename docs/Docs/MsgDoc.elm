@@ -1,6 +1,7 @@
 module Docs.MsgDoc exposing (allMessages, forKey, view)
 
 import Analyser.Checks.Base exposing (Checker, CheckerInfo)
+import Analyser.Checks.BooleanCase
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.DebugCrash
 import Analyser.Checks.DebugLog
@@ -87,6 +88,7 @@ allMessages =
     , duplicateImport
     , fileLoadFailed
     , unformattedFile
+    , booleanCase
     , debugCrash
     , debugLog
     , unnecessaryParens
@@ -121,6 +123,24 @@ module Foo exposing (sum)
 sum : Int -> Int -> Int
 sum x y =
     0
+"""
+    }
+
+
+booleanCase : MsgDoc
+booleanCase =
+    { info = .info Analyser.Checks.BooleanCase.checker
+    , example = Dynamic Analyser.Checks.BooleanCase.checker
+    , input = """
+module Foo exposing (sum)
+
+thing : Boolean -> String
+thing x =
+    case x of
+        True ->
+            "Hello"
+        False ->
+            "Goodbye"
 """
     }
 
