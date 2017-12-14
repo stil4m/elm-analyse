@@ -1,5 +1,13 @@
 # elm-analyse changelog
 
+## 0.13.2 (2017-12-14)
+
+* [Issue #129](https://github.com/stil4m/elm-analyse/issues/129) No file name in standard output
+
+## 0.13.1 (2017-12-10)
+
+Fix missing dependency.
+
 ## 0.13.0 (2017-12-10)
 
 * [Issue #128](https://github.com/stil4m/elm-analyse/issues/128) Drop line length check
