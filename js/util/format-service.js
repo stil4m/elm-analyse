@@ -33,22 +33,24 @@ const setupCache = function(config) {
     const cacheSuccess = prefillCacheWithKnownFiles();
     if (cacheSuccess) {
         try {
+            const searchPath = path.resolve(cachePath, '_shas/*.elma');
             cp.execSync(
-                config.elmFormatPath +
-                    ' ' +
-                    cachePath +
-                    '/_shas/*.elma --validate ',
-                {
-                    stdio: []
-                }
+                config.elmFormatPath + ' ' + searchPath + ' --validate ',
+                { stdio: [] }
             );
             //All files are formatted correctly.
         } catch (e) {
             // Parse Std [1]
-            const invalidFiles = JSON.parse(e.output[1].toString());
-            invalidFiles.forEach(f => {
-                cache[f.path] = false;
-            });
+            try {
+                const invalidFiles = JSON.parse(e.output[1].toString());
+                invalidFiles.forEach(f => {
+                    cache[f.path] = false;
+                });
+            } catch (parseException) {
+                console.log(parseException);
+                //Do nothing when output parse fails. Cache will fill itself.
+                //There may be no .elma files present, then elm-format will fail. Just ignore this
+            }
         }
     }
 };
