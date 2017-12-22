@@ -1,5 +1,10 @@
 # elm-analyse changelog
 
+## 0.13.3 (2017-12-22)
+
+* [Issue #132](https://github.com/stil4m/elm-analyse/issues/132) Elm format service fails when output is no JSON or when no files are detected.
+* [Issue #134](https://github.com/stil4m/elm-analyse/issues/134) Fix bug on grouping messages by type in UI
+
 ## 0.13.2 (2017-12-14)
 
 * [Issue #129](https://github.com/stil4m/elm-analyse/issues/129) No file name in standard output
