@@ -43,7 +43,7 @@ type MessageStatus
 groupByType : List Message -> GroupedMessages
 groupByType messages =
     messages
-        |> Dict.groupBy (\m -> String.split " " (toString m.data) |> List.head |> Maybe.withDefault "")
+        |> Dict.groupBy .type_
 
 
 groupByFileName : List Message -> GroupedMessages
