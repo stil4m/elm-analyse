@@ -33,16 +33,21 @@ scan fileContext _ =
 
 onCase : (List MessageData -> List MessageData) -> Case -> List MessageData -> List MessageData
 onCase _ ( ( { start }, pattern ), ( { end }, expression ) ) context =
-    if
-        pattern
-            == NamedPattern { moduleName = [], name = "Nothing" } []
-            && expression
-            == FunctionOrValue "Nothing"
-    then
+    if isNothingPattern pattern && isNothingExpression expression then
         buildMessage { start = start, end = end }
             :: context
     else
         context
+
+
+isNothingPattern : Pattern -> Bool
+isNothingPattern pattern =
+    pattern == NamedPattern { moduleName = [], name = "Nothing" } []
+
+
+isNothingExpression : Expression -> Bool
+isNothingExpression expression =
+    expression == FunctionOrValue "Nothing"
 
 
 buildMessage : Range -> MessageData
