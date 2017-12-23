@@ -25763,15 +25763,8 @@ var _user$project$Analyser_Messages_Types$groupByFileName = function (messages) 
 var _user$project$Analyser_Messages_Types$groupByType = function (messages) {
 	return A2(
 		_elm_community$dict_extra$Dict_Extra$groupBy,
-		function (m) {
-			return A2(
-				_elm_lang$core$Maybe$withDefault,
-				'',
-				_elm_lang$core$List$head(
-					A2(
-						_elm_lang$core$String$split,
-						' ',
-						_elm_lang$core$Basics$toString(m.data))));
+		function (_) {
+			return _.type_;
 		},
 		messages);
 };
