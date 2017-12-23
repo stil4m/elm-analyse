@@ -13,6 +13,7 @@ import Analyser.Checks.ExposeAll
 import Analyser.Checks.FileLoadFailed as FileLoadFailed
 import Analyser.Checks.FunctionInLet
 import Analyser.Checks.ImportAll
+import Analyser.Checks.MapNothingToNothing
 import Analyser.Checks.MultiLineRecordFormatting
 import Analyser.Checks.NoTopLevelSignature
 import Analyser.Checks.NoUncurriedPrefix
@@ -100,6 +101,7 @@ allMessages =
     , singleFieldRecord
     , duplicateRecordFieldUpdate
     , triggerWords
+    , mapNothingToNothing
     ]
 
 
@@ -108,6 +110,23 @@ forKey x =
     allMessages
         |> List.filter (.info >> .key >> (==) x)
         |> List.head
+
+
+mapNothingToNothing : MsgDoc
+mapNothingToNothing =
+    { info = .info Analyser.Checks.MapNothingToNothing.checker
+    , example = Dynamic Analyser.Checks.MapNothingToNothing.checker
+    , input = """
+module Greet exposing (greet)
+
+greet x =
+    case x of
+        Nothing ->
+            Nothing
+        Just x ->
+            "Hello " ++ x
+"""
+    }
 
 
 triggerWords : MsgDoc
