@@ -12,6 +12,7 @@ import Analyser.Checks.DuplicateRecordFieldUpdate as DuplicateRecordFieldUpdate
 import Analyser.Checks.ExposeAll as ExposeAll
 import Analyser.Checks.FunctionInLet as FunctionInLet
 import Analyser.Checks.ImportAll as ImportAll
+import Analyser.Checks.MapNothingToNothing as MapNothingToNothing
 import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
 import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
@@ -71,4 +72,5 @@ all =
     , DuplicateRecordFieldUpdate.checker
     , SingleFieldRecord.checker
     , TriggerWords.checker
+    , MapNothingToNothing.checker
     ]
