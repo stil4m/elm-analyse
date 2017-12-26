@@ -31,6 +31,10 @@ foo =
     , [ Data.init "foo"
             |> Data.addRange "range"
                 { start = { row = 4, column = 4 }, end = { row = 4, column = 16 } }
+            |> Data.addRange "car"
+                { start = { row = 4, column = 4 }, end = { row = 4, column = 5 } }
+            |> Data.addRange "cdr"
+                { start = { row = 4, column = 9 }, end = { row = 4, column = 16 } }
       ]
     )
 
