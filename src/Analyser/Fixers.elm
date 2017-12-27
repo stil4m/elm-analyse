@@ -4,6 +4,7 @@ import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.MultiLineRecordFormatting as MultiLineRecordFormatting
 import Analyser.Fixes.UnformattedFile as UnformattedFileFixer
 import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
+import Analyser.Fixes.UnusedImport as UnusedImportFixer
 import Analyser.Fixes.UnusedImportAlias as UnusedImportAliasFixer
 import Analyser.Fixes.UnusedImportedVariable as UnusedImportedVariableFixer
 import Analyser.Fixes.UnusedPatternVariable as UnusedPatternVariableFixer
@@ -20,6 +21,7 @@ getFixer m =
 all : List Fixer
 all =
     [ UnnecessaryParensFixer.fixer
+    , UnusedImportFixer.fixer
     , UnusedImportedVariableFixer.fixer
     , UnusedImportAliasFixer.fixer
     , UnusedPatternVariableFixer.fixer
