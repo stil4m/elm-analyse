@@ -21,8 +21,8 @@ checker =
         , schema =
             Schema.schema
                 |> Schema.rangeProp "range"
-                |> Schema.rangeProp "car"
-                |> Schema.rangeProp "cdr"
+                |> Schema.rangeProp "head"
+                |> Schema.rangeProp "tail"
         }
     }
 
@@ -56,8 +56,8 @@ onExpression ( r, inner ) context =
                     ]
                 )
                 |> Data.addRange "range" range
-                |> Data.addRange "car" carRange
-                |> Data.addRange "cdr" cdrRange
+                |> Data.addRange "head" carRange
+                |> Data.addRange "tail" cdrRange
             )
                 :: context
 

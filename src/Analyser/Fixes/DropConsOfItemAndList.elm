@@ -18,27 +18,27 @@ fixer =
 fix : ( String, File ) -> MessageData -> Result String String
 fix ( content, _ ) messageData =
     case
-        ( Data.getRange "car" messageData
-        , Data.getRange "cdr" messageData
-        )
+        Maybe.map2 (,)
+            (Data.getRange "head" messageData)
+            (Data.getRange "tail" messageData)
     of
-        ( Just carRange, Just cdrRange ) ->
-            fixContent carRange cdrRange content |> Ok
+        Just ( headRange, tailRange ) ->
+            fixContent headRange tailRange content |> Ok
 
-        _ ->
-            Err "Invalid message data for fixer UnnecessaryParens"
+        Nothing ->
+            Err "Invalid message data for fixer DropConsOfItemAndList"
 
 
 fixContent : Range -> Range -> String -> String
-fixContent carRange cdrRange content =
+fixContent headRange tailRange content =
     let
         middleRange =
-            { start = carRange.end, end = cdrRange.start }
+            { start = headRange.end, end = tailRange.start }
     in
     content
         -- Drop the opening `[`
-        |> FileContent.updateRange cdrRange (String.dropLeft 1)
+        |> FileContent.updateRange tailRange (String.dropLeft 1)
         -- Replace the `::`
         |> FileContent.replaceRangeWith middleRange ","
         -- Add new opening `[`
-        |> FileContent.updateRange carRange (String.append "[ ")
+        |> FileContent.updateRange headRange (String.append "[ ")
