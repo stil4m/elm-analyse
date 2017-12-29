@@ -44,7 +44,7 @@ scan fileContext _ =
 onExpression : Ranged Expression -> Context -> Context
 onExpression ( r, inner ) context =
     case inner of
-        OperatorApplication "::" _ ( carRange, _ ) ( cdrRange, ListExpr _ ) ->
+        OperatorApplication "::" _ ( headRange, _ ) ( tailRange, ListExpr _ ) ->
             let
                 range =
                     r
@@ -56,8 +56,8 @@ onExpression ( r, inner ) context =
                     ]
                 )
                 |> Data.addRange "range" range
-                |> Data.addRange "head" carRange
-                |> Data.addRange "tail" cdrRange
+                |> Data.addRange "head" headRange
+                |> Data.addRange "tail" tailRange
             )
                 :: context
 
