@@ -1,4 +1,4 @@
-module Docs.MsgDoc exposing (allMessages, forKey, view)
+module Docs.MsgDoc exposing (allMessages, forKey, getMessage, view)
 
 import Analyser.Checks.Base exposing (Checker, CheckerInfo)
 import Analyser.Checks.BooleanCase
