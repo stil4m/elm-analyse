@@ -302,7 +302,7 @@ foo =
 
 useConsOverConcat : MsgDoc
 useConsOverConcat =
-    { info = .info Analyser.Checks.DropConcatOfLists.checker
+    { info = .info Analyser.Checks.UseConsOverConcat.checker
     , example = Dynamic Analyser.Checks.UseConsOverConcat.checker
     , input = """
 module Foo exposing (foo)
@@ -620,7 +620,7 @@ importAll =
     , input = """
 module Foo exposing (bar)
 
-import Html exposing (Html)
+import Html exposing (..)
 
 foo = text "Hello world!"
 """
