@@ -1,4 +1,4 @@
-module Analyser.Fixes.FileContent exposing (getCharAtLocation, replaceLines, replaceLocationWith, replaceRangeWith, updateRange)
+module Analyser.Fixes.FileContent exposing (getCharAtLocation, getStringAtRange, replaceLines, replaceLocationWith, replaceRangeWith, updateRange)
 
 import Elm.Syntax.Range exposing (Range)
 import List.Extra as List
@@ -90,6 +90,30 @@ getCharAtLocation ( row, column ) input =
         |> List.drop row
         |> List.head
         |> Maybe.map (String.dropLeft column >> String.left 1)
+
+
+getStringAtRange : Range -> String -> String
+getStringAtRange { start, end } input =
+    let
+        trimLast i line =
+            if i == end.row then
+                String.left end.column line
+            else
+                line
+
+        trimFirst i line =
+            if i == 0 then
+                String.dropLeft start.column line
+            else
+                line
+    in
+    input
+        |> String.split "\n"
+        |> List.take (end.row + 1)
+        |> List.indexedMap trimLast
+        |> List.drop start.row
+        |> List.indexedMap trimFirst
+        |> String.concat
 
 
 replaceLines : ( Int, Int ) -> String -> String -> String

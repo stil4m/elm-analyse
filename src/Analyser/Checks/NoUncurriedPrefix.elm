@@ -18,7 +18,12 @@ checker =
         { key = "NoUncurriedPrefix"
         , name = "Fully Applied Operator as Prefix"
         , description = "It's not needed to use an operator in prefix notation when you apply both arguments directly."
-        , schema = Schema.schema |> Schema.rangeProp "range" |> Schema.varProp "varName"
+        , schema =
+            Schema.schema
+                |> Schema.varProp "varName"
+                |> Schema.rangeProp "range"
+                |> Schema.rangeProp "arg1"
+                |> Schema.rangeProp "arg2"
         }
     }
 
@@ -40,31 +45,25 @@ scan fileContext _ =
 onExpression : Ranged Expression -> Context -> Context
 onExpression ( _, expression ) context =
     case expression of
-        Application xs ->
-            case xs of
-                [ ( r, PrefixOperator x ), _, _ ] ->
-                    if String.startsWith ",," x then
-                        context
-                    else
-                        let
-                            range =
-                                r
-                        in
-                        (Data.init
-                            (String.concat
-                                [ "Prefix notation for `"
-                                , x
-                                , "` is unneeded in at "
-                                , Range.rangeToString range
-                                ]
-                            )
-                            |> Data.addVarName "varName" x
-                            |> Data.addRange "range" range
-                        )
-                            :: context
-
-                _ ->
-                    context
+        Application [ ( opRange, PrefixOperator x ), ( argRange1, _ ), ( argRange2, _ ) ] ->
+            -- Allow 3-tuple or greater as prefix.
+            if String.startsWith ",," x then
+                context
+            else
+                (Data.init
+                    (String.concat
+                        [ "Prefix notation for `"
+                        , x
+                        , "` is unneeded in at "
+                        , Range.rangeToString opRange
+                        ]
+                    )
+                    |> Data.addVarName "varName" x
+                    |> Data.addRange "range" opRange
+                    |> Data.addRange "arg1" argRange1
+                    |> Data.addRange "arg2" argRange2
+                )
+                    :: context
 
         _ ->
             context
