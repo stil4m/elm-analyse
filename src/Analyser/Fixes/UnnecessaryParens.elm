@@ -1,7 +1,7 @@
 module Analyser.Fixes.UnnecessaryParens exposing (fixer)
 
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParensCheck
-import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Fixes.Base exposing (Fixer, Patch(..))
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Elm.Syntax.File exposing (File)
@@ -15,7 +15,7 @@ fixer =
         "Remove and format"
 
 
-fix : ( String, File ) -> MessageData -> Result String String
+fix : ( String, File ) -> MessageData -> Patch
 fix input messageData =
     case Data.getRange "range" messageData of
         Just range ->
@@ -23,10 +23,10 @@ fix input messageData =
                 |> (Tuple.first >> fixContent range)
 
         Nothing ->
-            Err "Invalid message data for fixer UnnecessaryParens"
+            IncompatibleData
 
 
-fixContent : Range -> String -> Result String String
+fixContent : Range -> String -> Patch
 fixContent range content =
     let
         { start, end } =
@@ -69,7 +69,7 @@ fixContent range content =
             content
                 |> FileContent.replaceLocationWith ( start.row, start.column ) " "
                 |> FileContent.replaceLocationWith endCharLoc ""
-                |> Ok
+                |> Patched
 
         _ ->
-            Err "Could not locate parens to replace"
+            Error "Could not locate parens to replace"

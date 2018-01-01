@@ -1,7 +1,7 @@
 module Analyser.Fixes.DropConsOfItemAndList exposing (fixer)
 
 import Analyser.Checks.DropConsOfItemAndList as DropConsOfItemAndListCheck
-import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Fixes.Base exposing (Fixer, Patch(..))
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Elm.Syntax.File exposing (File)
@@ -15,7 +15,7 @@ fixer =
         "Combine and format"
 
 
-fix : ( String, File ) -> MessageData -> Result String String
+fix : ( String, File ) -> MessageData -> Patch
 fix ( content, _ ) messageData =
     case
         Maybe.map2 (,)
@@ -23,10 +23,10 @@ fix ( content, _ ) messageData =
             (Data.getRange "tail" messageData)
     of
         Just ( headRange, tailRange ) ->
-            fixContent headRange tailRange content |> Ok
+            Patched (fixContent headRange tailRange content)
 
         Nothing ->
-            Err "Invalid message data for fixer DropConsOfItemAndList"
+            IncompatibleData
 
 
 fixContent : Range -> Range -> String -> String

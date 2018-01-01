@@ -2,7 +2,7 @@ module Analyser.Fixes.UnusedImportAlias exposing (fixer)
 
 import ASTUtil.Imports as Imports
 import Analyser.Checks.UnusedImportAlias as UnusedImportAliasCheck
-import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Fixes.Base exposing (Fixer, Patch(..))
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Elm.Syntax.File exposing (File)
@@ -15,25 +15,24 @@ fixer =
     Fixer (.key <| .info <| UnusedImportAliasCheck.checker) fix "Remove alias and format"
 
 
-fix : ( String, File ) -> MessageData -> Result String String
+fix : ( String, File ) -> MessageData -> Patch
 fix input messageData =
     case Data.getRange "range" messageData of
         Just range ->
             updateImport input range
 
         Nothing ->
-            Err "Invalid message data for fixer UnusedImportAlias"
+            IncompatibleData
 
 
-updateImport : ( String, File ) -> Range -> Result String String
+updateImport : ( String, File ) -> Range -> Patch
 updateImport ( content, ast ) range =
     case Imports.findImportWithRange ast range of
         Just imp ->
-            Ok <|
-                writeNewImport imp.range { imp | moduleAlias = Nothing } content
+            Patched (writeNewImport imp.range { imp | moduleAlias = Nothing } content)
 
         Nothing ->
-            Err "Could not locate import for the target range"
+            Error "Could not locate import for the target range"
 
 
 writeNewImport : Syntax.Range -> Import -> String -> String

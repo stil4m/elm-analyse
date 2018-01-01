@@ -1,7 +1,7 @@
 module Analyser.Fixes.UnusedTypeAlias exposing (fixer)
 
 import Analyser.Checks.UnusedTypeAlias as UnusedTypeAliasCheck
-import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Fixes.Base exposing (Fixer, Patch(..))
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Elm.Syntax.Declaration exposing (Declaration(AliasDecl))
@@ -16,15 +16,16 @@ fixer =
     Fixer (.key <| .info <| UnusedTypeAliasCheck.checker) fix "Remove type alias and format"
 
 
-fix : ( String, File ) -> MessageData -> Result String String
+fix : ( String, File ) -> MessageData -> Patch
 fix input messageData =
     case Data.getRange "range" messageData of
         Just range ->
             findAndRemoveTypeAlias input range
-                |> Result.fromMaybe "Could not find type alias"
+                |> Maybe.map Patched
+                |> Maybe.withDefault (Error "Could not find type alias")
 
-        _ ->
-            Err "Invalid message data for fixer UnusedTypeAlias"
+        Nothing ->
+            IncompatibleData
 
 
 findAndRemoveTypeAlias : ( String, File ) -> Range -> Maybe String

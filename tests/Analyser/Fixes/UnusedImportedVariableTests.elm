@@ -1,5 +1,6 @@
 module Analyser.Fixes.UnusedImportedVariableTests exposing (all)
 
+import Analyser.Fixes.Base exposing (Patch(..))
 import Analyser.Fixes.UnusedImportedVariable exposing (fixer)
 import Analyser.Messages.Data as Data
 import Elm.Parser as Parser
@@ -38,7 +39,7 @@ foo = bar 1
                                 |> Data.addRange "range"
                                     { start = { row = 2, column = 26 }, end = { row = 2, column = 31 } }
                             )
-                            |> Expect.equal (Ok output)
+                            |> Expect.equal (Patched output)
 
                     Err _ ->
                         Expect.equal True False

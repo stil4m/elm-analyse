@@ -1,5 +1,6 @@
 module Analyser.Fixes.UnusedImportAliasTests exposing (all)
 
+import Analyser.Fixes.Base exposing (Fixer, Patch(..))
 import Analyser.Fixes.UnusedImportAlias exposing (fixer)
 import Analyser.Messages.Data as Data
 import Elm.Parser as Parser
@@ -39,7 +40,7 @@ foo = bar 1
                                     { start = { row = 2, column = 0 }, end = { row = 2, column = 37 } }
                             )
                             |> Expect.equal
-                                (Ok output)
+                                (Patched output)
 
                     Err _ ->
                         Expect.equal True False
