@@ -37,7 +37,7 @@ replacement { match } =
 
 fixContent : Range -> String -> String
 fixContent range content =
-    FileContent.updateRange
-        range
-        content
-        (Regex.replace (Regex.AtMost 1) commaAndIdentifierRegex replacement)
+    content
+        |> FileContent.updateRange
+            range
+            (Regex.replace (Regex.AtMost 1) commaAndIdentifierRegex replacement)

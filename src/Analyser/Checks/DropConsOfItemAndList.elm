@@ -17,10 +17,12 @@ checker =
     , info =
         { key = "DropConsOfItemAndList"
         , name = "Drop Cons Of Item And List"
-        , description = "If you cons an item to a literal list (x :x [1, 2, 3]), then you can just put the item into the list."
+        , description = "If you cons an item to a literal list (x :: [1, 2, 3]), then you can just put the item into the list."
         , schema =
             Schema.schema
                 |> Schema.rangeProp "range"
+                |> Schema.rangeProp "head"
+                |> Schema.rangeProp "tail"
         }
     }
 
@@ -42,7 +44,7 @@ scan fileContext _ =
 onExpression : Ranged Expression -> Context -> Context
 onExpression ( r, inner ) context =
     case inner of
-        OperatorApplication "::" _ _ ( _, ListExpr _ ) ->
+        OperatorApplication "::" _ ( headRange, _ ) ( tailRange, ListExpr _ ) ->
             let
                 range =
                     r
@@ -54,6 +56,8 @@ onExpression ( r, inner ) context =
                     ]
                 )
                 |> Data.addRange "range" range
+                |> Data.addRange "head" headRange
+                |> Data.addRange "tail" tailRange
             )
                 :: context
 

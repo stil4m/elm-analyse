@@ -4,8 +4,8 @@ import Elm.Syntax.Range exposing (Range)
 import List.Extra as List
 
 
-updateRange : Range -> String -> (String -> String) -> String
-updateRange range content patch =
+updateRange : Range -> (String -> String) -> String -> String
+updateRange range patch content =
     let
         rows =
             content
@@ -24,7 +24,7 @@ updateRange range content patch =
             String.left range.start.column
 
         rowPostPartTakeFn =
-            String.dropLeft (range.end.column + 1)
+            String.dropLeft range.end.column
 
         rowPrePart =
             List.drop beforeRows rows
@@ -61,7 +61,7 @@ updateRange range content patch =
 
 replaceRangeWith : Range -> String -> String -> String
 replaceRangeWith range newValue input =
-    updateRange range input (always newValue)
+    updateRange range (always newValue) input
 
 
 replaceLocationWith : ( Int, Int ) -> String -> String -> String
