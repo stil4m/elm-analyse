@@ -10,7 +10,6 @@
     "exposed-modules": [],
     "dependencies": {
         "Fresheyeball/elm-tuple-extra": "3.0.0 <= v < 4.0.0",
-        "danielnarey/elm-css-frameworks": "4.0.0 <= v < 5.0.0",
         "elm-community/dict-extra": "2.2.0 <= v < 3.0.0",
         "elm-community/graph": "4.0.1 <= v < 5.0.0",
         "elm-community/intdict": "2.0.0 <= v < 3.0.0",
