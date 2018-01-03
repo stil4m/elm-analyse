@@ -1,4 +1,4 @@
-module AST.Ranges exposing (compareRangeStarts, containsRange, emptyRange, getRange, orderByStart, rangeToString)
+module AST.Ranges exposing (containsRange, emptyRange, orderByStart, rangeToString)
 
 import Elm.Syntax.Range exposing (Location, Range)
 
@@ -16,44 +16,9 @@ rangeToString { start, end } =
     "(" ++ locationToString start ++ "," ++ locationToString end ++ ")"
 
 
-getRange : List Range -> Range
-getRange ranges =
-    let
-        starts =
-            List.map .start ranges |> sortLocations
-
-        ends =
-            List.map .end ranges |> sortLocations |> List.reverse
-    in
-    Maybe.map2 Range (List.head starts) (List.head ends)
-        |> Maybe.withDefault emptyRange
-
-
 emptyRange : Range
 emptyRange =
     { start = { row = 0, column = 0 }, end = { row = 0, column = 0 } }
-
-
-compareRangeStarts : Range -> Range -> Order
-compareRangeStarts a b =
-    compareLocations a.start b.start
-
-
-compareLocations : Location -> Location -> Order
-compareLocations left right =
-    if left.row < right.row then
-        LT
-    else if right.row < left.row then
-        GT
-    else
-        compare left.column right.column
-
-
-{-| Could be faster via single fold
--}
-sortLocations : List Location -> List Location
-sortLocations =
-    List.sortWith compareLocations
 
 
 locationToString : Location -> String

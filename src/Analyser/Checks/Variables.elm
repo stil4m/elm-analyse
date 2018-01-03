@@ -1,4 +1,4 @@
-module Analyser.Checks.Variables exposing (ActiveScope, Scope, UsedVariableContext, collect)
+module Analyser.Checks.Variables exposing (UsedVariableContext, collect, unusedTopLevels, unusedVariables)
 
 import ASTUtil.Inspector as Inspector exposing (Order(Inner, Post, Pre), defaultConfig)
 import ASTUtil.Variables exposing (VariableType(Pattern), getLetDeclarationsVars, getTopLevels, patternToUsedVars, patternToVars, patternToVarsInner, withoutTopLevel)
@@ -9,57 +9,86 @@ import Elm.Syntax.Expression exposing (Case, Expression(..), Function, Lambda, L
 import Elm.Syntax.File exposing (File)
 import Elm.Syntax.Infix exposing (InfixDirection)
 import Elm.Syntax.Pattern exposing (Pattern(..))
-import Elm.Syntax.Range as Syntax
+import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(Typed))
 import Tuple3
 
 
 type alias Scope =
-    Dict String ( Int, VariableType, Syntax.Range )
+    Dict String ( Int, VariableType, Range )
 
 
 type alias ActiveScope =
     ( List String, Scope )
 
 
-type alias UsedVariableContext =
+type UsedVariableContext
+    = UsedVariableContext InneUsedVariableContext
+
+
+type alias InneUsedVariableContext =
     { poppedScopes : List Scope
     , activeScopes : List ActiveScope
     }
 
 
+unusedVariables : UsedVariableContext -> List ( String, VariableType, Range )
+unusedVariables (UsedVariableContext x) =
+    x.poppedScopes
+        |> List.concatMap Dict.toList
+        |> onlyUnused
+        |> List.map (\( a, ( _, c, d ) ) -> ( a, c, d ))
+
+
+unusedTopLevels : UsedVariableContext -> List ( String, VariableType, Range )
+unusedTopLevels (UsedVariableContext x) =
+    x.activeScopes
+        |> List.head
+        |> Maybe.map Tuple.second
+        |> Maybe.withDefault Dict.empty
+        |> Dict.toList
+        |> onlyUnused
+        |> List.map (\( a, ( _, c, d ) ) -> ( a, c, d ))
+
+
+onlyUnused : List ( String, ( Int, VariableType, Range ) ) -> List ( String, ( Int, VariableType, Range ) )
+onlyUnused =
+    List.filter (Tuple.second >> Tuple3.first >> (==) 0)
+
+
 collect : FileContext -> UsedVariableContext
 collect fileContext =
-    Inspector.inspect
-        { defaultConfig
-            | onFile = Pre onFile
-            , onFunction = Inner onFunction
-            , onLetBlock = Inner onLetBlock
-            , onLambda = Inner onLambda
-            , onCase = Inner onCase
-            , onOperatorApplication = Post onOperatorAppliction
-            , onDestructuring = Post onDestructuring
-            , onFunctionOrValue = Post onFunctionOrValue
-            , onPrefixOperator = Post onPrefixOperator
-            , onRecordUpdate = Post onRecordUpdate
-            , onTypeAnnotation = Post onTypeAnnotation
-        }
-        fileContext.ast
-        emptyContext
+    UsedVariableContext <|
+        Inspector.inspect
+            { defaultConfig
+                | onFile = Pre onFile
+                , onFunction = Inner onFunction
+                , onLetBlock = Inner onLetBlock
+                , onLambda = Inner onLambda
+                , onCase = Inner onCase
+                , onOperatorApplication = Post onOperatorAppliction
+                , onDestructuring = Post onDestructuring
+                , onFunctionOrValue = Post onFunctionOrValue
+                , onPrefixOperator = Post onPrefixOperator
+                , onRecordUpdate = Post onRecordUpdate
+                , onTypeAnnotation = Post onTypeAnnotation
+            }
+            fileContext.ast
+            emptyContext
 
 
-emptyContext : UsedVariableContext
+emptyContext : InneUsedVariableContext
 emptyContext =
     { poppedScopes = [], activeScopes = [] }
 
 
-addUsedVariable : String -> UsedVariableContext -> UsedVariableContext
+addUsedVariable : String -> InneUsedVariableContext -> InneUsedVariableContext
 addUsedVariable x context =
     { context | activeScopes = flagVariable x context.activeScopes }
 
 
-popScope : UsedVariableContext -> UsedVariableContext
+popScope : InneUsedVariableContext -> InneUsedVariableContext
 popScope x =
     { x
         | activeScopes = List.drop 1 x.activeScopes
@@ -76,7 +105,7 @@ popScope x =
     }
 
 
-pushScope : List ( VariablePointer, VariableType ) -> UsedVariableContext -> UsedVariableContext
+pushScope : List ( VariablePointer, VariableType ) -> InneUsedVariableContext -> InneUsedVariableContext
 pushScope vars x =
     let
         y : ActiveScope
@@ -89,7 +118,7 @@ pushScope vars x =
     { x | activeScopes = y :: x.activeScopes }
 
 
-unMaskVariable : String -> UsedVariableContext -> UsedVariableContext
+unMaskVariable : String -> InneUsedVariableContext -> InneUsedVariableContext
 unMaskVariable k context =
     { context
         | activeScopes =
@@ -102,7 +131,7 @@ unMaskVariable k context =
     }
 
 
-maskVariable : String -> UsedVariableContext -> UsedVariableContext
+maskVariable : String -> InneUsedVariableContext -> InneUsedVariableContext
 maskVariable k context =
     { context
         | activeScopes =
@@ -130,33 +159,33 @@ flagVariable k l =
                 ( masked, x ) :: flagVariable k xs
 
 
-onFunctionOrValue : String -> UsedVariableContext -> UsedVariableContext
+onFunctionOrValue : String -> InneUsedVariableContext -> InneUsedVariableContext
 onFunctionOrValue x context =
     addUsedVariable x context
 
 
-onPrefixOperator : String -> UsedVariableContext -> UsedVariableContext
+onPrefixOperator : String -> InneUsedVariableContext -> InneUsedVariableContext
 onPrefixOperator prefixOperator context =
     addUsedVariable prefixOperator context
 
 
-onRecordUpdate : RecordUpdate -> UsedVariableContext -> UsedVariableContext
+onRecordUpdate : RecordUpdate -> InneUsedVariableContext -> InneUsedVariableContext
 onRecordUpdate recordUpdate context =
     addUsedVariable recordUpdate.name context
 
 
-onOperatorAppliction : ( String, InfixDirection, Ranged Expression, Ranged Expression ) -> UsedVariableContext -> UsedVariableContext
+onOperatorAppliction : ( String, InfixDirection, Ranged Expression, Ranged Expression ) -> InneUsedVariableContext -> InneUsedVariableContext
 onOperatorAppliction ( op, _, _, _ ) context =
     addUsedVariable op context
 
 
-onFile : File -> UsedVariableContext -> UsedVariableContext
+onFile : File -> InneUsedVariableContext -> InneUsedVariableContext
 onFile file context =
     getTopLevels file
         |> flip pushScope context
 
 
-onFunction : (UsedVariableContext -> UsedVariableContext) -> Function -> UsedVariableContext -> UsedVariableContext
+onFunction : (InneUsedVariableContext -> InneUsedVariableContext) -> Function -> InneUsedVariableContext -> InneUsedVariableContext
 onFunction f function context =
     let
         used =
@@ -178,7 +207,7 @@ onFunction f function context =
     List.foldl addUsedVariable postContext used
 
 
-onLambda : (UsedVariableContext -> UsedVariableContext) -> Lambda -> UsedVariableContext -> UsedVariableContext
+onLambda : (InneUsedVariableContext -> InneUsedVariableContext) -> Lambda -> InneUsedVariableContext -> InneUsedVariableContext
 onLambda f lambda context =
     let
         preContext =
@@ -192,7 +221,7 @@ onLambda f lambda context =
     postContext |> popScope
 
 
-onLetBlock : (UsedVariableContext -> UsedVariableContext) -> LetBlock -> UsedVariableContext -> UsedVariableContext
+onLetBlock : (InneUsedVariableContext -> InneUsedVariableContext) -> LetBlock -> InneUsedVariableContext -> InneUsedVariableContext
 onLetBlock f letBlock context =
     letBlock.declarations
         |> (getLetDeclarationsVars >> withoutTopLevel)
@@ -201,14 +230,14 @@ onLetBlock f letBlock context =
         |> popScope
 
 
-onDestructuring : ( Ranged Pattern, Ranged Expression ) -> UsedVariableContext -> UsedVariableContext
+onDestructuring : ( Ranged Pattern, Ranged Expression ) -> InneUsedVariableContext -> InneUsedVariableContext
 onDestructuring ( pattern, _ ) context =
     List.foldl addUsedVariable
         context
         (List.map .value (patternToUsedVars pattern))
 
 
-onCase : (UsedVariableContext -> UsedVariableContext) -> Case -> UsedVariableContext -> UsedVariableContext
+onCase : (InneUsedVariableContext -> InneUsedVariableContext) -> Case -> InneUsedVariableContext -> InneUsedVariableContext
 onCase f caze context =
     let
         used =
@@ -224,7 +253,7 @@ onCase f caze context =
     List.foldl addUsedVariable postContext used
 
 
-onTypeAnnotation : Ranged TypeAnnotation -> UsedVariableContext -> UsedVariableContext
+onTypeAnnotation : Ranged TypeAnnotation -> InneUsedVariableContext -> InneUsedVariableContext
 onTypeAnnotation ( _, t ) c =
     case t of
         Typed [] name _ ->
