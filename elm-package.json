@@ -14,7 +14,7 @@
         "elm-community/graph": "4.0.1 <= v < 5.0.0",
         "elm-community/intdict": "2.0.0 <= v < 3.0.0",
         "elm-community/json-extra": "2.1.0 <= v < 3.0.0",
-        "elm-community/list-extra": "6.0.0 <= v < 7.0.0",
+        "elm-community/list-extra": "7.0.0 <= v < 8.0.0",
         "elm-community/maybe-extra": "4.0.0 <= v < 5.0.0",
         "elm-community/result-extra": "2.2.0 <= v < 3.0.0",
         "elm-community/string-extra": "1.4.0 <= v < 2.0.0",
