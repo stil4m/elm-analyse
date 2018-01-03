@@ -1,14 +1,13 @@
 module Analyser.Checks.UnnecessaryParens exposing (checker)
 
 import AST.Ranges as Range
-import AST.Util exposing (getParenthesized, isCase, isIf, isLambda, isLet, isOperatorApplication)
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
-import Elm.Syntax.Expression exposing (CaseBlock, Expression(..), Function, Lambda)
+import Elm.Syntax.Expression as Expression exposing (CaseBlock, Expression(..), Function, Lambda)
 import Elm.Syntax.Infix exposing (InfixDirection)
 import Elm.Syntax.Range as Syntax exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
@@ -158,8 +157,8 @@ onApplication : List (Ranged Expression) -> Context -> Context
 onApplication parts context =
     List.head parts
         |> Maybe.andThen getParenthesized
-        |> Maybe.filter (Tuple.second >> isOperatorApplication >> not)
-        |> Maybe.filter (Tuple.second >> isCase >> not)
+        |> Maybe.filter (Tuple.second >> Tuple.second >> Expression.isOperatorApplication >> not)
+        |> Maybe.filter (Tuple.second >> Tuple.second >> Expression.isCase >> not)
         |> Maybe.map Tuple.first
         |> Maybe.map (flip (::) context)
         |> Maybe.withDefault context
@@ -182,9 +181,9 @@ onOperatorApplication ( _, _, left, right ) context =
 
 
 operatorHandSideAllowedParens : Ranged Expression -> Bool
-operatorHandSideAllowedParens expr =
+operatorHandSideAllowedParens ( _, expr ) =
     List.any ((|>) expr)
-        [ isOperatorApplication, isIf, isCase, isLet, isLambda ]
+        [ Expression.isOperatorApplication, Expression.isIfElse, Expression.isCase, Expression.isLet, Expression.isLambda ]
 
 
 onParenthesizedExpression : Syntax.Range -> Ranged Expression -> Context -> Context
@@ -228,3 +227,13 @@ onParenthesizedExpression range ( _, expression ) context =
 
         _ ->
             context
+
+
+getParenthesized : Ranged Expression -> Maybe ( Range, Ranged Expression )
+getParenthesized ( r, e ) =
+    case e of
+        ParenthesizedExpression p ->
+            Just ( r, p )
+
+        _ ->
+            Nothing

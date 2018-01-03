@@ -1,7 +1,6 @@
 module Analyser.Checks.UnusedImportAlias exposing (checker)
 
 import AST.Ranges as Range
-import AST.Util as Util
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
@@ -12,6 +11,7 @@ import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.Expression exposing (Case, Expression(..))
 import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.Pattern
 import Elm.Syntax.Range as Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
@@ -110,5 +110,5 @@ onExpression expr context =
 
 
 onCase : Case -> Context -> Context
-onCase ( pattern, _ ) context =
-    List.foldl markUsage context (Util.patternModuleNames pattern)
+onCase ( ( _, pattern ), _ ) context =
+    List.foldl markUsage context (Elm.Syntax.Pattern.moduleNames pattern)
