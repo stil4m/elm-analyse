@@ -1,10 +1,9 @@
 module Client.MessagesPage exposing (Model, Msg, init, onNewState, subscriptions, update, view)
 
-import Analyser.Messages.Types exposing (GroupedMessages, groupByFileName, groupByType)
+import Analyser.Messages.Grouped as Grouped exposing (GroupedMessages)
 import Client.Components.MessageList as MessageList
 import Client.LoadingScreen as LoadingScreen
 import Client.State exposing (State)
-import Dict
 import Html exposing (Html, button, div, h3, text)
 import Html.Attributes exposing (class, classList, type_)
 import Html.Events exposing (onClick)
@@ -35,7 +34,7 @@ subscriptions model =
 
 init : State -> Model
 init state =
-    { messageList = buildMessageList state GroupByFileName (MessageList.init Dict.empty)
+    { messageList = buildMessageList state GroupByFileName (MessageList.init (Grouped.byFileName []))
     , messageGrouper = GroupByFileName
     }
 
@@ -52,12 +51,12 @@ groupMessages s m =
             (\state ->
                 case m of
                     GroupByFileName ->
-                        groupByFileName state.messages
+                        Grouped.byFileName state.messages
 
                     GroupByType ->
-                        groupByType state.messages
+                        Grouped.byType state.messages
             )
-        |> RD.withDefault Dict.empty
+        |> RD.withDefault (Grouped.byFileName [])
 
 
 buildMessageList : State -> MessageGrouper -> MessageList.Model -> MessageList.Model

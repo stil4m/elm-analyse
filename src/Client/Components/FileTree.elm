@@ -1,9 +1,9 @@
 module Client.Components.FileTree exposing (Model, Msg, init, onNewState, subscriptions, update, view)
 
-import Analyser.Messages.Types exposing (GroupedMessages, Message, groupByType)
+import Analyser.Messages.Grouped as Grouped exposing (GroupedMessages)
+import Analyser.Messages.Types exposing (Message)
 import Client.Components.MessageList as MessageList
 import Client.State
-import Dict
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -38,7 +38,7 @@ init =
       , hideGoodFiles = True
       , fileIndex = Nothing
       , selectedFile = Nothing
-      , messageList = MessageList.init Dict.empty
+      , messageList = MessageList.init (Grouped.byType [])
       }
     , Cmd.batch
         [ Http.get "/tree" (JD.list JD.string) |> Http.send OnFileTree
@@ -122,10 +122,10 @@ messagesForSelectedFile m =
                 |> List.head
                 |> Maybe.map Tuple.second
                 |> Maybe.withDefault []
-                |> groupByType
+                |> Grouped.byType
 
         _ ->
-            Dict.empty
+            Grouped.byType []
 
 
 view : Model -> Html Msg

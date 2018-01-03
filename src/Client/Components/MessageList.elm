@@ -1,9 +1,9 @@
 module Client.Components.MessageList exposing (Model, Msg, init, subscriptions, update, view, withMessages)
 
-import Analyser.Messages.Types exposing (GroupedMessages, Message)
+import Analyser.Messages.Grouped as Grouped exposing (GroupedMessages)
+import Analyser.Messages.Types exposing (Message)
 import Client.Components.ActiveMessageDialog as ActiveMessageDialog
 import Client.Messages as M
-import Dict
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
 import Navigation exposing (Location)
@@ -47,7 +47,7 @@ update location msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ if Dict.isEmpty model.messages then
+        [ if Grouped.isEmpty model.messages then
             div [ class "alert alert-success" ] [ text "No messages" ]
           else
             M.viewAll Focus model.messages
