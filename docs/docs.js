@@ -8370,6 +8370,25 @@ var _elm_community$dict_extra$Dict_Extra$removeWhen = F2(
 				}),
 			dict);
 	});
+var _elm_community$dict_extra$Dict_Extra$frequencies = function (list) {
+	return A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (el, counter) {
+				return function (count) {
+					return A3(_elm_lang$core$Dict$insert, el, count, counter);
+				}(
+					function (count) {
+						return count + 1;
+					}(
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							0,
+							A2(_elm_lang$core$Dict$get, el, counter))));
+			}),
+		_elm_lang$core$Dict$empty,
+		list);
+};
 var _elm_community$dict_extra$Dict_Extra$fromListDedupeBy = F3(
 	function (combine, keyfn, xs) {
 		return A3(
@@ -22868,7 +22887,7 @@ var _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typedTypeAnnotation = _elm_comm
 				_elm_community$parser_combinators$Combine$maybe(
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace,
+						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
 						A2(_elm_community$parser_combinators$Combine$sepBy, _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotationNoFn)))));
 	});
 
@@ -33479,7 +33498,7 @@ var _user$project$Docs_MsgDoc$dropConcatOfLists = {
 var _user$project$Docs_MsgDoc$useConsOverConcat = {
 	info: function (_) {
 		return _.info;
-	}(_user$project$Analyser_Checks_DropConcatOfLists$checker),
+	}(_user$project$Analyser_Checks_UseConsOverConcat$checker),
 	example: _user$project$Docs_MsgDoc$Dynamic(_user$project$Analyser_Checks_UseConsOverConcat$checker),
 	input: '\nmodule Foo exposing (foo)\n\nfoo : List String\nfoo =\n    [ a ] ++ foo\n'
 };
@@ -33614,7 +33633,7 @@ var _user$project$Docs_MsgDoc$importAll = {
 		return _.info;
 	}(_user$project$Analyser_Checks_ImportAll$checker),
 	example: _user$project$Docs_MsgDoc$Dynamic(_user$project$Analyser_Checks_ImportAll$checker),
-	input: '\nmodule Foo exposing (bar)\n\nimport Html exposing (Html)\n\nfoo = text \"Hello world!\"\n'
+	input: '\nmodule Foo exposing (bar)\n\nimport Html exposing (..)\n\nfoo = text \"Hello world!\"\n'
 };
 var _user$project$Docs_MsgDoc$Fixed = function (a) {
 	return {ctor: 'Fixed', _0: a};

@@ -8306,6 +8306,25 @@ var _elm_community$dict_extra$Dict_Extra$removeWhen = F2(
 				}),
 			dict);
 	});
+var _elm_community$dict_extra$Dict_Extra$frequencies = function (list) {
+	return A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (el, counter) {
+				return function (count) {
+					return A3(_elm_lang$core$Dict$insert, el, count, counter);
+				}(
+					function (count) {
+						return count + 1;
+					}(
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							0,
+							A2(_elm_lang$core$Dict$get, el, counter))));
+			}),
+		_elm_lang$core$Dict$empty,
+		list);
+};
 var _elm_community$dict_extra$Dict_Extra$fromListDedupeBy = F3(
 	function (combine, keyfn, xs) {
 		return A3(
@@ -21738,7 +21757,7 @@ var _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typedTypeAnnotation = _elm_comm
 				_elm_community$parser_combinators$Combine$maybe(
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace,
+						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
 						A2(_elm_community$parser_combinators$Combine$sepBy, _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotationNoFn)))));
 	});
 
