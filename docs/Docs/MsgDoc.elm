@@ -35,6 +35,7 @@ import Analyser.Checks.UnusedTypeAlias
 import Analyser.Checks.UnusedVariable
 import Analyser.Checks.UseConsOverConcat
 import Analyser.Configuration as Configuration exposing (Configuration)
+import Analyser.FileContext as FileContext
 import Analyser.FileRef exposing (FileRef)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Json as J
@@ -746,7 +747,7 @@ getMessages input checker =
         |> Result.map
             (\rawFile ->
                 { interface = Interface.build rawFile
-                , moduleName = RawFile.moduleName rawFile
+                , moduleName = FileContext.moduleName rawFile
                 , ast = Processing.process Processing.init rawFile
                 , content = input
                 , file = { path = "./foo.elm", version = "" }

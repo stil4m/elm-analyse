@@ -31,7 +31,7 @@ build codeBase sources =
             FileContext.build codeBase sources
     in
     ( UnusedDependency.check codeBase files
-    , { projectModules = List.filterMap .moduleName files
+    , { projectModules = List.map .moduleName files
       , dependencies = List.concatMap edgesInFile files
       }
     )
@@ -39,14 +39,9 @@ build codeBase sources =
 
 edgesInFile : FileContext -> List ( List String, List String )
 edgesInFile file =
-    case file.moduleName of
-        Just moduleName ->
-            file.ast.imports
-                |> List.map .moduleName
-                |> List.map ((,) moduleName)
-
-        Nothing ->
-            []
+    file.ast.imports
+        |> List.map .moduleName
+        |> List.map ((,) file.moduleName)
 
 
 decode : JD.Decoder Modules

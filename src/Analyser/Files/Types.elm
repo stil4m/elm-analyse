@@ -30,7 +30,7 @@ type alias LoadedSourceFile =
 
 type alias LoadedFileData =
     { interface : Interface
-    , moduleName : Maybe AST.ModuleName
+    , moduleName : AST.ModuleName
     , ast : RawFile
     }
 

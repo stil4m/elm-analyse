@@ -2,6 +2,7 @@ module Analyser.Fixes.TestUtil exposing (testFix)
 
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration as Configuration
+import Analyser.FileContext as FileContext
 import Analyser.Fixes.Base exposing (Fixer, Patch(..))
 import Elm.Interface as Interface
 import Elm.Parser as Parser
@@ -17,7 +18,7 @@ analyseAndFix checker fixer input rawFile f =
     let
         fileContext =
             { interface = Interface.build rawFile
-            , moduleName = RawFile.moduleName rawFile
+            , moduleName = FileContext.moduleName rawFile
             , ast = f
             , content = input
             , file =
