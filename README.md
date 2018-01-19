@@ -89,4 +89,4 @@ The library is divided into the following main modules:
 * `Analyser.Messages.*`: All messages that can be produced and the supporting functions.
 * `Client.*`: Front-end code for running in 'server' mode.
 
-The code that represents the Elm syntax and the parsing is supported by the [elm-syntax](github.com/stil4m/elm-syntax) package.
+The code that represents the Elm syntax and the parsing is supported by the [elm-syntax](https://github.com/stil4m/elm-syntax) package.
