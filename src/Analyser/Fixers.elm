@@ -2,6 +2,7 @@ module Analyser.Fixers exposing (all, getFixer)
 
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.DropConsOfItemAndList as DropConsOfItemAndList
+import Analyser.Fixes.DuplicateImport as DuplicateImportFixer
 import Analyser.Fixes.MultiLineRecordFormatting as MultiLineRecordFormatting
 import Analyser.Fixes.UnformattedFile as UnformattedFileFixer
 import Analyser.Fixes.UnnecessaryParens as UnnecessaryParensFixer
@@ -30,4 +31,5 @@ all =
     , UnusedTypeAliasFixer.fixer
     , MultiLineRecordFormatting.fixer
     , DropConsOfItemAndList.fixer
+    , DuplicateImportFixer.fixer
     ]
