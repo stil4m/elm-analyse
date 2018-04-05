@@ -32,6 +32,7 @@ import Analyser.Checks.UnusedImportedVariable
 import Analyser.Checks.UnusedPatternVariable
 import Analyser.Checks.UnusedTopLevel
 import Analyser.Checks.UnusedTypeAlias
+import Analyser.Checks.UnusedValueConstructor
 import Analyser.Checks.UnusedVariable
 import Analyser.Checks.UseConsOverConcat
 import Analyser.Configuration as Configuration exposing (Configuration)
@@ -104,6 +105,7 @@ allMessages =
     , duplicateRecordFieldUpdate
     , triggerWords
     , mapNothingToNothing
+    , unusedValueConstructor
     ]
 
 
@@ -112,6 +114,23 @@ forKey x =
     allMessages
         |> List.filter (.info >> .key >> (==) x)
         |> List.head
+
+
+unusedValueConstructor : MsgDoc
+unusedValueConstructor =
+    { info = .info Analyser.Checks.UnusedValueConstructor.checker
+    , example = Dynamic Analyser.Checks.UnusedValueConstructor.checker
+    , input = """
+module Greet exposing (Color(Green))
+
+type Color
+    = Blue
+    | Red
+    | Green
+
+red = Red
+"""
+    }
 
 
 mapNothingToNothing : MsgDoc

@@ -31,6 +31,7 @@ import Analyser.Checks.UnusedImportedVariable as UnusedImportedVariable
 import Analyser.Checks.UnusedPatternVariable as UnusedPatternVariable
 import Analyser.Checks.UnusedTopLevel as UnusedTopLevel
 import Analyser.Checks.UnusedTypeAlias as UnusedTypeAlias
+import Analyser.Checks.UnusedValueConstructor as UnusedValueConstructor
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.UseConsOverConcat as UseConsOverConcat
 import Analyser.Messages.Schemas as Schemas exposing (Schemas)
@@ -44,6 +45,7 @@ schemas =
 all : List Checker
 all =
     [ UnusedVariable.checker
+    , UnusedValueConstructor.checker
     , UnusedImportedVariable.checker
     , UnusedPatternVariable.checker
     , UnusedTopLevel.checker
