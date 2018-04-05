@@ -7,9 +7,15 @@ import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
-import Elm.Syntax.Range as Syntax
+import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAnnotation exposing (RecordDefinition, TypeAnnotation(..))
+
+
+type alias Context =
+    { whitelisted : List Range
+    , matches : List ( Range, RecordDefinition )
+    }
 
 
 checker : Checker
@@ -26,12 +32,18 @@ checker =
     }
 
 
+realMatches : Context -> List ( Range, RecordDefinition )
+realMatches { matches, whitelisted } =
+    List.filter (\m -> not <| List.member (Tuple.first m) whitelisted) matches
+
+
 scan : FileContext -> Configuration -> List MessageData
 scan fileContext _ =
     Inspector.inspect
         { defaultConfig | onTypeAnnotation = Post onTypeAnnotation }
         fileContext.ast
-        []
+        { whitelisted = [], matches = [] }
+        |> realMatches
         |> List.filter (Tuple.second >> isSingleFieldRecord)
         |> List.map Tuple.first
         |> List.map
@@ -51,12 +63,35 @@ isSingleFieldRecord x =
     List.length x == 1
 
 
-onTypeAnnotation : Ranged TypeAnnotation -> List ( Syntax.Range, RecordDefinition ) -> List ( Syntax.Range, RecordDefinition )
-onTypeAnnotation x context =
-    findPlainRecords x ++ context
+onTypeAnnotation : Ranged TypeAnnotation -> Context -> Context
+onTypeAnnotation (( _, t ) as x) context =
+    let
+        newWhitelisted =
+            case t of
+                Typed _ _ ws ->
+                    ws
+                        |> List.filter
+                            (\( _, ta ) ->
+                                case ta of
+                                    Record _ ->
+                                        True
+
+                                    _ ->
+                                        False
+                            )
+                        |> List.map Tuple.first
+                        |> (++) context.whitelisted
+
+                _ ->
+                    context.whitelisted
+    in
+    { context
+        | matches = findPlainRecords x ++ context.matches
+        , whitelisted = context.whitelisted ++ newWhitelisted
+    }
 
 
-findPlainRecords : Ranged TypeAnnotation -> List ( Syntax.Range, RecordDefinition )
+findPlainRecords : Ranged TypeAnnotation -> List ( Range, RecordDefinition )
 findPlainRecords ( r, x ) =
     case x of
         Record fields ->
