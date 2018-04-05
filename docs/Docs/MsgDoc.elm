@@ -52,7 +52,6 @@ import Docs.Page as Page exposing (Page(Messages))
 import Elm.Interface as Interface
 import Elm.Parser
 import Elm.Processing as Processing
-import Elm.RawFile as RawFile
 import Html exposing (Html)
 import Html.Attributes as Html
 import Json.Encode

@@ -7,7 +7,7 @@ import Analyser.Files.Types exposing (LoadedFileData, LoadedSourceFile, Version)
 import Dict
 import Elm.Dependency exposing (Dependency)
 import Elm.Interface as Interface
-import Elm.RawFile as RawFile exposing (RawFile)
+import Elm.RawFile exposing (RawFile)
 import Result
 import Result.Extra as Result
 import Util.Logger as Logger
