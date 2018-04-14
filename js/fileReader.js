@@ -1,11 +1,10 @@
 // Reference the module
-const normalizeNewline = require('normalize-newline');
 const fs = require('fs');
 const cache = require('./util/cache');
 const sums = require('sums');
 
-module.exports = function(config) {
-    const formatService = require('./util/format-service')(config);
+module.exports = function() {
+
 
     function errorResponse(path) {
         return {
@@ -13,7 +12,6 @@ module.exports = function(config) {
             path: path,
             sha1: null,
             content: null,
-            formatted: false,
             ast: null
         };
     }
@@ -26,17 +24,12 @@ module.exports = function(config) {
                     return;
                 }
                 const originalContent = content.toString();
-                const normalized = normalizeNewline(originalContent);
-                const fullPath = cache.elmCachePathForSha(checksum);
-                fs.writeFileSync(fullPath, normalized);
-                const formatted = formatService(fullPath);
 
                 accept({
                     success: true,
                     path: path,
                     sha1: checksum,
-                    content: normalized,
-                    formatted: formatted,
+                    content: originalContent,
                     ast: null
                 });
             });
@@ -53,13 +46,11 @@ module.exports = function(config) {
                     const checksum = checkSumResult.sum;
 
                     if (cache.hasAstForSha(checksum)) {
-                        const fullPath = cache.elmCachePathForSha(checksum);
                         return {
                             success: true,
                             path: path,
                             sha1: checksum,
-                            content: fs.readFileSync(fullPath).toString(),
-                            formatted: formatService(fullPath),
+                            content: fs.readFileSync(real).toString(),
                             ast: cache.readAstForSha(checksum)
                         };
                     }

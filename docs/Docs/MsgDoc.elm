@@ -22,7 +22,6 @@ import Analyser.Checks.NonStaticRegex
 import Analyser.Checks.OverriddenVariables
 import Analyser.Checks.SingleFieldRecord
 import Analyser.Checks.TriggerWords
-import Analyser.Checks.UnformattedFile as UnformattedFile
 import Analyser.Checks.UnnecessaryListConcat
 import Analyser.Checks.UnnecessaryParens
 import Analyser.Checks.UnnecessaryPortModule
@@ -89,7 +88,6 @@ allMessages =
     , duplicateImportedVariable
     , duplicateImport
     , fileLoadFailed
-    , unformattedFile
     , booleanCase
     , debugCrash
     , debugLog
@@ -615,23 +613,6 @@ fileLoadFailed =
     }
 
 
-unformattedFile : MsgDoc
-unformattedFile =
-    { info = .info UnformattedFile.checker
-    , example = Dynamic UnformattedFile.checker
-    , input = """
-module Foo exposing (foo)
-
-helloWorld =
-        String.concat [
-        "Hello"
-        , " "
-    "World"
-    ]
-"""
-    }
-
-
 importAll : MsgDoc
 importAll =
     { info = .info Analyser.Checks.ImportAll.checker
@@ -769,7 +750,6 @@ getMessages input checker =
                 , ast = Processing.process Processing.init rawFile
                 , content = input
                 , file = { path = "./foo.elm", version = "" }
-                , formatted = False
                 }
             )
         |> Result.toMaybe

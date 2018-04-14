@@ -21,7 +21,6 @@ import Analyser.Checks.NonStaticRegex as NonStaticRegex
 import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Checks.SingleFieldRecord as SingleFieldRecord
 import Analyser.Checks.TriggerWords as TriggerWords
-import Analyser.Checks.UnformattedFile as UnformattedFile
 import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 import Analyser.Checks.UnnecessaryPortModule as UnnecessaryPortModule
@@ -71,7 +70,6 @@ all =
     , NonStaticRegex.checker
     , CoreArrayUsage.checker
     , FunctionInLet.checker
-    , UnformattedFile.checker
     , DuplicateRecordFieldUpdate.checker
     , SingleFieldRecord.checker
     , TriggerWords.checker
