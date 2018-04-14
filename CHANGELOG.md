@@ -1,5 +1,19 @@
 # elm-analyse changelog
 
+## 0.14.0 (2018-04-14)
+
+* [Issue #131](https://github.com/stil4m/elm-analyse/issues/131) New Check: Do not map `Nothing` to `Nothing`.
+* [Issue #130](https://github.com/stil4m/elm-analyse/issues/130) New Check: Do not use booleans in case-expressions.
+* [Issue #153](https://github.com/stil4m/elm-analyse/issues/153) New Check: Unused value constructor in module
+* [Issue #142](https://github.com/stil4m/elm-analyse/issues/142) Top importers / top importees sorting is mixed up. Thanks to @adeschamps.
+* [Issue #137](https://github.com/stil4m/elm-analyse/issues/137) Unit test for documentation
+* [Issue #141](https://github.com/stil4m/elm-analyse/issues/141) Eliminate duplication among fixers such as 'incompatible data'.
+* [Issue #147](https://github.com/stil4m/elm-analyse/issues/147) Remove deprecated dependency elm-css-frameworks. Thanks to @adeschamps.
+* [Issue #154](https://github.com/stil4m/elm-analyse/issues/154) Bug: False positives among single field records.
+* [Issue #156](https://github.com/stil4m/elm-analyse/issues/156) Bug: Multiline comments not parsable in front of expression
+* [PR #140](https://github.com/stil4m/elm-analyse/pull/140) Autofix: Cons of item and literal list. Thanks to @adeschamps.
+* [PR #138](https://github.com/stil4m/elm-analyse/pull/138) Autofix: Prefix operator without curry-ing it. Thanks to @adeschamps.
+
 ## 0.13.3 (2017-12-22)
 
 * [Issue #132](https://github.com/stil4m/elm-analyse/issues/132) Elm format service fails when output is no JSON or when no files are detected.
