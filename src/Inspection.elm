@@ -22,7 +22,7 @@ run codeBase includedSources configuration =
         failedMessages : List Message
         failedMessages =
             includedSources
-                |> List.filter (Tuple.second >> Result.Extra.isOk)
+                |> List.filter (Tuple.second >> Result.Extra.isOk >> not)
                 |> List.filterMap
                     (\( source, result ) ->
                         case result of
