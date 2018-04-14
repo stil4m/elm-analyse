@@ -6022,2055 +6022,6 @@ var _elm_lang$core$Json_Decode$bool = _elm_lang$core$Native_Json.decodePrimitive
 var _elm_lang$core$Json_Decode$string = _elm_lang$core$Native_Json.decodePrimitive('string');
 var _elm_lang$core$Json_Decode$Decoder = {ctor: 'Decoder'};
 
-var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
-var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
-
-var _elm_lang$virtual_dom$Native_VirtualDom = function() {
-
-var STYLE_KEY = 'STYLE';
-var EVENT_KEY = 'EVENT';
-var ATTR_KEY = 'ATTR';
-var ATTR_NS_KEY = 'ATTR_NS';
-
-var localDoc = typeof document !== 'undefined' ? document : {};
-
-
-////////////  VIRTUAL DOM NODES  ////////////
-
-
-function text(string)
-{
-	return {
-		type: 'text',
-		text: string
-	};
-}
-
-
-function node(tag)
-{
-	return F2(function(factList, kidList) {
-		return nodeHelp(tag, factList, kidList);
-	});
-}
-
-
-function nodeHelp(tag, factList, kidList)
-{
-	var organized = organizeFacts(factList);
-	var namespace = organized.namespace;
-	var facts = organized.facts;
-
-	var children = [];
-	var descendantsCount = 0;
-	while (kidList.ctor !== '[]')
-	{
-		var kid = kidList._0;
-		descendantsCount += (kid.descendantsCount || 0);
-		children.push(kid);
-		kidList = kidList._1;
-	}
-	descendantsCount += children.length;
-
-	return {
-		type: 'node',
-		tag: tag,
-		facts: facts,
-		children: children,
-		namespace: namespace,
-		descendantsCount: descendantsCount
-	};
-}
-
-
-function keyedNode(tag, factList, kidList)
-{
-	var organized = organizeFacts(factList);
-	var namespace = organized.namespace;
-	var facts = organized.facts;
-
-	var children = [];
-	var descendantsCount = 0;
-	while (kidList.ctor !== '[]')
-	{
-		var kid = kidList._0;
-		descendantsCount += (kid._1.descendantsCount || 0);
-		children.push(kid);
-		kidList = kidList._1;
-	}
-	descendantsCount += children.length;
-
-	return {
-		type: 'keyed-node',
-		tag: tag,
-		facts: facts,
-		children: children,
-		namespace: namespace,
-		descendantsCount: descendantsCount
-	};
-}
-
-
-function custom(factList, model, impl)
-{
-	var facts = organizeFacts(factList).facts;
-
-	return {
-		type: 'custom',
-		facts: facts,
-		model: model,
-		impl: impl
-	};
-}
-
-
-function map(tagger, node)
-{
-	return {
-		type: 'tagger',
-		tagger: tagger,
-		node: node,
-		descendantsCount: 1 + (node.descendantsCount || 0)
-	};
-}
-
-
-function thunk(func, args, thunk)
-{
-	return {
-		type: 'thunk',
-		func: func,
-		args: args,
-		thunk: thunk,
-		node: undefined
-	};
-}
-
-function lazy(fn, a)
-{
-	return thunk(fn, [a], function() {
-		return fn(a);
-	});
-}
-
-function lazy2(fn, a, b)
-{
-	return thunk(fn, [a,b], function() {
-		return A2(fn, a, b);
-	});
-}
-
-function lazy3(fn, a, b, c)
-{
-	return thunk(fn, [a,b,c], function() {
-		return A3(fn, a, b, c);
-	});
-}
-
-
-
-// FACTS
-
-
-function organizeFacts(factList)
-{
-	var namespace, facts = {};
-
-	while (factList.ctor !== '[]')
-	{
-		var entry = factList._0;
-		var key = entry.key;
-
-		if (key === ATTR_KEY || key === ATTR_NS_KEY || key === EVENT_KEY)
-		{
-			var subFacts = facts[key] || {};
-			subFacts[entry.realKey] = entry.value;
-			facts[key] = subFacts;
-		}
-		else if (key === STYLE_KEY)
-		{
-			var styles = facts[key] || {};
-			var styleList = entry.value;
-			while (styleList.ctor !== '[]')
-			{
-				var style = styleList._0;
-				styles[style._0] = style._1;
-				styleList = styleList._1;
-			}
-			facts[key] = styles;
-		}
-		else if (key === 'namespace')
-		{
-			namespace = entry.value;
-		}
-		else if (key === 'className')
-		{
-			var classes = facts[key];
-			facts[key] = typeof classes === 'undefined'
-				? entry.value
-				: classes + ' ' + entry.value;
-		}
- 		else
-		{
-			facts[key] = entry.value;
-		}
-		factList = factList._1;
-	}
-
-	return {
-		facts: facts,
-		namespace: namespace
-	};
-}
-
-
-
-////////////  PROPERTIES AND ATTRIBUTES  ////////////
-
-
-function style(value)
-{
-	return {
-		key: STYLE_KEY,
-		value: value
-	};
-}
-
-
-function property(key, value)
-{
-	return {
-		key: key,
-		value: value
-	};
-}
-
-
-function attribute(key, value)
-{
-	return {
-		key: ATTR_KEY,
-		realKey: key,
-		value: value
-	};
-}
-
-
-function attributeNS(namespace, key, value)
-{
-	return {
-		key: ATTR_NS_KEY,
-		realKey: key,
-		value: {
-			value: value,
-			namespace: namespace
-		}
-	};
-}
-
-
-function on(name, options, decoder)
-{
-	return {
-		key: EVENT_KEY,
-		realKey: name,
-		value: {
-			options: options,
-			decoder: decoder
-		}
-	};
-}
-
-
-function equalEvents(a, b)
-{
-	if (a.options !== b.options)
-	{
-		if (a.options.stopPropagation !== b.options.stopPropagation || a.options.preventDefault !== b.options.preventDefault)
-		{
-			return false;
-		}
-	}
-	return _elm_lang$core$Native_Json.equality(a.decoder, b.decoder);
-}
-
-
-function mapProperty(func, property)
-{
-	if (property.key !== EVENT_KEY)
-	{
-		return property;
-	}
-	return on(
-		property.realKey,
-		property.value.options,
-		A2(_elm_lang$core$Json_Decode$map, func, property.value.decoder)
-	);
-}
-
-
-////////////  RENDER  ////////////
-
-
-function render(vNode, eventNode)
-{
-	switch (vNode.type)
-	{
-		case 'thunk':
-			if (!vNode.node)
-			{
-				vNode.node = vNode.thunk();
-			}
-			return render(vNode.node, eventNode);
-
-		case 'tagger':
-			var subNode = vNode.node;
-			var tagger = vNode.tagger;
-
-			while (subNode.type === 'tagger')
-			{
-				typeof tagger !== 'object'
-					? tagger = [tagger, subNode.tagger]
-					: tagger.push(subNode.tagger);
-
-				subNode = subNode.node;
-			}
-
-			var subEventRoot = { tagger: tagger, parent: eventNode };
-			var domNode = render(subNode, subEventRoot);
-			domNode.elm_event_node_ref = subEventRoot;
-			return domNode;
-
-		case 'text':
-			return localDoc.createTextNode(vNode.text);
-
-		case 'node':
-			var domNode = vNode.namespace
-				? localDoc.createElementNS(vNode.namespace, vNode.tag)
-				: localDoc.createElement(vNode.tag);
-
-			applyFacts(domNode, eventNode, vNode.facts);
-
-			var children = vNode.children;
-
-			for (var i = 0; i < children.length; i++)
-			{
-				domNode.appendChild(render(children[i], eventNode));
-			}
-
-			return domNode;
-
-		case 'keyed-node':
-			var domNode = vNode.namespace
-				? localDoc.createElementNS(vNode.namespace, vNode.tag)
-				: localDoc.createElement(vNode.tag);
-
-			applyFacts(domNode, eventNode, vNode.facts);
-
-			var children = vNode.children;
-
-			for (var i = 0; i < children.length; i++)
-			{
-				domNode.appendChild(render(children[i]._1, eventNode));
-			}
-
-			return domNode;
-
-		case 'custom':
-			var domNode = vNode.impl.render(vNode.model);
-			applyFacts(domNode, eventNode, vNode.facts);
-			return domNode;
-	}
-}
-
-
-
-////////////  APPLY FACTS  ////////////
-
-
-function applyFacts(domNode, eventNode, facts)
-{
-	for (var key in facts)
-	{
-		var value = facts[key];
-
-		switch (key)
-		{
-			case STYLE_KEY:
-				applyStyles(domNode, value);
-				break;
-
-			case EVENT_KEY:
-				applyEvents(domNode, eventNode, value);
-				break;
-
-			case ATTR_KEY:
-				applyAttrs(domNode, value);
-				break;
-
-			case ATTR_NS_KEY:
-				applyAttrsNS(domNode, value);
-				break;
-
-			case 'value':
-				if (domNode[key] !== value)
-				{
-					domNode[key] = value;
-				}
-				break;
-
-			default:
-				domNode[key] = value;
-				break;
-		}
-	}
-}
-
-function applyStyles(domNode, styles)
-{
-	var domNodeStyle = domNode.style;
-
-	for (var key in styles)
-	{
-		domNodeStyle[key] = styles[key];
-	}
-}
-
-function applyEvents(domNode, eventNode, events)
-{
-	var allHandlers = domNode.elm_handlers || {};
-
-	for (var key in events)
-	{
-		var handler = allHandlers[key];
-		var value = events[key];
-
-		if (typeof value === 'undefined')
-		{
-			domNode.removeEventListener(key, handler);
-			allHandlers[key] = undefined;
-		}
-		else if (typeof handler === 'undefined')
-		{
-			var handler = makeEventHandler(eventNode, value);
-			domNode.addEventListener(key, handler);
-			allHandlers[key] = handler;
-		}
-		else
-		{
-			handler.info = value;
-		}
-	}
-
-	domNode.elm_handlers = allHandlers;
-}
-
-function makeEventHandler(eventNode, info)
-{
-	function eventHandler(event)
-	{
-		var info = eventHandler.info;
-
-		var value = A2(_elm_lang$core$Native_Json.run, info.decoder, event);
-
-		if (value.ctor === 'Ok')
-		{
-			var options = info.options;
-			if (options.stopPropagation)
-			{
-				event.stopPropagation();
-			}
-			if (options.preventDefault)
-			{
-				event.preventDefault();
-			}
-
-			var message = value._0;
-
-			var currentEventNode = eventNode;
-			while (currentEventNode)
-			{
-				var tagger = currentEventNode.tagger;
-				if (typeof tagger === 'function')
-				{
-					message = tagger(message);
-				}
-				else
-				{
-					for (var i = tagger.length; i--; )
-					{
-						message = tagger[i](message);
-					}
-				}
-				currentEventNode = currentEventNode.parent;
-			}
-		}
-	};
-
-	eventHandler.info = info;
-
-	return eventHandler;
-}
-
-function applyAttrs(domNode, attrs)
-{
-	for (var key in attrs)
-	{
-		var value = attrs[key];
-		if (typeof value === 'undefined')
-		{
-			domNode.removeAttribute(key);
-		}
-		else
-		{
-			domNode.setAttribute(key, value);
-		}
-	}
-}
-
-function applyAttrsNS(domNode, nsAttrs)
-{
-	for (var key in nsAttrs)
-	{
-		var pair = nsAttrs[key];
-		var namespace = pair.namespace;
-		var value = pair.value;
-
-		if (typeof value === 'undefined')
-		{
-			domNode.removeAttributeNS(namespace, key);
-		}
-		else
-		{
-			domNode.setAttributeNS(namespace, key, value);
-		}
-	}
-}
-
-
-
-////////////  DIFF  ////////////
-
-
-function diff(a, b)
-{
-	var patches = [];
-	diffHelp(a, b, patches, 0);
-	return patches;
-}
-
-
-function makePatch(type, index, data)
-{
-	return {
-		index: index,
-		type: type,
-		data: data,
-		domNode: undefined,
-		eventNode: undefined
-	};
-}
-
-
-function diffHelp(a, b, patches, index)
-{
-	if (a === b)
-	{
-		return;
-	}
-
-	var aType = a.type;
-	var bType = b.type;
-
-	// Bail if you run into different types of nodes. Implies that the
-	// structure has changed significantly and it's not worth a diff.
-	if (aType !== bType)
-	{
-		patches.push(makePatch('p-redraw', index, b));
-		return;
-	}
-
-	// Now we know that both nodes are the same type.
-	switch (bType)
-	{
-		case 'thunk':
-			var aArgs = a.args;
-			var bArgs = b.args;
-			var i = aArgs.length;
-			var same = a.func === b.func && i === bArgs.length;
-			while (same && i--)
-			{
-				same = aArgs[i] === bArgs[i];
-			}
-			if (same)
-			{
-				b.node = a.node;
-				return;
-			}
-			b.node = b.thunk();
-			var subPatches = [];
-			diffHelp(a.node, b.node, subPatches, 0);
-			if (subPatches.length > 0)
-			{
-				patches.push(makePatch('p-thunk', index, subPatches));
-			}
-			return;
-
-		case 'tagger':
-			// gather nested taggers
-			var aTaggers = a.tagger;
-			var bTaggers = b.tagger;
-			var nesting = false;
-
-			var aSubNode = a.node;
-			while (aSubNode.type === 'tagger')
-			{
-				nesting = true;
-
-				typeof aTaggers !== 'object'
-					? aTaggers = [aTaggers, aSubNode.tagger]
-					: aTaggers.push(aSubNode.tagger);
-
-				aSubNode = aSubNode.node;
-			}
-
-			var bSubNode = b.node;
-			while (bSubNode.type === 'tagger')
-			{
-				nesting = true;
-
-				typeof bTaggers !== 'object'
-					? bTaggers = [bTaggers, bSubNode.tagger]
-					: bTaggers.push(bSubNode.tagger);
-
-				bSubNode = bSubNode.node;
-			}
-
-			// Just bail if different numbers of taggers. This implies the
-			// structure of the virtual DOM has changed.
-			if (nesting && aTaggers.length !== bTaggers.length)
-			{
-				patches.push(makePatch('p-redraw', index, b));
-				return;
-			}
-
-			// check if taggers are "the same"
-			if (nesting ? !pairwiseRefEqual(aTaggers, bTaggers) : aTaggers !== bTaggers)
-			{
-				patches.push(makePatch('p-tagger', index, bTaggers));
-			}
-
-			// diff everything below the taggers
-			diffHelp(aSubNode, bSubNode, patches, index + 1);
-			return;
-
-		case 'text':
-			if (a.text !== b.text)
-			{
-				patches.push(makePatch('p-text', index, b.text));
-				return;
-			}
-
-			return;
-
-		case 'node':
-			// Bail if obvious indicators have changed. Implies more serious
-			// structural changes such that it's not worth it to diff.
-			if (a.tag !== b.tag || a.namespace !== b.namespace)
-			{
-				patches.push(makePatch('p-redraw', index, b));
-				return;
-			}
-
-			var factsDiff = diffFacts(a.facts, b.facts);
-
-			if (typeof factsDiff !== 'undefined')
-			{
-				patches.push(makePatch('p-facts', index, factsDiff));
-			}
-
-			diffChildren(a, b, patches, index);
-			return;
-
-		case 'keyed-node':
-			// Bail if obvious indicators have changed. Implies more serious
-			// structural changes such that it's not worth it to diff.
-			if (a.tag !== b.tag || a.namespace !== b.namespace)
-			{
-				patches.push(makePatch('p-redraw', index, b));
-				return;
-			}
-
-			var factsDiff = diffFacts(a.facts, b.facts);
-
-			if (typeof factsDiff !== 'undefined')
-			{
-				patches.push(makePatch('p-facts', index, factsDiff));
-			}
-
-			diffKeyedChildren(a, b, patches, index);
-			return;
-
-		case 'custom':
-			if (a.impl !== b.impl)
-			{
-				patches.push(makePatch('p-redraw', index, b));
-				return;
-			}
-
-			var factsDiff = diffFacts(a.facts, b.facts);
-			if (typeof factsDiff !== 'undefined')
-			{
-				patches.push(makePatch('p-facts', index, factsDiff));
-			}
-
-			var patch = b.impl.diff(a,b);
-			if (patch)
-			{
-				patches.push(makePatch('p-custom', index, patch));
-				return;
-			}
-
-			return;
-	}
-}
-
-
-// assumes the incoming arrays are the same length
-function pairwiseRefEqual(as, bs)
-{
-	for (var i = 0; i < as.length; i++)
-	{
-		if (as[i] !== bs[i])
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
-// TODO Instead of creating a new diff object, it's possible to just test if
-// there *is* a diff. During the actual patch, do the diff again and make the
-// modifications directly. This way, there's no new allocations. Worth it?
-function diffFacts(a, b, category)
-{
-	var diff;
-
-	// look for changes and removals
-	for (var aKey in a)
-	{
-		if (aKey === STYLE_KEY || aKey === EVENT_KEY || aKey === ATTR_KEY || aKey === ATTR_NS_KEY)
-		{
-			var subDiff = diffFacts(a[aKey], b[aKey] || {}, aKey);
-			if (subDiff)
-			{
-				diff = diff || {};
-				diff[aKey] = subDiff;
-			}
-			continue;
-		}
-
-		// remove if not in the new facts
-		if (!(aKey in b))
-		{
-			diff = diff || {};
-			diff[aKey] =
-				(typeof category === 'undefined')
-					? (typeof a[aKey] === 'string' ? '' : null)
-					:
-				(category === STYLE_KEY)
-					? ''
-					:
-				(category === EVENT_KEY || category === ATTR_KEY)
-					? undefined
-					:
-				{ namespace: a[aKey].namespace, value: undefined };
-
-			continue;
-		}
-
-		var aValue = a[aKey];
-		var bValue = b[aKey];
-
-		// reference equal, so don't worry about it
-		if (aValue === bValue && aKey !== 'value'
-			|| category === EVENT_KEY && equalEvents(aValue, bValue))
-		{
-			continue;
-		}
-
-		diff = diff || {};
-		diff[aKey] = bValue;
-	}
-
-	// add new stuff
-	for (var bKey in b)
-	{
-		if (!(bKey in a))
-		{
-			diff = diff || {};
-			diff[bKey] = b[bKey];
-		}
-	}
-
-	return diff;
-}
-
-
-function diffChildren(aParent, bParent, patches, rootIndex)
-{
-	var aChildren = aParent.children;
-	var bChildren = bParent.children;
-
-	var aLen = aChildren.length;
-	var bLen = bChildren.length;
-
-	// FIGURE OUT IF THERE ARE INSERTS OR REMOVALS
-
-	if (aLen > bLen)
-	{
-		patches.push(makePatch('p-remove-last', rootIndex, aLen - bLen));
-	}
-	else if (aLen < bLen)
-	{
-		patches.push(makePatch('p-append', rootIndex, bChildren.slice(aLen)));
-	}
-
-	// PAIRWISE DIFF EVERYTHING ELSE
-
-	var index = rootIndex;
-	var minLen = aLen < bLen ? aLen : bLen;
-	for (var i = 0; i < minLen; i++)
-	{
-		index++;
-		var aChild = aChildren[i];
-		diffHelp(aChild, bChildren[i], patches, index);
-		index += aChild.descendantsCount || 0;
-	}
-}
-
-
-
-////////////  KEYED DIFF  ////////////
-
-
-function diffKeyedChildren(aParent, bParent, patches, rootIndex)
-{
-	var localPatches = [];
-
-	var changes = {}; // Dict String Entry
-	var inserts = []; // Array { index : Int, entry : Entry }
-	// type Entry = { tag : String, vnode : VNode, index : Int, data : _ }
-
-	var aChildren = aParent.children;
-	var bChildren = bParent.children;
-	var aLen = aChildren.length;
-	var bLen = bChildren.length;
-	var aIndex = 0;
-	var bIndex = 0;
-
-	var index = rootIndex;
-
-	while (aIndex < aLen && bIndex < bLen)
-	{
-		var a = aChildren[aIndex];
-		var b = bChildren[bIndex];
-
-		var aKey = a._0;
-		var bKey = b._0;
-		var aNode = a._1;
-		var bNode = b._1;
-
-		// check if keys match
-
-		if (aKey === bKey)
-		{
-			index++;
-			diffHelp(aNode, bNode, localPatches, index);
-			index += aNode.descendantsCount || 0;
-
-			aIndex++;
-			bIndex++;
-			continue;
-		}
-
-		// look ahead 1 to detect insertions and removals.
-
-		var aLookAhead = aIndex + 1 < aLen;
-		var bLookAhead = bIndex + 1 < bLen;
-
-		if (aLookAhead)
-		{
-			var aNext = aChildren[aIndex + 1];
-			var aNextKey = aNext._0;
-			var aNextNode = aNext._1;
-			var oldMatch = bKey === aNextKey;
-		}
-
-		if (bLookAhead)
-		{
-			var bNext = bChildren[bIndex + 1];
-			var bNextKey = bNext._0;
-			var bNextNode = bNext._1;
-			var newMatch = aKey === bNextKey;
-		}
-
-
-		// swap a and b
-		if (aLookAhead && bLookAhead && newMatch && oldMatch)
-		{
-			index++;
-			diffHelp(aNode, bNextNode, localPatches, index);
-			insertNode(changes, localPatches, aKey, bNode, bIndex, inserts);
-			index += aNode.descendantsCount || 0;
-
-			index++;
-			removeNode(changes, localPatches, aKey, aNextNode, index);
-			index += aNextNode.descendantsCount || 0;
-
-			aIndex += 2;
-			bIndex += 2;
-			continue;
-		}
-
-		// insert b
-		if (bLookAhead && newMatch)
-		{
-			index++;
-			insertNode(changes, localPatches, bKey, bNode, bIndex, inserts);
-			diffHelp(aNode, bNextNode, localPatches, index);
-			index += aNode.descendantsCount || 0;
-
-			aIndex += 1;
-			bIndex += 2;
-			continue;
-		}
-
-		// remove a
-		if (aLookAhead && oldMatch)
-		{
-			index++;
-			removeNode(changes, localPatches, aKey, aNode, index);
-			index += aNode.descendantsCount || 0;
-
-			index++;
-			diffHelp(aNextNode, bNode, localPatches, index);
-			index += aNextNode.descendantsCount || 0;
-
-			aIndex += 2;
-			bIndex += 1;
-			continue;
-		}
-
-		// remove a, insert b
-		if (aLookAhead && bLookAhead && aNextKey === bNextKey)
-		{
-			index++;
-			removeNode(changes, localPatches, aKey, aNode, index);
-			insertNode(changes, localPatches, bKey, bNode, bIndex, inserts);
-			index += aNode.descendantsCount || 0;
-
-			index++;
-			diffHelp(aNextNode, bNextNode, localPatches, index);
-			index += aNextNode.descendantsCount || 0;
-
-			aIndex += 2;
-			bIndex += 2;
-			continue;
-		}
-
-		break;
-	}
-
-	// eat up any remaining nodes with removeNode and insertNode
-
-	while (aIndex < aLen)
-	{
-		index++;
-		var a = aChildren[aIndex];
-		var aNode = a._1;
-		removeNode(changes, localPatches, a._0, aNode, index);
-		index += aNode.descendantsCount || 0;
-		aIndex++;
-	}
-
-	var endInserts;
-	while (bIndex < bLen)
-	{
-		endInserts = endInserts || [];
-		var b = bChildren[bIndex];
-		insertNode(changes, localPatches, b._0, b._1, undefined, endInserts);
-		bIndex++;
-	}
-
-	if (localPatches.length > 0 || inserts.length > 0 || typeof endInserts !== 'undefined')
-	{
-		patches.push(makePatch('p-reorder', rootIndex, {
-			patches: localPatches,
-			inserts: inserts,
-			endInserts: endInserts
-		}));
-	}
-}
-
-
-
-////////////  CHANGES FROM KEYED DIFF  ////////////
-
-
-var POSTFIX = '_elmW6BL';
-
-
-function insertNode(changes, localPatches, key, vnode, bIndex, inserts)
-{
-	var entry = changes[key];
-
-	// never seen this key before
-	if (typeof entry === 'undefined')
-	{
-		entry = {
-			tag: 'insert',
-			vnode: vnode,
-			index: bIndex,
-			data: undefined
-		};
-
-		inserts.push({ index: bIndex, entry: entry });
-		changes[key] = entry;
-
-		return;
-	}
-
-	// this key was removed earlier, a match!
-	if (entry.tag === 'remove')
-	{
-		inserts.push({ index: bIndex, entry: entry });
-
-		entry.tag = 'move';
-		var subPatches = [];
-		diffHelp(entry.vnode, vnode, subPatches, entry.index);
-		entry.index = bIndex;
-		entry.data.data = {
-			patches: subPatches,
-			entry: entry
-		};
-
-		return;
-	}
-
-	// this key has already been inserted or moved, a duplicate!
-	insertNode(changes, localPatches, key + POSTFIX, vnode, bIndex, inserts);
-}
-
-
-function removeNode(changes, localPatches, key, vnode, index)
-{
-	var entry = changes[key];
-
-	// never seen this key before
-	if (typeof entry === 'undefined')
-	{
-		var patch = makePatch('p-remove', index, undefined);
-		localPatches.push(patch);
-
-		changes[key] = {
-			tag: 'remove',
-			vnode: vnode,
-			index: index,
-			data: patch
-		};
-
-		return;
-	}
-
-	// this key was inserted earlier, a match!
-	if (entry.tag === 'insert')
-	{
-		entry.tag = 'move';
-		var subPatches = [];
-		diffHelp(vnode, entry.vnode, subPatches, index);
-
-		var patch = makePatch('p-remove', index, {
-			patches: subPatches,
-			entry: entry
-		});
-		localPatches.push(patch);
-
-		return;
-	}
-
-	// this key has already been removed or moved, a duplicate!
-	removeNode(changes, localPatches, key + POSTFIX, vnode, index);
-}
-
-
-
-////////////  ADD DOM NODES  ////////////
-//
-// Each DOM node has an "index" assigned in order of traversal. It is important
-// to minimize our crawl over the actual DOM, so these indexes (along with the
-// descendantsCount of virtual nodes) let us skip touching entire subtrees of
-// the DOM if we know there are no patches there.
-
-
-function addDomNodes(domNode, vNode, patches, eventNode)
-{
-	addDomNodesHelp(domNode, vNode, patches, 0, 0, vNode.descendantsCount, eventNode);
-}
-
-
-// assumes `patches` is non-empty and indexes increase monotonically.
-function addDomNodesHelp(domNode, vNode, patches, i, low, high, eventNode)
-{
-	var patch = patches[i];
-	var index = patch.index;
-
-	while (index === low)
-	{
-		var patchType = patch.type;
-
-		if (patchType === 'p-thunk')
-		{
-			addDomNodes(domNode, vNode.node, patch.data, eventNode);
-		}
-		else if (patchType === 'p-reorder')
-		{
-			patch.domNode = domNode;
-			patch.eventNode = eventNode;
-
-			var subPatches = patch.data.patches;
-			if (subPatches.length > 0)
-			{
-				addDomNodesHelp(domNode, vNode, subPatches, 0, low, high, eventNode);
-			}
-		}
-		else if (patchType === 'p-remove')
-		{
-			patch.domNode = domNode;
-			patch.eventNode = eventNode;
-
-			var data = patch.data;
-			if (typeof data !== 'undefined')
-			{
-				data.entry.data = domNode;
-				var subPatches = data.patches;
-				if (subPatches.length > 0)
-				{
-					addDomNodesHelp(domNode, vNode, subPatches, 0, low, high, eventNode);
-				}
-			}
-		}
-		else
-		{
-			patch.domNode = domNode;
-			patch.eventNode = eventNode;
-		}
-
-		i++;
-
-		if (!(patch = patches[i]) || (index = patch.index) > high)
-		{
-			return i;
-		}
-	}
-
-	switch (vNode.type)
-	{
-		case 'tagger':
-			var subNode = vNode.node;
-
-			while (subNode.type === "tagger")
-			{
-				subNode = subNode.node;
-			}
-
-			return addDomNodesHelp(domNode, subNode, patches, i, low + 1, high, domNode.elm_event_node_ref);
-
-		case 'node':
-			var vChildren = vNode.children;
-			var childNodes = domNode.childNodes;
-			for (var j = 0; j < vChildren.length; j++)
-			{
-				low++;
-				var vChild = vChildren[j];
-				var nextLow = low + (vChild.descendantsCount || 0);
-				if (low <= index && index <= nextLow)
-				{
-					i = addDomNodesHelp(childNodes[j], vChild, patches, i, low, nextLow, eventNode);
-					if (!(patch = patches[i]) || (index = patch.index) > high)
-					{
-						return i;
-					}
-				}
-				low = nextLow;
-			}
-			return i;
-
-		case 'keyed-node':
-			var vChildren = vNode.children;
-			var childNodes = domNode.childNodes;
-			for (var j = 0; j < vChildren.length; j++)
-			{
-				low++;
-				var vChild = vChildren[j]._1;
-				var nextLow = low + (vChild.descendantsCount || 0);
-				if (low <= index && index <= nextLow)
-				{
-					i = addDomNodesHelp(childNodes[j], vChild, patches, i, low, nextLow, eventNode);
-					if (!(patch = patches[i]) || (index = patch.index) > high)
-					{
-						return i;
-					}
-				}
-				low = nextLow;
-			}
-			return i;
-
-		case 'text':
-		case 'thunk':
-			throw new Error('should never traverse `text` or `thunk` nodes like this');
-	}
-}
-
-
-
-////////////  APPLY PATCHES  ////////////
-
-
-function applyPatches(rootDomNode, oldVirtualNode, patches, eventNode)
-{
-	if (patches.length === 0)
-	{
-		return rootDomNode;
-	}
-
-	addDomNodes(rootDomNode, oldVirtualNode, patches, eventNode);
-	return applyPatchesHelp(rootDomNode, patches);
-}
-
-function applyPatchesHelp(rootDomNode, patches)
-{
-	for (var i = 0; i < patches.length; i++)
-	{
-		var patch = patches[i];
-		var localDomNode = patch.domNode
-		var newNode = applyPatch(localDomNode, patch);
-		if (localDomNode === rootDomNode)
-		{
-			rootDomNode = newNode;
-		}
-	}
-	return rootDomNode;
-}
-
-function applyPatch(domNode, patch)
-{
-	switch (patch.type)
-	{
-		case 'p-redraw':
-			return applyPatchRedraw(domNode, patch.data, patch.eventNode);
-
-		case 'p-facts':
-			applyFacts(domNode, patch.eventNode, patch.data);
-			return domNode;
-
-		case 'p-text':
-			domNode.replaceData(0, domNode.length, patch.data);
-			return domNode;
-
-		case 'p-thunk':
-			return applyPatchesHelp(domNode, patch.data);
-
-		case 'p-tagger':
-			if (typeof domNode.elm_event_node_ref !== 'undefined')
-			{
-				domNode.elm_event_node_ref.tagger = patch.data;
-			}
-			else
-			{
-				domNode.elm_event_node_ref = { tagger: patch.data, parent: patch.eventNode };
-			}
-			return domNode;
-
-		case 'p-remove-last':
-			var i = patch.data;
-			while (i--)
-			{
-				domNode.removeChild(domNode.lastChild);
-			}
-			return domNode;
-
-		case 'p-append':
-			var newNodes = patch.data;
-			for (var i = 0; i < newNodes.length; i++)
-			{
-				domNode.appendChild(render(newNodes[i], patch.eventNode));
-			}
-			return domNode;
-
-		case 'p-remove':
-			var data = patch.data;
-			if (typeof data === 'undefined')
-			{
-				domNode.parentNode.removeChild(domNode);
-				return domNode;
-			}
-			var entry = data.entry;
-			if (typeof entry.index !== 'undefined')
-			{
-				domNode.parentNode.removeChild(domNode);
-			}
-			entry.data = applyPatchesHelp(domNode, data.patches);
-			return domNode;
-
-		case 'p-reorder':
-			return applyPatchReorder(domNode, patch);
-
-		case 'p-custom':
-			var impl = patch.data;
-			return impl.applyPatch(domNode, impl.data);
-
-		default:
-			throw new Error('Ran into an unknown patch!');
-	}
-}
-
-
-function applyPatchRedraw(domNode, vNode, eventNode)
-{
-	var parentNode = domNode.parentNode;
-	var newNode = render(vNode, eventNode);
-
-	if (typeof newNode.elm_event_node_ref === 'undefined')
-	{
-		newNode.elm_event_node_ref = domNode.elm_event_node_ref;
-	}
-
-	if (parentNode && newNode !== domNode)
-	{
-		parentNode.replaceChild(newNode, domNode);
-	}
-	return newNode;
-}
-
-
-function applyPatchReorder(domNode, patch)
-{
-	var data = patch.data;
-
-	// remove end inserts
-	var frag = applyPatchReorderEndInsertsHelp(data.endInserts, patch);
-
-	// removals
-	domNode = applyPatchesHelp(domNode, data.patches);
-
-	// inserts
-	var inserts = data.inserts;
-	for (var i = 0; i < inserts.length; i++)
-	{
-		var insert = inserts[i];
-		var entry = insert.entry;
-		var node = entry.tag === 'move'
-			? entry.data
-			: render(entry.vnode, patch.eventNode);
-		domNode.insertBefore(node, domNode.childNodes[insert.index]);
-	}
-
-	// add end inserts
-	if (typeof frag !== 'undefined')
-	{
-		domNode.appendChild(frag);
-	}
-
-	return domNode;
-}
-
-
-function applyPatchReorderEndInsertsHelp(endInserts, patch)
-{
-	if (typeof endInserts === 'undefined')
-	{
-		return;
-	}
-
-	var frag = localDoc.createDocumentFragment();
-	for (var i = 0; i < endInserts.length; i++)
-	{
-		var insert = endInserts[i];
-		var entry = insert.entry;
-		frag.appendChild(entry.tag === 'move'
-			? entry.data
-			: render(entry.vnode, patch.eventNode)
-		);
-	}
-	return frag;
-}
-
-
-// PROGRAMS
-
-var program = makeProgram(checkNoFlags);
-var programWithFlags = makeProgram(checkYesFlags);
-
-function makeProgram(flagChecker)
-{
-	return F2(function(debugWrap, impl)
-	{
-		return function(flagDecoder)
-		{
-			return function(object, moduleName, debugMetadata)
-			{
-				var checker = flagChecker(flagDecoder, moduleName);
-				if (typeof debugMetadata === 'undefined')
-				{
-					normalSetup(impl, object, moduleName, checker);
-				}
-				else
-				{
-					debugSetup(A2(debugWrap, debugMetadata, impl), object, moduleName, checker);
-				}
-			};
-		};
-	});
-}
-
-function staticProgram(vNode)
-{
-	var nothing = _elm_lang$core$Native_Utils.Tuple2(
-		_elm_lang$core$Native_Utils.Tuple0,
-		_elm_lang$core$Platform_Cmd$none
-	);
-	return A2(program, _elm_lang$virtual_dom$VirtualDom_Debug$wrap, {
-		init: nothing,
-		view: function() { return vNode; },
-		update: F2(function() { return nothing; }),
-		subscriptions: function() { return _elm_lang$core$Platform_Sub$none; }
-	})();
-}
-
-
-// FLAG CHECKERS
-
-function checkNoFlags(flagDecoder, moduleName)
-{
-	return function(init, flags, domNode)
-	{
-		if (typeof flags === 'undefined')
-		{
-			return init;
-		}
-
-		var errorMessage =
-			'The `' + moduleName + '` module does not need flags.\n'
-			+ 'Initialize it with no arguments and you should be all set!';
-
-		crash(errorMessage, domNode);
-	};
-}
-
-function checkYesFlags(flagDecoder, moduleName)
-{
-	return function(init, flags, domNode)
-	{
-		if (typeof flagDecoder === 'undefined')
-		{
-			var errorMessage =
-				'Are you trying to sneak a Never value into Elm? Trickster!\n'
-				+ 'It looks like ' + moduleName + '.main is defined with `programWithFlags` but has type `Program Never`.\n'
-				+ 'Use `program` instead if you do not want flags.'
-
-			crash(errorMessage, domNode);
-		}
-
-		var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
-		if (result.ctor === 'Ok')
-		{
-			return init(result._0);
-		}
-
-		var errorMessage =
-			'Trying to initialize the `' + moduleName + '` module with an unexpected flag.\n'
-			+ 'I tried to convert it to an Elm value, but ran into this problem:\n\n'
-			+ result._0;
-
-		crash(errorMessage, domNode);
-	};
-}
-
-function crash(errorMessage, domNode)
-{
-	if (domNode)
-	{
-		domNode.innerHTML =
-			'<div style="padding-left:1em;">'
-			+ '<h2 style="font-weight:normal;"><b>Oops!</b> Something went wrong when starting your Elm program.</h2>'
-			+ '<pre style="padding-left:1em;">' + errorMessage + '</pre>'
-			+ '</div>';
-	}
-
-	throw new Error(errorMessage);
-}
-
-
-//  NORMAL SETUP
-
-function normalSetup(impl, object, moduleName, flagChecker)
-{
-	object['embed'] = function embed(node, flags)
-	{
-		while (node.lastChild)
-		{
-			node.removeChild(node.lastChild);
-		}
-
-		return _elm_lang$core$Native_Platform.initialize(
-			flagChecker(impl.init, flags, node),
-			impl.update,
-			impl.subscriptions,
-			normalRenderer(node, impl.view)
-		);
-	};
-
-	object['fullscreen'] = function fullscreen(flags)
-	{
-		return _elm_lang$core$Native_Platform.initialize(
-			flagChecker(impl.init, flags, document.body),
-			impl.update,
-			impl.subscriptions,
-			normalRenderer(document.body, impl.view)
-		);
-	};
-}
-
-function normalRenderer(parentNode, view)
-{
-	return function(tagger, initialModel)
-	{
-		var eventNode = { tagger: tagger, parent: undefined };
-		var initialVirtualNode = view(initialModel);
-		var domNode = render(initialVirtualNode, eventNode);
-		parentNode.appendChild(domNode);
-		return makeStepper(domNode, view, initialVirtualNode, eventNode);
-	};
-}
-
-
-// STEPPER
-
-var rAF =
-	typeof requestAnimationFrame !== 'undefined'
-		? requestAnimationFrame
-		: function(callback) { setTimeout(callback, 1000 / 60); };
-
-function makeStepper(domNode, view, initialVirtualNode, eventNode)
-{
-	var state = 'NO_REQUEST';
-	var currNode = initialVirtualNode;
-	var nextModel;
-
-	function updateIfNeeded()
-	{
-		switch (state)
-		{
-			case 'NO_REQUEST':
-				throw new Error(
-					'Unexpected draw callback.\n' +
-					'Please report this to <https://github.com/elm-lang/virtual-dom/issues>.'
-				);
-
-			case 'PENDING_REQUEST':
-				rAF(updateIfNeeded);
-				state = 'EXTRA_REQUEST';
-
-				var nextNode = view(nextModel);
-				var patches = diff(currNode, nextNode);
-				domNode = applyPatches(domNode, currNode, patches, eventNode);
-				currNode = nextNode;
-
-				return;
-
-			case 'EXTRA_REQUEST':
-				state = 'NO_REQUEST';
-				return;
-		}
-	}
-
-	return function stepper(model)
-	{
-		if (state === 'NO_REQUEST')
-		{
-			rAF(updateIfNeeded);
-		}
-		state = 'PENDING_REQUEST';
-		nextModel = model;
-	};
-}
-
-
-// DEBUG SETUP
-
-function debugSetup(impl, object, moduleName, flagChecker)
-{
-	object['fullscreen'] = function fullscreen(flags)
-	{
-		var popoutRef = { doc: undefined };
-		return _elm_lang$core$Native_Platform.initialize(
-			flagChecker(impl.init, flags, document.body),
-			impl.update(scrollTask(popoutRef)),
-			impl.subscriptions,
-			debugRenderer(moduleName, document.body, popoutRef, impl.view, impl.viewIn, impl.viewOut)
-		);
-	};
-
-	object['embed'] = function fullscreen(node, flags)
-	{
-		var popoutRef = { doc: undefined };
-		return _elm_lang$core$Native_Platform.initialize(
-			flagChecker(impl.init, flags, node),
-			impl.update(scrollTask(popoutRef)),
-			impl.subscriptions,
-			debugRenderer(moduleName, node, popoutRef, impl.view, impl.viewIn, impl.viewOut)
-		);
-	};
-}
-
-function scrollTask(popoutRef)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		var doc = popoutRef.doc;
-		if (doc)
-		{
-			var msgs = doc.getElementsByClassName('debugger-sidebar-messages')[0];
-			if (msgs)
-			{
-				msgs.scrollTop = msgs.scrollHeight;
-			}
-		}
-		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
-	});
-}
-
-
-function debugRenderer(moduleName, parentNode, popoutRef, view, viewIn, viewOut)
-{
-	return function(tagger, initialModel)
-	{
-		var appEventNode = { tagger: tagger, parent: undefined };
-		var eventNode = { tagger: tagger, parent: undefined };
-
-		// make normal stepper
-		var appVirtualNode = view(initialModel);
-		var appNode = render(appVirtualNode, appEventNode);
-		parentNode.appendChild(appNode);
-		var appStepper = makeStepper(appNode, view, appVirtualNode, appEventNode);
-
-		// make overlay stepper
-		var overVirtualNode = viewIn(initialModel)._1;
-		var overNode = render(overVirtualNode, eventNode);
-		parentNode.appendChild(overNode);
-		var wrappedViewIn = wrapViewIn(appEventNode, overNode, viewIn);
-		var overStepper = makeStepper(overNode, wrappedViewIn, overVirtualNode, eventNode);
-
-		// make debugger stepper
-		var debugStepper = makeDebugStepper(initialModel, viewOut, eventNode, parentNode, moduleName, popoutRef);
-
-		return function stepper(model)
-		{
-			appStepper(model);
-			overStepper(model);
-			debugStepper(model);
-		}
-	};
-}
-
-function makeDebugStepper(initialModel, view, eventNode, parentNode, moduleName, popoutRef)
-{
-	var curr;
-	var domNode;
-
-	return function stepper(model)
-	{
-		if (!model.isDebuggerOpen)
-		{
-			return;
-		}
-
-		if (!popoutRef.doc)
-		{
-			curr = view(model);
-			domNode = openDebugWindow(moduleName, popoutRef, curr, eventNode);
-			return;
-		}
-
-		// switch to document of popout
-		localDoc = popoutRef.doc;
-
-		var next = view(model);
-		var patches = diff(curr, next);
-		domNode = applyPatches(domNode, curr, patches, eventNode);
-		curr = next;
-
-		// switch back to normal document
-		localDoc = document;
-	};
-}
-
-function openDebugWindow(moduleName, popoutRef, virtualNode, eventNode)
-{
-	var w = 900;
-	var h = 360;
-	var x = screen.width - w;
-	var y = screen.height - h;
-	var debugWindow = window.open('', '', 'width=' + w + ',height=' + h + ',left=' + x + ',top=' + y);
-
-	// switch to window document
-	localDoc = debugWindow.document;
-
-	popoutRef.doc = localDoc;
-	localDoc.title = 'Debugger - ' + moduleName;
-	localDoc.body.style.margin = '0';
-	localDoc.body.style.padding = '0';
-	var domNode = render(virtualNode, eventNode);
-	localDoc.body.appendChild(domNode);
-
-	localDoc.addEventListener('keydown', function(event) {
-		if (event.metaKey && event.which === 82)
-		{
-			window.location.reload();
-		}
-		if (event.which === 38)
-		{
-			eventNode.tagger({ ctor: 'Up' });
-			event.preventDefault();
-		}
-		if (event.which === 40)
-		{
-			eventNode.tagger({ ctor: 'Down' });
-			event.preventDefault();
-		}
-	});
-
-	function close()
-	{
-		popoutRef.doc = undefined;
-		debugWindow.close();
-	}
-	window.addEventListener('unload', close);
-	debugWindow.addEventListener('unload', function() {
-		popoutRef.doc = undefined;
-		window.removeEventListener('unload', close);
-		eventNode.tagger({ ctor: 'Close' });
-	});
-
-	// switch back to the normal document
-	localDoc = document;
-
-	return domNode;
-}
-
-
-// BLOCK EVENTS
-
-function wrapViewIn(appEventNode, overlayNode, viewIn)
-{
-	var ignorer = makeIgnorer(overlayNode);
-	var blocking = 'Normal';
-	var overflow;
-
-	var normalTagger = appEventNode.tagger;
-	var blockTagger = function() {};
-
-	return function(model)
-	{
-		var tuple = viewIn(model);
-		var newBlocking = tuple._0.ctor;
-		appEventNode.tagger = newBlocking === 'Normal' ? normalTagger : blockTagger;
-		if (blocking !== newBlocking)
-		{
-			traverse('removeEventListener', ignorer, blocking);
-			traverse('addEventListener', ignorer, newBlocking);
-
-			if (blocking === 'Normal')
-			{
-				overflow = document.body.style.overflow;
-				document.body.style.overflow = 'hidden';
-			}
-
-			if (newBlocking === 'Normal')
-			{
-				document.body.style.overflow = overflow;
-			}
-
-			blocking = newBlocking;
-		}
-		return tuple._1;
-	}
-}
-
-function traverse(verbEventListener, ignorer, blocking)
-{
-	switch(blocking)
-	{
-		case 'Normal':
-			return;
-
-		case 'Pause':
-			return traverseHelp(verbEventListener, ignorer, mostEvents);
-
-		case 'Message':
-			return traverseHelp(verbEventListener, ignorer, allEvents);
-	}
-}
-
-function traverseHelp(verbEventListener, handler, eventNames)
-{
-	for (var i = 0; i < eventNames.length; i++)
-	{
-		document.body[verbEventListener](eventNames[i], handler, true);
-	}
-}
-
-function makeIgnorer(overlayNode)
-{
-	return function(event)
-	{
-		if (event.type === 'keydown' && event.metaKey && event.which === 82)
-		{
-			return;
-		}
-
-		var isScroll = event.type === 'scroll' || event.type === 'wheel';
-
-		var node = event.target;
-		while (node !== null)
-		{
-			if (node.className === 'elm-overlay-message-details' && isScroll)
-			{
-				return;
-			}
-
-			if (node === overlayNode && !isScroll)
-			{
-				return;
-			}
-			node = node.parentNode;
-		}
-
-		event.stopPropagation();
-		event.preventDefault();
-	}
-}
-
-var mostEvents = [
-	'click', 'dblclick', 'mousemove',
-	'mouseup', 'mousedown', 'mouseenter', 'mouseleave',
-	'touchstart', 'touchend', 'touchcancel', 'touchmove',
-	'pointerdown', 'pointerup', 'pointerover', 'pointerout',
-	'pointerenter', 'pointerleave', 'pointermove', 'pointercancel',
-	'dragstart', 'drag', 'dragend', 'dragenter', 'dragover', 'dragleave', 'drop',
-	'keyup', 'keydown', 'keypress',
-	'input', 'change',
-	'focus', 'blur'
-];
-
-var allEvents = mostEvents.concat('wheel', 'scroll');
-
-
-return {
-	node: node,
-	text: text,
-	custom: custom,
-	map: F2(map),
-
-	on: F3(on),
-	style: style,
-	property: F2(property),
-	attribute: F2(attribute),
-	attributeNS: F3(attributeNS),
-	mapProperty: F2(mapProperty),
-
-	lazy: F2(lazy),
-	lazy2: F3(lazy2),
-	lazy3: F4(lazy3),
-	keyedNode: F3(keyedNode),
-
-	program: program,
-	programWithFlags: programWithFlags,
-	staticProgram: staticProgram
-};
-
-}();
-
-var _elm_lang$virtual_dom$VirtualDom$programWithFlags = function (impl) {
-	return A2(_elm_lang$virtual_dom$Native_VirtualDom.programWithFlags, _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags, impl);
-};
-var _elm_lang$virtual_dom$VirtualDom$program = function (impl) {
-	return A2(_elm_lang$virtual_dom$Native_VirtualDom.program, _elm_lang$virtual_dom$VirtualDom_Debug$wrap, impl);
-};
-var _elm_lang$virtual_dom$VirtualDom$keyedNode = _elm_lang$virtual_dom$Native_VirtualDom.keyedNode;
-var _elm_lang$virtual_dom$VirtualDom$lazy3 = _elm_lang$virtual_dom$Native_VirtualDom.lazy3;
-var _elm_lang$virtual_dom$VirtualDom$lazy2 = _elm_lang$virtual_dom$Native_VirtualDom.lazy2;
-var _elm_lang$virtual_dom$VirtualDom$lazy = _elm_lang$virtual_dom$Native_VirtualDom.lazy;
-var _elm_lang$virtual_dom$VirtualDom$defaultOptions = {stopPropagation: false, preventDefault: false};
-var _elm_lang$virtual_dom$VirtualDom$onWithOptions = _elm_lang$virtual_dom$Native_VirtualDom.on;
-var _elm_lang$virtual_dom$VirtualDom$on = F2(
-	function (eventName, decoder) {
-		return A3(_elm_lang$virtual_dom$VirtualDom$onWithOptions, eventName, _elm_lang$virtual_dom$VirtualDom$defaultOptions, decoder);
-	});
-var _elm_lang$virtual_dom$VirtualDom$style = _elm_lang$virtual_dom$Native_VirtualDom.style;
-var _elm_lang$virtual_dom$VirtualDom$mapProperty = _elm_lang$virtual_dom$Native_VirtualDom.mapProperty;
-var _elm_lang$virtual_dom$VirtualDom$attributeNS = _elm_lang$virtual_dom$Native_VirtualDom.attributeNS;
-var _elm_lang$virtual_dom$VirtualDom$attribute = _elm_lang$virtual_dom$Native_VirtualDom.attribute;
-var _elm_lang$virtual_dom$VirtualDom$property = _elm_lang$virtual_dom$Native_VirtualDom.property;
-var _elm_lang$virtual_dom$VirtualDom$map = _elm_lang$virtual_dom$Native_VirtualDom.map;
-var _elm_lang$virtual_dom$VirtualDom$text = _elm_lang$virtual_dom$Native_VirtualDom.text;
-var _elm_lang$virtual_dom$VirtualDom$node = _elm_lang$virtual_dom$Native_VirtualDom.node;
-var _elm_lang$virtual_dom$VirtualDom$Options = F2(
-	function (a, b) {
-		return {stopPropagation: a, preventDefault: b};
-	});
-var _elm_lang$virtual_dom$VirtualDom$Node = {ctor: 'Node'};
-var _elm_lang$virtual_dom$VirtualDom$Property = {ctor: 'Property'};
-
-var _elm_lang$html$Html$programWithFlags = _elm_lang$virtual_dom$VirtualDom$programWithFlags;
-var _elm_lang$html$Html$program = _elm_lang$virtual_dom$VirtualDom$program;
-var _elm_lang$html$Html$beginnerProgram = function (_p0) {
-	var _p1 = _p0;
-	return _elm_lang$html$Html$program(
-		{
-			init: A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
-				_p1.model,
-				{ctor: '[]'}),
-			update: F2(
-				function (msg, model) {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						A2(_p1.update, msg, model),
-						{ctor: '[]'});
-				}),
-			view: _p1.view,
-			subscriptions: function (_p2) {
-				return _elm_lang$core$Platform_Sub$none;
-			}
-		});
-};
-var _elm_lang$html$Html$map = _elm_lang$virtual_dom$VirtualDom$map;
-var _elm_lang$html$Html$text = _elm_lang$virtual_dom$VirtualDom$text;
-var _elm_lang$html$Html$node = _elm_lang$virtual_dom$VirtualDom$node;
-var _elm_lang$html$Html$body = _elm_lang$html$Html$node('body');
-var _elm_lang$html$Html$section = _elm_lang$html$Html$node('section');
-var _elm_lang$html$Html$nav = _elm_lang$html$Html$node('nav');
-var _elm_lang$html$Html$article = _elm_lang$html$Html$node('article');
-var _elm_lang$html$Html$aside = _elm_lang$html$Html$node('aside');
-var _elm_lang$html$Html$h1 = _elm_lang$html$Html$node('h1');
-var _elm_lang$html$Html$h2 = _elm_lang$html$Html$node('h2');
-var _elm_lang$html$Html$h3 = _elm_lang$html$Html$node('h3');
-var _elm_lang$html$Html$h4 = _elm_lang$html$Html$node('h4');
-var _elm_lang$html$Html$h5 = _elm_lang$html$Html$node('h5');
-var _elm_lang$html$Html$h6 = _elm_lang$html$Html$node('h6');
-var _elm_lang$html$Html$header = _elm_lang$html$Html$node('header');
-var _elm_lang$html$Html$footer = _elm_lang$html$Html$node('footer');
-var _elm_lang$html$Html$address = _elm_lang$html$Html$node('address');
-var _elm_lang$html$Html$main_ = _elm_lang$html$Html$node('main');
-var _elm_lang$html$Html$p = _elm_lang$html$Html$node('p');
-var _elm_lang$html$Html$hr = _elm_lang$html$Html$node('hr');
-var _elm_lang$html$Html$pre = _elm_lang$html$Html$node('pre');
-var _elm_lang$html$Html$blockquote = _elm_lang$html$Html$node('blockquote');
-var _elm_lang$html$Html$ol = _elm_lang$html$Html$node('ol');
-var _elm_lang$html$Html$ul = _elm_lang$html$Html$node('ul');
-var _elm_lang$html$Html$li = _elm_lang$html$Html$node('li');
-var _elm_lang$html$Html$dl = _elm_lang$html$Html$node('dl');
-var _elm_lang$html$Html$dt = _elm_lang$html$Html$node('dt');
-var _elm_lang$html$Html$dd = _elm_lang$html$Html$node('dd');
-var _elm_lang$html$Html$figure = _elm_lang$html$Html$node('figure');
-var _elm_lang$html$Html$figcaption = _elm_lang$html$Html$node('figcaption');
-var _elm_lang$html$Html$div = _elm_lang$html$Html$node('div');
-var _elm_lang$html$Html$a = _elm_lang$html$Html$node('a');
-var _elm_lang$html$Html$em = _elm_lang$html$Html$node('em');
-var _elm_lang$html$Html$strong = _elm_lang$html$Html$node('strong');
-var _elm_lang$html$Html$small = _elm_lang$html$Html$node('small');
-var _elm_lang$html$Html$s = _elm_lang$html$Html$node('s');
-var _elm_lang$html$Html$cite = _elm_lang$html$Html$node('cite');
-var _elm_lang$html$Html$q = _elm_lang$html$Html$node('q');
-var _elm_lang$html$Html$dfn = _elm_lang$html$Html$node('dfn');
-var _elm_lang$html$Html$abbr = _elm_lang$html$Html$node('abbr');
-var _elm_lang$html$Html$time = _elm_lang$html$Html$node('time');
-var _elm_lang$html$Html$code = _elm_lang$html$Html$node('code');
-var _elm_lang$html$Html$var = _elm_lang$html$Html$node('var');
-var _elm_lang$html$Html$samp = _elm_lang$html$Html$node('samp');
-var _elm_lang$html$Html$kbd = _elm_lang$html$Html$node('kbd');
-var _elm_lang$html$Html$sub = _elm_lang$html$Html$node('sub');
-var _elm_lang$html$Html$sup = _elm_lang$html$Html$node('sup');
-var _elm_lang$html$Html$i = _elm_lang$html$Html$node('i');
-var _elm_lang$html$Html$b = _elm_lang$html$Html$node('b');
-var _elm_lang$html$Html$u = _elm_lang$html$Html$node('u');
-var _elm_lang$html$Html$mark = _elm_lang$html$Html$node('mark');
-var _elm_lang$html$Html$ruby = _elm_lang$html$Html$node('ruby');
-var _elm_lang$html$Html$rt = _elm_lang$html$Html$node('rt');
-var _elm_lang$html$Html$rp = _elm_lang$html$Html$node('rp');
-var _elm_lang$html$Html$bdi = _elm_lang$html$Html$node('bdi');
-var _elm_lang$html$Html$bdo = _elm_lang$html$Html$node('bdo');
-var _elm_lang$html$Html$span = _elm_lang$html$Html$node('span');
-var _elm_lang$html$Html$br = _elm_lang$html$Html$node('br');
-var _elm_lang$html$Html$wbr = _elm_lang$html$Html$node('wbr');
-var _elm_lang$html$Html$ins = _elm_lang$html$Html$node('ins');
-var _elm_lang$html$Html$del = _elm_lang$html$Html$node('del');
-var _elm_lang$html$Html$img = _elm_lang$html$Html$node('img');
-var _elm_lang$html$Html$iframe = _elm_lang$html$Html$node('iframe');
-var _elm_lang$html$Html$embed = _elm_lang$html$Html$node('embed');
-var _elm_lang$html$Html$object = _elm_lang$html$Html$node('object');
-var _elm_lang$html$Html$param = _elm_lang$html$Html$node('param');
-var _elm_lang$html$Html$video = _elm_lang$html$Html$node('video');
-var _elm_lang$html$Html$audio = _elm_lang$html$Html$node('audio');
-var _elm_lang$html$Html$source = _elm_lang$html$Html$node('source');
-var _elm_lang$html$Html$track = _elm_lang$html$Html$node('track');
-var _elm_lang$html$Html$canvas = _elm_lang$html$Html$node('canvas');
-var _elm_lang$html$Html$math = _elm_lang$html$Html$node('math');
-var _elm_lang$html$Html$table = _elm_lang$html$Html$node('table');
-var _elm_lang$html$Html$caption = _elm_lang$html$Html$node('caption');
-var _elm_lang$html$Html$colgroup = _elm_lang$html$Html$node('colgroup');
-var _elm_lang$html$Html$col = _elm_lang$html$Html$node('col');
-var _elm_lang$html$Html$tbody = _elm_lang$html$Html$node('tbody');
-var _elm_lang$html$Html$thead = _elm_lang$html$Html$node('thead');
-var _elm_lang$html$Html$tfoot = _elm_lang$html$Html$node('tfoot');
-var _elm_lang$html$Html$tr = _elm_lang$html$Html$node('tr');
-var _elm_lang$html$Html$td = _elm_lang$html$Html$node('td');
-var _elm_lang$html$Html$th = _elm_lang$html$Html$node('th');
-var _elm_lang$html$Html$form = _elm_lang$html$Html$node('form');
-var _elm_lang$html$Html$fieldset = _elm_lang$html$Html$node('fieldset');
-var _elm_lang$html$Html$legend = _elm_lang$html$Html$node('legend');
-var _elm_lang$html$Html$label = _elm_lang$html$Html$node('label');
-var _elm_lang$html$Html$input = _elm_lang$html$Html$node('input');
-var _elm_lang$html$Html$button = _elm_lang$html$Html$node('button');
-var _elm_lang$html$Html$select = _elm_lang$html$Html$node('select');
-var _elm_lang$html$Html$datalist = _elm_lang$html$Html$node('datalist');
-var _elm_lang$html$Html$optgroup = _elm_lang$html$Html$node('optgroup');
-var _elm_lang$html$Html$option = _elm_lang$html$Html$node('option');
-var _elm_lang$html$Html$textarea = _elm_lang$html$Html$node('textarea');
-var _elm_lang$html$Html$keygen = _elm_lang$html$Html$node('keygen');
-var _elm_lang$html$Html$output = _elm_lang$html$Html$node('output');
-var _elm_lang$html$Html$progress = _elm_lang$html$Html$node('progress');
-var _elm_lang$html$Html$meter = _elm_lang$html$Html$node('meter');
-var _elm_lang$html$Html$details = _elm_lang$html$Html$node('details');
-var _elm_lang$html$Html$summary = _elm_lang$html$Html$node('summary');
-var _elm_lang$html$Html$menuitem = _elm_lang$html$Html$node('menuitem');
-var _elm_lang$html$Html$menu = _elm_lang$html$Html$node('menu');
-
-var _danielnarey$elm_css_frameworks$CssFrameworks$toStyleNode = function (css) {
-	return A3(
-		_elm_lang$html$Html$node,
-		'style',
-		{ctor: '[]'},
-		_elm_lang$core$List$singleton(
-			_elm_lang$html$Html$text(css)));
-};
-
-var _danielnarey$elm_css_frameworks$CssFrameworks_Bootstrap$bootstrap = '/*!\n * Bootstrap v3.3.7 (http://getbootstrap.com)\n * Copyright 2011-2016 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n */\n/*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */\nhtml {\n  font-family: sans-serif;\n  -webkit-text-size-adjust: 100%;\n      -ms-text-size-adjust: 100%;\n}\nbody {\n  margin: 0;\n}\narticle,\naside,\ndetails,\nfigcaption,\nfigure,\nfooter,\nheader,\nhgroup,\nmain,\nmenu,\nnav,\nsection,\nsummary {\n  display: block;\n}\naudio,\ncanvas,\nprogress,\nvideo {\n  display: inline-block;\n  vertical-align: baseline;\n}\naudio:not([controls]) {\n  display: none;\n  height: 0;\n}\n[hidden],\ntemplate {\n  display: none;\n}\na {\n  background-color: transparent;\n}\na:active,\na:hover {\n  outline: 0;\n}\nabbr[title] {\n  border-bottom: 1px dotted;\n}\nb,\nstrong {\n  font-weight: bold;\n}\ndfn {\n  font-style: italic;\n}\nh1 {\n  margin: .67em 0;\n  font-size: 2em;\n}\nmark {\n  color: #000;\n  background: #ff0;\n}\nsmall {\n  font-size: 80%;\n}\nsub,\nsup {\n  position: relative;\n  font-size: 75%;\n  line-height: 0;\n  vertical-align: baseline;\n}\nsup {\n  top: -.5em;\n}\nsub {\n  bottom: -.25em;\n}\nimg {\n  border: 0;\n}\nsvg:not(:root) {\n  overflow: hidden;\n}\nfigure {\n  margin: 1em 40px;\n}\nhr {\n  height: 0;\n  -webkit-box-sizing: content-box;\n     -moz-box-sizing: content-box;\n          box-sizing: content-box;\n}\npre {\n  overflow: auto;\n}\ncode,\nkbd,\npre,\nsamp {\n  font-family: monospace, monospace;\n  font-size: 1em;\n}\nbutton,\ninput,\noptgroup,\nselect,\ntextarea {\n  margin: 0;\n  font: inherit;\n  color: inherit;\n}\nbutton {\n  overflow: visible;\n}\nbutton,\nselect {\n  text-transform: none;\n}\nbutton,\nhtml input[type=\"button\"],\ninput[type=\"reset\"],\ninput[type=\"submit\"] {\n  -webkit-appearance: button;\n  cursor: pointer;\n}\nbutton[disabled],\nhtml input[disabled] {\n  cursor: default;\n}\nbutton::-moz-focus-inner,\ninput::-moz-focus-inner {\n  padding: 0;\n  border: 0;\n}\ninput {\n  line-height: normal;\n}\ninput[type=\"checkbox\"],\ninput[type=\"radio\"] {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n  padding: 0;\n}\ninput[type=\"number\"]::-webkit-inner-spin-button,\ninput[type=\"number\"]::-webkit-outer-spin-button {\n  height: auto;\n}\ninput[type=\"search\"] {\n  -webkit-box-sizing: content-box;\n     -moz-box-sizing: content-box;\n          box-sizing: content-box;\n  -webkit-appearance: textfield;\n}\ninput[type=\"search\"]::-webkit-search-cancel-button,\ninput[type=\"search\"]::-webkit-search-decoration {\n  -webkit-appearance: none;\n}\nfieldset {\n  padding: .35em .625em .75em;\n  margin: 0 2px;\n  border: 1px solid #c0c0c0;\n}\nlegend {\n  padding: 0;\n  border: 0;\n}\ntextarea {\n  overflow: auto;\n}\noptgroup {\n  font-weight: bold;\n}\ntable {\n  border-spacing: 0;\n  border-collapse: collapse;\n}\ntd,\nth {\n  padding: 0;\n}\n/*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */\n@media print {\n  *,\n  *:before,\n  *:after {\n    color: #000 !important;\n    text-shadow: none !important;\n    background: transparent !important;\n    -webkit-box-shadow: none !important;\n            box-shadow: none !important;\n  }\n  a,\n  a:visited {\n    text-decoration: underline;\n  }\n  a[href]:after {\n    content: \" (\" attr(href) \")\";\n  }\n  abbr[title]:after {\n    content: \" (\" attr(title) \")\";\n  }\n  a[href^=\"#\"]:after,\n  a[href^=\"javascript:\"]:after {\n    content: \"\";\n  }\n  pre,\n  blockquote {\n    border: 1px solid #999;\n\n    page-break-inside: avoid;\n  }\n  thead {\n    display: table-header-group;\n  }\n  tr,\n  img {\n    page-break-inside: avoid;\n  }\n  img {\n    max-width: 100% !important;\n  }\n  p,\n  h2,\n  h3 {\n    orphans: 3;\n    widows: 3;\n  }\n  h2,\n  h3 {\n    page-break-after: avoid;\n  }\n  .navbar {\n    display: none;\n  }\n  .btn > .caret,\n  .dropup > .btn > .caret {\n    border-top-color: #000 !important;\n  }\n  .label {\n    border: 1px solid #000;\n  }\n  .table {\n    border-collapse: collapse !important;\n  }\n  .table td,\n  .table th {\n    background-color: #fff !important;\n  }\n  .table-bordered th,\n  .table-bordered td {\n    border: 1px solid #ddd !important;\n  }\n}\n@font-face {\n  font-family: \'Glyphicons Halflings\';\n\n  src: url(\'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.eot\');\n  src: url(\'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.eot?#iefix\') format(\'embedded-opentype\'), url(\'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.woff2\') format(\'woff2\'), url(\'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.woff\') format(\'woff\'), url(\'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.ttf\') format(\'truetype\'), url(\'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular\') format(\'svg\');\n}\n.glyphicon {\n  position: relative;\n  top: 1px;\n  display: inline-block;\n  font-family: \'Glyphicons Halflings\';\n  font-style: normal;\n  font-weight: normal;\n  line-height: 1;\n\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n.glyphicon-asterisk:before {\n  content: \"\\002a\";\n}\n.glyphicon-plus:before {\n  content: \"\\002b\";\n}\n.glyphicon-euro:before,\n.glyphicon-eur:before {\n  content: \"\\20ac\";\n}\n.glyphicon-minus:before {\n  content: \"\\2212\";\n}\n.glyphicon-cloud:before {\n  content: \"\\2601\";\n}\n.glyphicon-envelope:before {\n  content: \"\\2709\";\n}\n.glyphicon-pencil:before {\n  content: \"\\270f\";\n}\n.glyphicon-glass:before {\n  content: \"\\e001\";\n}\n.glyphicon-music:before {\n  content: \"\\e002\";\n}\n.glyphicon-search:before {\n  content: \"\\e003\";\n}\n.glyphicon-heart:before {\n  content: \"\\e005\";\n}\n.glyphicon-star:before {\n  content: \"\\e006\";\n}\n.glyphicon-star-empty:before {\n  content: \"\\e007\";\n}\n.glyphicon-user:before {\n  content: \"\\e008\";\n}\n.glyphicon-film:before {\n  content: \"\\e009\";\n}\n.glyphicon-th-large:before {\n  content: \"\\e010\";\n}\n.glyphicon-th:before {\n  content: \"\\e011\";\n}\n.glyphicon-th-list:before {\n  content: \"\\e012\";\n}\n.glyphicon-ok:before {\n  content: \"\\e013\";\n}\n.glyphicon-remove:before {\n  content: \"\\e014\";\n}\n.glyphicon-zoom-in:before {\n  content: \"\\e015\";\n}\n.glyphicon-zoom-out:before {\n  content: \"\\e016\";\n}\n.glyphicon-off:before {\n  content: \"\\e017\";\n}\n.glyphicon-signal:before {\n  content: \"\\e018\";\n}\n.glyphicon-cog:before {\n  content: \"\\e019\";\n}\n.glyphicon-trash:before {\n  content: \"\\e020\";\n}\n.glyphicon-home:before {\n  content: \"\\e021\";\n}\n.glyphicon-file:before {\n  content: \"\\e022\";\n}\n.glyphicon-time:before {\n  content: \"\\e023\";\n}\n.glyphicon-road:before {\n  content: \"\\e024\";\n}\n.glyphicon-download-alt:before {\n  content: \"\\e025\";\n}\n.glyphicon-download:before {\n  content: \"\\e026\";\n}\n.glyphicon-upload:before {\n  content: \"\\e027\";\n}\n.glyphicon-inbox:before {\n  content: \"\\e028\";\n}\n.glyphicon-play-circle:before {\n  content: \"\\e029\";\n}\n.glyphicon-repeat:before {\n  content: \"\\e030\";\n}\n.glyphicon-refresh:before {\n  content: \"\\e031\";\n}\n.glyphicon-list-alt:before {\n  content: \"\\e032\";\n}\n.glyphicon-lock:before {\n  content: \"\\e033\";\n}\n.glyphicon-flag:before {\n  content: \"\\e034\";\n}\n.glyphicon-headphones:before {\n  content: \"\\e035\";\n}\n.glyphicon-volume-off:before {\n  content: \"\\e036\";\n}\n.glyphicon-volume-down:before {\n  content: \"\\e037\";\n}\n.glyphicon-volume-up:before {\n  content: \"\\e038\";\n}\n.glyphicon-qrcode:before {\n  content: \"\\e039\";\n}\n.glyphicon-barcode:before {\n  content: \"\\e040\";\n}\n.glyphicon-tag:before {\n  content: \"\\e041\";\n}\n.glyphicon-tags:before {\n  content: \"\\e042\";\n}\n.glyphicon-book:before {\n  content: \"\\e043\";\n}\n.glyphicon-bookmark:before {\n  content: \"\\e044\";\n}\n.glyphicon-print:before {\n  content: \"\\e045\";\n}\n.glyphicon-camera:before {\n  content: \"\\e046\";\n}\n.glyphicon-font:before {\n  content: \"\\e047\";\n}\n.glyphicon-bold:before {\n  content: \"\\e048\";\n}\n.glyphicon-italic:before {\n  content: \"\\e049\";\n}\n.glyphicon-text-height:before {\n  content: \"\\e050\";\n}\n.glyphicon-text-width:before {\n  content: \"\\e051\";\n}\n.glyphicon-align-left:before {\n  content: \"\\e052\";\n}\n.glyphicon-align-center:before {\n  content: \"\\e053\";\n}\n.glyphicon-align-right:before {\n  content: \"\\e054\";\n}\n.glyphicon-align-justify:before {\n  content: \"\\e055\";\n}\n.glyphicon-list:before {\n  content: \"\\e056\";\n}\n.glyphicon-indent-left:before {\n  content: \"\\e057\";\n}\n.glyphicon-indent-right:before {\n  content: \"\\e058\";\n}\n.glyphicon-facetime-video:before {\n  content: \"\\e059\";\n}\n.glyphicon-picture:before {\n  content: \"\\e060\";\n}\n.glyphicon-map-marker:before {\n  content: \"\\e062\";\n}\n.glyphicon-adjust:before {\n  content: \"\\e063\";\n}\n.glyphicon-tint:before {\n  content: \"\\e064\";\n}\n.glyphicon-edit:before {\n  content: \"\\e065\";\n}\n.glyphicon-share:before {\n  content: \"\\e066\";\n}\n.glyphicon-check:before {\n  content: \"\\e067\";\n}\n.glyphicon-move:before {\n  content: \"\\e068\";\n}\n.glyphicon-step-backward:before {\n  content: \"\\e069\";\n}\n.glyphicon-fast-backward:before {\n  content: \"\\e070\";\n}\n.glyphicon-backward:before {\n  content: \"\\e071\";\n}\n.glyphicon-play:before {\n  content: \"\\e072\";\n}\n.glyphicon-pause:before {\n  content: \"\\e073\";\n}\n.glyphicon-stop:before {\n  content: \"\\e074\";\n}\n.glyphicon-forward:before {\n  content: \"\\e075\";\n}\n.glyphicon-fast-forward:before {\n  content: \"\\e076\";\n}\n.glyphicon-step-forward:before {\n  content: \"\\e077\";\n}\n.glyphicon-eject:before {\n  content: \"\\e078\";\n}\n.glyphicon-chevron-left:before {\n  content: \"\\e079\";\n}\n.glyphicon-chevron-right:before {\n  content: \"\\e080\";\n}\n.glyphicon-plus-sign:before {\n  content: \"\\e081\";\n}\n.glyphicon-minus-sign:before {\n  content: \"\\e082\";\n}\n.glyphicon-remove-sign:before {\n  content: \"\\e083\";\n}\n.glyphicon-ok-sign:before {\n  content: \"\\e084\";\n}\n.glyphicon-question-sign:before {\n  content: \"\\e085\";\n}\n.glyphicon-info-sign:before {\n  content: \"\\e086\";\n}\n.glyphicon-screenshot:before {\n  content: \"\\e087\";\n}\n.glyphicon-remove-circle:before {\n  content: \"\\e088\";\n}\n.glyphicon-ok-circle:before {\n  content: \"\\e089\";\n}\n.glyphicon-ban-circle:before {\n  content: \"\\e090\";\n}\n.glyphicon-arrow-left:before {\n  content: \"\\e091\";\n}\n.glyphicon-arrow-right:before {\n  content: \"\\e092\";\n}\n.glyphicon-arrow-up:before {\n  content: \"\\e093\";\n}\n.glyphicon-arrow-down:before {\n  content: \"\\e094\";\n}\n.glyphicon-share-alt:before {\n  content: \"\\e095\";\n}\n.glyphicon-resize-full:before {\n  content: \"\\e096\";\n}\n.glyphicon-resize-small:before {\n  content: \"\\e097\";\n}\n.glyphicon-exclamation-sign:before {\n  content: \"\\e101\";\n}\n.glyphicon-gift:before {\n  content: \"\\e102\";\n}\n.glyphicon-leaf:before {\n  content: \"\\e103\";\n}\n.glyphicon-fire:before {\n  content: \"\\e104\";\n}\n.glyphicon-eye-open:before {\n  content: \"\\e105\";\n}\n.glyphicon-eye-close:before {\n  content: \"\\e106\";\n}\n.glyphicon-warning-sign:before {\n  content: \"\\e107\";\n}\n.glyphicon-plane:before {\n  content: \"\\e108\";\n}\n.glyphicon-calendar:before {\n  content: \"\\e109\";\n}\n.glyphicon-random:before {\n  content: \"\\e110\";\n}\n.glyphicon-comment:before {\n  content: \"\\e111\";\n}\n.glyphicon-magnet:before {\n  content: \"\\e112\";\n}\n.glyphicon-chevron-up:before {\n  content: \"\\e113\";\n}\n.glyphicon-chevron-down:before {\n  content: \"\\e114\";\n}\n.glyphicon-retweet:before {\n  content: \"\\e115\";\n}\n.glyphicon-shopping-cart:before {\n  content: \"\\e116\";\n}\n.glyphicon-folder-close:before {\n  content: \"\\e117\";\n}\n.glyphicon-folder-open:before {\n  content: \"\\e118\";\n}\n.glyphicon-resize-vertical:before {\n  content: \"\\e119\";\n}\n.glyphicon-resize-horizontal:before {\n  content: \"\\e120\";\n}\n.glyphicon-hdd:before {\n  content: \"\\e121\";\n}\n.glyphicon-bullhorn:before {\n  content: \"\\e122\";\n}\n.glyphicon-bell:before {\n  content: \"\\e123\";\n}\n.glyphicon-certificate:before {\n  content: \"\\e124\";\n}\n.glyphicon-thumbs-up:before {\n  content: \"\\e125\";\n}\n.glyphicon-thumbs-down:before {\n  content: \"\\e126\";\n}\n.glyphicon-hand-right:before {\n  content: \"\\e127\";\n}\n.glyphicon-hand-left:before {\n  content: \"\\e128\";\n}\n.glyphicon-hand-up:before {\n  content: \"\\e129\";\n}\n.glyphicon-hand-down:before {\n  content: \"\\e130\";\n}\n.glyphicon-circle-arrow-right:before {\n  content: \"\\e131\";\n}\n.glyphicon-circle-arrow-left:before {\n  content: \"\\e132\";\n}\n.glyphicon-circle-arrow-up:before {\n  content: \"\\e133\";\n}\n.glyphicon-circle-arrow-down:before {\n  content: \"\\e134\";\n}\n.glyphicon-globe:before {\n  content: \"\\e135\";\n}\n.glyphicon-wrench:before {\n  content: \"\\e136\";\n}\n.glyphicon-tasks:before {\n  content: \"\\e137\";\n}\n.glyphicon-filter:before {\n  content: \"\\e138\";\n}\n.glyphicon-briefcase:before {\n  content: \"\\e139\";\n}\n.glyphicon-fullscreen:before {\n  content: \"\\e140\";\n}\n.glyphicon-dashboard:before {\n  content: \"\\e141\";\n}\n.glyphicon-paperclip:before {\n  content: \"\\e142\";\n}\n.glyphicon-heart-empty:before {\n  content: \"\\e143\";\n}\n.glyphicon-link:before {\n  content: \"\\e144\";\n}\n.glyphicon-phone:before {\n  content: \"\\e145\";\n}\n.glyphicon-pushpin:before {\n  content: \"\\e146\";\n}\n.glyphicon-usd:before {\n  content: \"\\e148\";\n}\n.glyphicon-gbp:before {\n  content: \"\\e149\";\n}\n.glyphicon-sort:before {\n  content: \"\\e150\";\n}\n.glyphicon-sort-by-alphabet:before {\n  content: \"\\e151\";\n}\n.glyphicon-sort-by-alphabet-alt:before {\n  content: \"\\e152\";\n}\n.glyphicon-sort-by-order:before {\n  content: \"\\e153\";\n}\n.glyphicon-sort-by-order-alt:before {\n  content: \"\\e154\";\n}\n.glyphicon-sort-by-attributes:before {\n  content: \"\\e155\";\n}\n.glyphicon-sort-by-attributes-alt:before {\n  content: \"\\e156\";\n}\n.glyphicon-unchecked:before {\n  content: \"\\e157\";\n}\n.glyphicon-expand:before {\n  content: \"\\e158\";\n}\n.glyphicon-collapse-down:before {\n  content: \"\\e159\";\n}\n.glyphicon-collapse-up:before {\n  content: \"\\e160\";\n}\n.glyphicon-log-in:before {\n  content: \"\\e161\";\n}\n.glyphicon-flash:before {\n  content: \"\\e162\";\n}\n.glyphicon-log-out:before {\n  content: \"\\e163\";\n}\n.glyphicon-new-window:before {\n  content: \"\\e164\";\n}\n.glyphicon-record:before {\n  content: \"\\e165\";\n}\n.glyphicon-save:before {\n  content: \"\\e166\";\n}\n.glyphicon-open:before {\n  content: \"\\e167\";\n}\n.glyphicon-saved:before {\n  content: \"\\e168\";\n}\n.glyphicon-import:before {\n  content: \"\\e169\";\n}\n.glyphicon-export:before {\n  content: \"\\e170\";\n}\n.glyphicon-send:before {\n  content: \"\\e171\";\n}\n.glyphicon-floppy-disk:before {\n  content: \"\\e172\";\n}\n.glyphicon-floppy-saved:before {\n  content: \"\\e173\";\n}\n.glyphicon-floppy-remove:before {\n  content: \"\\e174\";\n}\n.glyphicon-floppy-save:before {\n  content: \"\\e175\";\n}\n.glyphicon-floppy-open:before {\n  content: \"\\e176\";\n}\n.glyphicon-credit-card:before {\n  content: \"\\e177\";\n}\n.glyphicon-transfer:before {\n  content: \"\\e178\";\n}\n.glyphicon-cutlery:before {\n  content: \"\\e179\";\n}\n.glyphicon-header:before {\n  content: \"\\e180\";\n}\n.glyphicon-compressed:before {\n  content: \"\\e181\";\n}\n.glyphicon-earphone:before {\n  content: \"\\e182\";\n}\n.glyphicon-phone-alt:before {\n  content: \"\\e183\";\n}\n.glyphicon-tower:before {\n  content: \"\\e184\";\n}\n.glyphicon-stats:before {\n  content: \"\\e185\";\n}\n.glyphicon-sd-video:before {\n  content: \"\\e186\";\n}\n.glyphicon-hd-video:before {\n  content: \"\\e187\";\n}\n.glyphicon-subtitles:before {\n  content: \"\\e188\";\n}\n.glyphicon-sound-stereo:before {\n  content: \"\\e189\";\n}\n.glyphicon-sound-dolby:before {\n  content: \"\\e190\";\n}\n.glyphicon-sound-5-1:before {\n  content: \"\\e191\";\n}\n.glyphicon-sound-6-1:before {\n  content: \"\\e192\";\n}\n.glyphicon-sound-7-1:before {\n  content: \"\\e193\";\n}\n.glyphicon-copyright-mark:before {\n  content: \"\\e194\";\n}\n.glyphicon-registration-mark:before {\n  content: \"\\e195\";\n}\n.glyphicon-cloud-download:before {\n  content: \"\\e197\";\n}\n.glyphicon-cloud-upload:before {\n  content: \"\\e198\";\n}\n.glyphicon-tree-conifer:before {\n  content: \"\\e199\";\n}\n.glyphicon-tree-deciduous:before {\n  content: \"\\e200\";\n}\n.glyphicon-cd:before {\n  content: \"\\e201\";\n}\n.glyphicon-save-file:before {\n  content: \"\\e202\";\n}\n.glyphicon-open-file:before {\n  content: \"\\e203\";\n}\n.glyphicon-level-up:before {\n  content: \"\\e204\";\n}\n.glyphicon-copy:before {\n  content: \"\\e205\";\n}\n.glyphicon-paste:before {\n  content: \"\\e206\";\n}\n.glyphicon-alert:before {\n  content: \"\\e209\";\n}\n.glyphicon-equalizer:before {\n  content: \"\\e210\";\n}\n.glyphicon-king:before {\n  content: \"\\e211\";\n}\n.glyphicon-queen:before {\n  content: \"\\e212\";\n}\n.glyphicon-pawn:before {\n  content: \"\\e213\";\n}\n.glyphicon-bishop:before {\n  content: \"\\e214\";\n}\n.glyphicon-knight:before {\n  content: \"\\e215\";\n}\n.glyphicon-baby-formula:before {\n  content: \"\\e216\";\n}\n.glyphicon-tent:before {\n  content: \"\\26fa\";\n}\n.glyphicon-blackboard:before {\n  content: \"\\e218\";\n}\n.glyphicon-bed:before {\n  content: \"\\e219\";\n}\n.glyphicon-apple:before {\n  content: \"\\f8ff\";\n}\n.glyphicon-erase:before {\n  content: \"\\e221\";\n}\n.glyphicon-hourglass:before {\n  content: \"\\231b\";\n}\n.glyphicon-lamp:before {\n  content: \"\\e223\";\n}\n.glyphicon-duplicate:before {\n  content: \"\\e224\";\n}\n.glyphicon-piggy-bank:before {\n  content: \"\\e225\";\n}\n.glyphicon-scissors:before {\n  content: \"\\e226\";\n}\n.glyphicon-bitcoin:before {\n  content: \"\\e227\";\n}\n.glyphicon-btc:before {\n  content: \"\\e227\";\n}\n.glyphicon-xbt:before {\n  content: \"\\e227\";\n}\n.glyphicon-yen:before {\n  content: \"\\00a5\";\n}\n.glyphicon-jpy:before {\n  content: \"\\00a5\";\n}\n.glyphicon-ruble:before {\n  content: \"\\20bd\";\n}\n.glyphicon-rub:before {\n  content: \"\\20bd\";\n}\n.glyphicon-scale:before {\n  content: \"\\e230\";\n}\n.glyphicon-ice-lolly:before {\n  content: \"\\e231\";\n}\n.glyphicon-ice-lolly-tasted:before {\n  content: \"\\e232\";\n}\n.glyphicon-education:before {\n  content: \"\\e233\";\n}\n.glyphicon-option-horizontal:before {\n  content: \"\\e234\";\n}\n.glyphicon-option-vertical:before {\n  content: \"\\e235\";\n}\n.glyphicon-menu-hamburger:before {\n  content: \"\\e236\";\n}\n.glyphicon-modal-window:before {\n  content: \"\\e237\";\n}\n.glyphicon-oil:before {\n  content: \"\\e238\";\n}\n.glyphicon-grain:before {\n  content: \"\\e239\";\n}\n.glyphicon-sunglasses:before {\n  content: \"\\e240\";\n}\n.glyphicon-text-size:before {\n  content: \"\\e241\";\n}\n.glyphicon-text-color:before {\n  content: \"\\e242\";\n}\n.glyphicon-text-background:before {\n  content: \"\\e243\";\n}\n.glyphicon-object-align-top:before {\n  content: \"\\e244\";\n}\n.glyphicon-object-align-bottom:before {\n  content: \"\\e245\";\n}\n.glyphicon-object-align-horizontal:before {\n  content: \"\\e246\";\n}\n.glyphicon-object-align-left:before {\n  content: \"\\e247\";\n}\n.glyphicon-object-align-vertical:before {\n  content: \"\\e248\";\n}\n.glyphicon-object-align-right:before {\n  content: \"\\e249\";\n}\n.glyphicon-triangle-right:before {\n  content: \"\\e250\";\n}\n.glyphicon-triangle-left:before {\n  content: \"\\e251\";\n}\n.glyphicon-triangle-bottom:before {\n  content: \"\\e252\";\n}\n.glyphicon-triangle-top:before {\n  content: \"\\e253\";\n}\n.glyphicon-console:before {\n  content: \"\\e254\";\n}\n.glyphicon-superscript:before {\n  content: \"\\e255\";\n}\n.glyphicon-subscript:before {\n  content: \"\\e256\";\n}\n.glyphicon-menu-left:before {\n  content: \"\\e257\";\n}\n.glyphicon-menu-right:before {\n  content: \"\\e258\";\n}\n.glyphicon-menu-down:before {\n  content: \"\\e259\";\n}\n.glyphicon-menu-up:before {\n  content: \"\\e260\";\n}\n* {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\n*:before,\n*:after {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\nhtml {\n  font-size: 10px;\n\n  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);\n}\nbody {\n  font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  font-size: 14px;\n  line-height: 1.42857143;\n  color: #333;\n  background-color: #fff;\n}\ninput,\nbutton,\nselect,\ntextarea {\n  font-family: inherit;\n  font-size: inherit;\n  line-height: inherit;\n}\na {\n  color: #337ab7;\n  text-decoration: none;\n}\na:hover,\na:focus {\n  color: #23527c;\n  text-decoration: underline;\n}\na:focus {\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\nfigure {\n  margin: 0;\n}\nimg {\n  vertical-align: middle;\n}\n.img-responsive,\n.thumbnail > img,\n.thumbnail a > img,\n.carousel-inner > .item > img,\n.carousel-inner > .item > a > img {\n  display: block;\n  max-width: 100%;\n  height: auto;\n}\n.img-rounded {\n  border-radius: 6px;\n}\n.img-thumbnail {\n  display: inline-block;\n  max-width: 100%;\n  height: auto;\n  padding: 4px;\n  line-height: 1.42857143;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 4px;\n  -webkit-transition: all .2s ease-in-out;\n       -o-transition: all .2s ease-in-out;\n          transition: all .2s ease-in-out;\n}\n.img-circle {\n  border-radius: 50%;\n}\nhr {\n  margin-top: 20px;\n  margin-bottom: 20px;\n  border: 0;\n  border-top: 1px solid #eee;\n}\n.sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  border: 0;\n}\n.sr-only-focusable:active,\n.sr-only-focusable:focus {\n  position: static;\n  width: auto;\n  height: auto;\n  margin: 0;\n  overflow: visible;\n  clip: auto;\n}\n[role=\"button\"] {\n  cursor: pointer;\n}\nh1,\nh2,\nh3,\nh4,\nh5,\nh6,\n.h1,\n.h2,\n.h3,\n.h4,\n.h5,\n.h6 {\n  font-family: inherit;\n  font-weight: 500;\n  line-height: 1.1;\n  color: inherit;\n}\nh1 small,\nh2 small,\nh3 small,\nh4 small,\nh5 small,\nh6 small,\n.h1 small,\n.h2 small,\n.h3 small,\n.h4 small,\n.h5 small,\n.h6 small,\nh1 .small,\nh2 .small,\nh3 .small,\nh4 .small,\nh5 .small,\nh6 .small,\n.h1 .small,\n.h2 .small,\n.h3 .small,\n.h4 .small,\n.h5 .small,\n.h6 .small {\n  font-weight: normal;\n  line-height: 1;\n  color: #777;\n}\nh1,\n.h1,\nh2,\n.h2,\nh3,\n.h3 {\n  margin-top: 20px;\n  margin-bottom: 10px;\n}\nh1 small,\n.h1 small,\nh2 small,\n.h2 small,\nh3 small,\n.h3 small,\nh1 .small,\n.h1 .small,\nh2 .small,\n.h2 .small,\nh3 .small,\n.h3 .small {\n  font-size: 65%;\n}\nh4,\n.h4,\nh5,\n.h5,\nh6,\n.h6 {\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\nh4 small,\n.h4 small,\nh5 small,\n.h5 small,\nh6 small,\n.h6 small,\nh4 .small,\n.h4 .small,\nh5 .small,\n.h5 .small,\nh6 .small,\n.h6 .small {\n  font-size: 75%;\n}\nh1,\n.h1 {\n  font-size: 36px;\n}\nh2,\n.h2 {\n  font-size: 30px;\n}\nh3,\n.h3 {\n  font-size: 24px;\n}\nh4,\n.h4 {\n  font-size: 18px;\n}\nh5,\n.h5 {\n  font-size: 14px;\n}\nh6,\n.h6 {\n  font-size: 12px;\n}\np {\n  margin: 0 0 10px;\n}\n.lead {\n  margin-bottom: 20px;\n  font-size: 16px;\n  font-weight: 300;\n  line-height: 1.4;\n}\n@media (min-width: 768px) {\n  .lead {\n    font-size: 21px;\n  }\n}\nsmall,\n.small {\n  font-size: 85%;\n}\nmark,\n.mark {\n  padding: .2em;\n  background-color: #fcf8e3;\n}\n.text-left {\n  text-align: left;\n}\n.text-right {\n  text-align: right;\n}\n.text-center {\n  text-align: center;\n}\n.text-justify {\n  text-align: justify;\n}\n.text-nowrap {\n  white-space: nowrap;\n}\n.text-lowercase {\n  text-transform: lowercase;\n}\n.text-uppercase {\n  text-transform: uppercase;\n}\n.text-capitalize {\n  text-transform: capitalize;\n}\n.text-muted {\n  color: #777;\n}\n.text-primary {\n  color: #337ab7;\n}\na.text-primary:hover,\na.text-primary:focus {\n  color: #286090;\n}\n.text-success {\n  color: #3c763d;\n}\na.text-success:hover,\na.text-success:focus {\n  color: #2b542c;\n}\n.text-info {\n  color: #31708f;\n}\na.text-info:hover,\na.text-info:focus {\n  color: #245269;\n}\n.text-warning {\n  color: #8a6d3b;\n}\na.text-warning:hover,\na.text-warning:focus {\n  color: #66512c;\n}\n.text-danger {\n  color: #a94442;\n}\na.text-danger:hover,\na.text-danger:focus {\n  color: #843534;\n}\n.bg-primary {\n  color: #fff;\n  background-color: #337ab7;\n}\na.bg-primary:hover,\na.bg-primary:focus {\n  background-color: #286090;\n}\n.bg-success {\n  background-color: #dff0d8;\n}\na.bg-success:hover,\na.bg-success:focus {\n  background-color: #c1e2b3;\n}\n.bg-info {\n  background-color: #d9edf7;\n}\na.bg-info:hover,\na.bg-info:focus {\n  background-color: #afd9ee;\n}\n.bg-warning {\n  background-color: #fcf8e3;\n}\na.bg-warning:hover,\na.bg-warning:focus {\n  background-color: #f7ecb5;\n}\n.bg-danger {\n  background-color: #f2dede;\n}\na.bg-danger:hover,\na.bg-danger:focus {\n  background-color: #e4b9b9;\n}\n.page-header {\n  padding-bottom: 9px;\n  margin: 40px 0 20px;\n  border-bottom: 1px solid #eee;\n}\nul,\nol {\n  margin-top: 0;\n  margin-bottom: 10px;\n}\nul ul,\nol ul,\nul ol,\nol ol {\n  margin-bottom: 0;\n}\n.list-unstyled {\n  padding-left: 0;\n  list-style: none;\n}\n.list-inline {\n  padding-left: 0;\n  margin-left: -5px;\n  list-style: none;\n}\n.list-inline > li {\n  display: inline-block;\n  padding-right: 5px;\n  padding-left: 5px;\n}\ndl {\n  margin-top: 0;\n  margin-bottom: 20px;\n}\ndt,\ndd {\n  line-height: 1.42857143;\n}\ndt {\n  font-weight: bold;\n}\ndd {\n  margin-left: 0;\n}\n@media (min-width: 768px) {\n  .dl-horizontal dt {\n    float: left;\n    width: 160px;\n    overflow: hidden;\n    clear: left;\n    text-align: right;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n  .dl-horizontal dd {\n    margin-left: 180px;\n  }\n}\nabbr[title],\nabbr[data-original-title] {\n  cursor: help;\n  border-bottom: 1px dotted #777;\n}\n.initialism {\n  font-size: 90%;\n  text-transform: uppercase;\n}\nblockquote {\n  padding: 10px 20px;\n  margin: 0 0 20px;\n  font-size: 17.5px;\n  border-left: 5px solid #eee;\n}\nblockquote p:last-child,\nblockquote ul:last-child,\nblockquote ol:last-child {\n  margin-bottom: 0;\n}\nblockquote footer,\nblockquote small,\nblockquote .small {\n  display: block;\n  font-size: 80%;\n  line-height: 1.42857143;\n  color: #777;\n}\nblockquote footer:before,\nblockquote small:before,\nblockquote .small:before {\n  content: \'\\2014 \\00A0\';\n}\n.blockquote-reverse,\nblockquote.pull-right {\n  padding-right: 15px;\n  padding-left: 0;\n  text-align: right;\n  border-right: 5px solid #eee;\n  border-left: 0;\n}\n.blockquote-reverse footer:before,\nblockquote.pull-right footer:before,\n.blockquote-reverse small:before,\nblockquote.pull-right small:before,\n.blockquote-reverse .small:before,\nblockquote.pull-right .small:before {\n  content: \'\';\n}\n.blockquote-reverse footer:after,\nblockquote.pull-right footer:after,\n.blockquote-reverse small:after,\nblockquote.pull-right small:after,\n.blockquote-reverse .small:after,\nblockquote.pull-right .small:after {\n  content: \'\\00A0 \\2014\';\n}\naddress {\n  margin-bottom: 20px;\n  font-style: normal;\n  line-height: 1.42857143;\n}\ncode,\nkbd,\npre,\nsamp {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n}\ncode {\n  padding: 2px 4px;\n  font-size: 90%;\n  color: #c7254e;\n  background-color: #f9f2f4;\n  border-radius: 4px;\n}\nkbd {\n  padding: 2px 4px;\n  font-size: 90%;\n  color: #fff;\n  background-color: #333;\n  border-radius: 3px;\n  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .25);\n          box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .25);\n}\nkbd kbd {\n  padding: 0;\n  font-size: 100%;\n  font-weight: bold;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\npre {\n  display: block;\n  padding: 9.5px;\n  margin: 0 0 10px;\n  font-size: 13px;\n  line-height: 1.42857143;\n  color: #333;\n  word-break: break-all;\n  word-wrap: break-word;\n  background-color: #f5f5f5;\n  border: 1px solid #ccc;\n  border-radius: 4px;\n}\npre code {\n  padding: 0;\n  font-size: inherit;\n  color: inherit;\n  white-space: pre-wrap;\n  background-color: transparent;\n  border-radius: 0;\n}\n.pre-scrollable {\n  max-height: 340px;\n  overflow-y: scroll;\n}\n.container {\n  padding-right: 15px;\n  padding-left: 15px;\n  margin-right: auto;\n  margin-left: auto;\n}\n@media (min-width: 768px) {\n  .container {\n    width: 750px;\n  }\n}\n@media (min-width: 992px) {\n  .container {\n    width: 970px;\n  }\n}\n@media (min-width: 1200px) {\n  .container {\n    width: 1170px;\n  }\n}\n.container-fluid {\n  padding-right: 15px;\n  padding-left: 15px;\n  margin-right: auto;\n  margin-left: auto;\n}\n.row {\n  margin-right: -15px;\n  margin-left: -15px;\n}\n.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {\n  position: relative;\n  min-height: 1px;\n  padding-right: 15px;\n  padding-left: 15px;\n}\n.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {\n  float: left;\n}\n.col-xs-12 {\n  width: 100%;\n}\n.col-xs-11 {\n  width: 91.66666667%;\n}\n.col-xs-10 {\n  width: 83.33333333%;\n}\n.col-xs-9 {\n  width: 75%;\n}\n.col-xs-8 {\n  width: 66.66666667%;\n}\n.col-xs-7 {\n  width: 58.33333333%;\n}\n.col-xs-6 {\n  width: 50%;\n}\n.col-xs-5 {\n  width: 41.66666667%;\n}\n.col-xs-4 {\n  width: 33.33333333%;\n}\n.col-xs-3 {\n  width: 25%;\n}\n.col-xs-2 {\n  width: 16.66666667%;\n}\n.col-xs-1 {\n  width: 8.33333333%;\n}\n.col-xs-pull-12 {\n  right: 100%;\n}\n.col-xs-pull-11 {\n  right: 91.66666667%;\n}\n.col-xs-pull-10 {\n  right: 83.33333333%;\n}\n.col-xs-pull-9 {\n  right: 75%;\n}\n.col-xs-pull-8 {\n  right: 66.66666667%;\n}\n.col-xs-pull-7 {\n  right: 58.33333333%;\n}\n.col-xs-pull-6 {\n  right: 50%;\n}\n.col-xs-pull-5 {\n  right: 41.66666667%;\n}\n.col-xs-pull-4 {\n  right: 33.33333333%;\n}\n.col-xs-pull-3 {\n  right: 25%;\n}\n.col-xs-pull-2 {\n  right: 16.66666667%;\n}\n.col-xs-pull-1 {\n  right: 8.33333333%;\n}\n.col-xs-pull-0 {\n  right: auto;\n}\n.col-xs-push-12 {\n  left: 100%;\n}\n.col-xs-push-11 {\n  left: 91.66666667%;\n}\n.col-xs-push-10 {\n  left: 83.33333333%;\n}\n.col-xs-push-9 {\n  left: 75%;\n}\n.col-xs-push-8 {\n  left: 66.66666667%;\n}\n.col-xs-push-7 {\n  left: 58.33333333%;\n}\n.col-xs-push-6 {\n  left: 50%;\n}\n.col-xs-push-5 {\n  left: 41.66666667%;\n}\n.col-xs-push-4 {\n  left: 33.33333333%;\n}\n.col-xs-push-3 {\n  left: 25%;\n}\n.col-xs-push-2 {\n  left: 16.66666667%;\n}\n.col-xs-push-1 {\n  left: 8.33333333%;\n}\n.col-xs-push-0 {\n  left: auto;\n}\n.col-xs-offset-12 {\n  margin-left: 100%;\n}\n.col-xs-offset-11 {\n  margin-left: 91.66666667%;\n}\n.col-xs-offset-10 {\n  margin-left: 83.33333333%;\n}\n.col-xs-offset-9 {\n  margin-left: 75%;\n}\n.col-xs-offset-8 {\n  margin-left: 66.66666667%;\n}\n.col-xs-offset-7 {\n  margin-left: 58.33333333%;\n}\n.col-xs-offset-6 {\n  margin-left: 50%;\n}\n.col-xs-offset-5 {\n  margin-left: 41.66666667%;\n}\n.col-xs-offset-4 {\n  margin-left: 33.33333333%;\n}\n.col-xs-offset-3 {\n  margin-left: 25%;\n}\n.col-xs-offset-2 {\n  margin-left: 16.66666667%;\n}\n.col-xs-offset-1 {\n  margin-left: 8.33333333%;\n}\n.col-xs-offset-0 {\n  margin-left: 0;\n}\n@media (min-width: 768px) {\n  .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {\n    float: left;\n  }\n  .col-sm-12 {\n    width: 100%;\n  }\n  .col-sm-11 {\n    width: 91.66666667%;\n  }\n  .col-sm-10 {\n    width: 83.33333333%;\n  }\n  .col-sm-9 {\n    width: 75%;\n  }\n  .col-sm-8 {\n    width: 66.66666667%;\n  }\n  .col-sm-7 {\n    width: 58.33333333%;\n  }\n  .col-sm-6 {\n    width: 50%;\n  }\n  .col-sm-5 {\n    width: 41.66666667%;\n  }\n  .col-sm-4 {\n    width: 33.33333333%;\n  }\n  .col-sm-3 {\n    width: 25%;\n  }\n  .col-sm-2 {\n    width: 16.66666667%;\n  }\n  .col-sm-1 {\n    width: 8.33333333%;\n  }\n  .col-sm-pull-12 {\n    right: 100%;\n  }\n  .col-sm-pull-11 {\n    right: 91.66666667%;\n  }\n  .col-sm-pull-10 {\n    right: 83.33333333%;\n  }\n  .col-sm-pull-9 {\n    right: 75%;\n  }\n  .col-sm-pull-8 {\n    right: 66.66666667%;\n  }\n  .col-sm-pull-7 {\n    right: 58.33333333%;\n  }\n  .col-sm-pull-6 {\n    right: 50%;\n  }\n  .col-sm-pull-5 {\n    right: 41.66666667%;\n  }\n  .col-sm-pull-4 {\n    right: 33.33333333%;\n  }\n  .col-sm-pull-3 {\n    right: 25%;\n  }\n  .col-sm-pull-2 {\n    right: 16.66666667%;\n  }\n  .col-sm-pull-1 {\n    right: 8.33333333%;\n  }\n  .col-sm-pull-0 {\n    right: auto;\n  }\n  .col-sm-push-12 {\n    left: 100%;\n  }\n  .col-sm-push-11 {\n    left: 91.66666667%;\n  }\n  .col-sm-push-10 {\n    left: 83.33333333%;\n  }\n  .col-sm-push-9 {\n    left: 75%;\n  }\n  .col-sm-push-8 {\n    left: 66.66666667%;\n  }\n  .col-sm-push-7 {\n    left: 58.33333333%;\n  }\n  .col-sm-push-6 {\n    left: 50%;\n  }\n  .col-sm-push-5 {\n    left: 41.66666667%;\n  }\n  .col-sm-push-4 {\n    left: 33.33333333%;\n  }\n  .col-sm-push-3 {\n    left: 25%;\n  }\n  .col-sm-push-2 {\n    left: 16.66666667%;\n  }\n  .col-sm-push-1 {\n    left: 8.33333333%;\n  }\n  .col-sm-push-0 {\n    left: auto;\n  }\n  .col-sm-offset-12 {\n    margin-left: 100%;\n  }\n  .col-sm-offset-11 {\n    margin-left: 91.66666667%;\n  }\n  .col-sm-offset-10 {\n    margin-left: 83.33333333%;\n  }\n  .col-sm-offset-9 {\n    margin-left: 75%;\n  }\n  .col-sm-offset-8 {\n    margin-left: 66.66666667%;\n  }\n  .col-sm-offset-7 {\n    margin-left: 58.33333333%;\n  }\n  .col-sm-offset-6 {\n    margin-left: 50%;\n  }\n  .col-sm-offset-5 {\n    margin-left: 41.66666667%;\n  }\n  .col-sm-offset-4 {\n    margin-left: 33.33333333%;\n  }\n  .col-sm-offset-3 {\n    margin-left: 25%;\n  }\n  .col-sm-offset-2 {\n    margin-left: 16.66666667%;\n  }\n  .col-sm-offset-1 {\n    margin-left: 8.33333333%;\n  }\n  .col-sm-offset-0 {\n    margin-left: 0;\n  }\n}\n@media (min-width: 992px) {\n  .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12 {\n    float: left;\n  }\n  .col-md-12 {\n    width: 100%;\n  }\n  .col-md-11 {\n    width: 91.66666667%;\n  }\n  .col-md-10 {\n    width: 83.33333333%;\n  }\n  .col-md-9 {\n    width: 75%;\n  }\n  .col-md-8 {\n    width: 66.66666667%;\n  }\n  .col-md-7 {\n    width: 58.33333333%;\n  }\n  .col-md-6 {\n    width: 50%;\n  }\n  .col-md-5 {\n    width: 41.66666667%;\n  }\n  .col-md-4 {\n    width: 33.33333333%;\n  }\n  .col-md-3 {\n    width: 25%;\n  }\n  .col-md-2 {\n    width: 16.66666667%;\n  }\n  .col-md-1 {\n    width: 8.33333333%;\n  }\n  .col-md-pull-12 {\n    right: 100%;\n  }\n  .col-md-pull-11 {\n    right: 91.66666667%;\n  }\n  .col-md-pull-10 {\n    right: 83.33333333%;\n  }\n  .col-md-pull-9 {\n    right: 75%;\n  }\n  .col-md-pull-8 {\n    right: 66.66666667%;\n  }\n  .col-md-pull-7 {\n    right: 58.33333333%;\n  }\n  .col-md-pull-6 {\n    right: 50%;\n  }\n  .col-md-pull-5 {\n    right: 41.66666667%;\n  }\n  .col-md-pull-4 {\n    right: 33.33333333%;\n  }\n  .col-md-pull-3 {\n    right: 25%;\n  }\n  .col-md-pull-2 {\n    right: 16.66666667%;\n  }\n  .col-md-pull-1 {\n    right: 8.33333333%;\n  }\n  .col-md-pull-0 {\n    right: auto;\n  }\n  .col-md-push-12 {\n    left: 100%;\n  }\n  .col-md-push-11 {\n    left: 91.66666667%;\n  }\n  .col-md-push-10 {\n    left: 83.33333333%;\n  }\n  .col-md-push-9 {\n    left: 75%;\n  }\n  .col-md-push-8 {\n    left: 66.66666667%;\n  }\n  .col-md-push-7 {\n    left: 58.33333333%;\n  }\n  .col-md-push-6 {\n    left: 50%;\n  }\n  .col-md-push-5 {\n    left: 41.66666667%;\n  }\n  .col-md-push-4 {\n    left: 33.33333333%;\n  }\n  .col-md-push-3 {\n    left: 25%;\n  }\n  .col-md-push-2 {\n    left: 16.66666667%;\n  }\n  .col-md-push-1 {\n    left: 8.33333333%;\n  }\n  .col-md-push-0 {\n    left: auto;\n  }\n  .col-md-offset-12 {\n    margin-left: 100%;\n  }\n  .col-md-offset-11 {\n    margin-left: 91.66666667%;\n  }\n  .col-md-offset-10 {\n    margin-left: 83.33333333%;\n  }\n  .col-md-offset-9 {\n    margin-left: 75%;\n  }\n  .col-md-offset-8 {\n    margin-left: 66.66666667%;\n  }\n  .col-md-offset-7 {\n    margin-left: 58.33333333%;\n  }\n  .col-md-offset-6 {\n    margin-left: 50%;\n  }\n  .col-md-offset-5 {\n    margin-left: 41.66666667%;\n  }\n  .col-md-offset-4 {\n    margin-left: 33.33333333%;\n  }\n  .col-md-offset-3 {\n    margin-left: 25%;\n  }\n  .col-md-offset-2 {\n    margin-left: 16.66666667%;\n  }\n  .col-md-offset-1 {\n    margin-left: 8.33333333%;\n  }\n  .col-md-offset-0 {\n    margin-left: 0;\n  }\n}\n@media (min-width: 1200px) {\n  .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12 {\n    float: left;\n  }\n  .col-lg-12 {\n    width: 100%;\n  }\n  .col-lg-11 {\n    width: 91.66666667%;\n  }\n  .col-lg-10 {\n    width: 83.33333333%;\n  }\n  .col-lg-9 {\n    width: 75%;\n  }\n  .col-lg-8 {\n    width: 66.66666667%;\n  }\n  .col-lg-7 {\n    width: 58.33333333%;\n  }\n  .col-lg-6 {\n    width: 50%;\n  }\n  .col-lg-5 {\n    width: 41.66666667%;\n  }\n  .col-lg-4 {\n    width: 33.33333333%;\n  }\n  .col-lg-3 {\n    width: 25%;\n  }\n  .col-lg-2 {\n    width: 16.66666667%;\n  }\n  .col-lg-1 {\n    width: 8.33333333%;\n  }\n  .col-lg-pull-12 {\n    right: 100%;\n  }\n  .col-lg-pull-11 {\n    right: 91.66666667%;\n  }\n  .col-lg-pull-10 {\n    right: 83.33333333%;\n  }\n  .col-lg-pull-9 {\n    right: 75%;\n  }\n  .col-lg-pull-8 {\n    right: 66.66666667%;\n  }\n  .col-lg-pull-7 {\n    right: 58.33333333%;\n  }\n  .col-lg-pull-6 {\n    right: 50%;\n  }\n  .col-lg-pull-5 {\n    right: 41.66666667%;\n  }\n  .col-lg-pull-4 {\n    right: 33.33333333%;\n  }\n  .col-lg-pull-3 {\n    right: 25%;\n  }\n  .col-lg-pull-2 {\n    right: 16.66666667%;\n  }\n  .col-lg-pull-1 {\n    right: 8.33333333%;\n  }\n  .col-lg-pull-0 {\n    right: auto;\n  }\n  .col-lg-push-12 {\n    left: 100%;\n  }\n  .col-lg-push-11 {\n    left: 91.66666667%;\n  }\n  .col-lg-push-10 {\n    left: 83.33333333%;\n  }\n  .col-lg-push-9 {\n    left: 75%;\n  }\n  .col-lg-push-8 {\n    left: 66.66666667%;\n  }\n  .col-lg-push-7 {\n    left: 58.33333333%;\n  }\n  .col-lg-push-6 {\n    left: 50%;\n  }\n  .col-lg-push-5 {\n    left: 41.66666667%;\n  }\n  .col-lg-push-4 {\n    left: 33.33333333%;\n  }\n  .col-lg-push-3 {\n    left: 25%;\n  }\n  .col-lg-push-2 {\n    left: 16.66666667%;\n  }\n  .col-lg-push-1 {\n    left: 8.33333333%;\n  }\n  .col-lg-push-0 {\n    left: auto;\n  }\n  .col-lg-offset-12 {\n    margin-left: 100%;\n  }\n  .col-lg-offset-11 {\n    margin-left: 91.66666667%;\n  }\n  .col-lg-offset-10 {\n    margin-left: 83.33333333%;\n  }\n  .col-lg-offset-9 {\n    margin-left: 75%;\n  }\n  .col-lg-offset-8 {\n    margin-left: 66.66666667%;\n  }\n  .col-lg-offset-7 {\n    margin-left: 58.33333333%;\n  }\n  .col-lg-offset-6 {\n    margin-left: 50%;\n  }\n  .col-lg-offset-5 {\n    margin-left: 41.66666667%;\n  }\n  .col-lg-offset-4 {\n    margin-left: 33.33333333%;\n  }\n  .col-lg-offset-3 {\n    margin-left: 25%;\n  }\n  .col-lg-offset-2 {\n    margin-left: 16.66666667%;\n  }\n  .col-lg-offset-1 {\n    margin-left: 8.33333333%;\n  }\n  .col-lg-offset-0 {\n    margin-left: 0;\n  }\n}\ntable {\n  background-color: transparent;\n}\ncaption {\n  padding-top: 8px;\n  padding-bottom: 8px;\n  color: #777;\n  text-align: left;\n}\nth {\n  text-align: left;\n}\n.table {\n  width: 100%;\n  max-width: 100%;\n  margin-bottom: 20px;\n}\n.table > thead > tr > th,\n.table > tbody > tr > th,\n.table > tfoot > tr > th,\n.table > thead > tr > td,\n.table > tbody > tr > td,\n.table > tfoot > tr > td {\n  padding: 8px;\n  line-height: 1.42857143;\n  vertical-align: top;\n  border-top: 1px solid #ddd;\n}\n.table > thead > tr > th {\n  vertical-align: bottom;\n  border-bottom: 2px solid #ddd;\n}\n.table > caption + thead > tr:first-child > th,\n.table > colgroup + thead > tr:first-child > th,\n.table > thead:first-child > tr:first-child > th,\n.table > caption + thead > tr:first-child > td,\n.table > colgroup + thead > tr:first-child > td,\n.table > thead:first-child > tr:first-child > td {\n  border-top: 0;\n}\n.table > tbody + tbody {\n  border-top: 2px solid #ddd;\n}\n.table .table {\n  background-color: #fff;\n}\n.table-condensed > thead > tr > th,\n.table-condensed > tbody > tr > th,\n.table-condensed > tfoot > tr > th,\n.table-condensed > thead > tr > td,\n.table-condensed > tbody > tr > td,\n.table-condensed > tfoot > tr > td {\n  padding: 5px;\n}\n.table-bordered {\n  border: 1px solid #ddd;\n}\n.table-bordered > thead > tr > th,\n.table-bordered > tbody > tr > th,\n.table-bordered > tfoot > tr > th,\n.table-bordered > thead > tr > td,\n.table-bordered > tbody > tr > td,\n.table-bordered > tfoot > tr > td {\n  border: 1px solid #ddd;\n}\n.table-bordered > thead > tr > th,\n.table-bordered > thead > tr > td {\n  border-bottom-width: 2px;\n}\n.table-striped > tbody > tr:nth-of-type(odd) {\n  background-color: #f9f9f9;\n}\n.table-hover > tbody > tr:hover {\n  background-color: #f5f5f5;\n}\ntable col[class*=\"col-\"] {\n  position: static;\n  display: table-column;\n  float: none;\n}\ntable td[class*=\"col-\"],\ntable th[class*=\"col-\"] {\n  position: static;\n  display: table-cell;\n  float: none;\n}\n.table > thead > tr > td.active,\n.table > tbody > tr > td.active,\n.table > tfoot > tr > td.active,\n.table > thead > tr > th.active,\n.table > tbody > tr > th.active,\n.table > tfoot > tr > th.active,\n.table > thead > tr.active > td,\n.table > tbody > tr.active > td,\n.table > tfoot > tr.active > td,\n.table > thead > tr.active > th,\n.table > tbody > tr.active > th,\n.table > tfoot > tr.active > th {\n  background-color: #f5f5f5;\n}\n.table-hover > tbody > tr > td.active:hover,\n.table-hover > tbody > tr > th.active:hover,\n.table-hover > tbody > tr.active:hover > td,\n.table-hover > tbody > tr:hover > .active,\n.table-hover > tbody > tr.active:hover > th {\n  background-color: #e8e8e8;\n}\n.table > thead > tr > td.success,\n.table > tbody > tr > td.success,\n.table > tfoot > tr > td.success,\n.table > thead > tr > th.success,\n.table > tbody > tr > th.success,\n.table > tfoot > tr > th.success,\n.table > thead > tr.success > td,\n.table > tbody > tr.success > td,\n.table > tfoot > tr.success > td,\n.table > thead > tr.success > th,\n.table > tbody > tr.success > th,\n.table > tfoot > tr.success > th {\n  background-color: #dff0d8;\n}\n.table-hover > tbody > tr > td.success:hover,\n.table-hover > tbody > tr > th.success:hover,\n.table-hover > tbody > tr.success:hover > td,\n.table-hover > tbody > tr:hover > .success,\n.table-hover > tbody > tr.success:hover > th {\n  background-color: #d0e9c6;\n}\n.table > thead > tr > td.info,\n.table > tbody > tr > td.info,\n.table > tfoot > tr > td.info,\n.table > thead > tr > th.info,\n.table > tbody > tr > th.info,\n.table > tfoot > tr > th.info,\n.table > thead > tr.info > td,\n.table > tbody > tr.info > td,\n.table > tfoot > tr.info > td,\n.table > thead > tr.info > th,\n.table > tbody > tr.info > th,\n.table > tfoot > tr.info > th {\n  background-color: #d9edf7;\n}\n.table-hover > tbody > tr > td.info:hover,\n.table-hover > tbody > tr > th.info:hover,\n.table-hover > tbody > tr.info:hover > td,\n.table-hover > tbody > tr:hover > .info,\n.table-hover > tbody > tr.info:hover > th {\n  background-color: #c4e3f3;\n}\n.table > thead > tr > td.warning,\n.table > tbody > tr > td.warning,\n.table > tfoot > tr > td.warning,\n.table > thead > tr > th.warning,\n.table > tbody > tr > th.warning,\n.table > tfoot > tr > th.warning,\n.table > thead > tr.warning > td,\n.table > tbody > tr.warning > td,\n.table > tfoot > tr.warning > td,\n.table > thead > tr.warning > th,\n.table > tbody > tr.warning > th,\n.table > tfoot > tr.warning > th {\n  background-color: #fcf8e3;\n}\n.table-hover > tbody > tr > td.warning:hover,\n.table-hover > tbody > tr > th.warning:hover,\n.table-hover > tbody > tr.warning:hover > td,\n.table-hover > tbody > tr:hover > .warning,\n.table-hover > tbody > tr.warning:hover > th {\n  background-color: #faf2cc;\n}\n.table > thead > tr > td.danger,\n.table > tbody > tr > td.danger,\n.table > tfoot > tr > td.danger,\n.table > thead > tr > th.danger,\n.table > tbody > tr > th.danger,\n.table > tfoot > tr > th.danger,\n.table > thead > tr.danger > td,\n.table > tbody > tr.danger > td,\n.table > tfoot > tr.danger > td,\n.table > thead > tr.danger > th,\n.table > tbody > tr.danger > th,\n.table > tfoot > tr.danger > th {\n  background-color: #f2dede;\n}\n.table-hover > tbody > tr > td.danger:hover,\n.table-hover > tbody > tr > th.danger:hover,\n.table-hover > tbody > tr.danger:hover > td,\n.table-hover > tbody > tr:hover > .danger,\n.table-hover > tbody > tr.danger:hover > th {\n  background-color: #ebcccc;\n}\n.table-responsive {\n  min-height: .01%;\n  overflow-x: auto;\n}\n@media screen and (max-width: 767px) {\n  .table-responsive {\n    width: 100%;\n    margin-bottom: 15px;\n    overflow-y: hidden;\n    -ms-overflow-style: -ms-autohiding-scrollbar;\n    border: 1px solid #ddd;\n  }\n  .table-responsive > .table {\n    margin-bottom: 0;\n  }\n  .table-responsive > .table > thead > tr > th,\n  .table-responsive > .table > tbody > tr > th,\n  .table-responsive > .table > tfoot > tr > th,\n  .table-responsive > .table > thead > tr > td,\n  .table-responsive > .table > tbody > tr > td,\n  .table-responsive > .table > tfoot > tr > td {\n    white-space: nowrap;\n  }\n  .table-responsive > .table-bordered {\n    border: 0;\n  }\n  .table-responsive > .table-bordered > thead > tr > th:first-child,\n  .table-responsive > .table-bordered > tbody > tr > th:first-child,\n  .table-responsive > .table-bordered > tfoot > tr > th:first-child,\n  .table-responsive > .table-bordered > thead > tr > td:first-child,\n  .table-responsive > .table-bordered > tbody > tr > td:first-child,\n  .table-responsive > .table-bordered > tfoot > tr > td:first-child {\n    border-left: 0;\n  }\n  .table-responsive > .table-bordered > thead > tr > th:last-child,\n  .table-responsive > .table-bordered > tbody > tr > th:last-child,\n  .table-responsive > .table-bordered > tfoot > tr > th:last-child,\n  .table-responsive > .table-bordered > thead > tr > td:last-child,\n  .table-responsive > .table-bordered > tbody > tr > td:last-child,\n  .table-responsive > .table-bordered > tfoot > tr > td:last-child {\n    border-right: 0;\n  }\n  .table-responsive > .table-bordered > tbody > tr:last-child > th,\n  .table-responsive > .table-bordered > tfoot > tr:last-child > th,\n  .table-responsive > .table-bordered > tbody > tr:last-child > td,\n  .table-responsive > .table-bordered > tfoot > tr:last-child > td {\n    border-bottom: 0;\n  }\n}\nfieldset {\n  min-width: 0;\n  padding: 0;\n  margin: 0;\n  border: 0;\n}\nlegend {\n  display: block;\n  width: 100%;\n  padding: 0;\n  margin-bottom: 20px;\n  font-size: 21px;\n  line-height: inherit;\n  color: #333;\n  border: 0;\n  border-bottom: 1px solid #e5e5e5;\n}\nlabel {\n  display: inline-block;\n  max-width: 100%;\n  margin-bottom: 5px;\n  font-weight: bold;\n}\ninput[type=\"search\"] {\n  -webkit-box-sizing: border-box;\n     -moz-box-sizing: border-box;\n          box-sizing: border-box;\n}\ninput[type=\"radio\"],\ninput[type=\"checkbox\"] {\n  margin: 4px 0 0;\n  margin-top: 1px \\9;\n  line-height: normal;\n}\ninput[type=\"file\"] {\n  display: block;\n}\ninput[type=\"range\"] {\n  display: block;\n  width: 100%;\n}\nselect[multiple],\nselect[size] {\n  height: auto;\n}\ninput[type=\"file\"]:focus,\ninput[type=\"radio\"]:focus,\ninput[type=\"checkbox\"]:focus {\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\noutput {\n  display: block;\n  padding-top: 7px;\n  font-size: 14px;\n  line-height: 1.42857143;\n  color: #555;\n}\n.form-control {\n  display: block;\n  width: 100%;\n  height: 34px;\n  padding: 6px 12px;\n  font-size: 14px;\n  line-height: 1.42857143;\n  color: #555;\n  background-color: #fff;\n  background-image: none;\n  border: 1px solid #ccc;\n  border-radius: 4px;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n  -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;\n       -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n          transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n}\n.form-control:focus {\n  border-color: #66afe9;\n  outline: 0;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);\n          box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);\n}\n.form-control::-moz-placeholder {\n  color: #999;\n  opacity: 1;\n}\n.form-control:-ms-input-placeholder {\n  color: #999;\n}\n.form-control::-webkit-input-placeholder {\n  color: #999;\n}\n.form-control::-ms-expand {\n  background-color: transparent;\n  border: 0;\n}\n.form-control[disabled],\n.form-control[readonly],\nfieldset[disabled] .form-control {\n  background-color: #eee;\n  opacity: 1;\n}\n.form-control[disabled],\nfieldset[disabled] .form-control {\n  cursor: not-allowed;\n}\ntextarea.form-control {\n  height: auto;\n}\ninput[type=\"search\"] {\n  -webkit-appearance: none;\n}\n@media screen and (-webkit-min-device-pixel-ratio: 0) {\n  input[type=\"date\"].form-control,\n  input[type=\"time\"].form-control,\n  input[type=\"datetime-local\"].form-control,\n  input[type=\"month\"].form-control {\n    line-height: 34px;\n  }\n  input[type=\"date\"].input-sm,\n  input[type=\"time\"].input-sm,\n  input[type=\"datetime-local\"].input-sm,\n  input[type=\"month\"].input-sm,\n  .input-group-sm input[type=\"date\"],\n  .input-group-sm input[type=\"time\"],\n  .input-group-sm input[type=\"datetime-local\"],\n  .input-group-sm input[type=\"month\"] {\n    line-height: 30px;\n  }\n  input[type=\"date\"].input-lg,\n  input[type=\"time\"].input-lg,\n  input[type=\"datetime-local\"].input-lg,\n  input[type=\"month\"].input-lg,\n  .input-group-lg input[type=\"date\"],\n  .input-group-lg input[type=\"time\"],\n  .input-group-lg input[type=\"datetime-local\"],\n  .input-group-lg input[type=\"month\"] {\n    line-height: 46px;\n  }\n}\n.form-group {\n  margin-bottom: 15px;\n}\n.radio,\n.checkbox {\n  position: relative;\n  display: block;\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\n.radio label,\n.checkbox label {\n  min-height: 20px;\n  padding-left: 20px;\n  margin-bottom: 0;\n  font-weight: normal;\n  cursor: pointer;\n}\n.radio input[type=\"radio\"],\n.radio-inline input[type=\"radio\"],\n.checkbox input[type=\"checkbox\"],\n.checkbox-inline input[type=\"checkbox\"] {\n  position: absolute;\n  margin-top: 4px \\9;\n  margin-left: -20px;\n}\n.radio + .radio,\n.checkbox + .checkbox {\n  margin-top: -5px;\n}\n.radio-inline,\n.checkbox-inline {\n  position: relative;\n  display: inline-block;\n  padding-left: 20px;\n  margin-bottom: 0;\n  font-weight: normal;\n  vertical-align: middle;\n  cursor: pointer;\n}\n.radio-inline + .radio-inline,\n.checkbox-inline + .checkbox-inline {\n  margin-top: 0;\n  margin-left: 10px;\n}\ninput[type=\"radio\"][disabled],\ninput[type=\"checkbox\"][disabled],\ninput[type=\"radio\"].disabled,\ninput[type=\"checkbox\"].disabled,\nfieldset[disabled] input[type=\"radio\"],\nfieldset[disabled] input[type=\"checkbox\"] {\n  cursor: not-allowed;\n}\n.radio-inline.disabled,\n.checkbox-inline.disabled,\nfieldset[disabled] .radio-inline,\nfieldset[disabled] .checkbox-inline {\n  cursor: not-allowed;\n}\n.radio.disabled label,\n.checkbox.disabled label,\nfieldset[disabled] .radio label,\nfieldset[disabled] .checkbox label {\n  cursor: not-allowed;\n}\n.form-control-static {\n  min-height: 34px;\n  padding-top: 7px;\n  padding-bottom: 7px;\n  margin-bottom: 0;\n}\n.form-control-static.input-lg,\n.form-control-static.input-sm {\n  padding-right: 0;\n  padding-left: 0;\n}\n.input-sm {\n  height: 30px;\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\nselect.input-sm {\n  height: 30px;\n  line-height: 30px;\n}\ntextarea.input-sm,\nselect[multiple].input-sm {\n  height: auto;\n}\n.form-group-sm .form-control {\n  height: 30px;\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\n.form-group-sm select.form-control {\n  height: 30px;\n  line-height: 30px;\n}\n.form-group-sm textarea.form-control,\n.form-group-sm select[multiple].form-control {\n  height: auto;\n}\n.form-group-sm .form-control-static {\n  height: 30px;\n  min-height: 32px;\n  padding: 6px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n}\n.input-lg {\n  height: 46px;\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\nselect.input-lg {\n  height: 46px;\n  line-height: 46px;\n}\ntextarea.input-lg,\nselect[multiple].input-lg {\n  height: auto;\n}\n.form-group-lg .form-control {\n  height: 46px;\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\n.form-group-lg select.form-control {\n  height: 46px;\n  line-height: 46px;\n}\n.form-group-lg textarea.form-control,\n.form-group-lg select[multiple].form-control {\n  height: auto;\n}\n.form-group-lg .form-control-static {\n  height: 46px;\n  min-height: 38px;\n  padding: 11px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n}\n.has-feedback {\n  position: relative;\n}\n.has-feedback .form-control {\n  padding-right: 42.5px;\n}\n.form-control-feedback {\n  position: absolute;\n  top: 0;\n  right: 0;\n  z-index: 2;\n  display: block;\n  width: 34px;\n  height: 34px;\n  line-height: 34px;\n  text-align: center;\n  pointer-events: none;\n}\n.input-lg + .form-control-feedback,\n.input-group-lg + .form-control-feedback,\n.form-group-lg .form-control + .form-control-feedback {\n  width: 46px;\n  height: 46px;\n  line-height: 46px;\n}\n.input-sm + .form-control-feedback,\n.input-group-sm + .form-control-feedback,\n.form-group-sm .form-control + .form-control-feedback {\n  width: 30px;\n  height: 30px;\n  line-height: 30px;\n}\n.has-success .help-block,\n.has-success .control-label,\n.has-success .radio,\n.has-success .checkbox,\n.has-success .radio-inline,\n.has-success .checkbox-inline,\n.has-success.radio label,\n.has-success.checkbox label,\n.has-success.radio-inline label,\n.has-success.checkbox-inline label {\n  color: #3c763d;\n}\n.has-success .form-control {\n  border-color: #3c763d;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n}\n.has-success .form-control:focus {\n  border-color: #2b542c;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #67b168;\n}\n.has-success .input-group-addon {\n  color: #3c763d;\n  background-color: #dff0d8;\n  border-color: #3c763d;\n}\n.has-success .form-control-feedback {\n  color: #3c763d;\n}\n.has-warning .help-block,\n.has-warning .control-label,\n.has-warning .radio,\n.has-warning .checkbox,\n.has-warning .radio-inline,\n.has-warning .checkbox-inline,\n.has-warning.radio label,\n.has-warning.checkbox label,\n.has-warning.radio-inline label,\n.has-warning.checkbox-inline label {\n  color: #8a6d3b;\n}\n.has-warning .form-control {\n  border-color: #8a6d3b;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n}\n.has-warning .form-control:focus {\n  border-color: #66512c;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #c0a16b;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #c0a16b;\n}\n.has-warning .input-group-addon {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n  border-color: #8a6d3b;\n}\n.has-warning .form-control-feedback {\n  color: #8a6d3b;\n}\n.has-error .help-block,\n.has-error .control-label,\n.has-error .radio,\n.has-error .checkbox,\n.has-error .radio-inline,\n.has-error .checkbox-inline,\n.has-error.radio label,\n.has-error.checkbox label,\n.has-error.radio-inline label,\n.has-error.checkbox-inline label {\n  color: #a94442;\n}\n.has-error .form-control {\n  border-color: #a94442;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n}\n.has-error .form-control:focus {\n  border-color: #843534;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483;\n}\n.has-error .input-group-addon {\n  color: #a94442;\n  background-color: #f2dede;\n  border-color: #a94442;\n}\n.has-error .form-control-feedback {\n  color: #a94442;\n}\n.has-feedback label ~ .form-control-feedback {\n  top: 25px;\n}\n.has-feedback label.sr-only ~ .form-control-feedback {\n  top: 0;\n}\n.help-block {\n  display: block;\n  margin-top: 5px;\n  margin-bottom: 10px;\n  color: #737373;\n}\n@media (min-width: 768px) {\n  .form-inline .form-group {\n    display: inline-block;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .form-control {\n    display: inline-block;\n    width: auto;\n    vertical-align: middle;\n  }\n  .form-inline .form-control-static {\n    display: inline-block;\n  }\n  .form-inline .input-group {\n    display: inline-table;\n    vertical-align: middle;\n  }\n  .form-inline .input-group .input-group-addon,\n  .form-inline .input-group .input-group-btn,\n  .form-inline .input-group .form-control {\n    width: auto;\n  }\n  .form-inline .input-group > .form-control {\n    width: 100%;\n  }\n  .form-inline .control-label {\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .radio,\n  .form-inline .checkbox {\n    display: inline-block;\n    margin-top: 0;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .radio label,\n  .form-inline .checkbox label {\n    padding-left: 0;\n  }\n  .form-inline .radio input[type=\"radio\"],\n  .form-inline .checkbox input[type=\"checkbox\"] {\n    position: relative;\n    margin-left: 0;\n  }\n  .form-inline .has-feedback .form-control-feedback {\n    top: 0;\n  }\n}\n.form-horizontal .radio,\n.form-horizontal .checkbox,\n.form-horizontal .radio-inline,\n.form-horizontal .checkbox-inline {\n  padding-top: 7px;\n  margin-top: 0;\n  margin-bottom: 0;\n}\n.form-horizontal .radio,\n.form-horizontal .checkbox {\n  min-height: 27px;\n}\n.form-horizontal .form-group {\n  margin-right: -15px;\n  margin-left: -15px;\n}\n@media (min-width: 768px) {\n  .form-horizontal .control-label {\n    padding-top: 7px;\n    margin-bottom: 0;\n    text-align: right;\n  }\n}\n.form-horizontal .has-feedback .form-control-feedback {\n  right: 15px;\n}\n@media (min-width: 768px) {\n  .form-horizontal .form-group-lg .control-label {\n    padding-top: 11px;\n    font-size: 18px;\n  }\n}\n@media (min-width: 768px) {\n  .form-horizontal .form-group-sm .control-label {\n    padding-top: 6px;\n    font-size: 12px;\n  }\n}\n.btn {\n  display: inline-block;\n  padding: 6px 12px;\n  margin-bottom: 0;\n  font-size: 14px;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: middle;\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  background-image: none;\n  border: 1px solid transparent;\n  border-radius: 4px;\n}\n.btn:focus,\n.btn:active:focus,\n.btn.active:focus,\n.btn.focus,\n.btn:active.focus,\n.btn.active.focus {\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\n.btn:hover,\n.btn:focus,\n.btn.focus {\n  color: #333;\n  text-decoration: none;\n}\n.btn:active,\n.btn.active {\n  background-image: none;\n  outline: 0;\n  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n          box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n}\n.btn.disabled,\n.btn[disabled],\nfieldset[disabled] .btn {\n  cursor: not-allowed;\n  filter: alpha(opacity=65);\n  -webkit-box-shadow: none;\n          box-shadow: none;\n  opacity: .65;\n}\na.btn.disabled,\nfieldset[disabled] a.btn {\n  pointer-events: none;\n}\n.btn-default {\n  color: #333;\n  background-color: #fff;\n  border-color: #ccc;\n}\n.btn-default:focus,\n.btn-default.focus {\n  color: #333;\n  background-color: #e6e6e6;\n  border-color: #8c8c8c;\n}\n.btn-default:hover {\n  color: #333;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n}\n.btn-default:active,\n.btn-default.active,\n.open > .dropdown-toggle.btn-default {\n  color: #333;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n}\n.btn-default:active:hover,\n.btn-default.active:hover,\n.open > .dropdown-toggle.btn-default:hover,\n.btn-default:active:focus,\n.btn-default.active:focus,\n.open > .dropdown-toggle.btn-default:focus,\n.btn-default:active.focus,\n.btn-default.active.focus,\n.open > .dropdown-toggle.btn-default.focus {\n  color: #333;\n  background-color: #d4d4d4;\n  border-color: #8c8c8c;\n}\n.btn-default:active,\n.btn-default.active,\n.open > .dropdown-toggle.btn-default {\n  background-image: none;\n}\n.btn-default.disabled:hover,\n.btn-default[disabled]:hover,\nfieldset[disabled] .btn-default:hover,\n.btn-default.disabled:focus,\n.btn-default[disabled]:focus,\nfieldset[disabled] .btn-default:focus,\n.btn-default.disabled.focus,\n.btn-default[disabled].focus,\nfieldset[disabled] .btn-default.focus {\n  background-color: #fff;\n  border-color: #ccc;\n}\n.btn-default .badge {\n  color: #fff;\n  background-color: #333;\n}\n.btn-primary {\n  color: #fff;\n  background-color: #337ab7;\n  border-color: #2e6da4;\n}\n.btn-primary:focus,\n.btn-primary.focus {\n  color: #fff;\n  background-color: #286090;\n  border-color: #122b40;\n}\n.btn-primary:hover {\n  color: #fff;\n  background-color: #286090;\n  border-color: #204d74;\n}\n.btn-primary:active,\n.btn-primary.active,\n.open > .dropdown-toggle.btn-primary {\n  color: #fff;\n  background-color: #286090;\n  border-color: #204d74;\n}\n.btn-primary:active:hover,\n.btn-primary.active:hover,\n.open > .dropdown-toggle.btn-primary:hover,\n.btn-primary:active:focus,\n.btn-primary.active:focus,\n.open > .dropdown-toggle.btn-primary:focus,\n.btn-primary:active.focus,\n.btn-primary.active.focus,\n.open > .dropdown-toggle.btn-primary.focus {\n  color: #fff;\n  background-color: #204d74;\n  border-color: #122b40;\n}\n.btn-primary:active,\n.btn-primary.active,\n.open > .dropdown-toggle.btn-primary {\n  background-image: none;\n}\n.btn-primary.disabled:hover,\n.btn-primary[disabled]:hover,\nfieldset[disabled] .btn-primary:hover,\n.btn-primary.disabled:focus,\n.btn-primary[disabled]:focus,\nfieldset[disabled] .btn-primary:focus,\n.btn-primary.disabled.focus,\n.btn-primary[disabled].focus,\nfieldset[disabled] .btn-primary.focus {\n  background-color: #337ab7;\n  border-color: #2e6da4;\n}\n.btn-primary .badge {\n  color: #337ab7;\n  background-color: #fff;\n}\n.btn-success {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #4cae4c;\n}\n.btn-success:focus,\n.btn-success.focus {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #255625;\n}\n.btn-success:hover {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #398439;\n}\n.btn-success:active,\n.btn-success.active,\n.open > .dropdown-toggle.btn-success {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #398439;\n}\n.btn-success:active:hover,\n.btn-success.active:hover,\n.open > .dropdown-toggle.btn-success:hover,\n.btn-success:active:focus,\n.btn-success.active:focus,\n.open > .dropdown-toggle.btn-success:focus,\n.btn-success:active.focus,\n.btn-success.active.focus,\n.open > .dropdown-toggle.btn-success.focus {\n  color: #fff;\n  background-color: #398439;\n  border-color: #255625;\n}\n.btn-success:active,\n.btn-success.active,\n.open > .dropdown-toggle.btn-success {\n  background-image: none;\n}\n.btn-success.disabled:hover,\n.btn-success[disabled]:hover,\nfieldset[disabled] .btn-success:hover,\n.btn-success.disabled:focus,\n.btn-success[disabled]:focus,\nfieldset[disabled] .btn-success:focus,\n.btn-success.disabled.focus,\n.btn-success[disabled].focus,\nfieldset[disabled] .btn-success.focus {\n  background-color: #5cb85c;\n  border-color: #4cae4c;\n}\n.btn-success .badge {\n  color: #5cb85c;\n  background-color: #fff;\n}\n.btn-info {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #46b8da;\n}\n.btn-info:focus,\n.btn-info.focus {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #1b6d85;\n}\n.btn-info:hover {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #269abc;\n}\n.btn-info:active,\n.btn-info.active,\n.open > .dropdown-toggle.btn-info {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #269abc;\n}\n.btn-info:active:hover,\n.btn-info.active:hover,\n.open > .dropdown-toggle.btn-info:hover,\n.btn-info:active:focus,\n.btn-info.active:focus,\n.open > .dropdown-toggle.btn-info:focus,\n.btn-info:active.focus,\n.btn-info.active.focus,\n.open > .dropdown-toggle.btn-info.focus {\n  color: #fff;\n  background-color: #269abc;\n  border-color: #1b6d85;\n}\n.btn-info:active,\n.btn-info.active,\n.open > .dropdown-toggle.btn-info {\n  background-image: none;\n}\n.btn-info.disabled:hover,\n.btn-info[disabled]:hover,\nfieldset[disabled] .btn-info:hover,\n.btn-info.disabled:focus,\n.btn-info[disabled]:focus,\nfieldset[disabled] .btn-info:focus,\n.btn-info.disabled.focus,\n.btn-info[disabled].focus,\nfieldset[disabled] .btn-info.focus {\n  background-color: #5bc0de;\n  border-color: #46b8da;\n}\n.btn-info .badge {\n  color: #5bc0de;\n  background-color: #fff;\n}\n.btn-warning {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #eea236;\n}\n.btn-warning:focus,\n.btn-warning.focus {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #985f0d;\n}\n.btn-warning:hover {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #d58512;\n}\n.btn-warning:active,\n.btn-warning.active,\n.open > .dropdown-toggle.btn-warning {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #d58512;\n}\n.btn-warning:active:hover,\n.btn-warning.active:hover,\n.open > .dropdown-toggle.btn-warning:hover,\n.btn-warning:active:focus,\n.btn-warning.active:focus,\n.open > .dropdown-toggle.btn-warning:focus,\n.btn-warning:active.focus,\n.btn-warning.active.focus,\n.open > .dropdown-toggle.btn-warning.focus {\n  color: #fff;\n  background-color: #d58512;\n  border-color: #985f0d;\n}\n.btn-warning:active,\n.btn-warning.active,\n.open > .dropdown-toggle.btn-warning {\n  background-image: none;\n}\n.btn-warning.disabled:hover,\n.btn-warning[disabled]:hover,\nfieldset[disabled] .btn-warning:hover,\n.btn-warning.disabled:focus,\n.btn-warning[disabled]:focus,\nfieldset[disabled] .btn-warning:focus,\n.btn-warning.disabled.focus,\n.btn-warning[disabled].focus,\nfieldset[disabled] .btn-warning.focus {\n  background-color: #f0ad4e;\n  border-color: #eea236;\n}\n.btn-warning .badge {\n  color: #f0ad4e;\n  background-color: #fff;\n}\n.btn-danger {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d43f3a;\n}\n.btn-danger:focus,\n.btn-danger.focus {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #761c19;\n}\n.btn-danger:hover {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #ac2925;\n}\n.btn-danger:active,\n.btn-danger.active,\n.open > .dropdown-toggle.btn-danger {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #ac2925;\n}\n.btn-danger:active:hover,\n.btn-danger.active:hover,\n.open > .dropdown-toggle.btn-danger:hover,\n.btn-danger:active:focus,\n.btn-danger.active:focus,\n.open > .dropdown-toggle.btn-danger:focus,\n.btn-danger:active.focus,\n.btn-danger.active.focus,\n.open > .dropdown-toggle.btn-danger.focus {\n  color: #fff;\n  background-color: #ac2925;\n  border-color: #761c19;\n}\n.btn-danger:active,\n.btn-danger.active,\n.open > .dropdown-toggle.btn-danger {\n  background-image: none;\n}\n.btn-danger.disabled:hover,\n.btn-danger[disabled]:hover,\nfieldset[disabled] .btn-danger:hover,\n.btn-danger.disabled:focus,\n.btn-danger[disabled]:focus,\nfieldset[disabled] .btn-danger:focus,\n.btn-danger.disabled.focus,\n.btn-danger[disabled].focus,\nfieldset[disabled] .btn-danger.focus {\n  background-color: #d9534f;\n  border-color: #d43f3a;\n}\n.btn-danger .badge {\n  color: #d9534f;\n  background-color: #fff;\n}\n.btn-link {\n  font-weight: normal;\n  color: #337ab7;\n  border-radius: 0;\n}\n.btn-link,\n.btn-link:active,\n.btn-link.active,\n.btn-link[disabled],\nfieldset[disabled] .btn-link {\n  background-color: transparent;\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\n.btn-link,\n.btn-link:hover,\n.btn-link:focus,\n.btn-link:active {\n  border-color: transparent;\n}\n.btn-link:hover,\n.btn-link:focus {\n  color: #23527c;\n  text-decoration: underline;\n  background-color: transparent;\n}\n.btn-link[disabled]:hover,\nfieldset[disabled] .btn-link:hover,\n.btn-link[disabled]:focus,\nfieldset[disabled] .btn-link:focus {\n  color: #777;\n  text-decoration: none;\n}\n.btn-lg,\n.btn-group-lg > .btn {\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\n.btn-sm,\n.btn-group-sm > .btn {\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\n.btn-xs,\n.btn-group-xs > .btn {\n  padding: 1px 5px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\n.btn-block {\n  display: block;\n  width: 100%;\n}\n.btn-block + .btn-block {\n  margin-top: 5px;\n}\ninput[type=\"submit\"].btn-block,\ninput[type=\"reset\"].btn-block,\ninput[type=\"button\"].btn-block {\n  width: 100%;\n}\n.fade {\n  opacity: 0;\n  -webkit-transition: opacity .15s linear;\n       -o-transition: opacity .15s linear;\n          transition: opacity .15s linear;\n}\n.fade.in {\n  opacity: 1;\n}\n.collapse {\n  display: none;\n}\n.collapse.in {\n  display: block;\n}\ntr.collapse.in {\n  display: table-row;\n}\ntbody.collapse.in {\n  display: table-row-group;\n}\n.collapsing {\n  position: relative;\n  height: 0;\n  overflow: hidden;\n  -webkit-transition-timing-function: ease;\n       -o-transition-timing-function: ease;\n          transition-timing-function: ease;\n  -webkit-transition-duration: .35s;\n       -o-transition-duration: .35s;\n          transition-duration: .35s;\n  -webkit-transition-property: height, visibility;\n       -o-transition-property: height, visibility;\n          transition-property: height, visibility;\n}\n.caret {\n  display: inline-block;\n  width: 0;\n  height: 0;\n  margin-left: 2px;\n  vertical-align: middle;\n  border-top: 4px dashed;\n  border-top: 4px solid \\9;\n  border-right: 4px solid transparent;\n  border-left: 4px solid transparent;\n}\n.dropup,\n.dropdown {\n  position: relative;\n}\n.dropdown-toggle:focus {\n  outline: 0;\n}\n.dropdown-menu {\n  position: absolute;\n  top: 100%;\n  left: 0;\n  z-index: 1000;\n  display: none;\n  float: left;\n  min-width: 160px;\n  padding: 5px 0;\n  margin: 2px 0 0;\n  font-size: 14px;\n  text-align: left;\n  list-style: none;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid #ccc;\n  border: 1px solid rgba(0, 0, 0, .15);\n  border-radius: 4px;\n  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);\n          box-shadow: 0 6px 12px rgba(0, 0, 0, .175);\n}\n.dropdown-menu.pull-right {\n  right: 0;\n  left: auto;\n}\n.dropdown-menu .divider {\n  height: 1px;\n  margin: 9px 0;\n  overflow: hidden;\n  background-color: #e5e5e5;\n}\n.dropdown-menu > li > a {\n  display: block;\n  padding: 3px 20px;\n  clear: both;\n  font-weight: normal;\n  line-height: 1.42857143;\n  color: #333;\n  white-space: nowrap;\n}\n.dropdown-menu > li > a:hover,\n.dropdown-menu > li > a:focus {\n  color: #262626;\n  text-decoration: none;\n  background-color: #f5f5f5;\n}\n.dropdown-menu > .active > a,\n.dropdown-menu > .active > a:hover,\n.dropdown-menu > .active > a:focus {\n  color: #fff;\n  text-decoration: none;\n  background-color: #337ab7;\n  outline: 0;\n}\n.dropdown-menu > .disabled > a,\n.dropdown-menu > .disabled > a:hover,\n.dropdown-menu > .disabled > a:focus {\n  color: #777;\n}\n.dropdown-menu > .disabled > a:hover,\n.dropdown-menu > .disabled > a:focus {\n  text-decoration: none;\n  cursor: not-allowed;\n  background-color: transparent;\n  background-image: none;\n  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);\n}\n.open > .dropdown-menu {\n  display: block;\n}\n.open > a {\n  outline: 0;\n}\n.dropdown-menu-right {\n  right: 0;\n  left: auto;\n}\n.dropdown-menu-left {\n  right: auto;\n  left: 0;\n}\n.dropdown-header {\n  display: block;\n  padding: 3px 20px;\n  font-size: 12px;\n  line-height: 1.42857143;\n  color: #777;\n  white-space: nowrap;\n}\n.dropdown-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 990;\n}\n.pull-right > .dropdown-menu {\n  right: 0;\n  left: auto;\n}\n.dropup .caret,\n.navbar-fixed-bottom .dropdown .caret {\n  content: \"\";\n  border-top: 0;\n  border-bottom: 4px dashed;\n  border-bottom: 4px solid \\9;\n}\n.dropup .dropdown-menu,\n.navbar-fixed-bottom .dropdown .dropdown-menu {\n  top: auto;\n  bottom: 100%;\n  margin-bottom: 2px;\n}\n@media (min-width: 768px) {\n  .navbar-right .dropdown-menu {\n    right: 0;\n    left: auto;\n  }\n  .navbar-right .dropdown-menu-left {\n    right: auto;\n    left: 0;\n  }\n}\n.btn-group,\n.btn-group-vertical {\n  position: relative;\n  display: inline-block;\n  vertical-align: middle;\n}\n.btn-group > .btn,\n.btn-group-vertical > .btn {\n  position: relative;\n  float: left;\n}\n.btn-group > .btn:hover,\n.btn-group-vertical > .btn:hover,\n.btn-group > .btn:focus,\n.btn-group-vertical > .btn:focus,\n.btn-group > .btn:active,\n.btn-group-vertical > .btn:active,\n.btn-group > .btn.active,\n.btn-group-vertical > .btn.active {\n  z-index: 2;\n}\n.btn-group .btn + .btn,\n.btn-group .btn + .btn-group,\n.btn-group .btn-group + .btn,\n.btn-group .btn-group + .btn-group {\n  margin-left: -1px;\n}\n.btn-toolbar {\n  margin-left: -5px;\n}\n.btn-toolbar .btn,\n.btn-toolbar .btn-group,\n.btn-toolbar .input-group {\n  float: left;\n}\n.btn-toolbar > .btn,\n.btn-toolbar > .btn-group,\n.btn-toolbar > .input-group {\n  margin-left: 5px;\n}\n.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {\n  border-radius: 0;\n}\n.btn-group > .btn:first-child {\n  margin-left: 0;\n}\n.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.btn-group > .btn:last-child:not(:first-child),\n.btn-group > .dropdown-toggle:not(:first-child) {\n  border-top-left-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group > .btn-group {\n  float: left;\n}\n.btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n.btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-top-left-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group .dropdown-toggle:active,\n.btn-group.open .dropdown-toggle {\n  outline: 0;\n}\n.btn-group > .btn + .dropdown-toggle {\n  padding-right: 8px;\n  padding-left: 8px;\n}\n.btn-group > .btn-lg + .dropdown-toggle {\n  padding-right: 12px;\n  padding-left: 12px;\n}\n.btn-group.open .dropdown-toggle {\n  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n          box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);\n}\n.btn-group.open .dropdown-toggle.btn-link {\n  -webkit-box-shadow: none;\n          box-shadow: none;\n}\n.btn .caret {\n  margin-left: 0;\n}\n.btn-lg .caret {\n  border-width: 5px 5px 0;\n  border-bottom-width: 0;\n}\n.dropup .btn-lg .caret {\n  border-width: 0 5px 5px;\n}\n.btn-group-vertical > .btn,\n.btn-group-vertical > .btn-group,\n.btn-group-vertical > .btn-group > .btn {\n  display: block;\n  float: none;\n  width: 100%;\n  max-width: 100%;\n}\n.btn-group-vertical > .btn-group > .btn {\n  float: none;\n}\n.btn-group-vertical > .btn + .btn,\n.btn-group-vertical > .btn + .btn-group,\n.btn-group-vertical > .btn-group + .btn,\n.btn-group-vertical > .btn-group + .btn-group {\n  margin-top: -1px;\n  margin-left: 0;\n}\n.btn-group-vertical > .btn:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n.btn-group-vertical > .btn:first-child:not(:last-child) {\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group-vertical > .btn:last-child:not(:first-child) {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 4px;\n  border-bottom-left-radius: 4px;\n}\n.btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.btn-group-justified {\n  display: table;\n  width: 100%;\n  table-layout: fixed;\n  border-collapse: separate;\n}\n.btn-group-justified > .btn,\n.btn-group-justified > .btn-group {\n  display: table-cell;\n  float: none;\n  width: 1%;\n}\n.btn-group-justified > .btn-group .btn {\n  width: 100%;\n}\n.btn-group-justified > .btn-group .dropdown-menu {\n  left: auto;\n}\n[data-toggle=\"buttons\"] > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn input[type=\"checkbox\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"checkbox\"] {\n  position: absolute;\n  clip: rect(0, 0, 0, 0);\n  pointer-events: none;\n}\n.input-group {\n  position: relative;\n  display: table;\n  border-collapse: separate;\n}\n.input-group[class*=\"col-\"] {\n  float: none;\n  padding-right: 0;\n  padding-left: 0;\n}\n.input-group .form-control {\n  position: relative;\n  z-index: 2;\n  float: left;\n  width: 100%;\n  margin-bottom: 0;\n}\n.input-group .form-control:focus {\n  z-index: 3;\n}\n.input-group-lg > .form-control,\n.input-group-lg > .input-group-addon,\n.input-group-lg > .input-group-btn > .btn {\n  height: 46px;\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n  border-radius: 6px;\n}\nselect.input-group-lg > .form-control,\nselect.input-group-lg > .input-group-addon,\nselect.input-group-lg > .input-group-btn > .btn {\n  height: 46px;\n  line-height: 46px;\n}\ntextarea.input-group-lg > .form-control,\ntextarea.input-group-lg > .input-group-addon,\ntextarea.input-group-lg > .input-group-btn > .btn,\nselect[multiple].input-group-lg > .form-control,\nselect[multiple].input-group-lg > .input-group-addon,\nselect[multiple].input-group-lg > .input-group-btn > .btn {\n  height: auto;\n}\n.input-group-sm > .form-control,\n.input-group-sm > .input-group-addon,\n.input-group-sm > .input-group-btn > .btn {\n  height: 30px;\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n  border-radius: 3px;\n}\nselect.input-group-sm > .form-control,\nselect.input-group-sm > .input-group-addon,\nselect.input-group-sm > .input-group-btn > .btn {\n  height: 30px;\n  line-height: 30px;\n}\ntextarea.input-group-sm > .form-control,\ntextarea.input-group-sm > .input-group-addon,\ntextarea.input-group-sm > .input-group-btn > .btn,\nselect[multiple].input-group-sm > .form-control,\nselect[multiple].input-group-sm > .input-group-addon,\nselect[multiple].input-group-sm > .input-group-btn > .btn {\n  height: auto;\n}\n.input-group-addon,\n.input-group-btn,\n.input-group .form-control {\n  display: table-cell;\n}\n.input-group-addon:not(:first-child):not(:last-child),\n.input-group-btn:not(:first-child):not(:last-child),\n.input-group .form-control:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n.input-group-addon,\n.input-group-btn {\n  width: 1%;\n  white-space: nowrap;\n  vertical-align: middle;\n}\n.input-group-addon {\n  padding: 6px 12px;\n  font-size: 14px;\n  font-weight: normal;\n  line-height: 1;\n  color: #555;\n  text-align: center;\n  background-color: #eee;\n  border: 1px solid #ccc;\n  border-radius: 4px;\n}\n.input-group-addon.input-sm {\n  padding: 5px 10px;\n  font-size: 12px;\n  border-radius: 3px;\n}\n.input-group-addon.input-lg {\n  padding: 10px 16px;\n  font-size: 18px;\n  border-radius: 6px;\n}\n.input-group-addon input[type=\"radio\"],\n.input-group-addon input[type=\"checkbox\"] {\n  margin-top: 0;\n}\n.input-group .form-control:first-child,\n.input-group-addon:first-child,\n.input-group-btn:first-child > .btn,\n.input-group-btn:first-child > .btn-group > .btn,\n.input-group-btn:first-child > .dropdown-toggle,\n.input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle),\n.input-group-btn:last-child > .btn-group:not(:last-child) > .btn {\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.input-group-addon:first-child {\n  border-right: 0;\n}\n.input-group .form-control:last-child,\n.input-group-addon:last-child,\n.input-group-btn:last-child > .btn,\n.input-group-btn:last-child > .btn-group > .btn,\n.input-group-btn:last-child > .dropdown-toggle,\n.input-group-btn:first-child > .btn:not(:first-child),\n.input-group-btn:first-child > .btn-group:not(:first-child) > .btn {\n  border-top-left-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.input-group-addon:last-child {\n  border-left: 0;\n}\n.input-group-btn {\n  position: relative;\n  font-size: 0;\n  white-space: nowrap;\n}\n.input-group-btn > .btn {\n  position: relative;\n}\n.input-group-btn > .btn + .btn {\n  margin-left: -1px;\n}\n.input-group-btn > .btn:hover,\n.input-group-btn > .btn:focus,\n.input-group-btn > .btn:active {\n  z-index: 2;\n}\n.input-group-btn:first-child > .btn,\n.input-group-btn:first-child > .btn-group {\n  margin-right: -1px;\n}\n.input-group-btn:last-child > .btn,\n.input-group-btn:last-child > .btn-group {\n  z-index: 2;\n  margin-left: -1px;\n}\n.nav {\n  padding-left: 0;\n  margin-bottom: 0;\n  list-style: none;\n}\n.nav > li {\n  position: relative;\n  display: block;\n}\n.nav > li > a {\n  position: relative;\n  display: block;\n  padding: 10px 15px;\n}\n.nav > li > a:hover,\n.nav > li > a:focus {\n  text-decoration: none;\n  background-color: #eee;\n}\n.nav > li.disabled > a {\n  color: #777;\n}\n.nav > li.disabled > a:hover,\n.nav > li.disabled > a:focus {\n  color: #777;\n  text-decoration: none;\n  cursor: not-allowed;\n  background-color: transparent;\n}\n.nav .open > a,\n.nav .open > a:hover,\n.nav .open > a:focus {\n  background-color: #eee;\n  border-color: #337ab7;\n}\n.nav .nav-divider {\n  height: 1px;\n  margin: 9px 0;\n  overflow: hidden;\n  background-color: #e5e5e5;\n}\n.nav > li > a > img {\n  max-width: none;\n}\n.nav-tabs {\n  border-bottom: 1px solid #ddd;\n}\n.nav-tabs > li {\n  float: left;\n  margin-bottom: -1px;\n}\n.nav-tabs > li > a {\n  margin-right: 2px;\n  line-height: 1.42857143;\n  border: 1px solid transparent;\n  border-radius: 4px 4px 0 0;\n}\n.nav-tabs > li > a:hover {\n  border-color: #eee #eee #ddd;\n}\n.nav-tabs > li.active > a,\n.nav-tabs > li.active > a:hover,\n.nav-tabs > li.active > a:focus {\n  color: #555;\n  cursor: default;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-bottom-color: transparent;\n}\n.nav-tabs.nav-justified {\n  width: 100%;\n  border-bottom: 0;\n}\n.nav-tabs.nav-justified > li {\n  float: none;\n}\n.nav-tabs.nav-justified > li > a {\n  margin-bottom: 5px;\n  text-align: center;\n}\n.nav-tabs.nav-justified > .dropdown .dropdown-menu {\n  top: auto;\n  left: auto;\n}\n@media (min-width: 768px) {\n  .nav-tabs.nav-justified > li {\n    display: table-cell;\n    width: 1%;\n  }\n  .nav-tabs.nav-justified > li > a {\n    margin-bottom: 0;\n  }\n}\n.nav-tabs.nav-justified > li > a {\n  margin-right: 0;\n  border-radius: 4px;\n}\n.nav-tabs.nav-justified > .active > a,\n.nav-tabs.nav-justified > .active > a:hover,\n.nav-tabs.nav-justified > .active > a:focus {\n  border: 1px solid #ddd;\n}\n@media (min-width: 768px) {\n  .nav-tabs.nav-justified > li > a {\n    border-bottom: 1px solid #ddd;\n    border-radius: 4px 4px 0 0;\n  }\n  .nav-tabs.nav-justified > .active > a,\n  .nav-tabs.nav-justified > .active > a:hover,\n  .nav-tabs.nav-justified > .active > a:focus {\n    border-bottom-color: #fff;\n  }\n}\n.nav-pills > li {\n  float: left;\n}\n.nav-pills > li > a {\n  border-radius: 4px;\n}\n.nav-pills > li + li {\n  margin-left: 2px;\n}\n.nav-pills > li.active > a,\n.nav-pills > li.active > a:hover,\n.nav-pills > li.active > a:focus {\n  color: #fff;\n  background-color: #337ab7;\n}\n.nav-stacked > li {\n  float: none;\n}\n.nav-stacked > li + li {\n  margin-top: 2px;\n  margin-left: 0;\n}\n.nav-justified {\n  width: 100%;\n}\n.nav-justified > li {\n  float: none;\n}\n.nav-justified > li > a {\n  margin-bottom: 5px;\n  text-align: center;\n}\n.nav-justified > .dropdown .dropdown-menu {\n  top: auto;\n  left: auto;\n}\n@media (min-width: 768px) {\n  .nav-justified > li {\n    display: table-cell;\n    width: 1%;\n  }\n  .nav-justified > li > a {\n    margin-bottom: 0;\n  }\n}\n.nav-tabs-justified {\n  border-bottom: 0;\n}\n.nav-tabs-justified > li > a {\n  margin-right: 0;\n  border-radius: 4px;\n}\n.nav-tabs-justified > .active > a,\n.nav-tabs-justified > .active > a:hover,\n.nav-tabs-justified > .active > a:focus {\n  border: 1px solid #ddd;\n}\n@media (min-width: 768px) {\n  .nav-tabs-justified > li > a {\n    border-bottom: 1px solid #ddd;\n    border-radius: 4px 4px 0 0;\n  }\n  .nav-tabs-justified > .active > a,\n  .nav-tabs-justified > .active > a:hover,\n  .nav-tabs-justified > .active > a:focus {\n    border-bottom-color: #fff;\n  }\n}\n.tab-content > .tab-pane {\n  display: none;\n}\n.tab-content > .active {\n  display: block;\n}\n.nav-tabs .dropdown-menu {\n  margin-top: -1px;\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.navbar {\n  position: relative;\n  min-height: 50px;\n  margin-bottom: 20px;\n  border: 1px solid transparent;\n}\n@media (min-width: 768px) {\n  .navbar {\n    border-radius: 4px;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-header {\n    float: left;\n  }\n}\n.navbar-collapse {\n  padding-right: 15px;\n  padding-left: 15px;\n  overflow-x: visible;\n  -webkit-overflow-scrolling: touch;\n  border-top: 1px solid transparent;\n  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);\n          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);\n}\n.navbar-collapse.in {\n  overflow-y: auto;\n}\n@media (min-width: 768px) {\n  .navbar-collapse {\n    width: auto;\n    border-top: 0;\n    -webkit-box-shadow: none;\n            box-shadow: none;\n  }\n  .navbar-collapse.collapse {\n    display: block !important;\n    height: auto !important;\n    padding-bottom: 0;\n    overflow: visible !important;\n  }\n  .navbar-collapse.in {\n    overflow-y: visible;\n  }\n  .navbar-fixed-top .navbar-collapse,\n  .navbar-static-top .navbar-collapse,\n  .navbar-fixed-bottom .navbar-collapse {\n    padding-right: 0;\n    padding-left: 0;\n  }\n}\n.navbar-fixed-top .navbar-collapse,\n.navbar-fixed-bottom .navbar-collapse {\n  max-height: 340px;\n}\n@media (max-device-width: 480px) and (orientation: landscape) {\n  .navbar-fixed-top .navbar-collapse,\n  .navbar-fixed-bottom .navbar-collapse {\n    max-height: 200px;\n  }\n}\n.container > .navbar-header,\n.container-fluid > .navbar-header,\n.container > .navbar-collapse,\n.container-fluid > .navbar-collapse {\n  margin-right: -15px;\n  margin-left: -15px;\n}\n@media (min-width: 768px) {\n  .container > .navbar-header,\n  .container-fluid > .navbar-header,\n  .container > .navbar-collapse,\n  .container-fluid > .navbar-collapse {\n    margin-right: 0;\n    margin-left: 0;\n  }\n}\n.navbar-static-top {\n  z-index: 1000;\n  border-width: 0 0 1px;\n}\n@media (min-width: 768px) {\n  .navbar-static-top {\n    border-radius: 0;\n  }\n}\n.navbar-fixed-top,\n.navbar-fixed-bottom {\n  position: fixed;\n  right: 0;\n  left: 0;\n  z-index: 1030;\n}\n@media (min-width: 768px) {\n  .navbar-fixed-top,\n  .navbar-fixed-bottom {\n    border-radius: 0;\n  }\n}\n.navbar-fixed-top {\n  top: 0;\n  border-width: 0 0 1px;\n}\n.navbar-fixed-bottom {\n  bottom: 0;\n  margin-bottom: 0;\n  border-width: 1px 0 0;\n}\n.navbar-brand {\n  float: left;\n  height: 50px;\n  padding: 15px 15px;\n  font-size: 18px;\n  line-height: 20px;\n}\n.navbar-brand:hover,\n.navbar-brand:focus {\n  text-decoration: none;\n}\n.navbar-brand > img {\n  display: block;\n}\n@media (min-width: 768px) {\n  .navbar > .container .navbar-brand,\n  .navbar > .container-fluid .navbar-brand {\n    margin-left: -15px;\n  }\n}\n.navbar-toggle {\n  position: relative;\n  float: right;\n  padding: 9px 10px;\n  margin-top: 8px;\n  margin-right: 15px;\n  margin-bottom: 8px;\n  background-color: transparent;\n  background-image: none;\n  border: 1px solid transparent;\n  border-radius: 4px;\n}\n.navbar-toggle:focus {\n  outline: 0;\n}\n.navbar-toggle .icon-bar {\n  display: block;\n  width: 22px;\n  height: 2px;\n  border-radius: 1px;\n}\n.navbar-toggle .icon-bar + .icon-bar {\n  margin-top: 4px;\n}\n@media (min-width: 768px) {\n  .navbar-toggle {\n    display: none;\n  }\n}\n.navbar-nav {\n  margin: 7.5px -15px;\n}\n.navbar-nav > li > a {\n  padding-top: 10px;\n  padding-bottom: 10px;\n  line-height: 20px;\n}\n@media (max-width: 767px) {\n  .navbar-nav .open .dropdown-menu {\n    position: static;\n    float: none;\n    width: auto;\n    margin-top: 0;\n    background-color: transparent;\n    border: 0;\n    -webkit-box-shadow: none;\n            box-shadow: none;\n  }\n  .navbar-nav .open .dropdown-menu > li > a,\n  .navbar-nav .open .dropdown-menu .dropdown-header {\n    padding: 5px 15px 5px 25px;\n  }\n  .navbar-nav .open .dropdown-menu > li > a {\n    line-height: 20px;\n  }\n  .navbar-nav .open .dropdown-menu > li > a:hover,\n  .navbar-nav .open .dropdown-menu > li > a:focus {\n    background-image: none;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-nav {\n    float: left;\n    margin: 0;\n  }\n  .navbar-nav > li {\n    float: left;\n  }\n  .navbar-nav > li > a {\n    padding-top: 15px;\n    padding-bottom: 15px;\n  }\n}\n.navbar-form {\n  padding: 10px 15px;\n  margin-top: 8px;\n  margin-right: -15px;\n  margin-bottom: 8px;\n  margin-left: -15px;\n  border-top: 1px solid transparent;\n  border-bottom: 1px solid transparent;\n  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .1);\n          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .1);\n}\n@media (min-width: 768px) {\n  .navbar-form .form-group {\n    display: inline-block;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .navbar-form .form-control {\n    display: inline-block;\n    width: auto;\n    vertical-align: middle;\n  }\n  .navbar-form .form-control-static {\n    display: inline-block;\n  }\n  .navbar-form .input-group {\n    display: inline-table;\n    vertical-align: middle;\n  }\n  .navbar-form .input-group .input-group-addon,\n  .navbar-form .input-group .input-group-btn,\n  .navbar-form .input-group .form-control {\n    width: auto;\n  }\n  .navbar-form .input-group > .form-control {\n    width: 100%;\n  }\n  .navbar-form .control-label {\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .navbar-form .radio,\n  .navbar-form .checkbox {\n    display: inline-block;\n    margin-top: 0;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .navbar-form .radio label,\n  .navbar-form .checkbox label {\n    padding-left: 0;\n  }\n  .navbar-form .radio input[type=\"radio\"],\n  .navbar-form .checkbox input[type=\"checkbox\"] {\n    position: relative;\n    margin-left: 0;\n  }\n  .navbar-form .has-feedback .form-control-feedback {\n    top: 0;\n  }\n}\n@media (max-width: 767px) {\n  .navbar-form .form-group {\n    margin-bottom: 5px;\n  }\n  .navbar-form .form-group:last-child {\n    margin-bottom: 0;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-form {\n    width: auto;\n    padding-top: 0;\n    padding-bottom: 0;\n    margin-right: 0;\n    margin-left: 0;\n    border: 0;\n    -webkit-box-shadow: none;\n            box-shadow: none;\n  }\n}\n.navbar-nav > li > .dropdown-menu {\n  margin-top: 0;\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.navbar-fixed-bottom .navbar-nav > li > .dropdown-menu {\n  margin-bottom: 0;\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n.navbar-btn {\n  margin-top: 8px;\n  margin-bottom: 8px;\n}\n.navbar-btn.btn-sm {\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\n.navbar-btn.btn-xs {\n  margin-top: 14px;\n  margin-bottom: 14px;\n}\n.navbar-text {\n  margin-top: 15px;\n  margin-bottom: 15px;\n}\n@media (min-width: 768px) {\n  .navbar-text {\n    float: left;\n    margin-right: 15px;\n    margin-left: 15px;\n  }\n}\n@media (min-width: 768px) {\n  .navbar-left {\n    float: left !important;\n  }\n  .navbar-right {\n    float: right !important;\n    margin-right: -15px;\n  }\n  .navbar-right ~ .navbar-right {\n    margin-right: 0;\n  }\n}\n.navbar-default {\n  background-color: #f8f8f8;\n  border-color: #e7e7e7;\n}\n.navbar-default .navbar-brand {\n  color: #777;\n}\n.navbar-default .navbar-brand:hover,\n.navbar-default .navbar-brand:focus {\n  color: #5e5e5e;\n  background-color: transparent;\n}\n.navbar-default .navbar-text {\n  color: #777;\n}\n.navbar-default .navbar-nav > li > a {\n  color: #777;\n}\n.navbar-default .navbar-nav > li > a:hover,\n.navbar-default .navbar-nav > li > a:focus {\n  color: #333;\n  background-color: transparent;\n}\n.navbar-default .navbar-nav > .active > a,\n.navbar-default .navbar-nav > .active > a:hover,\n.navbar-default .navbar-nav > .active > a:focus {\n  color: #555;\n  background-color: #e7e7e7;\n}\n.navbar-default .navbar-nav > .disabled > a,\n.navbar-default .navbar-nav > .disabled > a:hover,\n.navbar-default .navbar-nav > .disabled > a:focus {\n  color: #ccc;\n  background-color: transparent;\n}\n.navbar-default .navbar-toggle {\n  border-color: #ddd;\n}\n.navbar-default .navbar-toggle:hover,\n.navbar-default .navbar-toggle:focus {\n  background-color: #ddd;\n}\n.navbar-default .navbar-toggle .icon-bar {\n  background-color: #888;\n}\n.navbar-default .navbar-collapse,\n.navbar-default .navbar-form {\n  border-color: #e7e7e7;\n}\n.navbar-default .navbar-nav > .open > a,\n.navbar-default .navbar-nav > .open > a:hover,\n.navbar-default .navbar-nav > .open > a:focus {\n  color: #555;\n  background-color: #e7e7e7;\n}\n@media (max-width: 767px) {\n  .navbar-default .navbar-nav .open .dropdown-menu > li > a {\n    color: #777;\n  }\n  .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,\n  .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {\n    color: #333;\n    background-color: transparent;\n  }\n  .navbar-default .navbar-nav .open .dropdown-menu > .active > a,\n  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,\n  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {\n    color: #555;\n    background-color: #e7e7e7;\n  }\n  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a,\n  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:hover,\n  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:focus {\n    color: #ccc;\n    background-color: transparent;\n  }\n}\n.navbar-default .navbar-link {\n  color: #777;\n}\n.navbar-default .navbar-link:hover {\n  color: #333;\n}\n.navbar-default .btn-link {\n  color: #777;\n}\n.navbar-default .btn-link:hover,\n.navbar-default .btn-link:focus {\n  color: #333;\n}\n.navbar-default .btn-link[disabled]:hover,\nfieldset[disabled] .navbar-default .btn-link:hover,\n.navbar-default .btn-link[disabled]:focus,\nfieldset[disabled] .navbar-default .btn-link:focus {\n  color: #ccc;\n}\n.navbar-inverse {\n  background-color: #222;\n  border-color: #080808;\n}\n.navbar-inverse .navbar-brand {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-brand:hover,\n.navbar-inverse .navbar-brand:focus {\n  color: #fff;\n  background-color: transparent;\n}\n.navbar-inverse .navbar-text {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-nav > li > a {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-nav > li > a:hover,\n.navbar-inverse .navbar-nav > li > a:focus {\n  color: #fff;\n  background-color: transparent;\n}\n.navbar-inverse .navbar-nav > .active > a,\n.navbar-inverse .navbar-nav > .active > a:hover,\n.navbar-inverse .navbar-nav > .active > a:focus {\n  color: #fff;\n  background-color: #080808;\n}\n.navbar-inverse .navbar-nav > .disabled > a,\n.navbar-inverse .navbar-nav > .disabled > a:hover,\n.navbar-inverse .navbar-nav > .disabled > a:focus {\n  color: #444;\n  background-color: transparent;\n}\n.navbar-inverse .navbar-toggle {\n  border-color: #333;\n}\n.navbar-inverse .navbar-toggle:hover,\n.navbar-inverse .navbar-toggle:focus {\n  background-color: #333;\n}\n.navbar-inverse .navbar-toggle .icon-bar {\n  background-color: #fff;\n}\n.navbar-inverse .navbar-collapse,\n.navbar-inverse .navbar-form {\n  border-color: #101010;\n}\n.navbar-inverse .navbar-nav > .open > a,\n.navbar-inverse .navbar-nav > .open > a:hover,\n.navbar-inverse .navbar-nav > .open > a:focus {\n  color: #fff;\n  background-color: #080808;\n}\n@media (max-width: 767px) {\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .dropdown-header {\n    border-color: #080808;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu .divider {\n    background-color: #080808;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {\n    color: #9d9d9d;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a:hover,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a:focus {\n    color: #fff;\n    background-color: transparent;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a:hover,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a:focus {\n    color: #fff;\n    background-color: #080808;\n  }\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a:hover,\n  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a:focus {\n    color: #444;\n    background-color: transparent;\n  }\n}\n.navbar-inverse .navbar-link {\n  color: #9d9d9d;\n}\n.navbar-inverse .navbar-link:hover {\n  color: #fff;\n}\n.navbar-inverse .btn-link {\n  color: #9d9d9d;\n}\n.navbar-inverse .btn-link:hover,\n.navbar-inverse .btn-link:focus {\n  color: #fff;\n}\n.navbar-inverse .btn-link[disabled]:hover,\nfieldset[disabled] .navbar-inverse .btn-link:hover,\n.navbar-inverse .btn-link[disabled]:focus,\nfieldset[disabled] .navbar-inverse .btn-link:focus {\n  color: #444;\n}\n.breadcrumb {\n  padding: 8px 15px;\n  margin-bottom: 20px;\n  list-style: none;\n  background-color: #f5f5f5;\n  border-radius: 4px;\n}\n.breadcrumb > li {\n  display: inline-block;\n}\n.breadcrumb > li + li:before {\n  padding: 0 5px;\n  color: #ccc;\n  content: \"/\\00a0\";\n}\n.breadcrumb > .active {\n  color: #777;\n}\n.pagination {\n  display: inline-block;\n  padding-left: 0;\n  margin: 20px 0;\n  border-radius: 4px;\n}\n.pagination > li {\n  display: inline;\n}\n.pagination > li > a,\n.pagination > li > span {\n  position: relative;\n  float: left;\n  padding: 6px 12px;\n  margin-left: -1px;\n  line-height: 1.42857143;\n  color: #337ab7;\n  text-decoration: none;\n  background-color: #fff;\n  border: 1px solid #ddd;\n}\n.pagination > li:first-child > a,\n.pagination > li:first-child > span {\n  margin-left: 0;\n  border-top-left-radius: 4px;\n  border-bottom-left-radius: 4px;\n}\n.pagination > li:last-child > a,\n.pagination > li:last-child > span {\n  border-top-right-radius: 4px;\n  border-bottom-right-radius: 4px;\n}\n.pagination > li > a:hover,\n.pagination > li > span:hover,\n.pagination > li > a:focus,\n.pagination > li > span:focus {\n  z-index: 2;\n  color: #23527c;\n  background-color: #eee;\n  border-color: #ddd;\n}\n.pagination > .active > a,\n.pagination > .active > span,\n.pagination > .active > a:hover,\n.pagination > .active > span:hover,\n.pagination > .active > a:focus,\n.pagination > .active > span:focus {\n  z-index: 3;\n  color: #fff;\n  cursor: default;\n  background-color: #337ab7;\n  border-color: #337ab7;\n}\n.pagination > .disabled > span,\n.pagination > .disabled > span:hover,\n.pagination > .disabled > span:focus,\n.pagination > .disabled > a,\n.pagination > .disabled > a:hover,\n.pagination > .disabled > a:focus {\n  color: #777;\n  cursor: not-allowed;\n  background-color: #fff;\n  border-color: #ddd;\n}\n.pagination-lg > li > a,\n.pagination-lg > li > span {\n  padding: 10px 16px;\n  font-size: 18px;\n  line-height: 1.3333333;\n}\n.pagination-lg > li:first-child > a,\n.pagination-lg > li:first-child > span {\n  border-top-left-radius: 6px;\n  border-bottom-left-radius: 6px;\n}\n.pagination-lg > li:last-child > a,\n.pagination-lg > li:last-child > span {\n  border-top-right-radius: 6px;\n  border-bottom-right-radius: 6px;\n}\n.pagination-sm > li > a,\n.pagination-sm > li > span {\n  padding: 5px 10px;\n  font-size: 12px;\n  line-height: 1.5;\n}\n.pagination-sm > li:first-child > a,\n.pagination-sm > li:first-child > span {\n  border-top-left-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.pagination-sm > li:last-child > a,\n.pagination-sm > li:last-child > span {\n  border-top-right-radius: 3px;\n  border-bottom-right-radius: 3px;\n}\n.pager {\n  padding-left: 0;\n  margin: 20px 0;\n  text-align: center;\n  list-style: none;\n}\n.pager li {\n  display: inline;\n}\n.pager li > a,\n.pager li > span {\n  display: inline-block;\n  padding: 5px 14px;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 15px;\n}\n.pager li > a:hover,\n.pager li > a:focus {\n  text-decoration: none;\n  background-color: #eee;\n}\n.pager .next > a,\n.pager .next > span {\n  float: right;\n}\n.pager .previous > a,\n.pager .previous > span {\n  float: left;\n}\n.pager .disabled > a,\n.pager .disabled > a:hover,\n.pager .disabled > a:focus,\n.pager .disabled > span {\n  color: #777;\n  cursor: not-allowed;\n  background-color: #fff;\n}\n.label {\n  display: inline;\n  padding: .2em .6em .3em;\n  font-size: 75%;\n  font-weight: bold;\n  line-height: 1;\n  color: #fff;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: baseline;\n  border-radius: .25em;\n}\na.label:hover,\na.label:focus {\n  color: #fff;\n  text-decoration: none;\n  cursor: pointer;\n}\n.label:empty {\n  display: none;\n}\n.btn .label {\n  position: relative;\n  top: -1px;\n}\n.label-default {\n  background-color: #777;\n}\n.label-default[href]:hover,\n.label-default[href]:focus {\n  background-color: #5e5e5e;\n}\n.label-primary {\n  background-color: #337ab7;\n}\n.label-primary[href]:hover,\n.label-primary[href]:focus {\n  background-color: #286090;\n}\n.label-success {\n  background-color: #5cb85c;\n}\n.label-success[href]:hover,\n.label-success[href]:focus {\n  background-color: #449d44;\n}\n.label-info {\n  background-color: #5bc0de;\n}\n.label-info[href]:hover,\n.label-info[href]:focus {\n  background-color: #31b0d5;\n}\n.label-warning {\n  background-color: #f0ad4e;\n}\n.label-warning[href]:hover,\n.label-warning[href]:focus {\n  background-color: #ec971f;\n}\n.label-danger {\n  background-color: #d9534f;\n}\n.label-danger[href]:hover,\n.label-danger[href]:focus {\n  background-color: #c9302c;\n}\n.badge {\n  display: inline-block;\n  min-width: 10px;\n  padding: 3px 7px;\n  font-size: 12px;\n  font-weight: bold;\n  line-height: 1;\n  color: #fff;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: middle;\n  background-color: #777;\n  border-radius: 10px;\n}\n.badge:empty {\n  display: none;\n}\n.btn .badge {\n  position: relative;\n  top: -1px;\n}\n.btn-xs .badge,\n.btn-group-xs > .btn .badge {\n  top: 0;\n  padding: 1px 5px;\n}\na.badge:hover,\na.badge:focus {\n  color: #fff;\n  text-decoration: none;\n  cursor: pointer;\n}\n.list-group-item.active > .badge,\n.nav-pills > .active > a > .badge {\n  color: #337ab7;\n  background-color: #fff;\n}\n.list-group-item > .badge {\n  float: right;\n}\n.list-group-item > .badge + .badge {\n  margin-right: 5px;\n}\n.nav-pills > li > a > .badge {\n  margin-left: 3px;\n}\n.jumbotron {\n  padding-top: 30px;\n  padding-bottom: 30px;\n  margin-bottom: 30px;\n  color: inherit;\n  background-color: #eee;\n}\n.jumbotron h1,\n.jumbotron .h1 {\n  color: inherit;\n}\n.jumbotron p {\n  margin-bottom: 15px;\n  font-size: 21px;\n  font-weight: 200;\n}\n.jumbotron > hr {\n  border-top-color: #d5d5d5;\n}\n.container .jumbotron,\n.container-fluid .jumbotron {\n  padding-right: 15px;\n  padding-left: 15px;\n  border-radius: 6px;\n}\n.jumbotron .container {\n  max-width: 100%;\n}\n@media screen and (min-width: 768px) {\n  .jumbotron {\n    padding-top: 48px;\n    padding-bottom: 48px;\n  }\n  .container .jumbotron,\n  .container-fluid .jumbotron {\n    padding-right: 60px;\n    padding-left: 60px;\n  }\n  .jumbotron h1,\n  .jumbotron .h1 {\n    font-size: 63px;\n  }\n}\n.thumbnail {\n  display: block;\n  padding: 4px;\n  margin-bottom: 20px;\n  line-height: 1.42857143;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 4px;\n  -webkit-transition: border .2s ease-in-out;\n       -o-transition: border .2s ease-in-out;\n          transition: border .2s ease-in-out;\n}\n.thumbnail > img,\n.thumbnail a > img {\n  margin-right: auto;\n  margin-left: auto;\n}\na.thumbnail:hover,\na.thumbnail:focus,\na.thumbnail.active {\n  border-color: #337ab7;\n}\n.thumbnail .caption {\n  padding: 9px;\n  color: #333;\n}\n.alert {\n  padding: 15px;\n  margin-bottom: 20px;\n  border: 1px solid transparent;\n  border-radius: 4px;\n}\n.alert h4 {\n  margin-top: 0;\n  color: inherit;\n}\n.alert .alert-link {\n  font-weight: bold;\n}\n.alert > p,\n.alert > ul {\n  margin-bottom: 0;\n}\n.alert > p + p {\n  margin-top: 5px;\n}\n.alert-dismissable,\n.alert-dismissible {\n  padding-right: 35px;\n}\n.alert-dismissable .close,\n.alert-dismissible .close {\n  position: relative;\n  top: -2px;\n  right: -21px;\n  color: inherit;\n}\n.alert-success {\n  color: #3c763d;\n  background-color: #dff0d8;\n  border-color: #d6e9c6;\n}\n.alert-success hr {\n  border-top-color: #c9e2b3;\n}\n.alert-success .alert-link {\n  color: #2b542c;\n}\n.alert-info {\n  color: #31708f;\n  background-color: #d9edf7;\n  border-color: #bce8f1;\n}\n.alert-info hr {\n  border-top-color: #a6e1ec;\n}\n.alert-info .alert-link {\n  color: #245269;\n}\n.alert-warning {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n  border-color: #faebcc;\n}\n.alert-warning hr {\n  border-top-color: #f7e1b5;\n}\n.alert-warning .alert-link {\n  color: #66512c;\n}\n.alert-danger {\n  color: #a94442;\n  background-color: #f2dede;\n  border-color: #ebccd1;\n}\n.alert-danger hr {\n  border-top-color: #e4b9c0;\n}\n.alert-danger .alert-link {\n  color: #843534;\n}\n@-webkit-keyframes progress-bar-stripes {\n  from {\n    background-position: 40px 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n@-o-keyframes progress-bar-stripes {\n  from {\n    background-position: 40px 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n@keyframes progress-bar-stripes {\n  from {\n    background-position: 40px 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n.progress {\n  height: 20px;\n  margin-bottom: 20px;\n  overflow: hidden;\n  background-color: #f5f5f5;\n  border-radius: 4px;\n  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);\n          box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);\n}\n.progress-bar {\n  float: left;\n  width: 0;\n  height: 100%;\n  font-size: 12px;\n  line-height: 20px;\n  color: #fff;\n  text-align: center;\n  background-color: #337ab7;\n  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);\n          box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);\n  -webkit-transition: width .6s ease;\n       -o-transition: width .6s ease;\n          transition: width .6s ease;\n}\n.progress-striped .progress-bar,\n.progress-bar-striped {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  -webkit-background-size: 40px 40px;\n          background-size: 40px 40px;\n}\n.progress.active .progress-bar,\n.progress-bar.active {\n  -webkit-animation: progress-bar-stripes 2s linear infinite;\n       -o-animation: progress-bar-stripes 2s linear infinite;\n          animation: progress-bar-stripes 2s linear infinite;\n}\n.progress-bar-success {\n  background-color: #5cb85c;\n}\n.progress-striped .progress-bar-success {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.progress-bar-info {\n  background-color: #5bc0de;\n}\n.progress-striped .progress-bar-info {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.progress-bar-warning {\n  background-color: #f0ad4e;\n}\n.progress-striped .progress-bar-warning {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.progress-bar-danger {\n  background-color: #d9534f;\n}\n.progress-striped .progress-bar-danger {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:      -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n  background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\n}\n.media {\n  margin-top: 15px;\n}\n.media:first-child {\n  margin-top: 0;\n}\n.media,\n.media-body {\n  overflow: hidden;\n  zoom: 1;\n}\n.media-body {\n  width: 10000px;\n}\n.media-object {\n  display: block;\n}\n.media-object.img-thumbnail {\n  max-width: none;\n}\n.media-right,\n.media > .pull-right {\n  padding-left: 10px;\n}\n.media-left,\n.media > .pull-left {\n  padding-right: 10px;\n}\n.media-left,\n.media-right,\n.media-body {\n  display: table-cell;\n  vertical-align: top;\n}\n.media-middle {\n  vertical-align: middle;\n}\n.media-bottom {\n  vertical-align: bottom;\n}\n.media-heading {\n  margin-top: 0;\n  margin-bottom: 5px;\n}\n.media-list {\n  padding-left: 0;\n  list-style: none;\n}\n.list-group {\n  padding-left: 0;\n  margin-bottom: 20px;\n}\n.list-group-item {\n  position: relative;\n  display: block;\n  padding: 10px 15px;\n  margin-bottom: -1px;\n  background-color: #fff;\n  border: 1px solid #ddd;\n}\n.list-group-item:first-child {\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n}\n.list-group-item:last-child {\n  margin-bottom: 0;\n  border-bottom-right-radius: 4px;\n  border-bottom-left-radius: 4px;\n}\na.list-group-item,\nbutton.list-group-item {\n  color: #555;\n}\na.list-group-item .list-group-item-heading,\nbutton.list-group-item .list-group-item-heading {\n  color: #333;\n}\na.list-group-item:hover,\nbutton.list-group-item:hover,\na.list-group-item:focus,\nbutton.list-group-item:focus {\n  color: #555;\n  text-decoration: none;\n  background-color: #f5f5f5;\n}\nbutton.list-group-item {\n  width: 100%;\n  text-align: left;\n}\n.list-group-item.disabled,\n.list-group-item.disabled:hover,\n.list-group-item.disabled:focus {\n  color: #777;\n  cursor: not-allowed;\n  background-color: #eee;\n}\n.list-group-item.disabled .list-group-item-heading,\n.list-group-item.disabled:hover .list-group-item-heading,\n.list-group-item.disabled:focus .list-group-item-heading {\n  color: inherit;\n}\n.list-group-item.disabled .list-group-item-text,\n.list-group-item.disabled:hover .list-group-item-text,\n.list-group-item.disabled:focus .list-group-item-text {\n  color: #777;\n}\n.list-group-item.active,\n.list-group-item.active:hover,\n.list-group-item.active:focus {\n  z-index: 2;\n  color: #fff;\n  background-color: #337ab7;\n  border-color: #337ab7;\n}\n.list-group-item.active .list-group-item-heading,\n.list-group-item.active:hover .list-group-item-heading,\n.list-group-item.active:focus .list-group-item-heading,\n.list-group-item.active .list-group-item-heading > small,\n.list-group-item.active:hover .list-group-item-heading > small,\n.list-group-item.active:focus .list-group-item-heading > small,\n.list-group-item.active .list-group-item-heading > .small,\n.list-group-item.active:hover .list-group-item-heading > .small,\n.list-group-item.active:focus .list-group-item-heading > .small {\n  color: inherit;\n}\n.list-group-item.active .list-group-item-text,\n.list-group-item.active:hover .list-group-item-text,\n.list-group-item.active:focus .list-group-item-text {\n  color: #c7ddef;\n}\n.list-group-item-success {\n  color: #3c763d;\n  background-color: #dff0d8;\n}\na.list-group-item-success,\nbutton.list-group-item-success {\n  color: #3c763d;\n}\na.list-group-item-success .list-group-item-heading,\nbutton.list-group-item-success .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-success:hover,\nbutton.list-group-item-success:hover,\na.list-group-item-success:focus,\nbutton.list-group-item-success:focus {\n  color: #3c763d;\n  background-color: #d0e9c6;\n}\na.list-group-item-success.active,\nbutton.list-group-item-success.active,\na.list-group-item-success.active:hover,\nbutton.list-group-item-success.active:hover,\na.list-group-item-success.active:focus,\nbutton.list-group-item-success.active:focus {\n  color: #fff;\n  background-color: #3c763d;\n  border-color: #3c763d;\n}\n.list-group-item-info {\n  color: #31708f;\n  background-color: #d9edf7;\n}\na.list-group-item-info,\nbutton.list-group-item-info {\n  color: #31708f;\n}\na.list-group-item-info .list-group-item-heading,\nbutton.list-group-item-info .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-info:hover,\nbutton.list-group-item-info:hover,\na.list-group-item-info:focus,\nbutton.list-group-item-info:focus {\n  color: #31708f;\n  background-color: #c4e3f3;\n}\na.list-group-item-info.active,\nbutton.list-group-item-info.active,\na.list-group-item-info.active:hover,\nbutton.list-group-item-info.active:hover,\na.list-group-item-info.active:focus,\nbutton.list-group-item-info.active:focus {\n  color: #fff;\n  background-color: #31708f;\n  border-color: #31708f;\n}\n.list-group-item-warning {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n}\na.list-group-item-warning,\nbutton.list-group-item-warning {\n  color: #8a6d3b;\n}\na.list-group-item-warning .list-group-item-heading,\nbutton.list-group-item-warning .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-warning:hover,\nbutton.list-group-item-warning:hover,\na.list-group-item-warning:focus,\nbutton.list-group-item-warning:focus {\n  color: #8a6d3b;\n  background-color: #faf2cc;\n}\na.list-group-item-warning.active,\nbutton.list-group-item-warning.active,\na.list-group-item-warning.active:hover,\nbutton.list-group-item-warning.active:hover,\na.list-group-item-warning.active:focus,\nbutton.list-group-item-warning.active:focus {\n  color: #fff;\n  background-color: #8a6d3b;\n  border-color: #8a6d3b;\n}\n.list-group-item-danger {\n  color: #a94442;\n  background-color: #f2dede;\n}\na.list-group-item-danger,\nbutton.list-group-item-danger {\n  color: #a94442;\n}\na.list-group-item-danger .list-group-item-heading,\nbutton.list-group-item-danger .list-group-item-heading {\n  color: inherit;\n}\na.list-group-item-danger:hover,\nbutton.list-group-item-danger:hover,\na.list-group-item-danger:focus,\nbutton.list-group-item-danger:focus {\n  color: #a94442;\n  background-color: #ebcccc;\n}\na.list-group-item-danger.active,\nbutton.list-group-item-danger.active,\na.list-group-item-danger.active:hover,\nbutton.list-group-item-danger.active:hover,\na.list-group-item-danger.active:focus,\nbutton.list-group-item-danger.active:focus {\n  color: #fff;\n  background-color: #a94442;\n  border-color: #a94442;\n}\n.list-group-item-heading {\n  margin-top: 0;\n  margin-bottom: 5px;\n}\n.list-group-item-text {\n  margin-bottom: 0;\n  line-height: 1.3;\n}\n.panel {\n  margin-bottom: 20px;\n  background-color: #fff;\n  border: 1px solid transparent;\n  border-radius: 4px;\n  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);\n          box-shadow: 0 1px 1px rgba(0, 0, 0, .05);\n}\n.panel-body {\n  padding: 15px;\n}\n.panel-heading {\n  padding: 10px 15px;\n  border-bottom: 1px solid transparent;\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel-heading > .dropdown .dropdown-toggle {\n  color: inherit;\n}\n.panel-title {\n  margin-top: 0;\n  margin-bottom: 0;\n  font-size: 16px;\n  color: inherit;\n}\n.panel-title > a,\n.panel-title > small,\n.panel-title > .small,\n.panel-title > small > a,\n.panel-title > .small > a {\n  color: inherit;\n}\n.panel-footer {\n  padding: 10px 15px;\n  background-color: #f5f5f5;\n  border-top: 1px solid #ddd;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .list-group,\n.panel > .panel-collapse > .list-group {\n  margin-bottom: 0;\n}\n.panel > .list-group .list-group-item,\n.panel > .panel-collapse > .list-group .list-group-item {\n  border-width: 1px 0;\n  border-radius: 0;\n}\n.panel > .list-group:first-child .list-group-item:first-child,\n.panel > .panel-collapse > .list-group:first-child .list-group-item:first-child {\n  border-top: 0;\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel > .list-group:last-child .list-group-item:last-child,\n.panel > .panel-collapse > .list-group:last-child .list-group-item:last-child {\n  border-bottom: 0;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .panel-heading + .panel-collapse > .list-group .list-group-item:first-child {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.panel-heading + .list-group .list-group-item:first-child {\n  border-top-width: 0;\n}\n.list-group + .panel-footer {\n  border-top-width: 0;\n}\n.panel > .table,\n.panel > .table-responsive > .table,\n.panel > .panel-collapse > .table {\n  margin-bottom: 0;\n}\n.panel > .table caption,\n.panel > .table-responsive > .table caption,\n.panel > .panel-collapse > .table caption {\n  padding-right: 15px;\n  padding-left: 15px;\n}\n.panel > .table:first-child,\n.panel > .table-responsive:first-child > .table:first-child {\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel > .table:first-child > thead:first-child > tr:first-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child {\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px;\n}\n.panel > .table:first-child > thead:first-child > tr:first-child td:first-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:first-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child td:first-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:first-child,\n.panel > .table:first-child > thead:first-child > tr:first-child th:first-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:first-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child th:first-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:first-child {\n  border-top-left-radius: 3px;\n}\n.panel > .table:first-child > thead:first-child > tr:first-child td:last-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:last-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child td:last-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:last-child,\n.panel > .table:first-child > thead:first-child > tr:first-child th:last-child,\n.panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:last-child,\n.panel > .table:first-child > tbody:first-child > tr:first-child th:last-child,\n.panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:last-child {\n  border-top-right-radius: 3px;\n}\n.panel > .table:last-child,\n.panel > .table-responsive:last-child > .table:last-child {\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .table:last-child > tbody:last-child > tr:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child {\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel > .table:last-child > tbody:last-child > tr:last-child td:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:first-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child td:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:first-child,\n.panel > .table:last-child > tbody:last-child > tr:last-child th:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:first-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child th:first-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:first-child {\n  border-bottom-left-radius: 3px;\n}\n.panel > .table:last-child > tbody:last-child > tr:last-child td:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:last-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child td:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:last-child,\n.panel > .table:last-child > tbody:last-child > tr:last-child th:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:last-child,\n.panel > .table:last-child > tfoot:last-child > tr:last-child th:last-child,\n.panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:last-child {\n  border-bottom-right-radius: 3px;\n}\n.panel > .panel-body + .table,\n.panel > .panel-body + .table-responsive,\n.panel > .table + .panel-body,\n.panel > .table-responsive + .panel-body {\n  border-top: 1px solid #ddd;\n}\n.panel > .table > tbody:first-child > tr:first-child th,\n.panel > .table > tbody:first-child > tr:first-child td {\n  border-top: 0;\n}\n.panel > .table-bordered,\n.panel > .table-responsive > .table-bordered {\n  border: 0;\n}\n.panel > .table-bordered > thead > tr > th:first-child,\n.panel > .table-responsive > .table-bordered > thead > tr > th:first-child,\n.panel > .table-bordered > tbody > tr > th:first-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > th:first-child,\n.panel > .table-bordered > tfoot > tr > th:first-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > th:first-child,\n.panel > .table-bordered > thead > tr > td:first-child,\n.panel > .table-responsive > .table-bordered > thead > tr > td:first-child,\n.panel > .table-bordered > tbody > tr > td:first-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > td:first-child,\n.panel > .table-bordered > tfoot > tr > td:first-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > td:first-child {\n  border-left: 0;\n}\n.panel > .table-bordered > thead > tr > th:last-child,\n.panel > .table-responsive > .table-bordered > thead > tr > th:last-child,\n.panel > .table-bordered > tbody > tr > th:last-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > th:last-child,\n.panel > .table-bordered > tfoot > tr > th:last-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > th:last-child,\n.panel > .table-bordered > thead > tr > td:last-child,\n.panel > .table-responsive > .table-bordered > thead > tr > td:last-child,\n.panel > .table-bordered > tbody > tr > td:last-child,\n.panel > .table-responsive > .table-bordered > tbody > tr > td:last-child,\n.panel > .table-bordered > tfoot > tr > td:last-child,\n.panel > .table-responsive > .table-bordered > tfoot > tr > td:last-child {\n  border-right: 0;\n}\n.panel > .table-bordered > thead > tr:first-child > td,\n.panel > .table-responsive > .table-bordered > thead > tr:first-child > td,\n.panel > .table-bordered > tbody > tr:first-child > td,\n.panel > .table-responsive > .table-bordered > tbody > tr:first-child > td,\n.panel > .table-bordered > thead > tr:first-child > th,\n.panel > .table-responsive > .table-bordered > thead > tr:first-child > th,\n.panel > .table-bordered > tbody > tr:first-child > th,\n.panel > .table-responsive > .table-bordered > tbody > tr:first-child > th {\n  border-bottom: 0;\n}\n.panel > .table-bordered > tbody > tr:last-child > td,\n.panel > .table-responsive > .table-bordered > tbody > tr:last-child > td,\n.panel > .table-bordered > tfoot > tr:last-child > td,\n.panel > .table-responsive > .table-bordered > tfoot > tr:last-child > td,\n.panel > .table-bordered > tbody > tr:last-child > th,\n.panel > .table-responsive > .table-bordered > tbody > tr:last-child > th,\n.panel > .table-bordered > tfoot > tr:last-child > th,\n.panel > .table-responsive > .table-bordered > tfoot > tr:last-child > th {\n  border-bottom: 0;\n}\n.panel > .table-responsive {\n  margin-bottom: 0;\n  border: 0;\n}\n.panel-group {\n  margin-bottom: 20px;\n}\n.panel-group .panel {\n  margin-bottom: 0;\n  border-radius: 4px;\n}\n.panel-group .panel + .panel {\n  margin-top: 5px;\n}\n.panel-group .panel-heading {\n  border-bottom: 0;\n}\n.panel-group .panel-heading + .panel-collapse > .panel-body,\n.panel-group .panel-heading + .panel-collapse > .list-group {\n  border-top: 1px solid #ddd;\n}\n.panel-group .panel-footer {\n  border-top: 0;\n}\n.panel-group .panel-footer + .panel-collapse .panel-body {\n  border-bottom: 1px solid #ddd;\n}\n.panel-default {\n  border-color: #ddd;\n}\n.panel-default > .panel-heading {\n  color: #333;\n  background-color: #f5f5f5;\n  border-color: #ddd;\n}\n.panel-default > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #ddd;\n}\n.panel-default > .panel-heading .badge {\n  color: #f5f5f5;\n  background-color: #333;\n}\n.panel-default > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #ddd;\n}\n.panel-primary {\n  border-color: #337ab7;\n}\n.panel-primary > .panel-heading {\n  color: #fff;\n  background-color: #337ab7;\n  border-color: #337ab7;\n}\n.panel-primary > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #337ab7;\n}\n.panel-primary > .panel-heading .badge {\n  color: #337ab7;\n  background-color: #fff;\n}\n.panel-primary > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #337ab7;\n}\n.panel-success {\n  border-color: #d6e9c6;\n}\n.panel-success > .panel-heading {\n  color: #3c763d;\n  background-color: #dff0d8;\n  border-color: #d6e9c6;\n}\n.panel-success > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #d6e9c6;\n}\n.panel-success > .panel-heading .badge {\n  color: #dff0d8;\n  background-color: #3c763d;\n}\n.panel-success > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #d6e9c6;\n}\n.panel-info {\n  border-color: #bce8f1;\n}\n.panel-info > .panel-heading {\n  color: #31708f;\n  background-color: #d9edf7;\n  border-color: #bce8f1;\n}\n.panel-info > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #bce8f1;\n}\n.panel-info > .panel-heading .badge {\n  color: #d9edf7;\n  background-color: #31708f;\n}\n.panel-info > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #bce8f1;\n}\n.panel-warning {\n  border-color: #faebcc;\n}\n.panel-warning > .panel-heading {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n  border-color: #faebcc;\n}\n.panel-warning > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #faebcc;\n}\n.panel-warning > .panel-heading .badge {\n  color: #fcf8e3;\n  background-color: #8a6d3b;\n}\n.panel-warning > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #faebcc;\n}\n.panel-danger {\n  border-color: #ebccd1;\n}\n.panel-danger > .panel-heading {\n  color: #a94442;\n  background-color: #f2dede;\n  border-color: #ebccd1;\n}\n.panel-danger > .panel-heading + .panel-collapse > .panel-body {\n  border-top-color: #ebccd1;\n}\n.panel-danger > .panel-heading .badge {\n  color: #f2dede;\n  background-color: #a94442;\n}\n.panel-danger > .panel-footer + .panel-collapse > .panel-body {\n  border-bottom-color: #ebccd1;\n}\n.embed-responsive {\n  position: relative;\n  display: block;\n  height: 0;\n  padding: 0;\n  overflow: hidden;\n}\n.embed-responsive .embed-responsive-item,\n.embed-responsive iframe,\n.embed-responsive embed,\n.embed-responsive object,\n.embed-responsive video {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border: 0;\n}\n.embed-responsive-16by9 {\n  padding-bottom: 56.25%;\n}\n.embed-responsive-4by3 {\n  padding-bottom: 75%;\n}\n.well {\n  min-height: 20px;\n  padding: 19px;\n  margin-bottom: 20px;\n  background-color: #f5f5f5;\n  border: 1px solid #e3e3e3;\n  border-radius: 4px;\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);\n}\n.well blockquote {\n  border-color: #ddd;\n  border-color: rgba(0, 0, 0, .15);\n}\n.well-lg {\n  padding: 24px;\n  border-radius: 6px;\n}\n.well-sm {\n  padding: 9px;\n  border-radius: 3px;\n}\n.close {\n  float: right;\n  font-size: 21px;\n  font-weight: bold;\n  line-height: 1;\n  color: #000;\n  text-shadow: 0 1px 0 #fff;\n  filter: alpha(opacity=20);\n  opacity: .2;\n}\n.close:hover,\n.close:focus {\n  color: #000;\n  text-decoration: none;\n  cursor: pointer;\n  filter: alpha(opacity=50);\n  opacity: .5;\n}\nbutton.close {\n  -webkit-appearance: none;\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n}\n.modal-open {\n  overflow: hidden;\n}\n.modal {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1050;\n  display: none;\n  overflow: hidden;\n  -webkit-overflow-scrolling: touch;\n  outline: 0;\n}\n.modal.fade .modal-dialog {\n  -webkit-transition: -webkit-transform .3s ease-out;\n       -o-transition:      -o-transform .3s ease-out;\n          transition:         transform .3s ease-out;\n  -webkit-transform: translate(0, -25%);\n      -ms-transform: translate(0, -25%);\n       -o-transform: translate(0, -25%);\n          transform: translate(0, -25%);\n}\n.modal.in .modal-dialog {\n  -webkit-transform: translate(0, 0);\n      -ms-transform: translate(0, 0);\n       -o-transform: translate(0, 0);\n          transform: translate(0, 0);\n}\n.modal-open .modal {\n  overflow-x: hidden;\n  overflow-y: auto;\n}\n.modal-dialog {\n  position: relative;\n  width: auto;\n  margin: 10px;\n}\n.modal-content {\n  position: relative;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid #999;\n  border: 1px solid rgba(0, 0, 0, .2);\n  border-radius: 6px;\n  outline: 0;\n  -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);\n          box-shadow: 0 3px 9px rgba(0, 0, 0, .5);\n}\n.modal-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1040;\n  background-color: #000;\n}\n.modal-backdrop.fade {\n  filter: alpha(opacity=0);\n  opacity: 0;\n}\n.modal-backdrop.in {\n  filter: alpha(opacity=50);\n  opacity: .5;\n}\n.modal-header {\n  padding: 15px;\n  border-bottom: 1px solid #e5e5e5;\n}\n.modal-header .close {\n  margin-top: -2px;\n}\n.modal-title {\n  margin: 0;\n  line-height: 1.42857143;\n}\n.modal-body {\n  position: relative;\n  padding: 15px;\n}\n.modal-footer {\n  padding: 15px;\n  text-align: right;\n  border-top: 1px solid #e5e5e5;\n}\n.modal-footer .btn + .btn {\n  margin-bottom: 0;\n  margin-left: 5px;\n}\n.modal-footer .btn-group .btn + .btn {\n  margin-left: -1px;\n}\n.modal-footer .btn-block + .btn-block {\n  margin-left: 0;\n}\n.modal-scrollbar-measure {\n  position: absolute;\n  top: -9999px;\n  width: 50px;\n  height: 50px;\n  overflow: scroll;\n}\n@media (min-width: 768px) {\n  .modal-dialog {\n    width: 600px;\n    margin: 30px auto;\n  }\n  .modal-content {\n    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);\n            box-shadow: 0 5px 15px rgba(0, 0, 0, .5);\n  }\n  .modal-sm {\n    width: 300px;\n  }\n}\n@media (min-width: 992px) {\n  .modal-lg {\n    width: 900px;\n  }\n}\n.tooltip {\n  position: absolute;\n  z-index: 1070;\n  display: block;\n  font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  font-size: 12px;\n  font-style: normal;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  letter-spacing: normal;\n  word-break: normal;\n  word-spacing: normal;\n  word-wrap: normal;\n  white-space: normal;\n  filter: alpha(opacity=0);\n  opacity: 0;\n\n  line-break: auto;\n}\n.tooltip.in {\n  filter: alpha(opacity=90);\n  opacity: .9;\n}\n.tooltip.top {\n  padding: 5px 0;\n  margin-top: -3px;\n}\n.tooltip.right {\n  padding: 0 5px;\n  margin-left: 3px;\n}\n.tooltip.bottom {\n  padding: 5px 0;\n  margin-top: 3px;\n}\n.tooltip.left {\n  padding: 0 5px;\n  margin-left: -3px;\n}\n.tooltip-inner {\n  max-width: 200px;\n  padding: 3px 8px;\n  color: #fff;\n  text-align: center;\n  background-color: #000;\n  border-radius: 4px;\n}\n.tooltip-arrow {\n  position: absolute;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n.tooltip.top .tooltip-arrow {\n  bottom: 0;\n  left: 50%;\n  margin-left: -5px;\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n.tooltip.top-left .tooltip-arrow {\n  right: 5px;\n  bottom: 0;\n  margin-bottom: -5px;\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n.tooltip.top-right .tooltip-arrow {\n  bottom: 0;\n  left: 5px;\n  margin-bottom: -5px;\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n.tooltip.right .tooltip-arrow {\n  top: 50%;\n  left: 0;\n  margin-top: -5px;\n  border-width: 5px 5px 5px 0;\n  border-right-color: #000;\n}\n.tooltip.left .tooltip-arrow {\n  top: 50%;\n  right: 0;\n  margin-top: -5px;\n  border-width: 5px 0 5px 5px;\n  border-left-color: #000;\n}\n.tooltip.bottom .tooltip-arrow {\n  top: 0;\n  left: 50%;\n  margin-left: -5px;\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n.tooltip.bottom-left .tooltip-arrow {\n  top: 0;\n  right: 5px;\n  margin-top: -5px;\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n.tooltip.bottom-right .tooltip-arrow {\n  top: 0;\n  left: 5px;\n  margin-top: -5px;\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n.popover {\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 1060;\n  display: none;\n  max-width: 276px;\n  padding: 1px;\n  font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  font-size: 14px;\n  font-style: normal;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  letter-spacing: normal;\n  word-break: normal;\n  word-spacing: normal;\n  word-wrap: normal;\n  white-space: normal;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid #ccc;\n  border: 1px solid rgba(0, 0, 0, .2);\n  border-radius: 6px;\n  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);\n          box-shadow: 0 5px 10px rgba(0, 0, 0, .2);\n\n  line-break: auto;\n}\n.popover.top {\n  margin-top: -10px;\n}\n.popover.right {\n  margin-left: 10px;\n}\n.popover.bottom {\n  margin-top: 10px;\n}\n.popover.left {\n  margin-left: -10px;\n}\n.popover-title {\n  padding: 8px 14px;\n  margin: 0;\n  font-size: 14px;\n  background-color: #f7f7f7;\n  border-bottom: 1px solid #ebebeb;\n  border-radius: 5px 5px 0 0;\n}\n.popover-content {\n  padding: 9px 14px;\n}\n.popover > .arrow,\n.popover > .arrow:after {\n  position: absolute;\n  display: block;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n.popover > .arrow {\n  border-width: 11px;\n}\n.popover > .arrow:after {\n  content: \"\";\n  border-width: 10px;\n}\n.popover.top > .arrow {\n  bottom: -11px;\n  left: 50%;\n  margin-left: -11px;\n  border-top-color: #999;\n  border-top-color: rgba(0, 0, 0, .25);\n  border-bottom-width: 0;\n}\n.popover.top > .arrow:after {\n  bottom: 1px;\n  margin-left: -10px;\n  content: \" \";\n  border-top-color: #fff;\n  border-bottom-width: 0;\n}\n.popover.right > .arrow {\n  top: 50%;\n  left: -11px;\n  margin-top: -11px;\n  border-right-color: #999;\n  border-right-color: rgba(0, 0, 0, .25);\n  border-left-width: 0;\n}\n.popover.right > .arrow:after {\n  bottom: -10px;\n  left: 1px;\n  content: \" \";\n  border-right-color: #fff;\n  border-left-width: 0;\n}\n.popover.bottom > .arrow {\n  top: -11px;\n  left: 50%;\n  margin-left: -11px;\n  border-top-width: 0;\n  border-bottom-color: #999;\n  border-bottom-color: rgba(0, 0, 0, .25);\n}\n.popover.bottom > .arrow:after {\n  top: 1px;\n  margin-left: -10px;\n  content: \" \";\n  border-top-width: 0;\n  border-bottom-color: #fff;\n}\n.popover.left > .arrow {\n  top: 50%;\n  right: -11px;\n  margin-top: -11px;\n  border-right-width: 0;\n  border-left-color: #999;\n  border-left-color: rgba(0, 0, 0, .25);\n}\n.popover.left > .arrow:after {\n  right: 1px;\n  bottom: -10px;\n  content: \" \";\n  border-right-width: 0;\n  border-left-color: #fff;\n}\n.carousel {\n  position: relative;\n}\n.carousel-inner {\n  position: relative;\n  width: 100%;\n  overflow: hidden;\n}\n.carousel-inner > .item {\n  position: relative;\n  display: none;\n  -webkit-transition: .6s ease-in-out left;\n       -o-transition: .6s ease-in-out left;\n          transition: .6s ease-in-out left;\n}\n.carousel-inner > .item > img,\n.carousel-inner > .item > a > img {\n  line-height: 1;\n}\n@media all and (transform-3d), (-webkit-transform-3d) {\n  .carousel-inner > .item {\n    -webkit-transition: -webkit-transform .6s ease-in-out;\n         -o-transition:      -o-transform .6s ease-in-out;\n            transition:         transform .6s ease-in-out;\n\n    -webkit-backface-visibility: hidden;\n            backface-visibility: hidden;\n    -webkit-perspective: 1000px;\n            perspective: 1000px;\n  }\n  .carousel-inner > .item.next,\n  .carousel-inner > .item.active.right {\n    left: 0;\n    -webkit-transform: translate3d(100%, 0, 0);\n            transform: translate3d(100%, 0, 0);\n  }\n  .carousel-inner > .item.prev,\n  .carousel-inner > .item.active.left {\n    left: 0;\n    -webkit-transform: translate3d(-100%, 0, 0);\n            transform: translate3d(-100%, 0, 0);\n  }\n  .carousel-inner > .item.next.left,\n  .carousel-inner > .item.prev.right,\n  .carousel-inner > .item.active {\n    left: 0;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n.carousel-inner > .active,\n.carousel-inner > .next,\n.carousel-inner > .prev {\n  display: block;\n}\n.carousel-inner > .active {\n  left: 0;\n}\n.carousel-inner > .next,\n.carousel-inner > .prev {\n  position: absolute;\n  top: 0;\n  width: 100%;\n}\n.carousel-inner > .next {\n  left: 100%;\n}\n.carousel-inner > .prev {\n  left: -100%;\n}\n.carousel-inner > .next.left,\n.carousel-inner > .prev.right {\n  left: 0;\n}\n.carousel-inner > .active.left {\n  left: -100%;\n}\n.carousel-inner > .active.right {\n  left: 100%;\n}\n.carousel-control {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  width: 15%;\n  font-size: 20px;\n  color: #fff;\n  text-align: center;\n  text-shadow: 0 1px 2px rgba(0, 0, 0, .6);\n  background-color: rgba(0, 0, 0, 0);\n  filter: alpha(opacity=50);\n  opacity: .5;\n}\n.carousel-control.left {\n  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);\n  background-image:      -o-linear-gradient(left, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);\n  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .5)), to(rgba(0, 0, 0, .0001)));\n  background-image:         linear-gradient(to right, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .0001) 100%);\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#80000000\', endColorstr=\'#00000000\', GradientType=1);\n  background-repeat: repeat-x;\n}\n.carousel-control.right {\n  right: 0;\n  left: auto;\n  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);\n  background-image:      -o-linear-gradient(left, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);\n  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .0001)), to(rgba(0, 0, 0, .5)));\n  background-image:         linear-gradient(to right, rgba(0, 0, 0, .0001) 0%, rgba(0, 0, 0, .5) 100%);\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#00000000\', endColorstr=\'#80000000\', GradientType=1);\n  background-repeat: repeat-x;\n}\n.carousel-control:hover,\n.carousel-control:focus {\n  color: #fff;\n  text-decoration: none;\n  filter: alpha(opacity=90);\n  outline: 0;\n  opacity: .9;\n}\n.carousel-control .icon-prev,\n.carousel-control .icon-next,\n.carousel-control .glyphicon-chevron-left,\n.carousel-control .glyphicon-chevron-right {\n  position: absolute;\n  top: 50%;\n  z-index: 5;\n  display: inline-block;\n  margin-top: -10px;\n}\n.carousel-control .icon-prev,\n.carousel-control .glyphicon-chevron-left {\n  left: 50%;\n  margin-left: -10px;\n}\n.carousel-control .icon-next,\n.carousel-control .glyphicon-chevron-right {\n  right: 50%;\n  margin-right: -10px;\n}\n.carousel-control .icon-prev,\n.carousel-control .icon-next {\n  width: 20px;\n  height: 20px;\n  font-family: serif;\n  line-height: 1;\n}\n.carousel-control .icon-prev:before {\n  content: \'\\2039\';\n}\n.carousel-control .icon-next:before {\n  content: \'\\203a\';\n}\n.carousel-indicators {\n  position: absolute;\n  bottom: 10px;\n  left: 50%;\n  z-index: 15;\n  width: 60%;\n  padding-left: 0;\n  margin-left: -30%;\n  text-align: center;\n  list-style: none;\n}\n.carousel-indicators li {\n  display: inline-block;\n  width: 10px;\n  height: 10px;\n  margin: 1px;\n  text-indent: -999px;\n  cursor: pointer;\n  background-color: #000 \t;\n  background-color: rgba(0, 0, 0, 0);\n  border: 1px solid #fff;\n  border-radius: 10px;\n}\n.carousel-indicators .active {\n  width: 12px;\n  height: 12px;\n  margin: 0;\n  background-color: #fff;\n}\n.carousel-caption {\n  position: absolute;\n  right: 15%;\n  bottom: 20px;\n  left: 15%;\n  z-index: 10;\n  padding-top: 20px;\n  padding-bottom: 20px;\n  color: #fff;\n  text-align: center;\n  text-shadow: 0 1px 2px rgba(0, 0, 0, .6);\n}\n.carousel-caption .btn {\n  text-shadow: none;\n}\n@media screen and (min-width: 768px) {\n  .carousel-control .glyphicon-chevron-left,\n  .carousel-control .glyphicon-chevron-right,\n  .carousel-control .icon-prev,\n  .carousel-control .icon-next {\n    width: 30px;\n    height: 30px;\n    margin-top: -10px;\n    font-size: 30px;\n  }\n  .carousel-control .glyphicon-chevron-left,\n  .carousel-control .icon-prev {\n    margin-left: -10px;\n  }\n  .carousel-control .glyphicon-chevron-right,\n  .carousel-control .icon-next {\n    margin-right: -10px;\n  }\n  .carousel-caption {\n    right: 20%;\n    left: 20%;\n    padding-bottom: 30px;\n  }\n  .carousel-indicators {\n    bottom: 20px;\n  }\n}\n.clearfix:before,\n.clearfix:after,\n.dl-horizontal dd:before,\n.dl-horizontal dd:after,\n.container:before,\n.container:after,\n.container-fluid:before,\n.container-fluid:after,\n.row:before,\n.row:after,\n.form-horizontal .form-group:before,\n.form-horizontal .form-group:after,\n.btn-toolbar:before,\n.btn-toolbar:after,\n.btn-group-vertical > .btn-group:before,\n.btn-group-vertical > .btn-group:after,\n.nav:before,\n.nav:after,\n.navbar:before,\n.navbar:after,\n.navbar-header:before,\n.navbar-header:after,\n.navbar-collapse:before,\n.navbar-collapse:after,\n.pager:before,\n.pager:after,\n.panel-body:before,\n.panel-body:after,\n.modal-header:before,\n.modal-header:after,\n.modal-footer:before,\n.modal-footer:after {\n  display: table;\n  content: \" \";\n}\n.clearfix:after,\n.dl-horizontal dd:after,\n.container:after,\n.container-fluid:after,\n.row:after,\n.form-horizontal .form-group:after,\n.btn-toolbar:after,\n.btn-group-vertical > .btn-group:after,\n.nav:after,\n.navbar:after,\n.navbar-header:after,\n.navbar-collapse:after,\n.pager:after,\n.panel-body:after,\n.modal-header:after,\n.modal-footer:after {\n  clear: both;\n}\n.center-block {\n  display: block;\n  margin-right: auto;\n  margin-left: auto;\n}\n.pull-right {\n  float: right !important;\n}\n.pull-left {\n  float: left !important;\n}\n.hide {\n  display: none !important;\n}\n.show {\n  display: block !important;\n}\n.invisible {\n  visibility: hidden;\n}\n.text-hide {\n  font: 0/0 a;\n  color: transparent;\n  text-shadow: none;\n  background-color: transparent;\n  border: 0;\n}\n.hidden {\n  display: none !important;\n}\n.affix {\n  position: fixed;\n}\n@-ms-viewport {\n  width: device-width;\n}\n.visible-xs,\n.visible-sm,\n.visible-md,\n.visible-lg {\n  display: none !important;\n}\n.visible-xs-block,\n.visible-xs-inline,\n.visible-xs-inline-block,\n.visible-sm-block,\n.visible-sm-inline,\n.visible-sm-inline-block,\n.visible-md-block,\n.visible-md-inline,\n.visible-md-inline-block,\n.visible-lg-block,\n.visible-lg-inline,\n.visible-lg-inline-block {\n  display: none !important;\n}\n@media (max-width: 767px) {\n  .visible-xs {\n    display: block !important;\n  }\n  table.visible-xs {\n    display: table !important;\n  }\n  tr.visible-xs {\n    display: table-row !important;\n  }\n  th.visible-xs,\n  td.visible-xs {\n    display: table-cell !important;\n  }\n}\n@media (max-width: 767px) {\n  .visible-xs-block {\n    display: block !important;\n  }\n}\n@media (max-width: 767px) {\n  .visible-xs-inline {\n    display: inline !important;\n  }\n}\n@media (max-width: 767px) {\n  .visible-xs-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm {\n    display: block !important;\n  }\n  table.visible-sm {\n    display: table !important;\n  }\n  tr.visible-sm {\n    display: table-row !important;\n  }\n  th.visible-sm,\n  td.visible-sm {\n    display: table-cell !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm-block {\n    display: block !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm-inline {\n    display: inline !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .visible-sm-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md {\n    display: block !important;\n  }\n  table.visible-md {\n    display: table !important;\n  }\n  tr.visible-md {\n    display: table-row !important;\n  }\n  th.visible-md,\n  td.visible-md {\n    display: table-cell !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md-block {\n    display: block !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md-inline {\n    display: inline !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .visible-md-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg {\n    display: block !important;\n  }\n  table.visible-lg {\n    display: table !important;\n  }\n  tr.visible-lg {\n    display: table-row !important;\n  }\n  th.visible-lg,\n  td.visible-lg {\n    display: table-cell !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg-block {\n    display: block !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg-inline {\n    display: inline !important;\n  }\n}\n@media (min-width: 1200px) {\n  .visible-lg-inline-block {\n    display: inline-block !important;\n  }\n}\n@media (max-width: 767px) {\n  .hidden-xs {\n    display: none !important;\n  }\n}\n@media (min-width: 768px) and (max-width: 991px) {\n  .hidden-sm {\n    display: none !important;\n  }\n}\n@media (min-width: 992px) and (max-width: 1199px) {\n  .hidden-md {\n    display: none !important;\n  }\n}\n@media (min-width: 1200px) {\n  .hidden-lg {\n    display: none !important;\n  }\n}\n.visible-print {\n  display: none !important;\n}\n@media print {\n  .visible-print {\n    display: block !important;\n  }\n  table.visible-print {\n    display: table !important;\n  }\n  tr.visible-print {\n    display: table-row !important;\n  }\n  th.visible-print,\n  td.visible-print {\n    display: table-cell !important;\n  }\n}\n.visible-print-block {\n  display: none !important;\n}\n@media print {\n  .visible-print-block {\n    display: block !important;\n  }\n}\n.visible-print-inline {\n  display: none !important;\n}\n@media print {\n  .visible-print-inline {\n    display: inline !important;\n  }\n}\n.visible-print-inline-block {\n  display: none !important;\n}\n@media print {\n  .visible-print-inline-block {\n    display: inline-block !important;\n  }\n}\n@media print {\n  .hidden-print {\n    display: none !important;\n  }\n}\n/*# sourceMappingURL=bootstrap.css.map */\n';
-
 var _elm_lang$core$Set$foldr = F3(
 	function (f, b, _p0) {
 		var _p1 = _p0;
@@ -10609,11 +8560,11 @@ var _elm_community$graph$Graph$stronglyConnectedComponents = function (graph) {
 		A2(_elm_community$graph$Graph$checkForBackEdges, reversePostOrder, graph));
 };
 
-var _elm_community$graph$Graph_GraphViz$outputWithStylesWithOverrides = F2(
-	function (styles, graph) {
+var _elm_community$graph$Graph_DOT$outputWithStylesAndAttributes = F4(
+	function (styles, nodeAttrs, edgeAttrs, graph) {
 		var nodes = _elm_community$graph$Graph$nodes(graph);
 		var edges = function () {
-			var sortEdges = F2(
+			var compareEdge = F2(
 				function (a, b) {
 					var _p0 = A2(_elm_lang$core$Basics$compare, a.from, b.from);
 					switch (_p0.ctor) {
@@ -10627,251 +8578,160 @@ var _elm_community$graph$Graph_GraphViz$outputWithStylesWithOverrides = F2(
 				});
 			return A2(
 				_elm_lang$core$List$sortWith,
-				sortEdges,
+				compareEdge,
 				_elm_community$graph$Graph$edges(graph));
 		}();
-		var getText = function (id) {
+		var attrAssocs = function (_p1) {
 			return A2(
-				_elm_lang$core$Maybe$withDefault,
+				_elm_lang$core$String$join,
+				', ',
+				A2(
+					_elm_lang$core$List$map,
+					function (_p2) {
+						var _p3 = _p2;
+						return A2(
+							_elm_lang$core$Basics_ops['++'],
+							_p3._0,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'=',
+								_elm_lang$core$Basics$toString(_p3._1)));
+					},
+					_elm_lang$core$Dict$toList(_p1)));
+		};
+		var makeAttrs = function (d) {
+			return _elm_lang$core$Dict$isEmpty(d) ? '' : A2(
+				_elm_lang$core$Basics_ops['++'],
+				' [',
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					'*Node id ',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_elm_lang$core$Basics$toString(id),
-						' not found*')),
-				A2(
-					_elm_lang$core$Maybe$map,
-					function (_p1) {
-						return function (_) {
-							return _.text;
-						}(
-							function (_) {
-								return _.label;
-							}(
-								function (_) {
-									return _.node;
-								}(_p1)));
-					},
-					A2(_elm_community$graph$Graph$get, id, graph)));
+					attrAssocs(d),
+					']'));
 		};
-		var edge = function (_p2) {
-			var _p3 = _p2;
-			var _p4 = _p3.label;
+		var edge = function (e) {
 			return A2(
 				_elm_lang$core$Basics_ops['++'],
 				'  ',
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(
-						getText(_p3.from)),
+					_elm_lang$core$Basics$toString(e.from),
 					A2(
 						_elm_lang$core$Basics_ops['++'],
 						' -> ',
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(
-								getText(_p3.to)),
-							(!_elm_lang$core$String$isEmpty(_p4.attrs)) ? A2(
-								_elm_lang$core$Basics_ops['++'],
-								' [',
-								A2(_elm_lang$core$Basics_ops['++'], _p4.attrs, ']')) : ''))));
+							_elm_lang$core$Basics$toString(e.to),
+							makeAttrs(
+								edgeAttrs(e.label))))));
 		};
 		var edgesString = A2(
 			_elm_lang$core$String$join,
 			'\n',
 			A2(_elm_lang$core$List$map, edge, edges));
-		var node = function (node) {
+		var node = function (n) {
 			return A2(
 				_elm_lang$core$Basics_ops['++'],
 				'  ',
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(
-						getText(node.id)),
-					(!_elm_lang$core$String$isEmpty(node.label.attrs)) ? A2(
-						_elm_lang$core$Basics_ops['++'],
-						' [',
-						A2(_elm_lang$core$Basics_ops['++'], node.label.attrs, ']')) : ''));
+					_elm_lang$core$Basics$toString(n.id),
+					makeAttrs(
+						nodeAttrs(n.label))));
 		};
 		var nodesString = A2(
 			_elm_lang$core$String$join,
 			'\n',
 			A2(_elm_lang$core$List$map, node, nodes));
 		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			'digraph G {\n',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'  rankdir=',
-					A2(
+			_elm_lang$core$String$join,
+			'\n',
+			{
+				ctor: '::',
+				_0: 'digraph G {',
+				_1: {
+					ctor: '::',
+					_0: A2(
 						_elm_lang$core$Basics_ops['++'],
-						_elm_lang$core$Basics$toString(styles.rankdir),
-						'\n')),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						'  graph [',
-						A2(
+						'  rankdir=',
+						_elm_lang$core$Basics$toString(styles.rankdir)),
+					_1: {
+						ctor: '::',
+						_0: A2(
 							_elm_lang$core$Basics_ops['++'],
-							styles.graph,
-							A2(_elm_lang$core$Basics_ops['++'], ']', '\n'))),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							'  node [',
-							A2(
+							'  graph [',
+							A2(_elm_lang$core$Basics_ops['++'], styles.graph, ']')),
+						_1: {
+							ctor: '::',
+							_0: A2(
 								_elm_lang$core$Basics_ops['++'],
-								styles.node,
-								A2(_elm_lang$core$Basics_ops['++'], ']', '\n'))),
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								'  edge [',
-								A2(
+								'  node [',
+								A2(_elm_lang$core$Basics_ops['++'], styles.node, ']')),
+							_1: {
+								ctor: '::',
+								_0: A2(
 									_elm_lang$core$Basics_ops['++'],
-									styles.edge,
-									A2(_elm_lang$core$Basics_ops['++'], ']', '\n\n'))),
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								A2(_elm_lang$core$Basics_ops['++'], edgesString, '\n\n'),
-								A2(_elm_lang$core$Basics_ops['++'], nodesString, '\n}')))))));
-	});
-var _elm_community$graph$Graph_GraphViz$outputWithStyles = F2(
-	function (styles, graph) {
-		var nodes = _elm_community$graph$Graph$nodes(graph);
-		var edges = function () {
-			var sortEdges = F2(
-				function (a, b) {
-					var _p5 = A2(_elm_lang$core$Basics$compare, a.from, b.from);
-					switch (_p5.ctor) {
-						case 'LT':
-							return _elm_lang$core$Basics$LT;
-						case 'GT':
-							return _elm_lang$core$Basics$GT;
-						default:
-							return A2(_elm_lang$core$Basics$compare, a.to, b.to);
+									'  edge [',
+									A2(_elm_lang$core$Basics_ops['++'], styles.edge, ']')),
+								_1: {
+									ctor: '::',
+									_0: '',
+									_1: {
+										ctor: '::',
+										_0: edgesString,
+										_1: {
+											ctor: '::',
+											_0: '',
+											_1: {
+												ctor: '::',
+												_0: nodesString,
+												_1: {
+													ctor: '::',
+													_0: '}',
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
 					}
-				});
-			return A2(
-				_elm_lang$core$List$sortWith,
-				sortEdges,
-				_elm_community$graph$Graph$edges(graph));
-		}();
-		var getText = function (id) {
-			return A2(
-				_elm_lang$core$Maybe$withDefault,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'*Node id ',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_elm_lang$core$Basics$toString(id),
-						' not found*')),
-				A2(
-					_elm_lang$core$Maybe$map,
-					function (_p6) {
-						return function (_) {
-							return _.text;
-						}(
-							function (_) {
-								return _.label;
-							}(
-								function (_) {
-									return _.node;
-								}(_p6)));
-					},
-					A2(_elm_community$graph$Graph$get, id, graph)));
-		};
-		var edge = function (_p7) {
-			var _p8 = _p7;
-			return A2(
-				_elm_lang$core$Basics_ops['++'],
-				'  ',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(
-						getText(_p8.from)),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						' -> ',
-						_elm_lang$core$Basics$toString(
-							getText(_p8.to)))));
-		};
-		var edgesString = A2(
-			_elm_lang$core$String$join,
-			'\n',
-			A2(_elm_lang$core$List$map, edge, edges));
-		var node = function (node) {
-			return A2(
-				_elm_lang$core$Basics_ops['++'],
-				'  ',
-				_elm_lang$core$Basics$toString(
-					getText(node.id)));
-		};
-		var nodesString = A2(
-			_elm_lang$core$String$join,
-			'\n',
-			A2(_elm_lang$core$List$map, node, nodes));
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			'digraph G {\n',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'  rankdir=',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_elm_lang$core$Basics$toString(styles.rankdir),
-						'\n')),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						'  graph [',
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							styles.graph,
-							A2(_elm_lang$core$Basics_ops['++'], ']', '\n'))),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							'  node [',
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								styles.node,
-								A2(_elm_lang$core$Basics_ops['++'], ']', '\n'))),
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								'  edge [',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									styles.edge,
-									A2(_elm_lang$core$Basics_ops['++'], ']', '\n\n'))),
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								A2(_elm_lang$core$Basics_ops['++'], edgesString, '\n\n'),
-								A2(_elm_lang$core$Basics_ops['++'], nodesString, '\n}')))))));
+				}
+			});
 	});
-var _elm_community$graph$Graph_GraphViz$Styles = F4(
+var _elm_community$graph$Graph_DOT$outputWithStyles = F4(
+	function (styles, mapNode, mapEdge, graph) {
+		var labelOnly = function (maybeLabel) {
+			var _p4 = maybeLabel;
+			if (_p4.ctor === 'Nothing') {
+				return _elm_lang$core$Dict$empty;
+			} else {
+				return A2(_elm_lang$core$Dict$singleton, 'label', _p4._0);
+			}
+		};
+		return A4(
+			_elm_community$graph$Graph_DOT$outputWithStylesAndAttributes,
+			styles,
+			function (_p5) {
+				return labelOnly(
+					mapNode(_p5));
+			},
+			function (_p6) {
+				return labelOnly(
+					mapEdge(_p6));
+			},
+			graph);
+	});
+var _elm_community$graph$Graph_DOT$Styles = F4(
 	function (a, b, c, d) {
 		return {rankdir: a, graph: b, node: c, edge: d};
 	});
-var _elm_community$graph$Graph_GraphViz$RL = {ctor: 'RL'};
-var _elm_community$graph$Graph_GraphViz$BT = {ctor: 'BT'};
-var _elm_community$graph$Graph_GraphViz$LR = {ctor: 'LR'};
-var _elm_community$graph$Graph_GraphViz$TB = {ctor: 'TB'};
-var _elm_community$graph$Graph_GraphViz$defaultStyles = A4(_elm_community$graph$Graph_GraphViz$Styles, _elm_community$graph$Graph_GraphViz$TB, '', '', '');
-var _elm_community$graph$Graph_GraphViz$output = _elm_community$graph$Graph_GraphViz$outputWithStyles(_elm_community$graph$Graph_GraphViz$defaultStyles);
+var _elm_community$graph$Graph_DOT$RL = {ctor: 'RL'};
+var _elm_community$graph$Graph_DOT$BT = {ctor: 'BT'};
+var _elm_community$graph$Graph_DOT$LR = {ctor: 'LR'};
+var _elm_community$graph$Graph_DOT$TB = {ctor: 'TB'};
+var _elm_community$graph$Graph_DOT$defaultStyles = A4(_elm_community$graph$Graph_DOT$Styles, _elm_community$graph$Graph_DOT$TB, '', '', '');
+var _elm_community$graph$Graph_DOT$output = _elm_community$graph$Graph_DOT$outputWithStyles(_elm_community$graph$Graph_DOT$defaultStyles);
 
 //import Result //
 
@@ -11351,6 +9211,22 @@ var _elm_lang$core$Date$Mar = {ctor: 'Mar'};
 var _elm_lang$core$Date$Feb = {ctor: 'Feb'};
 var _elm_lang$core$Date$Jan = {ctor: 'Jan'};
 
+var _elm_community$json_extra$Json_Decode_Extra$when = F3(
+	function (checkDecoder, check, passDecoder) {
+		return A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (checkVal) {
+				return check(checkVal) ? passDecoder : _elm_lang$core$Json_Decode$fail(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'Check failed with input `',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(checkVal),
+							'`')));
+			},
+			checkDecoder);
+	});
 var _elm_community$json_extra$Json_Decode_Extra$combine = A2(
 	_elm_lang$core$List$foldr,
 	_elm_lang$core$Json_Decode$map2(
@@ -11587,16 +9463,45 @@ var _elm_community$list_extra$List_Extra$zip = _elm_lang$core$List$map2(
 		function (v0, v1) {
 			return {ctor: '_Tuple2', _0: v0, _1: v1};
 		}));
+var _elm_community$list_extra$List_Extra$isSubsequenceOf = F2(
+	function (subseq, list) {
+		isSubsequenceOf:
+		while (true) {
+			var _p0 = {ctor: '_Tuple2', _0: subseq, _1: list};
+			if (_p0._0.ctor === '[]') {
+				return true;
+			} else {
+				if (_p0._1.ctor === '[]') {
+					return false;
+				} else {
+					var _p1 = _p0._1._1;
+					if (_elm_lang$core$Native_Utils.eq(_p0._0._0, _p0._1._0)) {
+						var _v1 = _p0._0._1,
+							_v2 = _p1;
+						subseq = _v1;
+						list = _v2;
+						continue isSubsequenceOf;
+					} else {
+						var _v3 = subseq,
+							_v4 = _p1;
+						subseq = _v3;
+						list = _v4;
+						continue isSubsequenceOf;
+					}
+				}
+			}
+		}
+	});
 var _elm_community$list_extra$List_Extra$isPrefixOf = F2(
 	function (prefix, xs) {
-		var _p0 = {ctor: '_Tuple2', _0: prefix, _1: xs};
-		if (_p0._0.ctor === '[]') {
+		var _p2 = {ctor: '_Tuple2', _0: prefix, _1: xs};
+		if (_p2._0.ctor === '[]') {
 			return true;
 		} else {
-			if (_p0._1.ctor === '[]') {
+			if (_p2._1.ctor === '[]') {
 				return false;
 			} else {
-				return _elm_lang$core$Native_Utils.eq(_p0._0._0, _p0._1._0) && A2(_elm_community$list_extra$List_Extra$isPrefixOf, _p0._0._1, _p0._1._1);
+				return _elm_lang$core$Native_Utils.eq(_p2._0._0, _p2._1._0) && A2(_elm_community$list_extra$List_Extra$isPrefixOf, _p2._0._1, _p2._1._1);
 			}
 		}
 	});
@@ -11607,37 +9512,39 @@ var _elm_community$list_extra$List_Extra$isSuffixOf = F2(
 			_elm_lang$core$List$reverse(suffix),
 			_elm_lang$core$List$reverse(xs));
 	});
+var _elm_community$list_extra$List_Extra$isInfixOfHelp = F3(
+	function (infixHead, infixTail, list) {
+		isInfixOfHelp:
+		while (true) {
+			var _p3 = list;
+			if (_p3.ctor === '[]') {
+				return false;
+			} else {
+				var _p4 = _p3._1;
+				if (_elm_lang$core$Native_Utils.eq(_p3._0, infixHead)) {
+					return A2(_elm_community$list_extra$List_Extra$isPrefixOf, infixTail, _p4);
+				} else {
+					var _v7 = infixHead,
+						_v8 = infixTail,
+						_v9 = _p4;
+					infixHead = _v7;
+					infixTail = _v8;
+					list = _v9;
+					continue isInfixOfHelp;
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$isInfixOf = F2(
+	function (infixList, list) {
+		var _p5 = infixList;
+		if (_p5.ctor === '[]') {
+			return true;
+		} else {
+			return A3(_elm_community$list_extra$List_Extra$isInfixOfHelp, _p5._0, _p5._1, list);
+		}
+	});
 var _elm_community$list_extra$List_Extra$selectSplit = function (xs) {
-	var _p1 = xs;
-	if (_p1.ctor === '[]') {
-		return {ctor: '[]'};
-	} else {
-		var _p5 = _p1._1;
-		var _p4 = _p1._0;
-		return {
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple3',
-				_0: {ctor: '[]'},
-				_1: _p4,
-				_2: _p5
-			},
-			_1: A2(
-				_elm_lang$core$List$map,
-				function (_p2) {
-					var _p3 = _p2;
-					return {
-						ctor: '_Tuple3',
-						_0: {ctor: '::', _0: _p4, _1: _p3._0},
-						_1: _p3._1,
-						_2: _p3._2
-					};
-				},
-				_elm_community$list_extra$List_Extra$selectSplit(_p5))
-		};
-	}
-};
-var _elm_community$list_extra$List_Extra$select = function (xs) {
 	var _p6 = xs;
 	if (_p6.ctor === '[]') {
 		return {ctor: '[]'};
@@ -11646,30 +9553,60 @@ var _elm_community$list_extra$List_Extra$select = function (xs) {
 		var _p9 = _p6._0;
 		return {
 			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: _p9, _1: _p10},
+			_0: {
+				ctor: '_Tuple3',
+				_0: {ctor: '[]'},
+				_1: _p9,
+				_2: _p10
+			},
 			_1: A2(
 				_elm_lang$core$List$map,
 				function (_p7) {
 					var _p8 = _p7;
 					return {
-						ctor: '_Tuple2',
-						_0: _p8._0,
-						_1: {ctor: '::', _0: _p9, _1: _p8._1}
+						ctor: '_Tuple3',
+						_0: {ctor: '::', _0: _p9, _1: _p8._0},
+						_1: _p8._1,
+						_2: _p8._2
 					};
 				},
-				_elm_community$list_extra$List_Extra$select(_p10))
+				_elm_community$list_extra$List_Extra$selectSplit(_p10))
+		};
+	}
+};
+var _elm_community$list_extra$List_Extra$select = function (xs) {
+	var _p11 = xs;
+	if (_p11.ctor === '[]') {
+		return {ctor: '[]'};
+	} else {
+		var _p15 = _p11._1;
+		var _p14 = _p11._0;
+		return {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: _p14, _1: _p15},
+			_1: A2(
+				_elm_lang$core$List$map,
+				function (_p12) {
+					var _p13 = _p12;
+					return {
+						ctor: '_Tuple2',
+						_0: _p13._0,
+						_1: {ctor: '::', _0: _p14, _1: _p13._1}
+					};
+				},
+				_elm_community$list_extra$List_Extra$select(_p15))
 		};
 	}
 };
 var _elm_community$list_extra$List_Extra$tailsHelp = F2(
 	function (e, list) {
-		var _p11 = list;
-		if (_p11.ctor === '::') {
-			var _p12 = _p11._0;
+		var _p16 = list;
+		if (_p16.ctor === '::') {
+			var _p17 = _p16._0;
 			return {
 				ctor: '::',
-				_0: {ctor: '::', _0: e, _1: _p12},
-				_1: {ctor: '::', _0: _p12, _1: _p11._1}
+				_0: {ctor: '::', _0: e, _1: _p17},
+				_1: {ctor: '::', _0: _p17, _1: _p16._1}
 			};
 		} else {
 			return {ctor: '[]'};
@@ -11682,13 +9619,6 @@ var _elm_community$list_extra$List_Extra$tails = A2(
 		ctor: '::',
 		_0: {ctor: '[]'},
 		_1: {ctor: '[]'}
-	});
-var _elm_community$list_extra$List_Extra$isInfixOf = F2(
-	function (infix, xs) {
-		return A2(
-			_elm_lang$core$List$any,
-			_elm_community$list_extra$List_Extra$isPrefixOf(infix),
-			_elm_community$list_extra$List_Extra$tails(xs));
 	});
 var _elm_community$list_extra$List_Extra$inits = A2(
 	_elm_lang$core$List$foldr,
@@ -11711,57 +9641,78 @@ var _elm_community$list_extra$List_Extra$inits = A2(
 		_0: {ctor: '[]'},
 		_1: {ctor: '[]'}
 	});
-var _elm_community$list_extra$List_Extra$groupWhileTransitively = F2(
-	function (cmp, xs_) {
-		var _p13 = xs_;
-		if (_p13.ctor === '[]') {
-			return {ctor: '[]'};
-		} else {
-			if (_p13._1.ctor === '[]') {
-				return {
-					ctor: '::',
-					_0: {
-						ctor: '::',
-						_0: _p13._0,
-						_1: {ctor: '[]'}
-					},
-					_1: {ctor: '[]'}
-				};
+var _elm_community$list_extra$List_Extra$groupWhileTransitivelyHelp = F4(
+	function (result, currentGroup, compare, list) {
+		groupWhileTransitivelyHelp:
+		while (true) {
+			var _p18 = list;
+			if (_p18.ctor === '[]') {
+				return _elm_lang$core$List$reverse(
+					_elm_lang$core$List$isEmpty(currentGroup) ? result : _elm_lang$core$List$reverse(
+						{ctor: '::', _0: currentGroup, _1: result}));
 			} else {
-				var _p15 = _p13._0;
-				var _p14 = A2(_elm_community$list_extra$List_Extra$groupWhileTransitively, cmp, _p13._1);
-				if (_p14.ctor === '::') {
-					return A2(cmp, _p15, _p13._1._0) ? {
-						ctor: '::',
-						_0: {ctor: '::', _0: _p15, _1: _p14._0},
-						_1: _p14._1
-					} : {
-						ctor: '::',
-						_0: {
+				if (_p18._1.ctor === '[]') {
+					return _elm_lang$core$List$reverse(
+						{
 							ctor: '::',
-							_0: _p15,
-							_1: {ctor: '[]'}
-						},
-						_1: _p14
-					};
+							_0: _elm_lang$core$List$reverse(
+								{ctor: '::', _0: _p18._0, _1: currentGroup}),
+							_1: result
+						});
 				} else {
-					return {ctor: '[]'};
+					var _p20 = _p18._1;
+					var _p19 = _p18._0;
+					if (A2(compare, _p19, _p18._1._0)) {
+						var _v17 = result,
+							_v18 = {ctor: '::', _0: _p19, _1: currentGroup},
+							_v19 = compare,
+							_v20 = _p20;
+						result = _v17;
+						currentGroup = _v18;
+						compare = _v19;
+						list = _v20;
+						continue groupWhileTransitivelyHelp;
+					} else {
+						var _v21 = {
+							ctor: '::',
+							_0: _elm_lang$core$List$reverse(
+								{ctor: '::', _0: _p19, _1: currentGroup}),
+							_1: result
+						},
+							_v22 = {ctor: '[]'},
+							_v23 = compare,
+							_v24 = _p20;
+						result = _v21;
+						currentGroup = _v22;
+						compare = _v23;
+						list = _v24;
+						continue groupWhileTransitivelyHelp;
+					}
 				}
 			}
 		}
+	});
+var _elm_community$list_extra$List_Extra$groupWhileTransitively = F2(
+	function (compare, list) {
+		return A4(
+			_elm_community$list_extra$List_Extra$groupWhileTransitivelyHelp,
+			{ctor: '[]'},
+			{ctor: '[]'},
+			compare,
+			list);
 	});
 var _elm_community$list_extra$List_Extra$stripPrefix = F2(
 	function (prefix, xs) {
 		var step = F2(
 			function (e, m) {
-				var _p16 = m;
-				if (_p16.ctor === 'Nothing') {
+				var _p21 = m;
+				if (_p21.ctor === 'Nothing') {
 					return _elm_lang$core$Maybe$Nothing;
 				} else {
-					if (_p16._0.ctor === '[]') {
+					if (_p21._0.ctor === '[]') {
 						return _elm_lang$core$Maybe$Nothing;
 					} else {
-						return _elm_lang$core$Native_Utils.eq(e, _p16._0._0) ? _elm_lang$core$Maybe$Just(_p16._0._1) : _elm_lang$core$Maybe$Nothing;
+						return _elm_lang$core$Native_Utils.eq(e, _p21._0._0) ? _elm_lang$core$Maybe$Just(_p21._0._1) : _elm_lang$core$Maybe$Nothing;
 					}
 				}
 			});
@@ -11782,16 +9733,16 @@ var _elm_community$list_extra$List_Extra$dropWhileRight = function (p) {
 };
 var _elm_community$list_extra$List_Extra$takeWhileRight = function (p) {
 	var step = F2(
-		function (x, _p17) {
-			var _p18 = _p17;
-			var _p19 = _p18._0;
-			return (p(x) && _p18._1) ? {
+		function (x, _p22) {
+			var _p23 = _p22;
+			var _p24 = _p23._0;
+			return (p(x) && _p23._1) ? {
 				ctor: '_Tuple2',
-				_0: {ctor: '::', _0: x, _1: _p19},
+				_0: {ctor: '::', _0: x, _1: _p24},
 				_1: true
-			} : {ctor: '_Tuple2', _0: _p19, _1: false};
+			} : {ctor: '_Tuple2', _0: _p24, _1: false};
 		});
-	return function (_p20) {
+	return function (_p25) {
 		return _elm_lang$core$Tuple$first(
 			A3(
 				_elm_lang$core$List$foldr,
@@ -11801,7 +9752,7 @@ var _elm_community$list_extra$List_Extra$takeWhileRight = function (p) {
 					_0: {ctor: '[]'},
 					_1: true
 				},
-				_p20));
+				_p25));
 	};
 };
 var _elm_community$list_extra$List_Extra$splitAt = F2(
@@ -11816,17 +9767,17 @@ var _elm_community$list_extra$List_Extra$groupsOfVarying_ = F3(
 	function (listOflengths, list, accu) {
 		groupsOfVarying_:
 		while (true) {
-			var _p21 = {ctor: '_Tuple2', _0: listOflengths, _1: list};
-			if (((_p21.ctor === '_Tuple2') && (_p21._0.ctor === '::')) && (_p21._1.ctor === '::')) {
-				var _p22 = A2(_elm_community$list_extra$List_Extra$splitAt, _p21._0._0, list);
-				var head = _p22._0;
-				var tail = _p22._1;
-				var _v11 = _p21._0._1,
-					_v12 = tail,
-					_v13 = {ctor: '::', _0: head, _1: accu};
-				listOflengths = _v11;
-				list = _v12;
-				accu = _v13;
+			var _p26 = {ctor: '_Tuple2', _0: listOflengths, _1: list};
+			if (((_p26.ctor === '_Tuple2') && (_p26._0.ctor === '::')) && (_p26._1.ctor === '::')) {
+				var _p27 = A2(_elm_community$list_extra$List_Extra$splitAt, _p26._0._0, list);
+				var head = _p27._0;
+				var tail = _p27._1;
+				var _v28 = _p26._0._1,
+					_v29 = tail,
+					_v30 = {ctor: '::', _0: head, _1: accu};
+				listOflengths = _v28;
+				list = _v29;
+				accu = _v30;
 				continue groupsOfVarying_;
 			} else {
 				return _elm_lang$core$List$reverse(accu);
@@ -11843,36 +9794,89 @@ var _elm_community$list_extra$List_Extra$groupsOfVarying = F2(
 	});
 var _elm_community$list_extra$List_Extra$unfoldr = F2(
 	function (f, seed) {
-		var _p23 = f(seed);
-		if (_p23.ctor === 'Nothing') {
+		var _p28 = f(seed);
+		if (_p28.ctor === 'Nothing') {
 			return {ctor: '[]'};
 		} else {
 			return {
 				ctor: '::',
-				_0: _p23._0._0,
-				_1: A2(_elm_community$list_extra$List_Extra$unfoldr, f, _p23._0._1)
+				_0: _p28._0._0,
+				_1: A2(_elm_community$list_extra$List_Extra$unfoldr, f, _p28._0._1)
 			};
 		}
 	});
+var _elm_community$list_extra$List_Extra$mapAccumr = F3(
+	function (f, acc0, list) {
+		return A3(
+			_elm_lang$core$List$foldr,
+			F2(
+				function (x, _p29) {
+					var _p30 = _p29;
+					var _p31 = A2(f, _p30._0, x);
+					var acc2 = _p31._0;
+					var y = _p31._1;
+					return {
+						ctor: '_Tuple2',
+						_0: acc2,
+						_1: {ctor: '::', _0: y, _1: _p30._1}
+					};
+				}),
+			{
+				ctor: '_Tuple2',
+				_0: acc0,
+				_1: {ctor: '[]'}
+			},
+			list);
+	});
+var _elm_community$list_extra$List_Extra$mapAccuml = F3(
+	function (f, acc0, list) {
+		var _p32 = A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (x, _p33) {
+					var _p34 = _p33;
+					var _p35 = A2(f, _p34._0, x);
+					var acc2 = _p35._0;
+					var y = _p35._1;
+					return {
+						ctor: '_Tuple2',
+						_0: acc2,
+						_1: {ctor: '::', _0: y, _1: _p34._1}
+					};
+				}),
+			{
+				ctor: '_Tuple2',
+				_0: acc0,
+				_1: {ctor: '[]'}
+			},
+			list);
+		var accFinal = _p32._0;
+		var generatedList = _p32._1;
+		return {
+			ctor: '_Tuple2',
+			_0: accFinal,
+			_1: _elm_lang$core$List$reverse(generatedList)
+		};
+	});
 var _elm_community$list_extra$List_Extra$scanr1 = F2(
 	function (f, xs_) {
-		var _p24 = xs_;
-		if (_p24.ctor === '[]') {
+		var _p36 = xs_;
+		if (_p36.ctor === '[]') {
 			return {ctor: '[]'};
 		} else {
-			if (_p24._1.ctor === '[]') {
+			if (_p36._1.ctor === '[]') {
 				return {
 					ctor: '::',
-					_0: _p24._0,
+					_0: _p36._0,
 					_1: {ctor: '[]'}
 				};
 			} else {
-				var _p25 = A2(_elm_community$list_extra$List_Extra$scanr1, f, _p24._1);
-				if (_p25.ctor === '::') {
+				var _p37 = A2(_elm_community$list_extra$List_Extra$scanr1, f, _p36._1);
+				if (_p37.ctor === '::') {
 					return {
 						ctor: '::',
-						_0: A2(f, _p24._0, _p25._0),
-						_1: _p25
+						_0: A2(f, _p36._0, _p37._0),
+						_1: _p37
 					};
 				} else {
 					return {ctor: '[]'};
@@ -11882,20 +9886,20 @@ var _elm_community$list_extra$List_Extra$scanr1 = F2(
 	});
 var _elm_community$list_extra$List_Extra$scanr = F3(
 	function (f, acc, xs_) {
-		var _p26 = xs_;
-		if (_p26.ctor === '[]') {
+		var _p38 = xs_;
+		if (_p38.ctor === '[]') {
 			return {
 				ctor: '::',
 				_0: acc,
 				_1: {ctor: '[]'}
 			};
 		} else {
-			var _p27 = A3(_elm_community$list_extra$List_Extra$scanr, f, acc, _p26._1);
-			if (_p27.ctor === '::') {
+			var _p39 = A3(_elm_community$list_extra$List_Extra$scanr, f, acc, _p38._1);
+			if (_p39.ctor === '::') {
 				return {
 					ctor: '::',
-					_0: A2(f, _p26._0, _p27._0),
-					_1: _p27
+					_0: A2(f, _p38._0, _p39._0),
+					_1: _p39
 				};
 			} else {
 				return {ctor: '[]'};
@@ -11904,23 +9908,23 @@ var _elm_community$list_extra$List_Extra$scanr = F3(
 	});
 var _elm_community$list_extra$List_Extra$scanl1 = F2(
 	function (f, xs_) {
-		var _p28 = xs_;
-		if (_p28.ctor === '[]') {
+		var _p40 = xs_;
+		if (_p40.ctor === '[]') {
 			return {ctor: '[]'};
 		} else {
-			return A3(_elm_lang$core$List$scanl, f, _p28._0, _p28._1);
+			return A3(_elm_lang$core$List$scanl, f, _p40._0, _p40._1);
 		}
 	});
 var _elm_community$list_extra$List_Extra$indexedFoldr = F3(
 	function (func, acc, list) {
 		var step = F2(
-			function (x, _p29) {
-				var _p30 = _p29;
-				var _p31 = _p30._0;
+			function (x, _p41) {
+				var _p42 = _p41;
+				var _p43 = _p42._0;
 				return {
 					ctor: '_Tuple2',
-					_0: _p31 - 1,
-					_1: A3(func, _p31, x, _p30._1)
+					_0: _p43 - 1,
+					_1: A3(func, _p43, x, _p42._1)
 				};
 			});
 		return _elm_lang$core$Tuple$second(
@@ -11937,13 +9941,13 @@ var _elm_community$list_extra$List_Extra$indexedFoldr = F3(
 var _elm_community$list_extra$List_Extra$indexedFoldl = F3(
 	function (func, acc, list) {
 		var step = F2(
-			function (x, _p32) {
-				var _p33 = _p32;
-				var _p34 = _p33._0;
+			function (x, _p44) {
+				var _p45 = _p44;
+				var _p46 = _p45._0;
 				return {
 					ctor: '_Tuple2',
-					_0: _p34 + 1,
-					_1: A3(func, _p34, x, _p33._1)
+					_0: _p46 + 1,
+					_1: A3(func, _p46, x, _p45._1)
 				};
 			});
 		return _elm_lang$core$Tuple$second(
@@ -11959,11 +9963,11 @@ var _elm_community$list_extra$List_Extra$foldr1 = F2(
 			function (x, m) {
 				return _elm_lang$core$Maybe$Just(
 					function () {
-						var _p35 = m;
-						if (_p35.ctor === 'Nothing') {
+						var _p47 = m;
+						if (_p47.ctor === 'Nothing') {
 							return x;
 						} else {
-							return A2(f, x, _p35._0);
+							return A2(f, x, _p47._0);
 						}
 					}());
 			});
@@ -11975,88 +9979,78 @@ var _elm_community$list_extra$List_Extra$foldl1 = F2(
 			function (x, m) {
 				return _elm_lang$core$Maybe$Just(
 					function () {
-						var _p36 = m;
-						if (_p36.ctor === 'Nothing') {
+						var _p48 = m;
+						if (_p48.ctor === 'Nothing') {
 							return x;
 						} else {
-							return A2(f, _p36._0, x);
+							return A2(f, _p48._0, x);
 						}
 					}());
 			});
 		return A3(_elm_lang$core$List$foldl, mf, _elm_lang$core$Maybe$Nothing, xs);
 	});
+var _elm_community$list_extra$List_Extra$reverseAppend = F2(
+	function (list1, list2) {
+		return A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				}),
+			list2,
+			list1);
+	});
 var _elm_community$list_extra$List_Extra$interweaveHelp = F3(
-	function (l1, l2, acc) {
+	function (acc, list1, list2) {
 		interweaveHelp:
 		while (true) {
-			var _p37 = {ctor: '_Tuple2', _0: l1, _1: l2};
-			_v24_1:
-			do {
-				if (_p37._0.ctor === '::') {
-					if (_p37._1.ctor === '::') {
-						var _v25 = _p37._0._1,
-							_v26 = _p37._1._1,
-							_v27 = A2(
-							_elm_lang$core$Basics_ops['++'],
-							acc,
-							{
-								ctor: '::',
-								_0: _p37._0._0,
-								_1: {
-									ctor: '::',
-									_0: _p37._1._0,
-									_1: {ctor: '[]'}
-								}
-							});
-						l1 = _v25;
-						l2 = _v26;
-						acc = _v27;
-						continue interweaveHelp;
-					} else {
-						break _v24_1;
-					}
+			var _p49 = {ctor: '_Tuple2', _0: list1, _1: list2};
+			if (_p49._0.ctor === '::') {
+				if (_p49._1.ctor === '::') {
+					var _v44 = {
+						ctor: '::',
+						_0: _p49._1._0,
+						_1: {ctor: '::', _0: _p49._0._0, _1: acc}
+					},
+						_v45 = _p49._0._1,
+						_v46 = _p49._1._1;
+					acc = _v44;
+					list1 = _v45;
+					list2 = _v46;
+					continue interweaveHelp;
 				} else {
-					if (_p37._1.ctor === '[]') {
-						break _v24_1;
-					} else {
-						return A2(_elm_lang$core$Basics_ops['++'], acc, _p37._1);
-					}
+					return A2(_elm_community$list_extra$List_Extra$reverseAppend, acc, list1);
 				}
-			} while(false);
-			return A2(_elm_lang$core$Basics_ops['++'], acc, _p37._0);
+			} else {
+				return A2(_elm_community$list_extra$List_Extra$reverseAppend, acc, list2);
+			}
 		}
 	});
-var _elm_community$list_extra$List_Extra$interweave = F2(
-	function (l1, l2) {
-		return A3(
-			_elm_community$list_extra$List_Extra$interweaveHelp,
-			l1,
-			l2,
-			{ctor: '[]'});
-	});
+var _elm_community$list_extra$List_Extra$interweave = _elm_community$list_extra$List_Extra$interweaveHelp(
+	{ctor: '[]'});
 var _elm_community$list_extra$List_Extra$permutations = function (xs_) {
-	var _p38 = xs_;
-	if (_p38.ctor === '[]') {
+	var _p50 = xs_;
+	if (_p50.ctor === '[]') {
 		return {
 			ctor: '::',
 			_0: {ctor: '[]'},
 			_1: {ctor: '[]'}
 		};
 	} else {
-		var f = function (_p39) {
-			var _p40 = _p39;
+		var f = function (_p51) {
+			var _p52 = _p51;
 			return A2(
 				_elm_lang$core$List$map,
 				F2(
 					function (x, y) {
 						return {ctor: '::', _0: x, _1: y};
-					})(_p40._0),
-				_elm_community$list_extra$List_Extra$permutations(_p40._1));
+					})(_p52._0),
+				_elm_community$list_extra$List_Extra$permutations(_p52._1));
 		};
 		return A2(
 			_elm_lang$core$List$concatMap,
 			f,
-			_elm_community$list_extra$List_Extra$select(_p38));
+			_elm_community$list_extra$List_Extra$select(_p50));
 	}
 };
 var _elm_community$list_extra$List_Extra$isPermutationOf = F2(
@@ -12067,11 +10061,11 @@ var _elm_community$list_extra$List_Extra$isPermutationOf = F2(
 			_elm_community$list_extra$List_Extra$permutations(xs));
 	});
 var _elm_community$list_extra$List_Extra$subsequencesNonEmpty = function (xs) {
-	var _p41 = xs;
-	if (_p41.ctor === '[]') {
+	var _p53 = xs;
+	if (_p53.ctor === '[]') {
 		return {ctor: '[]'};
 	} else {
-		var _p42 = _p41._0;
+		var _p54 = _p53._0;
 		var f = F2(
 			function (ys, r) {
 				return {
@@ -12079,7 +10073,7 @@ var _elm_community$list_extra$List_Extra$subsequencesNonEmpty = function (xs) {
 					_0: ys,
 					_1: {
 						ctor: '::',
-						_0: {ctor: '::', _0: _p42, _1: ys},
+						_0: {ctor: '::', _0: _p54, _1: ys},
 						_1: r
 					}
 				};
@@ -12088,14 +10082,14 @@ var _elm_community$list_extra$List_Extra$subsequencesNonEmpty = function (xs) {
 			ctor: '::',
 			_0: {
 				ctor: '::',
-				_0: _p42,
+				_0: _p54,
 				_1: {ctor: '[]'}
 			},
 			_1: A3(
 				_elm_lang$core$List$foldr,
 				f,
 				{ctor: '[]'},
-				_elm_community$list_extra$List_Extra$subsequencesNonEmpty(_p41._1))
+				_elm_community$list_extra$List_Extra$subsequencesNonEmpty(_p53._1))
 		};
 	}
 };
@@ -12106,53 +10100,52 @@ var _elm_community$list_extra$List_Extra$subsequences = function (xs) {
 		_1: _elm_community$list_extra$List_Extra$subsequencesNonEmpty(xs)
 	};
 };
-var _elm_community$list_extra$List_Extra$isSubsequenceOf = F2(
-	function (subseq, xs) {
-		return A2(
-			_elm_lang$core$List$member,
-			subseq,
-			_elm_community$list_extra$List_Extra$subsequences(xs));
-	});
-var _elm_community$list_extra$List_Extra$transpose = function (ll) {
-	transpose:
-	while (true) {
-		var _p43 = ll;
-		if (_p43.ctor === '[]') {
-			return {ctor: '[]'};
-		} else {
-			if (_p43._0.ctor === '[]') {
-				var _v32 = _p43._1;
-				ll = _v32;
-				continue transpose;
-			} else {
-				var _p44 = _p43._1;
-				var tails = A2(_elm_lang$core$List$filterMap, _elm_lang$core$List$tail, _p44);
-				var heads = A2(_elm_lang$core$List$filterMap, _elm_lang$core$List$head, _p44);
-				return {
-					ctor: '::',
-					_0: {ctor: '::', _0: _p43._0._0, _1: heads},
-					_1: _elm_community$list_extra$List_Extra$transpose(
-						{ctor: '::', _0: _p43._0._1, _1: tails})
-				};
-			}
-		}
+var _elm_community$list_extra$List_Extra$rowsLength = function (listOfLists) {
+	var _p55 = listOfLists;
+	if (_p55.ctor === '[]') {
+		return 0;
+	} else {
+		return _elm_lang$core$List$length(_p55._0);
 	}
 };
+var _elm_community$list_extra$List_Extra$transpose = function (listOfLists) {
+	return A3(
+		_elm_lang$core$List$foldr,
+		_elm_lang$core$List$map2(
+			F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				})),
+		A2(
+			_elm_lang$core$List$repeat,
+			_elm_community$list_extra$List_Extra$rowsLength(listOfLists),
+			{ctor: '[]'}),
+		listOfLists);
+};
 var _elm_community$list_extra$List_Extra$intercalate = function (xs) {
-	return function (_p45) {
+	return function (_p56) {
 		return _elm_lang$core$List$concat(
-			A2(_elm_lang$core$List$intersperse, xs, _p45));
+			A2(_elm_lang$core$List$intersperse, xs, _p56));
 	};
 };
 var _elm_community$list_extra$List_Extra$filterNot = F2(
 	function (pred, list) {
 		return A2(
 			_elm_lang$core$List$filter,
-			function (_p46) {
-				return !pred(_p46);
+			function (_p57) {
+				return !pred(_p57);
 			},
 			list);
 	});
+var _elm_community$list_extra$List_Extra$removeIfIndex = function (predicate) {
+	return A2(
+		_elm_community$list_extra$List_Extra$indexedFoldr,
+		F3(
+			function (index, item, acc) {
+				return predicate(index) ? acc : {ctor: '::', _0: item, _1: acc};
+			}),
+		{ctor: '[]'});
+};
 var _elm_community$list_extra$List_Extra$removeAt = F2(
 	function (index, l) {
 		if (_elm_lang$core$Native_Utils.cmp(index, 0) < 0) {
@@ -12161,24 +10154,24 @@ var _elm_community$list_extra$List_Extra$removeAt = F2(
 			var tail = _elm_lang$core$List$tail(
 				A2(_elm_lang$core$List$drop, index, l));
 			var head = A2(_elm_lang$core$List$take, index, l);
-			var _p47 = tail;
-			if (_p47.ctor === 'Nothing') {
+			var _p58 = tail;
+			if (_p58.ctor === 'Nothing') {
 				return l;
 			} else {
-				return A2(_elm_lang$core$List$append, head, _p47._0);
+				return A2(_elm_lang$core$List$append, head, _p58._0);
 			}
 		}
 	});
 var _elm_community$list_extra$List_Extra$stableSortWith = F2(
 	function (pred, list) {
 		var predWithIndex = F2(
-			function (_p49, _p48) {
-				var _p50 = _p49;
-				var _p51 = _p48;
-				var result = A2(pred, _p50._0, _p51._0);
-				var _p52 = result;
-				if (_p52.ctor === 'EQ') {
-					return A2(_elm_lang$core$Basics$compare, _p50._1, _p51._1);
+			function (_p60, _p59) {
+				var _p61 = _p60;
+				var _p62 = _p59;
+				var result = A2(pred, _p61._0, _p62._0);
+				var _p63 = result;
+				if (_p63.ctor === 'EQ') {
+					return A2(_elm_lang$core$Basics$compare, _p61._1, _p62._1);
 				} else {
 					return result;
 				}
@@ -12195,38 +10188,18 @@ var _elm_community$list_extra$List_Extra$stableSortWith = F2(
 			_elm_lang$core$Tuple$first,
 			A2(_elm_lang$core$List$sortWith, predWithIndex, listWithIndex));
 	});
-var _elm_community$list_extra$List_Extra$setAt = F3(
-	function (index, value, l) {
-		if (_elm_lang$core$Native_Utils.cmp(index, 0) < 0) {
-			return _elm_lang$core$Maybe$Nothing;
-		} else {
-			var tail = _elm_lang$core$List$tail(
-				A2(_elm_lang$core$List$drop, index, l));
-			var head = A2(_elm_lang$core$List$take, index, l);
-			var _p53 = tail;
-			if (_p53.ctor === 'Nothing') {
-				return _elm_lang$core$Maybe$Nothing;
-			} else {
-				return _elm_lang$core$Maybe$Just(
-					A2(
-						_elm_lang$core$List$append,
-						head,
-						{ctor: '::', _0: value, _1: _p53._0}));
-			}
-		}
-	});
 var _elm_community$list_extra$List_Extra$remove = F2(
 	function (x, xs) {
-		var _p54 = xs;
-		if (_p54.ctor === '[]') {
+		var _p64 = xs;
+		if (_p64.ctor === '[]') {
 			return {ctor: '[]'};
 		} else {
-			var _p56 = _p54._1;
-			var _p55 = _p54._0;
-			return _elm_lang$core$Native_Utils.eq(x, _p55) ? _p56 : {
+			var _p66 = _p64._1;
+			var _p65 = _p64._0;
+			return _elm_lang$core$Native_Utils.eq(x, _p65) ? _p66 : {
 				ctor: '::',
-				_0: _p55,
-				_1: A2(_elm_community$list_extra$List_Extra$remove, x, _p56)
+				_0: _p65,
+				_1: A2(_elm_community$list_extra$List_Extra$remove, x, _p66)
 			};
 		}
 	});
@@ -12241,18 +10214,33 @@ var _elm_community$list_extra$List_Extra$updateIfIndex = F3(
 			list);
 	});
 var _elm_community$list_extra$List_Extra$updateAt = F3(
-	function (index, update, list) {
-		return ((_elm_lang$core$Native_Utils.cmp(index, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(
+	function (index, fn, list) {
+		if (_elm_lang$core$Native_Utils.cmp(index, 0) < 0) {
+			return list;
+		} else {
+			var tail = A2(_elm_lang$core$List$drop, index, list);
+			var head = A2(_elm_lang$core$List$take, index, list);
+			var _p67 = tail;
+			if (_p67.ctor === '::') {
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					head,
+					{
+						ctor: '::',
+						_0: fn(_p67._0),
+						_1: _p67._1
+					});
+			} else {
+				return list;
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$setAt = F2(
+	function (index, value) {
+		return A2(
+			_elm_community$list_extra$List_Extra$updateAt,
 			index,
-			_elm_lang$core$List$length(list)) > -1)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
-			A3(
-				_elm_community$list_extra$List_Extra$updateIfIndex,
-				F2(
-					function (x, y) {
-						return _elm_lang$core$Native_Utils.eq(x, y);
-					})(index),
-				update,
-				list));
+			_elm_lang$core$Basics$always(value));
 	});
 var _elm_community$list_extra$List_Extra$updateIf = F3(
 	function (predicate, update, list) {
@@ -12271,32 +10259,48 @@ var _elm_community$list_extra$List_Extra$replaceIf = F3(
 			_elm_lang$core$Basics$always(replacement),
 			list);
 	});
-var _elm_community$list_extra$List_Extra$findIndices = function (p) {
-	return function (_p57) {
-		return A2(
-			_elm_lang$core$List$map,
-			_elm_lang$core$Tuple$first,
-			A2(
-				_elm_lang$core$List$filter,
-				function (_p58) {
-					var _p59 = _p58;
-					return p(_p59._1);
-				},
-				A2(
-					_elm_lang$core$List$indexedMap,
-					F2(
-						function (v0, v1) {
-							return {ctor: '_Tuple2', _0: v0, _1: v1};
-						}),
-					_p57)));
-	};
+var _elm_community$list_extra$List_Extra$count = function (predicate) {
+	return A2(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (x, acc) {
+				return predicate(x) ? (acc + 1) : acc;
+			}),
+		0);
 };
-var _elm_community$list_extra$List_Extra$findIndex = function (p) {
-	return function (_p60) {
-		return _elm_lang$core$List$head(
-			A2(_elm_community$list_extra$List_Extra$findIndices, p, _p60));
-	};
+var _elm_community$list_extra$List_Extra$findIndices = function (predicate) {
+	var consIndexIf = F3(
+		function (index, x, acc) {
+			return predicate(x) ? {ctor: '::', _0: index, _1: acc} : acc;
+		});
+	return A2(
+		_elm_community$list_extra$List_Extra$indexedFoldr,
+		consIndexIf,
+		{ctor: '[]'});
 };
+var _elm_community$list_extra$List_Extra$findIndexHelp = F3(
+	function (index, predicate, list) {
+		findIndexHelp:
+		while (true) {
+			var _p68 = list;
+			if (_p68.ctor === '[]') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				if (predicate(_p68._0)) {
+					return _elm_lang$core$Maybe$Just(index);
+				} else {
+					var _v58 = index + 1,
+						_v59 = predicate,
+						_v60 = _p68._1;
+					index = _v58;
+					predicate = _v59;
+					list = _v60;
+					continue findIndexHelp;
+				}
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$findIndex = _elm_community$list_extra$List_Extra$findIndexHelp(0);
 var _elm_community$list_extra$List_Extra$splitWhen = F2(
 	function (predicate, list) {
 		return A2(
@@ -12324,28 +10328,43 @@ var _elm_community$list_extra$List_Extra$find = F2(
 	function (predicate, list) {
 		find:
 		while (true) {
-			var _p61 = list;
-			if (_p61.ctor === '[]') {
+			var _p69 = list;
+			if (_p69.ctor === '[]') {
 				return _elm_lang$core$Maybe$Nothing;
 			} else {
-				var _p62 = _p61._0;
-				if (predicate(_p62)) {
-					return _elm_lang$core$Maybe$Just(_p62);
+				var _p70 = _p69._0;
+				if (predicate(_p70)) {
+					return _elm_lang$core$Maybe$Just(_p70);
 				} else {
-					var _v41 = predicate,
-						_v42 = _p61._1;
-					predicate = _v41;
-					list = _v42;
+					var _v62 = predicate,
+						_v63 = _p69._1;
+					predicate = _v62;
+					list = _v63;
 					continue find;
 				}
 			}
 		}
 	});
 var _elm_community$list_extra$List_Extra$notMember = function (x) {
-	return function (_p63) {
-		return !A2(_elm_lang$core$List$member, x, _p63);
+	return function (_p71) {
+		return !A2(_elm_lang$core$List$member, x, _p71);
 	};
 };
+var _elm_community$list_extra$List_Extra$reverseMap = F2(
+	function (f, xs) {
+		return A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (x, acc) {
+					return {
+						ctor: '::',
+						_0: f(x),
+						_1: acc
+					};
+				}),
+			{ctor: '[]'},
+			xs);
+	});
 var _elm_community$list_extra$List_Extra$andThen = _elm_lang$core$List$concatMap;
 var _elm_community$list_extra$List_Extra$lift2 = F3(
 	function (f, la, lb) {
@@ -12365,6 +10384,25 @@ var _elm_community$list_extra$List_Extra$lift2 = F3(
 			},
 			la);
 	});
+var _elm_community$list_extra$List_Extra$cartesianProduct = function (ll) {
+	var _p72 = ll;
+	if (_p72.ctor === '[]') {
+		return {
+			ctor: '::',
+			_0: {ctor: '[]'},
+			_1: {ctor: '[]'}
+		};
+	} else {
+		return A3(
+			_elm_community$list_extra$List_Extra$lift2,
+			F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				}),
+			_p72._0,
+			_elm_community$list_extra$List_Extra$cartesianProduct(_p72._1));
+	}
+};
 var _elm_community$list_extra$List_Extra$lift3 = F4(
 	function (f, la, lb, lc) {
 		return A2(
@@ -12427,42 +10465,49 @@ var _elm_community$list_extra$List_Extra$andMap = F2(
 			fl,
 			l);
 	});
-var _elm_community$list_extra$List_Extra$uniqueHelp = F3(
-	function (f, existing, remaining) {
+var _elm_community$list_extra$List_Extra$uniqueHelp = F4(
+	function (f, existing, remaining, accumulator) {
 		uniqueHelp:
 		while (true) {
-			var _p64 = remaining;
-			if (_p64.ctor === '[]') {
-				return {ctor: '[]'};
+			var _p73 = remaining;
+			if (_p73.ctor === '[]') {
+				return _elm_lang$core$List$reverse(accumulator);
 			} else {
-				var _p66 = _p64._1;
-				var _p65 = _p64._0;
-				var computedFirst = f(_p65);
+				var _p75 = _p73._1;
+				var _p74 = _p73._0;
+				var computedFirst = f(_p74);
 				if (A2(_elm_lang$core$Set$member, computedFirst, existing)) {
-					var _v44 = f,
-						_v45 = existing,
-						_v46 = _p66;
-					f = _v44;
-					existing = _v45;
-					remaining = _v46;
+					var _v66 = f,
+						_v67 = existing,
+						_v68 = _p75,
+						_v69 = accumulator;
+					f = _v66;
+					existing = _v67;
+					remaining = _v68;
+					accumulator = _v69;
 					continue uniqueHelp;
 				} else {
-					return {
-						ctor: '::',
-						_0: _p65,
-						_1: A3(
-							_elm_community$list_extra$List_Extra$uniqueHelp,
-							f,
-							A2(_elm_lang$core$Set$insert, computedFirst, existing),
-							_p66)
-					};
+					var _v70 = f,
+						_v71 = A2(_elm_lang$core$Set$insert, computedFirst, existing),
+						_v72 = _p75,
+						_v73 = {ctor: '::', _0: _p74, _1: accumulator};
+					f = _v70;
+					existing = _v71;
+					remaining = _v72;
+					accumulator = _v73;
+					continue uniqueHelp;
 				}
 			}
 		}
 	});
 var _elm_community$list_extra$List_Extra$uniqueBy = F2(
 	function (f, list) {
-		return A3(_elm_community$list_extra$List_Extra$uniqueHelp, f, _elm_lang$core$Set$empty, list);
+		return A4(
+			_elm_community$list_extra$List_Extra$uniqueHelp,
+			f,
+			_elm_lang$core$Set$empty,
+			list,
+			{ctor: '[]'});
 	});
 var _elm_community$list_extra$List_Extra$allDifferentBy = F2(
 	function (f, list) {
@@ -12475,21 +10520,26 @@ var _elm_community$list_extra$List_Extra$allDifferent = function (list) {
 	return A2(_elm_community$list_extra$List_Extra$allDifferentBy, _elm_lang$core$Basics$identity, list);
 };
 var _elm_community$list_extra$List_Extra$unique = function (list) {
-	return A3(_elm_community$list_extra$List_Extra$uniqueHelp, _elm_lang$core$Basics$identity, _elm_lang$core$Set$empty, list);
+	return A4(
+		_elm_community$list_extra$List_Extra$uniqueHelp,
+		_elm_lang$core$Basics$identity,
+		_elm_lang$core$Set$empty,
+		list,
+		{ctor: '[]'});
 };
 var _elm_community$list_extra$List_Extra$dropWhile = F2(
 	function (predicate, list) {
 		dropWhile:
 		while (true) {
-			var _p67 = list;
-			if (_p67.ctor === '[]') {
+			var _p76 = list;
+			if (_p76.ctor === '[]') {
 				return {ctor: '[]'};
 			} else {
-				if (predicate(_p67._0)) {
-					var _v48 = predicate,
-						_v49 = _p67._1;
-					predicate = _v48;
-					list = _v49;
+				if (predicate(_p76._0)) {
+					var _v75 = predicate,
+						_v76 = _p76._1;
+					predicate = _v75;
+					list = _v76;
 					continue dropWhile;
 				} else {
 					return list;
@@ -12502,16 +10552,16 @@ var _elm_community$list_extra$List_Extra$takeWhile = function (predicate) {
 		function (memo, list) {
 			takeWhileMemo:
 			while (true) {
-				var _p68 = list;
-				if (_p68.ctor === '[]') {
+				var _p77 = list;
+				if (_p77.ctor === '[]') {
 					return _elm_lang$core$List$reverse(memo);
 				} else {
-					var _p69 = _p68._0;
-					if (predicate(_p69)) {
-						var _v51 = {ctor: '::', _0: _p69, _1: memo},
-							_v52 = _p68._1;
-						memo = _v51;
-						list = _v52;
+					var _p78 = _p77._0;
+					if (predicate(_p78)) {
+						var _v78 = {ctor: '::', _0: _p78, _1: memo},
+							_v79 = _p77._1;
+						memo = _v78;
+						list = _v79;
 						continue takeWhileMemo;
 					} else {
 						return _elm_lang$core$List$reverse(memo);
@@ -12532,26 +10582,26 @@ var _elm_community$list_extra$List_Extra$span = F2(
 	});
 var _elm_community$list_extra$List_Extra$break = function (p) {
 	return _elm_community$list_extra$List_Extra$span(
-		function (_p70) {
-			return !p(_p70);
+		function (_p79) {
+			return !p(_p79);
 		});
 };
 var _elm_community$list_extra$List_Extra$groupWhile = F2(
 	function (eq, xs_) {
-		var _p71 = xs_;
-		if (_p71.ctor === '[]') {
+		var _p80 = xs_;
+		if (_p80.ctor === '[]') {
 			return {ctor: '[]'};
 		} else {
-			var _p73 = _p71._0;
-			var _p72 = A2(
+			var _p82 = _p80._0;
+			var _p81 = A2(
 				_elm_community$list_extra$List_Extra$span,
-				eq(_p73),
-				_p71._1);
-			var ys = _p72._0;
-			var zs = _p72._1;
+				eq(_p82),
+				_p80._1);
+			var ys = _p81._0;
+			var zs = _p81._1;
 			return {
 				ctor: '::',
-				_0: {ctor: '::', _0: _p73, _1: ys},
+				_0: {ctor: '::', _0: _p82, _1: ys},
 				_1: A2(_elm_community$list_extra$List_Extra$groupWhile, eq, zs)
 			};
 		}
@@ -12564,18 +10614,18 @@ var _elm_community$list_extra$List_Extra$group = _elm_community$list_extra$List_
 var _elm_community$list_extra$List_Extra$minimumBy = F2(
 	function (f, ls) {
 		var minBy = F2(
-			function (x, _p74) {
-				var _p75 = _p74;
-				var _p76 = _p75._1;
+			function (x, _p83) {
+				var _p84 = _p83;
+				var _p85 = _p84._1;
 				var fx = f(x);
-				return (_elm_lang$core$Native_Utils.cmp(fx, _p76) < 0) ? {ctor: '_Tuple2', _0: x, _1: fx} : {ctor: '_Tuple2', _0: _p75._0, _1: _p76};
+				return (_elm_lang$core$Native_Utils.cmp(fx, _p85) < 0) ? {ctor: '_Tuple2', _0: x, _1: fx} : {ctor: '_Tuple2', _0: _p84._0, _1: _p85};
 			});
-		var _p77 = ls;
-		if (_p77.ctor === '::') {
-			if (_p77._1.ctor === '[]') {
-				return _elm_lang$core$Maybe$Just(_p77._0);
+		var _p86 = ls;
+		if (_p86.ctor === '::') {
+			if (_p86._1.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p86._0);
 			} else {
-				var _p78 = _p77._0;
+				var _p87 = _p86._0;
 				return _elm_lang$core$Maybe$Just(
 					_elm_lang$core$Tuple$first(
 						A3(
@@ -12583,10 +10633,10 @@ var _elm_community$list_extra$List_Extra$minimumBy = F2(
 							minBy,
 							{
 								ctor: '_Tuple2',
-								_0: _p78,
-								_1: f(_p78)
+								_0: _p87,
+								_1: f(_p87)
 							},
-							_p77._1)));
+							_p86._1)));
 			}
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
@@ -12595,18 +10645,18 @@ var _elm_community$list_extra$List_Extra$minimumBy = F2(
 var _elm_community$list_extra$List_Extra$maximumBy = F2(
 	function (f, ls) {
 		var maxBy = F2(
-			function (x, _p79) {
-				var _p80 = _p79;
-				var _p81 = _p80._1;
+			function (x, _p88) {
+				var _p89 = _p88;
+				var _p90 = _p89._1;
 				var fx = f(x);
-				return (_elm_lang$core$Native_Utils.cmp(fx, _p81) > 0) ? {ctor: '_Tuple2', _0: x, _1: fx} : {ctor: '_Tuple2', _0: _p80._0, _1: _p81};
+				return (_elm_lang$core$Native_Utils.cmp(fx, _p90) > 0) ? {ctor: '_Tuple2', _0: x, _1: fx} : {ctor: '_Tuple2', _0: _p89._0, _1: _p90};
 			});
-		var _p82 = ls;
-		if (_p82.ctor === '::') {
-			if (_p82._1.ctor === '[]') {
-				return _elm_lang$core$Maybe$Just(_p82._0);
+		var _p91 = ls;
+		if (_p91.ctor === '::') {
+			if (_p91._1.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p91._0);
 			} else {
-				var _p83 = _p82._0;
+				var _p92 = _p91._0;
 				return _elm_lang$core$Maybe$Just(
 					_elm_lang$core$Tuple$first(
 						A3(
@@ -12614,85 +10664,140 @@ var _elm_community$list_extra$List_Extra$maximumBy = F2(
 							maxBy,
 							{
 								ctor: '_Tuple2',
-								_0: _p83,
-								_1: f(_p83)
+								_0: _p92,
+								_1: f(_p92)
 							},
-							_p82._1)));
+							_p91._1)));
 			}
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
 		}
 	});
 var _elm_community$list_extra$List_Extra$uncons = function (xs) {
-	var _p84 = xs;
-	if (_p84.ctor === '[]') {
+	var _p93 = xs;
+	if (_p93.ctor === '[]') {
 		return _elm_lang$core$Maybe$Nothing;
 	} else {
 		return _elm_lang$core$Maybe$Just(
-			{ctor: '_Tuple2', _0: _p84._0, _1: _p84._1});
+			{ctor: '_Tuple2', _0: _p93._0, _1: _p93._1});
 	}
 };
 var _elm_community$list_extra$List_Extra$swapAt = F3(
 	function (index1, index2, l) {
 		swapAt:
 		while (true) {
-			if (_elm_lang$core$Native_Utils.eq(index1, index2)) {
-				return _elm_lang$core$Maybe$Just(l);
+			if (_elm_lang$core$Native_Utils.eq(index1, index2) || (_elm_lang$core$Native_Utils.cmp(index1, 0) < 0)) {
+				return l;
 			} else {
 				if (_elm_lang$core$Native_Utils.cmp(index1, index2) > 0) {
-					var _v59 = index2,
-						_v60 = index1,
-						_v61 = l;
-					index1 = _v59;
-					index2 = _v60;
-					l = _v61;
+					var _v86 = index2,
+						_v87 = index1,
+						_v88 = l;
+					index1 = _v86;
+					index2 = _v87;
+					l = _v88;
 					continue swapAt;
 				} else {
-					if (_elm_lang$core$Native_Utils.cmp(index1, 0) < 0) {
-						return _elm_lang$core$Maybe$Nothing;
+					var _p94 = A2(_elm_community$list_extra$List_Extra$splitAt, index1, l);
+					var part1 = _p94._0;
+					var tail1 = _p94._1;
+					var _p95 = A2(_elm_community$list_extra$List_Extra$splitAt, index2 - index1, tail1);
+					var head2 = _p95._0;
+					var tail2 = _p95._1;
+					var _p96 = {
+						ctor: '_Tuple2',
+						_0: _elm_community$list_extra$List_Extra$uncons(head2),
+						_1: _elm_community$list_extra$List_Extra$uncons(tail2)
+					};
+					if (((((_p96.ctor === '_Tuple2') && (_p96._0.ctor === 'Just')) && (_p96._0._0.ctor === '_Tuple2')) && (_p96._1.ctor === 'Just')) && (_p96._1._0.ctor === '_Tuple2')) {
+						return _elm_lang$core$List$concat(
+							{
+								ctor: '::',
+								_0: part1,
+								_1: {
+									ctor: '::',
+									_0: {ctor: '::', _0: _p96._1._0._0, _1: _p96._0._0._1},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '::', _0: _p96._0._0._0, _1: _p96._1._0._1},
+										_1: {ctor: '[]'}
+									}
+								}
+							});
 					} else {
-						var _p85 = A2(_elm_community$list_extra$List_Extra$splitAt, index1, l);
-						var part1 = _p85._0;
-						var tail1 = _p85._1;
-						var _p86 = A2(_elm_community$list_extra$List_Extra$splitAt, index2 - index1, tail1);
-						var head2 = _p86._0;
-						var tail2 = _p86._1;
-						return A3(
-							_elm_lang$core$Maybe$map2,
-							F2(
-								function (_p88, _p87) {
-									var _p89 = _p88;
-									var _p90 = _p87;
-									return _elm_lang$core$List$concat(
-										{
-											ctor: '::',
-											_0: part1,
-											_1: {
-												ctor: '::',
-												_0: {ctor: '::', _0: _p90._0, _1: _p89._1},
-												_1: {
-													ctor: '::',
-													_0: {ctor: '::', _0: _p89._0, _1: _p90._1},
-													_1: {ctor: '[]'}
-												}
-											}
-										});
-								}),
-							_elm_community$list_extra$List_Extra$uncons(head2),
-							_elm_community$list_extra$List_Extra$uncons(tail2));
+						return l;
 					}
 				}
 			}
 		}
 	});
+var _elm_community$list_extra$List_Extra$cycleHelp = F3(
+	function (acc, n, list) {
+		cycleHelp:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.cmp(n, 0) > 0) {
+				var _v90 = A2(_elm_community$list_extra$List_Extra$reverseAppend, list, acc),
+					_v91 = n - 1,
+					_v92 = list;
+				acc = _v90;
+				n = _v91;
+				list = _v92;
+				continue cycleHelp;
+			} else {
+				return acc;
+			}
+		}
+	});
+var _elm_community$list_extra$List_Extra$cycle = F2(
+	function (len, list) {
+		var cycleLength = _elm_lang$core$List$length(list);
+		return (_elm_lang$core$Native_Utils.eq(cycleLength, 0) || _elm_lang$core$Native_Utils.eq(cycleLength, len)) ? list : ((_elm_lang$core$Native_Utils.cmp(cycleLength, len) < 0) ? _elm_lang$core$List$reverse(
+			A2(
+				_elm_community$list_extra$List_Extra$reverseAppend,
+				A2(
+					_elm_lang$core$List$take,
+					A2(_elm_lang$core$Basics$rem, len, cycleLength),
+					list),
+				A3(
+					_elm_community$list_extra$List_Extra$cycleHelp,
+					{ctor: '[]'},
+					(len / cycleLength) | 0,
+					list))) : A2(_elm_lang$core$List$take, len, list));
+	});
+var _elm_community$list_extra$List_Extra$initialize = F2(
+	function (n, f) {
+		var step = F2(
+			function (i, acc) {
+				step:
+				while (true) {
+					if (_elm_lang$core$Native_Utils.cmp(i, 0) < 0) {
+						return acc;
+					} else {
+						var _v93 = i - 1,
+							_v94 = {
+							ctor: '::',
+							_0: f(i),
+							_1: acc
+						};
+						i = _v93;
+						acc = _v94;
+						continue step;
+					}
+				}
+			});
+		return A2(
+			step,
+			n - 1,
+			{ctor: '[]'});
+	});
 var _elm_community$list_extra$List_Extra$iterate = F2(
 	function (f, x) {
-		var _p91 = f(x);
-		if (_p91.ctor === 'Just') {
+		var _p97 = f(x);
+		if (_p97.ctor === 'Just') {
 			return {
 				ctor: '::',
 				_0: x,
-				_1: A2(_elm_community$list_extra$List_Extra$iterate, f, _p91._0)
+				_1: A2(_elm_community$list_extra$List_Extra$iterate, f, _p97._0)
 			};
 		} else {
 			return {
@@ -12709,35 +10814,35 @@ var _elm_community$list_extra$List_Extra$getAt = F2(
 	});
 var _elm_community$list_extra$List_Extra_ops = _elm_community$list_extra$List_Extra_ops || {};
 _elm_community$list_extra$List_Extra_ops['!!'] = _elm_lang$core$Basics$flip(_elm_community$list_extra$List_Extra$getAt);
-var _elm_community$list_extra$List_Extra$init = function () {
-	var maybe = F2(
-		function (d, f) {
-			return function (_p92) {
-				return A2(
-					_elm_lang$core$Maybe$withDefault,
-					d,
-					A2(_elm_lang$core$Maybe$map, f, _p92));
-			};
-		});
-	return A2(
-		_elm_lang$core$List$foldr,
-		function (x) {
-			return function (_p93) {
-				return _elm_lang$core$Maybe$Just(
-					A3(
-						maybe,
-						{ctor: '[]'},
-						F2(
-							function (x, y) {
-								return {ctor: '::', _0: x, _1: y};
-							})(x),
-						_p93));
-			};
-		},
-		_elm_lang$core$Maybe$Nothing);
-}();
-var _elm_community$list_extra$List_Extra$last = _elm_community$list_extra$List_Extra$foldl1(
-	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
+var _elm_community$list_extra$List_Extra$init = function (items) {
+	var _p98 = items;
+	if (_p98.ctor === '[]') {
+		return _elm_lang$core$Maybe$Nothing;
+	} else {
+		return A2(
+			_elm_lang$core$Maybe$map,
+			_elm_lang$core$List$reverse,
+			_elm_lang$core$List$tail(
+				_elm_lang$core$List$reverse(_p98)));
+	}
+};
+var _elm_community$list_extra$List_Extra$last = function (items) {
+	last:
+	while (true) {
+		var _p99 = items;
+		if (_p99.ctor === '[]') {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			if (_p99._1.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p99._0);
+			} else {
+				var _v98 = _p99._1;
+				items = _v98;
+				continue last;
+			}
+		}
+	}
+};
 
 var _elm_community$maybe_extra$Maybe_Extra$foldrValues = F2(
 	function (item, list) {
@@ -14547,6 +12652,2044 @@ return {
 
 var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
 var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
+
+var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
+var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
+
+var _elm_lang$virtual_dom$Native_VirtualDom = function() {
+
+var STYLE_KEY = 'STYLE';
+var EVENT_KEY = 'EVENT';
+var ATTR_KEY = 'ATTR';
+var ATTR_NS_KEY = 'ATTR_NS';
+
+var localDoc = typeof document !== 'undefined' ? document : {};
+
+
+////////////  VIRTUAL DOM NODES  ////////////
+
+
+function text(string)
+{
+	return {
+		type: 'text',
+		text: string
+	};
+}
+
+
+function node(tag)
+{
+	return F2(function(factList, kidList) {
+		return nodeHelp(tag, factList, kidList);
+	});
+}
+
+
+function nodeHelp(tag, factList, kidList)
+{
+	var organized = organizeFacts(factList);
+	var namespace = organized.namespace;
+	var facts = organized.facts;
+
+	var children = [];
+	var descendantsCount = 0;
+	while (kidList.ctor !== '[]')
+	{
+		var kid = kidList._0;
+		descendantsCount += (kid.descendantsCount || 0);
+		children.push(kid);
+		kidList = kidList._1;
+	}
+	descendantsCount += children.length;
+
+	return {
+		type: 'node',
+		tag: tag,
+		facts: facts,
+		children: children,
+		namespace: namespace,
+		descendantsCount: descendantsCount
+	};
+}
+
+
+function keyedNode(tag, factList, kidList)
+{
+	var organized = organizeFacts(factList);
+	var namespace = organized.namespace;
+	var facts = organized.facts;
+
+	var children = [];
+	var descendantsCount = 0;
+	while (kidList.ctor !== '[]')
+	{
+		var kid = kidList._0;
+		descendantsCount += (kid._1.descendantsCount || 0);
+		children.push(kid);
+		kidList = kidList._1;
+	}
+	descendantsCount += children.length;
+
+	return {
+		type: 'keyed-node',
+		tag: tag,
+		facts: facts,
+		children: children,
+		namespace: namespace,
+		descendantsCount: descendantsCount
+	};
+}
+
+
+function custom(factList, model, impl)
+{
+	var facts = organizeFacts(factList).facts;
+
+	return {
+		type: 'custom',
+		facts: facts,
+		model: model,
+		impl: impl
+	};
+}
+
+
+function map(tagger, node)
+{
+	return {
+		type: 'tagger',
+		tagger: tagger,
+		node: node,
+		descendantsCount: 1 + (node.descendantsCount || 0)
+	};
+}
+
+
+function thunk(func, args, thunk)
+{
+	return {
+		type: 'thunk',
+		func: func,
+		args: args,
+		thunk: thunk,
+		node: undefined
+	};
+}
+
+function lazy(fn, a)
+{
+	return thunk(fn, [a], function() {
+		return fn(a);
+	});
+}
+
+function lazy2(fn, a, b)
+{
+	return thunk(fn, [a,b], function() {
+		return A2(fn, a, b);
+	});
+}
+
+function lazy3(fn, a, b, c)
+{
+	return thunk(fn, [a,b,c], function() {
+		return A3(fn, a, b, c);
+	});
+}
+
+
+
+// FACTS
+
+
+function organizeFacts(factList)
+{
+	var namespace, facts = {};
+
+	while (factList.ctor !== '[]')
+	{
+		var entry = factList._0;
+		var key = entry.key;
+
+		if (key === ATTR_KEY || key === ATTR_NS_KEY || key === EVENT_KEY)
+		{
+			var subFacts = facts[key] || {};
+			subFacts[entry.realKey] = entry.value;
+			facts[key] = subFacts;
+		}
+		else if (key === STYLE_KEY)
+		{
+			var styles = facts[key] || {};
+			var styleList = entry.value;
+			while (styleList.ctor !== '[]')
+			{
+				var style = styleList._0;
+				styles[style._0] = style._1;
+				styleList = styleList._1;
+			}
+			facts[key] = styles;
+		}
+		else if (key === 'namespace')
+		{
+			namespace = entry.value;
+		}
+		else if (key === 'className')
+		{
+			var classes = facts[key];
+			facts[key] = typeof classes === 'undefined'
+				? entry.value
+				: classes + ' ' + entry.value;
+		}
+ 		else
+		{
+			facts[key] = entry.value;
+		}
+		factList = factList._1;
+	}
+
+	return {
+		facts: facts,
+		namespace: namespace
+	};
+}
+
+
+
+////////////  PROPERTIES AND ATTRIBUTES  ////////////
+
+
+function style(value)
+{
+	return {
+		key: STYLE_KEY,
+		value: value
+	};
+}
+
+
+function property(key, value)
+{
+	return {
+		key: key,
+		value: value
+	};
+}
+
+
+function attribute(key, value)
+{
+	return {
+		key: ATTR_KEY,
+		realKey: key,
+		value: value
+	};
+}
+
+
+function attributeNS(namespace, key, value)
+{
+	return {
+		key: ATTR_NS_KEY,
+		realKey: key,
+		value: {
+			value: value,
+			namespace: namespace
+		}
+	};
+}
+
+
+function on(name, options, decoder)
+{
+	return {
+		key: EVENT_KEY,
+		realKey: name,
+		value: {
+			options: options,
+			decoder: decoder
+		}
+	};
+}
+
+
+function equalEvents(a, b)
+{
+	if (a.options !== b.options)
+	{
+		if (a.options.stopPropagation !== b.options.stopPropagation || a.options.preventDefault !== b.options.preventDefault)
+		{
+			return false;
+		}
+	}
+	return _elm_lang$core$Native_Json.equality(a.decoder, b.decoder);
+}
+
+
+function mapProperty(func, property)
+{
+	if (property.key !== EVENT_KEY)
+	{
+		return property;
+	}
+	return on(
+		property.realKey,
+		property.value.options,
+		A2(_elm_lang$core$Json_Decode$map, func, property.value.decoder)
+	);
+}
+
+
+////////////  RENDER  ////////////
+
+
+function render(vNode, eventNode)
+{
+	switch (vNode.type)
+	{
+		case 'thunk':
+			if (!vNode.node)
+			{
+				vNode.node = vNode.thunk();
+			}
+			return render(vNode.node, eventNode);
+
+		case 'tagger':
+			var subNode = vNode.node;
+			var tagger = vNode.tagger;
+
+			while (subNode.type === 'tagger')
+			{
+				typeof tagger !== 'object'
+					? tagger = [tagger, subNode.tagger]
+					: tagger.push(subNode.tagger);
+
+				subNode = subNode.node;
+			}
+
+			var subEventRoot = { tagger: tagger, parent: eventNode };
+			var domNode = render(subNode, subEventRoot);
+			domNode.elm_event_node_ref = subEventRoot;
+			return domNode;
+
+		case 'text':
+			return localDoc.createTextNode(vNode.text);
+
+		case 'node':
+			var domNode = vNode.namespace
+				? localDoc.createElementNS(vNode.namespace, vNode.tag)
+				: localDoc.createElement(vNode.tag);
+
+			applyFacts(domNode, eventNode, vNode.facts);
+
+			var children = vNode.children;
+
+			for (var i = 0; i < children.length; i++)
+			{
+				domNode.appendChild(render(children[i], eventNode));
+			}
+
+			return domNode;
+
+		case 'keyed-node':
+			var domNode = vNode.namespace
+				? localDoc.createElementNS(vNode.namespace, vNode.tag)
+				: localDoc.createElement(vNode.tag);
+
+			applyFacts(domNode, eventNode, vNode.facts);
+
+			var children = vNode.children;
+
+			for (var i = 0; i < children.length; i++)
+			{
+				domNode.appendChild(render(children[i]._1, eventNode));
+			}
+
+			return domNode;
+
+		case 'custom':
+			var domNode = vNode.impl.render(vNode.model);
+			applyFacts(domNode, eventNode, vNode.facts);
+			return domNode;
+	}
+}
+
+
+
+////////////  APPLY FACTS  ////////////
+
+
+function applyFacts(domNode, eventNode, facts)
+{
+	for (var key in facts)
+	{
+		var value = facts[key];
+
+		switch (key)
+		{
+			case STYLE_KEY:
+				applyStyles(domNode, value);
+				break;
+
+			case EVENT_KEY:
+				applyEvents(domNode, eventNode, value);
+				break;
+
+			case ATTR_KEY:
+				applyAttrs(domNode, value);
+				break;
+
+			case ATTR_NS_KEY:
+				applyAttrsNS(domNode, value);
+				break;
+
+			case 'value':
+				if (domNode[key] !== value)
+				{
+					domNode[key] = value;
+				}
+				break;
+
+			default:
+				domNode[key] = value;
+				break;
+		}
+	}
+}
+
+function applyStyles(domNode, styles)
+{
+	var domNodeStyle = domNode.style;
+
+	for (var key in styles)
+	{
+		domNodeStyle[key] = styles[key];
+	}
+}
+
+function applyEvents(domNode, eventNode, events)
+{
+	var allHandlers = domNode.elm_handlers || {};
+
+	for (var key in events)
+	{
+		var handler = allHandlers[key];
+		var value = events[key];
+
+		if (typeof value === 'undefined')
+		{
+			domNode.removeEventListener(key, handler);
+			allHandlers[key] = undefined;
+		}
+		else if (typeof handler === 'undefined')
+		{
+			var handler = makeEventHandler(eventNode, value);
+			domNode.addEventListener(key, handler);
+			allHandlers[key] = handler;
+		}
+		else
+		{
+			handler.info = value;
+		}
+	}
+
+	domNode.elm_handlers = allHandlers;
+}
+
+function makeEventHandler(eventNode, info)
+{
+	function eventHandler(event)
+	{
+		var info = eventHandler.info;
+
+		var value = A2(_elm_lang$core$Native_Json.run, info.decoder, event);
+
+		if (value.ctor === 'Ok')
+		{
+			var options = info.options;
+			if (options.stopPropagation)
+			{
+				event.stopPropagation();
+			}
+			if (options.preventDefault)
+			{
+				event.preventDefault();
+			}
+
+			var message = value._0;
+
+			var currentEventNode = eventNode;
+			while (currentEventNode)
+			{
+				var tagger = currentEventNode.tagger;
+				if (typeof tagger === 'function')
+				{
+					message = tagger(message);
+				}
+				else
+				{
+					for (var i = tagger.length; i--; )
+					{
+						message = tagger[i](message);
+					}
+				}
+				currentEventNode = currentEventNode.parent;
+			}
+		}
+	};
+
+	eventHandler.info = info;
+
+	return eventHandler;
+}
+
+function applyAttrs(domNode, attrs)
+{
+	for (var key in attrs)
+	{
+		var value = attrs[key];
+		if (typeof value === 'undefined')
+		{
+			domNode.removeAttribute(key);
+		}
+		else
+		{
+			domNode.setAttribute(key, value);
+		}
+	}
+}
+
+function applyAttrsNS(domNode, nsAttrs)
+{
+	for (var key in nsAttrs)
+	{
+		var pair = nsAttrs[key];
+		var namespace = pair.namespace;
+		var value = pair.value;
+
+		if (typeof value === 'undefined')
+		{
+			domNode.removeAttributeNS(namespace, key);
+		}
+		else
+		{
+			domNode.setAttributeNS(namespace, key, value);
+		}
+	}
+}
+
+
+
+////////////  DIFF  ////////////
+
+
+function diff(a, b)
+{
+	var patches = [];
+	diffHelp(a, b, patches, 0);
+	return patches;
+}
+
+
+function makePatch(type, index, data)
+{
+	return {
+		index: index,
+		type: type,
+		data: data,
+		domNode: undefined,
+		eventNode: undefined
+	};
+}
+
+
+function diffHelp(a, b, patches, index)
+{
+	if (a === b)
+	{
+		return;
+	}
+
+	var aType = a.type;
+	var bType = b.type;
+
+	// Bail if you run into different types of nodes. Implies that the
+	// structure has changed significantly and it's not worth a diff.
+	if (aType !== bType)
+	{
+		patches.push(makePatch('p-redraw', index, b));
+		return;
+	}
+
+	// Now we know that both nodes are the same type.
+	switch (bType)
+	{
+		case 'thunk':
+			var aArgs = a.args;
+			var bArgs = b.args;
+			var i = aArgs.length;
+			var same = a.func === b.func && i === bArgs.length;
+			while (same && i--)
+			{
+				same = aArgs[i] === bArgs[i];
+			}
+			if (same)
+			{
+				b.node = a.node;
+				return;
+			}
+			b.node = b.thunk();
+			var subPatches = [];
+			diffHelp(a.node, b.node, subPatches, 0);
+			if (subPatches.length > 0)
+			{
+				patches.push(makePatch('p-thunk', index, subPatches));
+			}
+			return;
+
+		case 'tagger':
+			// gather nested taggers
+			var aTaggers = a.tagger;
+			var bTaggers = b.tagger;
+			var nesting = false;
+
+			var aSubNode = a.node;
+			while (aSubNode.type === 'tagger')
+			{
+				nesting = true;
+
+				typeof aTaggers !== 'object'
+					? aTaggers = [aTaggers, aSubNode.tagger]
+					: aTaggers.push(aSubNode.tagger);
+
+				aSubNode = aSubNode.node;
+			}
+
+			var bSubNode = b.node;
+			while (bSubNode.type === 'tagger')
+			{
+				nesting = true;
+
+				typeof bTaggers !== 'object'
+					? bTaggers = [bTaggers, bSubNode.tagger]
+					: bTaggers.push(bSubNode.tagger);
+
+				bSubNode = bSubNode.node;
+			}
+
+			// Just bail if different numbers of taggers. This implies the
+			// structure of the virtual DOM has changed.
+			if (nesting && aTaggers.length !== bTaggers.length)
+			{
+				patches.push(makePatch('p-redraw', index, b));
+				return;
+			}
+
+			// check if taggers are "the same"
+			if (nesting ? !pairwiseRefEqual(aTaggers, bTaggers) : aTaggers !== bTaggers)
+			{
+				patches.push(makePatch('p-tagger', index, bTaggers));
+			}
+
+			// diff everything below the taggers
+			diffHelp(aSubNode, bSubNode, patches, index + 1);
+			return;
+
+		case 'text':
+			if (a.text !== b.text)
+			{
+				patches.push(makePatch('p-text', index, b.text));
+				return;
+			}
+
+			return;
+
+		case 'node':
+			// Bail if obvious indicators have changed. Implies more serious
+			// structural changes such that it's not worth it to diff.
+			if (a.tag !== b.tag || a.namespace !== b.namespace)
+			{
+				patches.push(makePatch('p-redraw', index, b));
+				return;
+			}
+
+			var factsDiff = diffFacts(a.facts, b.facts);
+
+			if (typeof factsDiff !== 'undefined')
+			{
+				patches.push(makePatch('p-facts', index, factsDiff));
+			}
+
+			diffChildren(a, b, patches, index);
+			return;
+
+		case 'keyed-node':
+			// Bail if obvious indicators have changed. Implies more serious
+			// structural changes such that it's not worth it to diff.
+			if (a.tag !== b.tag || a.namespace !== b.namespace)
+			{
+				patches.push(makePatch('p-redraw', index, b));
+				return;
+			}
+
+			var factsDiff = diffFacts(a.facts, b.facts);
+
+			if (typeof factsDiff !== 'undefined')
+			{
+				patches.push(makePatch('p-facts', index, factsDiff));
+			}
+
+			diffKeyedChildren(a, b, patches, index);
+			return;
+
+		case 'custom':
+			if (a.impl !== b.impl)
+			{
+				patches.push(makePatch('p-redraw', index, b));
+				return;
+			}
+
+			var factsDiff = diffFacts(a.facts, b.facts);
+			if (typeof factsDiff !== 'undefined')
+			{
+				patches.push(makePatch('p-facts', index, factsDiff));
+			}
+
+			var patch = b.impl.diff(a,b);
+			if (patch)
+			{
+				patches.push(makePatch('p-custom', index, patch));
+				return;
+			}
+
+			return;
+	}
+}
+
+
+// assumes the incoming arrays are the same length
+function pairwiseRefEqual(as, bs)
+{
+	for (var i = 0; i < as.length; i++)
+	{
+		if (as[i] !== bs[i])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+// TODO Instead of creating a new diff object, it's possible to just test if
+// there *is* a diff. During the actual patch, do the diff again and make the
+// modifications directly. This way, there's no new allocations. Worth it?
+function diffFacts(a, b, category)
+{
+	var diff;
+
+	// look for changes and removals
+	for (var aKey in a)
+	{
+		if (aKey === STYLE_KEY || aKey === EVENT_KEY || aKey === ATTR_KEY || aKey === ATTR_NS_KEY)
+		{
+			var subDiff = diffFacts(a[aKey], b[aKey] || {}, aKey);
+			if (subDiff)
+			{
+				diff = diff || {};
+				diff[aKey] = subDiff;
+			}
+			continue;
+		}
+
+		// remove if not in the new facts
+		if (!(aKey in b))
+		{
+			diff = diff || {};
+			diff[aKey] =
+				(typeof category === 'undefined')
+					? (typeof a[aKey] === 'string' ? '' : null)
+					:
+				(category === STYLE_KEY)
+					? ''
+					:
+				(category === EVENT_KEY || category === ATTR_KEY)
+					? undefined
+					:
+				{ namespace: a[aKey].namespace, value: undefined };
+
+			continue;
+		}
+
+		var aValue = a[aKey];
+		var bValue = b[aKey];
+
+		// reference equal, so don't worry about it
+		if (aValue === bValue && aKey !== 'value'
+			|| category === EVENT_KEY && equalEvents(aValue, bValue))
+		{
+			continue;
+		}
+
+		diff = diff || {};
+		diff[aKey] = bValue;
+	}
+
+	// add new stuff
+	for (var bKey in b)
+	{
+		if (!(bKey in a))
+		{
+			diff = diff || {};
+			diff[bKey] = b[bKey];
+		}
+	}
+
+	return diff;
+}
+
+
+function diffChildren(aParent, bParent, patches, rootIndex)
+{
+	var aChildren = aParent.children;
+	var bChildren = bParent.children;
+
+	var aLen = aChildren.length;
+	var bLen = bChildren.length;
+
+	// FIGURE OUT IF THERE ARE INSERTS OR REMOVALS
+
+	if (aLen > bLen)
+	{
+		patches.push(makePatch('p-remove-last', rootIndex, aLen - bLen));
+	}
+	else if (aLen < bLen)
+	{
+		patches.push(makePatch('p-append', rootIndex, bChildren.slice(aLen)));
+	}
+
+	// PAIRWISE DIFF EVERYTHING ELSE
+
+	var index = rootIndex;
+	var minLen = aLen < bLen ? aLen : bLen;
+	for (var i = 0; i < minLen; i++)
+	{
+		index++;
+		var aChild = aChildren[i];
+		diffHelp(aChild, bChildren[i], patches, index);
+		index += aChild.descendantsCount || 0;
+	}
+}
+
+
+
+////////////  KEYED DIFF  ////////////
+
+
+function diffKeyedChildren(aParent, bParent, patches, rootIndex)
+{
+	var localPatches = [];
+
+	var changes = {}; // Dict String Entry
+	var inserts = []; // Array { index : Int, entry : Entry }
+	// type Entry = { tag : String, vnode : VNode, index : Int, data : _ }
+
+	var aChildren = aParent.children;
+	var bChildren = bParent.children;
+	var aLen = aChildren.length;
+	var bLen = bChildren.length;
+	var aIndex = 0;
+	var bIndex = 0;
+
+	var index = rootIndex;
+
+	while (aIndex < aLen && bIndex < bLen)
+	{
+		var a = aChildren[aIndex];
+		var b = bChildren[bIndex];
+
+		var aKey = a._0;
+		var bKey = b._0;
+		var aNode = a._1;
+		var bNode = b._1;
+
+		// check if keys match
+
+		if (aKey === bKey)
+		{
+			index++;
+			diffHelp(aNode, bNode, localPatches, index);
+			index += aNode.descendantsCount || 0;
+
+			aIndex++;
+			bIndex++;
+			continue;
+		}
+
+		// look ahead 1 to detect insertions and removals.
+
+		var aLookAhead = aIndex + 1 < aLen;
+		var bLookAhead = bIndex + 1 < bLen;
+
+		if (aLookAhead)
+		{
+			var aNext = aChildren[aIndex + 1];
+			var aNextKey = aNext._0;
+			var aNextNode = aNext._1;
+			var oldMatch = bKey === aNextKey;
+		}
+
+		if (bLookAhead)
+		{
+			var bNext = bChildren[bIndex + 1];
+			var bNextKey = bNext._0;
+			var bNextNode = bNext._1;
+			var newMatch = aKey === bNextKey;
+		}
+
+
+		// swap a and b
+		if (aLookAhead && bLookAhead && newMatch && oldMatch)
+		{
+			index++;
+			diffHelp(aNode, bNextNode, localPatches, index);
+			insertNode(changes, localPatches, aKey, bNode, bIndex, inserts);
+			index += aNode.descendantsCount || 0;
+
+			index++;
+			removeNode(changes, localPatches, aKey, aNextNode, index);
+			index += aNextNode.descendantsCount || 0;
+
+			aIndex += 2;
+			bIndex += 2;
+			continue;
+		}
+
+		// insert b
+		if (bLookAhead && newMatch)
+		{
+			index++;
+			insertNode(changes, localPatches, bKey, bNode, bIndex, inserts);
+			diffHelp(aNode, bNextNode, localPatches, index);
+			index += aNode.descendantsCount || 0;
+
+			aIndex += 1;
+			bIndex += 2;
+			continue;
+		}
+
+		// remove a
+		if (aLookAhead && oldMatch)
+		{
+			index++;
+			removeNode(changes, localPatches, aKey, aNode, index);
+			index += aNode.descendantsCount || 0;
+
+			index++;
+			diffHelp(aNextNode, bNode, localPatches, index);
+			index += aNextNode.descendantsCount || 0;
+
+			aIndex += 2;
+			bIndex += 1;
+			continue;
+		}
+
+		// remove a, insert b
+		if (aLookAhead && bLookAhead && aNextKey === bNextKey)
+		{
+			index++;
+			removeNode(changes, localPatches, aKey, aNode, index);
+			insertNode(changes, localPatches, bKey, bNode, bIndex, inserts);
+			index += aNode.descendantsCount || 0;
+
+			index++;
+			diffHelp(aNextNode, bNextNode, localPatches, index);
+			index += aNextNode.descendantsCount || 0;
+
+			aIndex += 2;
+			bIndex += 2;
+			continue;
+		}
+
+		break;
+	}
+
+	// eat up any remaining nodes with removeNode and insertNode
+
+	while (aIndex < aLen)
+	{
+		index++;
+		var a = aChildren[aIndex];
+		var aNode = a._1;
+		removeNode(changes, localPatches, a._0, aNode, index);
+		index += aNode.descendantsCount || 0;
+		aIndex++;
+	}
+
+	var endInserts;
+	while (bIndex < bLen)
+	{
+		endInserts = endInserts || [];
+		var b = bChildren[bIndex];
+		insertNode(changes, localPatches, b._0, b._1, undefined, endInserts);
+		bIndex++;
+	}
+
+	if (localPatches.length > 0 || inserts.length > 0 || typeof endInserts !== 'undefined')
+	{
+		patches.push(makePatch('p-reorder', rootIndex, {
+			patches: localPatches,
+			inserts: inserts,
+			endInserts: endInserts
+		}));
+	}
+}
+
+
+
+////////////  CHANGES FROM KEYED DIFF  ////////////
+
+
+var POSTFIX = '_elmW6BL';
+
+
+function insertNode(changes, localPatches, key, vnode, bIndex, inserts)
+{
+	var entry = changes[key];
+
+	// never seen this key before
+	if (typeof entry === 'undefined')
+	{
+		entry = {
+			tag: 'insert',
+			vnode: vnode,
+			index: bIndex,
+			data: undefined
+		};
+
+		inserts.push({ index: bIndex, entry: entry });
+		changes[key] = entry;
+
+		return;
+	}
+
+	// this key was removed earlier, a match!
+	if (entry.tag === 'remove')
+	{
+		inserts.push({ index: bIndex, entry: entry });
+
+		entry.tag = 'move';
+		var subPatches = [];
+		diffHelp(entry.vnode, vnode, subPatches, entry.index);
+		entry.index = bIndex;
+		entry.data.data = {
+			patches: subPatches,
+			entry: entry
+		};
+
+		return;
+	}
+
+	// this key has already been inserted or moved, a duplicate!
+	insertNode(changes, localPatches, key + POSTFIX, vnode, bIndex, inserts);
+}
+
+
+function removeNode(changes, localPatches, key, vnode, index)
+{
+	var entry = changes[key];
+
+	// never seen this key before
+	if (typeof entry === 'undefined')
+	{
+		var patch = makePatch('p-remove', index, undefined);
+		localPatches.push(patch);
+
+		changes[key] = {
+			tag: 'remove',
+			vnode: vnode,
+			index: index,
+			data: patch
+		};
+
+		return;
+	}
+
+	// this key was inserted earlier, a match!
+	if (entry.tag === 'insert')
+	{
+		entry.tag = 'move';
+		var subPatches = [];
+		diffHelp(vnode, entry.vnode, subPatches, index);
+
+		var patch = makePatch('p-remove', index, {
+			patches: subPatches,
+			entry: entry
+		});
+		localPatches.push(patch);
+
+		return;
+	}
+
+	// this key has already been removed or moved, a duplicate!
+	removeNode(changes, localPatches, key + POSTFIX, vnode, index);
+}
+
+
+
+////////////  ADD DOM NODES  ////////////
+//
+// Each DOM node has an "index" assigned in order of traversal. It is important
+// to minimize our crawl over the actual DOM, so these indexes (along with the
+// descendantsCount of virtual nodes) let us skip touching entire subtrees of
+// the DOM if we know there are no patches there.
+
+
+function addDomNodes(domNode, vNode, patches, eventNode)
+{
+	addDomNodesHelp(domNode, vNode, patches, 0, 0, vNode.descendantsCount, eventNode);
+}
+
+
+// assumes `patches` is non-empty and indexes increase monotonically.
+function addDomNodesHelp(domNode, vNode, patches, i, low, high, eventNode)
+{
+	var patch = patches[i];
+	var index = patch.index;
+
+	while (index === low)
+	{
+		var patchType = patch.type;
+
+		if (patchType === 'p-thunk')
+		{
+			addDomNodes(domNode, vNode.node, patch.data, eventNode);
+		}
+		else if (patchType === 'p-reorder')
+		{
+			patch.domNode = domNode;
+			patch.eventNode = eventNode;
+
+			var subPatches = patch.data.patches;
+			if (subPatches.length > 0)
+			{
+				addDomNodesHelp(domNode, vNode, subPatches, 0, low, high, eventNode);
+			}
+		}
+		else if (patchType === 'p-remove')
+		{
+			patch.domNode = domNode;
+			patch.eventNode = eventNode;
+
+			var data = patch.data;
+			if (typeof data !== 'undefined')
+			{
+				data.entry.data = domNode;
+				var subPatches = data.patches;
+				if (subPatches.length > 0)
+				{
+					addDomNodesHelp(domNode, vNode, subPatches, 0, low, high, eventNode);
+				}
+			}
+		}
+		else
+		{
+			patch.domNode = domNode;
+			patch.eventNode = eventNode;
+		}
+
+		i++;
+
+		if (!(patch = patches[i]) || (index = patch.index) > high)
+		{
+			return i;
+		}
+	}
+
+	switch (vNode.type)
+	{
+		case 'tagger':
+			var subNode = vNode.node;
+
+			while (subNode.type === "tagger")
+			{
+				subNode = subNode.node;
+			}
+
+			return addDomNodesHelp(domNode, subNode, patches, i, low + 1, high, domNode.elm_event_node_ref);
+
+		case 'node':
+			var vChildren = vNode.children;
+			var childNodes = domNode.childNodes;
+			for (var j = 0; j < vChildren.length; j++)
+			{
+				low++;
+				var vChild = vChildren[j];
+				var nextLow = low + (vChild.descendantsCount || 0);
+				if (low <= index && index <= nextLow)
+				{
+					i = addDomNodesHelp(childNodes[j], vChild, patches, i, low, nextLow, eventNode);
+					if (!(patch = patches[i]) || (index = patch.index) > high)
+					{
+						return i;
+					}
+				}
+				low = nextLow;
+			}
+			return i;
+
+		case 'keyed-node':
+			var vChildren = vNode.children;
+			var childNodes = domNode.childNodes;
+			for (var j = 0; j < vChildren.length; j++)
+			{
+				low++;
+				var vChild = vChildren[j]._1;
+				var nextLow = low + (vChild.descendantsCount || 0);
+				if (low <= index && index <= nextLow)
+				{
+					i = addDomNodesHelp(childNodes[j], vChild, patches, i, low, nextLow, eventNode);
+					if (!(patch = patches[i]) || (index = patch.index) > high)
+					{
+						return i;
+					}
+				}
+				low = nextLow;
+			}
+			return i;
+
+		case 'text':
+		case 'thunk':
+			throw new Error('should never traverse `text` or `thunk` nodes like this');
+	}
+}
+
+
+
+////////////  APPLY PATCHES  ////////////
+
+
+function applyPatches(rootDomNode, oldVirtualNode, patches, eventNode)
+{
+	if (patches.length === 0)
+	{
+		return rootDomNode;
+	}
+
+	addDomNodes(rootDomNode, oldVirtualNode, patches, eventNode);
+	return applyPatchesHelp(rootDomNode, patches);
+}
+
+function applyPatchesHelp(rootDomNode, patches)
+{
+	for (var i = 0; i < patches.length; i++)
+	{
+		var patch = patches[i];
+		var localDomNode = patch.domNode
+		var newNode = applyPatch(localDomNode, patch);
+		if (localDomNode === rootDomNode)
+		{
+			rootDomNode = newNode;
+		}
+	}
+	return rootDomNode;
+}
+
+function applyPatch(domNode, patch)
+{
+	switch (patch.type)
+	{
+		case 'p-redraw':
+			return applyPatchRedraw(domNode, patch.data, patch.eventNode);
+
+		case 'p-facts':
+			applyFacts(domNode, patch.eventNode, patch.data);
+			return domNode;
+
+		case 'p-text':
+			domNode.replaceData(0, domNode.length, patch.data);
+			return domNode;
+
+		case 'p-thunk':
+			return applyPatchesHelp(domNode, patch.data);
+
+		case 'p-tagger':
+			if (typeof domNode.elm_event_node_ref !== 'undefined')
+			{
+				domNode.elm_event_node_ref.tagger = patch.data;
+			}
+			else
+			{
+				domNode.elm_event_node_ref = { tagger: patch.data, parent: patch.eventNode };
+			}
+			return domNode;
+
+		case 'p-remove-last':
+			var i = patch.data;
+			while (i--)
+			{
+				domNode.removeChild(domNode.lastChild);
+			}
+			return domNode;
+
+		case 'p-append':
+			var newNodes = patch.data;
+			for (var i = 0; i < newNodes.length; i++)
+			{
+				domNode.appendChild(render(newNodes[i], patch.eventNode));
+			}
+			return domNode;
+
+		case 'p-remove':
+			var data = patch.data;
+			if (typeof data === 'undefined')
+			{
+				domNode.parentNode.removeChild(domNode);
+				return domNode;
+			}
+			var entry = data.entry;
+			if (typeof entry.index !== 'undefined')
+			{
+				domNode.parentNode.removeChild(domNode);
+			}
+			entry.data = applyPatchesHelp(domNode, data.patches);
+			return domNode;
+
+		case 'p-reorder':
+			return applyPatchReorder(domNode, patch);
+
+		case 'p-custom':
+			var impl = patch.data;
+			return impl.applyPatch(domNode, impl.data);
+
+		default:
+			throw new Error('Ran into an unknown patch!');
+	}
+}
+
+
+function applyPatchRedraw(domNode, vNode, eventNode)
+{
+	var parentNode = domNode.parentNode;
+	var newNode = render(vNode, eventNode);
+
+	if (typeof newNode.elm_event_node_ref === 'undefined')
+	{
+		newNode.elm_event_node_ref = domNode.elm_event_node_ref;
+	}
+
+	if (parentNode && newNode !== domNode)
+	{
+		parentNode.replaceChild(newNode, domNode);
+	}
+	return newNode;
+}
+
+
+function applyPatchReorder(domNode, patch)
+{
+	var data = patch.data;
+
+	// remove end inserts
+	var frag = applyPatchReorderEndInsertsHelp(data.endInserts, patch);
+
+	// removals
+	domNode = applyPatchesHelp(domNode, data.patches);
+
+	// inserts
+	var inserts = data.inserts;
+	for (var i = 0; i < inserts.length; i++)
+	{
+		var insert = inserts[i];
+		var entry = insert.entry;
+		var node = entry.tag === 'move'
+			? entry.data
+			: render(entry.vnode, patch.eventNode);
+		domNode.insertBefore(node, domNode.childNodes[insert.index]);
+	}
+
+	// add end inserts
+	if (typeof frag !== 'undefined')
+	{
+		domNode.appendChild(frag);
+	}
+
+	return domNode;
+}
+
+
+function applyPatchReorderEndInsertsHelp(endInserts, patch)
+{
+	if (typeof endInserts === 'undefined')
+	{
+		return;
+	}
+
+	var frag = localDoc.createDocumentFragment();
+	for (var i = 0; i < endInserts.length; i++)
+	{
+		var insert = endInserts[i];
+		var entry = insert.entry;
+		frag.appendChild(entry.tag === 'move'
+			? entry.data
+			: render(entry.vnode, patch.eventNode)
+		);
+	}
+	return frag;
+}
+
+
+// PROGRAMS
+
+var program = makeProgram(checkNoFlags);
+var programWithFlags = makeProgram(checkYesFlags);
+
+function makeProgram(flagChecker)
+{
+	return F2(function(debugWrap, impl)
+	{
+		return function(flagDecoder)
+		{
+			return function(object, moduleName, debugMetadata)
+			{
+				var checker = flagChecker(flagDecoder, moduleName);
+				if (typeof debugMetadata === 'undefined')
+				{
+					normalSetup(impl, object, moduleName, checker);
+				}
+				else
+				{
+					debugSetup(A2(debugWrap, debugMetadata, impl), object, moduleName, checker);
+				}
+			};
+		};
+	});
+}
+
+function staticProgram(vNode)
+{
+	var nothing = _elm_lang$core$Native_Utils.Tuple2(
+		_elm_lang$core$Native_Utils.Tuple0,
+		_elm_lang$core$Platform_Cmd$none
+	);
+	return A2(program, _elm_lang$virtual_dom$VirtualDom_Debug$wrap, {
+		init: nothing,
+		view: function() { return vNode; },
+		update: F2(function() { return nothing; }),
+		subscriptions: function() { return _elm_lang$core$Platform_Sub$none; }
+	})();
+}
+
+
+// FLAG CHECKERS
+
+function checkNoFlags(flagDecoder, moduleName)
+{
+	return function(init, flags, domNode)
+	{
+		if (typeof flags === 'undefined')
+		{
+			return init;
+		}
+
+		var errorMessage =
+			'The `' + moduleName + '` module does not need flags.\n'
+			+ 'Initialize it with no arguments and you should be all set!';
+
+		crash(errorMessage, domNode);
+	};
+}
+
+function checkYesFlags(flagDecoder, moduleName)
+{
+	return function(init, flags, domNode)
+	{
+		if (typeof flagDecoder === 'undefined')
+		{
+			var errorMessage =
+				'Are you trying to sneak a Never value into Elm? Trickster!\n'
+				+ 'It looks like ' + moduleName + '.main is defined with `programWithFlags` but has type `Program Never`.\n'
+				+ 'Use `program` instead if you do not want flags.'
+
+			crash(errorMessage, domNode);
+		}
+
+		var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
+		if (result.ctor === 'Ok')
+		{
+			return init(result._0);
+		}
+
+		var errorMessage =
+			'Trying to initialize the `' + moduleName + '` module with an unexpected flag.\n'
+			+ 'I tried to convert it to an Elm value, but ran into this problem:\n\n'
+			+ result._0;
+
+		crash(errorMessage, domNode);
+	};
+}
+
+function crash(errorMessage, domNode)
+{
+	if (domNode)
+	{
+		domNode.innerHTML =
+			'<div style="padding-left:1em;">'
+			+ '<h2 style="font-weight:normal;"><b>Oops!</b> Something went wrong when starting your Elm program.</h2>'
+			+ '<pre style="padding-left:1em;">' + errorMessage + '</pre>'
+			+ '</div>';
+	}
+
+	throw new Error(errorMessage);
+}
+
+
+//  NORMAL SETUP
+
+function normalSetup(impl, object, moduleName, flagChecker)
+{
+	object['embed'] = function embed(node, flags)
+	{
+		while (node.lastChild)
+		{
+			node.removeChild(node.lastChild);
+		}
+
+		return _elm_lang$core$Native_Platform.initialize(
+			flagChecker(impl.init, flags, node),
+			impl.update,
+			impl.subscriptions,
+			normalRenderer(node, impl.view)
+		);
+	};
+
+	object['fullscreen'] = function fullscreen(flags)
+	{
+		return _elm_lang$core$Native_Platform.initialize(
+			flagChecker(impl.init, flags, document.body),
+			impl.update,
+			impl.subscriptions,
+			normalRenderer(document.body, impl.view)
+		);
+	};
+}
+
+function normalRenderer(parentNode, view)
+{
+	return function(tagger, initialModel)
+	{
+		var eventNode = { tagger: tagger, parent: undefined };
+		var initialVirtualNode = view(initialModel);
+		var domNode = render(initialVirtualNode, eventNode);
+		parentNode.appendChild(domNode);
+		return makeStepper(domNode, view, initialVirtualNode, eventNode);
+	};
+}
+
+
+// STEPPER
+
+var rAF =
+	typeof requestAnimationFrame !== 'undefined'
+		? requestAnimationFrame
+		: function(callback) { setTimeout(callback, 1000 / 60); };
+
+function makeStepper(domNode, view, initialVirtualNode, eventNode)
+{
+	var state = 'NO_REQUEST';
+	var currNode = initialVirtualNode;
+	var nextModel;
+
+	function updateIfNeeded()
+	{
+		switch (state)
+		{
+			case 'NO_REQUEST':
+				throw new Error(
+					'Unexpected draw callback.\n' +
+					'Please report this to <https://github.com/elm-lang/virtual-dom/issues>.'
+				);
+
+			case 'PENDING_REQUEST':
+				rAF(updateIfNeeded);
+				state = 'EXTRA_REQUEST';
+
+				var nextNode = view(nextModel);
+				var patches = diff(currNode, nextNode);
+				domNode = applyPatches(domNode, currNode, patches, eventNode);
+				currNode = nextNode;
+
+				return;
+
+			case 'EXTRA_REQUEST':
+				state = 'NO_REQUEST';
+				return;
+		}
+	}
+
+	return function stepper(model)
+	{
+		if (state === 'NO_REQUEST')
+		{
+			rAF(updateIfNeeded);
+		}
+		state = 'PENDING_REQUEST';
+		nextModel = model;
+	};
+}
+
+
+// DEBUG SETUP
+
+function debugSetup(impl, object, moduleName, flagChecker)
+{
+	object['fullscreen'] = function fullscreen(flags)
+	{
+		var popoutRef = { doc: undefined };
+		return _elm_lang$core$Native_Platform.initialize(
+			flagChecker(impl.init, flags, document.body),
+			impl.update(scrollTask(popoutRef)),
+			impl.subscriptions,
+			debugRenderer(moduleName, document.body, popoutRef, impl.view, impl.viewIn, impl.viewOut)
+		);
+	};
+
+	object['embed'] = function fullscreen(node, flags)
+	{
+		var popoutRef = { doc: undefined };
+		return _elm_lang$core$Native_Platform.initialize(
+			flagChecker(impl.init, flags, node),
+			impl.update(scrollTask(popoutRef)),
+			impl.subscriptions,
+			debugRenderer(moduleName, node, popoutRef, impl.view, impl.viewIn, impl.viewOut)
+		);
+	};
+}
+
+function scrollTask(popoutRef)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var doc = popoutRef.doc;
+		if (doc)
+		{
+			var msgs = doc.getElementsByClassName('debugger-sidebar-messages')[0];
+			if (msgs)
+			{
+				msgs.scrollTop = msgs.scrollHeight;
+			}
+		}
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+
+function debugRenderer(moduleName, parentNode, popoutRef, view, viewIn, viewOut)
+{
+	return function(tagger, initialModel)
+	{
+		var appEventNode = { tagger: tagger, parent: undefined };
+		var eventNode = { tagger: tagger, parent: undefined };
+
+		// make normal stepper
+		var appVirtualNode = view(initialModel);
+		var appNode = render(appVirtualNode, appEventNode);
+		parentNode.appendChild(appNode);
+		var appStepper = makeStepper(appNode, view, appVirtualNode, appEventNode);
+
+		// make overlay stepper
+		var overVirtualNode = viewIn(initialModel)._1;
+		var overNode = render(overVirtualNode, eventNode);
+		parentNode.appendChild(overNode);
+		var wrappedViewIn = wrapViewIn(appEventNode, overNode, viewIn);
+		var overStepper = makeStepper(overNode, wrappedViewIn, overVirtualNode, eventNode);
+
+		// make debugger stepper
+		var debugStepper = makeDebugStepper(initialModel, viewOut, eventNode, parentNode, moduleName, popoutRef);
+
+		return function stepper(model)
+		{
+			appStepper(model);
+			overStepper(model);
+			debugStepper(model);
+		}
+	};
+}
+
+function makeDebugStepper(initialModel, view, eventNode, parentNode, moduleName, popoutRef)
+{
+	var curr;
+	var domNode;
+
+	return function stepper(model)
+	{
+		if (!model.isDebuggerOpen)
+		{
+			return;
+		}
+
+		if (!popoutRef.doc)
+		{
+			curr = view(model);
+			domNode = openDebugWindow(moduleName, popoutRef, curr, eventNode);
+			return;
+		}
+
+		// switch to document of popout
+		localDoc = popoutRef.doc;
+
+		var next = view(model);
+		var patches = diff(curr, next);
+		domNode = applyPatches(domNode, curr, patches, eventNode);
+		curr = next;
+
+		// switch back to normal document
+		localDoc = document;
+	};
+}
+
+function openDebugWindow(moduleName, popoutRef, virtualNode, eventNode)
+{
+	var w = 900;
+	var h = 360;
+	var x = screen.width - w;
+	var y = screen.height - h;
+	var debugWindow = window.open('', '', 'width=' + w + ',height=' + h + ',left=' + x + ',top=' + y);
+
+	// switch to window document
+	localDoc = debugWindow.document;
+
+	popoutRef.doc = localDoc;
+	localDoc.title = 'Debugger - ' + moduleName;
+	localDoc.body.style.margin = '0';
+	localDoc.body.style.padding = '0';
+	var domNode = render(virtualNode, eventNode);
+	localDoc.body.appendChild(domNode);
+
+	localDoc.addEventListener('keydown', function(event) {
+		if (event.metaKey && event.which === 82)
+		{
+			window.location.reload();
+		}
+		if (event.which === 38)
+		{
+			eventNode.tagger({ ctor: 'Up' });
+			event.preventDefault();
+		}
+		if (event.which === 40)
+		{
+			eventNode.tagger({ ctor: 'Down' });
+			event.preventDefault();
+		}
+	});
+
+	function close()
+	{
+		popoutRef.doc = undefined;
+		debugWindow.close();
+	}
+	window.addEventListener('unload', close);
+	debugWindow.addEventListener('unload', function() {
+		popoutRef.doc = undefined;
+		window.removeEventListener('unload', close);
+		eventNode.tagger({ ctor: 'Close' });
+	});
+
+	// switch back to the normal document
+	localDoc = document;
+
+	return domNode;
+}
+
+
+// BLOCK EVENTS
+
+function wrapViewIn(appEventNode, overlayNode, viewIn)
+{
+	var ignorer = makeIgnorer(overlayNode);
+	var blocking = 'Normal';
+	var overflow;
+
+	var normalTagger = appEventNode.tagger;
+	var blockTagger = function() {};
+
+	return function(model)
+	{
+		var tuple = viewIn(model);
+		var newBlocking = tuple._0.ctor;
+		appEventNode.tagger = newBlocking === 'Normal' ? normalTagger : blockTagger;
+		if (blocking !== newBlocking)
+		{
+			traverse('removeEventListener', ignorer, blocking);
+			traverse('addEventListener', ignorer, newBlocking);
+
+			if (blocking === 'Normal')
+			{
+				overflow = document.body.style.overflow;
+				document.body.style.overflow = 'hidden';
+			}
+
+			if (newBlocking === 'Normal')
+			{
+				document.body.style.overflow = overflow;
+			}
+
+			blocking = newBlocking;
+		}
+		return tuple._1;
+	}
+}
+
+function traverse(verbEventListener, ignorer, blocking)
+{
+	switch(blocking)
+	{
+		case 'Normal':
+			return;
+
+		case 'Pause':
+			return traverseHelp(verbEventListener, ignorer, mostEvents);
+
+		case 'Message':
+			return traverseHelp(verbEventListener, ignorer, allEvents);
+	}
+}
+
+function traverseHelp(verbEventListener, handler, eventNames)
+{
+	for (var i = 0; i < eventNames.length; i++)
+	{
+		document.body[verbEventListener](eventNames[i], handler, true);
+	}
+}
+
+function makeIgnorer(overlayNode)
+{
+	return function(event)
+	{
+		if (event.type === 'keydown' && event.metaKey && event.which === 82)
+		{
+			return;
+		}
+
+		var isScroll = event.type === 'scroll' || event.type === 'wheel';
+
+		var node = event.target;
+		while (node !== null)
+		{
+			if (node.className === 'elm-overlay-message-details' && isScroll)
+			{
+				return;
+			}
+
+			if (node === overlayNode && !isScroll)
+			{
+				return;
+			}
+			node = node.parentNode;
+		}
+
+		event.stopPropagation();
+		event.preventDefault();
+	}
+}
+
+var mostEvents = [
+	'click', 'dblclick', 'mousemove',
+	'mouseup', 'mousedown', 'mouseenter', 'mouseleave',
+	'touchstart', 'touchend', 'touchcancel', 'touchmove',
+	'pointerdown', 'pointerup', 'pointerover', 'pointerout',
+	'pointerenter', 'pointerleave', 'pointermove', 'pointercancel',
+	'dragstart', 'drag', 'dragend', 'dragenter', 'dragover', 'dragleave', 'drop',
+	'keyup', 'keydown', 'keypress',
+	'input', 'change',
+	'focus', 'blur'
+];
+
+var allEvents = mostEvents.concat('wheel', 'scroll');
+
+
+return {
+	node: node,
+	text: text,
+	custom: custom,
+	map: F2(map),
+
+	on: F3(on),
+	style: style,
+	property: F2(property),
+	attribute: F2(attribute),
+	attributeNS: F3(attributeNS),
+	mapProperty: F2(mapProperty),
+
+	lazy: F2(lazy),
+	lazy2: F3(lazy2),
+	lazy3: F4(lazy3),
+	keyedNode: F3(keyedNode),
+
+	program: program,
+	programWithFlags: programWithFlags,
+	staticProgram: staticProgram
+};
+
+}();
+
+var _elm_lang$virtual_dom$VirtualDom$programWithFlags = function (impl) {
+	return A2(_elm_lang$virtual_dom$Native_VirtualDom.programWithFlags, _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags, impl);
+};
+var _elm_lang$virtual_dom$VirtualDom$program = function (impl) {
+	return A2(_elm_lang$virtual_dom$Native_VirtualDom.program, _elm_lang$virtual_dom$VirtualDom_Debug$wrap, impl);
+};
+var _elm_lang$virtual_dom$VirtualDom$keyedNode = _elm_lang$virtual_dom$Native_VirtualDom.keyedNode;
+var _elm_lang$virtual_dom$VirtualDom$lazy3 = _elm_lang$virtual_dom$Native_VirtualDom.lazy3;
+var _elm_lang$virtual_dom$VirtualDom$lazy2 = _elm_lang$virtual_dom$Native_VirtualDom.lazy2;
+var _elm_lang$virtual_dom$VirtualDom$lazy = _elm_lang$virtual_dom$Native_VirtualDom.lazy;
+var _elm_lang$virtual_dom$VirtualDom$defaultOptions = {stopPropagation: false, preventDefault: false};
+var _elm_lang$virtual_dom$VirtualDom$onWithOptions = _elm_lang$virtual_dom$Native_VirtualDom.on;
+var _elm_lang$virtual_dom$VirtualDom$on = F2(
+	function (eventName, decoder) {
+		return A3(_elm_lang$virtual_dom$VirtualDom$onWithOptions, eventName, _elm_lang$virtual_dom$VirtualDom$defaultOptions, decoder);
+	});
+var _elm_lang$virtual_dom$VirtualDom$style = _elm_lang$virtual_dom$Native_VirtualDom.style;
+var _elm_lang$virtual_dom$VirtualDom$mapProperty = _elm_lang$virtual_dom$Native_VirtualDom.mapProperty;
+var _elm_lang$virtual_dom$VirtualDom$attributeNS = _elm_lang$virtual_dom$Native_VirtualDom.attributeNS;
+var _elm_lang$virtual_dom$VirtualDom$attribute = _elm_lang$virtual_dom$Native_VirtualDom.attribute;
+var _elm_lang$virtual_dom$VirtualDom$property = _elm_lang$virtual_dom$Native_VirtualDom.property;
+var _elm_lang$virtual_dom$VirtualDom$map = _elm_lang$virtual_dom$Native_VirtualDom.map;
+var _elm_lang$virtual_dom$VirtualDom$text = _elm_lang$virtual_dom$Native_VirtualDom.text;
+var _elm_lang$virtual_dom$VirtualDom$node = _elm_lang$virtual_dom$Native_VirtualDom.node;
+var _elm_lang$virtual_dom$VirtualDom$Options = F2(
+	function (a, b) {
+		return {stopPropagation: a, preventDefault: b};
+	});
+var _elm_lang$virtual_dom$VirtualDom$Node = {ctor: 'Node'};
+var _elm_lang$virtual_dom$VirtualDom$Property = {ctor: 'Property'};
+
+var _elm_lang$html$Html$programWithFlags = _elm_lang$virtual_dom$VirtualDom$programWithFlags;
+var _elm_lang$html$Html$program = _elm_lang$virtual_dom$VirtualDom$program;
+var _elm_lang$html$Html$beginnerProgram = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$html$Html$program(
+		{
+			init: A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				_p1.model,
+				{ctor: '[]'}),
+			update: F2(
+				function (msg, model) {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						A2(_p1.update, msg, model),
+						{ctor: '[]'});
+				}),
+			view: _p1.view,
+			subscriptions: function (_p2) {
+				return _elm_lang$core$Platform_Sub$none;
+			}
+		});
+};
+var _elm_lang$html$Html$map = _elm_lang$virtual_dom$VirtualDom$map;
+var _elm_lang$html$Html$text = _elm_lang$virtual_dom$VirtualDom$text;
+var _elm_lang$html$Html$node = _elm_lang$virtual_dom$VirtualDom$node;
+var _elm_lang$html$Html$body = _elm_lang$html$Html$node('body');
+var _elm_lang$html$Html$section = _elm_lang$html$Html$node('section');
+var _elm_lang$html$Html$nav = _elm_lang$html$Html$node('nav');
+var _elm_lang$html$Html$article = _elm_lang$html$Html$node('article');
+var _elm_lang$html$Html$aside = _elm_lang$html$Html$node('aside');
+var _elm_lang$html$Html$h1 = _elm_lang$html$Html$node('h1');
+var _elm_lang$html$Html$h2 = _elm_lang$html$Html$node('h2');
+var _elm_lang$html$Html$h3 = _elm_lang$html$Html$node('h3');
+var _elm_lang$html$Html$h4 = _elm_lang$html$Html$node('h4');
+var _elm_lang$html$Html$h5 = _elm_lang$html$Html$node('h5');
+var _elm_lang$html$Html$h6 = _elm_lang$html$Html$node('h6');
+var _elm_lang$html$Html$header = _elm_lang$html$Html$node('header');
+var _elm_lang$html$Html$footer = _elm_lang$html$Html$node('footer');
+var _elm_lang$html$Html$address = _elm_lang$html$Html$node('address');
+var _elm_lang$html$Html$main_ = _elm_lang$html$Html$node('main');
+var _elm_lang$html$Html$p = _elm_lang$html$Html$node('p');
+var _elm_lang$html$Html$hr = _elm_lang$html$Html$node('hr');
+var _elm_lang$html$Html$pre = _elm_lang$html$Html$node('pre');
+var _elm_lang$html$Html$blockquote = _elm_lang$html$Html$node('blockquote');
+var _elm_lang$html$Html$ol = _elm_lang$html$Html$node('ol');
+var _elm_lang$html$Html$ul = _elm_lang$html$Html$node('ul');
+var _elm_lang$html$Html$li = _elm_lang$html$Html$node('li');
+var _elm_lang$html$Html$dl = _elm_lang$html$Html$node('dl');
+var _elm_lang$html$Html$dt = _elm_lang$html$Html$node('dt');
+var _elm_lang$html$Html$dd = _elm_lang$html$Html$node('dd');
+var _elm_lang$html$Html$figure = _elm_lang$html$Html$node('figure');
+var _elm_lang$html$Html$figcaption = _elm_lang$html$Html$node('figcaption');
+var _elm_lang$html$Html$div = _elm_lang$html$Html$node('div');
+var _elm_lang$html$Html$a = _elm_lang$html$Html$node('a');
+var _elm_lang$html$Html$em = _elm_lang$html$Html$node('em');
+var _elm_lang$html$Html$strong = _elm_lang$html$Html$node('strong');
+var _elm_lang$html$Html$small = _elm_lang$html$Html$node('small');
+var _elm_lang$html$Html$s = _elm_lang$html$Html$node('s');
+var _elm_lang$html$Html$cite = _elm_lang$html$Html$node('cite');
+var _elm_lang$html$Html$q = _elm_lang$html$Html$node('q');
+var _elm_lang$html$Html$dfn = _elm_lang$html$Html$node('dfn');
+var _elm_lang$html$Html$abbr = _elm_lang$html$Html$node('abbr');
+var _elm_lang$html$Html$time = _elm_lang$html$Html$node('time');
+var _elm_lang$html$Html$code = _elm_lang$html$Html$node('code');
+var _elm_lang$html$Html$var = _elm_lang$html$Html$node('var');
+var _elm_lang$html$Html$samp = _elm_lang$html$Html$node('samp');
+var _elm_lang$html$Html$kbd = _elm_lang$html$Html$node('kbd');
+var _elm_lang$html$Html$sub = _elm_lang$html$Html$node('sub');
+var _elm_lang$html$Html$sup = _elm_lang$html$Html$node('sup');
+var _elm_lang$html$Html$i = _elm_lang$html$Html$node('i');
+var _elm_lang$html$Html$b = _elm_lang$html$Html$node('b');
+var _elm_lang$html$Html$u = _elm_lang$html$Html$node('u');
+var _elm_lang$html$Html$mark = _elm_lang$html$Html$node('mark');
+var _elm_lang$html$Html$ruby = _elm_lang$html$Html$node('ruby');
+var _elm_lang$html$Html$rt = _elm_lang$html$Html$node('rt');
+var _elm_lang$html$Html$rp = _elm_lang$html$Html$node('rp');
+var _elm_lang$html$Html$bdi = _elm_lang$html$Html$node('bdi');
+var _elm_lang$html$Html$bdo = _elm_lang$html$Html$node('bdo');
+var _elm_lang$html$Html$span = _elm_lang$html$Html$node('span');
+var _elm_lang$html$Html$br = _elm_lang$html$Html$node('br');
+var _elm_lang$html$Html$wbr = _elm_lang$html$Html$node('wbr');
+var _elm_lang$html$Html$ins = _elm_lang$html$Html$node('ins');
+var _elm_lang$html$Html$del = _elm_lang$html$Html$node('del');
+var _elm_lang$html$Html$img = _elm_lang$html$Html$node('img');
+var _elm_lang$html$Html$iframe = _elm_lang$html$Html$node('iframe');
+var _elm_lang$html$Html$embed = _elm_lang$html$Html$node('embed');
+var _elm_lang$html$Html$object = _elm_lang$html$Html$node('object');
+var _elm_lang$html$Html$param = _elm_lang$html$Html$node('param');
+var _elm_lang$html$Html$video = _elm_lang$html$Html$node('video');
+var _elm_lang$html$Html$audio = _elm_lang$html$Html$node('audio');
+var _elm_lang$html$Html$source = _elm_lang$html$Html$node('source');
+var _elm_lang$html$Html$track = _elm_lang$html$Html$node('track');
+var _elm_lang$html$Html$canvas = _elm_lang$html$Html$node('canvas');
+var _elm_lang$html$Html$math = _elm_lang$html$Html$node('math');
+var _elm_lang$html$Html$table = _elm_lang$html$Html$node('table');
+var _elm_lang$html$Html$caption = _elm_lang$html$Html$node('caption');
+var _elm_lang$html$Html$colgroup = _elm_lang$html$Html$node('colgroup');
+var _elm_lang$html$Html$col = _elm_lang$html$Html$node('col');
+var _elm_lang$html$Html$tbody = _elm_lang$html$Html$node('tbody');
+var _elm_lang$html$Html$thead = _elm_lang$html$Html$node('thead');
+var _elm_lang$html$Html$tfoot = _elm_lang$html$Html$node('tfoot');
+var _elm_lang$html$Html$tr = _elm_lang$html$Html$node('tr');
+var _elm_lang$html$Html$td = _elm_lang$html$Html$node('td');
+var _elm_lang$html$Html$th = _elm_lang$html$Html$node('th');
+var _elm_lang$html$Html$form = _elm_lang$html$Html$node('form');
+var _elm_lang$html$Html$fieldset = _elm_lang$html$Html$node('fieldset');
+var _elm_lang$html$Html$legend = _elm_lang$html$Html$node('legend');
+var _elm_lang$html$Html$label = _elm_lang$html$Html$node('label');
+var _elm_lang$html$Html$input = _elm_lang$html$Html$node('input');
+var _elm_lang$html$Html$button = _elm_lang$html$Html$node('button');
+var _elm_lang$html$Html$select = _elm_lang$html$Html$node('select');
+var _elm_lang$html$Html$datalist = _elm_lang$html$Html$node('datalist');
+var _elm_lang$html$Html$optgroup = _elm_lang$html$Html$node('optgroup');
+var _elm_lang$html$Html$option = _elm_lang$html$Html$node('option');
+var _elm_lang$html$Html$textarea = _elm_lang$html$Html$node('textarea');
+var _elm_lang$html$Html$keygen = _elm_lang$html$Html$node('keygen');
+var _elm_lang$html$Html$output = _elm_lang$html$Html$node('output');
+var _elm_lang$html$Html$progress = _elm_lang$html$Html$node('progress');
+var _elm_lang$html$Html$meter = _elm_lang$html$Html$node('meter');
+var _elm_lang$html$Html$details = _elm_lang$html$Html$node('details');
+var _elm_lang$html$Html$summary = _elm_lang$html$Html$node('summary');
+var _elm_lang$html$Html$menuitem = _elm_lang$html$Html$node('menuitem');
+var _elm_lang$html$Html$menu = _elm_lang$html$Html$node('menu');
 
 var _elm_lang$html$Html_Attributes$map = _elm_lang$virtual_dom$VirtualDom$mapProperty;
 var _elm_lang$html$Html_Attributes$attribute = _elm_lang$virtual_dom$VirtualDom$attribute;
@@ -17825,6 +17968,7 @@ var _stil4m$elm_syntax$Elm_Syntax_Range$combine = function (ranges) {
 			_elm_lang$core$List$head(ends)));
 };
 
+var _stil4m$elm_syntax$Elm_Syntax_Ranged$value = _elm_lang$core$Tuple$second;
 
 var _stil4m$elm_syntax$Elm_Syntax_Exposing$operator = function (t) {
 	var _p0 = t;
@@ -17888,26 +18032,34 @@ var _stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer = F2(
 		return {value: a, range: b};
 	});
 
-var _stil4m$elm_syntax$Elm_Syntax_Module$exposingList = function (m) {
+var _stil4m$elm_syntax$Elm_Syntax_Module$isPortModule = function (m) {
 	var _p0 = m;
-	switch (_p0.ctor) {
-		case 'NormalModule':
-			return _p0._0.exposingList;
-		case 'PortModule':
-			return _p0._0.exposingList;
-		default:
-			return _p0._0.exposingList;
+	if (_p0.ctor === 'PortModule') {
+		return true;
+	} else {
+		return false;
 	}
 };
-var _stil4m$elm_syntax$Elm_Syntax_Module$moduleName = function (m) {
+var _stil4m$elm_syntax$Elm_Syntax_Module$exposingList = function (m) {
 	var _p1 = m;
 	switch (_p1.ctor) {
 		case 'NormalModule':
-			return _elm_lang$core$Maybe$Just(_p1._0.moduleName);
+			return _p1._0.exposingList;
 		case 'PortModule':
-			return _elm_lang$core$Maybe$Just(_p1._0.moduleName);
+			return _p1._0.exposingList;
 		default:
-			return _elm_lang$core$Maybe$Just(_p1._0.moduleName);
+			return _p1._0.exposingList;
+	}
+};
+var _stil4m$elm_syntax$Elm_Syntax_Module$moduleName = function (m) {
+	var _p2 = m;
+	switch (_p2.ctor) {
+		case 'NormalModule':
+			return _elm_lang$core$Maybe$Just(_p2._0.moduleName);
+		case 'PortModule':
+			return _elm_lang$core$Maybe$Just(_p2._0.moduleName);
+		default:
+			return _elm_lang$core$Maybe$Just(_p2._0.moduleName);
 	}
 };
 var _stil4m$elm_syntax$Elm_Syntax_Module$DefaultModuleData = F2(
@@ -18253,6 +18405,44 @@ var _stil4m$elm_syntax$Elm_Syntax_Infix$decode = A2(
 		A2(_elm_lang$core$Json_Decode$field, 'precedence', _elm_lang$core$Json_Decode$int)),
 	A2(_elm_lang$core$Json_Decode$field, 'operator', _elm_lang$core$Json_Decode$string));
 
+var _stil4m$elm_syntax$Elm_Syntax_Pattern$moduleNames = function (p) {
+	var recur = function (_p0) {
+		return _stil4m$elm_syntax$Elm_Syntax_Pattern$moduleNames(
+			_stil4m$elm_syntax$Elm_Syntax_Ranged$value(_p0));
+	};
+	var _p1 = p;
+	switch (_p1.ctor) {
+		case 'TuplePattern':
+			return A2(_elm_lang$core$List$concatMap, recur, _p1._0);
+		case 'RecordPattern':
+			return {ctor: '[]'};
+		case 'UnConsPattern':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				recur(_p1._0),
+				recur(_p1._1));
+		case 'ListPattern':
+			return A2(_elm_lang$core$List$concatMap, recur, _p1._0);
+		case 'NamedPattern':
+			return {
+				ctor: '::',
+				_0: _p1._0.moduleName,
+				_1: A2(_elm_lang$core$List$concatMap, recur, _p1._1)
+			};
+		case 'QualifiedNamePattern':
+			return {
+				ctor: '::',
+				_0: _p1._0.moduleName,
+				_1: {ctor: '[]'}
+			};
+		case 'AsPattern':
+			return recur(_p1._0);
+		case 'ParenthesizedPattern':
+			return recur(_p1._0);
+		default:
+			return {ctor: '[]'};
+	}
+};
 var _stil4m$elm_syntax$Elm_Syntax_Pattern$QualifiedNameRef = F2(
 	function (a, b) {
 		return {moduleName: a, name: b};
@@ -18325,6 +18515,46 @@ var _stil4m$elm_syntax$Elm_Syntax_TypeAnnotation$GenericType = function (a) {
 	return {ctor: 'GenericType', _0: a};
 };
 
+var _stil4m$elm_syntax$Elm_Syntax_Expression$isOperatorApplication = function (e) {
+	var _p0 = e;
+	if (_p0.ctor === 'OperatorApplication') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _stil4m$elm_syntax$Elm_Syntax_Expression$isCase = function (e) {
+	var _p1 = e;
+	if (_p1.ctor === 'CaseExpression') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _stil4m$elm_syntax$Elm_Syntax_Expression$isIfElse = function (e) {
+	var _p2 = e;
+	if (_p2.ctor === 'IfBlock') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _stil4m$elm_syntax$Elm_Syntax_Expression$isLet = function (e) {
+	var _p3 = e;
+	if (_p3.ctor === 'LetExpression') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _stil4m$elm_syntax$Elm_Syntax_Expression$isLambda = function (e) {
+	var _p4 = e;
+	if (_p4.ctor === 'LambdaExpression') {
+		return true;
+	} else {
+		return false;
+	}
+};
 var _stil4m$elm_syntax$Elm_Syntax_Expression$Function = F3(
 	function (a, b, c) {
 		return {documentation: a, signature: b, declaration: c};
@@ -20485,6 +20715,87 @@ var _stil4m$elm_syntax$Elm_Parser_State$addComment = F2(
 				}));
 	});
 
+var _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation = function (_p0) {
+	var _p1 = _p0;
+	return {row: _p1.line, column: _p1.column};
+};
+var _stil4m$elm_syntax$Elm_Parser_Ranges$withRangeCustomStart = F2(
+	function (_p2, p) {
+		var _p3 = _p2;
+		return A2(
+			_elm_community$parser_combinators$Combine_ops['<*>'],
+			p,
+			_elm_community$parser_combinators$Combine$withLocation(
+				function (end) {
+					return _elm_community$parser_combinators$Combine$succeed(
+						{
+							start: _p3.start,
+							end: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(end)
+						});
+				}));
+	});
+var _stil4m$elm_syntax$Elm_Parser_Ranges$withRange = function (p) {
+	return _elm_community$parser_combinators$Combine$withLocation(
+		function (start) {
+			return A2(
+				_elm_community$parser_combinators$Combine_ops['<*>'],
+				p,
+				_elm_community$parser_combinators$Combine$withLocation(
+					function (end) {
+						return _elm_community$parser_combinators$Combine$succeed(
+							{
+								start: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(start),
+								end: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(end)
+							});
+					}));
+		});
+};
+var _stil4m$elm_syntax$Elm_Parser_Ranges$ranged = function (p) {
+	return _elm_community$parser_combinators$Combine$withLocation(
+		function (start) {
+			return A2(
+				_elm_community$parser_combinators$Combine_ops['<*>'],
+				A2(
+					_elm_community$parser_combinators$Combine_ops['<$>'],
+					_elm_lang$core$Basics$flip(
+						F2(
+							function (v0, v1) {
+								return {ctor: '_Tuple2', _0: v0, _1: v1};
+							})),
+					p),
+				_elm_community$parser_combinators$Combine$withLocation(
+					function (end) {
+						return _elm_community$parser_combinators$Combine$succeed(
+							{
+								start: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(start),
+								end: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(end)
+							});
+					}));
+		});
+};
+var _stil4m$elm_syntax$Elm_Parser_Ranges$rangedWithCustomStart = F2(
+	function (_p4, p) {
+		var _p5 = _p4;
+		return A2(
+			_elm_community$parser_combinators$Combine_ops['<*>'],
+			A2(
+				_elm_community$parser_combinators$Combine_ops['<$>'],
+				_elm_lang$core$Basics$flip(
+					F2(
+						function (v0, v1) {
+							return {ctor: '_Tuple2', _0: v0, _1: v1};
+						})),
+				p),
+			_elm_community$parser_combinators$Combine$withLocation(
+				function (end) {
+					return _elm_community$parser_combinators$Combine$succeed(
+						{
+							start: _p5.start,
+							end: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(end)
+						});
+				}));
+	});
+
 var _stil4m$elm_syntax$Elm_Parser_Tokens$allowedOperatorTokens = {
 	ctor: '::',
 	_0: _elm_lang$core$Native_Utils.chr('+'),
@@ -20607,10 +20918,6 @@ var _stil4m$elm_syntax$Elm_Parser_Tokens$operatorTokenFromList = function (allow
 var _stil4m$elm_syntax$Elm_Parser_Tokens$prefixOperatorToken = _stil4m$elm_syntax$Elm_Parser_Tokens$operatorTokenFromList(_stil4m$elm_syntax$Elm_Parser_Tokens$allowedPrefixOperatorTokens);
 var _stil4m$elm_syntax$Elm_Parser_Tokens$infixOperatorToken = _stil4m$elm_syntax$Elm_Parser_Tokens$operatorTokenFromList(_stil4m$elm_syntax$Elm_Parser_Tokens$allowedOperatorTokens);
 var _stil4m$elm_syntax$Elm_Parser_Tokens$typeName = _elm_community$parser_combinators$Combine$regex('[A-Z][a-zA-Z0-9_]*');
-var _stil4m$elm_syntax$Elm_Parser_Tokens$moduleName = A2(
-	_elm_community$parser_combinators$Combine$sepBy1,
-	_elm_community$parser_combinators$Combine$string('.'),
-	_stil4m$elm_syntax$Elm_Parser_Tokens$typeName);
 var _stil4m$elm_syntax$Elm_Parser_Tokens$functionNamePatternInfix = '`([A-Z][a-zA-Z0-9_]*\\.)*[a-z][a-zA-Z0-9_]*\'?`';
 var _stil4m$elm_syntax$Elm_Parser_Tokens$functionNamePattern = '[a-z][a-zA-Z0-9_]*\'?';
 var _stil4m$elm_syntax$Elm_Parser_Tokens$escapedChar = A2(
@@ -20797,7 +21104,6 @@ var _stil4m$elm_syntax$Elm_Parser_Tokens$multiLineStringLiteral = A3(
 							_elm_lang$core$String$fromChar,
 							A2(_elm_community$parser_combinators$Combine$or, _stil4m$elm_syntax$Elm_Parser_Tokens$escapedChar, _elm_community$parser_combinators$Combine_Char$anyChar));
 					})))));
-var _stil4m$elm_syntax$Elm_Parser_Tokens$unitToken = _elm_community$parser_combinators$Combine$string('()');
 var _stil4m$elm_syntax$Elm_Parser_Tokens$ofToken = _elm_community$parser_combinators$Combine$string('of');
 var _stil4m$elm_syntax$Elm_Parser_Tokens$caseToken = _elm_community$parser_combinators$Combine$string('case');
 var _stil4m$elm_syntax$Elm_Parser_Tokens$elseToken = _elm_community$parser_combinators$Combine$string('else');
@@ -20895,101 +21201,14 @@ var _stil4m$elm_syntax$Elm_Parser_Tokens$functionName = A2(
 		_stil4m$elm_syntax$Elm_Parser_Tokens$notReserved));
 var _stil4m$elm_syntax$Elm_Parser_Tokens$functionOrTypeName = A2(_elm_community$parser_combinators$Combine$or, _stil4m$elm_syntax$Elm_Parser_Tokens$functionName, _stil4m$elm_syntax$Elm_Parser_Tokens$typeName);
 
-var _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation = function (_p0) {
-	var _p1 = _p0;
-	return {row: _p1.line, column: _p1.column};
-};
-var _stil4m$elm_syntax$Elm_Parser_Ranges$withRangeCustomStart = F2(
-	function (_p2, p) {
-		var _p3 = _p2;
-		return A2(
-			_elm_community$parser_combinators$Combine_ops['<*>'],
-			p,
-			_elm_community$parser_combinators$Combine$withLocation(
-				function (end) {
-					return _elm_community$parser_combinators$Combine$succeed(
-						{
-							start: _p3.start,
-							end: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(end)
-						});
-				}));
-	});
-var _stil4m$elm_syntax$Elm_Parser_Ranges$withRange = function (p) {
-	return _elm_community$parser_combinators$Combine$withLocation(
-		function (start) {
-			return A2(
-				_elm_community$parser_combinators$Combine_ops['<*>'],
-				p,
-				_elm_community$parser_combinators$Combine$withLocation(
-					function (end) {
-						return _elm_community$parser_combinators$Combine$succeed(
-							{
-								start: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(start),
-								end: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(end)
-							});
-					}));
-		});
-};
-var _stil4m$elm_syntax$Elm_Parser_Ranges$withRangeTuple = function (p) {
+var _stil4m$elm_syntax$Elm_Parser_Base$moduleName = A2(
+	_elm_community$parser_combinators$Combine$sepBy1,
+	_elm_community$parser_combinators$Combine$string('.'),
+	_stil4m$elm_syntax$Elm_Parser_Tokens$typeName);
+var _stil4m$elm_syntax$Elm_Parser_Base$variablePointer = function (p) {
 	return _stil4m$elm_syntax$Elm_Parser_Ranges$withRange(
-		A2(
-			_elm_community$parser_combinators$Combine_ops['<*>'],
-			_elm_community$parser_combinators$Combine$succeed(
-				F2(
-					function (pv, r) {
-						return {
-							ctor: '_Tuple2',
-							_0: r,
-							_1: pv(r)
-						};
-					})),
-			p));
+		A2(_elm_community$parser_combinators$Combine_ops['<$>'], _stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, p));
 };
-var _stil4m$elm_syntax$Elm_Parser_Ranges$ranged = function (p) {
-	return _elm_community$parser_combinators$Combine$withLocation(
-		function (start) {
-			return A2(
-				_elm_community$parser_combinators$Combine_ops['<*>'],
-				A2(
-					_elm_community$parser_combinators$Combine_ops['<$>'],
-					_elm_lang$core$Basics$flip(
-						F2(
-							function (v0, v1) {
-								return {ctor: '_Tuple2', _0: v0, _1: v1};
-							})),
-					p),
-				_elm_community$parser_combinators$Combine$withLocation(
-					function (end) {
-						return _elm_community$parser_combinators$Combine$succeed(
-							{
-								start: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(start),
-								end: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(end)
-							});
-					}));
-		});
-};
-var _stil4m$elm_syntax$Elm_Parser_Ranges$rangedWithCustomStart = F2(
-	function (_p4, p) {
-		var _p5 = _p4;
-		return A2(
-			_elm_community$parser_combinators$Combine_ops['<*>'],
-			A2(
-				_elm_community$parser_combinators$Combine_ops['<$>'],
-				_elm_lang$core$Basics$flip(
-					F2(
-						function (v0, v1) {
-							return {ctor: '_Tuple2', _0: v0, _1: v1};
-						})),
-				p),
-			_elm_community$parser_combinators$Combine$withLocation(
-				function (end) {
-					return _elm_community$parser_combinators$Combine$succeed(
-						{
-							start: _p5.start,
-							end: _stil4m$elm_syntax$Elm_Parser_Ranges$asPointerLocation(end)
-						});
-				}));
-	});
 
 var _stil4m$elm_syntax$Elm_Parser_Whitespace$untilNewlineToken = _elm_community$parser_combinators$Combine$regex('[^\r\n]*');
 var _stil4m$elm_syntax$Elm_Parser_Whitespace$realNewLine = _elm_community$parser_combinators$Combine$regex('\r?\n');
@@ -21092,151 +21311,120 @@ var _stil4m$elm_syntax$Elm_Parser_Comments$multilineComment = _elm_community$par
 		return _stil4m$elm_syntax$Elm_Parser_Comments$parseComment(_stil4m$elm_syntax$Elm_Parser_Comments$multilineCommentInner);
 	});
 
-var _stil4m$elm_syntax$Elm_Parser_Util$newLineWithIndentPlus = function (state) {
-	return _elm_community$parser_combinators$Combine$many1(
-		A2(
-			_elm_community$parser_combinators$Combine_ops['*>'],
-			A2(
-				_elm_community$parser_combinators$Combine_ops['*>'],
-				A2(
-					_elm_community$parser_combinators$Combine_ops['*>'],
-					_stil4m$elm_syntax$Elm_Parser_Whitespace$realNewLine,
-					_elm_community$parser_combinators$Combine$many(
-						A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Whitespace$manySpaces, _stil4m$elm_syntax$Elm_Parser_Whitespace$realNewLine))),
-				_stil4m$elm_syntax$Elm_Parser_Whitespace$nSpaces(
-					_stil4m$elm_syntax$Elm_Parser_State$currentIndent(state))),
-			_stil4m$elm_syntax$Elm_Parser_Whitespace$many1Spaces));
+var _stil4m$elm_syntax$Elm_Parser_Layout$verifyIndent = function (f) {
+	return _elm_community$parser_combinators$Combine$withState(
+		function (s) {
+			return _elm_community$parser_combinators$Combine$withLocation(
+				function (l) {
+					return A2(
+						f,
+						_stil4m$elm_syntax$Elm_Parser_State$currentIndent(s),
+						l.column) ? _elm_community$parser_combinators$Combine$succeed(
+						{ctor: '_Tuple0'}) : _elm_community$parser_combinators$Combine$fail(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'Expected higher indent than ',
+							_elm_lang$core$Basics$toString(l.column)));
+				});
+		});
 };
-var _stil4m$elm_syntax$Elm_Parser_Util$newLineWithIndentExact = function (state) {
-	return A2(
+var _stil4m$elm_syntax$Elm_Parser_Layout$anyComment = A2(_elm_community$parser_combinators$Combine$or, _stil4m$elm_syntax$Elm_Parser_Comments$singleLineComment, _stil4m$elm_syntax$Elm_Parser_Comments$multilineComment);
+var _stil4m$elm_syntax$Elm_Parser_Layout$layout = A2(
+	_elm_community$parser_combinators$Combine_ops['$>'],
+	A2(
 		_elm_community$parser_combinators$Combine_ops['*>'],
-		A2(
-			_elm_community$parser_combinators$Combine_ops['*>'],
-			_stil4m$elm_syntax$Elm_Parser_Whitespace$realNewLine,
-			_elm_community$parser_combinators$Combine$many(
-				A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Whitespace$manySpaces, _stil4m$elm_syntax$Elm_Parser_Whitespace$realNewLine))),
-		_stil4m$elm_syntax$Elm_Parser_Whitespace$nSpaces(
-			_stil4m$elm_syntax$Elm_Parser_State$currentIndent(state)));
-};
-var _stil4m$elm_syntax$Elm_Parser_Util$newLineWithSomeIndent = _elm_community$parser_combinators$Combine$many1(
-	A2(_elm_community$parser_combinators$Combine_ops['<*'], _stil4m$elm_syntax$Elm_Parser_Whitespace$realNewLine, _stil4m$elm_syntax$Elm_Parser_Whitespace$manySpaces));
-var _stil4m$elm_syntax$Elm_Parser_Util$multiLineCommentWithTrailingSpaces = A2(_elm_community$parser_combinators$Combine_ops['<*'], _stil4m$elm_syntax$Elm_Parser_Comments$multilineComment, _stil4m$elm_syntax$Elm_Parser_Whitespace$manySpaces);
-var _stil4m$elm_syntax$Elm_Parser_Util$someComment = A2(_elm_community$parser_combinators$Combine$or, _stil4m$elm_syntax$Elm_Parser_Comments$singleLineComment, _stil4m$elm_syntax$Elm_Parser_Util$multiLineCommentWithTrailingSpaces);
-var _stil4m$elm_syntax$Elm_Parser_Util$commentSequence = A2(
-	_elm_community$parser_combinators$Combine_ops['<$'],
-	{ctor: '_Tuple0'},
-	_elm_community$parser_combinators$Combine$many(
-		A2(
-			_elm_community$parser_combinators$Combine$or,
-			_stil4m$elm_syntax$Elm_Parser_Util$someComment,
-			A2(
-				_elm_community$parser_combinators$Combine_ops['*>'],
-				A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Whitespace$realNewLine, _stil4m$elm_syntax$Elm_Parser_Whitespace$manySpaces),
-				_stil4m$elm_syntax$Elm_Parser_Util$someComment))));
-var _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace = _elm_community$parser_combinators$Combine$withState(
-	function (state) {
-		return _elm_community$parser_combinators$Combine$choice(
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_community$parser_combinators$Combine_ops['<$'],
-					{ctor: '_Tuple0'},
-					A2(
-						_elm_community$parser_combinators$Combine_ops['<*'],
-						_elm_community$parser_combinators$Combine$regex(
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								'(( *\\n)+ {',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									_elm_lang$core$Basics$toString(
-										_stil4m$elm_syntax$Elm_Parser_State$currentIndent(state)),
-									'} +| +)'))),
-						_elm_community$parser_combinators$Combine$lookAhead(
-							_elm_community$parser_combinators$Combine$regex('[a-zA-Z0-9\\(\\+/*\\|\\>]')))),
-				_1: {
+		_elm_community$parser_combinators$Combine$many1(
+			_elm_community$parser_combinators$Combine$choice(
+				{
 					ctor: '::',
-					_0: A2(
-						_elm_community$parser_combinators$Combine_ops['<$'],
-						{ctor: '_Tuple0'},
-						_elm_community$parser_combinators$Combine$many1(
-							A2(
-								_elm_community$parser_combinators$Combine_ops['*>'],
-								A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Whitespace$manySpaces, _stil4m$elm_syntax$Elm_Parser_Util$commentSequence),
-								_stil4m$elm_syntax$Elm_Parser_Util$newLineWithIndentPlus(state)))),
+					_0: _stil4m$elm_syntax$Elm_Parser_Layout$anyComment,
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_community$parser_combinators$Combine_ops['<*'],
-							A2(
-								_elm_community$parser_combinators$Combine_ops['<$'],
-								{ctor: '_Tuple0'},
-								_stil4m$elm_syntax$Elm_Parser_Whitespace$many1Spaces),
-							_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$someComment)),
-						_1: {ctor: '[]'}
+							_elm_community$parser_combinators$Combine_ops['*>'],
+							_elm_community$parser_combinators$Combine$many1(_stil4m$elm_syntax$Elm_Parser_Whitespace$realNewLine),
+							_elm_community$parser_combinators$Combine$choice(
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_community$parser_combinators$Combine_ops['$>'],
+										_stil4m$elm_syntax$Elm_Parser_Whitespace$many1Spaces,
+										{ctor: '_Tuple0'}),
+									_1: {
+										ctor: '::',
+										_0: _stil4m$elm_syntax$Elm_Parser_Layout$anyComment,
+										_1: {ctor: '[]'}
+									}
+								})),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_community$parser_combinators$Combine_ops['$>'],
+								_stil4m$elm_syntax$Elm_Parser_Whitespace$many1Spaces,
+								{ctor: '_Tuple0'}),
+							_1: {ctor: '[]'}
+						}
 					}
-				}
-			});
-	});
-var _stil4m$elm_syntax$Elm_Parser_Util$trimmed = function (x) {
+				})),
+		_stil4m$elm_syntax$Elm_Parser_Layout$verifyIndent(
+			F2(
+				function (stateIndent, current) {
+					return _elm_lang$core$Native_Utils.cmp(stateIndent, current) < 0;
+				}))),
+	{ctor: '_Tuple0'});
+var _stil4m$elm_syntax$Elm_Parser_Layout$around = function (x) {
+	return A2(
+		_elm_community$parser_combinators$Combine_ops['<*'],
+		A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, x),
+		_stil4m$elm_syntax$Elm_Parser_Layout$layout);
+};
+var _stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides = function (x) {
 	return A2(
 		_elm_community$parser_combinators$Combine_ops['<*'],
 		A2(
 			_elm_community$parser_combinators$Combine_ops['*>'],
-			_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+			_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 			x),
-		_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace));
+		_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout));
 };
-var _stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace = _elm_community$parser_combinators$Combine$withState(
-	function (state) {
-		return _elm_community$parser_combinators$Combine$choice(
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_community$parser_combinators$Combine_ops['<$'],
-					{ctor: '_Tuple0'},
-					A2(
-						_elm_community$parser_combinators$Combine_ops['<*'],
-						_elm_community$parser_combinators$Combine$regex(
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								'( *\\n)+ {',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									_elm_lang$core$Basics$toString(
-										_stil4m$elm_syntax$Elm_Parser_State$currentIndent(state)),
-									'}'))),
-						_elm_community$parser_combinators$Combine$lookAhead(
-							_elm_community$parser_combinators$Combine$regex('[a-zA-Z0-9\\(\\+/*\\|\\>]')))),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_community$parser_combinators$Combine_ops['<$'],
-						{ctor: '_Tuple0'},
-						_elm_community$parser_combinators$Combine$many1(
-							A2(
-								_elm_community$parser_combinators$Combine_ops['*>'],
-								A2(
-									_elm_community$parser_combinators$Combine_ops['*>'],
-									_stil4m$elm_syntax$Elm_Parser_Whitespace$manySpaces,
-									_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$someComment)),
-								_stil4m$elm_syntax$Elm_Parser_Util$newLineWithIndentExact(state)))),
-					_1: {ctor: '[]'}
-				}
-			});
-	});
-var _stil4m$elm_syntax$Elm_Parser_Util$unstrictIndentWhitespace = _elm_community$parser_combinators$Combine$many1(
+var _stil4m$elm_syntax$Elm_Parser_Layout$layoutAndNewLine = A2(
+	_elm_community$parser_combinators$Combine_ops['$>'],
 	A2(
-		_elm_community$parser_combinators$Combine_ops['<*'],
-		A2(
-			_elm_community$parser_combinators$Combine_ops['<*'],
-			_stil4m$elm_syntax$Elm_Parser_Whitespace$manySpaces,
-			_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$someComment)),
-		_stil4m$elm_syntax$Elm_Parser_Util$newLineWithSomeIndent));
-var _stil4m$elm_syntax$Elm_Parser_Util$asPointer = function (p) {
-	return _stil4m$elm_syntax$Elm_Parser_Ranges$withRange(
-		A2(_elm_community$parser_combinators$Combine_ops['<$>'], _stil4m$elm_syntax$Elm_Syntax_Base$VariablePointer, p));
-};
+		_elm_community$parser_combinators$Combine_ops['*>'],
+		_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+		_elm_community$parser_combinators$Combine$many1(_stil4m$elm_syntax$Elm_Parser_Whitespace$realNewLine)),
+	{ctor: '_Tuple0'});
+var _stil4m$elm_syntax$Elm_Parser_Layout$layoutStrict = A2(
+	_elm_community$parser_combinators$Combine_ops['$>'],
+	A2(
+		_elm_community$parser_combinators$Combine_ops['*>'],
+		_elm_community$parser_combinators$Combine$many1(
+			_elm_community$parser_combinators$Combine$choice(
+				{
+					ctor: '::',
+					_0: _stil4m$elm_syntax$Elm_Parser_Layout$anyComment,
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_community$parser_combinators$Combine_ops['$>'],
+							_elm_community$parser_combinators$Combine$many1(_stil4m$elm_syntax$Elm_Parser_Whitespace$realNewLine),
+							{ctor: '_Tuple0'}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_community$parser_combinators$Combine_ops['$>'],
+								_stil4m$elm_syntax$Elm_Parser_Whitespace$many1Spaces,
+								{ctor: '_Tuple0'}),
+							_1: {ctor: '[]'}
+						}
+					}
+				})),
+		_stil4m$elm_syntax$Elm_Parser_Layout$verifyIndent(
+			F2(
+				function (stateIndent, current) {
+					return _elm_lang$core$Native_Utils.eq(stateIndent, current);
+				}))),
+	{ctor: '_Tuple0'});
 
 var _stil4m$elm_syntax$Elm_Parser_Infix$infixDirection = _elm_community$parser_combinators$Combine$choice(
 	{
@@ -21265,8 +21453,8 @@ var _stil4m$elm_syntax$Elm_Parser_Infix$infixDefinition = A2(
 			_elm_community$parser_combinators$Combine_ops['<*>'],
 			_elm_community$parser_combinators$Combine$succeed(_stil4m$elm_syntax$Elm_Syntax_Infix$Infix),
 			_stil4m$elm_syntax$Elm_Parser_Infix$infixDirection),
-		A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _elm_community$parser_combinators$Combine_Num$int)),
-	A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Tokens$prefixOperatorToken));
+		A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _elm_community$parser_combinators$Combine_Num$int)),
+	A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Tokens$prefixOperatorToken));
 
 var _stil4m$elm_syntax$Elm_Parser_Patterns$unitPattern = _elm_community$parser_combinators$Combine$lazy(
 	function (_p0) {
@@ -21312,16 +21500,16 @@ var _stil4m$elm_syntax$Elm_Parser_Patterns$recordPattern = _elm_community$parser
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
 					_elm_community$parser_combinators$Combine$string('{'),
-					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace)),
+					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout)),
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 					_elm_community$parser_combinators$Combine$string('}')),
 				A2(
 					_elm_community$parser_combinators$Combine$sepBy1,
 					_elm_community$parser_combinators$Combine$string(','),
-					_stil4m$elm_syntax$Elm_Parser_Util$trimmed(
-						_stil4m$elm_syntax$Elm_Parser_Util$asPointer(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName)))));
+					_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(
+						_stil4m$elm_syntax$Elm_Parser_Base$variablePointer(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName)))));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Patterns$asPattern2 = function (p) {
 	return _elm_community$parser_combinators$Combine$lazy(
@@ -21334,9 +21522,9 @@ var _stil4m$elm_syntax$Elm_Parser_Patterns$asPattern2 = function (p) {
 					_elm_community$parser_combinators$Combine_ops['*>'],
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Tokens$asToken),
-						_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
-					_stil4m$elm_syntax$Elm_Parser_Util$asPointer(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName)));
+						A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Tokens$asToken),
+						_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+					_stil4m$elm_syntax$Elm_Parser_Base$variablePointer(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName)));
 		});
 };
 var _stil4m$elm_syntax$Elm_Parser_Patterns$floatPattern = _elm_community$parser_combinators$Combine$lazy(
@@ -21409,7 +21597,7 @@ var _stil4m$elm_syntax$Elm_Parser_Patterns$tuplePattern = _elm_community$parser_
 				A2(
 					_elm_community$parser_combinators$Combine$sepBy1,
 					_elm_community$parser_combinators$Combine$string(','),
-					_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_Patterns$pattern))));
+					_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(_stil4m$elm_syntax$Elm_Parser_Patterns$pattern))));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Patterns$namedPattern = _elm_community$parser_combinators$Combine$lazy(
 	function (_p24) {
@@ -21423,7 +21611,7 @@ var _stil4m$elm_syntax$Elm_Parser_Patterns$namedPattern = _elm_community$parser_
 			_elm_community$parser_combinators$Combine$many(
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace,
+					_stil4m$elm_syntax$Elm_Parser_Layout$layout,
 					_stil4m$elm_syntax$Elm_Parser_Ranges$ranged(
 						A2(_elm_community$parser_combinators$Combine$or, _stil4m$elm_syntax$Elm_Parser_Patterns$qualifiedNamePattern, _stil4m$elm_syntax$Elm_Parser_Patterns$nonNamedPattern)))));
 	});
@@ -21455,15 +21643,15 @@ var _stil4m$elm_syntax$Elm_Parser_Patterns$asPattern = _elm_community$parser_com
 				_elm_community$parser_combinators$Combine$succeed(_stil4m$elm_syntax$Elm_Syntax_Pattern$AsPattern),
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 					_stil4m$elm_syntax$Elm_Parser_Ranges$ranged(_stil4m$elm_syntax$Elm_Parser_Patterns$nonAsPattern))),
 			A2(
 				_elm_community$parser_combinators$Combine_ops['*>'],
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Tokens$asToken),
-					_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
-				_stil4m$elm_syntax$Elm_Parser_Util$asPointer(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName)));
+					A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Tokens$asToken),
+					_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+				_stil4m$elm_syntax$Elm_Parser_Base$variablePointer(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName)));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Patterns$nonAsPattern = _elm_community$parser_combinators$Combine$lazy(
 	function (_p30) {
@@ -21534,7 +21722,7 @@ var _stil4m$elm_syntax$Elm_Parser_Patterns$listPattern = _elm_community$parser_c
 				A2(
 					_elm_community$parser_combinators$Combine$sepBy,
 					_elm_community$parser_combinators$Combine$string(','),
-					_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_Patterns$pattern))));
+					_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(_stil4m$elm_syntax$Elm_Parser_Patterns$pattern))));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Patterns$promoteToCompositePattern = function (_p36) {
 	var _p37 = _p36;
@@ -21565,7 +21753,7 @@ var _stil4m$elm_syntax$Elm_Parser_Patterns$unConsPattern2 = function (p) {
 				_stil4m$elm_syntax$Elm_Syntax_Pattern$UnConsPattern(p),
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					_stil4m$elm_syntax$Elm_Parser_Util$trimmed(
+					_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(
 						_elm_community$parser_combinators$Combine$string('::')),
 					_stil4m$elm_syntax$Elm_Parser_Patterns$pattern));
 		});
@@ -21656,7 +21844,7 @@ var _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$recordFieldsTypeAnnotation = _e
 		return A2(
 			_elm_community$parser_combinators$Combine$sepBy,
 			_elm_community$parser_combinators$Combine$string(','),
-			_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_TypeAnnotation$recordFieldDefinition));
+			_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(_stil4m$elm_syntax$Elm_Parser_TypeAnnotation$recordFieldDefinition));
 	});
 var _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$recordFieldDefinition = _elm_community$parser_combinators$Combine$lazy(
 	function (_p9) {
@@ -21672,7 +21860,7 @@ var _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$recordFieldDefinition = _elm_co
 						})),
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 					_stil4m$elm_syntax$Elm_Parser_Tokens$functionName)),
 			A2(
 				_elm_community$parser_combinators$Combine_ops['*>'],
@@ -21680,9 +21868,9 @@ var _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$recordFieldDefinition = _elm_co
 					_elm_community$parser_combinators$Combine_ops['*>'],
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 						_elm_community$parser_combinators$Combine$string(':')),
-					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace)),
+					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout)),
 				_stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotation));
 	});
 var _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotation = _elm_community$parser_combinators$Combine$lazy(
@@ -21700,7 +21888,7 @@ var _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotation = _elm_community
 							_stil4m$elm_syntax$Elm_Syntax_TypeAnnotation$FunctionTypeAnnotation(typeRef),
 							A2(
 								_elm_community$parser_combinators$Combine_ops['*>'],
-								_stil4m$elm_syntax$Elm_Parser_Util$trimmed(
+								_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(
 									_elm_community$parser_combinators$Combine$string('->')),
 								_stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotation)),
 						_elm_community$parser_combinators$Combine$succeed(
@@ -21716,11 +21904,11 @@ var _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$parensTypeAnnotation = _elm_com
 			_elm_community$parser_combinators$Combine$parens(
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 					A2(
 						_elm_community$parser_combinators$Combine$sepBy,
 						_elm_community$parser_combinators$Combine$string(','),
-						_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotation)))));
+						_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(_stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotation)))));
 	});
 var _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$recordTypeAnnotation = _elm_community$parser_combinators$Combine$lazy(
 	function (_p15) {
@@ -21757,23 +21945,23 @@ var _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typedTypeAnnotation = _elm_comm
 				_elm_community$parser_combinators$Combine$maybe(
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
-						A2(_elm_community$parser_combinators$Combine$sepBy, _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotationNoFn)))));
+						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+						A2(_elm_community$parser_combinators$Combine$sepBy, _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotationNoFn)))));
 	});
 
 var _stil4m$elm_syntax$Elm_Parser_Typings$typePrefix = A2(
 	_elm_community$parser_combinators$Combine_ops['*>'],
 	_elm_community$parser_combinators$Combine$string('type'),
-	_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace);
+	_stil4m$elm_syntax$Elm_Parser_Layout$layout);
 var _stil4m$elm_syntax$Elm_Parser_Typings$typeAliasPrefix = A2(
 	_elm_community$parser_combinators$Combine_ops['*>'],
 	A2(
 		_elm_community$parser_combinators$Combine_ops['*>'],
 		_stil4m$elm_syntax$Elm_Parser_Typings$typePrefix,
 		_elm_community$parser_combinators$Combine$string('alias')),
-	_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace);
+	_stil4m$elm_syntax$Elm_Parser_Layout$layout);
 var _stil4m$elm_syntax$Elm_Parser_Typings$genericList = _elm_community$parser_combinators$Combine$many(
-	A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Tokens$functionName));
+	A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Tokens$functionName));
 var _stil4m$elm_syntax$Elm_Parser_Typings$typeAlias = A2(
 	_elm_community$parser_combinators$Combine_ops['<*>'],
 	A2(
@@ -21786,7 +21974,7 @@ var _stil4m$elm_syntax$Elm_Parser_Typings$typeAlias = A2(
 		_stil4m$elm_syntax$Elm_Parser_Typings$genericList),
 	A2(
 		_elm_community$parser_combinators$Combine_ops['*>'],
-		_stil4m$elm_syntax$Elm_Parser_Util$trimmed(
+		_stil4m$elm_syntax$Elm_Parser_Layout$around(
 			_elm_community$parser_combinators$Combine$string('=')),
 		_stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotation));
 var _stil4m$elm_syntax$Elm_Parser_Typings$valueConstructor = _stil4m$elm_syntax$Elm_Parser_Ranges$withRange(
@@ -21797,11 +21985,17 @@ var _stil4m$elm_syntax$Elm_Parser_Typings$valueConstructor = _stil4m$elm_syntax$
 			_elm_community$parser_combinators$Combine$succeed(_stil4m$elm_syntax$Elm_Syntax_Type$ValueConstructor),
 			_stil4m$elm_syntax$Elm_Parser_Tokens$typeName),
 		_elm_community$parser_combinators$Combine$many(
-			A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotation))));
+			A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotation))));
 var _stil4m$elm_syntax$Elm_Parser_Typings$valueConstructors = A2(
 	_elm_community$parser_combinators$Combine$sepBy,
 	_elm_community$parser_combinators$Combine$string('|'),
-	_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_Typings$valueConstructor));
+	A2(
+		_elm_community$parser_combinators$Combine_ops['<*'],
+		A2(
+			_elm_community$parser_combinators$Combine_ops['*>'],
+			_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+			_stil4m$elm_syntax$Elm_Parser_Typings$valueConstructor),
+		_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout)));
 var _stil4m$elm_syntax$Elm_Parser_Typings$typeDeclaration = A2(
 	_elm_community$parser_combinators$Combine_ops['<*>'],
 	A2(
@@ -21813,7 +22007,7 @@ var _stil4m$elm_syntax$Elm_Parser_Typings$typeDeclaration = A2(
 		_stil4m$elm_syntax$Elm_Parser_Typings$genericList),
 	A2(
 		_elm_community$parser_combinators$Combine_ops['*>'],
-		_stil4m$elm_syntax$Elm_Parser_Util$trimmed(
+		_stil4m$elm_syntax$Elm_Parser_Layout$around(
 			_elm_community$parser_combinators$Combine$string('=')),
 		_stil4m$elm_syntax$Elm_Parser_Typings$valueConstructors));
 
@@ -21887,20 +22081,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$emptyListExpression = A2(
 			_elm_community$parser_combinators$Combine_ops['*>'],
 			_elm_community$parser_combinators$Combine$string('['),
 			_elm_community$parser_combinators$Combine$maybe(
-				_elm_community$parser_combinators$Combine$choice(
-					{
-						ctor: '::',
-						_0: _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace,
-						_1: {
-							ctor: '::',
-							_0: _stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace,
-							_1: {
-								ctor: '::',
-								_0: _stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_Util$commentSequence),
-								_1: {ctor: '[]'}
-							}
-						}
-					}))),
+				A2(_elm_community$parser_combinators$Combine$or, _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Layout$layoutAndNewLine))),
 		_elm_community$parser_combinators$Combine$string(']')));
 var _stil4m$elm_syntax$Elm_Parser_Declarations$glslExpression = A2(
 	_elm_community$parser_combinators$Combine_ops['<$>'],
@@ -21927,28 +22108,6 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$unitExpression = A2(
 	_elm_community$parser_combinators$Combine_ops['<$'],
 	_stil4m$elm_syntax$Elm_Syntax_Expression$UnitExpr,
 	_elm_community$parser_combinators$Combine$string('()'));
-var _stil4m$elm_syntax$Elm_Parser_Declarations$withIndentedState2 = function (p) {
-	return _elm_community$parser_combinators$Combine$withLocation(
-		function (location) {
-			var x = _elm_lang$core$List$length(
-				A2(
-					_elm_community$list_extra$List_Extra$takeWhile,
-					F2(
-						function (x, y) {
-							return _elm_lang$core$Native_Utils.eq(x, y);
-						})(
-						_elm_lang$core$Native_Utils.chr(' ')),
-					_elm_lang$core$String$toList(location.source)));
-			return A2(
-				_elm_community$parser_combinators$Combine_ops['<*'],
-				A2(
-					_elm_community$parser_combinators$Combine_ops['*>'],
-					_elm_community$parser_combinators$Combine$modifyState(
-						_stil4m$elm_syntax$Elm_Parser_State$pushIndent(x)),
-					p),
-				_elm_community$parser_combinators$Combine$modifyState(_stil4m$elm_syntax$Elm_Parser_State$popIndent));
-		});
-};
 var _stil4m$elm_syntax$Elm_Parser_Declarations$withIndentedState = function (p) {
 	return _elm_community$parser_combinators$Combine$withLocation(
 		function (location) {
@@ -22028,9 +22187,9 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$signature = A2(
 		_elm_community$parser_combinators$Combine_ops['*>'],
 		A2(
 			_elm_community$parser_combinators$Combine_ops['*>'],
-			_stil4m$elm_syntax$Elm_Parser_Util$trimmed(
+			_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(
 				_elm_community$parser_combinators$Combine$string(':')),
-			_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace)),
+			_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout)),
 		_stil4m$elm_syntax$Elm_Parser_TypeAnnotation$typeAnnotation));
 var _stil4m$elm_syntax$Elm_Parser_Declarations$portDeclaration = A2(
 	_elm_community$parser_combinators$Combine_ops['*>'],
@@ -22041,7 +22200,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$portDeclaration = A2(
 			return A2(
 				_elm_community$parser_combinators$Combine_ops['<$>'],
 				_stil4m$elm_syntax$Elm_Syntax_Declaration$PortDeclaration,
-				A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Declarations$signature));
+				A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Declarations$signature));
 		}));
 var _stil4m$elm_syntax$Elm_Parser_Declarations$infixDeclaration = _elm_community$parser_combinators$Combine$lazy(
 	function (_p8) {
@@ -22063,7 +22222,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$function = _elm_community$parser_
 					A2(
 						_elm_community$parser_combinators$Combine_ops['<*'],
 						_stil4m$elm_syntax$Elm_Parser_Ranges$ranged(_stil4m$elm_syntax$Elm_Parser_Declarations$signature),
-						_stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace))),
+						_stil4m$elm_syntax$Elm_Parser_Layout$layoutStrict))),
 			_stil4m$elm_syntax$Elm_Parser_Declarations$functionDeclaration);
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$functionDeclaration = _elm_community$parser_combinators$Combine$lazy(
@@ -22087,22 +22246,22 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$functionDeclaration = _elm_commun
 										c,
 										_elm_lang$core$Native_Utils.chr('(')));
 							})),
-					_stil4m$elm_syntax$Elm_Parser_Util$asPointer(
+					_stil4m$elm_syntax$Elm_Parser_Base$variablePointer(
 						A2(
 							_elm_community$parser_combinators$Combine$or,
 							_stil4m$elm_syntax$Elm_Parser_Tokens$functionName,
 							_elm_community$parser_combinators$Combine$parens(_stil4m$elm_syntax$Elm_Parser_Tokens$prefixOperatorToken)))),
 				_elm_community$parser_combinators$Combine$many(
-					A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Declarations$functionArgument))),
+					A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Declarations$functionArgument))),
 			A2(
 				_elm_community$parser_combinators$Combine_ops['*>'],
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 						_elm_community$parser_combinators$Combine$string('=')),
-					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace)),
+					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout)),
 				_stil4m$elm_syntax$Elm_Parser_Declarations$expression));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$expression = _elm_community$parser_combinators$Combine$lazy(
@@ -22110,7 +22269,10 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$expression = _elm_community$parse
 		var _p15 = _p14;
 		return A2(
 			_elm_community$parser_combinators$Combine_ops['>>='],
-			_stil4m$elm_syntax$Elm_Parser_Declarations$expressionNotApplication,
+			A2(
+				_elm_community$parser_combinators$Combine_ops['*>'],
+				_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+				_stil4m$elm_syntax$Elm_Parser_Declarations$expressionNotApplication),
 			function (expr) {
 				return A2(
 					_elm_community$parser_combinators$Combine$or,
@@ -22222,7 +22384,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$caseExpression = _elm_community$p
 					_stil4m$elm_syntax$Elm_Parser_Declarations$caseBlock),
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace,
+					_stil4m$elm_syntax$Elm_Parser_Layout$layout,
 					_stil4m$elm_syntax$Elm_Parser_Declarations$withIndentedState(_stil4m$elm_syntax$Elm_Parser_Declarations$caseStatements))));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$caseBlock = _elm_community$parser_combinators$Combine$lazy(
@@ -22234,15 +22396,15 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$caseBlock = _elm_community$parser
 				_elm_community$parser_combinators$Combine_ops['<*'],
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Tokens$caseToken, _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+					A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Tokens$caseToken, _stil4m$elm_syntax$Elm_Parser_Layout$layout),
 					_stil4m$elm_syntax$Elm_Parser_Declarations$expression),
-				_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+				_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 			_stil4m$elm_syntax$Elm_Parser_Tokens$ofToken);
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$caseStatements = _elm_community$parser_combinators$Combine$lazy(
 	function (_p22) {
 		var _p23 = _p22;
-		return A2(_elm_community$parser_combinators$Combine$sepBy1, _stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Declarations$caseStatement);
+		return A2(_elm_community$parser_combinators$Combine$sepBy1, _stil4m$elm_syntax$Elm_Parser_Layout$layoutStrict, _stil4m$elm_syntax$Elm_Parser_Declarations$caseStatement);
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$caseStatement = _elm_community$parser_combinators$Combine$lazy(
 	function (_p24) {
@@ -22264,9 +22426,9 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$caseStatement = _elm_community$pa
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
 						_elm_community$parser_combinators$Combine$maybe(
-							A2(_elm_community$parser_combinators$Combine$or, _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace)),
+							A2(_elm_community$parser_combinators$Combine$or, _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Layout$layoutStrict)),
 						_elm_community$parser_combinators$Combine$string('->')),
-					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace)),
+					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout)),
 				_stil4m$elm_syntax$Elm_Parser_Declarations$expression));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$ifBlockExpression = A2(
@@ -22282,14 +22444,14 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$ifBlockExpression = A2(
 					A2(
 						_elm_community$parser_combinators$Combine_ops['<*>'],
 						_elm_community$parser_combinators$Combine$succeed(_stil4m$elm_syntax$Elm_Syntax_Expression$IfBlock),
-						_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_Declarations$expression)),
+						_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(_stil4m$elm_syntax$Elm_Parser_Declarations$expression)),
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
 						_stil4m$elm_syntax$Elm_Parser_Tokens$thenToken,
-						_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_Declarations$expression))),
+						_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(_stil4m$elm_syntax$Elm_Parser_Declarations$expression))),
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Tokens$elseToken, _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+					A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Tokens$elseToken, _stil4m$elm_syntax$Elm_Parser_Layout$layout),
 					_stil4m$elm_syntax$Elm_Parser_Declarations$expression));
 		}));
 var _stil4m$elm_syntax$Elm_Parser_Declarations$lambdaExpression = _elm_community$parser_combinators$Combine$lazy(
@@ -22310,11 +22472,11 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$lambdaExpression = _elm_community
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
 						_elm_community$parser_combinators$Combine$string('\\'),
-						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace)),
-					A2(_elm_community$parser_combinators$Combine$sepBy1, _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Declarations$functionArgument))),
+						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout)),
+					A2(_elm_community$parser_combinators$Combine$sepBy1, _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Declarations$functionArgument))),
 			A2(
 				_elm_community$parser_combinators$Combine_ops['*>'],
-				_stil4m$elm_syntax$Elm_Parser_Util$trimmed(
+				_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(
 					_elm_community$parser_combinators$Combine$string('->')),
 				_stil4m$elm_syntax$Elm_Parser_Declarations$expression));
 	});
@@ -22332,8 +22494,8 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$letExpression = _elm_community$pa
 								A2(_stil4m$elm_syntax$Elm_Syntax_Expression$LetBlock, decls, _p32));
 						};
 					}),
-				_stil4m$elm_syntax$Elm_Parser_Declarations$withIndentedState2(_stil4m$elm_syntax$Elm_Parser_Declarations$letBlock)),
-			A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Declarations$expression));
+				_stil4m$elm_syntax$Elm_Parser_Declarations$letBlock),
+			A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Declarations$expression));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$letBlock = _elm_community$parser_combinators$Combine$lazy(
 	function (_p33) {
@@ -22341,21 +22503,31 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$letBlock = _elm_community$parser_
 		return A2(
 			_elm_community$parser_combinators$Combine_ops['<*'],
 			A2(
-				_elm_community$parser_combinators$Combine_ops['*>'],
+				_elm_community$parser_combinators$Combine_ops['<*'],
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					_elm_community$parser_combinators$Combine$string('let'),
-					_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
-				_stil4m$elm_syntax$Elm_Parser_Declarations$withIndentedState(_stil4m$elm_syntax$Elm_Parser_Declarations$letBody)),
+					A2(
+						_elm_community$parser_combinators$Combine_ops['*>'],
+						_elm_community$parser_combinators$Combine$string('let'),
+						_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+					_stil4m$elm_syntax$Elm_Parser_Declarations$withIndentedState(_stil4m$elm_syntax$Elm_Parser_Declarations$letBody)),
+				A2(
+					_elm_community$parser_combinators$Combine_ops['<$>'],
+					_elm_lang$core$String$fromList,
+					_elm_community$parser_combinators$Combine$lookAhead(
+						_elm_community$parser_combinators$Combine$many(_elm_community$parser_combinators$Combine_Char$anyChar)))),
 			A2(
 				_elm_community$parser_combinators$Combine_ops['*>'],
 				_elm_community$parser_combinators$Combine$choice(
 					{
 						ctor: '::',
-						_0: _stil4m$elm_syntax$Elm_Parser_Util$unstrictIndentWhitespace,
+						_0: _stil4m$elm_syntax$Elm_Parser_Layout$layout,
 						_1: {
 							ctor: '::',
-							_0: A2(_elm_community$parser_combinators$Combine_ops['<$>'], _elm_lang$core$List$singleton, _stil4m$elm_syntax$Elm_Parser_Whitespace$manySpaces),
+							_0: A2(
+								_elm_community$parser_combinators$Combine_ops['<$'],
+								{ctor: '_Tuple0'},
+								_stil4m$elm_syntax$Elm_Parser_Whitespace$manySpaces),
 							_1: {ctor: '[]'}
 						}
 					}),
@@ -22366,7 +22538,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$letBody = _elm_community$parser_c
 		var _p36 = _p35;
 		return A2(
 			_elm_community$parser_combinators$Combine$sepBy1,
-			_stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace,
+			_stil4m$elm_syntax$Elm_Parser_Layout$layoutStrict,
 			_stil4m$elm_syntax$Elm_Parser_Ranges$ranged(
 				A2(
 					_elm_community$parser_combinators$Combine$or,
@@ -22388,9 +22560,9 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$letDestructuringDeclaration = _el
 					_elm_community$parser_combinators$Combine_ops['*>'],
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace,
+						_stil4m$elm_syntax$Elm_Parser_Layout$layout,
 						_elm_community$parser_combinators$Combine$string('=')),
-					_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+					_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 				_stil4m$elm_syntax$Elm_Parser_Declarations$expression));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$listExpression = _elm_community$parser_combinators$Combine$lazy(
@@ -22409,7 +22581,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$listExpression = _elm_community$p
 					A2(
 						_elm_community$parser_combinators$Combine$sepBy,
 						_elm_community$parser_combinators$Combine$string(','),
-						_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_Declarations$expression)))));
+						_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(_stil4m$elm_syntax$Elm_Parser_Declarations$expression)))));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$negationExpression = _elm_community$parser_combinators$Combine$lazy(
 	function (_p41) {
@@ -22464,7 +22636,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$tupledExpression = _elm_community
 				A2(
 					_elm_community$parser_combinators$Combine$sepBy1,
 					_elm_community$parser_combinators$Combine$string(','),
-					_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_Declarations$expression))));
+					_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(_stil4m$elm_syntax$Elm_Parser_Declarations$expression))));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$recordExpression = _elm_community$parser_combinators$Combine$lazy(
 	function (_p46) {
@@ -22483,7 +22655,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$recordFields = function (oneOrMor
 	return A2(
 		p,
 		_elm_community$parser_combinators$Combine$string(','),
-		_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_Declarations$recordExpressionField));
+		_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(_stil4m$elm_syntax$Elm_Parser_Declarations$recordExpressionField));
 };
 var _stil4m$elm_syntax$Elm_Parser_Declarations$recordExpressionField = _elm_community$parser_combinators$Combine$lazy(
 	function (_p48) {
@@ -22504,9 +22676,9 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$recordExpressionField = _elm_comm
 					_elm_community$parser_combinators$Combine_ops['*>'],
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 						_elm_community$parser_combinators$Combine$string('=')),
-					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace)),
+					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout)),
 				_stil4m$elm_syntax$Elm_Parser_Declarations$expression));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$recordUpdateExpression = _elm_community$parser_combinators$Combine$lazy(
@@ -22524,7 +22696,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$recordUpdateExpression = _elm_com
 					A2(
 						_elm_community$parser_combinators$Combine_ops['<*>'],
 						_elm_community$parser_combinators$Combine$succeed(_stil4m$elm_syntax$Elm_Syntax_Expression$RecordUpdate),
-						_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName)),
+						_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName)),
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
 						_elm_community$parser_combinators$Combine$string('|'),
@@ -22550,7 +22722,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$promoteToApplicationExpression = 
 							return _elm_community$parser_combinators$Combine$many1(
 								A2(
 									_elm_community$parser_combinators$Combine_ops['*>'],
-									_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+									_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 									_stil4m$elm_syntax$Elm_Parser_Declarations$expressionNotApplication));
 						})));
 		});
@@ -22570,9 +22742,9 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$destructuringDeclaration = _elm_c
 					_elm_community$parser_combinators$Combine_ops['*>'],
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace,
+						_stil4m$elm_syntax$Elm_Parser_Layout$layout,
 						_elm_community$parser_combinators$Combine$string('=')),
-					_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+					_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 				_stil4m$elm_syntax$Elm_Parser_Declarations$expression));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$declaration = _elm_community$parser_combinators$Combine$lazy(
@@ -22618,7 +22790,7 @@ var _stil4m$elm_syntax$Elm_Parser_Expose$exposingListInner = function (p) {
 			A2(
 				_elm_community$parser_combinators$Combine_ops['<$'],
 				_stil4m$elm_syntax$Elm_Syntax_Exposing$All,
-				_stil4m$elm_syntax$Elm_Parser_Util$trimmed(
+				_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(
 					_elm_community$parser_combinators$Combine$string('..')))),
 		A2(
 			_elm_community$parser_combinators$Combine_ops['<$>'],
@@ -22627,7 +22799,7 @@ var _stil4m$elm_syntax$Elm_Parser_Expose$exposingListInner = function (p) {
 				_elm_community$parser_combinators$Combine$sepBy,
 				_elm_community$parser_combinators$Combine_Char$char(
 					_elm_lang$core$Native_Utils.chr(',')),
-				_stil4m$elm_syntax$Elm_Parser_Util$trimmed(p))));
+				_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(p))));
 };
 var _stil4m$elm_syntax$Elm_Parser_Expose$exposeListWith = function (p) {
 	return _elm_community$parser_combinators$Combine$parens(
@@ -22642,7 +22814,7 @@ var _stil4m$elm_syntax$Elm_Parser_Expose$exposedType = A2(
 		_stil4m$elm_syntax$Elm_Parser_Tokens$typeName),
 	A2(
 		_elm_community$parser_combinators$Combine_ops['*>'],
-		_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+		_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 		A2(
 			_elm_community$parser_combinators$Combine_ops['<$>'],
 			_elm_lang$core$Maybe$Just,
@@ -22679,24 +22851,9 @@ var _stil4m$elm_syntax$Elm_Parser_Expose$exposeDefinition = function (p) {
 		_elm_community$parser_combinators$Combine_ops['*>'],
 		A2(
 			_elm_community$parser_combinators$Combine_ops['*>'],
-			A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Tokens$exposingToken),
-			_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace)),
+			A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Tokens$exposingToken),
+			_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout)),
 		_stil4m$elm_syntax$Elm_Parser_Expose$exposeListWith(p));
-};
-var _stil4m$elm_syntax$Elm_Parser_Expose$maybeExposeDefinition = function (p) {
-	return _elm_community$parser_combinators$Combine$choice(
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_community$parser_combinators$Combine_ops['<$>'],
-				_elm_lang$core$Maybe$Just,
-				_stil4m$elm_syntax$Elm_Parser_Expose$exposeDefinition(p)),
-			_1: {
-				ctor: '::',
-				_0: _elm_community$parser_combinators$Combine$succeed(_elm_lang$core$Maybe$Nothing),
-				_1: {ctor: '[]'}
-			}
-		});
 };
 
 var _stil4m$elm_syntax$Elm_Parser_Imports$importDefinition = _stil4m$elm_syntax$Elm_Parser_Ranges$withRange(
@@ -22709,16 +22866,16 @@ var _stil4m$elm_syntax$Elm_Parser_Imports$importDefinition = _stil4m$elm_syntax$
 				_elm_community$parser_combinators$Combine$succeed(_stil4m$elm_syntax$Elm_Syntax_Module$Import),
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
-					A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Tokens$importToken, _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
-					_stil4m$elm_syntax$Elm_Parser_Tokens$moduleName)),
+					A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Tokens$importToken, _stil4m$elm_syntax$Elm_Parser_Layout$layout),
+					_stil4m$elm_syntax$Elm_Parser_Base$moduleName)),
 			_elm_community$parser_combinators$Combine$maybe(
 				A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Tokens$asToken),
-						_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
-					_stil4m$elm_syntax$Elm_Parser_Tokens$moduleName))),
+						A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Tokens$asToken),
+						_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+					_stil4m$elm_syntax$Elm_Parser_Base$moduleName))),
 		_elm_community$parser_combinators$Combine$maybe(
 			_stil4m$elm_syntax$Elm_Parser_Expose$exposeDefinition(_stil4m$elm_syntax$Elm_Parser_Expose$exposable))));
 
@@ -22736,10 +22893,10 @@ var _stil4m$elm_syntax$Elm_Parser_Modules$portModuleDefinition = A2(
 					_elm_community$parser_combinators$Combine_ops['*>'],
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Tokens$portToken, _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+						A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Tokens$portToken, _stil4m$elm_syntax$Elm_Parser_Layout$layout),
 						_stil4m$elm_syntax$Elm_Parser_Tokens$moduleToken),
-					_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
-				_stil4m$elm_syntax$Elm_Parser_Tokens$moduleName)),
+					_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+				_stil4m$elm_syntax$Elm_Parser_Base$moduleName)),
 		_stil4m$elm_syntax$Elm_Parser_Expose$exposeDefinition(_stil4m$elm_syntax$Elm_Parser_Expose$exposable)));
 var _stil4m$elm_syntax$Elm_Parser_Modules$normalModuleDefinition = A2(
 	_elm_community$parser_combinators$Combine_ops['<$>'],
@@ -22751,8 +22908,8 @@ var _stil4m$elm_syntax$Elm_Parser_Modules$normalModuleDefinition = A2(
 			_elm_community$parser_combinators$Combine$succeed(_stil4m$elm_syntax$Elm_Syntax_Module$DefaultModuleData),
 			A2(
 				_elm_community$parser_combinators$Combine_ops['*>'],
-				A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Tokens$moduleToken, _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
-				_stil4m$elm_syntax$Elm_Parser_Tokens$moduleName)),
+				A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Tokens$moduleToken, _stil4m$elm_syntax$Elm_Parser_Layout$layout),
+				_stil4m$elm_syntax$Elm_Parser_Base$moduleName)),
 		_stil4m$elm_syntax$Elm_Parser_Expose$exposeDefinition(_stil4m$elm_syntax$Elm_Parser_Expose$exposable)));
 var _stil4m$elm_syntax$Elm_Parser_Modules$effectWhereClause = A2(
 	_elm_community$parser_combinators$Combine_ops['<*>'],
@@ -22766,7 +22923,7 @@ var _stil4m$elm_syntax$Elm_Parser_Modules$effectWhereClause = A2(
 		_stil4m$elm_syntax$Elm_Parser_Tokens$functionName),
 	A2(
 		_elm_community$parser_combinators$Combine_ops['*>'],
-		_stil4m$elm_syntax$Elm_Parser_Util$trimmed(
+		_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(
 			_elm_community$parser_combinators$Combine$string('=')),
 		_stil4m$elm_syntax$Elm_Parser_Tokens$typeName));
 var _stil4m$elm_syntax$Elm_Parser_Modules$whereBlock = A2(
@@ -22814,13 +22971,13 @@ var _stil4m$elm_syntax$Elm_Parser_Modules$whereBlock = A2(
 		A2(
 			_elm_community$parser_combinators$Combine$sepBy1,
 			_elm_community$parser_combinators$Combine$string(','),
-			_stil4m$elm_syntax$Elm_Parser_Util$trimmed(_stil4m$elm_syntax$Elm_Parser_Modules$effectWhereClause))));
+			_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(_stil4m$elm_syntax$Elm_Parser_Modules$effectWhereClause))));
 var _stil4m$elm_syntax$Elm_Parser_Modules$effectWhereClauses = A2(
 	_elm_community$parser_combinators$Combine_ops['*>'],
 	A2(
 		_elm_community$parser_combinators$Combine_ops['*>'],
 		_elm_community$parser_combinators$Combine$string('where'),
-		_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+		_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 	_stil4m$elm_syntax$Elm_Parser_Modules$whereBlock);
 var _stil4m$elm_syntax$Elm_Parser_Modules$effectModuleDefinition = function () {
 	var createEffectModule = F3(
@@ -22844,11 +23001,11 @@ var _stil4m$elm_syntax$Elm_Parser_Modules$effectModuleDefinition = function () {
 							A2(
 								_elm_community$parser_combinators$Combine_ops['*>'],
 								_elm_community$parser_combinators$Combine$string('effect'),
-								_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
+								_stil4m$elm_syntax$Elm_Parser_Layout$layout),
 							_stil4m$elm_syntax$Elm_Parser_Tokens$moduleToken),
-						_stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace),
-					_stil4m$elm_syntax$Elm_Parser_Tokens$moduleName)),
-			A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Util$moreThanIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Modules$effectWhereClauses)),
+						_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+					_stil4m$elm_syntax$Elm_Parser_Base$moduleName)),
+			A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Modules$effectWhereClauses)),
 		_stil4m$elm_syntax$Elm_Parser_Expose$exposeDefinition(_stil4m$elm_syntax$Elm_Parser_Expose$exposable));
 }();
 var _stil4m$elm_syntax$Elm_Parser_Modules$moduleDefinition = _elm_community$parser_combinators$Combine$choice(
@@ -22872,10 +23029,10 @@ var _stil4m$elm_syntax$Elm_Parser_File$fileDeclarations = A2(
 		_elm_community$parser_combinators$Combine_ops['<*'],
 		A2(
 			_elm_community$parser_combinators$Combine$sepBy,
-			_stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace,
+			_stil4m$elm_syntax$Elm_Parser_Layout$layoutAndNewLine,
 			_stil4m$elm_syntax$Elm_Parser_Ranges$ranged(_stil4m$elm_syntax$Elm_Parser_Declarations$declaration)),
-		_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace)),
-	_stil4m$elm_syntax$Elm_Parser_Whitespace$manySpaces);
+		_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout)),
+	_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layoutAndNewLine));
 var _stil4m$elm_syntax$Elm_Parser_File$collectComments = _elm_community$parser_combinators$Combine$withState(
 	function (_p0) {
 		return _elm_community$parser_combinators$Combine$succeed(
@@ -22894,13 +23051,13 @@ var _stil4m$elm_syntax$Elm_Parser_File$file = A2(
 					_elm_community$parser_combinators$Combine_ops['<*'],
 					A2(
 						_elm_community$parser_combinators$Combine_ops['*>'],
-						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace),
+						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layoutAndNewLine),
 						_stil4m$elm_syntax$Elm_Parser_Modules$moduleDefinition),
-					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace))),
+					_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layoutAndNewLine))),
 			A2(
 				_elm_community$parser_combinators$Combine_ops['<*'],
-				A2(_elm_community$parser_combinators$Combine$sepBy, _stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace, _stil4m$elm_syntax$Elm_Parser_Imports$importDefinition),
-				_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Util$exactIndentWhitespace))),
+				A2(_elm_community$parser_combinators$Combine$sepBy, _stil4m$elm_syntax$Elm_Parser_Layout$layoutAndNewLine, _stil4m$elm_syntax$Elm_Parser_Imports$importDefinition),
+				_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layoutAndNewLine))),
 		_stil4m$elm_syntax$Elm_Parser_File$fileDeclarations),
 	_stil4m$elm_syntax$Elm_Parser_File$collectComments);
 
@@ -23627,200 +23784,54 @@ var _stil4m$structured_writer$StructuredWriter$sepBySpace = _stil4m$structured_w
 	{ctor: '_Tuple3', _0: '', _1: ' ', _2: ''});
 var _stil4m$structured_writer$StructuredWriter$sepBy = _stil4m$structured_writer$StructuredWriter$Sep;
 
-var _stil4m$elm_syntax$Elm_Writer$writeInfix = function (_p0) {
+var _stil4m$elm_syntax$Elm_Writer$parensIfContainsSpaces = function (w) {
+	return A2(
+		_elm_lang$core$String$contains,
+		' ',
+		_stil4m$structured_writer$StructuredWriter$write(w)) ? _stil4m$structured_writer$StructuredWriter$join(
+		{
+			ctor: '::',
+			_0: _stil4m$structured_writer$StructuredWriter$string('('),
+			_1: {
+				ctor: '::',
+				_0: w,
+				_1: {
+					ctor: '::',
+					_0: _stil4m$structured_writer$StructuredWriter$string(')'),
+					_1: {ctor: '[]'}
+				}
+			}
+		}) : w;
+};
+var _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation = function (_p0) {
 	var _p1 = _p0;
-	return _stil4m$structured_writer$StructuredWriter$spaced(
-		{
-			ctor: '::',
-			_0: function () {
-				var _p2 = _p1.direction;
-				if (_p2.ctor === 'Left') {
-					return _stil4m$structured_writer$StructuredWriter$string('infixl');
-				} else {
-					return _stil4m$structured_writer$StructuredWriter$string('infixr');
-				}
-			}(),
-			_1: {
-				ctor: '::',
-				_0: _stil4m$structured_writer$StructuredWriter$string(
-					_elm_lang$core$Basics$toString(_p1.precedence)),
-				_1: {
-					ctor: '::',
-					_0: _stil4m$structured_writer$StructuredWriter$string(_p1.operator),
-					_1: {ctor: '[]'}
-				}
-			}
-		});
-};
-var _stil4m$elm_syntax$Elm_Writer$writeDocumentation = function (_p3) {
-	return _stil4m$structured_writer$StructuredWriter$string(
-		function (_) {
-			return _.text;
-		}(_p3));
-};
-var _stil4m$elm_syntax$Elm_Writer$startOnDifferentLines = function (xs) {
-	return _elm_lang$core$Native_Utils.cmp(
-		_elm_lang$core$List$length(
-			_elm_community$list_extra$List_Extra$unique(
-				A2(
-					_elm_lang$core$List$map,
-					function (_p4) {
-						return function (_) {
-							return _.row;
-						}(
-							function (_) {
-								return _.start;
-							}(_p4));
-					},
-					xs))),
-		1) > 0;
-};
-var _stil4m$elm_syntax$Elm_Writer$writeExposureValueConstructor = function (x) {
-	var _p5 = x;
-	if (_p5.ctor === 'All') {
-		return _stil4m$structured_writer$StructuredWriter$string('(..)');
-	} else {
-		var _p7 = _p5._0;
-		var diffLines = _stil4m$elm_syntax$Elm_Writer$startOnDifferentLines(
-			A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, _p7));
-		return A2(
-			_stil4m$structured_writer$StructuredWriter$parensComma,
-			diffLines,
-			A2(
-				_elm_lang$core$List$map,
-				function (_p6) {
-					return _stil4m$structured_writer$StructuredWriter$string(
-						_elm_lang$core$Tuple$second(_p6));
-				},
-				_p7));
-	}
-};
-var _stil4m$elm_syntax$Elm_Writer$writeExpose = function (_p8) {
-	var _p9 = _p8;
-	var _p10 = _p9._1;
-	switch (_p10.ctor) {
-		case 'InfixExpose':
-			return _stil4m$structured_writer$StructuredWriter$string(
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'(',
-					A2(_elm_lang$core$Basics_ops['++'], _p10._0, ')')));
-		case 'FunctionExpose':
-			return _stil4m$structured_writer$StructuredWriter$string(_p10._0);
-		case 'TypeOrAliasExpose':
-			return _stil4m$structured_writer$StructuredWriter$string(_p10._0);
-		default:
-			var _p12 = _p10._0.name;
-			var _p11 = _p10._0.constructors;
-			if (_p11.ctor === 'Just') {
-				return _stil4m$structured_writer$StructuredWriter$spaced(
-					{
-						ctor: '::',
-						_0: _stil4m$structured_writer$StructuredWriter$string(_p12),
-						_1: {
-							ctor: '::',
-							_0: _stil4m$elm_syntax$Elm_Writer$writeExposureValueConstructor(_p11._0),
-							_1: {ctor: '[]'}
-						}
-					});
-			} else {
-				return _stil4m$structured_writer$StructuredWriter$string(_p12);
-			}
-	}
-};
-var _stil4m$elm_syntax$Elm_Writer$writeExposureExpose = function (x) {
-	var _p13 = x;
-	if (_p13.ctor === 'All') {
-		return _stil4m$structured_writer$StructuredWriter$string('exposing (..)');
-	} else {
-		var _p14 = _p13._0;
-		var diffLines = _stil4m$elm_syntax$Elm_Writer$startOnDifferentLines(
-			A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Syntax_Exposing$topLevelExposeRange, _p14));
-		return _stil4m$structured_writer$StructuredWriter$spaced(
-			{
-				ctor: '::',
-				_0: _stil4m$structured_writer$StructuredWriter$string('exposing'),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_stil4m$structured_writer$StructuredWriter$parensComma,
-						diffLines,
-						A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeExpose, _p14)),
-					_1: {ctor: '[]'}
-				}
-			});
-	}
-};
-var _stil4m$elm_syntax$Elm_Writer$writeModuleName = function (moduleName) {
-	return _stil4m$structured_writer$StructuredWriter$string(
-		A2(_elm_lang$core$String$join, '.', moduleName));
-};
-var _stil4m$elm_syntax$Elm_Writer$writeImport = function (_p15) {
-	var _p16 = _p15;
-	return _stil4m$structured_writer$StructuredWriter$spaced(
-		{
-			ctor: '::',
-			_0: _stil4m$structured_writer$StructuredWriter$string('import'),
-			_1: {
-				ctor: '::',
-				_0: _stil4m$elm_syntax$Elm_Writer$writeModuleName(_p16.moduleName),
-				_1: {
-					ctor: '::',
-					_0: _stil4m$structured_writer$StructuredWriter$maybe(
-						A2(
-							_elm_lang$core$Maybe$map,
-							function (_p17) {
-								return function (x) {
-									return _stil4m$structured_writer$StructuredWriter$spaced(
-										{
-											ctor: '::',
-											_0: _stil4m$structured_writer$StructuredWriter$string('as'),
-											_1: {
-												ctor: '::',
-												_0: x,
-												_1: {ctor: '[]'}
-											}
-										});
-								}(
-									_stil4m$elm_syntax$Elm_Writer$writeModuleName(_p17));
-							},
-							_p16.moduleAlias)),
-					_1: {
-						ctor: '::',
-						_0: _stil4m$structured_writer$StructuredWriter$maybe(
-							A2(_elm_lang$core$Maybe$map, _stil4m$elm_syntax$Elm_Writer$writeExposureExpose, _p16.exposingList)),
-						_1: {ctor: '[]'}
-					}
-				}
-			}
-		});
-};
-var _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation = function (_p18) {
-	var _p19 = _p18;
-	var _p20 = _p19._1;
-	switch (_p20.ctor) {
+	var _p2 = _p1._1;
+	switch (_p2.ctor) {
 		case 'GenericType':
-			return _stil4m$structured_writer$StructuredWriter$string(_p20._0);
+			return _stil4m$structured_writer$StructuredWriter$string(_p2._0);
 		case 'Typed':
 			return _stil4m$structured_writer$StructuredWriter$spaced(
 				{
 					ctor: '::',
-					_0: _stil4m$structured_writer$StructuredWriter$join(
-						{
-							ctor: '::',
-							_0: _stil4m$elm_syntax$Elm_Writer$writeModuleName(_p20._0),
-							_1: {
-								ctor: '::',
-								_0: _stil4m$structured_writer$StructuredWriter$string(_p20._1),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {
-						ctor: '::',
-						_0: _stil4m$structured_writer$StructuredWriter$spaced(
-							A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation, _p20._2)),
-						_1: {ctor: '[]'}
-					}
+					_0: _stil4m$structured_writer$StructuredWriter$string(
+						A2(
+							_elm_lang$core$String$join,
+							'.',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_p2._0,
+								{
+									ctor: '::',
+									_0: _p2._1,
+									_1: {ctor: '[]'}
+								}))),
+					_1: A2(
+						_elm_lang$core$List$map,
+						function (_p3) {
+							return _stil4m$elm_syntax$Elm_Writer$parensIfContainsSpaces(
+								_stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation(_p3));
+						},
+						_p2._2)
 				});
 		case 'Unit':
 			return _stil4m$structured_writer$StructuredWriter$string('()');
@@ -23828,12 +23839,12 @@ var _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation = function (_p18) {
 			return A2(
 				_stil4m$structured_writer$StructuredWriter$parensComma,
 				false,
-				A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation, _p20._0));
+				A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation, _p2._0));
 		case 'Record':
 			return A2(
 				_stil4m$structured_writer$StructuredWriter$bracesComma,
 				false,
-				A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeRecordField, _p20._0));
+				A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeRecordField, _p2._0));
 		case 'GenericRecord':
 			return _stil4m$structured_writer$StructuredWriter$spaced(
 				{
@@ -23841,7 +23852,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation = function (_p18) {
 					_0: _stil4m$structured_writer$StructuredWriter$string('{'),
 					_1: {
 						ctor: '::',
-						_0: _stil4m$structured_writer$StructuredWriter$string(_p20._0),
+						_0: _stil4m$structured_writer$StructuredWriter$string(_p2._0),
 						_1: {
 							ctor: '::',
 							_0: _stil4m$structured_writer$StructuredWriter$string('|'),
@@ -23850,7 +23861,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation = function (_p18) {
 								_0: A2(
 									_stil4m$structured_writer$StructuredWriter$sepByComma,
 									false,
-									A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeRecordField, _p20._1)),
+									A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeRecordField, _p2._1)),
 								_1: {
 									ctor: '::',
 									_0: _stil4m$structured_writer$StructuredWriter$string('}'),
@@ -23864,64 +23875,71 @@ var _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation = function (_p18) {
 			return _stil4m$structured_writer$StructuredWriter$spaced(
 				{
 					ctor: '::',
-					_0: _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation(_p20._0),
+					_0: _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation(_p2._0),
 					_1: {
 						ctor: '::',
 						_0: _stil4m$structured_writer$StructuredWriter$string('->'),
 						_1: {
 							ctor: '::',
-							_0: _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation(_p20._1),
+							_0: _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation(_p2._1),
 							_1: {ctor: '[]'}
 						}
 					}
 				});
 	}
 };
-var _stil4m$elm_syntax$Elm_Writer$writeRecordField = function (_p21) {
-	var _p22 = _p21;
+var _stil4m$elm_syntax$Elm_Writer$writeRecordField = function (_p4) {
+	var _p5 = _p4;
 	return _stil4m$structured_writer$StructuredWriter$spaced(
 		{
 			ctor: '::',
-			_0: _stil4m$structured_writer$StructuredWriter$string(_p22._0),
+			_0: _stil4m$structured_writer$StructuredWriter$string(_p5._0),
 			_1: {
 				ctor: '::',
 				_0: _stil4m$structured_writer$StructuredWriter$string(':'),
 				_1: {
 					ctor: '::',
-					_0: _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation(_p22._1),
+					_0: _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation(_p5._1),
 					_1: {ctor: '[]'}
 				}
 			}
 		});
 };
-var _stil4m$elm_syntax$Elm_Writer$writeSignature = function (signature) {
+var _stil4m$elm_syntax$Elm_Writer$writeInfix = function (_p6) {
+	var _p7 = _p6;
 	return _stil4m$structured_writer$StructuredWriter$spaced(
 		{
 			ctor: '::',
-			_0: signature.operatorDefinition ? _stil4m$structured_writer$StructuredWriter$string(
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'(',
-					A2(_elm_lang$core$Basics_ops['++'], signature.name, ')'))) : _stil4m$structured_writer$StructuredWriter$string(signature.name),
+			_0: function () {
+				var _p8 = _p7.direction;
+				if (_p8.ctor === 'Left') {
+					return _stil4m$structured_writer$StructuredWriter$string('infixl');
+				} else {
+					return _stil4m$structured_writer$StructuredWriter$string('infixr');
+				}
+			}(),
 			_1: {
 				ctor: '::',
-				_0: _stil4m$structured_writer$StructuredWriter$string(':'),
+				_0: _stil4m$structured_writer$StructuredWriter$string(
+					_elm_lang$core$Basics$toString(_p7.precedence)),
 				_1: {
 					ctor: '::',
-					_0: _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation(signature.typeAnnotation),
+					_0: _stil4m$structured_writer$StructuredWriter$string(_p7.operator),
 					_1: {ctor: '[]'}
 				}
 			}
 		});
 };
-var _stil4m$elm_syntax$Elm_Writer$writePortDeclaration = function (signature) {
+var _stil4m$elm_syntax$Elm_Writer$writeValueConstructor = function (_p9) {
+	var _p10 = _p9;
 	return _stil4m$structured_writer$StructuredWriter$spaced(
 		{
 			ctor: '::',
-			_0: _stil4m$structured_writer$StructuredWriter$string('port'),
+			_0: _stil4m$structured_writer$StructuredWriter$string(_p10.name),
 			_1: {
 				ctor: '::',
-				_0: _stil4m$elm_syntax$Elm_Writer$writeSignature(signature),
+				_0: _stil4m$structured_writer$StructuredWriter$spaced(
+					A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation, _p10.$arguments)),
 				_1: {ctor: '[]'}
 			}
 		});
@@ -23959,19 +23977,60 @@ var _stil4m$elm_syntax$Elm_Writer$writeTypeAlias = function (typeAlias) {
 			}
 		});
 };
-var _stil4m$elm_syntax$Elm_Writer$writeValueConstructor = function (_p23) {
-	var _p24 = _p23;
+var _stil4m$elm_syntax$Elm_Writer$writeDocumentation = function (_p11) {
+	return _stil4m$structured_writer$StructuredWriter$string(
+		function (_) {
+			return _.text;
+		}(_p11));
+};
+var _stil4m$elm_syntax$Elm_Writer$writeSignature = function (signature) {
 	return _stil4m$structured_writer$StructuredWriter$spaced(
 		{
 			ctor: '::',
-			_0: _stil4m$structured_writer$StructuredWriter$string(_p24.name),
+			_0: signature.operatorDefinition ? _stil4m$structured_writer$StructuredWriter$string(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'(',
+					A2(_elm_lang$core$Basics_ops['++'], signature.name, ')'))) : _stil4m$structured_writer$StructuredWriter$string(signature.name),
 			_1: {
 				ctor: '::',
-				_0: _stil4m$structured_writer$StructuredWriter$spaced(
-					A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation, _p24.$arguments)),
+				_0: _stil4m$structured_writer$StructuredWriter$string(':'),
+				_1: {
+					ctor: '::',
+					_0: _stil4m$elm_syntax$Elm_Writer$writeTypeAnnotation(signature.typeAnnotation),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _stil4m$elm_syntax$Elm_Writer$writePortDeclaration = function (signature) {
+	return _stil4m$structured_writer$StructuredWriter$spaced(
+		{
+			ctor: '::',
+			_0: _stil4m$structured_writer$StructuredWriter$string('port'),
+			_1: {
+				ctor: '::',
+				_0: _stil4m$elm_syntax$Elm_Writer$writeSignature(signature),
 				_1: {ctor: '[]'}
 			}
 		});
+};
+var _stil4m$elm_syntax$Elm_Writer$startOnDifferentLines = function (xs) {
+	return _elm_lang$core$Native_Utils.cmp(
+		_elm_lang$core$List$length(
+			_elm_community$list_extra$List_Extra$unique(
+				A2(
+					_elm_lang$core$List$map,
+					function (_p12) {
+						return function (_) {
+							return _.row;
+						}(
+							function (_) {
+								return _.start;
+							}(_p12));
+					},
+					xs))),
+		1) > 0;
 };
 var _stil4m$elm_syntax$Elm_Writer$writeType = function (type_) {
 	return _stil4m$structured_writer$StructuredWriter$breaked(
@@ -24016,78 +24075,198 @@ var _stil4m$elm_syntax$Elm_Writer$writeType = function (type_) {
 			}
 		});
 };
-var _stil4m$elm_syntax$Elm_Writer$writeQualifiedNameRef = function (_p25) {
-	var _p26 = _p25;
-	var _p29 = _p26.name;
-	var _p28 = _p26.moduleName;
-	var _p27 = _p28;
-	if (_p27.ctor === '[]') {
-		return _stil4m$structured_writer$StructuredWriter$string(_p29);
+var _stil4m$elm_syntax$Elm_Writer$writeExposureValueConstructor = function (x) {
+	var _p13 = x;
+	if (_p13.ctor === 'All') {
+		return _stil4m$structured_writer$StructuredWriter$string('(..)');
+	} else {
+		var _p15 = _p13._0;
+		var diffLines = _stil4m$elm_syntax$Elm_Writer$startOnDifferentLines(
+			A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, _p15));
+		return A2(
+			_stil4m$structured_writer$StructuredWriter$parensComma,
+			diffLines,
+			A2(
+				_elm_lang$core$List$map,
+				function (_p14) {
+					return _stil4m$structured_writer$StructuredWriter$string(
+						_elm_lang$core$Tuple$second(_p14));
+				},
+				_p15));
+	}
+};
+var _stil4m$elm_syntax$Elm_Writer$writeExpose = function (_p16) {
+	var _p17 = _p16;
+	var _p18 = _p17._1;
+	switch (_p18.ctor) {
+		case 'InfixExpose':
+			return _stil4m$structured_writer$StructuredWriter$string(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'(',
+					A2(_elm_lang$core$Basics_ops['++'], _p18._0, ')')));
+		case 'FunctionExpose':
+			return _stil4m$structured_writer$StructuredWriter$string(_p18._0);
+		case 'TypeOrAliasExpose':
+			return _stil4m$structured_writer$StructuredWriter$string(_p18._0);
+		default:
+			var _p20 = _p18._0.name;
+			var _p19 = _p18._0.constructors;
+			if (_p19.ctor === 'Just') {
+				return _stil4m$structured_writer$StructuredWriter$spaced(
+					{
+						ctor: '::',
+						_0: _stil4m$structured_writer$StructuredWriter$string(_p20),
+						_1: {
+							ctor: '::',
+							_0: _stil4m$elm_syntax$Elm_Writer$writeExposureValueConstructor(_p19._0),
+							_1: {ctor: '[]'}
+						}
+					});
+			} else {
+				return _stil4m$structured_writer$StructuredWriter$string(_p20);
+			}
+	}
+};
+var _stil4m$elm_syntax$Elm_Writer$writeExposureExpose = function (x) {
+	var _p21 = x;
+	if (_p21.ctor === 'All') {
+		return _stil4m$structured_writer$StructuredWriter$string('exposing (..)');
+	} else {
+		var _p22 = _p21._0;
+		var diffLines = _stil4m$elm_syntax$Elm_Writer$startOnDifferentLines(
+			A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Syntax_Exposing$topLevelExposeRange, _p22));
+		return _stil4m$structured_writer$StructuredWriter$spaced(
+			{
+				ctor: '::',
+				_0: _stil4m$structured_writer$StructuredWriter$string('exposing'),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_stil4m$structured_writer$StructuredWriter$parensComma,
+						diffLines,
+						A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeExpose, _p22)),
+					_1: {ctor: '[]'}
+				}
+			});
+	}
+};
+var _stil4m$elm_syntax$Elm_Writer$writeModuleName = function (moduleName) {
+	return _stil4m$structured_writer$StructuredWriter$string(
+		A2(_elm_lang$core$String$join, '.', moduleName));
+};
+var _stil4m$elm_syntax$Elm_Writer$writeImport = function (_p23) {
+	var _p24 = _p23;
+	return _stil4m$structured_writer$StructuredWriter$spaced(
+		{
+			ctor: '::',
+			_0: _stil4m$structured_writer$StructuredWriter$string('import'),
+			_1: {
+				ctor: '::',
+				_0: _stil4m$elm_syntax$Elm_Writer$writeModuleName(_p24.moduleName),
+				_1: {
+					ctor: '::',
+					_0: _stil4m$structured_writer$StructuredWriter$maybe(
+						A2(
+							_elm_lang$core$Maybe$map,
+							function (_p25) {
+								return function (x) {
+									return _stil4m$structured_writer$StructuredWriter$spaced(
+										{
+											ctor: '::',
+											_0: _stil4m$structured_writer$StructuredWriter$string('as'),
+											_1: {
+												ctor: '::',
+												_0: x,
+												_1: {ctor: '[]'}
+											}
+										});
+								}(
+									_stil4m$elm_syntax$Elm_Writer$writeModuleName(_p25));
+							},
+							_p24.moduleAlias)),
+					_1: {
+						ctor: '::',
+						_0: _stil4m$structured_writer$StructuredWriter$maybe(
+							A2(_elm_lang$core$Maybe$map, _stil4m$elm_syntax$Elm_Writer$writeExposureExpose, _p24.exposingList)),
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+};
+var _stil4m$elm_syntax$Elm_Writer$writeQualifiedNameRef = function (_p26) {
+	var _p27 = _p26;
+	var _p30 = _p27.name;
+	var _p29 = _p27.moduleName;
+	var _p28 = _p29;
+	if (_p28.ctor === '[]') {
+		return _stil4m$structured_writer$StructuredWriter$string(_p30);
 	} else {
 		return _stil4m$structured_writer$StructuredWriter$join(
 			{
 				ctor: '::',
-				_0: _stil4m$elm_syntax$Elm_Writer$writeModuleName(_p28),
+				_0: _stil4m$elm_syntax$Elm_Writer$writeModuleName(_p29),
 				_1: {
 					ctor: '::',
 					_0: _stil4m$structured_writer$StructuredWriter$string('.'),
 					_1: {
 						ctor: '::',
-						_0: _stil4m$structured_writer$StructuredWriter$string(_p29),
+						_0: _stil4m$structured_writer$StructuredWriter$string(_p30),
 						_1: {ctor: '[]'}
 					}
 				}
 			});
 	}
 };
-var _stil4m$elm_syntax$Elm_Writer$writePattern = function (_p30) {
-	var _p31 = _p30;
-	var _p32 = _p31._1;
-	switch (_p32.ctor) {
+var _stil4m$elm_syntax$Elm_Writer$writePattern = function (_p31) {
+	var _p32 = _p31;
+	var _p33 = _p32._1;
+	switch (_p33.ctor) {
 		case 'AllPattern':
 			return _stil4m$structured_writer$StructuredWriter$string('_');
 		case 'UnitPattern':
 			return _stil4m$structured_writer$StructuredWriter$string('()');
 		case 'CharPattern':
 			return _stil4m$structured_writer$StructuredWriter$string(
-				_elm_lang$core$Basics$toString(_p32._0));
+				_elm_lang$core$Basics$toString(_p33._0));
 		case 'StringPattern':
-			return _stil4m$structured_writer$StructuredWriter$string(_p32._0);
+			return _stil4m$structured_writer$StructuredWriter$string(_p33._0);
 		case 'IntPattern':
 			return _stil4m$structured_writer$StructuredWriter$string(
-				_elm_lang$core$Basics$toString(_p32._0));
+				_elm_lang$core$Basics$toString(_p33._0));
 		case 'FloatPattern':
 			return _stil4m$structured_writer$StructuredWriter$string(
-				_elm_lang$core$Basics$toString(_p32._0));
+				_elm_lang$core$Basics$toString(_p33._0));
 		case 'TuplePattern':
 			return A2(
 				_stil4m$structured_writer$StructuredWriter$parensComma,
 				false,
-				A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writePattern, _p32._0));
+				A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writePattern, _p33._0));
 		case 'RecordPattern':
 			return A2(
 				_stil4m$structured_writer$StructuredWriter$bracesComma,
 				false,
 				A2(
 					_elm_lang$core$List$map,
-					function (_p33) {
+					function (_p34) {
 						return _stil4m$structured_writer$StructuredWriter$string(
 							function (_) {
 								return _.value;
-							}(_p33));
+							}(_p34));
 					},
-					_p32._0));
+					_p33._0));
 		case 'UnConsPattern':
 			return _stil4m$structured_writer$StructuredWriter$spaced(
 				{
 					ctor: '::',
-					_0: _stil4m$elm_syntax$Elm_Writer$writePattern(_p32._0),
+					_0: _stil4m$elm_syntax$Elm_Writer$writePattern(_p33._0),
 					_1: {
 						ctor: '::',
 						_0: _stil4m$structured_writer$StructuredWriter$string('::'),
 						_1: {
 							ctor: '::',
-							_0: _stil4m$elm_syntax$Elm_Writer$writePattern(_p32._1),
+							_0: _stil4m$elm_syntax$Elm_Writer$writePattern(_p33._1),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -24096,34 +24275,34 @@ var _stil4m$elm_syntax$Elm_Writer$writePattern = function (_p30) {
 			return A2(
 				_stil4m$structured_writer$StructuredWriter$bracketsComma,
 				false,
-				A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writePattern, _p32._0));
+				A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writePattern, _p33._0));
 		case 'VarPattern':
-			return _stil4m$structured_writer$StructuredWriter$string(_p32._0);
+			return _stil4m$structured_writer$StructuredWriter$string(_p33._0);
 		case 'NamedPattern':
 			return _stil4m$structured_writer$StructuredWriter$spaced(
 				{
 					ctor: '::',
-					_0: _stil4m$elm_syntax$Elm_Writer$writeQualifiedNameRef(_p32._0),
+					_0: _stil4m$elm_syntax$Elm_Writer$writeQualifiedNameRef(_p33._0),
 					_1: {
 						ctor: '::',
 						_0: _stil4m$structured_writer$StructuredWriter$spaced(
-							A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writePattern, _p32._1)),
+							A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writePattern, _p33._1)),
 						_1: {ctor: '[]'}
 					}
 				});
 		case 'QualifiedNamePattern':
-			return _stil4m$elm_syntax$Elm_Writer$writeQualifiedNameRef(_p32._0);
+			return _stil4m$elm_syntax$Elm_Writer$writeQualifiedNameRef(_p33._0);
 		case 'AsPattern':
 			return _stil4m$structured_writer$StructuredWriter$spaced(
 				{
 					ctor: '::',
-					_0: _stil4m$elm_syntax$Elm_Writer$writePattern(_p32._0),
+					_0: _stil4m$elm_syntax$Elm_Writer$writePattern(_p33._0),
 					_1: {
 						ctor: '::',
 						_0: _stil4m$structured_writer$StructuredWriter$string('as'),
 						_1: {
 							ctor: '::',
-							_0: _stil4m$structured_writer$StructuredWriter$string(_p32._1.value),
+							_0: _stil4m$structured_writer$StructuredWriter$string(_p33._1.value),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -24135,7 +24314,7 @@ var _stil4m$elm_syntax$Elm_Writer$writePattern = function (_p30) {
 					_0: _stil4m$structured_writer$StructuredWriter$string('('),
 					_1: {
 						ctor: '::',
-						_0: _stil4m$elm_syntax$Elm_Writer$writePattern(_p32._0),
+						_0: _stil4m$elm_syntax$Elm_Writer$writePattern(_p33._0),
 						_1: {
 							ctor: '::',
 							_0: _stil4m$structured_writer$StructuredWriter$string(')'),
@@ -24145,10 +24324,10 @@ var _stil4m$elm_syntax$Elm_Writer$writePattern = function (_p30) {
 				});
 	}
 };
-var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
+var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p35) {
 	writeExpression:
 	while (true) {
-		var _p35 = _p34;
+		var _p36 = _p35;
 		var sepHelper = F2(
 			function (f, l) {
 				var diffLines = _stil4m$elm_syntax$Elm_Writer$startOnDifferentLines(
@@ -24158,73 +24337,73 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 					diffLines,
 					A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$second, l));
 			});
-		var writeRecordSetter = function (_p36) {
-			var _p37 = _p36;
-			var _p38 = _p37._1;
+		var writeRecordSetter = function (_p37) {
+			var _p38 = _p37;
+			var _p39 = _p38._1;
 			return {
 				ctor: '_Tuple2',
-				_0: _elm_lang$core$Tuple$first(_p38),
+				_0: _elm_lang$core$Tuple$first(_p39),
 				_1: _stil4m$structured_writer$StructuredWriter$spaced(
 					{
 						ctor: '::',
-						_0: _stil4m$structured_writer$StructuredWriter$string(_p37._0),
+						_0: _stil4m$structured_writer$StructuredWriter$string(_p38._0),
 						_1: {
 							ctor: '::',
 							_0: _stil4m$structured_writer$StructuredWriter$string('='),
 							_1: {
 								ctor: '::',
-								_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p38),
+								_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p39),
 								_1: {ctor: '[]'}
 							}
 						}
 					})
 			};
 		};
-		var recurRangeHelper = function (_p39) {
-			var _p40 = _p39;
-			var _p41 = _p40._0;
+		var recurRangeHelper = function (_p40) {
+			var _p41 = _p40;
+			var _p42 = _p41._0;
 			return {
 				ctor: '_Tuple2',
-				_0: _p41,
+				_0: _p42,
 				_1: _stil4m$elm_syntax$Elm_Writer$writeExpression(
-					{ctor: '_Tuple2', _0: _p41, _1: _p40._1})
+					{ctor: '_Tuple2', _0: _p42, _1: _p41._1})
 			};
 		};
-		var _p42 = _p35._1;
-		switch (_p42.ctor) {
+		var _p43 = _p36._1;
+		switch (_p43.ctor) {
 			case 'UnitExpr':
 				return _stil4m$structured_writer$StructuredWriter$string('()');
 			case 'Application':
-				var _p43 = _p42._0;
-				if (_p43.ctor === '[]') {
+				var _p44 = _p43._0;
+				if (_p44.ctor === '[]') {
 					return _stil4m$structured_writer$StructuredWriter$epsilon;
 				} else {
-					if (_p43._1.ctor === '[]') {
-						var _v21 = _p43._0;
-						_p34 = _v21;
+					if (_p44._1.ctor === '[]') {
+						var _v21 = _p44._0;
+						_p35 = _v21;
 						continue writeExpression;
 					} else {
 						return _stil4m$structured_writer$StructuredWriter$spaced(
 							{
 								ctor: '::',
-								_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p43._0),
+								_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p44._0),
 								_1: {
 									ctor: '::',
 									_0: A2(
 										sepHelper,
 										_stil4m$structured_writer$StructuredWriter$sepBySpace,
-										A2(_elm_lang$core$List$map, recurRangeHelper, _p43._1)),
+										A2(_elm_lang$core$List$map, recurRangeHelper, _p44._1)),
 									_1: {ctor: '[]'}
 								}
 							});
 					}
 				}
 			case 'OperatorApplication':
-				var _p47 = _p42._0;
-				var _p46 = _p42._3;
-				var _p45 = _p42._2;
-				var _p44 = _p42._1;
-				if (_p44.ctor === 'Left') {
+				var _p48 = _p43._0;
+				var _p47 = _p43._3;
+				var _p46 = _p43._2;
+				var _p45 = _p43._1;
+				if (_p45.ctor === 'Left') {
 					return A2(
 						sepHelper,
 						_stil4m$structured_writer$StructuredWriter$sepBySpace,
@@ -24232,21 +24411,21 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: _elm_lang$core$Tuple$first(_p45),
-								_1: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p45)
+								_0: _elm_lang$core$Tuple$first(_p46),
+								_1: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p46)
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: _p35._0,
+									_0: _p36._0,
 									_1: _stil4m$structured_writer$StructuredWriter$spaced(
 										{
 											ctor: '::',
-											_0: _stil4m$structured_writer$StructuredWriter$string(_p47),
+											_0: _stil4m$structured_writer$StructuredWriter$string(_p48),
 											_1: {
 												ctor: '::',
-												_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p46),
+												_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p47),
 												_1: {ctor: '[]'}
 											}
 										})
@@ -24262,14 +24441,14 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: _elm_lang$core$Tuple$first(_p45),
+								_0: _elm_lang$core$Tuple$first(_p46),
 								_1: _stil4m$structured_writer$StructuredWriter$spaced(
 									{
 										ctor: '::',
-										_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p45),
+										_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p46),
 										_1: {
 											ctor: '::',
-											_0: _stil4m$structured_writer$StructuredWriter$string(_p47),
+											_0: _stil4m$structured_writer$StructuredWriter$string(_p48),
 											_1: {ctor: '[]'}
 										}
 									})
@@ -24278,15 +24457,15 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: _elm_lang$core$Tuple$first(_p46),
-									_1: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p46)
+									_0: _elm_lang$core$Tuple$first(_p47),
+									_1: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p47)
 								},
 								_1: {ctor: '[]'}
 							}
 						});
 				}
 			case 'FunctionOrValue':
-				return _stil4m$structured_writer$StructuredWriter$string(_p42._0);
+				return _stil4m$structured_writer$StructuredWriter$string(_p43._0);
 			case 'IfBlock':
 				return _stil4m$structured_writer$StructuredWriter$breaked(
 					{
@@ -24297,7 +24476,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 								_0: _stil4m$structured_writer$StructuredWriter$string('if'),
 								_1: {
 									ctor: '::',
-									_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p42._0),
+									_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p43._0),
 									_1: {
 										ctor: '::',
 										_0: _stil4m$structured_writer$StructuredWriter$string('then'),
@@ -24310,7 +24489,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 							_0: A2(
 								_stil4m$structured_writer$StructuredWriter$indent,
 								2,
-								_stil4m$elm_syntax$Elm_Writer$writeExpression(_p42._1)),
+								_stil4m$elm_syntax$Elm_Writer$writeExpression(_p43._1)),
 							_1: {
 								ctor: '::',
 								_0: _stil4m$structured_writer$StructuredWriter$string('else'),
@@ -24319,7 +24498,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 									_0: A2(
 										_stil4m$structured_writer$StructuredWriter$indent,
 										2,
-										_stil4m$elm_syntax$Elm_Writer$writeExpression(_p42._2)),
+										_stil4m$elm_syntax$Elm_Writer$writeExpression(_p43._2)),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -24330,31 +24509,31 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 					A2(
 						_elm_lang$core$Basics_ops['++'],
 						'(',
-						A2(_elm_lang$core$Basics_ops['++'], _p42._0, ')')));
+						A2(_elm_lang$core$Basics_ops['++'], _p43._0, ')')));
 			case 'Operator':
-				return _stil4m$structured_writer$StructuredWriter$string(_p42._0);
+				return _stil4m$structured_writer$StructuredWriter$string(_p43._0);
 			case 'Integer':
 				return _stil4m$structured_writer$StructuredWriter$string(
-					_elm_lang$core$Basics$toString(_p42._0));
+					_elm_lang$core$Basics$toString(_p43._0));
 			case 'Floatable':
 				return _stil4m$structured_writer$StructuredWriter$string(
-					_elm_lang$core$Basics$toString(_p42._0));
+					_elm_lang$core$Basics$toString(_p43._0));
 			case 'Negation':
 				return A2(
 					_stil4m$structured_writer$StructuredWriter$append,
 					_stil4m$structured_writer$StructuredWriter$string('-'),
-					_stil4m$elm_syntax$Elm_Writer$writeExpression(_p42._0));
+					_stil4m$elm_syntax$Elm_Writer$writeExpression(_p43._0));
 			case 'Literal':
 				return _stil4m$structured_writer$StructuredWriter$string(
-					_elm_lang$core$Basics$toString(_p42._0));
+					_elm_lang$core$Basics$toString(_p43._0));
 			case 'CharLiteral':
 				return _stil4m$structured_writer$StructuredWriter$string(
-					_elm_lang$core$Basics$toString(_p42._0));
+					_elm_lang$core$Basics$toString(_p43._0));
 			case 'TupledExpression':
 				return A2(
 					sepHelper,
 					_stil4m$structured_writer$StructuredWriter$sepByComma,
-					A2(_elm_lang$core$List$map, recurRangeHelper, _p42._0));
+					A2(_elm_lang$core$List$map, recurRangeHelper, _p43._0));
 			case 'ParenthesizedExpression':
 				return _stil4m$structured_writer$StructuredWriter$join(
 					{
@@ -24362,7 +24541,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 						_0: _stil4m$structured_writer$StructuredWriter$string('('),
 						_1: {
 							ctor: '::',
-							_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p42._0),
+							_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p43._0),
 							_1: {
 								ctor: '::',
 								_0: _stil4m$structured_writer$StructuredWriter$string(')'),
@@ -24371,7 +24550,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 						}
 					});
 			case 'LetExpression':
-				var _p48 = _p42._0;
+				var _p49 = _p43._0;
 				return _stil4m$structured_writer$StructuredWriter$breaked(
 					{
 						ctor: '::',
@@ -24382,7 +24561,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 								_stil4m$structured_writer$StructuredWriter$indent,
 								2,
 								_stil4m$structured_writer$StructuredWriter$breaked(
-									A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeLetDeclaration, _p48.declarations))),
+									A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writeLetDeclaration, _p49.declarations))),
 							_1: {
 								ctor: '::',
 								_0: _stil4m$structured_writer$StructuredWriter$string('in'),
@@ -24391,23 +24570,23 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 									_0: A2(
 										_stil4m$structured_writer$StructuredWriter$indent,
 										2,
-										_stil4m$elm_syntax$Elm_Writer$writeExpression(_p48.expression)),
+										_stil4m$elm_syntax$Elm_Writer$writeExpression(_p49.expression)),
 									_1: {ctor: '[]'}
 								}
 							}
 						}
 					});
 			case 'CaseExpression':
-				var _p51 = _p42._0;
-				var writeCaseBranch = function (_p49) {
-					var _p50 = _p49;
+				var _p52 = _p43._0;
+				var writeCaseBranch = function (_p50) {
+					var _p51 = _p50;
 					return _stil4m$structured_writer$StructuredWriter$breaked(
 						{
 							ctor: '::',
 							_0: _stil4m$structured_writer$StructuredWriter$spaced(
 								{
 									ctor: '::',
-									_0: _stil4m$elm_syntax$Elm_Writer$writePattern(_p50._0),
+									_0: _stil4m$elm_syntax$Elm_Writer$writePattern(_p51._0),
 									_1: {
 										ctor: '::',
 										_0: _stil4m$structured_writer$StructuredWriter$string('->'),
@@ -24419,7 +24598,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 								_0: A2(
 									_stil4m$structured_writer$StructuredWriter$indent,
 									2,
-									_stil4m$elm_syntax$Elm_Writer$writeExpression(_p50._1)),
+									_stil4m$elm_syntax$Elm_Writer$writeExpression(_p51._1)),
 								_1: {ctor: '[]'}
 							}
 						});
@@ -24433,7 +24612,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 								_0: _stil4m$structured_writer$StructuredWriter$string('case'),
 								_1: {
 									ctor: '::',
-									_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p51.expression),
+									_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p52.expression),
 									_1: {
 										ctor: '::',
 										_0: _stil4m$structured_writer$StructuredWriter$string('of'),
@@ -24447,12 +24626,12 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 								_stil4m$structured_writer$StructuredWriter$indent,
 								2,
 								_stil4m$structured_writer$StructuredWriter$breaked(
-									A2(_elm_lang$core$List$map, writeCaseBranch, _p51.cases))),
+									A2(_elm_lang$core$List$map, writeCaseBranch, _p52.cases))),
 							_1: {ctor: '[]'}
 						}
 					});
 			case 'LambdaExpression':
-				var _p52 = _p42._0;
+				var _p53 = _p43._0;
 				return _stil4m$structured_writer$StructuredWriter$spaced(
 					{
 						ctor: '::',
@@ -24463,7 +24642,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 								_1: {
 									ctor: '::',
 									_0: _stil4m$structured_writer$StructuredWriter$spaced(
-										A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writePattern, _p52.args)),
+										A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Writer$writePattern, _p53.args)),
 									_1: {ctor: '[]'}
 								}
 							}),
@@ -24472,7 +24651,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 							_0: _stil4m$structured_writer$StructuredWriter$string('->'),
 							_1: {
 								ctor: '::',
-								_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p52.expression),
+								_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p53.expression),
 								_1: {ctor: '[]'}
 							}
 						}
@@ -24481,20 +24660,20 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 				return A2(
 					sepHelper,
 					_stil4m$structured_writer$StructuredWriter$bracesComma,
-					A2(_elm_lang$core$List$map, writeRecordSetter, _p42._0));
+					A2(_elm_lang$core$List$map, writeRecordSetter, _p43._0));
 			case 'ListExpr':
 				return A2(
 					sepHelper,
 					_stil4m$structured_writer$StructuredWriter$bracketsComma,
-					A2(_elm_lang$core$List$map, recurRangeHelper, _p42._0));
+					A2(_elm_lang$core$List$map, recurRangeHelper, _p43._0));
 			case 'QualifiedExpr':
 				return _stil4m$structured_writer$StructuredWriter$join(
 					{
 						ctor: '::',
-						_0: _stil4m$elm_syntax$Elm_Writer$writeModuleName(_p42._0),
+						_0: _stil4m$elm_syntax$Elm_Writer$writeModuleName(_p43._0),
 						_1: {
 							ctor: '::',
-							_0: _stil4m$structured_writer$StructuredWriter$string(_p42._1),
+							_0: _stil4m$structured_writer$StructuredWriter$string(_p43._1),
 							_1: {ctor: '[]'}
 						}
 					});
@@ -24502,13 +24681,13 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 				return _stil4m$structured_writer$StructuredWriter$join(
 					{
 						ctor: '::',
-						_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p42._0),
+						_0: _stil4m$elm_syntax$Elm_Writer$writeExpression(_p43._0),
 						_1: {
 							ctor: '::',
 							_0: _stil4m$structured_writer$StructuredWriter$string('.'),
 							_1: {
 								ctor: '::',
-								_0: _stil4m$structured_writer$StructuredWriter$string(_p42._1),
+								_0: _stil4m$structured_writer$StructuredWriter$string(_p43._1),
 								_1: {ctor: '[]'}
 							}
 						}
@@ -24520,7 +24699,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 						_0: _stil4m$structured_writer$StructuredWriter$string('.'),
 						_1: {
 							ctor: '::',
-							_0: _stil4m$structured_writer$StructuredWriter$string(_p42._0),
+							_0: _stil4m$structured_writer$StructuredWriter$string(_p43._0),
 							_1: {ctor: '[]'}
 						}
 					});
@@ -24531,7 +24710,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 						_0: _stil4m$structured_writer$StructuredWriter$string('{'),
 						_1: {
 							ctor: '::',
-							_0: _stil4m$structured_writer$StructuredWriter$string(_p42._0.name),
+							_0: _stil4m$structured_writer$StructuredWriter$string(_p43._0.name),
 							_1: {
 								ctor: '::',
 								_0: _stil4m$structured_writer$StructuredWriter$string('|'),
@@ -24540,7 +24719,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 									_0: A2(
 										sepHelper,
 										_stil4m$structured_writer$StructuredWriter$sepByComma,
-										A2(_elm_lang$core$List$map, writeRecordSetter, _p42._0.updates)),
+										A2(_elm_lang$core$List$map, writeRecordSetter, _p43._0.updates)),
 									_1: {
 										ctor: '::',
 										_0: _stil4m$structured_writer$StructuredWriter$string('}'),
@@ -24557,7 +24736,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 						_0: _stil4m$structured_writer$StructuredWriter$string('[glsl|'),
 						_1: {
 							ctor: '::',
-							_0: _stil4m$structured_writer$StructuredWriter$string(_p42._0),
+							_0: _stil4m$structured_writer$StructuredWriter$string(_p43._0),
 							_1: {
 								ctor: '::',
 								_0: _stil4m$structured_writer$StructuredWriter$string('|]'),
@@ -24568,13 +24747,13 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p34) {
 		}
 	}
 };
-var _stil4m$elm_syntax$Elm_Writer$writeLetDeclaration = function (_p53) {
-	var _p54 = _p53;
-	var _p55 = _p54._1;
-	if (_p55.ctor === 'LetFunction') {
-		return _stil4m$elm_syntax$Elm_Writer$writeFunction(_p55._0);
+var _stil4m$elm_syntax$Elm_Writer$writeLetDeclaration = function (_p54) {
+	var _p55 = _p54;
+	var _p56 = _p55._1;
+	if (_p56.ctor === 'LetFunction') {
+		return _stil4m$elm_syntax$Elm_Writer$writeFunction(_p56._0);
 	} else {
-		return A2(_stil4m$elm_syntax$Elm_Writer$writeDestructuring, _p55._0, _p55._1);
+		return A2(_stil4m$elm_syntax$Elm_Writer$writeDestructuring, _p56._0, _p56._1);
 	}
 };
 var _stil4m$elm_syntax$Elm_Writer$writeDestructuring = F2(
@@ -24602,26 +24781,26 @@ var _stil4m$elm_syntax$Elm_Writer$writeDestructuring = F2(
 				}
 			});
 	});
-var _stil4m$elm_syntax$Elm_Writer$writeFunction = function (_p56) {
-	var _p57 = _p56;
+var _stil4m$elm_syntax$Elm_Writer$writeFunction = function (_p57) {
+	var _p58 = _p57;
 	return _stil4m$structured_writer$StructuredWriter$breaked(
 		{
 			ctor: '::',
 			_0: _stil4m$structured_writer$StructuredWriter$maybe(
-				A2(_elm_lang$core$Maybe$map, _stil4m$elm_syntax$Elm_Writer$writeDocumentation, _p57.documentation)),
+				A2(_elm_lang$core$Maybe$map, _stil4m$elm_syntax$Elm_Writer$writeDocumentation, _p58.documentation)),
 			_1: {
 				ctor: '::',
 				_0: _stil4m$structured_writer$StructuredWriter$maybe(
 					A2(
 						_elm_lang$core$Maybe$map,
-						function (_p58) {
+						function (_p59) {
 							return _stil4m$elm_syntax$Elm_Writer$writeSignature(
-								_elm_lang$core$Tuple$second(_p58));
+								_elm_lang$core$Tuple$second(_p59));
 						},
-						_p57.signature)),
+						_p58.signature)),
 				_1: {
 					ctor: '::',
-					_0: _stil4m$elm_syntax$Elm_Writer$writeFunctionDeclaration(_p57.declaration),
+					_0: _stil4m$elm_syntax$Elm_Writer$writeFunctionDeclaration(_p58.declaration),
 					_1: {ctor: '[]'}
 				}
 			}
@@ -24660,28 +24839,28 @@ var _stil4m$elm_syntax$Elm_Writer$writeFunctionDeclaration = function (declarati
 			}
 		});
 };
-var _stil4m$elm_syntax$Elm_Writer$writeDeclaration = function (_p59) {
-	var _p60 = _p59;
-	var _p61 = _p60._1;
-	switch (_p61.ctor) {
+var _stil4m$elm_syntax$Elm_Writer$writeDeclaration = function (_p60) {
+	var _p61 = _p60;
+	var _p62 = _p61._1;
+	switch (_p62.ctor) {
 		case 'FuncDecl':
-			return _stil4m$elm_syntax$Elm_Writer$writeFunction(_p61._0);
+			return _stil4m$elm_syntax$Elm_Writer$writeFunction(_p62._0);
 		case 'AliasDecl':
-			return _stil4m$elm_syntax$Elm_Writer$writeTypeAlias(_p61._0);
+			return _stil4m$elm_syntax$Elm_Writer$writeTypeAlias(_p62._0);
 		case 'TypeDecl':
-			return _stil4m$elm_syntax$Elm_Writer$writeType(_p61._0);
+			return _stil4m$elm_syntax$Elm_Writer$writeType(_p62._0);
 		case 'PortDeclaration':
-			return _stil4m$elm_syntax$Elm_Writer$writePortDeclaration(_p61._0);
+			return _stil4m$elm_syntax$Elm_Writer$writePortDeclaration(_p62._0);
 		case 'InfixDeclaration':
-			return _stil4m$elm_syntax$Elm_Writer$writeInfix(_p61._0);
+			return _stil4m$elm_syntax$Elm_Writer$writeInfix(_p62._0);
 		default:
-			return A2(_stil4m$elm_syntax$Elm_Writer$writeDestructuring, _p61._0, _p61._1);
+			return A2(_stil4m$elm_syntax$Elm_Writer$writeDestructuring, _p62._0, _p62._1);
 	}
 };
 var _stil4m$elm_syntax$Elm_Writer$writeWhere = function (input) {
-	var _p62 = input;
-	if (_p62._0.ctor === 'Nothing') {
-		if (_p62._1.ctor === 'Nothing') {
+	var _p63 = input;
+	if (_p63._0.ctor === 'Nothing') {
+		if (_p63._1.ctor === 'Nothing') {
 			return _stil4m$structured_writer$StructuredWriter$epsilon;
 		} else {
 			return _stil4m$structured_writer$StructuredWriter$spaced(
@@ -24690,7 +24869,7 @@ var _stil4m$elm_syntax$Elm_Writer$writeWhere = function (input) {
 					_0: _stil4m$structured_writer$StructuredWriter$string('where { subscription ='),
 					_1: {
 						ctor: '::',
-						_0: _stil4m$structured_writer$StructuredWriter$string(_p62._1._0),
+						_0: _stil4m$structured_writer$StructuredWriter$string(_p63._1._0),
 						_1: {
 							ctor: '::',
 							_0: _stil4m$structured_writer$StructuredWriter$string('}'),
@@ -24700,14 +24879,14 @@ var _stil4m$elm_syntax$Elm_Writer$writeWhere = function (input) {
 				});
 		}
 	} else {
-		if (_p62._1.ctor === 'Nothing') {
+		if (_p63._1.ctor === 'Nothing') {
 			return _stil4m$structured_writer$StructuredWriter$spaced(
 				{
 					ctor: '::',
 					_0: _stil4m$structured_writer$StructuredWriter$string('where { command ='),
 					_1: {
 						ctor: '::',
-						_0: _stil4m$structured_writer$StructuredWriter$string(_p62._0._0),
+						_0: _stil4m$structured_writer$StructuredWriter$string(_p63._0._0),
 						_1: {
 							ctor: '::',
 							_0: _stil4m$structured_writer$StructuredWriter$string('}'),
@@ -24722,13 +24901,13 @@ var _stil4m$elm_syntax$Elm_Writer$writeWhere = function (input) {
 					_0: _stil4m$structured_writer$StructuredWriter$string('where { command ='),
 					_1: {
 						ctor: '::',
-						_0: _stil4m$structured_writer$StructuredWriter$string(_p62._0._0),
+						_0: _stil4m$structured_writer$StructuredWriter$string(_p63._0._0),
 						_1: {
 							ctor: '::',
 							_0: _stil4m$structured_writer$StructuredWriter$string(', subscription ='),
 							_1: {
 								ctor: '::',
-								_0: _stil4m$structured_writer$StructuredWriter$string(_p62._1._0),
+								_0: _stil4m$structured_writer$StructuredWriter$string(_p63._1._0),
 								_1: {
 									ctor: '::',
 									_0: _stil4m$structured_writer$StructuredWriter$string('}'),
@@ -24741,8 +24920,8 @@ var _stil4m$elm_syntax$Elm_Writer$writeWhere = function (input) {
 		}
 	}
 };
-var _stil4m$elm_syntax$Elm_Writer$writeEffectModuleData = function (_p63) {
-	var _p64 = _p63;
+var _stil4m$elm_syntax$Elm_Writer$writeEffectModuleData = function (_p64) {
+	var _p65 = _p64;
 	return _stil4m$structured_writer$StructuredWriter$spaced(
 		{
 			ctor: '::',
@@ -24752,14 +24931,14 @@ var _stil4m$elm_syntax$Elm_Writer$writeEffectModuleData = function (_p63) {
 				_0: _stil4m$structured_writer$StructuredWriter$string('module'),
 				_1: {
 					ctor: '::',
-					_0: _stil4m$elm_syntax$Elm_Writer$writeModuleName(_p64.moduleName),
+					_0: _stil4m$elm_syntax$Elm_Writer$writeModuleName(_p65.moduleName),
 					_1: {
 						ctor: '::',
 						_0: _stil4m$elm_syntax$Elm_Writer$writeWhere(
-							{ctor: '_Tuple2', _0: _p64.command, _1: _p64.subscription}),
+							{ctor: '_Tuple2', _0: _p65.command, _1: _p65.subscription}),
 						_1: {
 							ctor: '::',
-							_0: _stil4m$elm_syntax$Elm_Writer$writeExposureExpose(_p64.exposingList),
+							_0: _stil4m$elm_syntax$Elm_Writer$writeExposureExpose(_p65.exposingList),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -24767,28 +24946,28 @@ var _stil4m$elm_syntax$Elm_Writer$writeEffectModuleData = function (_p63) {
 			}
 		});
 };
-var _stil4m$elm_syntax$Elm_Writer$writeDefaultModuleData = function (_p65) {
-	var _p66 = _p65;
+var _stil4m$elm_syntax$Elm_Writer$writeDefaultModuleData = function (_p66) {
+	var _p67 = _p66;
 	return _stil4m$structured_writer$StructuredWriter$spaced(
 		{
 			ctor: '::',
 			_0: _stil4m$structured_writer$StructuredWriter$string('module'),
 			_1: {
 				ctor: '::',
-				_0: _stil4m$elm_syntax$Elm_Writer$writeModuleName(_p66.moduleName),
+				_0: _stil4m$elm_syntax$Elm_Writer$writeModuleName(_p67.moduleName),
 				_1: {
 					ctor: '::',
-					_0: _stil4m$elm_syntax$Elm_Writer$writeExposureExpose(_p66.exposingList),
+					_0: _stil4m$elm_syntax$Elm_Writer$writeExposureExpose(_p67.exposingList),
 					_1: {ctor: '[]'}
 				}
 			}
 		});
 };
 var _stil4m$elm_syntax$Elm_Writer$writeModule = function (m) {
-	var _p67 = m;
-	switch (_p67.ctor) {
+	var _p68 = m;
+	switch (_p68.ctor) {
 		case 'NormalModule':
-			return _stil4m$elm_syntax$Elm_Writer$writeDefaultModuleData(_p67._0);
+			return _stil4m$elm_syntax$Elm_Writer$writeDefaultModuleData(_p68._0);
 		case 'PortModule':
 			return _stil4m$structured_writer$StructuredWriter$spaced(
 				{
@@ -24796,12 +24975,12 @@ var _stil4m$elm_syntax$Elm_Writer$writeModule = function (m) {
 					_0: _stil4m$structured_writer$StructuredWriter$string('port'),
 					_1: {
 						ctor: '::',
-						_0: _stil4m$elm_syntax$Elm_Writer$writeDefaultModuleData(_p67._0),
+						_0: _stil4m$elm_syntax$Elm_Writer$writeDefaultModuleData(_p68._0),
 						_1: {ctor: '[]'}
 					}
 				});
 		default:
-			return _stil4m$elm_syntax$Elm_Writer$writeEffectModuleData(_p67._0);
+			return _stil4m$elm_syntax$Elm_Writer$writeEffectModuleData(_p68._0);
 	}
 };
 var _stil4m$elm_syntax$Elm_Writer$writeFile = function (file) {
@@ -24848,43 +25027,9 @@ var _user$project$AST_Ranges$locationToString = function (_p0) {
 					_elm_lang$core$Basics$toString(_p1.column),
 					')'))));
 };
-var _user$project$AST_Ranges$compareLocations = F2(
-	function (left, right) {
-		return (_elm_lang$core$Native_Utils.cmp(left.row, right.row) < 0) ? _elm_lang$core$Basics$LT : ((_elm_lang$core$Native_Utils.cmp(right.row, left.row) < 0) ? _elm_lang$core$Basics$GT : A2(_elm_lang$core$Basics$compare, left.column, right.column));
-	});
-var _user$project$AST_Ranges$sortLocations = _elm_lang$core$List$sortWith(_user$project$AST_Ranges$compareLocations);
-var _user$project$AST_Ranges$compareRangeStarts = F2(
-	function (a, b) {
-		return A2(_user$project$AST_Ranges$compareLocations, a.start, b.start);
-	});
 var _user$project$AST_Ranges$emptyRange = {
 	start: {row: 0, column: 0},
 	end: {row: 0, column: 0}
-};
-var _user$project$AST_Ranges$getRange = function (ranges) {
-	var ends = _elm_lang$core$List$reverse(
-		_user$project$AST_Ranges$sortLocations(
-			A2(
-				_elm_lang$core$List$map,
-				function (_) {
-					return _.end;
-				},
-				ranges)));
-	var starts = _user$project$AST_Ranges$sortLocations(
-		A2(
-			_elm_lang$core$List$map,
-			function (_) {
-				return _.start;
-			},
-			ranges));
-	return A2(
-		_elm_lang$core$Maybe$withDefault,
-		_user$project$AST_Ranges$emptyRange,
-		A3(
-			_elm_lang$core$Maybe$map2,
-			_stil4m$elm_syntax$Elm_Syntax_Range$Range,
-			_elm_lang$core$List$head(starts),
-			_elm_lang$core$List$head(ends)));
 };
 var _user$project$AST_Ranges$rangeToString = function (_p2) {
 	var _p3 = _p2;
@@ -24906,145 +25051,6 @@ var _user$project$AST_Ranges$orderByStart = F2(
 	function (r1, r2) {
 		return (!_elm_lang$core$Native_Utils.eq(r1.start.row, r2.start.row)) ? A2(_elm_lang$core$Basics$compare, r1.start.row, r2.start.row) : A2(_elm_lang$core$Basics$compare, r1.start.column, r2.start.column);
 	});
-
-var _user$project$AST_Util$patternModuleNames = function (_p0) {
-	patternModuleNames:
-	while (true) {
-		var _p1 = _p0;
-		var _p2 = _p1._1;
-		switch (_p2.ctor) {
-			case 'TuplePattern':
-				return A2(_elm_lang$core$List$concatMap, _user$project$AST_Util$patternModuleNames, _p2._0);
-			case 'RecordPattern':
-				return {ctor: '[]'};
-			case 'UnConsPattern':
-				return A2(
-					_elm_lang$core$Basics_ops['++'],
-					_user$project$AST_Util$patternModuleNames(_p2._0),
-					_user$project$AST_Util$patternModuleNames(_p2._1));
-			case 'ListPattern':
-				return A2(_elm_lang$core$List$concatMap, _user$project$AST_Util$patternModuleNames, _p2._0);
-			case 'NamedPattern':
-				return {
-					ctor: '::',
-					_0: _p2._0.moduleName,
-					_1: A2(_elm_lang$core$List$concatMap, _user$project$AST_Util$patternModuleNames, _p2._1)
-				};
-			case 'QualifiedNamePattern':
-				return {
-					ctor: '::',
-					_0: _p2._0.moduleName,
-					_1: {ctor: '[]'}
-				};
-			case 'AsPattern':
-				var _v2 = _p2._0;
-				_p0 = _v2;
-				continue patternModuleNames;
-			case 'ParenthesizedPattern':
-				var _v3 = _p2._0;
-				_p0 = _v3;
-				continue patternModuleNames;
-			default:
-				return {ctor: '[]'};
-		}
-	}
-};
-var _user$project$AST_Util$getParenthesized = function (_p3) {
-	var _p4 = _p3;
-	var _p5 = _p4._1;
-	if (_p5.ctor === 'ParenthesizedExpression') {
-		return _elm_lang$core$Maybe$Just(
-			{ctor: '_Tuple2', _0: _p4._0, _1: _p5._0});
-	} else {
-		return _elm_lang$core$Maybe$Nothing;
-	}
-};
-var _user$project$AST_Util$isOperatorApplication = function (_p6) {
-	var _p7 = _p6;
-	var _p8 = _p7._1;
-	if (_p8.ctor === 'OperatorApplication') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$AST_Util$isCase = function (_p9) {
-	var _p10 = _p9;
-	var _p11 = _p10._1;
-	if (_p11.ctor === 'CaseExpression') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$AST_Util$isIf = function (_p12) {
-	var _p13 = _p12;
-	var _p14 = _p13._1;
-	if (_p14.ctor === 'IfBlock') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$AST_Util$isLet = function (_p15) {
-	var _p16 = _p15;
-	var _p17 = _p16._1;
-	if (_p17.ctor === 'LetExpression') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$AST_Util$isLambda = function (_p18) {
-	var _p19 = _p18;
-	var _p20 = _p19._1;
-	if (_p20.ctor === 'LambdaExpression') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$AST_Util$fileModuleName = function (file) {
-	var _p21 = file.moduleDefinition;
-	switch (_p21.ctor) {
-		case 'NormalModule':
-			return _p21._0.moduleName;
-		case 'PortModule':
-			return _p21._0.moduleName;
-		default:
-			return _p21._0.moduleName;
-	}
-};
-var _user$project$AST_Util$fileExposingList = function (file) {
-	var _p22 = file.moduleDefinition;
-	switch (_p22.ctor) {
-		case 'NormalModule':
-			return _p22._0.exposingList;
-		case 'PortModule':
-			return _p22._0.exposingList;
-		default:
-			return _p22._0.exposingList;
-	}
-};
-var _user$project$AST_Util$isPortModule = function (file) {
-	var _p23 = file.moduleDefinition;
-	if (_p23.ctor === 'PortModule') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var _user$project$AST_Util$moduleExposingList = function (m) {
-	var _p24 = m;
-	switch (_p24.ctor) {
-		case 'NormalModule':
-			return _p24._0.exposingList;
-		case 'PortModule':
-			return _p24._0.exposingList;
-		default:
-			return _p24._0.exposingList;
-	}
-};
 
 var _user$project$ASTUtil_Functions$isFunctionTypeAnnotation = function (typeAnnotation) {
 	var _p0 = typeAnnotation;
@@ -25487,11 +25493,18 @@ var _user$project$ASTUtil_Inspector$inspectValueConstructor = F3(
 	});
 var _user$project$ASTUtil_Inspector$inspectType = F3(
 	function (config, typeDecl, context) {
-		return A3(
-			_elm_lang$core$List$foldl,
-			_user$project$ASTUtil_Inspector$inspectValueConstructor(config),
-			context,
-			typeDecl.constructors);
+		return A4(
+			_user$project$ASTUtil_Inspector$actionLambda,
+			config.onType,
+			function (c) {
+				return A3(
+					_elm_lang$core$List$foldl,
+					_user$project$ASTUtil_Inspector$inspectValueConstructor(config),
+					c,
+					typeDecl.constructors);
+			},
+			typeDecl,
+			context);
 	});
 var _user$project$ASTUtil_Inspector$inspectTypeAlias = F3(
 	function (config, typeAlias, context) {
@@ -25832,7 +25845,9 @@ var _user$project$ASTUtil_Inspector$Config = function (a) {
 														return function (o) {
 															return function (p) {
 																return function (q) {
-																	return {onFile: a, onImport: b, onFunction: c, onFunctionSignature: d, onPortDeclaration: e, onTypeAlias: f, onDestructuring: g, onExpression: h, onOperatorApplication: i, onTypeAnnotation: j, onLambda: k, onLetBlock: l, onCase: m, onFunctionOrValue: n, onPrefixOperator: o, onRecordAccess: p, onRecordUpdate: q};
+																	return function (r) {
+																		return {onFile: a, onImport: b, onFunction: c, onFunctionSignature: d, onPortDeclaration: e, onTypeAlias: f, onType: g, onDestructuring: h, onExpression: i, onOperatorApplication: j, onTypeAnnotation: k, onLambda: l, onLetBlock: m, onCase: n, onFunctionOrValue: o, onPrefixOperator: p, onRecordAccess: q, onRecordUpdate: r};
+																	};
 																};
 															};
 														};
@@ -25860,7 +25875,7 @@ var _user$project$ASTUtil_Inspector$Pre = function (a) {
 	return {ctor: 'Pre', _0: a};
 };
 var _user$project$ASTUtil_Inspector$Continue = {ctor: 'Continue'};
-var _user$project$ASTUtil_Inspector$defaultConfig = {onFile: _user$project$ASTUtil_Inspector$Continue, onImport: _user$project$ASTUtil_Inspector$Continue, onFunction: _user$project$ASTUtil_Inspector$Continue, onPortDeclaration: _user$project$ASTUtil_Inspector$Continue, onFunctionSignature: _user$project$ASTUtil_Inspector$Continue, onTypeAnnotation: _user$project$ASTUtil_Inspector$Continue, onTypeAlias: _user$project$ASTUtil_Inspector$Continue, onDestructuring: _user$project$ASTUtil_Inspector$Continue, onExpression: _user$project$ASTUtil_Inspector$Continue, onLambda: _user$project$ASTUtil_Inspector$Continue, onOperatorApplication: _user$project$ASTUtil_Inspector$Continue, onLetBlock: _user$project$ASTUtil_Inspector$Continue, onCase: _user$project$ASTUtil_Inspector$Continue, onFunctionOrValue: _user$project$ASTUtil_Inspector$Continue, onPrefixOperator: _user$project$ASTUtil_Inspector$Continue, onRecordAccess: _user$project$ASTUtil_Inspector$Continue, onRecordUpdate: _user$project$ASTUtil_Inspector$Continue};
+var _user$project$ASTUtil_Inspector$defaultConfig = {onFile: _user$project$ASTUtil_Inspector$Continue, onImport: _user$project$ASTUtil_Inspector$Continue, onFunction: _user$project$ASTUtil_Inspector$Continue, onPortDeclaration: _user$project$ASTUtil_Inspector$Continue, onFunctionSignature: _user$project$ASTUtil_Inspector$Continue, onTypeAnnotation: _user$project$ASTUtil_Inspector$Continue, onType: _user$project$ASTUtil_Inspector$Continue, onTypeAlias: _user$project$ASTUtil_Inspector$Continue, onDestructuring: _user$project$ASTUtil_Inspector$Continue, onExpression: _user$project$ASTUtil_Inspector$Continue, onLambda: _user$project$ASTUtil_Inspector$Continue, onOperatorApplication: _user$project$ASTUtil_Inspector$Continue, onLetBlock: _user$project$ASTUtil_Inspector$Continue, onCase: _user$project$ASTUtil_Inspector$Continue, onFunctionOrValue: _user$project$ASTUtil_Inspector$Continue, onPrefixOperator: _user$project$ASTUtil_Inspector$Continue, onRecordAccess: _user$project$ASTUtil_Inspector$Continue, onRecordUpdate: _user$project$ASTUtil_Inspector$Continue};
 var _user$project$ASTUtil_Inspector$Skip = {ctor: 'Skip'};
 
 var _user$project$ASTUtil_PatternOptimizer$isAllPattern = function (p) {
@@ -26683,26 +26698,40 @@ var _user$project$Analyser_CodeBase$addSourceFiles = F2(
 				}));
 	});
 
+var _user$project$Analyser_FileContext$moduleName = function (rf) {
+	var _p0 = _stil4m$elm_syntax$Elm_RawFile$moduleName(rf);
+	if (_p0.ctor === 'Nothing') {
+		return _elm_lang$core$Native_Utils.crashCase(
+			'Analyser.FileContext',
+			{
+				start: {line: 16, column: 5},
+				end: {line: 21, column: 14}
+			},
+			_p0)('Legacy');
+	} else {
+		return _p0._0;
+	}
+};
 var _user$project$Analyser_FileContext$buildForFile = F2(
-	function (moduleIndex, _p0) {
-		var _p1 = _p0;
-		var _p4 = _p1._0;
-		var _p2 = _p1._1;
-		if (_p2.ctor === 'Err') {
+	function (moduleIndex, _p2) {
+		var _p3 = _p2;
+		var _p6 = _p3._0;
+		var _p4 = _p3._1;
+		if (_p4.ctor === 'Err') {
 			return _elm_lang$core$Maybe$Nothing;
 		} else {
-			var _p3 = _p2._0;
+			var _p5 = _p4._0;
 			return _elm_lang$core$Maybe$Just(
 				{
-					moduleName: _stil4m$elm_syntax$Elm_RawFile$moduleName(_p3),
-					ast: A2(_stil4m$elm_syntax$Elm_Processing$process, moduleIndex, _p3),
+					moduleName: _user$project$Analyser_FileContext$moduleName(_p5),
+					ast: A2(_stil4m$elm_syntax$Elm_Processing$process, moduleIndex, _p5),
 					file: {
-						path: _p4.path,
-						version: A2(_elm_lang$core$Maybe$withDefault, '', _p4.sha1)
+						path: _p6.path,
+						version: A2(_elm_lang$core$Maybe$withDefault, '', _p6.sha1)
 					},
-					content: A2(_elm_lang$core$Maybe$withDefault, '', _p4.content),
-					$interface: _stil4m$elm_syntax$Elm_Interface$build(_p3),
-					formatted: _p4.formatted
+					content: A2(_elm_lang$core$Maybe$withDefault, '', _p6.content),
+					$interface: _stil4m$elm_syntax$Elm_Interface$build(_p5),
+					formatted: _p6.formatted
 				});
 		}
 	});
@@ -26824,50 +26853,66 @@ var _user$project$Analyser_Messages_Schema$errorProp = F2(
 			A3(_elm_lang$core$Dict$insert, k, _user$project$Analyser_Messages_Schema$ErrorMessage, _p18._0));
 	});
 
-var _user$project$Analyser_Messages_Data$valueAsRange = function (dv) {
+var _user$project$Analyser_Messages_Data$valueAsRangeList = function (dv) {
 	var _p0 = dv;
-	if (_p0.ctor === 'RangeV') {
+	if (_p0.ctor === 'RangeListV') {
 		return _elm_lang$core$Maybe$Just(_p0._0);
 	} else {
 		return _elm_lang$core$Maybe$Nothing;
 	}
 };
+var _user$project$Analyser_Messages_Data$valueAsRange = function (dv) {
+	var _p1 = dv;
+	if (_p1.ctor === 'RangeV') {
+		return _elm_lang$core$Maybe$Just(_p1._0);
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _user$project$Analyser_Messages_Data$getRangeList = F2(
+	function (k, _p2) {
+		var _p3 = _p2;
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			_user$project$Analyser_Messages_Data$valueAsRangeList,
+			A2(_elm_lang$core$Dict$get, k, _p3._1));
+	});
 var _user$project$Analyser_Messages_Data$getRange = F2(
-	function (k, _p1) {
-		var _p2 = _p1;
+	function (k, _p4) {
+		var _p5 = _p4;
 		return A2(
 			_elm_lang$core$Maybe$andThen,
 			_user$project$Analyser_Messages_Data$valueAsRange,
-			A2(_elm_lang$core$Dict$get, k, _p2._1));
+			A2(_elm_lang$core$Dict$get, k, _p5._1));
 	});
 var _user$project$Analyser_Messages_Data$encodeDataValue = function (dataValue) {
-	var _p3 = dataValue;
-	switch (_p3.ctor) {
+	var _p6 = dataValue;
+	switch (_p6.ctor) {
 		case 'RangeV':
-			return _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p3._0);
+			return _stil4m$elm_syntax$Elm_Syntax_Range$encode(_p6._0);
 		case 'FileNameV':
-			return _elm_lang$core$Json_Encode$string(_p3._0);
+			return _elm_lang$core$Json_Encode$string(_p6._0);
 		case 'VariableNameV':
-			return _elm_lang$core$Json_Encode$string(_p3._0);
+			return _elm_lang$core$Json_Encode$string(_p6._0);
 		case 'RangeListV':
 			return _elm_lang$core$Json_Encode$list(
-				A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Syntax_Range$encode, _p3._0));
+				A2(_elm_lang$core$List$map, _stil4m$elm_syntax$Elm_Syntax_Range$encode, _p6._0));
 		case 'ModuleNameV':
 			return _elm_lang$core$Json_Encode$list(
-				A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, _p3._0));
+				A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, _p6._0));
 		default:
-			return _elm_lang$core$Json_Encode$string(_p3._0);
+			return _elm_lang$core$Json_Encode$string(_p6._0);
 	}
 };
-var _user$project$Analyser_Messages_Data$encode = function (_p4) {
-	var _p5 = _p4;
+var _user$project$Analyser_Messages_Data$encode = function (_p7) {
+	var _p8 = _p7;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'description',
-				_1: _elm_lang$core$Json_Encode$string(_p5._0)
+				_1: _elm_lang$core$Json_Encode$string(_p8._0)
 			},
 			_1: {
 				ctor: '::',
@@ -26878,49 +26923,49 @@ var _user$project$Analyser_Messages_Data$encode = function (_p4) {
 						A2(
 							_elm_lang$core$List$map,
 							_elm_lang$core$Tuple$mapSecond(_user$project$Analyser_Messages_Data$encodeDataValue),
-							_elm_lang$core$Dict$toList(_p5._1)))
+							_elm_lang$core$Dict$toList(_p8._1)))
 				},
 				_1: {ctor: '[]'}
 			}
 		});
 };
 var _user$project$Analyser_Messages_Data$dataValueRanges = function (dv) {
-	var _p6 = dv;
-	switch (_p6.ctor) {
+	var _p9 = dv;
+	switch (_p9.ctor) {
 		case 'RangeV':
 			return {
 				ctor: '::',
-				_0: _p6._0,
+				_0: _p9._0,
 				_1: {ctor: '[]'}
 			};
 		case 'RangeListV':
-			return _p6._0;
+			return _p9._0;
 		default:
 			return {ctor: '[]'};
 	}
 };
-var _user$project$Analyser_Messages_Data$getRanges = function (_p7) {
-	var _p8 = _p7;
+var _user$project$Analyser_Messages_Data$getRanges = function (_p10) {
+	var _p11 = _p10;
 	return A2(
 		_elm_lang$core$List$concatMap,
 		_user$project$Analyser_Messages_Data$dataValueRanges,
-		_elm_lang$core$Dict$values(_p8._1));
+		_elm_lang$core$Dict$values(_p11._1));
 };
 var _user$project$Analyser_Messages_Data$firstRange = function (x) {
 	return _elm_lang$core$List$head(
 		_user$project$Analyser_Messages_Data$getRanges(x));
 };
-var _user$project$Analyser_Messages_Data$description = function (_p9) {
-	var _p10 = _p9;
-	return _p10._0;
+var _user$project$Analyser_Messages_Data$description = function (_p12) {
+	var _p13 = _p12;
+	return _p13._0;
 };
 var _user$project$Analyser_Messages_Data$asSchema = function (d) {
 	var applyV = F3(
 		function (k, v, s) {
 			return A2(
 				function () {
-					var _p11 = v;
-					switch (_p11.ctor) {
+					var _p14 = v;
+					switch (_p14.ctor) {
 						case 'RangeV':
 							return _user$project$Analyser_Messages_Schema$rangeProp;
 						case 'FileNameV':
@@ -26941,10 +26986,10 @@ var _user$project$Analyser_Messages_Data$asSchema = function (d) {
 	return A3(_elm_lang$core$Dict$foldl, applyV, _user$project$Analyser_Messages_Schema$schema, d);
 };
 var _user$project$Analyser_Messages_Data$conformToSchema = F2(
-	function (schema, _p12) {
-		var _p13 = _p12;
+	function (schema, _p15) {
+		var _p16 = _p15;
 		return _elm_lang$core$Native_Utils.eq(
-			_user$project$Analyser_Messages_Data$asSchema(_p13._1),
+			_user$project$Analyser_Messages_Data$asSchema(_p16._1),
 			schema);
 	});
 var _user$project$Analyser_Messages_Data$MessageData = F2(
@@ -26952,9 +26997,9 @@ var _user$project$Analyser_Messages_Data$MessageData = F2(
 		return {ctor: 'MessageData', _0: a, _1: b};
 	});
 var _user$project$Analyser_Messages_Data$withDescription = F2(
-	function (desc, _p14) {
-		var _p15 = _p14;
-		return A2(_user$project$Analyser_Messages_Data$MessageData, desc, _p15._1);
+	function (desc, _p17) {
+		var _p18 = _p17;
+		return A2(_user$project$Analyser_Messages_Data$MessageData, desc, _p18._1);
 	});
 var _user$project$Analyser_Messages_Data$init = function (description) {
 	return A2(_user$project$Analyser_Messages_Data$MessageData, description, _elm_lang$core$Dict$empty);
@@ -26963,89 +27008,89 @@ var _user$project$Analyser_Messages_Data$ErrorMessageV = function (a) {
 	return {ctor: 'ErrorMessageV', _0: a};
 };
 var _user$project$Analyser_Messages_Data$addErrorMessage = F3(
-	function (k, v, _p16) {
-		var _p17 = _p16;
+	function (k, v, _p19) {
+		var _p20 = _p19;
 		return A2(
 			_user$project$Analyser_Messages_Data$MessageData,
-			_p17._0,
+			_p20._0,
 			A3(
 				_elm_lang$core$Dict$insert,
 				k,
 				_user$project$Analyser_Messages_Data$ErrorMessageV(v),
-				_p17._1));
+				_p20._1));
 	});
 var _user$project$Analyser_Messages_Data$ModuleNameV = function (a) {
 	return {ctor: 'ModuleNameV', _0: a};
 };
 var _user$project$Analyser_Messages_Data$addModuleName = F3(
-	function (k, v, _p18) {
-		var _p19 = _p18;
+	function (k, v, _p21) {
+		var _p22 = _p21;
 		return A2(
 			_user$project$Analyser_Messages_Data$MessageData,
-			_p19._0,
+			_p22._0,
 			A3(
 				_elm_lang$core$Dict$insert,
 				k,
 				_user$project$Analyser_Messages_Data$ModuleNameV(v),
-				_p19._1));
+				_p22._1));
 	});
 var _user$project$Analyser_Messages_Data$RangeListV = function (a) {
 	return {ctor: 'RangeListV', _0: a};
 };
 var _user$project$Analyser_Messages_Data$addRanges = F3(
-	function (k, v, _p20) {
-		var _p21 = _p20;
+	function (k, v, _p23) {
+		var _p24 = _p23;
 		return A2(
 			_user$project$Analyser_Messages_Data$MessageData,
-			_p21._0,
+			_p24._0,
 			A3(
 				_elm_lang$core$Dict$insert,
 				k,
 				_user$project$Analyser_Messages_Data$RangeListV(v),
-				_p21._1));
+				_p24._1));
 	});
 var _user$project$Analyser_Messages_Data$VariableNameV = function (a) {
 	return {ctor: 'VariableNameV', _0: a};
 };
 var _user$project$Analyser_Messages_Data$addVarName = F3(
-	function (k, v, _p22) {
-		var _p23 = _p22;
+	function (k, v, _p25) {
+		var _p26 = _p25;
 		return A2(
 			_user$project$Analyser_Messages_Data$MessageData,
-			_p23._0,
+			_p26._0,
 			A3(
 				_elm_lang$core$Dict$insert,
 				k,
 				_user$project$Analyser_Messages_Data$VariableNameV(v),
-				_p23._1));
+				_p26._1));
 	});
 var _user$project$Analyser_Messages_Data$FileNameV = function (a) {
 	return {ctor: 'FileNameV', _0: a};
 };
 var _user$project$Analyser_Messages_Data$addFileName = F3(
-	function (k, v, _p24) {
-		var _p25 = _p24;
+	function (k, v, _p27) {
+		var _p28 = _p27;
 		return A2(
 			_user$project$Analyser_Messages_Data$MessageData,
-			_p25._0,
+			_p28._0,
 			A3(
 				_elm_lang$core$Dict$insert,
 				k,
 				_user$project$Analyser_Messages_Data$FileNameV(v),
-				_p25._1));
+				_p28._1));
 	});
 var _user$project$Analyser_Messages_Data$RangeV = function (a) {
 	return {ctor: 'RangeV', _0: a};
 };
 var _user$project$Analyser_Messages_Data$schemaDecoder = F2(
 	function (key, schema) {
-		var _p26 = A2(_user$project$Analyser_Messages_Schema$propertyTypeForKey, key, schema);
-		if (_p26.ctor === 'Nothing') {
+		var _p29 = A2(_user$project$Analyser_Messages_Schema$propertyTypeForKey, key, schema);
+		if (_p29.ctor === 'Nothing') {
 			return _elm_lang$core$Json_Decode$fail(
 				A2(_elm_lang$core$Basics_ops['++'], 'Unknown property key: ', key));
 		} else {
-			var _p27 = _p26._0;
-			switch (_p27.ctor) {
+			var _p30 = _p29._0;
+			switch (_p30.ctor) {
 				case 'Range':
 					return A2(_elm_lang$core$Json_Decode$map, _user$project$Analyser_Messages_Data$RangeV, _stil4m$elm_syntax$Elm_Syntax_Range$decode);
 				case 'FileName':
@@ -27098,16 +27143,16 @@ var _user$project$Analyser_Messages_Data$decode = function (schema) {
 			_user$project$Analyser_Messages_Data$decodeDataValues(schema)));
 };
 var _user$project$Analyser_Messages_Data$addRange = F3(
-	function (k, v, _p28) {
-		var _p29 = _p28;
+	function (k, v, _p31) {
+		var _p32 = _p31;
 		return A2(
 			_user$project$Analyser_Messages_Data$MessageData,
-			_p29._0,
+			_p32._0,
 			A3(
 				_elm_lang$core$Dict$insert,
 				k,
 				_user$project$Analyser_Messages_Data$RangeV(v),
-				_p29._1));
+				_p32._1));
 	});
 
 var _user$project$Analyser_Checks_Base$Checker = F2(
@@ -27118,6 +27163,69 @@ var _user$project$Analyser_Checks_Base$CheckerInfo = F4(
 	function (a, b, c, d) {
 		return {key: a, name: b, description: c, schema: d};
 	});
+
+var _user$project$Analyser_Checks_BooleanCase$isBooleanCase = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1._0._1;
+	if ((_p2.ctor === 'NamedPattern') && (_p2._1.ctor === '[]')) {
+		var _p3 = _p2._0;
+		return _elm_lang$core$Native_Utils.eq(
+			_p3.moduleName,
+			{ctor: '[]'}) && (_elm_lang$core$Native_Utils.eq(_p3.name, 'True') || _elm_lang$core$Native_Utils.eq(_p3.name, 'False'));
+	} else {
+		return false;
+	}
+};
+var _user$project$Analyser_Checks_BooleanCase$onExpression = F2(
+	function (_p4, context) {
+		var _p5 = _p4;
+		var _p7 = _p5._0;
+		var _p6 = _p5._1;
+		if (_p6.ctor === 'CaseExpression') {
+			return A2(_elm_lang$core$List$any, _user$project$Analyser_Checks_BooleanCase$isBooleanCase, _p6._0.cases) ? {
+				ctor: '::',
+				_0: A3(
+					_user$project$Analyser_Messages_Data$addRange,
+					'range',
+					_p7,
+					_user$project$Analyser_Messages_Data$init(
+						_elm_lang$core$String$concat(
+							{
+								ctor: '::',
+								_0: 'Use an if-block instead of an case expression ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$AST_Ranges$rangeToString(_p7),
+									_1: {ctor: '[]'}
+								}
+							}))),
+				_1: context
+			} : context;
+		} else {
+			return context;
+		}
+	});
+var _user$project$Analyser_Checks_BooleanCase$scan = F2(
+	function (fileContext, _p8) {
+		return A3(
+			_user$project$ASTUtil_Inspector$inspect,
+			_elm_lang$core$Native_Utils.update(
+				_user$project$ASTUtil_Inspector$defaultConfig,
+				{
+					onExpression: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_BooleanCase$onExpression)
+				}),
+			fileContext.ast,
+			{ctor: '[]'});
+	});
+var _user$project$Analyser_Checks_BooleanCase$checker = {
+	check: _user$project$Analyser_Checks_BooleanCase$scan,
+	info: {
+		key: 'Boolean Case',
+		name: 'Boolean Case Expression',
+		description: 'If you case over a boolean value, it maybe better to use an if expression.',
+		schema: A2(_user$project$Analyser_Messages_Schema$rangeProp, 'range', _user$project$Analyser_Messages_Schema$schema)
+	}
+};
 
 var _user$project$Analyser_Checks_CoreArrayUsage$isArrayImport = function (_p0) {
 	var _p1 = _p0;
@@ -27352,25 +27460,33 @@ var _user$project$Analyser_Checks_DropConsOfItemAndList$onExpression = F2(
 	function (_p0, context) {
 		var _p1 = _p0;
 		var _p2 = _p1._1;
-		if ((((_p2.ctor === 'OperatorApplication') && (_p2._0 === '::')) && (_p2._3.ctor === '_Tuple2')) && (_p2._3._1.ctor === 'ListExpr')) {
+		if (((((_p2.ctor === 'OperatorApplication') && (_p2._0 === '::')) && (_p2._2.ctor === '_Tuple2')) && (_p2._3.ctor === '_Tuple2')) && (_p2._3._1.ctor === 'ListExpr')) {
 			var range = _p1._0;
 			return {
 				ctor: '::',
 				_0: A3(
 					_user$project$Analyser_Messages_Data$addRange,
-					'range',
-					range,
-					_user$project$Analyser_Messages_Data$init(
-						_elm_lang$core$String$concat(
-							{
-								ctor: '::',
-								_0: 'Adding an item to the front of a literal list, but instead you can just put it in the list. At ',
-								_1: {
-									ctor: '::',
-									_0: _user$project$AST_Ranges$rangeToString(range),
-									_1: {ctor: '[]'}
-								}
-							}))),
+					'tail',
+					_p2._3._0,
+					A3(
+						_user$project$Analyser_Messages_Data$addRange,
+						'head',
+						_p2._2._0,
+						A3(
+							_user$project$Analyser_Messages_Data$addRange,
+							'range',
+							range,
+							_user$project$Analyser_Messages_Data$init(
+								_elm_lang$core$String$concat(
+									{
+										ctor: '::',
+										_0: 'Adding an item to the front of a literal list, but instead you can just put it in the list. At ',
+										_1: {
+											ctor: '::',
+											_0: _user$project$AST_Ranges$rangeToString(range),
+											_1: {ctor: '[]'}
+										}
+									}))))),
 				_1: context
 			};
 		} else {
@@ -27394,8 +27510,14 @@ var _user$project$Analyser_Checks_DropConsOfItemAndList$checker = {
 	info: {
 		key: 'DropConsOfItemAndList',
 		name: 'Drop Cons Of Item And List',
-		description: 'If you cons an item to a literal list (x :x [1, 2, 3]), then you can just put the item into the list.',
-		schema: A2(_user$project$Analyser_Messages_Schema$rangeProp, 'range', _user$project$Analyser_Messages_Schema$schema)
+		description: 'If you cons an item to a literal list (x :: [1, 2, 3]), then you can just put the item into the list.',
+		schema: A2(
+			_user$project$Analyser_Messages_Schema$rangeProp,
+			'tail',
+			A2(
+				_user$project$Analyser_Messages_Schema$rangeProp,
+				'head',
+				A2(_user$project$Analyser_Messages_Schema$rangeProp, 'range', _user$project$Analyser_Messages_Schema$schema)))
 	}
 };
 
@@ -27844,7 +27966,7 @@ var _user$project$Analyser_Checks_DuplicateRecordFieldUpdate$checker = {
 
 var _user$project$Analyser_Checks_ExposeAll$onFile = F3(
 	function (_p1, file, _p0) {
-		var _p2 = _user$project$AST_Util$fileExposingList(file);
+		var _p2 = _stil4m$elm_syntax$Elm_Syntax_Module$exposingList(file.moduleDefinition);
 		if (_p2.ctor === 'All') {
 			var range = _p2._0;
 			return {
@@ -28040,6 +28162,71 @@ var _user$project$Analyser_Checks_ImportAll$checker = {
 			_user$project$Analyser_Messages_Schema$moduleProp,
 			'moduleName',
 			A2(_user$project$Analyser_Messages_Schema$rangeProp, 'range', _user$project$Analyser_Messages_Schema$schema))
+	}
+};
+
+var _user$project$Analyser_Checks_MapNothingToNothing$buildMessage = function (r) {
+	return A3(
+		_user$project$Analyser_Messages_Data$addRange,
+		'range',
+		r,
+		_user$project$Analyser_Messages_Data$init(
+			_elm_lang$core$String$concat(
+				{
+					ctor: '::',
+					_0: '`Nothing` mapped to `Nothing` in case expression, but instead you can use `Maybe.map` or `Maybe.andThen`. At ',
+					_1: {
+						ctor: '::',
+						_0: _user$project$AST_Ranges$rangeToString(r),
+						_1: {ctor: '[]'}
+					}
+				})));
+};
+var _user$project$Analyser_Checks_MapNothingToNothing$isNothingExpression = function (expression) {
+	return _elm_lang$core$Native_Utils.eq(
+		expression,
+		_stil4m$elm_syntax$Elm_Syntax_Expression$FunctionOrValue('Nothing'));
+};
+var _user$project$Analyser_Checks_MapNothingToNothing$isNothingPattern = function (pattern) {
+	return _elm_lang$core$Native_Utils.eq(
+		pattern,
+		A2(
+			_stil4m$elm_syntax$Elm_Syntax_Pattern$NamedPattern,
+			{
+				moduleName: {ctor: '[]'},
+				name: 'Nothing'
+			},
+			{ctor: '[]'}));
+};
+var _user$project$Analyser_Checks_MapNothingToNothing$onCase = F3(
+	function (_p1, _p0, context) {
+		var _p2 = _p0;
+		return (_user$project$Analyser_Checks_MapNothingToNothing$isNothingPattern(_p2._0._1) && _user$project$Analyser_Checks_MapNothingToNothing$isNothingExpression(_p2._1._1)) ? {
+			ctor: '::',
+			_0: _user$project$Analyser_Checks_MapNothingToNothing$buildMessage(
+				{start: _p2._0._0.start, end: _p2._1._0.end}),
+			_1: context
+		} : context;
+	});
+var _user$project$Analyser_Checks_MapNothingToNothing$scan = F2(
+	function (fileContext, _p3) {
+		return A3(
+			_user$project$ASTUtil_Inspector$inspect,
+			_elm_lang$core$Native_Utils.update(
+				_user$project$ASTUtil_Inspector$defaultConfig,
+				{
+					onCase: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_MapNothingToNothing$onCase)
+				}),
+			fileContext.ast,
+			{ctor: '[]'});
+	});
+var _user$project$Analyser_Checks_MapNothingToNothing$checker = {
+	check: _user$project$Analyser_Checks_MapNothingToNothing$scan,
+	info: {
+		key: 'MapNothingToNothing',
+		name: 'Map Nothing To Nothing',
+		description: 'Do not map a `Nothing` to `Nothing` with a case expression. Use `andThen` or `map` instead.',
+		schema: A2(_user$project$Analyser_Messages_Schema$rangeProp, 'range', _user$project$Analyser_Messages_Schema$schema)
 	}
 };
 
@@ -28264,20 +28451,23 @@ var _user$project$Analyser_Checks_NoUncurriedPrefix$onExpression = F2(
 	function (_p0, context) {
 		var _p1 = _p0;
 		var _p2 = _p1._1;
-		if (_p2.ctor === 'Application') {
-			var _p3 = _p2._0;
-			if ((((((_p3.ctor === '::') && (_p3._0.ctor === '_Tuple2')) && (_p3._0._1.ctor === 'PrefixOperator')) && (_p3._1.ctor === '::')) && (_p3._1._1.ctor === '::')) && (_p3._1._1._1.ctor === '[]')) {
-				var _p4 = _p3._0._1._0;
-				if (A2(_elm_lang$core$String$startsWith, ',,', _p4)) {
-					return context;
-				} else {
-					var range = _p3._0._0;
-					return {
-						ctor: '::',
-						_0: A3(
+		if (((((((((_p2.ctor === 'Application') && (_p2._0.ctor === '::')) && (_p2._0._0.ctor === '_Tuple2')) && (_p2._0._0._1.ctor === 'PrefixOperator')) && (_p2._0._1.ctor === '::')) && (_p2._0._1._0.ctor === '_Tuple2')) && (_p2._0._1._1.ctor === '::')) && (_p2._0._1._1._0.ctor === '_Tuple2')) && (_p2._0._1._1._1.ctor === '[]')) {
+			var _p4 = _p2._0._0._1._0;
+			var _p3 = _p2._0._0._0;
+			return A2(_elm_lang$core$String$startsWith, ',,', _p4) ? context : {
+				ctor: '::',
+				_0: A3(
+					_user$project$Analyser_Messages_Data$addRange,
+					'arg2',
+					_p2._0._1._1._0._0,
+					A3(
+						_user$project$Analyser_Messages_Data$addRange,
+						'arg1',
+						_p2._0._1._0._0,
+						A3(
 							_user$project$Analyser_Messages_Data$addRange,
 							'range',
-							range,
+							_p3,
 							A3(
 								_user$project$Analyser_Messages_Data$addVarName,
 								'varName',
@@ -28295,18 +28485,14 @@ var _user$project$Analyser_Checks_NoUncurriedPrefix$onExpression = F2(
 													_0: '` is unneeded in at ',
 													_1: {
 														ctor: '::',
-														_0: _user$project$AST_Ranges$rangeToString(range),
+														_0: _user$project$AST_Ranges$rangeToString(_p3),
 														_1: {ctor: '[]'}
 													}
 												}
 											}
-										})))),
-						_1: context
-					};
-				}
-			} else {
-				return context;
-			}
+										})))))),
+				_1: context
+			};
 		} else {
 			return context;
 		}
@@ -28330,9 +28516,15 @@ var _user$project$Analyser_Checks_NoUncurriedPrefix$checker = {
 		name: 'Fully Applied Operator as Prefix',
 		description: 'It\'s not needed to use an operator in prefix notation when you apply both arguments directly.',
 		schema: A2(
-			_user$project$Analyser_Messages_Schema$varProp,
-			'varName',
-			A2(_user$project$Analyser_Messages_Schema$rangeProp, 'range', _user$project$Analyser_Messages_Schema$schema))
+			_user$project$Analyser_Messages_Schema$rangeProp,
+			'arg2',
+			A2(
+				_user$project$Analyser_Messages_Schema$rangeProp,
+				'arg1',
+				A2(
+					_user$project$Analyser_Messages_Schema$rangeProp,
+					'range',
+					A2(_user$project$Analyser_Messages_Schema$varProp, 'varName', _user$project$Analyser_Messages_Schema$schema))))
 	}
 };
 
@@ -28666,19 +28858,65 @@ var _user$project$Analyser_Checks_SingleFieldRecord$findPlainRecords = function 
 	}
 };
 var _user$project$Analyser_Checks_SingleFieldRecord$onTypeAnnotation = F2(
-	function (x, context) {
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			_user$project$Analyser_Checks_SingleFieldRecord$findPlainRecords(x),
-			context);
+	function (_p3, context) {
+		var _p4 = _p3;
+		var newWhitelisted = function () {
+			var _p5 = _p4._1;
+			if (_p5.ctor === 'Typed') {
+				return A2(
+					F2(
+						function (x, y) {
+							return A2(_elm_lang$core$Basics_ops['++'], x, y);
+						}),
+					context.whitelisted,
+					A2(
+						_elm_lang$core$List$map,
+						_elm_lang$core$Tuple$first,
+						A2(
+							_elm_lang$core$List$filter,
+							function (_p6) {
+								var _p7 = _p6;
+								var _p8 = _p7._1;
+								if (_p8.ctor === 'Record') {
+									return true;
+								} else {
+									return false;
+								}
+							},
+							_p5._2)));
+			} else {
+				return context.whitelisted;
+			}
+		}();
+		return _elm_lang$core$Native_Utils.update(
+			context,
+			{
+				matches: A2(
+					_elm_lang$core$Basics_ops['++'],
+					_user$project$Analyser_Checks_SingleFieldRecord$findPlainRecords(_p4),
+					context.matches),
+				whitelisted: A2(_elm_lang$core$Basics_ops['++'], context.whitelisted, newWhitelisted)
+			});
 	});
 var _user$project$Analyser_Checks_SingleFieldRecord$isSingleFieldRecord = function (x) {
 	return _elm_lang$core$Native_Utils.eq(
 		_elm_lang$core$List$length(x),
 		1);
 };
+var _user$project$Analyser_Checks_SingleFieldRecord$realMatches = function (_p9) {
+	var _p10 = _p9;
+	return A2(
+		_elm_lang$core$List$filter,
+		function (m) {
+			return !A2(
+				_elm_lang$core$List$member,
+				_elm_lang$core$Tuple$first(m),
+				_p10.whitelisted);
+		},
+		_p10.matches);
+};
 var _user$project$Analyser_Checks_SingleFieldRecord$scan = F2(
-	function (fileContext, _p3) {
+	function (fileContext, _p11) {
 		return A2(
 			_elm_lang$core$List$map,
 			function (r) {
@@ -28703,19 +28941,23 @@ var _user$project$Analyser_Checks_SingleFieldRecord$scan = F2(
 				_elm_lang$core$Tuple$first,
 				A2(
 					_elm_lang$core$List$filter,
-					function (_p4) {
+					function (_p12) {
 						return _user$project$Analyser_Checks_SingleFieldRecord$isSingleFieldRecord(
-							_elm_lang$core$Tuple$second(_p4));
+							_elm_lang$core$Tuple$second(_p12));
 					},
-					A3(
-						_user$project$ASTUtil_Inspector$inspect,
-						_elm_lang$core$Native_Utils.update(
-							_user$project$ASTUtil_Inspector$defaultConfig,
+					_user$project$Analyser_Checks_SingleFieldRecord$realMatches(
+						A3(
+							_user$project$ASTUtil_Inspector$inspect,
+							_elm_lang$core$Native_Utils.update(
+								_user$project$ASTUtil_Inspector$defaultConfig,
+								{
+									onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_SingleFieldRecord$onTypeAnnotation)
+								}),
+							fileContext.ast,
 							{
-								onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_SingleFieldRecord$onTypeAnnotation)
-							}),
-						fileContext.ast,
-						{ctor: '[]'}))));
+								whitelisted: {ctor: '[]'},
+								matches: {ctor: '[]'}
+							})))));
 	});
 var _user$project$Analyser_Checks_SingleFieldRecord$checker = {
 	check: _user$project$Analyser_Checks_SingleFieldRecord$scan,
@@ -28726,6 +28968,10 @@ var _user$project$Analyser_Checks_SingleFieldRecord$checker = {
 		schema: A2(_user$project$Analyser_Messages_Schema$rangeProp, 'range', _user$project$Analyser_Messages_Schema$schema)
 	}
 };
+var _user$project$Analyser_Checks_SingleFieldRecord$Context = F2(
+	function (a, b) {
+		return {whitelisted: a, matches: b};
+	});
 
 var _user$project$Analyser_Checks_TriggerWords$normalizeWord = _elm_lang$core$String$toLower;
 var _user$project$Analyser_Checks_TriggerWords$splitRegex = _elm_lang$core$Regex$regex('[^\\w]+');
@@ -28911,11 +29157,21 @@ var _user$project$Analyser_Checks_UnnecessaryListConcat$checker = {
 	}
 };
 
+var _user$project$Analyser_Checks_UnnecessaryParens$getParenthesized = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1._1;
+	if (_p2.ctor === 'ParenthesizedExpression') {
+		return _elm_lang$core$Maybe$Just(
+			{ctor: '_Tuple2', _0: _p1._0, _1: _p2._0});
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
 var _user$project$Analyser_Checks_UnnecessaryParens$onParenthesizedExpression = F3(
-	function (range, _p0, context) {
-		var _p1 = _p0;
-		var _p2 = _p1._1;
-		switch (_p2.ctor) {
+	function (range, _p3, context) {
+		var _p4 = _p3;
+		var _p5 = _p4._1;
+		switch (_p5.ctor) {
 			case 'RecordAccess':
 				return {ctor: '::', _0: range, _1: context};
 			case 'RecordAccessFunction':
@@ -28944,28 +29200,29 @@ var _user$project$Analyser_Checks_UnnecessaryParens$onParenthesizedExpression = 
 				return context;
 		}
 	});
-var _user$project$Analyser_Checks_UnnecessaryParens$operatorHandSideAllowedParens = function (expr) {
+var _user$project$Analyser_Checks_UnnecessaryParens$operatorHandSideAllowedParens = function (_p6) {
+	var _p7 = _p6;
 	return A2(
 		_elm_lang$core$List$any,
 		F2(
 			function (x, y) {
 				return y(x);
-			})(expr),
+			})(_p7._1),
 		{
 			ctor: '::',
-			_0: _user$project$AST_Util$isOperatorApplication,
+			_0: _stil4m$elm_syntax$Elm_Syntax_Expression$isOperatorApplication,
 			_1: {
 				ctor: '::',
-				_0: _user$project$AST_Util$isIf,
+				_0: _stil4m$elm_syntax$Elm_Syntax_Expression$isIfElse,
 				_1: {
 					ctor: '::',
-					_0: _user$project$AST_Util$isCase,
+					_0: _stil4m$elm_syntax$Elm_Syntax_Expression$isCase,
 					_1: {
 						ctor: '::',
-						_0: _user$project$AST_Util$isLet,
+						_0: _stil4m$elm_syntax$Elm_Syntax_Expression$isLet,
 						_1: {
 							ctor: '::',
-							_0: _user$project$AST_Util$isLambda,
+							_0: _stil4m$elm_syntax$Elm_Syntax_Expression$isLambda,
 							_1: {ctor: '[]'}
 						}
 					}
@@ -28974,19 +29231,19 @@ var _user$project$Analyser_Checks_UnnecessaryParens$operatorHandSideAllowedParen
 		});
 };
 var _user$project$Analyser_Checks_UnnecessaryParens$onOperatorApplication = F2(
-	function (_p3, context) {
-		var _p4 = _p3;
-		var fixHandSide = function (_p5) {
+	function (_p8, context) {
+		var _p9 = _p8;
+		var fixHandSide = function (_p10) {
 			return A2(
 				_elm_lang$core$Maybe$map,
 				_elm_lang$core$Tuple$first,
 				A2(
 					_elm_community$maybe_extra$Maybe_Extra$filter,
-					function (_p6) {
+					function (_p11) {
 						return !_user$project$Analyser_Checks_UnnecessaryParens$operatorHandSideAllowedParens(
-							_elm_lang$core$Tuple$second(_p6));
+							_elm_lang$core$Tuple$second(_p11));
 					},
-					_user$project$AST_Util$getParenthesized(_p5)));
+					_user$project$Analyser_Checks_UnnecessaryParens$getParenthesized(_p10)));
 		};
 		return A3(
 			_elm_lang$core$Basics$flip,
@@ -29000,10 +29257,10 @@ var _user$project$Analyser_Checks_UnnecessaryParens$onOperatorApplication = F2(
 				_elm_lang$core$Basics$identity,
 				{
 					ctor: '::',
-					_0: fixHandSide(_p4._2),
+					_0: fixHandSide(_p9._2),
 					_1: {
 						ctor: '::',
-						_0: fixHandSide(_p4._3),
+						_0: fixHandSide(_p9._3),
 						_1: {ctor: '[]'}
 					}
 				}));
@@ -29027,19 +29284,21 @@ var _user$project$Analyser_Checks_UnnecessaryParens$onApplication = F2(
 					_elm_lang$core$Tuple$first,
 					A2(
 						_elm_community$maybe_extra$Maybe_Extra$filter,
-						function (_p7) {
-							return !_user$project$AST_Util$isCase(
-								_elm_lang$core$Tuple$second(_p7));
+						function (_p12) {
+							return !_stil4m$elm_syntax$Elm_Syntax_Expression$isCase(
+								_elm_lang$core$Tuple$second(
+									_elm_lang$core$Tuple$second(_p12)));
 						},
 						A2(
 							_elm_community$maybe_extra$Maybe_Extra$filter,
-							function (_p8) {
-								return !_user$project$AST_Util$isOperatorApplication(
-									_elm_lang$core$Tuple$second(_p8));
+							function (_p13) {
+								return !_stil4m$elm_syntax$Elm_Syntax_Expression$isOperatorApplication(
+									_elm_lang$core$Tuple$second(
+										_elm_lang$core$Tuple$second(_p13)));
 							},
 							A2(
 								_elm_lang$core$Maybe$andThen,
-								_user$project$AST_Util$getParenthesized,
+								_user$project$Analyser_Checks_UnnecessaryParens$getParenthesized,
 								_elm_lang$core$List$head(parts)))))));
 	});
 var _user$project$Analyser_Checks_UnnecessaryParens$onIfBlock = F4(
@@ -29056,7 +29315,7 @@ var _user$project$Analyser_Checks_UnnecessaryParens$onIfBlock = F4(
 				_elm_lang$core$Tuple$first,
 				A2(
 					_elm_lang$core$List$filterMap,
-					_user$project$AST_Util$getParenthesized,
+					_user$project$Analyser_Checks_UnnecessaryParens$getParenthesized,
 					{
 						ctor: '::',
 						_0: clause,
@@ -29073,9 +29332,9 @@ var _user$project$Analyser_Checks_UnnecessaryParens$onIfBlock = F4(
 	});
 var _user$project$Analyser_Checks_UnnecessaryParens$onCaseBlock = F2(
 	function (caseBlock, context) {
-		var _p9 = _user$project$AST_Util$getParenthesized(caseBlock.expression);
-		if (_p9.ctor === 'Just') {
-			return {ctor: '::', _0: _p9._0._0, _1: context};
+		var _p14 = _user$project$Analyser_Checks_UnnecessaryParens$getParenthesized(caseBlock.expression);
+		if (_p14.ctor === 'Just') {
+			return {ctor: '::', _0: _p14._0._0, _1: context};
 		} else {
 			return context;
 		}
@@ -29094,9 +29353,9 @@ var _user$project$Analyser_Checks_UnnecessaryParens$onRecord = F2(
 				_elm_lang$core$Tuple$first,
 				A2(
 					_elm_lang$core$List$filterMap,
-					function (_p10) {
-						return _user$project$AST_Util$getParenthesized(
-							_elm_lang$core$Tuple$second(_p10));
+					function (_p15) {
+						return _user$project$Analyser_Checks_UnnecessaryParens$getParenthesized(
+							_elm_lang$core$Tuple$second(_p15));
 					},
 					fields)));
 	});
@@ -29112,7 +29371,7 @@ var _user$project$Analyser_Checks_UnnecessaryParens$onTuple = F2(
 			A2(
 				_elm_lang$core$List$map,
 				_elm_lang$core$Tuple$first,
-				A2(_elm_lang$core$List$filterMap, _user$project$AST_Util$getParenthesized, exprs)));
+				A2(_elm_lang$core$List$filterMap, _user$project$Analyser_Checks_UnnecessaryParens$getParenthesized, exprs)));
 	});
 var _user$project$Analyser_Checks_UnnecessaryParens$onListExpr = F2(
 	function (exprs, context) {
@@ -29126,52 +29385,52 @@ var _user$project$Analyser_Checks_UnnecessaryParens$onListExpr = F2(
 			A2(
 				_elm_lang$core$List$map,
 				_elm_lang$core$Tuple$first,
-				A2(_elm_lang$core$List$filterMap, _user$project$AST_Util$getParenthesized, exprs)));
+				A2(_elm_lang$core$List$filterMap, _user$project$Analyser_Checks_UnnecessaryParens$getParenthesized, exprs)));
 	});
 var _user$project$Analyser_Checks_UnnecessaryParens$onExpression = F2(
-	function (_p11, context) {
-		var _p12 = _p11;
-		var _p13 = _p12._1;
-		switch (_p13.ctor) {
+	function (_p16, context) {
+		var _p17 = _p16;
+		var _p18 = _p17._1;
+		switch (_p18.ctor) {
 			case 'ParenthesizedExpression':
-				return A3(_user$project$Analyser_Checks_UnnecessaryParens$onParenthesizedExpression, _p12._0, _p13._0, context);
+				return A3(_user$project$Analyser_Checks_UnnecessaryParens$onParenthesizedExpression, _p17._0, _p18._0, context);
 			case 'OperatorApplication':
 				return A2(
 					_user$project$Analyser_Checks_UnnecessaryParens$onOperatorApplication,
-					{ctor: '_Tuple4', _0: _p13._0, _1: _p13._1, _2: _p13._2, _3: _p13._3},
+					{ctor: '_Tuple4', _0: _p18._0, _1: _p18._1, _2: _p18._2, _3: _p18._3},
 					context);
 			case 'Application':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onApplication, _p13._0, context);
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onApplication, _p18._0, context);
 			case 'IfBlock':
-				return A4(_user$project$Analyser_Checks_UnnecessaryParens$onIfBlock, _p13._0, _p13._1, _p13._2, context);
+				return A4(_user$project$Analyser_Checks_UnnecessaryParens$onIfBlock, _p18._0, _p18._1, _p18._2, context);
 			case 'CaseExpression':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onCaseBlock, _p13._0, context);
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onCaseBlock, _p18._0, context);
 			case 'RecordExpr':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onRecord, _p13._0, context);
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onRecord, _p18._0, context);
 			case 'RecordUpdateExpression':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onRecord, _p13._0.updates, context);
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onRecord, _p18._0.updates, context);
 			case 'TupledExpression':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onTuple, _p13._0, context);
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onTuple, _p18._0, context);
 			case 'ListExpr':
-				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onListExpr, _p13._0, context);
+				return A2(_user$project$Analyser_Checks_UnnecessaryParens$onListExpr, _p18._0, context);
 			default:
 				return context;
 		}
 	});
 var _user$project$Analyser_Checks_UnnecessaryParens$onLambda = F2(
 	function (lambda, context) {
-		var _p14 = lambda.expression;
-		if ((_p14.ctor === '_Tuple2') && (_p14._1.ctor === 'ParenthesizedExpression')) {
-			return {ctor: '::', _0: _p14._0, _1: context};
+		var _p19 = lambda.expression;
+		if ((_p19.ctor === '_Tuple2') && (_p19._1.ctor === 'ParenthesizedExpression')) {
+			return {ctor: '::', _0: _p19._0, _1: context};
 		} else {
 			return context;
 		}
 	});
 var _user$project$Analyser_Checks_UnnecessaryParens$onFunction = F2(
 	function ($function, context) {
-		var _p15 = $function.declaration.expression;
-		if ((_p15.ctor === '_Tuple2') && (_p15._1.ctor === 'ParenthesizedExpression')) {
-			return {ctor: '::', _0: _p15._0, _1: context};
+		var _p20 = $function.declaration.expression;
+		if ((_p20.ctor === '_Tuple2') && (_p20._1.ctor === 'ParenthesizedExpression')) {
+			return {ctor: '::', _0: _p20._0, _1: context};
 		} else {
 			return context;
 		}
@@ -29194,7 +29453,7 @@ var _user$project$Analyser_Checks_UnnecessaryParens$buildMessage = function (r) 
 				})));
 };
 var _user$project$Analyser_Checks_UnnecessaryParens$scan = F2(
-	function (fileContext, _p16) {
+	function (fileContext, _p21) {
 		var x = A3(
 			_user$project$ASTUtil_Inspector$inspect,
 			_elm_lang$core$Native_Utils.update(
@@ -29227,7 +29486,7 @@ var _user$project$Analyser_Checks_UnnecessaryPortModule$onPortDeclaration = F2(
 	});
 var _user$project$Analyser_Checks_UnnecessaryPortModule$scan = F2(
 	function (fileContext, _p1) {
-		if (_user$project$AST_Util$isPortModule(fileContext.ast)) {
+		if (_stil4m$elm_syntax$Elm_Syntax_Module$isPortModule(fileContext.ast.moduleDefinition)) {
 			var portDeclCount = A3(
 				_user$project$ASTUtil_Inspector$inspect,
 				_elm_lang$core$Native_Utils.update(
@@ -29298,7 +29557,7 @@ var _user$project$Analyser_Checks_UnusedImport$onCase = F2(
 			_elm_lang$core$List$foldl,
 			_user$project$Analyser_Checks_UnusedImport$markUsage,
 			context,
-			_user$project$AST_Util$patternModuleNames(_p5._0));
+			_stil4m$elm_syntax$Elm_Syntax_Pattern$moduleNames(_p5._0._1));
 	});
 var _user$project$Analyser_Checks_UnusedImport$buildMessage = function (_p6) {
 	var _p7 = _p6;
@@ -29439,7 +29698,7 @@ var _user$project$Analyser_Checks_UnusedImportAlias$onCase = F2(
 			_elm_lang$core$List$foldl,
 			_user$project$Analyser_Checks_UnusedImportAlias$markUsage,
 			context,
-			_user$project$AST_Util$patternModuleNames(_p6._0));
+			_stil4m$elm_syntax$Elm_Syntax_Pattern$moduleNames(_p6._0._1));
 	});
 var _user$project$Analyser_Checks_UnusedImportAlias$buildMessageData = function (_p7) {
 	var _p8 = _p7;
@@ -29790,31 +30049,75 @@ var _user$project$Analyser_Checks_Variables$emptyContext = {
 	poppedScopes: {ctor: '[]'},
 	activeScopes: {ctor: '[]'}
 };
-var _user$project$Analyser_Checks_Variables$collect = function (fileContext) {
-	return A3(
-		_user$project$ASTUtil_Inspector$inspect,
-		_elm_lang$core$Native_Utils.update(
-			_user$project$ASTUtil_Inspector$defaultConfig,
-			{
-				onFile: _user$project$ASTUtil_Inspector$Pre(_user$project$Analyser_Checks_Variables$onFile),
-				onFunction: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_Variables$onFunction),
-				onLetBlock: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_Variables$onLetBlock),
-				onLambda: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_Variables$onLambda),
-				onCase: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_Variables$onCase),
-				onOperatorApplication: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onOperatorAppliction),
-				onDestructuring: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onDestructuring),
-				onFunctionOrValue: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onFunctionOrValue),
-				onPrefixOperator: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onPrefixOperator),
-				onRecordUpdate: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onRecordUpdate),
-				onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onTypeAnnotation)
-			}),
-		fileContext.ast,
-		_user$project$Analyser_Checks_Variables$emptyContext);
+var _user$project$Analyser_Checks_Variables$onlyUnused = _elm_lang$core$List$filter(
+	function (_p20) {
+		return A2(
+			F2(
+				function (x, y) {
+					return _elm_lang$core$Native_Utils.eq(x, y);
+				}),
+			0,
+			_Fresheyeball$elm_tuple_extra$Tuple3$first(
+				_elm_lang$core$Tuple$second(_p20)));
+	});
+var _user$project$Analyser_Checks_Variables$unusedTopLevels = function (_p21) {
+	var _p22 = _p21;
+	return A2(
+		_elm_lang$core$List$map,
+		function (_p23) {
+			var _p24 = _p23;
+			return {ctor: '_Tuple3', _0: _p24._0, _1: _p24._1._1, _2: _p24._1._2};
+		},
+		_user$project$Analyser_Checks_Variables$onlyUnused(
+			_elm_lang$core$Dict$toList(
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					_elm_lang$core$Dict$empty,
+					A2(
+						_elm_lang$core$Maybe$map,
+						_elm_lang$core$Tuple$second,
+						_elm_lang$core$List$head(_p22._0.activeScopes))))));
 };
-var _user$project$Analyser_Checks_Variables$UsedVariableContext = F2(
+var _user$project$Analyser_Checks_Variables$unusedVariables = function (_p25) {
+	var _p26 = _p25;
+	return A2(
+		_elm_lang$core$List$map,
+		function (_p27) {
+			var _p28 = _p27;
+			return {ctor: '_Tuple3', _0: _p28._0, _1: _p28._1._1, _2: _p28._1._2};
+		},
+		_user$project$Analyser_Checks_Variables$onlyUnused(
+			A2(_elm_lang$core$List$concatMap, _elm_lang$core$Dict$toList, _p26._0.poppedScopes)));
+};
+var _user$project$Analyser_Checks_Variables$InneUsedVariableContext = F2(
 	function (a, b) {
 		return {poppedScopes: a, activeScopes: b};
 	});
+var _user$project$Analyser_Checks_Variables$UsedVariableContext = function (a) {
+	return {ctor: 'UsedVariableContext', _0: a};
+};
+var _user$project$Analyser_Checks_Variables$collect = function (fileContext) {
+	return _user$project$Analyser_Checks_Variables$UsedVariableContext(
+		A3(
+			_user$project$ASTUtil_Inspector$inspect,
+			_elm_lang$core$Native_Utils.update(
+				_user$project$ASTUtil_Inspector$defaultConfig,
+				{
+					onFile: _user$project$ASTUtil_Inspector$Pre(_user$project$Analyser_Checks_Variables$onFile),
+					onFunction: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_Variables$onFunction),
+					onLetBlock: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_Variables$onLetBlock),
+					onLambda: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_Variables$onLambda),
+					onCase: _user$project$ASTUtil_Inspector$Inner(_user$project$Analyser_Checks_Variables$onCase),
+					onOperatorApplication: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onOperatorAppliction),
+					onDestructuring: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onDestructuring),
+					onFunctionOrValue: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onFunctionOrValue),
+					onPrefixOperator: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onPrefixOperator),
+					onRecordUpdate: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onRecordUpdate),
+					onTypeAnnotation: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_Variables$onTypeAnnotation)
+				}),
+			fileContext.ast,
+			_user$project$Analyser_Checks_Variables$emptyContext));
+};
 
 var _user$project$Analyser_Checks_UnusedImportedVariable$filterForEffectModule = function (_p0) {
 	var _p1 = _p0;
@@ -29851,91 +30154,67 @@ var _user$project$Analyser_Checks_UnusedImportedVariable$filterByModuleType = fu
 		return _elm_lang$core$Basics$always(true);
 	}
 };
-var _user$project$Analyser_Checks_UnusedImportedVariable$forVariableType = F3(
-	function (variableType, variableName, range) {
-		var _p3 = variableType;
-		if (_p3.ctor === 'Imported') {
-			return _elm_lang$core$Maybe$Just(
+var _user$project$Analyser_Checks_UnusedImportedVariable$forVariableType = function (_p3) {
+	var _p4 = _p3;
+	var _p7 = _p4._0;
+	var _p6 = _p4._2;
+	var _p5 = _p4._1;
+	if (_p5.ctor === 'Imported') {
+		return _elm_lang$core$Maybe$Just(
+			A3(
+				_user$project$Analyser_Messages_Data$addVarName,
+				'varName',
+				_p7,
 				A3(
-					_user$project$Analyser_Messages_Data$addVarName,
-					'varName',
-					variableName,
-					A3(
-						_user$project$Analyser_Messages_Data$addRange,
-						'range',
-						range,
-						_user$project$Analyser_Messages_Data$init(
-							_elm_lang$core$String$concat(
-								{
+					_user$project$Analyser_Messages_Data$addRange,
+					'range',
+					_p6,
+					_user$project$Analyser_Messages_Data$init(
+						_elm_lang$core$String$concat(
+							{
+								ctor: '::',
+								_0: 'Unused imported variable `',
+								_1: {
 									ctor: '::',
-									_0: 'Unused imported variable `',
+									_0: _p7,
 									_1: {
 										ctor: '::',
-										_0: variableName,
+										_0: '` at ',
 										_1: {
 											ctor: '::',
-											_0: '` at ',
-											_1: {
-												ctor: '::',
-												_0: _user$project$AST_Ranges$rangeToString(range),
-												_1: {ctor: '[]'}
-											}
+											_0: _user$project$AST_Ranges$rangeToString(_p6),
+											_1: {ctor: '[]'}
 										}
 									}
-								})))));
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
+								}
+							})))));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
 var _user$project$Analyser_Checks_UnusedImportedVariable$scan = F2(
-	function (fileContext, _p4) {
-		var onlyUnused = _elm_lang$core$List$filter(
-			function (_p5) {
-				return A2(
-					F2(
-						function (x, y) {
-							return _elm_lang$core$Native_Utils.eq(x, y);
-						}),
-					0,
-					_Fresheyeball$elm_tuple_extra$Tuple3$first(
-						_elm_lang$core$Tuple$second(_p5)));
-			});
+	function (fileContext, _p8) {
 		var x = _user$project$Analyser_Checks_Variables$collect(fileContext);
 		var unusedVariables = A2(
 			_elm_lang$core$List$filterMap,
-			function (_p6) {
-				var _p7 = _p6;
-				return A3(_user$project$Analyser_Checks_UnusedImportedVariable$forVariableType, _p7._1._1, _p7._0, _p7._1._2);
-			},
-			onlyUnused(
-				A2(_elm_lang$core$List$concatMap, _elm_lang$core$Dict$toList, x.poppedScopes)));
+			_user$project$Analyser_Checks_UnusedImportedVariable$forVariableType,
+			_user$project$Analyser_Checks_Variables$unusedVariables(x));
 		var unusedTopLevels = A2(
 			_elm_lang$core$List$filterMap,
-			function (_p8) {
-				var _p9 = _p8;
-				return A3(_user$project$Analyser_Checks_UnusedImportedVariable$forVariableType, _p9._1._1, _p9._0, _p9._1._2);
-			},
+			_user$project$Analyser_Checks_UnusedImportedVariable$forVariableType,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p10) {
+				function (_p9) {
 					return !A3(
 						_elm_lang$core$Basics$flip,
 						_stil4m$elm_syntax$Elm_Interface$exposesFunction,
 						fileContext.$interface,
-						_elm_lang$core$Tuple$first(_p10));
+						_Fresheyeball$elm_tuple_extra$Tuple3$first(_p9));
 				},
 				A2(
 					_elm_lang$core$List$filter,
 					_user$project$Analyser_Checks_UnusedImportedVariable$filterByModuleType(fileContext),
-					onlyUnused(
-						_elm_lang$core$Dict$toList(
-							A2(
-								_elm_lang$core$Maybe$withDefault,
-								_elm_lang$core$Dict$empty,
-								A2(
-									_elm_lang$core$Maybe$map,
-									_elm_lang$core$Tuple$second,
-									_elm_lang$core$List$head(x.activeScopes))))))));
+					_user$project$Analyser_Checks_Variables$unusedTopLevels(x))));
 		return A2(_elm_lang$core$Basics_ops['++'], unusedVariables, unusedTopLevels);
 	});
 var _user$project$Analyser_Checks_UnusedImportedVariable$checker = {
@@ -30405,91 +30684,67 @@ var _user$project$Analyser_Checks_UnusedTopLevel$filterByModuleType = function (
 		return _elm_lang$core$Basics$always(true);
 	}
 };
-var _user$project$Analyser_Checks_UnusedTopLevel$forVariableType = F3(
-	function (variableType, variableName, range) {
-		var _p3 = variableType;
-		if (_p3.ctor === 'TopLevel') {
-			return _elm_lang$core$Maybe$Just(
+var _user$project$Analyser_Checks_UnusedTopLevel$forVariableType = function (_p3) {
+	var _p4 = _p3;
+	var _p7 = _p4._0;
+	var _p6 = _p4._2;
+	var _p5 = _p4._1;
+	if (_p5.ctor === 'TopLevel') {
+		return _elm_lang$core$Maybe$Just(
+			A3(
+				_user$project$Analyser_Messages_Data$addRange,
+				'range',
+				_p6,
 				A3(
-					_user$project$Analyser_Messages_Data$addRange,
-					'range',
-					range,
-					A3(
-						_user$project$Analyser_Messages_Data$addVarName,
-						'varName',
-						variableName,
-						_user$project$Analyser_Messages_Data$init(
-							_elm_lang$core$String$concat(
-								{
+					_user$project$Analyser_Messages_Data$addVarName,
+					'varName',
+					_p7,
+					_user$project$Analyser_Messages_Data$init(
+						_elm_lang$core$String$concat(
+							{
+								ctor: '::',
+								_0: 'Unused top level definition `',
+								_1: {
 									ctor: '::',
-									_0: 'Unused top level definition `',
+									_0: _p7,
 									_1: {
 										ctor: '::',
-										_0: variableName,
+										_0: '` at ',
 										_1: {
 											ctor: '::',
-											_0: '` at ',
-											_1: {
-												ctor: '::',
-												_0: _user$project$AST_Ranges$rangeToString(range),
-												_1: {ctor: '[]'}
-											}
+											_0: _user$project$AST_Ranges$rangeToString(_p6),
+											_1: {ctor: '[]'}
 										}
 									}
-								})))));
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
+								}
+							})))));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
 var _user$project$Analyser_Checks_UnusedTopLevel$scan = F2(
-	function (fileContext, _p4) {
-		var onlyUnused = _elm_lang$core$List$filter(
-			function (_p5) {
-				return A2(
-					F2(
-						function (x, y) {
-							return _elm_lang$core$Native_Utils.eq(x, y);
-						}),
-					0,
-					_Fresheyeball$elm_tuple_extra$Tuple3$first(
-						_elm_lang$core$Tuple$second(_p5)));
-			});
+	function (fileContext, _p8) {
 		var x = _user$project$Analyser_Checks_Variables$collect(fileContext);
 		var unusedVariables = A2(
 			_elm_lang$core$List$filterMap,
-			function (_p6) {
-				var _p7 = _p6;
-				return A3(_user$project$Analyser_Checks_UnusedTopLevel$forVariableType, _p7._1._1, _p7._0, _p7._1._2);
-			},
-			onlyUnused(
-				A2(_elm_lang$core$List$concatMap, _elm_lang$core$Dict$toList, x.poppedScopes)));
+			_user$project$Analyser_Checks_UnusedTopLevel$forVariableType,
+			_user$project$Analyser_Checks_Variables$unusedVariables(x));
 		var unusedTopLevels = A2(
 			_elm_lang$core$List$filterMap,
-			function (_p8) {
-				var _p9 = _p8;
-				return A3(_user$project$Analyser_Checks_UnusedTopLevel$forVariableType, _p9._1._1, _p9._0, _p9._1._2);
-			},
+			_user$project$Analyser_Checks_UnusedTopLevel$forVariableType,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p10) {
+				function (_p9) {
 					return !A3(
 						_elm_lang$core$Basics$flip,
 						_stil4m$elm_syntax$Elm_Interface$exposesFunction,
 						fileContext.$interface,
-						_elm_lang$core$Tuple$first(_p10));
+						_Fresheyeball$elm_tuple_extra$Tuple3$first(_p9));
 				},
 				A2(
 					_elm_lang$core$List$filter,
 					_user$project$Analyser_Checks_UnusedTopLevel$filterByModuleType(fileContext),
-					onlyUnused(
-						_elm_lang$core$Dict$toList(
-							A2(
-								_elm_lang$core$Maybe$withDefault,
-								_elm_lang$core$Dict$empty,
-								A2(
-									_elm_lang$core$Maybe$map,
-									_elm_lang$core$Tuple$second,
-									_elm_lang$core$List$head(x.activeScopes))))))));
+					_user$project$Analyser_Checks_Variables$unusedTopLevels(x))));
 		return A2(_elm_lang$core$Basics_ops['++'], unusedVariables, unusedTopLevels);
 	});
 var _user$project$Analyser_Checks_UnusedTopLevel$checker = {
@@ -30504,10 +30759,6 @@ var _user$project$Analyser_Checks_UnusedTopLevel$checker = {
 			A2(_user$project$Analyser_Messages_Schema$varProp, 'varName', _user$project$Analyser_Messages_Schema$schema))
 	}
 };
-var _user$project$Analyser_Checks_UnusedTopLevel$UsedVariableContext = F2(
-	function (a, b) {
-		return {poppedScopes: a, activeScopes: b};
-	});
 
 var _user$project$Analyser_Checks_UnusedTypeAlias$onTypeAlias = F2(
 	function (_p0, context) {
@@ -30638,6 +30889,120 @@ var _user$project$Analyser_Checks_UnusedTypeAlias$checker = {
 	}
 };
 
+var _user$project$Analyser_Checks_UnusedValueConstructor$onType = F3(
+	function ($interface, t, context) {
+		var nonExposed = A2(
+			_elm_lang$core$List$map,
+			function (constructor) {
+				return {ctor: '_Tuple2', _0: constructor.name, _1: constructor.range};
+			},
+			A2(
+				_elm_lang$core$List$filter,
+				function (_p0) {
+					return !function (constructor) {
+						return A2(_stil4m$elm_syntax$Elm_Interface$exposesFunction, constructor.name, $interface);
+					}(_p0);
+				},
+				t.constructors));
+		return _elm_lang$core$Native_Utils.update(
+			context,
+			{
+				unexposedConstructors: A2(_elm_lang$core$Basics_ops['++'], context.unexposedConstructors, nonExposed)
+			});
+	});
+var _user$project$Analyser_Checks_UnusedValueConstructor$onExpression = F2(
+	function (_p1, config) {
+		var _p2 = _p1;
+		var _p3 = _p2._1;
+		if (_p3.ctor === 'FunctionOrValue') {
+			return _elm_lang$core$Native_Utils.update(
+				config,
+				{
+					usedFunctions: A2(_elm_lang$core$Set$insert, _p3._0, config.usedFunctions)
+				});
+		} else {
+			return config;
+		}
+	});
+var _user$project$Analyser_Checks_UnusedValueConstructor$buildMessageData = function (_p4) {
+	var _p5 = _p4;
+	var _p7 = _p5._0;
+	var _p6 = _p5._1;
+	return A3(
+		_user$project$Analyser_Messages_Data$addRange,
+		'range',
+		_p6,
+		A3(
+			_user$project$Analyser_Messages_Data$addVarName,
+			'varName',
+			_p7,
+			_user$project$Analyser_Messages_Data$init(
+				_elm_lang$core$String$concat(
+					{
+						ctor: '::',
+						_0: 'Value constructor `',
+						_1: {
+							ctor: '::',
+							_0: _p7,
+							_1: {
+								ctor: '::',
+								_0: '` is not used. Declared at ',
+								_1: {
+									ctor: '::',
+									_0: _user$project$AST_Ranges$rangeToString(_p6),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}))));
+};
+var _user$project$Analyser_Checks_UnusedValueConstructor$scan = F2(
+	function (fileContext, _p8) {
+		var result = A3(
+			_user$project$ASTUtil_Inspector$inspect,
+			_elm_lang$core$Native_Utils.update(
+				_user$project$ASTUtil_Inspector$defaultConfig,
+				{
+					onType: _user$project$ASTUtil_Inspector$Inner(
+						_elm_lang$core$Basics$always(
+							_user$project$Analyser_Checks_UnusedValueConstructor$onType(fileContext.$interface))),
+					onExpression: _user$project$ASTUtil_Inspector$Post(_user$project$Analyser_Checks_UnusedValueConstructor$onExpression)
+				}),
+			fileContext.ast,
+			{
+				unexposedConstructors: {ctor: '[]'},
+				usedFunctions: _elm_lang$core$Set$empty
+			});
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Analyser_Checks_UnusedValueConstructor$buildMessageData,
+			A2(
+				_elm_lang$core$List$filter,
+				function (x) {
+					return !A2(
+						_elm_lang$core$Set$member,
+						_elm_lang$core$Tuple$first(x),
+						result.usedFunctions);
+				},
+				result.unexposedConstructors));
+	});
+var _user$project$Analyser_Checks_UnusedValueConstructor$checker = {
+	check: _user$project$Analyser_Checks_UnusedValueConstructor$scan,
+	info: {
+		key: 'UnusedValueConstructor',
+		name: 'Unused Value Constructor',
+		description: 'Value Constructors which are not exposed and used should be eliminated.',
+		schema: A2(
+			_user$project$Analyser_Messages_Schema$rangeProp,
+			'range',
+			A2(_user$project$Analyser_Messages_Schema$varProp, 'varName', _user$project$Analyser_Messages_Schema$schema))
+	}
+};
+var _user$project$Analyser_Checks_UnusedValueConstructor$Context = F2(
+	function (a, b) {
+		return {unexposedConstructors: a, usedFunctions: b};
+	});
+
 var _user$project$Analyser_Checks_UnusedVariable$filterForEffectModule = function (_p0) {
 	var _p1 = _p0;
 	return !A2(
@@ -30715,53 +31080,33 @@ var _user$project$Analyser_Checks_UnusedVariable$forVariableType = F3(
 	});
 var _user$project$Analyser_Checks_UnusedVariable$scan = F2(
 	function (fileContext, _p4) {
-		var onlyUnused = _elm_lang$core$List$filter(
-			function (_p5) {
-				return A2(
-					F2(
-						function (x, y) {
-							return _elm_lang$core$Native_Utils.eq(x, y);
-						}),
-					0,
-					_Fresheyeball$elm_tuple_extra$Tuple3$first(
-						_elm_lang$core$Tuple$second(_p5)));
-			});
 		var x = _user$project$Analyser_Checks_Variables$collect(fileContext);
 		var unusedVariables = A2(
 			_elm_lang$core$List$filterMap,
-			function (_p6) {
-				var _p7 = _p6;
-				return A3(_user$project$Analyser_Checks_UnusedVariable$forVariableType, _p7._1._1, _p7._0, _p7._1._2);
+			function (_p5) {
+				var _p6 = _p5;
+				return A3(_user$project$Analyser_Checks_UnusedVariable$forVariableType, _p6._1, _p6._0, _p6._2);
 			},
-			onlyUnused(
-				A2(_elm_lang$core$List$concatMap, _elm_lang$core$Dict$toList, x.poppedScopes)));
+			_user$project$Analyser_Checks_Variables$unusedVariables(x));
 		var unusedTopLevels = A2(
 			_elm_lang$core$List$filterMap,
-			function (_p8) {
-				var _p9 = _p8;
-				return A3(_user$project$Analyser_Checks_UnusedVariable$forVariableType, _p9._1._1, _p9._0, _p9._1._2);
+			function (_p7) {
+				var _p8 = _p7;
+				return A3(_user$project$Analyser_Checks_UnusedVariable$forVariableType, _p8._1, _p8._0, _p8._2);
 			},
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p10) {
+				function (_p9) {
 					return !A3(
 						_elm_lang$core$Basics$flip,
 						_stil4m$elm_syntax$Elm_Interface$exposesFunction,
 						fileContext.$interface,
-						_elm_lang$core$Tuple$first(_p10));
+						_Fresheyeball$elm_tuple_extra$Tuple3$first(_p9));
 				},
 				A2(
 					_elm_lang$core$List$filter,
 					_user$project$Analyser_Checks_UnusedVariable$filterByModuleType(fileContext),
-					onlyUnused(
-						_elm_lang$core$Dict$toList(
-							A2(
-								_elm_lang$core$Maybe$withDefault,
-								_elm_lang$core$Dict$empty,
-								A2(
-									_elm_lang$core$Maybe$map,
-									_elm_lang$core$Tuple$second,
-									_elm_lang$core$List$head(x.activeScopes))))))));
+					_user$project$Analyser_Checks_Variables$unusedTopLevels(x))));
 		return A2(_elm_lang$core$Basics_ops['++'], unusedVariables, unusedTopLevels);
 	});
 var _user$project$Analyser_Checks_UnusedVariable$checker = {
@@ -30776,10 +31121,6 @@ var _user$project$Analyser_Checks_UnusedVariable$checker = {
 			A2(_user$project$Analyser_Messages_Schema$varProp, 'varName', _user$project$Analyser_Messages_Schema$schema))
 	}
 };
-var _user$project$Analyser_Checks_UnusedVariable$UsedVariableContext = F2(
-	function (a, b) {
-		return {poppedScopes: a, activeScopes: b};
-	});
 
 var _user$project$Analyser_Checks_UseConsOverConcat$onExpression = F2(
 	function (_p0, context) {
@@ -30862,92 +31203,104 @@ var _user$project$Analyser_Checks$all = {
 	_0: _user$project$Analyser_Checks_UnusedVariable$checker,
 	_1: {
 		ctor: '::',
-		_0: _user$project$Analyser_Checks_UnusedImportedVariable$checker,
+		_0: _user$project$Analyser_Checks_UnusedValueConstructor$checker,
 		_1: {
 			ctor: '::',
-			_0: _user$project$Analyser_Checks_UnusedPatternVariable$checker,
+			_0: _user$project$Analyser_Checks_UnusedImportedVariable$checker,
 			_1: {
 				ctor: '::',
-				_0: _user$project$Analyser_Checks_UnusedTopLevel$checker,
+				_0: _user$project$Analyser_Checks_UnusedPatternVariable$checker,
 				_1: {
 					ctor: '::',
-					_0: _user$project$Analyser_Checks_ExposeAll$checker,
+					_0: _user$project$Analyser_Checks_UnusedTopLevel$checker,
 					_1: {
 						ctor: '::',
-						_0: _user$project$Analyser_Checks_ImportAll$checker,
+						_0: _user$project$Analyser_Checks_ExposeAll$checker,
 						_1: {
 							ctor: '::',
-							_0: _user$project$Analyser_Checks_NoTopLevelSignature$checker,
+							_0: _user$project$Analyser_Checks_ImportAll$checker,
 							_1: {
 								ctor: '::',
-								_0: _user$project$Analyser_Checks_UnnecessaryParens$checker,
+								_0: _user$project$Analyser_Checks_NoTopLevelSignature$checker,
 								_1: {
 									ctor: '::',
-									_0: _user$project$Analyser_Checks_DebugLog$checker,
+									_0: _user$project$Analyser_Checks_UnnecessaryParens$checker,
 									_1: {
 										ctor: '::',
-										_0: _user$project$Analyser_Checks_DebugCrash$checker,
+										_0: _user$project$Analyser_Checks_DebugLog$checker,
 										_1: {
 											ctor: '::',
-											_0: _user$project$Analyser_Checks_DuplicateImport$checker,
+											_0: _user$project$Analyser_Checks_DebugCrash$checker,
 											_1: {
 												ctor: '::',
-												_0: _user$project$Analyser_Checks_DuplicateImportedVariable$checker,
+												_0: _user$project$Analyser_Checks_DuplicateImport$checker,
 												_1: {
 													ctor: '::',
-													_0: _user$project$Analyser_Checks_UnusedTypeAlias$checker,
+													_0: _user$project$Analyser_Checks_DuplicateImportedVariable$checker,
 													_1: {
 														ctor: '::',
-														_0: _user$project$Analyser_Checks_OverriddenVariables$checker,
+														_0: _user$project$Analyser_Checks_UnusedTypeAlias$checker,
 														_1: {
 															ctor: '::',
-															_0: _user$project$Analyser_Checks_NoUncurriedPrefix$checker,
+															_0: _user$project$Analyser_Checks_OverriddenVariables$checker,
 															_1: {
 																ctor: '::',
-																_0: _user$project$Analyser_Checks_UnusedImportAlias$checker,
+																_0: _user$project$Analyser_Checks_NoUncurriedPrefix$checker,
 																_1: {
 																	ctor: '::',
-																	_0: _user$project$Analyser_Checks_UnusedImport$checker,
+																	_0: _user$project$Analyser_Checks_UnusedImportAlias$checker,
 																	_1: {
 																		ctor: '::',
-																		_0: _user$project$Analyser_Checks_UseConsOverConcat$checker,
+																		_0: _user$project$Analyser_Checks_UnusedImport$checker,
 																		_1: {
 																			ctor: '::',
-																			_0: _user$project$Analyser_Checks_DropConcatOfLists$checker,
+																			_0: _user$project$Analyser_Checks_UseConsOverConcat$checker,
 																			_1: {
 																				ctor: '::',
-																				_0: _user$project$Analyser_Checks_DropConsOfItemAndList$checker,
+																				_0: _user$project$Analyser_Checks_DropConcatOfLists$checker,
 																				_1: {
 																					ctor: '::',
-																					_0: _user$project$Analyser_Checks_UnnecessaryListConcat$checker,
+																					_0: _user$project$Analyser_Checks_DropConsOfItemAndList$checker,
 																					_1: {
 																						ctor: '::',
-																						_0: _user$project$Analyser_Checks_MultiLineRecordFormatting$checker,
+																						_0: _user$project$Analyser_Checks_UnnecessaryListConcat$checker,
 																						_1: {
 																							ctor: '::',
-																							_0: _user$project$Analyser_Checks_UnnecessaryPortModule$checker,
+																							_0: _user$project$Analyser_Checks_MultiLineRecordFormatting$checker,
 																							_1: {
 																								ctor: '::',
-																								_0: _user$project$Analyser_Checks_NonStaticRegex$checker,
+																								_0: _user$project$Analyser_Checks_UnnecessaryPortModule$checker,
 																								_1: {
 																									ctor: '::',
-																									_0: _user$project$Analyser_Checks_CoreArrayUsage$checker,
+																									_0: _user$project$Analyser_Checks_NonStaticRegex$checker,
 																									_1: {
 																										ctor: '::',
-																										_0: _user$project$Analyser_Checks_FunctionInLet$checker,
+																										_0: _user$project$Analyser_Checks_CoreArrayUsage$checker,
 																										_1: {
 																											ctor: '::',
-																											_0: _user$project$Analyser_Checks_UnformattedFile$checker,
+																											_0: _user$project$Analyser_Checks_FunctionInLet$checker,
 																											_1: {
 																												ctor: '::',
-																												_0: _user$project$Analyser_Checks_DuplicateRecordFieldUpdate$checker,
+																												_0: _user$project$Analyser_Checks_UnformattedFile$checker,
 																												_1: {
 																													ctor: '::',
-																													_0: _user$project$Analyser_Checks_SingleFieldRecord$checker,
+																													_0: _user$project$Analyser_Checks_DuplicateRecordFieldUpdate$checker,
 																													_1: {
 																														ctor: '::',
-																														_0: _user$project$Analyser_Checks_TriggerWords$checker,
-																														_1: {ctor: '[]'}
+																														_0: _user$project$Analyser_Checks_SingleFieldRecord$checker,
+																														_1: {
+																															ctor: '::',
+																															_0: _user$project$Analyser_Checks_TriggerWords$checker,
+																															_1: {
+																																ctor: '::',
+																																_0: _user$project$Analyser_Checks_BooleanCase$checker,
+																																_1: {
+																																	ctor: '::',
+																																	_0: _user$project$Analyser_Checks_MapNothingToNothing$checker,
+																																	_1: {ctor: '[]'}
+																																}
+																															}
+																														}
 																													}
 																												}
 																											}
@@ -31254,6 +31607,13 @@ var _user$project$Analyser_Fixes_Base$Fixer = F3(
 	function (a, b, c) {
 		return {canFix: a, fix: b, description: c};
 	});
+var _user$project$Analyser_Fixes_Base$Error = function (a) {
+	return {ctor: 'Error', _0: a};
+};
+var _user$project$Analyser_Fixes_Base$Patched = function (a) {
+	return {ctor: 'Patched', _0: a};
+};
+var _user$project$Analyser_Fixes_Base$IncompatibleData = {ctor: 'IncompatibleData'};
 
 var _user$project$Analyser_Fixes_FileContent$replaceLines = F3(
 	function (_p0, fix, input) {
@@ -31281,38 +31641,66 @@ var _user$project$Analyser_Fixes_FileContent$replaceLines = F3(
 					}
 				}));
 	});
-var _user$project$Analyser_Fixes_FileContent$getCharAtLocation = F2(
+var _user$project$Analyser_Fixes_FileContent$getStringAtRange = F2(
 	function (_p2, input) {
 		var _p3 = _p2;
+		var _p5 = _p3.start;
+		var _p4 = _p3.end;
+		var trimFirst = F2(
+			function (i, line) {
+				return _elm_lang$core$Native_Utils.eq(i, 0) ? A2(_elm_lang$core$String$dropLeft, _p5.column, line) : line;
+			});
+		var trimLast = F2(
+			function (i, line) {
+				return _elm_lang$core$Native_Utils.eq(i, _p4.row) ? A2(_elm_lang$core$String$left, _p4.column, line) : line;
+			});
+		return _elm_lang$core$String$concat(
+			A2(
+				_elm_lang$core$List$indexedMap,
+				trimFirst,
+				A2(
+					_elm_lang$core$List$drop,
+					_p5.row,
+					A2(
+						_elm_lang$core$List$indexedMap,
+						trimLast,
+						A2(
+							_elm_lang$core$List$take,
+							_p4.row + 1,
+							A2(_elm_lang$core$String$split, '\n', input))))));
+	});
+var _user$project$Analyser_Fixes_FileContent$getCharAtLocation = F2(
+	function (_p6, input) {
+		var _p7 = _p6;
 		return A2(
 			_elm_lang$core$Maybe$map,
-			function (_p4) {
+			function (_p8) {
 				return A2(
 					_elm_lang$core$String$left,
 					1,
-					A2(_elm_lang$core$String$dropLeft, _p3._1, _p4));
+					A2(_elm_lang$core$String$dropLeft, _p7._1, _p8));
 			},
 			_elm_lang$core$List$head(
 				A2(
 					_elm_lang$core$List$drop,
-					_p3._0,
+					_p7._0,
 					A2(_elm_lang$core$String$split, '\n', input))));
 	});
 var _user$project$Analyser_Fixes_FileContent$replaceLocationWith = F3(
-	function (_p5, x, input) {
-		var _p6 = _p5;
-		var _p7 = _p6._1;
+	function (_p9, x, input) {
+		var _p10 = _p9;
+		var _p11 = _p10._1;
 		var lineUpdater = function (target) {
 			return _elm_lang$core$String$concat(
 				{
 					ctor: '::',
-					_0: A2(_elm_lang$core$String$left, _p7, target),
+					_0: A2(_elm_lang$core$String$left, _p11, target),
 					_1: {
 						ctor: '::',
 						_0: x,
 						_1: {
 							ctor: '::',
-							_0: A2(_elm_lang$core$String$dropLeft, _p7 + 1, target),
+							_0: A2(_elm_lang$core$String$dropLeft, _p11 + 1, target),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -31327,13 +31715,13 @@ var _user$project$Analyser_Fixes_FileContent$replaceLocationWith = F3(
 				F2(
 					function (x, y) {
 						return _elm_lang$core$Native_Utils.eq(x, y);
-					})(_p6._0),
+					})(_p10._0),
 				lineUpdater,
 				rows));
 	});
 var _user$project$Analyser_Fixes_FileContent$updateRange = F3(
-	function (range, content, patch) {
-		var rowPostPartTakeFn = _elm_lang$core$String$dropLeft(range.end.column + 1);
+	function (range, patch, content) {
+		var rowPostPartTakeFn = _elm_lang$core$String$dropLeft(range.end.column);
 		var rowPrePartTakeFn = _elm_lang$core$String$left(range.start.column);
 		var afterRows = range.end.row;
 		var beforeRows = range.start.row;
@@ -31398,9 +31786,101 @@ var _user$project$Analyser_Fixes_FileContent$replaceRangeWith = F3(
 		return A3(
 			_user$project$Analyser_Fixes_FileContent$updateRange,
 			range,
-			input,
-			_elm_lang$core$Basics$always(newValue));
+			_elm_lang$core$Basics$always(newValue),
+			input);
 	});
+
+var _user$project$Analyser_Fixes_DropConsOfItemAndList$fixContent = F3(
+	function (headRange, tailRange, content) {
+		var middleRange = {start: headRange.end, end: tailRange.start};
+		return A3(
+			_user$project$Analyser_Fixes_FileContent$updateRange,
+			headRange,
+			_elm_lang$core$String$append('[ '),
+			A3(
+				_user$project$Analyser_Fixes_FileContent$replaceRangeWith,
+				middleRange,
+				',',
+				A3(
+					_user$project$Analyser_Fixes_FileContent$updateRange,
+					tailRange,
+					_elm_lang$core$String$dropLeft(1),
+					content)));
+	});
+var _user$project$Analyser_Fixes_DropConsOfItemAndList$fix = F2(
+	function (_p0, messageData) {
+		var _p1 = _p0;
+		var _p2 = A3(
+			_elm_lang$core$Maybe$map2,
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				}),
+			A2(_user$project$Analyser_Messages_Data$getRange, 'head', messageData),
+			A2(_user$project$Analyser_Messages_Data$getRange, 'tail', messageData));
+		if (_p2.ctor === 'Just') {
+			return _user$project$Analyser_Fixes_Base$Patched(
+				A3(_user$project$Analyser_Fixes_DropConsOfItemAndList$fixContent, _p2._0._0, _p2._0._1, _p1._0));
+		} else {
+			return _user$project$Analyser_Fixes_Base$IncompatibleData;
+		}
+	});
+var _user$project$Analyser_Fixes_DropConsOfItemAndList$fixer = A3(
+	_user$project$Analyser_Fixes_Base$Fixer,
+	function (_) {
+		return _.key;
+	}(
+		function (_) {
+			return _.info;
+		}(_user$project$Analyser_Checks_DropConsOfItemAndList$checker)),
+	_user$project$Analyser_Fixes_DropConsOfItemAndList$fix,
+	'Combine and format');
+
+var _user$project$Analyser_Fixes_DuplicateImport$removeImports = F2(
+	function (_p0, ranges) {
+		var _p1 = _p0;
+		return _user$project$Analyser_Fixes_Base$Patched(
+			A3(
+				_elm_lang$core$List$foldr,
+				function (range) {
+					return A2(_user$project$Analyser_Fixes_FileContent$replaceRangeWith, range, '');
+				},
+				_p1._0,
+				_elm_lang$core$List$reverse(
+					A2(
+						_elm_lang$core$List$sortBy,
+						function (_p2) {
+							return function (_) {
+								return _.row;
+							}(
+								function (_) {
+									return _.start;
+								}(_p2));
+						},
+						ranges))));
+	});
+var _user$project$Analyser_Fixes_DuplicateImport$fix = F2(
+	function (input, messageData) {
+		var _p3 = A2(_user$project$Analyser_Messages_Data$getRangeList, 'ranges', messageData);
+		if (_p3.ctor === 'Just') {
+			return A2(
+				_user$project$Analyser_Fixes_DuplicateImport$removeImports,
+				input,
+				A2(_elm_lang$core$List$drop, 1, _p3._0));
+		} else {
+			return _user$project$Analyser_Fixes_Base$IncompatibleData;
+		}
+	});
+var _user$project$Analyser_Fixes_DuplicateImport$fixer = A3(
+	_user$project$Analyser_Fixes_Base$Fixer,
+	function (_) {
+		return _.key;
+	}(
+		function (_) {
+			return _.info;
+		}(_user$project$Analyser_Checks_DuplicateImport$checker)),
+	_user$project$Analyser_Fixes_DuplicateImport$fix,
+	'Remove extra imports and format');
 
 var _user$project$Analyser_Fixes_MultiLineRecordFormatting$replacement = function (_p0) {
 	var _p1 = _p0;
@@ -31412,18 +31892,18 @@ var _user$project$Analyser_Fixes_MultiLineRecordFormatting$fixContent = F2(
 		return A3(
 			_user$project$Analyser_Fixes_FileContent$updateRange,
 			range,
-			content,
 			A3(
 				_elm_lang$core$Regex$replace,
 				_elm_lang$core$Regex$AtMost(1),
 				_user$project$Analyser_Fixes_MultiLineRecordFormatting$commaAndIdentifierRegex,
-				_user$project$Analyser_Fixes_MultiLineRecordFormatting$replacement));
+				_user$project$Analyser_Fixes_MultiLineRecordFormatting$replacement),
+			content);
 	});
 var _user$project$Analyser_Fixes_MultiLineRecordFormatting$fix = F2(
 	function (input, messageData) {
 		var _p2 = A2(_user$project$Analyser_Messages_Data$getRange, 'range', messageData);
 		if (_p2.ctor === 'Just') {
-			return _elm_lang$core$Result$Ok(
+			return _user$project$Analyser_Fixes_Base$Patched(
 				function (_p3) {
 					return A2(
 						_user$project$Analyser_Fixes_MultiLineRecordFormatting$fixContent,
@@ -31431,7 +31911,7 @@ var _user$project$Analyser_Fixes_MultiLineRecordFormatting$fix = F2(
 						_elm_lang$core$Tuple$first(_p3));
 				}(input));
 		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnformattedFile');
+			return _user$project$Analyser_Fixes_Base$IncompatibleData;
 		}
 	});
 var _user$project$Analyser_Fixes_MultiLineRecordFormatting$fixer = A3(
@@ -31447,7 +31927,7 @@ var _user$project$Analyser_Fixes_MultiLineRecordFormatting$fixer = A3(
 
 var _user$project$Analyser_Fixes_UnformattedFile$fix = F2(
 	function (input, _p0) {
-		return _elm_lang$core$Result$Ok(
+		return _user$project$Analyser_Fixes_Base$Patched(
 			_elm_lang$core$Tuple$first(input));
 	});
 var _user$project$Analyser_Fixes_UnformattedFile$fixer = A3(
@@ -31507,7 +31987,7 @@ var _user$project$Analyser_Fixes_UnnecessaryParens$fixContent = F2(
 		var endChar = A2(_user$project$Analyser_Fixes_FileContent$getCharAtLocation, endCharLoc, content);
 		var _p1 = {ctor: '_Tuple2', _0: startChar, _1: endChar};
 		if (((((_p1.ctor === '_Tuple2') && (_p1._0.ctor === 'Just')) && (_p1._0._0 === '(')) && (_p1._1.ctor === 'Just')) && (_p1._1._0 === ')')) {
-			return _elm_lang$core$Result$Ok(
+			return _user$project$Analyser_Fixes_Base$Patched(
 				A3(
 					_user$project$Analyser_Fixes_FileContent$replaceLocationWith,
 					endCharLoc,
@@ -31518,7 +31998,7 @@ var _user$project$Analyser_Fixes_UnnecessaryParens$fixContent = F2(
 						' ',
 						content)));
 		} else {
-			return _elm_lang$core$Result$Err('Could not locate parens to replace');
+			return _user$project$Analyser_Fixes_Base$Error('Could not locate parens to replace');
 		}
 	});
 var _user$project$Analyser_Fixes_UnnecessaryParens$fix = F2(
@@ -31532,7 +32012,7 @@ var _user$project$Analyser_Fixes_UnnecessaryParens$fix = F2(
 					_elm_lang$core$Tuple$first(_p3));
 			}(input);
 		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnnecessaryParens');
+			return _user$project$Analyser_Fixes_Base$IncompatibleData;
 		}
 	});
 var _user$project$Analyser_Fixes_UnnecessaryParens$fixer = A3(
@@ -31545,6 +32025,34 @@ var _user$project$Analyser_Fixes_UnnecessaryParens$fixer = A3(
 		}(_user$project$Analyser_Checks_UnnecessaryParens$checker)),
 	_user$project$Analyser_Fixes_UnnecessaryParens$fix,
 	'Remove and format');
+
+var _user$project$Analyser_Fixes_UnusedImport$removeImport = F2(
+	function (_p0, range) {
+		var _p1 = _p0;
+		var _p2 = A2(_user$project$ASTUtil_Imports$findImportWithRange, _p1._1, range);
+		if (_p2.ctor === 'Just') {
+			return _user$project$Analyser_Fixes_Base$Patched(
+				A3(_user$project$Analyser_Fixes_FileContent$replaceRangeWith, _p2._0.range, '', _p1._0));
+		} else {
+			return _user$project$Analyser_Fixes_Base$Error('Could not locate import for the target range');
+		}
+	});
+var _user$project$Analyser_Fixes_UnusedImport$fix = F2(
+	function (input, messageData) {
+		var _p3 = A2(_user$project$Analyser_Messages_Data$getRange, 'range', messageData);
+		if (_p3.ctor === 'Just') {
+			return A2(_user$project$Analyser_Fixes_UnusedImport$removeImport, input, _p3._0);
+		} else {
+			return _user$project$Analyser_Fixes_Base$IncompatibleData;
+		}
+	});
+var _user$project$Analyser_Fixes_UnusedImport$canFix = function (_) {
+	return _.key;
+}(
+	function (_) {
+		return _.info;
+	}(_user$project$Analyser_Checks_UnusedImport$checker));
+var _user$project$Analyser_Fixes_UnusedImport$fixer = A3(_user$project$Analyser_Fixes_Base$Fixer, _user$project$Analyser_Fixes_UnusedImport$canFix, _user$project$Analyser_Fixes_UnusedImport$fix, 'Remove unused import');
 
 var _user$project$Analyser_Fixes_UnusedImportAlias$writeNewImport = F3(
 	function (syntaxRange, imp, i) {
@@ -31560,7 +32068,7 @@ var _user$project$Analyser_Fixes_UnusedImportAlias$updateImport = F2(
 		var _p2 = A2(_user$project$ASTUtil_Imports$findImportWithRange, _p1._1, range);
 		if (_p2.ctor === 'Just') {
 			var _p3 = _p2._0;
-			return _elm_lang$core$Result$Ok(
+			return _user$project$Analyser_Fixes_Base$Patched(
 				A3(
 					_user$project$Analyser_Fixes_UnusedImportAlias$writeNewImport,
 					_p3.range,
@@ -31569,7 +32077,7 @@ var _user$project$Analyser_Fixes_UnusedImportAlias$updateImport = F2(
 						{moduleAlias: _elm_lang$core$Maybe$Nothing}),
 					_p1._0));
 		} else {
-			return _elm_lang$core$Result$Err('Could not locate import for the target range');
+			return _user$project$Analyser_Fixes_Base$Error('Could not locate import for the target range');
 		}
 	});
 var _user$project$Analyser_Fixes_UnusedImportAlias$fix = F2(
@@ -31578,7 +32086,7 @@ var _user$project$Analyser_Fixes_UnusedImportAlias$fix = F2(
 		if (_p4.ctor === 'Just') {
 			return A2(_user$project$Analyser_Fixes_UnusedImportAlias$updateImport, input, _p4._0);
 		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedImportAlias');
+			return _user$project$Analyser_Fixes_Base$IncompatibleData;
 		}
 	});
 var _user$project$Analyser_Fixes_UnusedImportAlias$fixer = A3(
@@ -31606,14 +32114,14 @@ var _user$project$Analyser_Fixes_UnusedImportedVariable$removeImport = F2(
 		var _p2 = A2(_user$project$ASTUtil_Imports$findImportWithRange, _p1._1, range);
 		if (_p2.ctor === 'Just') {
 			var _p3 = _p2._0;
-			return _elm_lang$core$Result$Ok(
+			return _user$project$Analyser_Fixes_Base$Patched(
 				A3(
 					_user$project$Analyser_Fixes_UnusedImportedVariable$writeNewImport,
 					_p3.range,
 					A2(_user$project$ASTUtil_Imports$removeRangeFromImport, range, _p3),
 					_p1._0));
 		} else {
-			return _elm_lang$core$Result$Err('Could not locate import for the target range');
+			return _user$project$Analyser_Fixes_Base$Error('Could not locate import for the target range');
 		}
 	});
 var _user$project$Analyser_Fixes_UnusedImportedVariable$fix = F2(
@@ -31622,7 +32130,7 @@ var _user$project$Analyser_Fixes_UnusedImportedVariable$fix = F2(
 		if (_p4.ctor === 'Just') {
 			return A2(_user$project$Analyser_Fixes_UnusedImportedVariable$removeImport, input, _p4._0);
 		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedImportedVariable');
+			return _user$project$Analyser_Fixes_Base$IncompatibleData;
 		}
 	});
 var _user$project$Analyser_Fixes_UnusedImportedVariable$fixer = A3(
@@ -31642,7 +32150,7 @@ var _user$project$Analyser_Fixes_UnusedPatternVariable$fixPattern = F2(
 		var _p2 = A2(_user$project$ASTUtil_Patterns$findParentPattern, _p1._1, range);
 		if (_p2.ctor === 'Just') {
 			var _p3 = _p2._0;
-			return _elm_lang$core$Result$Ok(
+			return _user$project$Analyser_Fixes_Base$Patched(
 				A3(
 					_user$project$Analyser_Fixes_FileContent$replaceRangeWith,
 					_elm_lang$core$Tuple$first(_p3),
@@ -31651,7 +32159,7 @@ var _user$project$Analyser_Fixes_UnusedPatternVariable$fixPattern = F2(
 							A2(_user$project$ASTUtil_PatternOptimizer$optimize, range, _p3))),
 					_p1._0));
 		} else {
-			return _elm_lang$core$Result$Err('Could not find location to replace unused variable in pattern');
+			return _user$project$Analyser_Fixes_Base$Error('Could not find location to replace unused variable in pattern');
 		}
 	});
 var _user$project$Analyser_Fixes_UnusedPatternVariable$fix = F2(
@@ -31660,7 +32168,7 @@ var _user$project$Analyser_Fixes_UnusedPatternVariable$fix = F2(
 		if (_p4.ctor === 'Just') {
 			return A2(_user$project$Analyser_Fixes_UnusedPatternVariable$fixPattern, input, _p4._0);
 		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedPatternVariable');
+			return _user$project$Analyser_Fixes_Base$IncompatibleData;
 		}
 	});
 var _user$project$Analyser_Fixes_UnusedPatternVariable$fixer = A3(
@@ -31732,11 +32240,14 @@ var _user$project$Analyser_Fixes_UnusedTypeAlias$fix = F2(
 		var _p10 = A2(_user$project$Analyser_Messages_Data$getRange, 'range', messageData);
 		if (_p10.ctor === 'Just') {
 			return A2(
-				_elm_lang$core$Result$fromMaybe,
-				'Could not find type alias',
-				A2(_user$project$Analyser_Fixes_UnusedTypeAlias$findAndRemoveTypeAlias, input, _p10._0));
+				_elm_lang$core$Maybe$withDefault,
+				_user$project$Analyser_Fixes_Base$Error('Could not find type alias'),
+				A2(
+					_elm_lang$core$Maybe$map,
+					_user$project$Analyser_Fixes_Base$Patched,
+					A2(_user$project$Analyser_Fixes_UnusedTypeAlias$findAndRemoveTypeAlias, input, _p10._0)));
 		} else {
-			return _elm_lang$core$Result$Err('Invalid message data for fixer UnusedTypeAlias');
+			return _user$project$Analyser_Fixes_Base$IncompatibleData;
 		}
 	});
 var _user$project$Analyser_Fixes_UnusedTypeAlias$fixer = A3(
@@ -31750,31 +32261,6 @@ var _user$project$Analyser_Fixes_UnusedTypeAlias$fixer = A3(
 	_user$project$Analyser_Fixes_UnusedTypeAlias$fix,
 	'Remove type alias and format');
 
-var _user$project$Analyser_Messages_Types$groupByFileName = function (messages) {
-	return A2(
-		_elm_lang$core$Dict$map,
-		F2(
-			function (_p0, v) {
-				return A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$second, v);
-			}),
-		A2(
-			_elm_community$dict_extra$Dict_Extra$groupBy,
-			_elm_lang$core$Tuple$first,
-			A2(
-				_elm_lang$core$List$map,
-				function (m) {
-					return {ctor: '_Tuple2', _0: m.file.path, _1: m};
-				},
-				messages)));
-};
-var _user$project$Analyser_Messages_Types$groupByType = function (messages) {
-	return A2(
-		_elm_community$dict_extra$Dict_Extra$groupBy,
-		function (_) {
-			return _.type_;
-		},
-		messages);
-};
 var _user$project$Analyser_Messages_Types$Message = F5(
 	function (a, b, c, d, e) {
 		return {id: a, status: b, file: c, type_: d, data: e};
@@ -31795,23 +32281,35 @@ var _user$project$Analyser_Fixers$all = {
 	_0: _user$project$Analyser_Fixes_UnnecessaryParens$fixer,
 	_1: {
 		ctor: '::',
-		_0: _user$project$Analyser_Fixes_UnusedImportedVariable$fixer,
+		_0: _user$project$Analyser_Fixes_UnusedImport$fixer,
 		_1: {
 			ctor: '::',
-			_0: _user$project$Analyser_Fixes_UnusedImportAlias$fixer,
+			_0: _user$project$Analyser_Fixes_UnusedImportedVariable$fixer,
 			_1: {
 				ctor: '::',
-				_0: _user$project$Analyser_Fixes_UnusedPatternVariable$fixer,
+				_0: _user$project$Analyser_Fixes_UnusedImportAlias$fixer,
 				_1: {
 					ctor: '::',
-					_0: _user$project$Analyser_Fixes_UnformattedFile$fixer,
+					_0: _user$project$Analyser_Fixes_UnusedPatternVariable$fixer,
 					_1: {
 						ctor: '::',
-						_0: _user$project$Analyser_Fixes_UnusedTypeAlias$fixer,
+						_0: _user$project$Analyser_Fixes_UnformattedFile$fixer,
 						_1: {
 							ctor: '::',
-							_0: _user$project$Analyser_Fixes_MultiLineRecordFormatting$fixer,
-							_1: {ctor: '[]'}
+							_0: _user$project$Analyser_Fixes_UnusedTypeAlias$fixer,
+							_1: {
+								ctor: '::',
+								_0: _user$project$Analyser_Fixes_MultiLineRecordFormatting$fixer,
+								_1: {
+									ctor: '::',
+									_0: _user$project$Analyser_Fixes_DropConsOfItemAndList$fixer,
+									_1: {
+										ctor: '::',
+										_0: _user$project$Analyser_Fixes_DuplicateImport$fixer,
+										_1: {ctor: '[]'}
+									}
+								}
+							}
 						}
 					}
 				}
@@ -31827,6 +32325,84 @@ var _user$project$Analyser_Fixers$getFixer = function (m) {
 				return _elm_lang$core$Native_Utils.eq(x.canFix, m.type_);
 			},
 			_user$project$Analyser_Fixers$all));
+};
+
+var _user$project$Analyser_Messages_Grouped$map = F2(
+	function (f, _p0) {
+		var _p1 = _p0;
+		return A2(
+			_elm_lang$core$List$map,
+			function (_p2) {
+				return f(
+					A2(
+						_elm_lang$core$Tuple$mapSecond,
+						_elm_lang$core$List$map(
+							function (x) {
+								return {
+									ctor: '_Tuple2',
+									_0: _p1._0(x),
+									_1: x
+								};
+							}),
+						_p2));
+			},
+			_p1._1);
+	});
+var _user$project$Analyser_Messages_Grouped$isEmpty = function (_p3) {
+	var _p4 = _p3;
+	return _elm_lang$core$List$isEmpty(_p4._1);
+};
+var _user$project$Analyser_Messages_Grouped$GroupedMessages = F2(
+	function (a, b) {
+		return {ctor: 'GroupedMessages', _0: a, _1: b};
+	});
+var _user$project$Analyser_Messages_Grouped$byType = function (messages) {
+	return A2(
+		_user$project$Analyser_Messages_Grouped$GroupedMessages,
+		function (_p5) {
+			return function (_) {
+				return _.path;
+			}(
+				function (_) {
+					return _.file;
+				}(_p5));
+		},
+		A2(
+			_elm_lang$core$List$sortBy,
+			_elm_lang$core$Tuple$first,
+			_elm_lang$core$Dict$toList(
+				A2(
+					_elm_community$dict_extra$Dict_Extra$groupBy,
+					function (_) {
+						return _.type_;
+					},
+					messages))));
+};
+var _user$project$Analyser_Messages_Grouped$byFileName = function (messages) {
+	return A2(
+		_user$project$Analyser_Messages_Grouped$GroupedMessages,
+		function (_) {
+			return _.type_;
+		},
+		A2(
+			_elm_lang$core$List$sortBy,
+			_elm_lang$core$Tuple$first,
+			_elm_lang$core$Dict$toList(
+				A2(
+					_elm_lang$core$Dict$map,
+					F2(
+						function (_p6, v) {
+							return A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$second, v);
+						}),
+					A2(
+						_elm_community$dict_extra$Dict_Extra$groupBy,
+						_elm_lang$core$Tuple$first,
+						A2(
+							_elm_lang$core$List$map,
+							function (m) {
+								return {ctor: '_Tuple2', _0: m.file.path, _1: m};
+							},
+							messages))))));
 };
 
 var _user$project$Analyser_Messages_Json$encodeMessageStatus = function (m) {
@@ -32034,23 +32610,18 @@ var _user$project$Analyser_Modules$decodeDependency = A2(
 	_user$project$Analyser_Modules$tupleFromLIst,
 	_elm_lang$core$Json_Decode$list(_user$project$Analyser_Modules$decodeModuleName));
 var _user$project$Analyser_Modules$edgesInFile = function (file) {
-	var _p4 = file.moduleName;
-	if (_p4.ctor === 'Just') {
-		return A2(
+	return A2(
+		_elm_lang$core$List$map,
+		F2(
+			function (v0, v1) {
+				return {ctor: '_Tuple2', _0: v0, _1: v1};
+			})(file.moduleName),
+		A2(
 			_elm_lang$core$List$map,
-			F2(
-				function (v0, v1) {
-					return {ctor: '_Tuple2', _0: v0, _1: v1};
-				})(_p4._0),
-			A2(
-				_elm_lang$core$List$map,
-				function (_) {
-					return _.moduleName;
-				},
-				file.ast.imports));
-	} else {
-		return {ctor: '[]'};
-	}
+			function (_) {
+				return _.moduleName;
+			},
+			file.ast.imports));
 };
 var _user$project$Analyser_Modules$build = F2(
 	function (codeBase, sources) {
@@ -32060,7 +32631,7 @@ var _user$project$Analyser_Modules$build = F2(
 			_0: A2(_user$project$Analyser_Checks_UnusedDependency$check, codeBase, files),
 			_1: {
 				projectModules: A2(
-					_elm_lang$core$List$filterMap,
+					_elm_lang$core$List$map,
 					function (_) {
 						return _.moduleName;
 					},
@@ -33277,8 +33848,6 @@ var _user$project$Client_Components_ActiveMessageDialog$update = F3(
 	function (location, msg, model) {
 		var _p1 = msg;
 		switch (_p1.ctor) {
-			case 'NoOp':
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Close':
 				return {
 					ctor: '_Tuple2',
@@ -33357,7 +33926,6 @@ var _user$project$Client_Components_ActiveMessageDialog$subscriptions = function
 		return _elm_lang$core$Platform_Sub$none;
 	}
 };
-var _user$project$Client_Components_ActiveMessageDialog$NoOp = {ctor: 'NoOp'};
 var _user$project$Client_Components_ActiveMessageDialog$Fix = {ctor: 'Fix'};
 var _user$project$Client_Components_ActiveMessageDialog$fixableFooter = function (fixer) {
 	return A2(
@@ -33449,8 +34017,15 @@ var _user$project$Client_Components_ActiveMessageDialog$view = function (model) 
 		A2(_elm_lang$core$Maybe$map, _user$project$Client_Components_ActiveMessageDialog$dialogConfig, model));
 };
 
-var _user$project$Client_Messages$view = F3(
-	function (focus, n, x) {
+var _user$project$Client_Messages$labelIndex = _elm_lang$core$Dict$fromList(
+	A2(
+		_elm_lang$core$List$map,
+		function (k) {
+			return {ctor: '_Tuple2', _0: k.info.key, _1: k.info.name};
+		},
+		_user$project$Analyser_Checks$all));
+var _user$project$Client_Messages$view = F4(
+	function (tag, n, label, message) {
 		return A2(
 			_elm_lang$html$Html$li,
 			{
@@ -33473,14 +34048,14 @@ var _user$project$Client_Messages$view = F3(
 										_0: {
 											ctor: '_Tuple2',
 											_0: 'background',
-											_1: _elm_lang$core$Native_Utils.eq(x.status, _user$project$Analyser_Messages_Types$Fixing) ? '#dff0d8' : '#fafafa'
+											_1: _elm_lang$core$Native_Utils.eq(message.status, _user$project$Analyser_Messages_Types$Fixing) ? '#dff0d8' : '#fafafa'
 										},
 										_1: {
 											ctor: '::',
 											_0: {
 												ctor: '_Tuple2',
 												_0: 'opacity',
-												_1: _elm_lang$core$Native_Utils.eq(x.status, _user$project$Analyser_Messages_Types$Outdated) ? '.5' : '1.0'
+												_1: _elm_lang$core$Native_Utils.eq(message.status, _user$project$Analyser_Messages_Types$Outdated) ? '.5' : '1.0'
 											},
 											_1: {ctor: '[]'}
 										}
@@ -33511,7 +34086,8 @@ var _user$project$Client_Messages$view = F3(
 							_elm_lang$html$Html$a,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(focus),
+								_0: _elm_lang$html$Html_Events$onClick(
+									tag(message)),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Attributes$style(
@@ -33574,9 +34150,31 @@ var _user$project$Client_Messages$view = F3(
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										_user$project$Analyser_Messages_Data$description(x.data)),
-									_1: {ctor: '[]'}
+									_0: A2(
+										_elm_lang$html$Html$p,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$strong,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text(
+														A2(
+															_elm_lang$core$Maybe$withDefault,
+															label,
+															A2(_elm_lang$core$Dict$get, label, _user$project$Client_Messages$labelIndex))),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(
+											_user$project$Analyser_Messages_Data$description(message.data)),
+										_1: {ctor: '[]'}
+									}
 								}),
 							_1: {ctor: '[]'}
 						}
@@ -33584,8 +34182,41 @@ var _user$project$Client_Messages$view = F3(
 				_1: {ctor: '[]'}
 			});
 	});
+var _user$project$Client_Messages$renderGroup = F2(
+	function (tag, _p0) {
+		var _p1 = _p0;
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h5,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(_p1._0),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						A2(
+							_elm_lang$core$List$indexedMap,
+							F2(
+								function (n, _p2) {
+									var _p3 = _p2;
+									return A4(_user$project$Client_Messages$view, tag, n, _p3._0, _p3._1);
+								}),
+							_p1._1)),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
 var _user$project$Client_Messages$viewAll = F2(
-	function (f, messages) {
+	function (tag, messages) {
 		return A2(
 			_elm_lang$html$Html$ul,
 			{
@@ -33602,38 +34233,10 @@ var _user$project$Client_Messages$viewAll = F2(
 					}),
 				_1: {ctor: '[]'}
 			},
-			_elm_lang$core$Dict$values(
-				A2(
-					_elm_lang$core$Dict$map,
-					F2(
-						function (title, m) {
-							return A2(
-								_elm_lang$html$Html$div,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$h5,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text(title),
-											_1: {ctor: '[]'}
-										}),
-									_1: A2(
-										_elm_lang$core$List$indexedMap,
-										F2(
-											function (n, x) {
-												return A3(
-													_user$project$Client_Messages$view,
-													f(x),
-													n,
-													x);
-											}),
-										m)
-								});
-						}),
-					messages)));
+			A2(
+				_user$project$Analyser_Messages_Grouped$map,
+				_user$project$Client_Messages$renderGroup(tag),
+				messages));
 	});
 
 var _user$project$Client_Components_MessageList$withMessages = F2(
@@ -33696,7 +34299,7 @@ var _user$project$Client_Components_MessageList$view = function (model) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$core$Dict$isEmpty(model.messages) ? A2(
+			_0: _user$project$Analyser_Messages_Grouped$isEmpty(model.messages) ? A2(
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
@@ -33787,7 +34390,7 @@ var _user$project$Client_State$listen = function (location) {
 var _user$project$Client_Components_FileTree$messagesForSelectedFile = function (m) {
 	var _p0 = m.fileIndex;
 	if (_p0.ctor === 'Just') {
-		return _user$project$Analyser_Messages_Types$groupByType(
+		return _user$project$Analyser_Messages_Grouped$byType(
 			A2(
 				_elm_lang$core$Maybe$withDefault,
 				{ctor: '[]'},
@@ -33809,7 +34412,8 @@ var _user$project$Client_Components_FileTree$messagesForSelectedFile = function 
 							},
 							_p0._0)))));
 	} else {
-		return _elm_lang$core$Dict$empty;
+		return _user$project$Analyser_Messages_Grouped$byType(
+			{ctor: '[]'});
 	}
 };
 var _user$project$Client_Components_FileTree$updateMessageList = function (m) {
@@ -34124,7 +34728,9 @@ var _user$project$Client_Components_FileTree$init = {
 		hideGoodFiles: true,
 		fileIndex: _elm_lang$core$Maybe$Nothing,
 		selectedFile: _elm_lang$core$Maybe$Nothing,
-		messageList: _user$project$Client_Components_MessageList$init(_elm_lang$core$Dict$empty)
+		messageList: _user$project$Client_Components_MessageList$init(
+			_user$project$Analyser_Messages_Grouped$byType(
+				{ctor: '[]'}))
 	},
 	_1: _elm_lang$core$Platform_Cmd$batch(
 		{
@@ -35053,11 +35659,11 @@ var _user$project$Client_Graph_Table$topListInAndOut = F2(
 					-1,
 					_elm_community$intdict$IntDict$size(
 						function (_) {
-							return _.outgoing;
+							return _.incoming;
 						}(_p0)));
 			},
 			nodeContexts);
-		var topImported = A2(
+		var topImporters = A2(
 			_elm_lang$core$List$sortBy,
 			function (_p1) {
 				return A2(
@@ -35068,7 +35674,7 @@ var _user$project$Client_Graph_Table$topListInAndOut = F2(
 					-1,
 					_elm_community$intdict$IntDict$size(
 						function (_) {
-							return _.incoming;
+							return _.outgoing;
 						}(_p1)));
 			},
 			nodeContexts);
@@ -35092,7 +35698,7 @@ var _user$project$Client_Graph_Table$topListInAndOut = F2(
 						'Top importers',
 						_user$project$Client_View_Panel$documentationButton('top-importers'),
 						_user$project$Client_Graph_Table$topList(
-							A2(_elm_lang$core$List$take, count, topImported))),
+							A2(_elm_lang$core$List$take, count, topImporters))),
 					_1: {ctor: '[]'}
 				}
 			});
@@ -35203,7 +35809,7 @@ var _user$project$Client_Graph_Graph$view = F2(
 						{ctor: '[]'},
 						{ctor: '[]'});
 				} else {
-					var _p4 = _p3._0;
+					var _p6 = _p3._0;
 					return A2(
 						_elm_lang$html$Html$div,
 						{ctor: '[]'},
@@ -35226,7 +35832,7 @@ var _user$project$Client_Graph_Graph$view = F2(
 										_0: _elm_lang$html$Html_Attributes$class('row'),
 										_1: {ctor: '[]'}
 									},
-									_user$project$Client_Graph_Graph$widgets(_p4)),
+									_user$project$Client_Graph_Graph$widgets(_p6)),
 								_1: {
 									ctor: '::',
 									_0: A2(
@@ -35241,7 +35847,7 @@ var _user$project$Client_Graph_Graph$view = F2(
 											_0: A2(
 												_elm_lang$html$Html_Lazy$lazy,
 												_user$project$Client_Graph_Table$view(20),
-												_p4),
+												_p6),
 											_1: {ctor: '[]'}
 										}),
 									_1: {
@@ -35271,7 +35877,21 @@ var _user$project$Client_Graph_Graph$view = F2(
 														{
 															ctor: '::',
 															_0: _elm_lang$html$Html$text(
-																_elm_community$graph$Graph_GraphViz$output(_p4)),
+																A3(
+																	_elm_community$graph$Graph_DOT$output,
+																	function (_p4) {
+																		return _elm_lang$core$Maybe$Just(
+																			function (_) {
+																				return _.text;
+																			}(_p4));
+																	},
+																	function (_p5) {
+																		return _elm_lang$core$Maybe$Just(
+																			function (_) {
+																				return _.text;
+																			}(_p5));
+																	},
+																	_p6)),
 															_1: {ctor: '[]'}
 														}),
 													_1: {ctor: '[]'}
@@ -35292,16 +35912,16 @@ var _user$project$Client_Graph_Graph$init = function (state) {
 	return _user$project$Client_Graph_Graph$Model(
 		A2(
 			_elm_lang$core$Maybe$map,
-			function (_p5) {
+			function (_p7) {
 				return _user$project$Client_GraphBuilder$run(
 					function (_) {
 						return _.modules;
-					}(_p5));
+					}(_p7));
 			},
 			_user$project$Client_State$toMaybe(state)));
 };
 var _user$project$Client_Graph_Graph$onNewState = F2(
-	function (state, _p6) {
+	function (state, _p8) {
 		return _user$project$Client_Graph_Graph$init(state);
 	});
 
@@ -35896,15 +36516,16 @@ var _user$project$Client_MessagesPage$groupMessages = F2(
 	function (s, m) {
 		return A2(
 			_krisajenkins$remotedata$RemoteData$withDefault,
-			_elm_lang$core$Dict$empty,
+			_user$project$Analyser_Messages_Grouped$byFileName(
+				{ctor: '[]'}),
 			A2(
 				_krisajenkins$remotedata$RemoteData$map,
 				function (state) {
 					var _p0 = m;
 					if (_p0.ctor === 'GroupByFileName') {
-						return _user$project$Analyser_Messages_Types$groupByFileName(state.messages);
+						return _user$project$Analyser_Messages_Grouped$byFileName(state.messages);
 					} else {
-						return _user$project$Analyser_Messages_Types$groupByType(state.messages);
+						return _user$project$Analyser_Messages_Grouped$byType(state.messages);
 					}
 				},
 				s));
@@ -35977,7 +36598,9 @@ var _user$project$Client_MessagesPage$init = function (state) {
 			_user$project$Client_MessagesPage$buildMessageList,
 			state,
 			_user$project$Client_MessagesPage$GroupByFileName,
-			_user$project$Client_Components_MessageList$init(_elm_lang$core$Dict$empty)),
+			_user$project$Client_Components_MessageList$init(
+				_user$project$Analyser_Messages_Grouped$byFileName(
+					{ctor: '[]'}))),
 		messageGrouper: _user$project$Client_MessagesPage$GroupByFileName
 	};
 };
@@ -36482,11 +37105,7 @@ var _user$project$Client$view = function (model) {
 		{
 			ctor: '::',
 			_0: _user$project$Client_App_App$view(model),
-			_1: {
-				ctor: '::',
-				_0: _danielnarey$elm_css_frameworks$CssFrameworks$toStyleNode(_danielnarey$elm_css_frameworks$CssFrameworks_Bootstrap$bootstrap),
-				_1: {ctor: '[]'}
-			}
+			_1: {ctor: '[]'}
 		});
 };
 var _user$project$Client$main = A2(
