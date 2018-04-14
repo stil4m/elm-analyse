@@ -1,4 +1,4 @@
-module Analyser.Messages.Data exposing (MessageData, addErrorMessage, addFileName, addModuleName, addRange, addRanges, addVarName, conformToSchema, decode, description, encode, firstRange, getRange, getRanges, init, withDescription)
+module Analyser.Messages.Data exposing (MessageData, addErrorMessage, addFileName, addModuleName, addRange, addRanges, addVarName, conformToSchema, decode, description, encode, firstRange, getRange, getRangeList, getRanges, init, withDescription)
 
 import Analyser.Messages.Schema as Schema exposing (Schema)
 import Dict exposing (Dict)
@@ -219,10 +219,25 @@ getRange k (MessageData _ d) =
     Dict.get k d |> Maybe.andThen valueAsRange
 
 
+getRangeList : String -> MessageData -> Maybe (List Range)
+getRangeList k (MessageData _ d) =
+    Dict.get k d |> Maybe.andThen valueAsRangeList
+
+
 valueAsRange : DataValue -> Maybe Range
 valueAsRange dv =
     case dv of
         RangeV v ->
+            Just v
+
+        _ ->
+            Nothing
+
+
+valueAsRangeList : DataValue -> Maybe (List Range)
+valueAsRangeList dv =
+    case dv of
+        RangeListV v ->
             Just v
 
         _ ->

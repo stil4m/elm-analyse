@@ -2,12 +2,12 @@ module Analyser.Checks.CheckTestUtil exposing (..)
 
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (defaultConfiguration)
+import Analyser.FileContext as FileContext
 import Analyser.Files.FileContent exposing (FileContent)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Elm.Interface as Interface
 import Elm.Parser
 import Elm.Processing as Processing
-import Elm.RawFile as RawFile
 import Expect
 import Test exposing (Test, describe, test)
 
@@ -29,7 +29,7 @@ getMessages input checker =
         |> Result.map
             (\rawFile ->
                 { interface = Interface.build rawFile
-                , moduleName = RawFile.moduleName rawFile
+                , moduleName = FileContext.moduleName rawFile
                 , ast = Processing.process Processing.init rawFile
                 , content = String.trim input
                 , file =

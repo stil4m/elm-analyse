@@ -9,7 +9,7 @@ import Html.Attributes exposing (href)
 menu : (Navbar.State -> msg) -> Navbar.State -> Html.Html msg
 menu m state =
     Navbar.config m
-        |> Navbar.inverse
+        |> Navbar.dark
         |> Navbar.withAnimation
         |> Navbar.brand [ href (Page.hash Home) ] [ text "Elm Analyse" ]
         |> Navbar.items

@@ -1,7 +1,6 @@
 module Analyser.Checks.ExposeAll exposing (checker)
 
 import AST.Ranges as Range
-import AST.Util
 import ASTUtil.Inspector as Inspector exposing (Order(Inner), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
@@ -10,6 +9,7 @@ import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Exposing exposing (Exposing(..))
 import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Module
 
 
 checker : Checker
@@ -40,7 +40,7 @@ scan fileContext _ =
 
 onFile : (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
 onFile _ file _ =
-    case AST.Util.fileExposingList file of
+    case Elm.Syntax.Module.exposingList file.moduleDefinition of
         All x ->
             let
                 range =

@@ -1,6 +1,5 @@
 module Analyser.Checks.UnnecessaryPortModule exposing (checker)
 
-import AST.Util
 import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
@@ -8,6 +7,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (Expression(..), FunctionSignature)
+import Elm.Syntax.Module
 
 
 checker : Checker
@@ -25,7 +25,7 @@ checker =
 
 scan : FileContext -> Configuration -> List MessageData
 scan fileContext _ =
-    if AST.Util.isPortModule fileContext.ast then
+    if Elm.Syntax.Module.isPortModule fileContext.ast.moduleDefinition then
         let
             portDeclCount =
                 Inspector.inspect

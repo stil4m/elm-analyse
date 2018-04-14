@@ -27,6 +27,7 @@ type alias Config context =
     , onFunctionSignature : Order context FunctionSignature
     , onPortDeclaration : Order context FunctionSignature
     , onTypeAlias : Order context (Ranged TypeAlias)
+    , onType : Order context Type
     , onDestructuring : Order context ( Ranged Pattern, Ranged Expression )
     , onExpression : Order context (Ranged Expression)
     , onOperatorApplication : Order context ( String, InfixDirection, Ranged Expression, Ranged Expression )
@@ -49,6 +50,7 @@ defaultConfig =
     , onPortDeclaration = Continue
     , onFunctionSignature = Continue
     , onTypeAnnotation = Continue
+    , onType = Continue
     , onTypeAlias = Continue
     , onDestructuring = Continue
     , onExpression = Continue
@@ -147,7 +149,11 @@ inspectDeclaration config ( r, declaration ) context =
 
 inspectType : Config context -> Type -> context -> context
 inspectType config typeDecl context =
-    List.foldl (inspectValueConstructor config) context typeDecl.constructors
+    actionLambda
+        config.onType
+        (\c -> List.foldl (inspectValueConstructor config) c typeDecl.constructors)
+        typeDecl
+        context
 
 
 inspectValueConstructor : Config context -> ValueConstructor -> context -> context

@@ -3,12 +3,11 @@ module Analyser.Checks.UnusedVariable exposing (checker)
 import AST.Ranges as Range
 import ASTUtil.Variables exposing (VariableType(Defined))
 import Analyser.Checks.Base exposing (Checker)
-import Analyser.Checks.Variables as Variables
+import Analyser.Checks.Variables as Variables exposing (UsedVariableContext)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
-import Dict exposing (Dict)
 import Elm.Interface as Interface
 import Elm.Syntax.Module exposing (Module(..))
 import Elm.Syntax.Range as Syntax exposing (Range)
@@ -30,20 +29,6 @@ checker =
     }
 
 
-type alias Scope =
-    Dict String ( Int, VariableType, Syntax.Range )
-
-
-type alias ActiveScope =
-    ( List String, Scope )
-
-
-type alias UsedVariableContext =
-    { poppedScopes : List Scope
-    , activeScopes : List ActiveScope
-    }
-
-
 scan : FileContext -> Configuration -> List MessageData
 scan fileContext _ =
     let
@@ -51,26 +36,15 @@ scan fileContext _ =
         x =
             Variables.collect fileContext
 
-        onlyUnused : List ( String, ( Int, VariableType, Syntax.Range ) ) -> List ( String, ( Int, VariableType, Syntax.Range ) )
-        onlyUnused =
-            List.filter (Tuple.second >> Tuple3.first >> (==) 0)
-
         unusedVariables =
-            x.poppedScopes
-                |> List.concatMap Dict.toList
-                |> onlyUnused
-                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType t x y)
+            Variables.unusedVariables x
+                |> List.filterMap (\( x, t, y ) -> forVariableType t x y)
 
         unusedTopLevels =
-            x.activeScopes
-                |> List.head
-                |> Maybe.map Tuple.second
-                |> Maybe.withDefault Dict.empty
-                |> Dict.toList
-                |> onlyUnused
+            Variables.unusedTopLevels x
                 |> List.filter (filterByModuleType fileContext)
-                |> List.filter (Tuple.first >> flip Interface.exposesFunction fileContext.interface >> not)
-                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType t x y)
+                |> List.filter (Tuple3.first >> flip Interface.exposesFunction fileContext.interface >> not)
+                |> List.filterMap (\( x, t, y ) -> forVariableType t x y)
     in
     unusedVariables ++ unusedTopLevels
 
@@ -99,7 +73,7 @@ buildMessageData varName range =
         |> Data.addRange "range" range
 
 
-filterByModuleType : FileContext -> ( String, ( Int, VariableType, Syntax.Range ) ) -> Bool
+filterByModuleType : FileContext -> ( String, VariableType, Syntax.Range ) -> Bool
 filterByModuleType fileContext =
     case fileContext.ast.moduleDefinition of
         EffectModule _ ->
@@ -109,6 +83,6 @@ filterByModuleType fileContext =
             always True
 
 
-filterForEffectModule : ( String, ( Int, VariableType, Syntax.Range ) ) -> Bool
-filterForEffectModule ( k, _ ) =
+filterForEffectModule : ( String, VariableType, Syntax.Range ) -> Bool
+filterForEffectModule ( k, _, _ ) =
     not <| List.member k [ "init", "onEffects", "onSelfMsg", "subMap", "cmdMap" ]

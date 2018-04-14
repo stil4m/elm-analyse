@@ -28,11 +28,11 @@ topListInAndOut count graph =
 
         topImportees : List (NodeContext ModuleGraph.Node ModuleGraph.Node)
         topImportees =
-            List.sortBy (.outgoing >> IntDict.size >> (*) -1) nodeContexts
-
-        topImported : List (NodeContext ModuleGraph.Node ModuleGraph.Node)
-        topImported =
             List.sortBy (.incoming >> IntDict.size >> (*) -1) nodeContexts
+
+        topImporters : List (NodeContext ModuleGraph.Node ModuleGraph.Node)
+        topImporters =
+            List.sortBy (.outgoing >> IntDict.size >> (*) -1) nodeContexts
     in
     Html.div []
         [ Panel.view Panel.WidthHalf
@@ -42,7 +42,7 @@ topListInAndOut count graph =
         , Panel.view Panel.WidthHalf
             "Top importers"
             (Panel.documentationButton "top-importers")
-            (topList (List.take count topImported))
+            (topList (List.take count topImporters))
         ]
 
 

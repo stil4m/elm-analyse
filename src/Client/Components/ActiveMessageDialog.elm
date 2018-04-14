@@ -34,7 +34,6 @@ type Msg
     = Close
     | OnFile (Result Error String)
     | Fix
-    | NoOp
     | OnEscape Bool
 
 
@@ -81,9 +80,6 @@ subscriptions x =
 update : Location -> Msg -> Model -> ( Model, Cmd Msg )
 update location msg model =
     case msg of
-        NoOp ->
-            ( model, Cmd.none )
-
         Close ->
             ( hide model, Cmd.none )
 

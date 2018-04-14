@@ -1,18 +1,29 @@
-module Analyser.FileContext exposing (FileContext, build)
+module Analyser.FileContext exposing (FileContext, build, moduleName)
 
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.FileRef exposing (FileRef)
 import Analyser.Files.Types exposing (LoadedSourceFile)
+import Debug as SafeDebug
 import Elm.Interface as Interface exposing (Interface)
 import Elm.Processing as Processing exposing (ProcessContext)
-import Elm.RawFile as RawFile
+import Elm.RawFile as RawFile exposing (RawFile)
 import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.File exposing (File)
 
 
+moduleName : RawFile -> ModuleName
+moduleName rf =
+    case RawFile.moduleName rf of
+        Nothing ->
+            SafeDebug.crash "Legacy"
+
+        Just x ->
+            x
+
+
 type alias FileContext =
     { interface : Interface
-    , moduleName : Maybe ModuleName
+    , moduleName : ModuleName
     , ast : File
     , content : String
     , file : FileRef
@@ -37,7 +48,7 @@ buildForFile moduleIndex ( fileContent, r ) =
 
         Ok l ->
             Just <|
-                { moduleName = RawFile.moduleName l
+                { moduleName = moduleName l
                 , ast = Processing.process moduleIndex l
                 , file =
                     { path = fileContent.path

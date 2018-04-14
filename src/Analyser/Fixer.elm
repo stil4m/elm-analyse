@@ -3,12 +3,13 @@ port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, isDone, 
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.FileRef exposing (FileRef)
 import Analyser.Fixers
-import Analyser.Fixes.Base exposing (Fixer)
+import Analyser.Fixes.Base exposing (Fixer, Patch(..))
 import Analyser.Messages.Data as Data
 import Analyser.Messages.Types exposing (Message)
 import Analyser.State as State exposing (State)
 import Elm.Parser as Parser
 import Elm.Processing as Processing
+import Elm.Syntax.File exposing (File)
 
 
 port storeFiles : ( String, String ) -> Cmd msg
@@ -44,12 +45,15 @@ type Msg
 
 
 type Model
-    = Model
-        { message : Message
-        , fixer : Fixer
-        , done : Bool
-        , success : Bool
-        }
+    = Model InnerModel
+
+
+type alias InnerModel =
+    { message : Message
+    , fixer : Fixer
+    , done : Bool
+    , success : Bool
+    }
 
 
 init : Int -> State -> Maybe ( Model, Cmd Msg, State )
@@ -106,7 +110,7 @@ update codeBase msg (Model model) =
                                         |> Result.toMaybe
                                )
                             |> Result.fromMaybe "Could not parse file"
-                            |> Result.andThen (\x -> model.fixer.fix x model.message.data)
+                            |> Result.andThen (\x -> applyFix model x)
                 in
                 case changedContent of
                     Ok newContent ->
@@ -129,6 +133,19 @@ update codeBase msg (Model model) =
                 , message = "Fixed message: " ++ Data.description model.message.data
                 }
             )
+
+
+applyFix : InnerModel -> ( String, File ) -> Result String String
+applyFix model pair =
+    case model.fixer.fix pair model.message.data of
+        Error e ->
+            Err e
+
+        Patched p ->
+            Ok p
+
+        IncompatibleData ->
+            Err ("Invalid message data for fixer " ++ model.fixer.canFix)
 
 
 fileHashEqual : FileLoad -> Message -> Bool

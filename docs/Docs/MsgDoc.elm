@@ -1,6 +1,7 @@
-module Docs.MsgDoc exposing (allMessages, forKey, view)
+module Docs.MsgDoc exposing (allMessages, forKey, getMessage, view)
 
 import Analyser.Checks.Base exposing (Checker, CheckerInfo)
+import Analyser.Checks.BooleanCase
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.DebugCrash
 import Analyser.Checks.DebugLog
@@ -13,6 +14,7 @@ import Analyser.Checks.ExposeAll
 import Analyser.Checks.FileLoadFailed as FileLoadFailed
 import Analyser.Checks.FunctionInLet
 import Analyser.Checks.ImportAll
+import Analyser.Checks.MapNothingToNothing
 import Analyser.Checks.MultiLineRecordFormatting
 import Analyser.Checks.NoTopLevelSignature
 import Analyser.Checks.NoUncurriedPrefix
@@ -30,9 +32,11 @@ import Analyser.Checks.UnusedImportedVariable
 import Analyser.Checks.UnusedPatternVariable
 import Analyser.Checks.UnusedTopLevel
 import Analyser.Checks.UnusedTypeAlias
+import Analyser.Checks.UnusedValueConstructor
 import Analyser.Checks.UnusedVariable
 import Analyser.Checks.UseConsOverConcat
 import Analyser.Configuration as Configuration exposing (Configuration)
+import Analyser.FileContext as FileContext
 import Analyser.FileRef exposing (FileRef)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Json as J
@@ -49,7 +53,6 @@ import Docs.Page as Page exposing (Page(Messages))
 import Elm.Interface as Interface
 import Elm.Parser
 import Elm.Processing as Processing
-import Elm.RawFile as RawFile
 import Html exposing (Html)
 import Html.Attributes as Html
 import Json.Encode
@@ -87,6 +90,7 @@ allMessages =
     , duplicateImport
     , fileLoadFailed
     , unformattedFile
+    , booleanCase
     , debugCrash
     , debugLog
     , unnecessaryParens
@@ -100,6 +104,8 @@ allMessages =
     , singleFieldRecord
     , duplicateRecordFieldUpdate
     , triggerWords
+    , mapNothingToNothing
+    , unusedValueConstructor
     ]
 
 
@@ -108,6 +114,40 @@ forKey x =
     allMessages
         |> List.filter (.info >> .key >> (==) x)
         |> List.head
+
+
+unusedValueConstructor : MsgDoc
+unusedValueConstructor =
+    { info = .info Analyser.Checks.UnusedValueConstructor.checker
+    , example = Dynamic Analyser.Checks.UnusedValueConstructor.checker
+    , input = """
+module Greet exposing (Color(Green))
+
+type Color
+    = Blue
+    | Red
+    | Green
+
+red = Red
+"""
+    }
+
+
+mapNothingToNothing : MsgDoc
+mapNothingToNothing =
+    { info = .info Analyser.Checks.MapNothingToNothing.checker
+    , example = Dynamic Analyser.Checks.MapNothingToNothing.checker
+    , input = """
+module Greet exposing (greet)
+
+greet x =
+    case x of
+        Nothing ->
+            Nothing
+        Just x ->
+            "Hello " ++ x
+"""
+    }
 
 
 triggerWords : MsgDoc
@@ -121,6 +161,24 @@ module Foo exposing (sum)
 sum : Int -> Int -> Int
 sum x y =
     0
+"""
+    }
+
+
+booleanCase : MsgDoc
+booleanCase =
+    { info = .info Analyser.Checks.BooleanCase.checker
+    , example = Dynamic Analyser.Checks.BooleanCase.checker
+    , input = """
+module Foo exposing (sum)
+
+thing : Boolean -> String
+thing x =
+    case x of
+        True ->
+            "Hello"
+        False ->
+            "Goodbye"
 """
     }
 
@@ -707,7 +765,7 @@ getMessages input checker =
         |> Result.map
             (\rawFile ->
                 { interface = Interface.build rawFile
-                , moduleName = RawFile.moduleName rawFile
+                , moduleName = FileContext.moduleName rawFile
                 , ast = Processing.process Processing.init rawFile
                 , content = input
                 , file = { path = "./foo.elm", version = "" }

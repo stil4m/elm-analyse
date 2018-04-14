@@ -1,11 +1,11 @@
-module Analyser.Fixes.FileContent exposing (getCharAtLocation, replaceLines, replaceLocationWith, replaceRangeWith, updateRange)
+module Analyser.Fixes.FileContent exposing (getCharAtLocation, getStringAtRange, replaceLines, replaceLocationWith, replaceRangeWith, updateRange)
 
 import Elm.Syntax.Range exposing (Range)
 import List.Extra as List
 
 
-updateRange : Range -> String -> (String -> String) -> String
-updateRange range content patch =
+updateRange : Range -> (String -> String) -> String -> String
+updateRange range patch content =
     let
         rows =
             content
@@ -24,7 +24,7 @@ updateRange range content patch =
             String.left range.start.column
 
         rowPostPartTakeFn =
-            String.dropLeft (range.end.column + 1)
+            String.dropLeft range.end.column
 
         rowPrePart =
             List.drop beforeRows rows
@@ -61,7 +61,7 @@ updateRange range content patch =
 
 replaceRangeWith : Range -> String -> String -> String
 replaceRangeWith range newValue input =
-    updateRange range input (always newValue)
+    updateRange range (always newValue) input
 
 
 replaceLocationWith : ( Int, Int ) -> String -> String -> String
@@ -90,6 +90,30 @@ getCharAtLocation ( row, column ) input =
         |> List.drop row
         |> List.head
         |> Maybe.map (String.dropLeft column >> String.left 1)
+
+
+getStringAtRange : Range -> String -> String
+getStringAtRange { start, end } input =
+    let
+        trimLast i line =
+            if i == end.row then
+                String.left end.column line
+            else
+                line
+
+        trimFirst i line =
+            if i == 0 then
+                String.dropLeft start.column line
+            else
+                line
+    in
+    input
+        |> String.split "\n"
+        |> List.take (end.row + 1)
+        |> List.indexedMap trimLast
+        |> List.drop start.row
+        |> List.indexedMap trimFirst
+        |> String.concat
 
 
 replaceLines : ( Int, Int ) -> String -> String -> String

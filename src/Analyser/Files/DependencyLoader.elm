@@ -1,12 +1,13 @@
 port module Analyser.Files.DependencyLoader exposing (Model, Msg, getResult, init, subscriptions, update)
 
+import Analyser.FileContext as FileContext
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
 import Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
 import Analyser.Files.Types exposing (LoadedFileData, LoadedSourceFile, Version)
 import Dict
 import Elm.Dependency exposing (Dependency)
 import Elm.Interface as Interface
-import Elm.RawFile as RawFile exposing (RawFile)
+import Elm.RawFile exposing (RawFile)
 import Result
 import Result.Extra as Result
 import Util.Logger as Logger
@@ -111,20 +112,13 @@ update msg model =
 
 buildDependency : Model -> List (Result x LoadedFileData) -> Dependency
 buildDependency model loadedFiles =
-    let
-        interfaces =
-            loadedFiles
-                |> List.filterMap
-                    (Result.toMaybe
-                        >> Maybe.andThen
-                            (\z ->
-                                RawFile.moduleName z.ast
-                                    |> Maybe.map (flip (,) z.interface)
-                            )
-                    )
-                |> Dict.fromList
-    in
-    Dependency model.name model.version interfaces
+    loadedFiles
+        |> List.filterMap
+            (Result.toMaybe
+                >> Maybe.map (\z -> ( FileContext.moduleName z.ast, z.interface ))
+            )
+        |> Dict.fromList
+        |> Dependency model.name model.version
 
 
 dependencyFileInterface : FileContent -> Result String LoadedFileData
@@ -134,4 +128,4 @@ dependencyFileInterface =
 
 loadedInterfaceForFile : RawFile -> LoadedFileData
 loadedInterfaceForFile file =
-    { ast = file, moduleName = RawFile.moduleName file, interface = Interface.build file }
+    { ast = file, moduleName = FileContext.moduleName file, interface = Interface.build file }

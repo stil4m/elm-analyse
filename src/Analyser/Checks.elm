@@ -1,6 +1,7 @@
 module Analyser.Checks exposing (all, schemas)
 
 import Analyser.Checks.Base exposing (Checker)
+import Analyser.Checks.BooleanCase as BooleanCase
 import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.DebugCrash as DebugCrash
 import Analyser.Checks.DebugLog as DebugLog
@@ -12,6 +13,7 @@ import Analyser.Checks.DuplicateRecordFieldUpdate as DuplicateRecordFieldUpdate
 import Analyser.Checks.ExposeAll as ExposeAll
 import Analyser.Checks.FunctionInLet as FunctionInLet
 import Analyser.Checks.ImportAll as ImportAll
+import Analyser.Checks.MapNothingToNothing as MapNothingToNothing
 import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
 import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
@@ -29,6 +31,7 @@ import Analyser.Checks.UnusedImportedVariable as UnusedImportedVariable
 import Analyser.Checks.UnusedPatternVariable as UnusedPatternVariable
 import Analyser.Checks.UnusedTopLevel as UnusedTopLevel
 import Analyser.Checks.UnusedTypeAlias as UnusedTypeAlias
+import Analyser.Checks.UnusedValueConstructor as UnusedValueConstructor
 import Analyser.Checks.UnusedVariable as UnusedVariable
 import Analyser.Checks.UseConsOverConcat as UseConsOverConcat
 import Analyser.Messages.Schemas as Schemas exposing (Schemas)
@@ -42,6 +45,7 @@ schemas =
 all : List Checker
 all =
     [ UnusedVariable.checker
+    , UnusedValueConstructor.checker
     , UnusedImportedVariable.checker
     , UnusedPatternVariable.checker
     , UnusedTopLevel.checker
@@ -71,4 +75,6 @@ all =
     , DuplicateRecordFieldUpdate.checker
     , SingleFieldRecord.checker
     , TriggerWords.checker
+    , BooleanCase.checker
+    , MapNothingToNothing.checker
     ]
