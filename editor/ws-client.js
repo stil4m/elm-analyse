@@ -54,4 +54,5 @@ module.exports = function(url, es) {
     };
 
     bind(ws, es, reconnect);
+    return ws;
 };

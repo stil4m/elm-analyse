@@ -5,7 +5,7 @@ const Elm = require('./elm');
 const Editor = Elm.Editor;
 
 module.exports = function() {
-    var ws;
+    var ws = null;
 
     var listenerId = 0;
     const listeners = {};

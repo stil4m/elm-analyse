@@ -57,7 +57,7 @@ const Elm = __require(2,0);
 const Editor = Elm.Editor;
 
 module.exports = function() {
-    var ws;
+    var ws = null;
 
     var listenerId = 0;
     const listeners = {};
@@ -168,6 +168,7 @@ module.exports = function(url, es) {
     };
 
     bind(ws, es, reconnect);
+    return ws;
 };
 
 return module.exports;
@@ -23959,13 +23960,19 @@ var _user$project$Analyser_Checks_UnusedDependency$filterUsedDeps = F2(
 		var _p4 = _p3;
 		return A3(_elm_lang$core$List$foldl, _user$project$Analyser_Checks_UnusedDependency$markImport, deps, _p4.ast.imports);
 	});
+var _user$project$Analyser_Checks_UnusedDependency$notElmLangCore = function (dep) {
+	return !_elm_lang$core$Native_Utils.eq(dep.name, 'elm-lang/core');
+};
 var _user$project$Analyser_Checks_UnusedDependency$check = F2(
 	function (codeBase, files) {
-		return A3(
-			_elm_lang$core$List$foldl,
-			_user$project$Analyser_Checks_UnusedDependency$filterUsedDeps,
-			_user$project$Analyser_CodeBase$dependencies(codeBase),
-			files);
+		return A2(
+			_elm_lang$core$List$filter,
+			_user$project$Analyser_Checks_UnusedDependency$notElmLangCore,
+			A3(
+				_elm_lang$core$List$foldl,
+				_user$project$Analyser_Checks_UnusedDependency$filterUsedDeps,
+				_user$project$Analyser_CodeBase$dependencies(codeBase),
+				files));
 	});
 
 var _user$project$Util_Json$decodeTyped = function (opts) {
