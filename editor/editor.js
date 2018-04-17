@@ -4,7 +4,7 @@ const WebSocketClient = require('./ws-client');
 const Elm = require('./elm');
 const Editor = Elm.Editor;
 
-module.exports = function() {
+module.exports = function(port) {
     var ws = null;
 
     var listenerId = 0;
@@ -35,7 +35,7 @@ module.exports = function() {
                 console.log('Already started');
                 return;
             }
-            ws = WebSocketClient('ws://localhost:3000/state', {
+            ws = WebSocketClient('ws://localhost:' + port + '/state', {
                 onMessage: onMessage,
                 onReconnect: () => console.log('Elm editor: On reconnect'),
                 onOpen: () => console.log('Elm editor: On open')
@@ -54,12 +54,3 @@ module.exports = function() {
         }
     };
 };
-// //
-// const editor = module.exports();
-// const cancel = editor.onState(function(s) {
-//     console.log('On Client');
-//     console.log(s);
-// });
-// console.log('Cancel:', cancel);
-// //cancel();
-// editor.start();
