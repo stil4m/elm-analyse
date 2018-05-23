@@ -58,7 +58,7 @@ Add the `-s` option for server mode. This will allow you to view results in your
 
 ## Supported Checks
 
-All supported checks can be found in the [check documentation](https://stil4m.github.io/elm-analyse/#/configuration).
+All supported checks can be found in the [check documentation](https://stil4m.github.io/elm-analyse/#/messages).
 
 ---
 
