@@ -1,3 +1,4 @@
+const open = require('open');
 const fileLoadingPorts = require('../util/file-loading-ports');
 const loggingPorts = require('../util/logging-ports');
 const dependencies = require('../util/dependencies');
@@ -17,5 +18,8 @@ module.exports = function worker(config, onload) {
         loggingPorts(app, config, directory);
         fileLoadingPorts(app, config, process.cwd());
         onload(app);
+        if (config.open) {
+            open('http://localhost:' + config.port);
+        }
     });
 };
