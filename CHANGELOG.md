@@ -1,5 +1,9 @@
 # elm-analyse changelog
 
+## 0.14.1 (2018-04-16)
+
+* [Issue #159](https://github.com/stil4m/elm-analyse/issues/159) Bug: elm-lang/core reported as unused dependency in basic Elm program
+
 ## 0.14.0 (2018-04-14)
 
 * [Issue #131](https://github.com/stil4m/elm-analyse/issues/131) New Check: Do not map `Nothing` to `Nothing`.

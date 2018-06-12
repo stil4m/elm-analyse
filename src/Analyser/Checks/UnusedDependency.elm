@@ -11,6 +11,12 @@ import Elm.Syntax.Module exposing (Import)
 check : CodeBase -> List FileContext -> List Dependency
 check codeBase files =
     List.foldl filterUsedDeps (CodeBase.dependencies codeBase) files
+        |> List.filter notElmLangCore
+
+
+notElmLangCore : Dependency -> Bool
+notElmLangCore dep =
+    dep.name /= "elm-lang/core"
 
 
 filterUsedDeps : FileContext -> List Dependency -> List Dependency

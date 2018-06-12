@@ -65,6 +65,7 @@
     "gulp-replace": "0.5.4",
     "node-module-concat": "2.1.0",
     "nodemon": "1.12.1",
+    "open": "0.0.5",
     "prettier": "1.7.0",
     "run-sequence": "1.2.2",
     "utf-8-validate": "3.0.4"

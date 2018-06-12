@@ -8,9 +8,10 @@ var args = minimist(process.argv.slice(2), {
         serve: 's',
         help: 'h',
         port: 'p',
-        version: 'v'
+        version: 'v',
+        open: 'o'
     },
-    boolean: ['serve', 'help', 'version'],
+    boolean: ['serve', 'help', 'version', 'open'],
     string: ['port', 'elm-format-path', 'format']
 });
 
@@ -32,7 +33,8 @@ var args = minimist(process.argv.slice(2), {
     const config = {
         port: args.port || 3000,
         elmFormatPath: elmFormatPath,
-        format: validFormats.indexOf(args.format) != -1 ? args.format : 'human'
+        format: validFormats.indexOf(args.format) != -1 ? args.format : 'human',
+        open: args.open || false
     };
 
     if (args.help) {
@@ -52,6 +54,9 @@ var args = minimist(process.argv.slice(2), {
         );
         console.log(
             '   --port, -p          The port on which the server should listen. Defaults to 3000.'
+        );
+        console.log(
+            '   --open, -o          Open default browser when server goes live.'
         );
         console.log(
             '   --elm-format-path   Path to elm-format. Defaults to `elm-format`.'
