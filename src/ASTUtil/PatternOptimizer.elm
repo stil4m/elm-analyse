@@ -65,9 +65,6 @@ optimize range (( r, pattern ) as input) =
             NamedPattern qnr inner ->
                 ( r, NamedPattern qnr (List.map (optimize range) inner) )
 
-            QualifiedNamePattern _ ->
-                replaceWithAllIfRangeMatches input range r
-
             AsPattern subPattern asPointer ->
                 if asPointer.range == range then
                     subPattern

@@ -21,7 +21,7 @@ all =
                     targetRange =
                         { start = { row = 1, column = 1 }, end = { row = 1, column = 4 } }
                 in
-                ( targetRange, QualifiedNamePattern { moduleName = [], name = "foo" } )
+                ( targetRange, NamedPattern { moduleName = [], name = "foo" } [] )
                     |> optimize targetRange
                     |> Expect.equal ( emptyRange, AllPattern )
         , listPatternTests
