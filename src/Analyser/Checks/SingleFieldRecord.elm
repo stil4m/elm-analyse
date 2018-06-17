@@ -87,7 +87,7 @@ onTypeAnnotation (( _, t ) as x) context =
     in
     { context
         | matches = findPlainRecords x ++ context.matches
-        , whitelisted = context.whitelisted ++ newWhitelisted
+        , whitelisted = newWhitelisted
     }
 
 
