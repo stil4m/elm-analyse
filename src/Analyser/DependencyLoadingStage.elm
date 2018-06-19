@@ -2,99 +2,69 @@ module Analyser.DependencyLoadingStage exposing (Model, Msg, getDependencies, in
 
 import Analyser.Files.DependencyLoader as DependencyLoader
 import Analyser.Files.Types exposing (Version)
+import Dict exposing (Dict)
 import Elm.Dependency exposing (Dependency)
 
 
-type Model
-    = Model State
+type alias Model =
+    Dict String DependencyLoader.Model
 
 
 type Msg
-    = DependencyLoaderMsg DependencyLoader.Msg
-
-
-type alias State =
-    { queue : List ( String, Version )
-    , activeLoader : Maybe DependencyLoader.Model
-    , loadedDependencies : List (Result String Dependency)
-    }
+    = DependencyLoaderMsg String DependencyLoader.Msg
 
 
 getDependencies : Model -> List Dependency
-getDependencies (Model state) =
-    state.loadedDependencies |> List.filterMap Result.toMaybe
+getDependencies model =
+    model
+        |> Dict.values
+        |> List.filterMap DependencyLoader.getDependency
 
 
 init : List ( String, Version ) -> ( Model, Cmd Msg )
 init input =
-    ( Model
-        { queue = input
-        , activeLoader = Nothing
-        , loadedDependencies = []
-        }
-    , Cmd.none
+    let
+        inits : List ( String, ( DependencyLoader.Model, Cmd DependencyLoader.Msg ) )
+        inits =
+            List.map (\( s, v ) -> ( s, DependencyLoader.init ( s, v ) )) input
+    in
+    ( List.map (\( a, ( b, _ ) ) -> ( a, b )) inits
+        |> Dict.fromList
+    , List.map (\( a, ( _, c ) ) -> c |> Cmd.map (DependencyLoaderMsg a)) inits
+        |> Cmd.batch
     )
-        |> loadNextDependency
-
-
-loadNextDependency : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
-loadNextDependency (( Model m, cmds ) as input) =
-    if m.activeLoader /= Nothing then
-        input
-    else
-        let
-            nextLoaderPair =
-                List.head m.queue
-                    |> Maybe.map DependencyLoader.init
-        in
-        ( Model
-            { m
-                | queue = List.drop 1 m.queue
-                , activeLoader = Maybe.map Tuple.first nextLoaderPair
-            }
-        , Cmd.batch
-            [ cmds
-            , nextLoaderPair
-                |> Maybe.map (Tuple.second >> Cmd.map DependencyLoaderMsg)
-                |> Maybe.withDefault Cmd.none
-            ]
-        )
 
 
 subscriptions : Model -> Sub Msg
-subscriptions (Model model) =
-    model.activeLoader
-        |> Maybe.map (DependencyLoader.subscriptions >> Sub.map DependencyLoaderMsg)
-        |> Maybe.withDefault Sub.none
+subscriptions model =
+    model
+        |> Dict.toList
+        |> List.map (\( name, l ) -> DependencyLoader.subscriptions l |> Sub.map (DependencyLoaderMsg name))
+        |> Sub.batch
 
 
 isDone : Model -> Bool
-isDone (Model model) =
-    model.activeLoader == Nothing && List.isEmpty model.queue
+isDone model =
+    model |> Dict.values |> List.all DependencyLoader.isDone
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg (Model state) =
+update msg model =
     case msg of
-        DependencyLoaderMsg subMsg ->
-            state.activeLoader
-                |> Maybe.map (DependencyLoader.update subMsg)
-                |> Maybe.map
-                    (\( loader, cmds ) ->
-                        case DependencyLoader.getResult loader of
-                            Nothing ->
-                                ( Model { state | activeLoader = Just loader }
-                                , cmds |> Cmd.map DependencyLoaderMsg
-                                )
+        DependencyLoaderMsg name subMsg ->
+            let
+                loader =
+                    Dict.get name model
+            in
+            case loader of
+                Nothing ->
+                    ( model, Cmd.none )
 
-                            Just result ->
-                                ( Model
-                                    { state
-                                        | loadedDependencies = result :: state.loadedDependencies
-                                        , activeLoader = Nothing
-                                    }
-                                , cmds |> Cmd.map DependencyLoaderMsg
-                                )
-                                    |> loadNextDependency
+                Just l ->
+                    let
+                        ( newLoader, cmds ) =
+                            DependencyLoader.update subMsg l
+                    in
+                    ( Dict.insert name newLoader model
+                    , Cmd.map (DependencyLoaderMsg name) cmds
                     )
-                |> Maybe.withDefault ( Model state, Cmd.none )

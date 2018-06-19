@@ -1,131 +1,138 @@
-port module Analyser.Files.DependencyLoader exposing (Model, Msg, getResult, init, subscriptions, update)
+module Analyser.Files.DependencyLoader exposing (Model, Msg, getDependency, init, isDone, subscriptions, update)
 
-import Analyser.FileContext as FileContext
-import Analyser.Files.FileContent as FileContent exposing (FileContent)
-import Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
-import Analyser.Files.Types exposing (LoadedFileData, LoadedSourceFile, Version)
-import Dict
+import Analyser.DependencyHandler as DependencyHandler exposing (CacheDependencyRead(..))
+import Analyser.Files.Types exposing (Version)
 import Elm.Dependency exposing (Dependency)
-import Elm.Interface as Interface
-import Elm.RawFile exposing (RawFile)
-import Result
-import Result.Extra as Result
 import Util.Logger as Logger
 
 
-port loadRawDependency : ( String, Version ) -> Cmd msg
-
-
-port loadDependencyFiles : ( String, Version ) -> Cmd msg
-
-
-port storeRawDependency : ( String, Version, String ) -> Cmd msg
-
-
-port onRawDependency : (( String, Version, String ) -> msg) -> Sub msg
-
-
-port onDependencyFiles : (( String, Version, List FileContent ) -> msg) -> Sub msg
-
-
-type Msg
-    = LoadedRawDependency ( String, Version, String )
-    | LoadedDependencyFiles ( String, Version, List FileContent )
-
-
 type alias Model =
-    { name : String
-    , version : Version
-    , toParse : List String
-    , parsed : List LoadedSourceFile
-    , result : Maybe (Result String Dependency)
+    { dep : ( String, Version )
+    , state : State
     }
 
 
+type State
+    = AwaitingCache
+    | LoadingOnlineDocs
+    | RawDiskLoading
+    | Failure
+    | Done Dependency
+
+
+type Msg
+    = OnCacheRead CacheDependencyRead
+    | OnOnlineDocs (Maybe (Result String Dependency))
+    | OnLocallyBuildDependency (Maybe (Result String Dependency))
+
+
 init : ( String, Version ) -> ( Model, Cmd Msg )
-init ( name, version ) =
-    ( { name = name
-      , version = version
-      , toParse = []
-      , parsed = []
-      , result = Nothing
-      }
+init (( name, version ) as dep) =
+    ( { dep = dep, state = AwaitingCache }
     , Cmd.batch
-        [ loadRawDependency ( name, version )
+        [ DependencyHandler.readFromDisk dep
         , Logger.info ("Load dependency " ++ name ++ " " ++ version)
         ]
     )
 
 
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.batch
-        [ onRawDependency LoadedRawDependency
-        , onDependencyFiles LoadedDependencyFiles
-        ]
+isDone : Model -> Bool
+isDone m =
+    case m.state of
+        Failure ->
+            True
+
+        Done _ ->
+            True
+
+        _ ->
+            False
 
 
-getResult : Model -> Maybe (Result String Dependency)
-getResult =
-    .result
+getDependency : Model -> Maybe Dependency
+getDependency m =
+    case m.state of
+        Done d ->
+            Just d
+
+        _ ->
+            Nothing
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadedRawDependency ( dep, ver, x ) ->
-            if model.name /= dep || model.version /= ver then
-                ( model, Cmd.none )
-            else
-                case deserialiseDependency x of
-                    Nothing ->
-                        ( model, loadDependencyFiles ( model.name, model.version ) )
+        OnCacheRead read ->
+            case read of
+                Success result ->
+                    ( { model | state = Done <| result }
+                    , Logger.info ("Loaded " ++ Tuple.first model.dep ++ " from cache")
+                    )
 
-                    Just dependency ->
-                        ( { model | result = Just (Ok dependency) }, Cmd.none )
+                Failed ->
+                    ( { model | state = LoadingOnlineDocs }
+                    , DependencyHandler.loadOnlineDocumentation model.dep
+                    )
 
-        LoadedDependencyFiles ( dep, ver, files ) ->
-            if model.name /= dep || model.version /= ver then
-                ( model, Cmd.none )
-            else
-                let
-                    loadedFiles =
-                        List.map dependencyFileInterface files
-                in
-                if not <| List.all Result.isOk loadedFiles then
-                    ( { model | result = Just (Err "Could not load all dependency files") }
+                Ignore ->
+                    ( model
                     , Cmd.none
                     )
-                else
-                    let
-                        dependency =
-                            buildDependency model loadedFiles
-                    in
-                    ( { model | result = Just (Ok dependency) }
-                    , storeRawDependency
-                        ( dependency.name
-                        , dependency.version
-                        , serialiseDependency dependency
-                        )
+
+        OnOnlineDocs result ->
+            case result of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just (Err _) ->
+                    ( { model | state = RawDiskLoading }
+                    , DependencyHandler.loadDependencyFiles model.dep
+                    )
+
+                Just (Ok decodedDependency) ->
+                    ( { model | state = Done decodedDependency }
+                    , Cmd.batch
+                        [ DependencyHandler.storeToDisk decodedDependency
+                        , Logger.info ("Loaded " ++ Tuple.first model.dep ++ " from package.elm-lang.org")
+                        ]
+                    )
+
+        OnLocallyBuildDependency result ->
+            case result of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just (Err _) ->
+                    ( { model | state = Failure }
+                    , Logger.info ("Failed to load dependency: " ++ Tuple.first model.dep)
+                    )
+
+                Just (Ok decodedDependency) ->
+                    ( { model | state = Done decodedDependency }
+                    , Cmd.batch
+                        [ DependencyHandler.storeToDisk decodedDependency
+                        , Logger.info ("Loaded " ++ Tuple.first model.dep ++ " by building depenceny from plain source files")
+                        ]
                     )
 
 
-buildDependency : Model -> List (Result x LoadedFileData) -> Dependency
-buildDependency model loadedFiles =
-    loadedFiles
-        |> List.filterMap
-            (Result.toMaybe
-                >> Maybe.map (\z -> ( FileContext.moduleName z.ast, z.interface ))
-            )
-        |> Dict.fromList
-        |> Dependency model.name model.version
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    case model.state of
+        AwaitingCache ->
+            DependencyHandler.onReadFromDisk model.dep
+                |> Sub.map OnCacheRead
 
+        Failure ->
+            Sub.none
 
-dependencyFileInterface : FileContent -> Result String LoadedFileData
-dependencyFileInterface =
-    FileContent.asRawFile >> Tuple.first >> Result.map loadedInterfaceForFile
+        Done _ ->
+            Sub.none
 
+        LoadingOnlineDocs ->
+            DependencyHandler.onOnlineDocumentation model.dep
+                |> Sub.map OnOnlineDocs
 
-loadedInterfaceForFile : RawFile -> LoadedFileData
-loadedInterfaceForFile file =
-    { ast = file, moduleName = FileContext.moduleName file, interface = Interface.build file }
+        RawDiskLoading ->
+            DependencyHandler.onLoadDependencyFilesFromDisk model.dep
+                |> Sub.map OnLocallyBuildDependency

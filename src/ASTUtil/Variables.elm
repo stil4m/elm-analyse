@@ -109,7 +109,7 @@ getImportExposedVars e =
 
 
 getDeclarationVars : Ranged Declaration -> List ( VariablePointer, VariableType )
-getDeclarationVars ( r, decl ) =
+getDeclarationVars ( _, decl ) =
     case decl of
         FuncDecl f ->
             [ ( f.declaration.name, TopLevel ) ]

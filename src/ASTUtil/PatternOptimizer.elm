@@ -10,14 +10,6 @@ emptyRange =
     { start = { row = 0, column = 0 }, end = { row = 0, column = 0 } }
 
 
-replaceWithAllIfRangeMatches : Ranged Pattern -> Range -> Range -> Ranged Pattern
-replaceWithAllIfRangeMatches ( some, p ) x y =
-    if x == y then
-        ( emptyRange, AllPattern )
-    else
-        ( some, p )
-
-
 isAllPattern : Ranged Pattern -> Bool
 isAllPattern p =
     case Tuple.second p of
