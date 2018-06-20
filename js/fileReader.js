@@ -4,8 +4,6 @@ const cache = require('./util/cache');
 const sums = require('sums');
 
 module.exports = function() {
-
-
     function errorResponse(path) {
         return {
             success: false,
