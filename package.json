@@ -1,6 +1,6 @@
 {
   "name": "elm-analyse",
-  "version": "0.15.0-alpha.2",
+  "version": "0.15.0-alpha.3",
   "description": "A tool that allows you analyse your Elm code and identifies deficiencies and best practices.",
   "repository": {
     "type": "git",
@@ -46,6 +46,7 @@
     "lodash": "4.17.4",
     "minimist": "1.2.0",
     "node-watch": "0.5.5",
+    "open": "0.0.5",
     "os-homedir": "1.0.2",
     "sums": "0.2.4",
     "ws": "3.3.1",
@@ -65,7 +66,6 @@
     "gulp-replace": "0.5.4",
     "node-module-concat": "2.1.0",
     "nodemon": "1.12.1",
-    "open": "0.0.5",
     "prettier": "1.7.0",
     "run-sequence": "1.2.2",
     "utf-8-validate": "3.0.4"
