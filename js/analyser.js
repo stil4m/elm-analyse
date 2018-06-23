@@ -1,6 +1,6 @@
 const directory = process.cwd();
 
-const fileLoadingPorts = require('./util/file-loading-ports');
+const fileLoadingPorts = require('./file-loading-ports');
 const loggingPorts = require('./util/logging-ports');
 const Elm = require('./backend-elm');
 const dependencies = require('./util/dependencies');

@@ -1,5 +1,5 @@
 const open = require('open');
-const fileLoadingPorts = require('../util/file-loading-ports');
+const fileLoadingPorts = require('../file-loading-ports');
 const loggingPorts = require('../util/logging-ports');
 const dependencies = require('../util/dependencies');
 module.exports = function worker(config, onload) {
