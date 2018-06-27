@@ -1,7 +1,9 @@
 var modConcat = require('node-module-concat');
-var outputFile = './js/public/editor-elm.js';
-modConcat('./editor/editor.js', outputFile, function(err, stats) {
+var outputFile = './dist/public/editor-elm.js';
+var fs = require('fs');
+modConcat('./dist/app/editor/editor.js', outputFile, function(err, stats) {
     if (err) {
+        console.log(err);
         process.exit(1);
     }
     console.log(stats.files.length + ' were combined into ' + outputFile);

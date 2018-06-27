@@ -53,6 +53,18 @@
     "request": "2.83.0"
   },
   "devDependencies": {
+    "@types/express": "^4.16.0",
+    "@types/express-ws": "^3.0.0",
+    "@types/find": "^0.2.0",
+    "@types/fs-extra": "^5.0.3",
+    "@types/lodash": "^4.14.110",
+    "@types/minimist": "^1.2.0",
+    "@types/node": "^10.3.5",
+    "@types/open": "0.0.29",
+    "@types/os-homedir": "^1.0.0",
+    "@types/request": "^2.47.1",
+    "@types/ws": "^5.1.2",
+    "bootstrap": "^3.3.7",
     "bufferutil": "3.0.3",
     "chokidar": "1.7.0",
     "chokidar-cli": "1.2.0",
@@ -61,6 +73,7 @@
     "elm-live": "2.7.5",
     "elm-test": "0.18.7",
     "eslint": "4.10.0",
+    "font-awesome": "^4.7.0",
     "gulp": "3.9.1",
     "gulp-elm": "0.6.1",
     "gulp-replace": "0.5.4",
@@ -68,6 +81,8 @@
     "nodemon": "1.12.1",
     "prettier": "1.7.0",
     "run-sequence": "1.2.2",
+    "sb-admin-2": "^3.3.8",
+    "typescript": "^2.9.2",
     "utf-8-validate": "3.0.4"
   }
 }
