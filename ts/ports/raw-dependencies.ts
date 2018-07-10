@@ -1,25 +1,34 @@
 import * as cache from '../util/cache';
 
-import { ElmApp } from '../domain';
+import { ElmApp, DependencyPointer, DependencyStore } from '../domain';
 
 function setup(app: ElmApp) {
-    app.ports.storeRawDependency.subscribe(x => {
-        cache.storeDependencyJson(x[0], x[1], x[2]);
+    app.ports.storeRawDependency.subscribe((x: DependencyStore) => {
+        const dependency = x.dependency;
+        cache.storeDependencyJson(dependency.name, dependency.version, x.content);
     });
 
-    app.ports.loadRawDependency.subscribe(x => {
-        var dependency = x[0];
-        var version = x[1];
-        cache.readDependencyJson(dependency, version, function(err, content) {
+    app.ports.loadRawDependency.subscribe((dependency: DependencyPointer) => {
+        cache.readDependencyJson(dependency.name, dependency.version, function(err, content) {
             if (err) {
-                //TODO
-                app.ports.onRawDependency.send([dependency, version, '' + x]);
+                app.ports.onRawDependency.send({
+                    dependency: dependency,
+                    json: null
+                });
             } else {
-                app.ports.onRawDependency.send([
-                    dependency,
-                    version,
-                    content.toString()
-                ]);
+                try {
+                    const parsed: JSON = JSON.parse(content.toString());
+
+                    app.ports.onRawDependency.send({
+                        dependency: dependency,
+                        json: parsed
+                    });
+                } catch (e) {
+                    app.ports.onRawDependency.send({
+                        dependency: dependency,
+                        json: null
+                    });
+                }
             }
         });
     });

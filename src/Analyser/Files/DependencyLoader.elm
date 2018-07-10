@@ -1,13 +1,12 @@
 module Analyser.Files.DependencyLoader exposing (Model, Msg, getDependency, init, isDone, subscriptions, update)
 
-import Analyser.DependencyHandler as DependencyHandler exposing (CacheDependencyRead(..))
-import Analyser.Files.Types exposing (Version)
+import Analyser.DependencyHandler as DependencyHandler exposing (CacheDependencyRead(..), DependencyPointer)
 import Elm.Dependency exposing (Dependency)
 import Util.Logger as Logger
 
 
 type alias Model =
-    { dep : ( String, Version )
+    { dependency : DependencyPointer
     , state : State
     }
 
@@ -26,12 +25,12 @@ type Msg
     | OnLocallyBuildDependency (Maybe (Result String Dependency))
 
 
-init : ( String, Version ) -> ( Model, Cmd Msg )
-init (( name, version ) as dep) =
-    ( { dep = dep, state = AwaitingCache }
+init : DependencyPointer -> ( Model, Cmd Msg )
+init dep =
+    ( { dependency = dep, state = AwaitingCache }
     , Cmd.batch
         [ DependencyHandler.readFromDisk dep
-        , Logger.info ("Load dependency " ++ name ++ " " ++ version)
+        , Logger.info ("Load dependency " ++ dep.name ++ " " ++ dep.version)
         ]
     )
 
@@ -66,12 +65,12 @@ update msg model =
             case read of
                 Success result ->
                     ( { model | state = Done <| result }
-                    , Logger.info ("Loaded " ++ Tuple.first model.dep ++ " from cache")
+                    , Logger.info ("Loaded " ++ model.dependency.name ++ " from cache")
                     )
 
                 Failed ->
                     ( { model | state = LoadingOnlineDocs }
-                    , DependencyHandler.loadOnlineDocumentation model.dep
+                    , DependencyHandler.loadOnlineDocumentation model.dependency
                     )
 
                 Ignore ->
@@ -86,14 +85,14 @@ update msg model =
 
                 Just (Err _) ->
                     ( { model | state = RawDiskLoading }
-                    , DependencyHandler.loadDependencyFiles model.dep
+                    , DependencyHandler.loadDependencyFiles model.dependency
                     )
 
                 Just (Ok decodedDependency) ->
                     ( { model | state = Done decodedDependency }
                     , Cmd.batch
                         [ DependencyHandler.storeToDisk decodedDependency
-                        , Logger.info ("Loaded " ++ Tuple.first model.dep ++ " from package.elm-lang.org")
+                        , Logger.info ("Loaded " ++ model.dependency.name ++ " from package.elm-lang.org")
                         ]
                     )
 
@@ -104,14 +103,14 @@ update msg model =
 
                 Just (Err _) ->
                     ( { model | state = Failure }
-                    , Logger.info ("Failed to load dependency: " ++ Tuple.first model.dep)
+                    , Logger.info ("Failed to load dependency: " ++ model.dependency.name)
                     )
 
                 Just (Ok decodedDependency) ->
                     ( { model | state = Done decodedDependency }
                     , Cmd.batch
                         [ DependencyHandler.storeToDisk decodedDependency
-                        , Logger.info ("Loaded " ++ Tuple.first model.dep ++ " by building depenceny from plain source files")
+                        , Logger.info ("Loaded " ++ model.dependency.name ++ " by building dependency from plain source files")
                         ]
                     )
 
@@ -120,7 +119,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     case model.state of
         AwaitingCache ->
-            DependencyHandler.onReadFromDisk model.dep
+            DependencyHandler.onReadFromDisk model.dependency
                 |> Sub.map OnCacheRead
 
         Failure ->
@@ -130,9 +129,9 @@ subscriptions model =
             Sub.none
 
         LoadingOnlineDocs ->
-            DependencyHandler.onOnlineDocumentation model.dep
+            DependencyHandler.onOnlineDocumentation model.dependency
                 |> Sub.map OnOnlineDocs
 
         RawDiskLoading ->
-            DependencyHandler.onLoadDependencyFilesFromDisk model.dep
+            DependencyHandler.onLoadDependencyFilesFromDisk model.dependency
                 |> Sub.map OnLocallyBuildDependency

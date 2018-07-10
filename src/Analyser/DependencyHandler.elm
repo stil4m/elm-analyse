@@ -1,9 +1,9 @@
-port module Analyser.DependencyHandler exposing (CacheDependencyRead(..), loadDependencyFiles, loadOnlineDocumentation, onLoadDependencyFilesFromDisk, onOnlineDocumentation, onReadFromDisk, readFromDisk, storeToDisk)
+port module Analyser.DependencyHandler exposing (CacheDependencyRead(..), DependencyPointer, loadDependencyFiles, loadOnlineDocumentation, onLoadDependencyFilesFromDisk, onOnlineDocumentation, onReadFromDisk, readFromDisk, storeToDisk)
 
 import Analyser.FileContext as FileContext
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
-import Analyser.Files.Json exposing (deserialiseDependency, serialiseDependency)
-import Analyser.Files.Types exposing (LoadedFileData, Version)
+import Analyser.Files.Json exposing (deserialiseDependencyValue, serialiseDependency)
+import Analyser.Files.Types exposing (LoadedFileData)
 import Dict
 import Elm.Dependency exposing (Dependency)
 import Elm.Documentation exposing (Documentation)
@@ -18,25 +18,54 @@ import Result.Extra as Result
 --- Cached Dependencies
 
 
-port storeRawDependency : ( String, Version, String ) -> Cmd msg
+type alias DependencyPointer =
+    { name : String
+    , version : String
+    }
 
 
-port loadRawDependency : ( String, Version ) -> Cmd msg
+type alias DependencyStore =
+    { dependency : DependencyPointer
+    , content : String
+    }
 
 
-port onRawDependency : (( String, Version, String ) -> msg) -> Sub msg
+type alias RawDependencyLoad =
+    { dependency : DependencyPointer
+    , json : Value
+    }
+
+
+type alias DependencyFiles =
+    { dependency : DependencyPointer
+    , files : List FileContent
+    }
+
+
+type alias HttpDocumentationLoad =
+    { dependency : DependencyPointer
+    , json : Value
+    }
+
+
+port storeRawDependency : DependencyStore -> Cmd msg
+
+
+port loadRawDependency : DependencyPointer -> Cmd msg
+
+
+port onRawDependency : (RawDependencyLoad -> msg) -> Sub msg
 
 
 storeToDisk : Dependency -> Cmd msg
 storeToDisk dependency =
     storeRawDependency
-        ( dependency.name
-        , dependency.version
-        , serialiseDependency dependency
-        )
+        { dependency = { name = dependency.name, version = dependency.version }
+        , content = serialiseDependency dependency
+        }
 
 
-readFromDisk : ( String, Version ) -> Cmd msg
+readFromDisk : DependencyPointer -> Cmd msg
 readFromDisk dependency =
     loadRawDependency dependency
 
@@ -47,12 +76,12 @@ type CacheDependencyRead
     | Success Dependency
 
 
-onReadFromDisk : ( String, Version ) -> Sub CacheDependencyRead
-onReadFromDisk ( n, v ) =
+onReadFromDisk : DependencyPointer -> Sub CacheDependencyRead
+onReadFromDisk { name, version } =
     onRawDependency
-        (\( name, version, content ) ->
-            if name == n && v == version then
-                case deserialiseDependency content of
+        (\{ dependency, json } ->
+            if dependency.name == name && version == dependency.version then
+                case deserialiseDependencyValue json of
                     Nothing ->
                         Failed
 
@@ -67,23 +96,23 @@ onReadFromDisk ( n, v ) =
 -- Online Docs Ports
 
 
-port loadHttpDocumentation : ( String, Version ) -> Cmd msg
+port loadHttpDocumentation : DependencyPointer -> Cmd msg
 
 
-port onHttpDocumentation : (( ( String, Version ), Value ) -> msg) -> Sub msg
+port onHttpDocumentation : (HttpDocumentationLoad -> msg) -> Sub msg
 
 
-loadOnlineDocumentation : ( String, Version ) -> Cmd msg
+loadOnlineDocumentation : DependencyPointer -> Cmd msg
 loadOnlineDocumentation =
     loadHttpDocumentation
 
 
-onOnlineDocumentation : ( String, Version ) -> Sub (Maybe (Result String Dependency))
+onOnlineDocumentation : DependencyPointer -> Sub (Maybe (Result String Dependency))
 onOnlineDocumentation dep =
     onHttpDocumentation
-        (\( d, value ) ->
-            if d == dep then
-                JD.decodeValue (JD.list Elm.Documentation.decoder) value
+        (\{ dependency, json } ->
+            if dependency == dep then
+                JD.decodeValue (JD.list Elm.Documentation.decoder) json
                     |> Result.map (depFromModules dep)
                     |> Just
             else
@@ -91,9 +120,9 @@ onOnlineDocumentation dep =
         )
 
 
-depFromModules : ( String, Version ) -> List Documentation -> Dependency
-depFromModules ( depName, version ) docs =
-    { name = depName
+depFromModules : DependencyPointer -> List Documentation -> Dependency
+depFromModules { name, version } docs =
+    { name = name
     , version = version
     , interfaces = Dict.fromList (List.map interfaceFromDocumentation docs)
     }
@@ -136,18 +165,18 @@ interfaceFromDocumentation doc =
 -- Dep File Loading Ports
 
 
-port loadDependencyFiles : ( String, Version ) -> Cmd msg
+port loadDependencyFiles : DependencyPointer -> Cmd msg
 
 
-port onDependencyFiles : (( String, Version, List FileContent ) -> msg) -> Sub msg
+port onDependencyFiles : (DependencyFiles -> msg) -> Sub msg
 
 
-onLoadDependencyFilesFromDisk : ( String, Version ) -> Sub (Maybe (Result String Dependency))
-onLoadDependencyFilesFromDisk ( name, version ) =
+onLoadDependencyFilesFromDisk : DependencyPointer -> Sub (Maybe (Result String Dependency))
+onLoadDependencyFilesFromDisk dep =
     let
-        onRawFiles : ( String, Version, List FileContent ) -> Maybe (Result String Dependency)
-        onRawFiles ( n, v, files ) =
-            if n == name && v == version then
+        onRawFiles : DependencyFiles -> Maybe (Result String Dependency)
+        onRawFiles { dependency, files } =
+            if dep == dependency then
                 let
                     loadedFiles =
                         List.map dependencyFileInterface files
@@ -155,15 +184,15 @@ onLoadDependencyFilesFromDisk ( name, version ) =
                 if not <| List.all Result.isOk loadedFiles then
                     Just (Err "Could not load all dependency files")
                 else
-                    Just (Ok (buildDependency ( name, version ) loadedFiles))
+                    Just (Ok (buildDependency dependency loadedFiles))
             else
                 Nothing
     in
     onDependencyFiles onRawFiles
 
 
-buildDependency : ( String, Version ) -> List (Result x LoadedFileData) -> Dependency
-buildDependency ( name, version ) loadedFiles =
+buildDependency : DependencyPointer -> List (Result x LoadedFileData) -> Dependency
+buildDependency { name, version } loadedFiles =
     loadedFiles
         |> List.filterMap
             (Result.toMaybe

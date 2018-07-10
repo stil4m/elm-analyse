@@ -26,7 +26,7 @@ init input =
     let
         inits : List ( String, ( DependencyLoader.Model, Cmd DependencyLoader.Msg ) )
         inits =
-            List.map (\( s, v ) -> ( s, DependencyLoader.init ( s, v ) )) input
+            List.map (\( s, v ) -> ( s, DependencyLoader.init { name = s, version = v } )) input
     in
     ( List.map (\( a, ( b, _ ) ) -> ( a, b )) inits
         |> Dict.fromList

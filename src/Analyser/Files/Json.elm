@@ -1,4 +1,4 @@
-module Analyser.Files.Json exposing (decodeDependency, deserialiseDependency, encodeDependency, serialiseDependency)
+module Analyser.Files.Json exposing (decodeDependency, deserialiseDependency, deserialiseDependencyValue, encodeDependency, serialiseDependency)
 
 import Dict
 import Elm.Dependency exposing (Dependency)
@@ -13,6 +13,11 @@ import Util.Json exposing (decodeTyped, encodeTyped)
 deserialiseDependency : String -> Maybe Dependency
 deserialiseDependency =
     JD.decodeString decodeDependency >> Result.toMaybe
+
+
+deserialiseDependencyValue : Value -> Maybe Dependency
+deserialiseDependencyValue =
+    JD.decodeValue decodeDependency >> Result.toMaybe
 
 
 serialiseDependency : Dependency -> String

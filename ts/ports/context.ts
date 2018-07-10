@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as fileGatherer from '../util/file-gatherer';
-import { ElmApp } from '../domain';
+import { ElmApp, Context } from '../domain';
 
 function setup(app: ElmApp, directory: string) {
     app.ports.loadContext.subscribe(() => {
@@ -11,7 +11,7 @@ function setup(app: ElmApp, directory: string) {
         } catch (e) {
             configuration = '';
         }
-        const data = {
+        const data: Context = {
             sourceFiles: input.sourceFiles,
             interfaceFiles: input.interfaceFiles,
             configuration: configuration

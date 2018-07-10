@@ -10,9 +10,10 @@ import Analyser.State as State exposing (State)
 import Elm.Parser as Parser
 import Elm.Processing as Processing
 import Elm.Syntax.File exposing (File)
+import Util.Logger as Logger
 
 
-port storeFiles : ( String, String ) -> Cmd msg
+port storeFile : FileStore -> Cmd msg
 
 
 port onStoredFiles : (Bool -> msg) -> Sub msg
@@ -24,18 +25,15 @@ port loadFileContentWithSha : String -> Cmd msg
 port onFileContentWithShas : (FileLoad -> msg) -> Sub msg
 
 
-port sendFixResult : FixResult -> Cmd msg
+type alias FileStore =
+    { file : String
+    , newContent : String
+    }
 
 
 type alias FileLoad =
     { file : FileRef
     , content : String
-    }
-
-
-type alias FixResult =
-    { success : Bool
-    , message : String
     }
 
 
@@ -94,10 +92,7 @@ update codeBase msg (Model model) =
         LoadedFileContent reference ->
             if not (fileHashEqual reference model.message) then
                 ( Model { model | done = True, success = False }
-                , sendFixResult
-                    { success = False
-                    , message = "Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages."
-                    }
+                , Logger.warning "Could not fix file: Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages."
                 )
             else
                 let
@@ -115,23 +110,20 @@ update codeBase msg (Model model) =
                 case changedContent of
                     Ok newContent ->
                         ( Model model
-                        , storeFiles ( model.message.file.path, newContent )
+                        , storeFile
+                            { file = model.message.file.path
+                            , newContent = newContent
+                            }
                         )
 
-                    Err e ->
+                    Err _ ->
                         ( Model { model | done = True, success = False }
-                        , sendFixResult
-                            { success = False
-                            , message = e
-                            }
+                        , Logger.warning "Could not fix file: There was an error while loading the file."
                         )
 
         Stored _ ->
             ( Model { model | done = True }
-            , sendFixResult
-                { success = True
-                , message = "Fixed message: " ++ Data.description model.message.data
-                }
+            , Logger.info <| "Fixed message: " ++ Data.description model.message.data
             )
 
 

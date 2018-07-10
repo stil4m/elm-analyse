@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import _ from 'lodash';
 import * as find from 'find';
 import * as _path from 'path';
+import { DependencyPointer } from '../domain';
 
 function isRealElmPaths(sourceDir: string, filePath: String): boolean {
     const modulePath = filePath.replace(_path.normalize(sourceDir + '/'), '');
@@ -14,9 +15,7 @@ function includedInFileSet(path: string): boolean {
         return false;
     }
 
-    return (
-        path.indexOf('elm-stuff') === -1 && path.indexOf('node_modules') === -1
-    );
+    return path.indexOf('elm-stuff') === -1 && path.indexOf('node_modules') === -1;
 }
 
 interface ElmPackage {
@@ -24,11 +23,7 @@ interface ElmPackage {
     'exposed-modules': string[];
 }
 
-function targetFilesForPathAndPackage(
-    directory: string,
-    path: string,
-    pack: ElmPackage
-): string[] {
+function targetFilesForPathAndPackage(directory: string, path: string, pack: ElmPackage): string[] {
     const packTargetDirs: string[] = pack['source-directories'];
     const targetFiles = _.uniq(
         _.flatten(
@@ -39,17 +34,12 @@ function targetFilesForPathAndPackage(
                     return [];
                 }
 
-                const dirFiles = find
-                    .fileSync(/\.elm$/, sourceDir)
-                    .filter(x => {
-                        const resolvedX = _path.resolve(x);
-                        const resolvedPath = _path.resolve(path);
-                        const relativePath = resolvedX.replace(
-                            resolvedPath,
-                            ''
-                        );
-                        return includedInFileSet(relativePath) && x.length > 0;
-                    });
+                const dirFiles = find.fileSync(/\.elm$/, sourceDir).filter(x => {
+                    const resolvedX = _path.resolve(x);
+                    const resolvedPath = _path.resolve(path);
+                    const relativePath = resolvedX.replace(resolvedPath, '');
+                    return includedInFileSet(relativePath) && x.length > 0;
+                });
                 return dirFiles.filter(x => isRealElmPaths(sourceDir, x));
             })
         )
@@ -72,14 +62,10 @@ function targetFilesForPathAndPackage(
     return targetFiles;
 }
 
-function getDependencyFiles(directory: string, dep: string, version: string) {
-    const depPath = directory + '/elm-stuff/packages/' + dep + '/' + version;
+function getDependencyFiles(directory: string, dep: DependencyPointer) {
+    const depPath = `${directory}/elm-stuff/packages/${dep.name}/${dep.version}`;
     const depPackageFile: ElmPackage = require(depPath + '/elm-package.json');
-    const unfilteredTargetFiles: string[] = targetFilesForPathAndPackage(
-        directory,
-        depPath,
-        depPackageFile
-    );
+    const unfilteredTargetFiles: string[] = targetFilesForPathAndPackage(directory, depPath, depPackageFile);
 
     const exposedModules: string[] = depPackageFile['exposed-modules'].map(x =>
         _path.normalize('/' + x.replace(new RegExp('\\.', 'g'), '/') + '.elm')
@@ -89,32 +75,20 @@ function getDependencyFiles(directory: string, dep: string, version: string) {
     });
 }
 
-function gather(
-    directory: string
-): { interfaceFiles: Array<string[]>; sourceFiles: string[] } {
+function gather(directory: string): { interfaceFiles: Array<string[]>; sourceFiles: string[] } {
     const packageFile = require(directory + '/elm-package.json');
     const exactDeps = require(directory + '/elm-stuff/exact-dependencies.json');
     const dependencies = Object.keys(packageFile['dependencies']);
 
-    var interfaceFiles: Array<string[]> = dependencies
-        .filter(x => exactDeps[x])
-        .map(x => [x, exactDeps[x]]);
+    var interfaceFiles: Array<string[]> = dependencies.filter(x => exactDeps[x]).map(x => [x, exactDeps[x]]);
 
     dependencies.filter(x => !exactDeps[x]).forEach(x => {
-        console.log(
-            'WARN: Missing dependency `' +
-                x +
-                '`. Maybe run elm-package to update the dependencies.'
-        );
+        console.log('WARN: Missing dependency `' + x + '`. Maybe run elm-package to update the dependencies.');
     });
 
     const input = {
         interfaceFiles: interfaceFiles,
-        sourceFiles: targetFilesForPathAndPackage(
-            directory,
-            directory,
-            packageFile
-        )
+        sourceFiles: targetFilesForPathAndPackage(directory, directory, packageFile)
     };
     return input;
 }

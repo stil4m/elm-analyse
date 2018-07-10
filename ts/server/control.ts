@@ -13,12 +13,6 @@ function run(app: any, elm: ElmApp) {
             }
         });
     });
-
-    // TODO, bring to elm
-    elm.ports.sendFixResult.subscribe(function(m: any) {
-        console.log('FixResult');
-        console.log(m);
-    });
 }
 
 export default { run };

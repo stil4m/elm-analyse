@@ -3,7 +3,7 @@ port module Analyser.Files.FileLoader exposing (Msg, init, subscriptions, update
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Elm.Json.Encode
-import Json.Encode
+import Json.Encode exposing (Value)
 import Result
 import Util.Logger as Logger
 
@@ -14,7 +14,13 @@ port loadFile : String -> Cmd msg
 port fileContent : (FileContent -> msg) -> Sub msg
 
 
-port storeAstForSha : ( String, String ) -> Cmd msg
+port storeAstForSha : AstStore -> Cmd msg
+
+
+type alias AstStore =
+    { sha1 : String
+    , ast : Value
+    }
 
 
 type Msg
@@ -45,7 +51,7 @@ update msg =
                 cmd =
                     if store then
                         ( fileContent.sha1, Result.toMaybe fileLoad )
-                            |> uncurry (Maybe.map2 (\a b -> storeAstForSha ( a, Json.Encode.encode 0 (Elm.Json.Encode.encode b) )))
+                            |> uncurry (Maybe.map2 (\a b -> storeAstForSha { sha1 = a, ast = Elm.Json.Encode.encode b }))
                             |> Maybe.withDefault Cmd.none
                     else
                         Cmd.none

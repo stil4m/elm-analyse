@@ -8,32 +8,69 @@ interface Config {
     elmFormatPath: string;
 }
 
+export interface DependencyPointer {
+    name: string;
+    version: string;
+}
+export interface DependencyStore {
+    dependency: DependencyPointer;
+    content: string;
+}
+export interface HttpDocumentationLoad {
+    dependency: DependencyPointer;
+    json: any;
+}
+export interface RawDependencyLoad {
+    dependency: DependencyPointer;
+    json: JSON | null;
+}
+
+export interface DependencyFiles {
+    dependency: DependencyPointer;
+    files: FileContent[];
+}
+export interface FileChange {
+    event: string;
+    file: string;
+}
+export interface FileStore {
+    file: string;
+    newContent: string;
+}
+export interface AstStore {
+    sha1: string;
+    ast: JSON;
+}
+
+export interface LogMessage {
+    level: string;
+    message: string;
+}
 interface ElmApp {
     ports: {
-        log: Subscription<string[]>;
+        log: Subscription<LogMessage>;
         sendReportValue: Subscription<Report>;
         sendState: Subscription<State>;
-        sendFixResult: Subscription<any>;
-        loadContext: Subscription<any>;
-        loadDependencyFiles: Subscription<string[]>;
+        loadContext: Subscription<void>;
+        loadDependencyFiles: Subscription<DependencyPointer>;
         loadFile: Subscription<string>;
-        storeAstForSha: Subscription<string[]>;
-        storeFiles: Subscription<string[]>;
+        storeAstForSha: Subscription<AstStore>;
+        storeFile: Subscription<FileStore>;
         loadFileContentWithSha: Subscription<string>;
-        loadHttpDocumentation: Subscription<string[]>;
-        storeRawDependency: Subscription<string[]>;
-        loadRawDependency: Subscription<string[]>;
+        loadHttpDocumentation: Subscription<DependencyPointer>;
+        storeRawDependency: Subscription<DependencyStore>;
+        loadRawDependency: Subscription<DependencyPointer>;
 
-        fileWatch: MailBox<string[]>;
+        fileWatch: MailBox<FileChange>;
         onReset: MailBox<boolean>;
         onFixMessage: MailBox<number>;
         onLoadedContext: MailBox<Context>;
-        onDependencyFiles: MailBox<any[]>;
+        onDependencyFiles: MailBox<DependencyFiles>;
         fileContent: MailBox<FileContent>;
         onStoredFiles: MailBox<boolean>;
         onFileContentWithShas: MailBox<FileContentSha>;
-        onHttpDocumentation: MailBox<any[]>;
-        onRawDependency: MailBox<string[]>;
+        onHttpDocumentation: MailBox<HttpDocumentationLoad>;
+        onRawDependency: MailBox<RawDependencyLoad>;
     };
 }
 
@@ -99,18 +136,33 @@ interface FileContent {
     content: string | null;
     ast: string | null;
 }
+
 interface State {
-    status: String;
+    status: string;
     idCount: number;
     queue: any[];
     messages: any[];
     modules: any[];
 }
 
-//TODO
-interface Message {
-    data: any;
+interface FileRef {
+    version: string;
+    path: string;
 }
+
+interface Message {
+    id: number;
+    status: string;
+    file: FileRef;
+    type: string;
+    data: MessageData;
+}
+
+interface MessageData {
+    description: string;
+    properties: { [key: string]: any };
+}
+
 export {
     Config,
     ElmApp,

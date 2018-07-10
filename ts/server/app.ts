@@ -1,7 +1,6 @@
 import express from 'express';
 import ExpressWs from 'express-ws';
 import * as fs from 'fs';
-import _ from 'lodash';
 import * as fileGatherer from '../util/file-gatherer';
 import { Config, Info, ElmApp } from '../domain';
 import worker from './worker';
@@ -42,10 +41,7 @@ function start(config: Config, info: Info) {
         });
 
         app.get('/info', function(_req, res) {
-            // TODO Can this be removed?
-            const copy = _.cloneDeep(info);
-            copy.config = config;
-            res.send(copy);
+            res.send(info);
         });
 
         app.get('/state', function(_req, res) {
