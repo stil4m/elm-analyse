@@ -43,7 +43,7 @@
   },
   "keywords": ["elm", "ast", "lint"],
   "dependencies": {
-    "express": "4.14.1",
+    "express": "^4.16.3",
     "express-ws": "2.0.0",
     "find": "0.2.7",
     "fs-extra": "2.0.0",
@@ -52,9 +52,9 @@
     "node-watch": "0.5.5",
     "normalize-newline": "3.0.0",
     "os-homedir": "1.0.2",
+    "request": "2.83.0",
     "sums": "0.2.4",
-    "ws": "3.3.1",
-    "request": "2.83.0"
+    "ws": "3.3.1"
   },
   "devDependencies": {
     "bufferutil": "3.0.3",
