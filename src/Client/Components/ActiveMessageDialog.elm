@@ -114,7 +114,7 @@ dialogConfig : State -> Config Msg
 dialogConfig state =
     { closeMessage = Just Close
     , containerClass = Just "message-dialog"
-    , header = Just dialogHeader
+    , header = Just <| dialogHeader state
     , body = Just <| dialogBody state
     , footer = Just (footer state.message)
     }
@@ -157,13 +157,17 @@ dialogBody state =
 
 viewWithFileContent : State -> String -> Html msg
 viewWithFileContent state x =
-    div [ style [ ( "max-height", "400px" ), ( "overflow", "scroll" ) ] ]
+    div [ style [ ( "max-height", "400px" ), ( "overflow", "auto" ) ] ]
         [ div []
             (List.map (Highlight.highlightedPre 3 x) state.ranges)
         , text <| Data.description state.message.data
         ]
 
 
-dialogHeader : Html msg
-dialogHeader =
-    h3 [] [ text "Message" ]
+dialogHeader : State -> Html msg
+dialogHeader state =
+    let
+        filePath =
+            state.message.file.path
+    in
+    h3 [] [ text <| "Message (" ++ filePath ++ ")" ]
