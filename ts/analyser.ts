@@ -18,9 +18,7 @@ function start(config: Config) {
 
         app.ports.sendReportValue.subscribe(function(report: Report) {
             reporter.report(report);
-            const fail =
-                report.messages.length > 0 ||
-                report.unusedDependencies.length > 0;
+            const fail = report.messages.length > 0 || report.unusedDependencies.length > 0;
             process.exit(fail ? 1 : 0);
         });
 
