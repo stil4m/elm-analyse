@@ -27,7 +27,6 @@ type alias FileContext =
     , ast : File
     , content : String
     , file : FileRef
-    , formatted : Bool
     }
 
 
@@ -56,5 +55,4 @@ buildForFile moduleIndex ( fileContent, r ) =
                     }
                 , content = fileContent.content |> Maybe.withDefault ""
                 , interface = Interface.build l
-                , formatted = fileContent.formatted
                 }

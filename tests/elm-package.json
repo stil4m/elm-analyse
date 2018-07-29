@@ -21,7 +21,7 @@
         "elm-lang/html": "2.0.0 <= v < 3.0.0",
         "iosphere/elm-network-graph": "1.2.0 <= v < 2.0.0",
         "rundis/elm-bootstrap": "4.0.0 <= v < 5.0.0",
-        "stil4m/elm-syntax": "3.3.1 <= v < 4.0.0",
+        "stil4m/elm-syntax": "4.0.3 <= v < 5.0.0",
         "elm-community/graph": "5.0.1 <= v < 6.0.0",
         "elm-community/intdict": "2.0.0 <= v < 3.0.0",
         "elm-community/string-extra": "1.4.0 <= v < 2.0.0",

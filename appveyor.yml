@@ -8,14 +8,18 @@ install:
   - ps: Install-Product node $env:nodejs_version
   # install modules
   - npm install
+  - ./node_modules/.bin/elm-package install --yes
 
 # Post-install test scripts.
 test_script:
   - npm run js:validate-format
-  - npm run js:lint
-  - npm run elm:validate-format
+  - ./node_modules/.bin/elm-format --validate src/ tests/ docs/
+  - ./node_modules/.bin/eslint js
   - npm run elm:test
-  - npm run build
-  - npm run elm:lint
+  - ./node_modules/.bin/tsc
+  - ./node_modules/.bin/elm-make src/Analyser.elm --output dist/app/backend-elm.js
+  - ./node_modules/.bin/elm-make src/Client.elm --output dist/public/client-elm.js
+  - ./node_modules/.bin/elm-make docs/Docs/Main.elm --output docs/docs.js
+  - node ./dist/app/bin/index.js
 
 build: off

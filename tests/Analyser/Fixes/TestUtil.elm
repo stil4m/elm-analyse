@@ -25,7 +25,6 @@ analyseAndFix checker fixer input rawFile f =
                 { path = "./Foo.elm"
                 , version = "xxx"
                 }
-            , formatted = True
             }
 
         x =

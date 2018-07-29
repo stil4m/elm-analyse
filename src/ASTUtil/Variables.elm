@@ -109,7 +109,7 @@ getImportExposedVars e =
 
 
 getDeclarationVars : Ranged Declaration -> List ( VariablePointer, VariableType )
-getDeclarationVars ( r, decl ) =
+getDeclarationVars ( _, decl ) =
     case decl of
         FuncDecl f ->
             [ ( f.declaration.name, TopLevel ) ]
@@ -121,7 +121,7 @@ getDeclarationVars ( r, decl ) =
             List.map (\{ name, range } -> ( { value = name, range = range }, TopLevel )) t.constructors
 
         PortDeclaration p ->
-            [ ( { value = p.name, range = r }, TopLevel ) ]
+            [ ( p.name, TopLevel ) ]
 
         InfixDeclaration _ ->
             []
@@ -161,9 +161,6 @@ patternToUsedVars ( range, p ) =
         ParenthesizedPattern sub ->
             patternToUsedVars sub
 
-        QualifiedNamePattern x ->
-            qualifiedNameUsedVars x range
-
         RecordPattern _ ->
             []
 
@@ -183,6 +180,9 @@ patternToUsedVars ( range, p ) =
             []
 
         IntPattern _ ->
+            []
+
+        HexPattern _ ->
             []
 
         FloatPattern _ ->
@@ -239,9 +239,6 @@ patternToVarsInner isFirst ( range, p ) =
         ParenthesizedPattern sub ->
             recur sub
 
-        QualifiedNamePattern _ ->
-            []
-
         AllPattern ->
             []
 
@@ -255,6 +252,9 @@ patternToVarsInner isFirst ( range, p ) =
             []
 
         IntPattern _ ->
+            []
+
+        HexPattern _ ->
             []
 
         FloatPattern _ ->

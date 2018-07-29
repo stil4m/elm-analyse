@@ -4,3 +4,4 @@ elm.js
 tmp
 node_modules
 /cache
+ts-out

@@ -1,14 +1,14 @@
-port module Analyser.FileWatch exposing (FileChange(Remove, Update), Person, watcher)
+port module Analyser.FileWatch exposing (FileChange(Remove, Update), watcher)
 
 import Debug as SafeDebug
 
 
-port fileWatch : (( String, String ) -> msg) -> Sub msg
+port fileWatch : (RawFileChange -> msg) -> Sub msg
 
 
-type alias Person =
-    { name : String
-    , age : Int
+type alias RawFileChange =
+    { event : String
+    , file : String
     }
 
 
@@ -22,14 +22,14 @@ watcher f =
     fileWatch (asFileChange >> f)
 
 
-asFileChange : ( String, String ) -> FileChange
+asFileChange : RawFileChange -> FileChange
 asFileChange p =
-    case p of
-        ( "update", x ) ->
-            Update x
+    case p.event of
+        "update" ->
+            Update p.file
 
-        ( "remove", x ) ->
-            Remove x
+        "remove" ->
+            Remove p.file
 
         _ ->
             SafeDebug.crash

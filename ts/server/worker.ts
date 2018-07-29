@@ -1,0 +1,29 @@
+import open from 'open';
+import * as fileLoadingPorts from '../file-loading-ports';
+import * as loggingPorts from '../util/logging-ports';
+import * as dependencies from '../util/dependencies';
+import { Config, ElmApp, Report } from '../domain';
+
+function run(config: Config, onload: (app: ElmApp) => void) {
+    dependencies.getDependencies(function(registry) {
+        const directory = process.cwd();
+        var Elm = require('../backend-elm.js');
+        var app = Elm.Analyser.worker({
+            server: true,
+            registry: registry || []
+        });
+
+        app.ports.sendReportValue.subscribe((report: Report) => {
+            console.log('Found ' + report.messages.length + ' message(s)');
+        });
+
+        loggingPorts.setup(app, config);
+        fileLoadingPorts.setup(app, config, directory);
+        onload(app);
+        if (config.open) {
+            open('http://localhost:' + config.port);
+        }
+    });
+}
+
+export default { run };

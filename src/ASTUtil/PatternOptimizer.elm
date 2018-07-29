@@ -10,14 +10,6 @@ emptyRange =
     { start = { row = 0, column = 0 }, end = { row = 0, column = 0 } }
 
 
-replaceWithAllIfRangeMatches : Ranged Pattern -> Range -> Range -> Ranged Pattern
-replaceWithAllIfRangeMatches ( some, p ) x y =
-    if x == y then
-        ( emptyRange, AllPattern )
-    else
-        ( some, p )
-
-
 isAllPattern : Ranged Pattern -> Bool
 isAllPattern p =
     case Tuple.second p of
@@ -65,9 +57,6 @@ optimize range (( r, pattern ) as input) =
             NamedPattern qnr inner ->
                 ( r, NamedPattern qnr (List.map (optimize range) inner) )
 
-            QualifiedNamePattern _ ->
-                replaceWithAllIfRangeMatches input range r
-
             AsPattern subPattern asPointer ->
                 if asPointer.range == range then
                     subPattern
@@ -98,6 +87,9 @@ optimize range (( r, pattern ) as input) =
                 input
 
             IntPattern _ ->
+                input
+
+            HexPattern _ ->
                 input
 
             FloatPattern _ ->

@@ -24,7 +24,6 @@ type alias FileContent =
     , sha1 : Maybe String
     , content : Maybe String
     , ast : Maybe String
-    , formatted : Bool
     }
 
 
