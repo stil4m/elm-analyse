@@ -89,5 +89,8 @@ optimize range (( r, pattern ) as input) =
             IntPattern _ ->
                 input
 
+            HexPattern _ ->
+                input
+
             FloatPattern _ ->
                 input

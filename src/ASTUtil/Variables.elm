@@ -182,6 +182,9 @@ patternToUsedVars ( range, p ) =
         IntPattern _ ->
             []
 
+        HexPattern _ ->
+            []
+
         FloatPattern _ ->
             []
 
@@ -249,6 +252,9 @@ patternToVarsInner isFirst ( range, p ) =
             []
 
         IntPattern _ ->
+            []
+
+        HexPattern _ ->
             []
 
         FloatPattern _ ->

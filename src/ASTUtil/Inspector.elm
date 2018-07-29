@@ -277,6 +277,9 @@ inspectInnerExpression config expression context =
         Integer _ ->
             context
 
+        Hex _ ->
+            context
+
         Floatable _ ->
             context
 
