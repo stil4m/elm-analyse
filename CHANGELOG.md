@@ -1,5 +1,17 @@
 # elm-analyse changelog
 
+## 0.15.0 (2018-07-29)
+
+* [Issue #152](https://github.com/stil4m/elm-analyse/issues/152) Covered some performance concerns
+* [Issue #171](https://github.com/stil4m/elm-analyse/issues/171) Add message file to dialog in server mode. Thanks to @andys8
+* [Issue #160](https://github.com/stil4m/elm-analyse/issues/160) Fix out of memory crash
+* [Issue #158](https://github.com/stil4m/elm-analyse/issues/158) Remove 'formatted' check. Please use elm-format.
+* [Issue #162](https://github.com/stil4m/elm-analyse/issues/162) Add option to open browser when starting in server mode. Thanks to @romariolopezc
+* Bump elm-syntax to 5.0.1 which resolves #165 and #167
+
+
+
+
 ## 0.14.1 (2018-04-16)
 
 * [Issue #159](https://github.com/stil4m/elm-analyse/issues/159) Bug: elm-lang/core reported as unused dependency in basic Elm program
