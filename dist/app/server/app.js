@@ -13,7 +13,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var express_ws_1 = __importDefault(require("express-ws"));
 var fs = __importStar(require("fs"));
-var lodash_1 = __importDefault(require("lodash"));
 var fileGatherer = __importStar(require("../util/file-gatherer"));
 var worker_1 = __importDefault(require("./worker"));
 var watcher_1 = __importDefault(require("./watcher"));
@@ -43,10 +42,7 @@ function start(config, info) {
             res.send(x.sourceFiles);
         });
         app.get('/info', function (_req, res) {
-            // TODO Can this be removed?
-            var copy = lodash_1.default.cloneDeep(info);
-            copy.config = config;
-            res.send(copy);
+            res.send(info);
         });
         app.get('/state', function (_req, res) {
             res.send(dashboard.getState());

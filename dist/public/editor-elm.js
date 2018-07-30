@@ -12671,6 +12671,9 @@ var _stil4m$elm_syntax$Elm_Syntax_Pattern$TuplePattern = function (a) {
 var _stil4m$elm_syntax$Elm_Syntax_Pattern$FloatPattern = function (a) {
 	return {ctor: 'FloatPattern', _0: a};
 };
+var _stil4m$elm_syntax$Elm_Syntax_Pattern$HexPattern = function (a) {
+	return {ctor: 'HexPattern', _0: a};
+};
 var _stil4m$elm_syntax$Elm_Syntax_Pattern$IntPattern = function (a) {
 	return {ctor: 'IntPattern', _0: a};
 };
@@ -12856,6 +12859,9 @@ var _stil4m$elm_syntax$Elm_Syntax_Expression$Negation = function (a) {
 };
 var _stil4m$elm_syntax$Elm_Syntax_Expression$Floatable = function (a) {
 	return {ctor: 'Floatable', _0: a};
+};
+var _stil4m$elm_syntax$Elm_Syntax_Expression$Hex = function (a) {
+	return {ctor: 'Hex', _0: a};
 };
 var _stil4m$elm_syntax$Elm_Syntax_Expression$Integer = function (a) {
 	return {ctor: 'Integer', _0: a};
@@ -13408,6 +13414,8 @@ var _stil4m$elm_syntax$Elm_Inspector$inspectInnerExpression = F3(
 			case 'Operator':
 				return context;
 			case 'Integer':
+				return context;
+			case 'Hex':
 				return context;
 			case 'Floatable':
 				return context;
@@ -14248,108 +14256,119 @@ var _stil4m$elm_syntax$Elm_Json_Decode$decodePattern = _elm_lang$core$Json_Decod
 											ctor: '::',
 											_0: {
 												ctor: '_Tuple2',
-												_0: 'float',
+												_0: 'hex',
 												_1: A2(
 													_elm_lang$core$Json_Decode$map,
-													_stil4m$elm_syntax$Elm_Syntax_Pattern$FloatPattern,
-													A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$float))
+													_stil4m$elm_syntax$Elm_Syntax_Pattern$HexPattern,
+													A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$int))
 											},
 											_1: {
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'tuple',
+													_0: 'float',
 													_1: A2(
 														_elm_lang$core$Json_Decode$map,
-														_stil4m$elm_syntax$Elm_Syntax_Pattern$TuplePattern,
-														A2(
-															_elm_lang$core$Json_Decode$field,
-															'value',
-															_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
+														_stil4m$elm_syntax$Elm_Syntax_Pattern$FloatPattern,
+														A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$float))
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'record',
+														_0: 'tuple',
 														_1: A2(
 															_elm_lang$core$Json_Decode$map,
-															_stil4m$elm_syntax$Elm_Syntax_Pattern$RecordPattern,
+															_stil4m$elm_syntax$Elm_Syntax_Pattern$TuplePattern,
 															A2(
 																_elm_lang$core$Json_Decode$field,
 																'value',
-																_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeVariablePointer)))
+																_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'uncons',
-															_1: A3(
-																_elm_lang$core$Json_Decode$map2,
-																_stil4m$elm_syntax$Elm_Syntax_Pattern$UnConsPattern,
-																A2(_elm_lang$core$Json_Decode$field, 'left', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern),
-																A2(_elm_lang$core$Json_Decode$field, 'right', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern))
+															_0: 'record',
+															_1: A2(
+																_elm_lang$core$Json_Decode$map,
+																_stil4m$elm_syntax$Elm_Syntax_Pattern$RecordPattern,
+																A2(
+																	_elm_lang$core$Json_Decode$field,
+																	'value',
+																	_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeVariablePointer)))
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'list',
-																_1: A2(
-																	_elm_lang$core$Json_Decode$map,
-																	_stil4m$elm_syntax$Elm_Syntax_Pattern$ListPattern,
-																	A2(
-																		_elm_lang$core$Json_Decode$field,
-																		'value',
-																		_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
+																_0: 'uncons',
+																_1: A3(
+																	_elm_lang$core$Json_Decode$map2,
+																	_stil4m$elm_syntax$Elm_Syntax_Pattern$UnConsPattern,
+																	A2(_elm_lang$core$Json_Decode$field, 'left', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern),
+																	A2(_elm_lang$core$Json_Decode$field, 'right', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern))
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'var',
+																	_0: 'list',
 																	_1: A2(
 																		_elm_lang$core$Json_Decode$map,
-																		_stil4m$elm_syntax$Elm_Syntax_Pattern$VarPattern,
-																		A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$string))
+																		_stil4m$elm_syntax$Elm_Syntax_Pattern$ListPattern,
+																		A2(
+																			_elm_lang$core$Json_Decode$field,
+																			'value',
+																			_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
 																},
 																_1: {
 																	ctor: '::',
 																	_0: {
 																		ctor: '_Tuple2',
-																		_0: 'named',
-																		_1: A3(
-																			_elm_lang$core$Json_Decode$map2,
-																			_stil4m$elm_syntax$Elm_Syntax_Pattern$NamedPattern,
-																			A2(_elm_lang$core$Json_Decode$field, 'qualified', _stil4m$elm_syntax$Elm_Json_Decode$decodeQualifiedNameRef),
-																			A2(
-																				_elm_lang$core$Json_Decode$field,
-																				'patterns',
-																				_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
+																		_0: 'var',
+																		_1: A2(
+																			_elm_lang$core$Json_Decode$map,
+																			_stil4m$elm_syntax$Elm_Syntax_Pattern$VarPattern,
+																			A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$string))
 																	},
 																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'as',
+																			_0: 'named',
 																			_1: A3(
 																				_elm_lang$core$Json_Decode$map2,
-																				_stil4m$elm_syntax$Elm_Syntax_Pattern$AsPattern,
-																				A2(_elm_lang$core$Json_Decode$field, 'pattern', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern),
-																				A2(_elm_lang$core$Json_Decode$field, 'name', _stil4m$elm_syntax$Elm_Json_Decode$decodeVariablePointer))
+																				_stil4m$elm_syntax$Elm_Syntax_Pattern$NamedPattern,
+																				A2(_elm_lang$core$Json_Decode$field, 'qualified', _stil4m$elm_syntax$Elm_Json_Decode$decodeQualifiedNameRef),
+																				A2(
+																					_elm_lang$core$Json_Decode$field,
+																					'patterns',
+																					_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'parentisized',
-																				_1: A2(
-																					_elm_lang$core$Json_Decode$map,
-																					_stil4m$elm_syntax$Elm_Syntax_Pattern$ParenthesizedPattern,
-																					A2(_elm_lang$core$Json_Decode$field, 'value', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern))
+																				_0: 'as',
+																				_1: A3(
+																					_elm_lang$core$Json_Decode$map2,
+																					_stil4m$elm_syntax$Elm_Syntax_Pattern$AsPattern,
+																					A2(_elm_lang$core$Json_Decode$field, 'pattern', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern),
+																					A2(_elm_lang$core$Json_Decode$field, 'name', _stil4m$elm_syntax$Elm_Json_Decode$decodeVariablePointer))
 																			},
-																			_1: {ctor: '[]'}
+																			_1: {
+																				ctor: '::',
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: 'parentisized',
+																					_1: A2(
+																						_elm_lang$core$Json_Decode$map,
+																						_stil4m$elm_syntax$Elm_Syntax_Pattern$ParenthesizedPattern,
+																						A2(_elm_lang$core$Json_Decode$field, 'value', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern))
+																				},
+																				_1: {ctor: '[]'}
+																			}
 																		}
 																	}
 																}
@@ -14487,132 +14506,140 @@ var _stil4m$elm_syntax$Elm_Json_Decode$decodeInnerExpression = _elm_lang$core$Js
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'float',
-													_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Floatable, _elm_lang$core$Json_Decode$float)
+													_0: 'hex',
+													_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Hex, _elm_lang$core$Json_Decode$int)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'negation',
-														_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Negation, _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression)
+														_0: 'float',
+														_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Floatable, _elm_lang$core$Json_Decode$float)
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'literal',
-															_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Literal, _elm_lang$core$Json_Decode$string)
+															_0: 'negation',
+															_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Negation, _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression)
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'charLiteral',
-																_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$CharLiteral, _stil4m$elm_syntax$Elm_Json_Decode$decodeChar)
+																_0: 'literal',
+																_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Literal, _elm_lang$core$Json_Decode$string)
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'tupled',
-																	_1: A2(
-																		_elm_lang$core$Json_Decode$map,
-																		_stil4m$elm_syntax$Elm_Syntax_Expression$TupledExpression,
-																		_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeExpression))
+																	_0: 'charLiteral',
+																	_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$CharLiteral, _stil4m$elm_syntax$Elm_Json_Decode$decodeChar)
 																},
 																_1: {
 																	ctor: '::',
 																	_0: {
 																		ctor: '_Tuple2',
-																		_0: 'list',
+																		_0: 'tupled',
 																		_1: A2(
 																			_elm_lang$core$Json_Decode$map,
-																			_stil4m$elm_syntax$Elm_Syntax_Expression$ListExpr,
+																			_stil4m$elm_syntax$Elm_Syntax_Expression$TupledExpression,
 																			_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeExpression))
 																	},
 																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'parenthesized',
-																			_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$ParenthesizedExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression)
+																			_0: 'list',
+																			_1: A2(
+																				_elm_lang$core$Json_Decode$map,
+																				_stil4m$elm_syntax$Elm_Syntax_Expression$ListExpr,
+																				_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeExpression))
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'let',
-																				_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$LetExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeLetBlock)
+																				_0: 'parenthesized',
+																				_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$ParenthesizedExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression)
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'case',
-																					_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$CaseExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeCaseBlock)
+																					_0: 'let',
+																					_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$LetExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeLetBlock)
 																				},
 																				_1: {
 																					ctor: '::',
 																					_0: {
 																						ctor: '_Tuple2',
-																						_0: 'lambda',
-																						_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$LambdaExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeLambda)
+																						_0: 'case',
+																						_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$CaseExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeCaseBlock)
 																					},
 																					_1: {
 																						ctor: '::',
 																						_0: {
 																							ctor: '_Tuple2',
-																							_0: 'qualified',
-																							_1: A3(
-																								_elm_lang$core$Json_Decode$map2,
-																								_stil4m$elm_syntax$Elm_Syntax_Expression$QualifiedExpr,
-																								A2(_elm_lang$core$Json_Decode$field, 'moduleName', _stil4m$elm_syntax$Elm_Json_Decode$decodeModuleName),
-																								_stil4m$elm_syntax$Elm_Json_Decode$nameField)
+																							_0: 'lambda',
+																							_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$LambdaExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeLambda)
 																						},
 																						_1: {
 																							ctor: '::',
 																							_0: {
 																								ctor: '_Tuple2',
-																								_0: 'recordAccess',
+																								_0: 'qualified',
 																								_1: A3(
 																									_elm_lang$core$Json_Decode$map2,
-																									_stil4m$elm_syntax$Elm_Syntax_Expression$RecordAccess,
-																									A2(_elm_lang$core$Json_Decode$field, 'expression', _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression),
+																									_stil4m$elm_syntax$Elm_Syntax_Expression$QualifiedExpr,
+																									A2(_elm_lang$core$Json_Decode$field, 'moduleName', _stil4m$elm_syntax$Elm_Json_Decode$decodeModuleName),
 																									_stil4m$elm_syntax$Elm_Json_Decode$nameField)
 																							},
 																							_1: {
 																								ctor: '::',
 																								_0: {
 																									ctor: '_Tuple2',
-																									_0: 'recordAccessFunction',
-																									_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$RecordAccessFunction, _elm_lang$core$Json_Decode$string)
+																									_0: 'recordAccess',
+																									_1: A3(
+																										_elm_lang$core$Json_Decode$map2,
+																										_stil4m$elm_syntax$Elm_Syntax_Expression$RecordAccess,
+																										A2(_elm_lang$core$Json_Decode$field, 'expression', _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression),
+																										_stil4m$elm_syntax$Elm_Json_Decode$nameField)
 																								},
 																								_1: {
 																									ctor: '::',
 																									_0: {
 																										ctor: '_Tuple2',
-																										_0: 'record',
-																										_1: A2(
-																											_elm_lang$core$Json_Decode$map,
-																											_stil4m$elm_syntax$Elm_Syntax_Expression$RecordExpr,
-																											_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeRecordSetter))
+																										_0: 'recordAccessFunction',
+																										_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$RecordAccessFunction, _elm_lang$core$Json_Decode$string)
 																									},
 																									_1: {
 																										ctor: '::',
 																										_0: {
 																											ctor: '_Tuple2',
-																											_0: 'recordUpdate',
-																											_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$RecordUpdateExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeRecordUpdate)
+																											_0: 'record',
+																											_1: A2(
+																												_elm_lang$core$Json_Decode$map,
+																												_stil4m$elm_syntax$Elm_Syntax_Expression$RecordExpr,
+																												_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeRecordSetter))
 																										},
 																										_1: {
 																											ctor: '::',
 																											_0: {
 																												ctor: '_Tuple2',
-																												_0: 'glsl',
-																												_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$GLSLExpression, _elm_lang$core$Json_Decode$string)
+																												_0: 'recordUpdate',
+																												_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$RecordUpdateExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeRecordUpdate)
 																											},
-																											_1: {ctor: '[]'}
+																											_1: {
+																												ctor: '::',
+																												_0: {
+																													ctor: '_Tuple2',
+																													_0: 'glsl',
+																													_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$GLSLExpression, _elm_lang$core$Json_Decode$string)
+																												},
+																												_1: {ctor: '[]'}
+																											}
 																										}
 																									}
 																								}
@@ -15228,7 +15255,7 @@ var _stil4m$elm_syntax$Elm_Parser_Tokens$escapedChar = A2(
 															_elm_community$parser_combinators$Combine_ops['*>'],
 															_elm_community$parser_combinators$Combine_Char$char(
 																_elm_lang$core$Native_Utils.chr('x')),
-															_elm_community$parser_combinators$Combine$regex('[0-9A-Fa-f]{2}')),
+															_elm_community$parser_combinators$Combine$regex('([0-9A-Fa-f]{2}){1,2}')),
 														function (l) {
 															var _p0 = _rtfeldman$hex$Hex$fromString(
 																_elm_lang$core$String$toLower(l));
@@ -15807,16 +15834,38 @@ var _stil4m$elm_syntax$Elm_Parser_Infix$infixDefinition = A2(
 		A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _elm_community$parser_combinators$Combine_Num$int)),
 	A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Tokens$prefixOperatorToken));
 
-var _stil4m$elm_syntax$Elm_Parser_Numbers$number = F2(
-	function (floatf, intf) {
+var _stil4m$elm_syntax$Elm_Parser_Numbers$hexValueFromChars = function (_p0) {
+	return A2(
+		_elm_lang$core$Result$withDefault,
+		_elm_community$parser_combinators$Combine$fail('This should not happen'),
+		A2(
+			_elm_lang$core$Result$map,
+			_elm_community$parser_combinators$Combine$succeed,
+			_rtfeldman$hex$Hex$fromString(
+				_elm_lang$core$String$toLower(
+					_elm_lang$core$String$fromList(_p0)))));
+};
+var _stil4m$elm_syntax$Elm_Parser_Numbers$hex = A2(
+	_elm_community$parser_combinators$Combine$andThen,
+	_stil4m$elm_syntax$Elm_Parser_Numbers$hexValueFromChars,
+	A2(
+		_stil4m$elm_syntax$Combine_Extra$continueWith,
+		_elm_community$parser_combinators$Combine$many1(_elm_community$parser_combinators$Combine_Char$hexDigit),
+		_elm_community$parser_combinators$Combine$string('0x')));
+var _stil4m$elm_syntax$Elm_Parser_Numbers$number = F3(
+	function (floatf, intf, hexf) {
 		return _elm_community$parser_combinators$Combine$choice(
 			{
 				ctor: '::',
-				_0: A2(_elm_community$parser_combinators$Combine$map, floatf, _elm_community$parser_combinators$Combine_Num$float),
+				_0: A2(_elm_community$parser_combinators$Combine$map, hexf, _stil4m$elm_syntax$Elm_Parser_Numbers$hex),
 				_1: {
 					ctor: '::',
-					_0: A2(_elm_community$parser_combinators$Combine$map, intf, _elm_community$parser_combinators$Combine_Num$int),
-					_1: {ctor: '[]'}
+					_0: A2(_elm_community$parser_combinators$Combine$map, floatf, _elm_community$parser_combinators$Combine_Num$float),
+					_1: {
+						ctor: '::',
+						_0: A2(_elm_community$parser_combinators$Combine$map, intf, _elm_community$parser_combinators$Combine_Num$int),
+						_1: {ctor: '[]'}
+					}
 				}
 			});
 	});
@@ -15844,7 +15893,7 @@ var _stil4m$elm_syntax$Elm_Parser_Patterns$recordPart = _elm_community$parser_co
 						_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(
 							_stil4m$elm_syntax$Elm_Parser_Base$variablePointer(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName))))));
 	});
-var _stil4m$elm_syntax$Elm_Parser_Patterns$numberPart = A2(_stil4m$elm_syntax$Elm_Parser_Numbers$number, _stil4m$elm_syntax$Elm_Syntax_Pattern$FloatPattern, _stil4m$elm_syntax$Elm_Syntax_Pattern$IntPattern);
+var _stil4m$elm_syntax$Elm_Parser_Patterns$numberPart = A3(_stil4m$elm_syntax$Elm_Parser_Numbers$number, _stil4m$elm_syntax$Elm_Syntax_Pattern$FloatPattern, _stil4m$elm_syntax$Elm_Syntax_Pattern$IntPattern, _stil4m$elm_syntax$Elm_Syntax_Pattern$HexPattern);
 var _stil4m$elm_syntax$Elm_Parser_Patterns$variablePart = _stil4m$elm_syntax$Elm_Parser_Ranges$ranged(
 	A2(_elm_community$parser_combinators$Combine$map, _stil4m$elm_syntax$Elm_Syntax_Pattern$VarPattern, _stil4m$elm_syntax$Elm_Parser_Tokens$functionName));
 var _stil4m$elm_syntax$Elm_Parser_Patterns$tryToCompose = function (x) {
@@ -15879,7 +15928,7 @@ var _stil4m$elm_syntax$Elm_Parser_Patterns$tryToCompose = function (x) {
 								_stil4m$elm_syntax$Elm_Parser_Base$variablePointer(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName),
 								A2(
 									_stil4m$elm_syntax$Combine_Extra$ignore,
-									_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+									_stil4m$elm_syntax$Elm_Parser_Layout$layout,
 									_elm_community$parser_combinators$Combine$string('as')))),
 						_1: {
 							ctor: '::',
@@ -16836,7 +16885,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$referenceExpression = A2(
 		}
 	},
 	_stil4m$elm_syntax$Elm_Parser_Declarations$reference);
-var _stil4m$elm_syntax$Elm_Parser_Declarations$numberExpression = A2(_stil4m$elm_syntax$Elm_Parser_Numbers$number, _stil4m$elm_syntax$Elm_Syntax_Expression$Floatable, _stil4m$elm_syntax$Elm_Syntax_Expression$Integer);
+var _stil4m$elm_syntax$Elm_Parser_Declarations$numberExpression = A3(_stil4m$elm_syntax$Elm_Parser_Numbers$number, _stil4m$elm_syntax$Elm_Syntax_Expression$Floatable, _stil4m$elm_syntax$Elm_Syntax_Expression$Integer, _stil4m$elm_syntax$Elm_Syntax_Expression$Hex);
 var _stil4m$elm_syntax$Elm_Parser_Declarations$charLiteralExpression = A2(_elm_community$parser_combinators$Combine$map, _stil4m$elm_syntax$Elm_Syntax_Expression$CharLiteral, _stil4m$elm_syntax$Elm_Parser_Tokens$characterLiteral);
 var _stil4m$elm_syntax$Elm_Parser_Declarations$literalExpression = A2(
 	_elm_community$parser_combinators$Combine$map,
@@ -17716,7 +17765,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$recordExpression = _elm_community
 							function (x, y) {
 								return {ctor: '::', _0: x, _1: y};
 							})))));
-		return A2(
+		var recordContents = A2(
 			_elm_community$parser_combinators$Combine$andThen,
 			function (fname) {
 				return _elm_community$parser_combinators$Combine$choice(
@@ -17800,13 +17849,28 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$recordExpression = _elm_community
 			A2(
 				_stil4m$elm_syntax$Combine_Extra$ignore,
 				_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
-				A2(
-					_stil4m$elm_syntax$Combine_Extra$continueWith,
-					_stil4m$elm_syntax$Elm_Parser_Tokens$functionName,
-					A2(
-						_stil4m$elm_syntax$Combine_Extra$ignore,
-						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
-						_elm_community$parser_combinators$Combine$string('{')))));
+				_stil4m$elm_syntax$Elm_Parser_Tokens$functionName));
+		return A2(
+			_stil4m$elm_syntax$Combine_Extra$continueWith,
+			_elm_community$parser_combinators$Combine$choice(
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_community$parser_combinators$Combine$map,
+						_elm_lang$core$Basics$always(
+							_stil4m$elm_syntax$Elm_Syntax_Expression$RecordExpr(
+								{ctor: '[]'})),
+						_elm_community$parser_combinators$Combine$string('}')),
+					_1: {
+						ctor: '::',
+						_0: recordContents,
+						_1: {ctor: '[]'}
+					}
+				}),
+			A2(
+				_stil4m$elm_syntax$Combine_Extra$ignore,
+				_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+				_elm_community$parser_combinators$Combine$string('{')));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$function = _elm_community$parser_combinators$Combine$lazy(
 	function (_p70) {
@@ -19380,6 +19444,8 @@ var _user$project$ASTUtil_Inspector$inspectInnerExpression = F3(
 				return context;
 			case 'Integer':
 				return context;
+			case 'Hex':
+				return context;
 			case 'Floatable':
 				return context;
 			case 'Negation':
@@ -19737,6 +19803,8 @@ var _user$project$ASTUtil_Variables$patternToUsedVars = function (_p2) {
 				return {ctor: '[]'};
 			case 'IntPattern':
 				return {ctor: '[]'};
+			case 'HexPattern':
+				return {ctor: '[]'};
 			default:
 				return {ctor: '[]'};
 		}
@@ -19812,6 +19880,8 @@ var _user$project$ASTUtil_Variables$patternToVarsInner = F2(
 			case 'StringPattern':
 				return {ctor: '[]'};
 			case 'IntPattern':
+				return {ctor: '[]'};
+			case 'HexPattern':
 				return {ctor: '[]'};
 			default:
 				return {ctor: '[]'};
@@ -25170,9 +25240,13 @@ var _user$project$Analyser_Files_Json$serialiseDependency = function (_p4) {
 		2,
 		_user$project$Analyser_Files_Json$encodeDependency(_p4));
 };
-var _user$project$Analyser_Files_Json$deserialiseDependency = function (_p5) {
+var _user$project$Analyser_Files_Json$deserialiseDependencyValue = function (_p5) {
 	return _elm_lang$core$Result$toMaybe(
-		A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Analyser_Files_Json$decodeDependency, _p5));
+		A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Analyser_Files_Json$decodeDependency, _p5));
+};
+var _user$project$Analyser_Files_Json$deserialiseDependency = function (_p6) {
+	return _elm_lang$core$Result$toMaybe(
+		A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Analyser_Files_Json$decodeDependency, _p6));
 };
 
 var _user$project$Analyser_Messages_Types$Message = F5(

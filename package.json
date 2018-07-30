@@ -31,7 +31,7 @@
   "author": "Mats Stijlaart",
   "license": "MIT",
   "bin": {
-    "elm-analyse": "js/bin/index.js"
+    "elm-analyse": "dist/app/bin/index.js"
   },
   "keywords": [
     "elm",

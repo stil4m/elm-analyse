@@ -14713,6 +14713,9 @@ var _stil4m$elm_syntax$Elm_Syntax_Pattern$TuplePattern = function (a) {
 var _stil4m$elm_syntax$Elm_Syntax_Pattern$FloatPattern = function (a) {
 	return {ctor: 'FloatPattern', _0: a};
 };
+var _stil4m$elm_syntax$Elm_Syntax_Pattern$HexPattern = function (a) {
+	return {ctor: 'HexPattern', _0: a};
+};
 var _stil4m$elm_syntax$Elm_Syntax_Pattern$IntPattern = function (a) {
 	return {ctor: 'IntPattern', _0: a};
 };
@@ -14898,6 +14901,9 @@ var _stil4m$elm_syntax$Elm_Syntax_Expression$Negation = function (a) {
 };
 var _stil4m$elm_syntax$Elm_Syntax_Expression$Floatable = function (a) {
 	return {ctor: 'Floatable', _0: a};
+};
+var _stil4m$elm_syntax$Elm_Syntax_Expression$Hex = function (a) {
+	return {ctor: 'Hex', _0: a};
 };
 var _stil4m$elm_syntax$Elm_Syntax_Expression$Integer = function (a) {
 	return {ctor: 'Integer', _0: a};
@@ -15450,6 +15456,8 @@ var _stil4m$elm_syntax$Elm_Inspector$inspectInnerExpression = F3(
 			case 'Operator':
 				return context;
 			case 'Integer':
+				return context;
+			case 'Hex':
 				return context;
 			case 'Floatable':
 				return context;
@@ -16290,108 +16298,119 @@ var _stil4m$elm_syntax$Elm_Json_Decode$decodePattern = _elm_lang$core$Json_Decod
 											ctor: '::',
 											_0: {
 												ctor: '_Tuple2',
-												_0: 'float',
+												_0: 'hex',
 												_1: A2(
 													_elm_lang$core$Json_Decode$map,
-													_stil4m$elm_syntax$Elm_Syntax_Pattern$FloatPattern,
-													A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$float))
+													_stil4m$elm_syntax$Elm_Syntax_Pattern$HexPattern,
+													A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$int))
 											},
 											_1: {
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'tuple',
+													_0: 'float',
 													_1: A2(
 														_elm_lang$core$Json_Decode$map,
-														_stil4m$elm_syntax$Elm_Syntax_Pattern$TuplePattern,
-														A2(
-															_elm_lang$core$Json_Decode$field,
-															'value',
-															_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
+														_stil4m$elm_syntax$Elm_Syntax_Pattern$FloatPattern,
+														A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$float))
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'record',
+														_0: 'tuple',
 														_1: A2(
 															_elm_lang$core$Json_Decode$map,
-															_stil4m$elm_syntax$Elm_Syntax_Pattern$RecordPattern,
+															_stil4m$elm_syntax$Elm_Syntax_Pattern$TuplePattern,
 															A2(
 																_elm_lang$core$Json_Decode$field,
 																'value',
-																_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeVariablePointer)))
+																_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'uncons',
-															_1: A3(
-																_elm_lang$core$Json_Decode$map2,
-																_stil4m$elm_syntax$Elm_Syntax_Pattern$UnConsPattern,
-																A2(_elm_lang$core$Json_Decode$field, 'left', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern),
-																A2(_elm_lang$core$Json_Decode$field, 'right', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern))
+															_0: 'record',
+															_1: A2(
+																_elm_lang$core$Json_Decode$map,
+																_stil4m$elm_syntax$Elm_Syntax_Pattern$RecordPattern,
+																A2(
+																	_elm_lang$core$Json_Decode$field,
+																	'value',
+																	_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeVariablePointer)))
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'list',
-																_1: A2(
-																	_elm_lang$core$Json_Decode$map,
-																	_stil4m$elm_syntax$Elm_Syntax_Pattern$ListPattern,
-																	A2(
-																		_elm_lang$core$Json_Decode$field,
-																		'value',
-																		_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
+																_0: 'uncons',
+																_1: A3(
+																	_elm_lang$core$Json_Decode$map2,
+																	_stil4m$elm_syntax$Elm_Syntax_Pattern$UnConsPattern,
+																	A2(_elm_lang$core$Json_Decode$field, 'left', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern),
+																	A2(_elm_lang$core$Json_Decode$field, 'right', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern))
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'var',
+																	_0: 'list',
 																	_1: A2(
 																		_elm_lang$core$Json_Decode$map,
-																		_stil4m$elm_syntax$Elm_Syntax_Pattern$VarPattern,
-																		A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$string))
+																		_stil4m$elm_syntax$Elm_Syntax_Pattern$ListPattern,
+																		A2(
+																			_elm_lang$core$Json_Decode$field,
+																			'value',
+																			_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
 																},
 																_1: {
 																	ctor: '::',
 																	_0: {
 																		ctor: '_Tuple2',
-																		_0: 'named',
-																		_1: A3(
-																			_elm_lang$core$Json_Decode$map2,
-																			_stil4m$elm_syntax$Elm_Syntax_Pattern$NamedPattern,
-																			A2(_elm_lang$core$Json_Decode$field, 'qualified', _stil4m$elm_syntax$Elm_Json_Decode$decodeQualifiedNameRef),
-																			A2(
-																				_elm_lang$core$Json_Decode$field,
-																				'patterns',
-																				_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
+																		_0: 'var',
+																		_1: A2(
+																			_elm_lang$core$Json_Decode$map,
+																			_stil4m$elm_syntax$Elm_Syntax_Pattern$VarPattern,
+																			A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$string))
 																	},
 																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'as',
+																			_0: 'named',
 																			_1: A3(
 																				_elm_lang$core$Json_Decode$map2,
-																				_stil4m$elm_syntax$Elm_Syntax_Pattern$AsPattern,
-																				A2(_elm_lang$core$Json_Decode$field, 'pattern', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern),
-																				A2(_elm_lang$core$Json_Decode$field, 'name', _stil4m$elm_syntax$Elm_Json_Decode$decodeVariablePointer))
+																				_stil4m$elm_syntax$Elm_Syntax_Pattern$NamedPattern,
+																				A2(_elm_lang$core$Json_Decode$field, 'qualified', _stil4m$elm_syntax$Elm_Json_Decode$decodeQualifiedNameRef),
+																				A2(
+																					_elm_lang$core$Json_Decode$field,
+																					'patterns',
+																					_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodePattern)))
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'parentisized',
-																				_1: A2(
-																					_elm_lang$core$Json_Decode$map,
-																					_stil4m$elm_syntax$Elm_Syntax_Pattern$ParenthesizedPattern,
-																					A2(_elm_lang$core$Json_Decode$field, 'value', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern))
+																				_0: 'as',
+																				_1: A3(
+																					_elm_lang$core$Json_Decode$map2,
+																					_stil4m$elm_syntax$Elm_Syntax_Pattern$AsPattern,
+																					A2(_elm_lang$core$Json_Decode$field, 'pattern', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern),
+																					A2(_elm_lang$core$Json_Decode$field, 'name', _stil4m$elm_syntax$Elm_Json_Decode$decodeVariablePointer))
 																			},
-																			_1: {ctor: '[]'}
+																			_1: {
+																				ctor: '::',
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: 'parentisized',
+																					_1: A2(
+																						_elm_lang$core$Json_Decode$map,
+																						_stil4m$elm_syntax$Elm_Syntax_Pattern$ParenthesizedPattern,
+																						A2(_elm_lang$core$Json_Decode$field, 'value', _stil4m$elm_syntax$Elm_Json_Decode$decodePattern))
+																				},
+																				_1: {ctor: '[]'}
+																			}
 																		}
 																	}
 																}
@@ -16529,132 +16548,140 @@ var _stil4m$elm_syntax$Elm_Json_Decode$decodeInnerExpression = _elm_lang$core$Js
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'float',
-													_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Floatable, _elm_lang$core$Json_Decode$float)
+													_0: 'hex',
+													_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Hex, _elm_lang$core$Json_Decode$int)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'negation',
-														_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Negation, _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression)
+														_0: 'float',
+														_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Floatable, _elm_lang$core$Json_Decode$float)
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'literal',
-															_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Literal, _elm_lang$core$Json_Decode$string)
+															_0: 'negation',
+															_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Negation, _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression)
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'charLiteral',
-																_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$CharLiteral, _stil4m$elm_syntax$Elm_Json_Decode$decodeChar)
+																_0: 'literal',
+																_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$Literal, _elm_lang$core$Json_Decode$string)
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'tupled',
-																	_1: A2(
-																		_elm_lang$core$Json_Decode$map,
-																		_stil4m$elm_syntax$Elm_Syntax_Expression$TupledExpression,
-																		_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeExpression))
+																	_0: 'charLiteral',
+																	_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$CharLiteral, _stil4m$elm_syntax$Elm_Json_Decode$decodeChar)
 																},
 																_1: {
 																	ctor: '::',
 																	_0: {
 																		ctor: '_Tuple2',
-																		_0: 'list',
+																		_0: 'tupled',
 																		_1: A2(
 																			_elm_lang$core$Json_Decode$map,
-																			_stil4m$elm_syntax$Elm_Syntax_Expression$ListExpr,
+																			_stil4m$elm_syntax$Elm_Syntax_Expression$TupledExpression,
 																			_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeExpression))
 																	},
 																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'parenthesized',
-																			_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$ParenthesizedExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression)
+																			_0: 'list',
+																			_1: A2(
+																				_elm_lang$core$Json_Decode$map,
+																				_stil4m$elm_syntax$Elm_Syntax_Expression$ListExpr,
+																				_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeExpression))
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'let',
-																				_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$LetExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeLetBlock)
+																				_0: 'parenthesized',
+																				_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$ParenthesizedExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression)
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'case',
-																					_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$CaseExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeCaseBlock)
+																					_0: 'let',
+																					_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$LetExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeLetBlock)
 																				},
 																				_1: {
 																					ctor: '::',
 																					_0: {
 																						ctor: '_Tuple2',
-																						_0: 'lambda',
-																						_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$LambdaExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeLambda)
+																						_0: 'case',
+																						_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$CaseExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeCaseBlock)
 																					},
 																					_1: {
 																						ctor: '::',
 																						_0: {
 																							ctor: '_Tuple2',
-																							_0: 'qualified',
-																							_1: A3(
-																								_elm_lang$core$Json_Decode$map2,
-																								_stil4m$elm_syntax$Elm_Syntax_Expression$QualifiedExpr,
-																								A2(_elm_lang$core$Json_Decode$field, 'moduleName', _stil4m$elm_syntax$Elm_Json_Decode$decodeModuleName),
-																								_stil4m$elm_syntax$Elm_Json_Decode$nameField)
+																							_0: 'lambda',
+																							_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$LambdaExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeLambda)
 																						},
 																						_1: {
 																							ctor: '::',
 																							_0: {
 																								ctor: '_Tuple2',
-																								_0: 'recordAccess',
+																								_0: 'qualified',
 																								_1: A3(
 																									_elm_lang$core$Json_Decode$map2,
-																									_stil4m$elm_syntax$Elm_Syntax_Expression$RecordAccess,
-																									A2(_elm_lang$core$Json_Decode$field, 'expression', _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression),
+																									_stil4m$elm_syntax$Elm_Syntax_Expression$QualifiedExpr,
+																									A2(_elm_lang$core$Json_Decode$field, 'moduleName', _stil4m$elm_syntax$Elm_Json_Decode$decodeModuleName),
 																									_stil4m$elm_syntax$Elm_Json_Decode$nameField)
 																							},
 																							_1: {
 																								ctor: '::',
 																								_0: {
 																									ctor: '_Tuple2',
-																									_0: 'recordAccessFunction',
-																									_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$RecordAccessFunction, _elm_lang$core$Json_Decode$string)
+																									_0: 'recordAccess',
+																									_1: A3(
+																										_elm_lang$core$Json_Decode$map2,
+																										_stil4m$elm_syntax$Elm_Syntax_Expression$RecordAccess,
+																										A2(_elm_lang$core$Json_Decode$field, 'expression', _stil4m$elm_syntax$Elm_Json_Decode$decodeExpression),
+																										_stil4m$elm_syntax$Elm_Json_Decode$nameField)
 																								},
 																								_1: {
 																									ctor: '::',
 																									_0: {
 																										ctor: '_Tuple2',
-																										_0: 'record',
-																										_1: A2(
-																											_elm_lang$core$Json_Decode$map,
-																											_stil4m$elm_syntax$Elm_Syntax_Expression$RecordExpr,
-																											_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeRecordSetter))
+																										_0: 'recordAccessFunction',
+																										_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$RecordAccessFunction, _elm_lang$core$Json_Decode$string)
 																									},
 																									_1: {
 																										ctor: '::',
 																										_0: {
 																											ctor: '_Tuple2',
-																											_0: 'recordUpdate',
-																											_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$RecordUpdateExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeRecordUpdate)
+																											_0: 'record',
+																											_1: A2(
+																												_elm_lang$core$Json_Decode$map,
+																												_stil4m$elm_syntax$Elm_Syntax_Expression$RecordExpr,
+																												_elm_lang$core$Json_Decode$list(_stil4m$elm_syntax$Elm_Json_Decode$decodeRecordSetter))
 																										},
 																										_1: {
 																											ctor: '::',
 																											_0: {
 																												ctor: '_Tuple2',
-																												_0: 'glsl',
-																												_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$GLSLExpression, _elm_lang$core$Json_Decode$string)
+																												_0: 'recordUpdate',
+																												_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$RecordUpdateExpression, _stil4m$elm_syntax$Elm_Json_Decode$decodeRecordUpdate)
 																											},
-																											_1: {ctor: '[]'}
+																											_1: {
+																												ctor: '::',
+																												_0: {
+																													ctor: '_Tuple2',
+																													_0: 'glsl',
+																													_1: A2(_elm_lang$core$Json_Decode$map, _stil4m$elm_syntax$Elm_Syntax_Expression$GLSLExpression, _elm_lang$core$Json_Decode$string)
+																												},
+																												_1: {ctor: '[]'}
+																											}
 																										}
 																									}
 																								}
@@ -17584,7 +17611,7 @@ var _stil4m$elm_syntax$Elm_Json_Encode$encodePattern = function (_p42) {
 							case 'StringPattern':
 								return A2(
 									_stil4m$elm_syntax$Elm_Json_Util$encodeTyped,
-									'char',
+									'string',
 									_elm_lang$core$Json_Encode$object(
 										{
 											ctor: '::',
@@ -17599,6 +17626,20 @@ var _stil4m$elm_syntax$Elm_Json_Encode$encodePattern = function (_p42) {
 								return A2(
 									_stil4m$elm_syntax$Elm_Json_Util$encodeTyped,
 									'int',
+									_elm_lang$core$Json_Encode$object(
+										{
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'value',
+												_1: _elm_lang$core$Json_Encode$int(_p44._0)
+											},
+											_1: {ctor: '[]'}
+										}));
+							case 'HexPattern':
+								return A2(
+									_stil4m$elm_syntax$Elm_Json_Util$encodeTyped,
+									'hex',
 									_elm_lang$core$Json_Encode$object(
 										{
 											ctor: '::',
@@ -17862,6 +17903,11 @@ var _stil4m$elm_syntax$Elm_Json_Encode$encodeExpression = function (_p47) {
 								return A2(
 									_stil4m$elm_syntax$Elm_Json_Util$encodeTyped,
 									'integer',
+									_elm_lang$core$Json_Encode$int(_p49._0));
+							case 'Hex':
+								return A2(
+									_stil4m$elm_syntax$Elm_Json_Util$encodeTyped,
+									'hex',
 									_elm_lang$core$Json_Encode$int(_p49._0));
 							case 'Floatable':
 								return A2(
@@ -18683,7 +18729,7 @@ var _stil4m$elm_syntax$Elm_Parser_Tokens$escapedChar = A2(
 															_elm_community$parser_combinators$Combine_ops['*>'],
 															_elm_community$parser_combinators$Combine_Char$char(
 																_elm_lang$core$Native_Utils.chr('x')),
-															_elm_community$parser_combinators$Combine$regex('[0-9A-Fa-f]{2}')),
+															_elm_community$parser_combinators$Combine$regex('([0-9A-Fa-f]{2}){1,2}')),
 														function (l) {
 															var _p0 = _rtfeldman$hex$Hex$fromString(
 																_elm_lang$core$String$toLower(l));
@@ -19262,16 +19308,38 @@ var _stil4m$elm_syntax$Elm_Parser_Infix$infixDefinition = A2(
 		A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _elm_community$parser_combinators$Combine_Num$int)),
 	A2(_elm_community$parser_combinators$Combine_ops['*>'], _stil4m$elm_syntax$Elm_Parser_Layout$layout, _stil4m$elm_syntax$Elm_Parser_Tokens$prefixOperatorToken));
 
-var _stil4m$elm_syntax$Elm_Parser_Numbers$number = F2(
-	function (floatf, intf) {
+var _stil4m$elm_syntax$Elm_Parser_Numbers$hexValueFromChars = function (_p0) {
+	return A2(
+		_elm_lang$core$Result$withDefault,
+		_elm_community$parser_combinators$Combine$fail('This should not happen'),
+		A2(
+			_elm_lang$core$Result$map,
+			_elm_community$parser_combinators$Combine$succeed,
+			_rtfeldman$hex$Hex$fromString(
+				_elm_lang$core$String$toLower(
+					_elm_lang$core$String$fromList(_p0)))));
+};
+var _stil4m$elm_syntax$Elm_Parser_Numbers$hex = A2(
+	_elm_community$parser_combinators$Combine$andThen,
+	_stil4m$elm_syntax$Elm_Parser_Numbers$hexValueFromChars,
+	A2(
+		_stil4m$elm_syntax$Combine_Extra$continueWith,
+		_elm_community$parser_combinators$Combine$many1(_elm_community$parser_combinators$Combine_Char$hexDigit),
+		_elm_community$parser_combinators$Combine$string('0x')));
+var _stil4m$elm_syntax$Elm_Parser_Numbers$number = F3(
+	function (floatf, intf, hexf) {
 		return _elm_community$parser_combinators$Combine$choice(
 			{
 				ctor: '::',
-				_0: A2(_elm_community$parser_combinators$Combine$map, floatf, _elm_community$parser_combinators$Combine_Num$float),
+				_0: A2(_elm_community$parser_combinators$Combine$map, hexf, _stil4m$elm_syntax$Elm_Parser_Numbers$hex),
 				_1: {
 					ctor: '::',
-					_0: A2(_elm_community$parser_combinators$Combine$map, intf, _elm_community$parser_combinators$Combine_Num$int),
-					_1: {ctor: '[]'}
+					_0: A2(_elm_community$parser_combinators$Combine$map, floatf, _elm_community$parser_combinators$Combine_Num$float),
+					_1: {
+						ctor: '::',
+						_0: A2(_elm_community$parser_combinators$Combine$map, intf, _elm_community$parser_combinators$Combine_Num$int),
+						_1: {ctor: '[]'}
+					}
 				}
 			});
 	});
@@ -19299,7 +19367,7 @@ var _stil4m$elm_syntax$Elm_Parser_Patterns$recordPart = _elm_community$parser_co
 						_stil4m$elm_syntax$Elm_Parser_Layout$maybeAroundBothSides(
 							_stil4m$elm_syntax$Elm_Parser_Base$variablePointer(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName))))));
 	});
-var _stil4m$elm_syntax$Elm_Parser_Patterns$numberPart = A2(_stil4m$elm_syntax$Elm_Parser_Numbers$number, _stil4m$elm_syntax$Elm_Syntax_Pattern$FloatPattern, _stil4m$elm_syntax$Elm_Syntax_Pattern$IntPattern);
+var _stil4m$elm_syntax$Elm_Parser_Patterns$numberPart = A3(_stil4m$elm_syntax$Elm_Parser_Numbers$number, _stil4m$elm_syntax$Elm_Syntax_Pattern$FloatPattern, _stil4m$elm_syntax$Elm_Syntax_Pattern$IntPattern, _stil4m$elm_syntax$Elm_Syntax_Pattern$HexPattern);
 var _stil4m$elm_syntax$Elm_Parser_Patterns$variablePart = _stil4m$elm_syntax$Elm_Parser_Ranges$ranged(
 	A2(_elm_community$parser_combinators$Combine$map, _stil4m$elm_syntax$Elm_Syntax_Pattern$VarPattern, _stil4m$elm_syntax$Elm_Parser_Tokens$functionName));
 var _stil4m$elm_syntax$Elm_Parser_Patterns$tryToCompose = function (x) {
@@ -19334,7 +19402,7 @@ var _stil4m$elm_syntax$Elm_Parser_Patterns$tryToCompose = function (x) {
 								_stil4m$elm_syntax$Elm_Parser_Base$variablePointer(_stil4m$elm_syntax$Elm_Parser_Tokens$functionName),
 								A2(
 									_stil4m$elm_syntax$Combine_Extra$ignore,
-									_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+									_stil4m$elm_syntax$Elm_Parser_Layout$layout,
 									_elm_community$parser_combinators$Combine$string('as')))),
 						_1: {
 							ctor: '::',
@@ -20291,7 +20359,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$referenceExpression = A2(
 		}
 	},
 	_stil4m$elm_syntax$Elm_Parser_Declarations$reference);
-var _stil4m$elm_syntax$Elm_Parser_Declarations$numberExpression = A2(_stil4m$elm_syntax$Elm_Parser_Numbers$number, _stil4m$elm_syntax$Elm_Syntax_Expression$Floatable, _stil4m$elm_syntax$Elm_Syntax_Expression$Integer);
+var _stil4m$elm_syntax$Elm_Parser_Declarations$numberExpression = A3(_stil4m$elm_syntax$Elm_Parser_Numbers$number, _stil4m$elm_syntax$Elm_Syntax_Expression$Floatable, _stil4m$elm_syntax$Elm_Syntax_Expression$Integer, _stil4m$elm_syntax$Elm_Syntax_Expression$Hex);
 var _stil4m$elm_syntax$Elm_Parser_Declarations$charLiteralExpression = A2(_elm_community$parser_combinators$Combine$map, _stil4m$elm_syntax$Elm_Syntax_Expression$CharLiteral, _stil4m$elm_syntax$Elm_Parser_Tokens$characterLiteral);
 var _stil4m$elm_syntax$Elm_Parser_Declarations$literalExpression = A2(
 	_elm_community$parser_combinators$Combine$map,
@@ -21171,7 +21239,7 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$recordExpression = _elm_community
 							function (x, y) {
 								return {ctor: '::', _0: x, _1: y};
 							})))));
-		return A2(
+		var recordContents = A2(
 			_elm_community$parser_combinators$Combine$andThen,
 			function (fname) {
 				return _elm_community$parser_combinators$Combine$choice(
@@ -21255,13 +21323,28 @@ var _stil4m$elm_syntax$Elm_Parser_Declarations$recordExpression = _elm_community
 			A2(
 				_stil4m$elm_syntax$Combine_Extra$ignore,
 				_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
-				A2(
-					_stil4m$elm_syntax$Combine_Extra$continueWith,
-					_stil4m$elm_syntax$Elm_Parser_Tokens$functionName,
-					A2(
-						_stil4m$elm_syntax$Combine_Extra$ignore,
-						_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
-						_elm_community$parser_combinators$Combine$string('{')))));
+				_stil4m$elm_syntax$Elm_Parser_Tokens$functionName));
+		return A2(
+			_stil4m$elm_syntax$Combine_Extra$continueWith,
+			_elm_community$parser_combinators$Combine$choice(
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_community$parser_combinators$Combine$map,
+						_elm_lang$core$Basics$always(
+							_stil4m$elm_syntax$Elm_Syntax_Expression$RecordExpr(
+								{ctor: '[]'})),
+						_elm_community$parser_combinators$Combine$string('}')),
+					_1: {
+						ctor: '::',
+						_0: recordContents,
+						_1: {ctor: '[]'}
+					}
+				}),
+			A2(
+				_stil4m$elm_syntax$Combine_Extra$ignore,
+				_elm_community$parser_combinators$Combine$maybe(_stil4m$elm_syntax$Elm_Parser_Layout$layout),
+				_elm_community$parser_combinators$Combine$string('{')));
 	});
 var _stil4m$elm_syntax$Elm_Parser_Declarations$function = _elm_community$parser_combinators$Combine$lazy(
 	function (_p70) {
@@ -22393,6 +22476,13 @@ var _stil4m$structured_writer$StructuredWriter$sepBySpace = _stil4m$structured_w
 	{ctor: '_Tuple3', _0: '', _1: ' ', _2: ''});
 var _stil4m$structured_writer$StructuredWriter$sepBy = _stil4m$structured_writer$StructuredWriter$Sep;
 
+var _stil4m$elm_syntax$Elm_Writer$writeHex = function (h) {
+	return A2(
+		_stil4m$structured_writer$StructuredWriter$append,
+		_stil4m$structured_writer$StructuredWriter$string('0x'),
+		_stil4m$structured_writer$StructuredWriter$string(
+			_rtfeldman$hex$Hex$toString(h)));
+};
 var _stil4m$elm_syntax$Elm_Writer$parensIfContainsSpaces = function (w) {
 	return A2(
 		_elm_lang$core$String$contains,
@@ -22861,6 +22951,8 @@ var _stil4m$elm_syntax$Elm_Writer$writePattern = function (_p32) {
 		case 'IntPattern':
 			return _stil4m$structured_writer$StructuredWriter$string(
 				_elm_lang$core$Basics$toString(_p34._0));
+		case 'HexPattern':
+			return _stil4m$elm_syntax$Elm_Writer$writeHex(_p34._0);
 		case 'FloatPattern':
 			return _stil4m$structured_writer$StructuredWriter$string(
 				_elm_lang$core$Basics$toString(_p34._0));
@@ -23139,6 +23231,8 @@ var _stil4m$elm_syntax$Elm_Writer$writeExpression = function (_p36) {
 			case 'Integer':
 				return _stil4m$structured_writer$StructuredWriter$string(
 					_elm_lang$core$Basics$toString(_p44._0));
+			case 'Hex':
+				return _stil4m$elm_syntax$Elm_Writer$writeHex(_p44._0);
 			case 'Floatable':
 				return _stil4m$structured_writer$StructuredWriter$string(
 					_elm_lang$core$Basics$toString(_p44._0));
@@ -24202,6 +24296,8 @@ var _user$project$ASTUtil_Inspector$inspectInnerExpression = F3(
 				return context;
 			case 'Integer':
 				return context;
+			case 'Hex':
+				return context;
 			case 'Floatable':
 				return context;
 			case 'Negation':
@@ -24634,6 +24730,8 @@ var _user$project$ASTUtil_PatternOptimizer$optimize = F2(
 					return _p9;
 				case 'IntPattern':
 					return _p9;
+				case 'HexPattern':
+					return _p9;
 				default:
 					return _p9;
 			}
@@ -24765,6 +24863,8 @@ var _user$project$ASTUtil_Variables$patternToUsedVars = function (_p2) {
 				return {ctor: '[]'};
 			case 'IntPattern':
 				return {ctor: '[]'};
+			case 'HexPattern':
+				return {ctor: '[]'};
 			default:
 				return {ctor: '[]'};
 		}
@@ -24840,6 +24940,8 @@ var _user$project$ASTUtil_Variables$patternToVarsInner = F2(
 			case 'StringPattern':
 				return {ctor: '[]'};
 			case 'IntPattern':
+				return {ctor: '[]'};
+			case 'HexPattern':
 				return {ctor: '[]'};
 			default:
 				return {ctor: '[]'};
@@ -25648,9 +25750,13 @@ var _user$project$Analyser_Files_Json$serialiseDependency = function (_p4) {
 		2,
 		_user$project$Analyser_Files_Json$encodeDependency(_p4));
 };
-var _user$project$Analyser_Files_Json$deserialiseDependency = function (_p5) {
+var _user$project$Analyser_Files_Json$deserialiseDependencyValue = function (_p5) {
 	return _elm_lang$core$Result$toMaybe(
-		A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Analyser_Files_Json$decodeDependency, _p5));
+		A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Analyser_Files_Json$decodeDependency, _p5));
+};
+var _user$project$Analyser_Files_Json$deserialiseDependency = function (_p6) {
+	return _elm_lang$core$Result$toMaybe(
+		A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Analyser_Files_Json$decodeDependency, _p6));
 };
 
 var _user$project$Analyser_DependencyHandler$loadedInterfaceForFile = function (file) {
@@ -25672,8 +25778,8 @@ var _user$project$Analyser_DependencyHandler$buildDependency = F2(
 		var _p2 = _p1;
 		return A3(
 			_stil4m$elm_syntax$Elm_Dependency$Dependency,
-			_p2._0,
-			_p2._1,
+			_p2.name,
+			_p2.version,
 			_elm_lang$core$Dict$fromList(
 				A2(
 					_elm_lang$core$List$filterMap,
@@ -25758,8 +25864,8 @@ var _user$project$Analyser_DependencyHandler$depFromModules = F2(
 	function (_p7, docs) {
 		var _p8 = _p7;
 		return {
-			name: _p8._0,
-			version: _p8._1,
+			name: _p8.name,
+			version: _p8.version,
 			interfaces: _elm_lang$core$Dict$fromList(
 				A2(_elm_lang$core$List$map, _user$project$Analyser_DependencyHandler$interfaceFromDocumentation, docs))
 		};
@@ -25767,21 +25873,22 @@ var _user$project$Analyser_DependencyHandler$depFromModules = F2(
 var _user$project$Analyser_DependencyHandler$storeRawDependency = _elm_lang$core$Native_Platform.outgoingPort(
 	'storeRawDependency',
 	function (v) {
-		return [v._0, v._1, v._2];
+		return {
+			dependency: {name: v.dependency.name, version: v.dependency.version},
+			content: v.content
+		};
 	});
 var _user$project$Analyser_DependencyHandler$storeToDisk = function (dependency) {
 	return _user$project$Analyser_DependencyHandler$storeRawDependency(
 		{
-			ctor: '_Tuple3',
-			_0: dependency.name,
-			_1: dependency.version,
-			_2: _user$project$Analyser_Files_Json$serialiseDependency(dependency)
+			dependency: {name: dependency.name, version: dependency.version},
+			content: _user$project$Analyser_Files_Json$serialiseDependency(dependency)
 		});
 };
 var _user$project$Analyser_DependencyHandler$loadRawDependency = _elm_lang$core$Native_Platform.outgoingPort(
 	'loadRawDependency',
 	function (v) {
-		return [v._0, v._1];
+		return {name: v.name, version: v.version};
 	});
 var _user$project$Analyser_DependencyHandler$readFromDisk = function (dependency) {
 	return _user$project$Analyser_DependencyHandler$loadRawDependency(dependency);
@@ -25790,127 +25897,119 @@ var _user$project$Analyser_DependencyHandler$onRawDependency = _elm_lang$core$Na
 	'onRawDependency',
 	A2(
 		_elm_lang$core$Json_Decode$andThen,
-		function (x0) {
+		function (dependency) {
 			return A2(
 				_elm_lang$core$Json_Decode$andThen,
-				function (x1) {
+				function (json) {
+					return _elm_lang$core$Json_Decode$succeed(
+						{dependency: dependency, json: json});
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'json', _elm_lang$core$Json_Decode$value));
+		},
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'dependency',
+			A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (name) {
 					return A2(
 						_elm_lang$core$Json_Decode$andThen,
-						function (x2) {
+						function (version) {
 							return _elm_lang$core$Json_Decode$succeed(
-								{ctor: '_Tuple3', _0: x0, _1: x1, _2: x2});
+								{name: name, version: version});
 						},
-						A2(_elm_lang$core$Json_Decode$index, 2, _elm_lang$core$Json_Decode$string));
+						A2(_elm_lang$core$Json_Decode$field, 'version', _elm_lang$core$Json_Decode$string));
 				},
-				A2(_elm_lang$core$Json_Decode$index, 1, _elm_lang$core$Json_Decode$string));
-		},
-		A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string)));
+				A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string)))));
 var _user$project$Analyser_DependencyHandler$loadHttpDocumentation = _elm_lang$core$Native_Platform.outgoingPort(
 	'loadHttpDocumentation',
 	function (v) {
-		return [v._0, v._1];
+		return {name: v.name, version: v.version};
 	});
 var _user$project$Analyser_DependencyHandler$loadOnlineDocumentation = _user$project$Analyser_DependencyHandler$loadHttpDocumentation;
 var _user$project$Analyser_DependencyHandler$onHttpDocumentation = _elm_lang$core$Native_Platform.incomingPort(
 	'onHttpDocumentation',
 	A2(
 		_elm_lang$core$Json_Decode$andThen,
-		function (x0) {
+		function (dependency) {
 			return A2(
 				_elm_lang$core$Json_Decode$andThen,
-				function (x1) {
+				function (json) {
 					return _elm_lang$core$Json_Decode$succeed(
-						{ctor: '_Tuple2', _0: x0, _1: x1});
+						{dependency: dependency, json: json});
 				},
-				A2(_elm_lang$core$Json_Decode$index, 1, _elm_lang$core$Json_Decode$value));
+				A2(_elm_lang$core$Json_Decode$field, 'json', _elm_lang$core$Json_Decode$value));
 		},
 		A2(
-			_elm_lang$core$Json_Decode$index,
-			0,
+			_elm_lang$core$Json_Decode$field,
+			'dependency',
 			A2(
 				_elm_lang$core$Json_Decode$andThen,
-				function (x0) {
+				function (name) {
 					return A2(
 						_elm_lang$core$Json_Decode$andThen,
-						function (x1) {
+						function (version) {
 							return _elm_lang$core$Json_Decode$succeed(
-								{ctor: '_Tuple2', _0: x0, _1: x1});
+								{name: name, version: version});
 						},
-						A2(_elm_lang$core$Json_Decode$index, 1, _elm_lang$core$Json_Decode$string));
+						A2(_elm_lang$core$Json_Decode$field, 'version', _elm_lang$core$Json_Decode$string));
 				},
-				A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string)))));
+				A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string)))));
 var _user$project$Analyser_DependencyHandler$onOnlineDocumentation = function (dep) {
 	return _user$project$Analyser_DependencyHandler$onHttpDocumentation(
 		function (_p9) {
 			var _p10 = _p9;
-			return _elm_lang$core$Native_Utils.eq(_p10._0, dep) ? _elm_lang$core$Maybe$Just(
+			return _elm_lang$core$Native_Utils.eq(_p10.dependency, dep) ? _elm_lang$core$Maybe$Just(
 				A2(
 					_elm_lang$core$Result$map,
 					_user$project$Analyser_DependencyHandler$depFromModules(dep),
 					A2(
 						_elm_lang$core$Json_Decode$decodeValue,
 						_elm_lang$core$Json_Decode$list(_elm_tools$documentation$Elm_Documentation$decoder),
-						_p10._1))) : _elm_lang$core$Maybe$Nothing;
+						_p10.json))) : _elm_lang$core$Maybe$Nothing;
 		});
 };
 var _user$project$Analyser_DependencyHandler$loadDependencyFiles = _elm_lang$core$Native_Platform.outgoingPort(
 	'loadDependencyFiles',
 	function (v) {
-		return [v._0, v._1];
+		return {name: v.name, version: v.version};
 	});
 var _user$project$Analyser_DependencyHandler$onDependencyFiles = _elm_lang$core$Native_Platform.incomingPort(
 	'onDependencyFiles',
 	A2(
 		_elm_lang$core$Json_Decode$andThen,
-		function (x0) {
+		function (dependency) {
 			return A2(
 				_elm_lang$core$Json_Decode$andThen,
-				function (x1) {
-					return A2(
-						_elm_lang$core$Json_Decode$andThen,
-						function (x2) {
-							return _elm_lang$core$Json_Decode$succeed(
-								{ctor: '_Tuple3', _0: x0, _1: x1, _2: x2});
-						},
+				function (files) {
+					return _elm_lang$core$Json_Decode$succeed(
+						{dependency: dependency, files: files});
+				},
+				A2(
+					_elm_lang$core$Json_Decode$field,
+					'files',
+					_elm_lang$core$Json_Decode$list(
 						A2(
-							_elm_lang$core$Json_Decode$index,
-							2,
-							_elm_lang$core$Json_Decode$list(
-								A2(
+							_elm_lang$core$Json_Decode$andThen,
+							function (path) {
+								return A2(
 									_elm_lang$core$Json_Decode$andThen,
-									function (path) {
+									function (success) {
 										return A2(
 											_elm_lang$core$Json_Decode$andThen,
-											function (success) {
+											function (sha1) {
 												return A2(
 													_elm_lang$core$Json_Decode$andThen,
-													function (sha1) {
+													function (content) {
 														return A2(
 															_elm_lang$core$Json_Decode$andThen,
-															function (content) {
-																return A2(
-																	_elm_lang$core$Json_Decode$andThen,
-																	function (ast) {
-																		return _elm_lang$core$Json_Decode$succeed(
-																			{path: path, success: success, sha1: sha1, content: content, ast: ast});
-																	},
-																	A2(
-																		_elm_lang$core$Json_Decode$field,
-																		'ast',
-																		_elm_lang$core$Json_Decode$oneOf(
-																			{
-																				ctor: '::',
-																				_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
-																				_1: {
-																					ctor: '::',
-																					_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
-																					_1: {ctor: '[]'}
-																				}
-																			})));
+															function (ast) {
+																return _elm_lang$core$Json_Decode$succeed(
+																	{path: path, success: success, sha1: sha1, content: content, ast: ast});
 															},
 															A2(
 																_elm_lang$core$Json_Decode$field,
-																'content',
+																'ast',
 																_elm_lang$core$Json_Decode$oneOf(
 																	{
 																		ctor: '::',
@@ -25924,7 +26023,7 @@ var _user$project$Analyser_DependencyHandler$onDependencyFiles = _elm_lang$core$
 													},
 													A2(
 														_elm_lang$core$Json_Decode$field,
-														'sha1',
+														'content',
 														_elm_lang$core$Json_Decode$oneOf(
 															{
 																ctor: '::',
@@ -25936,50 +26035,92 @@ var _user$project$Analyser_DependencyHandler$onDependencyFiles = _elm_lang$core$
 																}
 															})));
 											},
-											A2(_elm_lang$core$Json_Decode$field, 'success', _elm_lang$core$Json_Decode$bool));
+											A2(
+												_elm_lang$core$Json_Decode$field,
+												'sha1',
+												_elm_lang$core$Json_Decode$oneOf(
+													{
+														ctor: '::',
+														_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+														_1: {
+															ctor: '::',
+															_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
+															_1: {ctor: '[]'}
+														}
+													})));
 									},
-									A2(_elm_lang$core$Json_Decode$field, 'path', _elm_lang$core$Json_Decode$string)))));
-				},
-				A2(_elm_lang$core$Json_Decode$index, 1, _elm_lang$core$Json_Decode$string));
+									A2(_elm_lang$core$Json_Decode$field, 'success', _elm_lang$core$Json_Decode$bool));
+							},
+							A2(_elm_lang$core$Json_Decode$field, 'path', _elm_lang$core$Json_Decode$string)))));
 		},
-		A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string)));
-var _user$project$Analyser_DependencyHandler$onLoadDependencyFilesFromDisk = function (_p11) {
-	var _p12 = _p11;
-	var _p16 = _p12._1;
-	var _p15 = _p12._0;
-	var onRawFiles = function (_p13) {
-		var _p14 = _p13;
-		if (_elm_lang$core$Native_Utils.eq(_p14._0, _p15) && _elm_lang$core$Native_Utils.eq(_p14._1, _p16)) {
-			var loadedFiles = A2(_elm_lang$core$List$map, _user$project$Analyser_DependencyHandler$dependencyFileInterface, _p14._2);
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'dependency',
+			A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (name) {
+					return A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (version) {
+							return _elm_lang$core$Json_Decode$succeed(
+								{name: name, version: version});
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'version', _elm_lang$core$Json_Decode$string));
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string)))));
+var _user$project$Analyser_DependencyHandler$onLoadDependencyFilesFromDisk = function (dep) {
+	var onRawFiles = function (_p11) {
+		var _p12 = _p11;
+		var _p13 = _p12.dependency;
+		if (_elm_lang$core$Native_Utils.eq(dep, _p13)) {
+			var loadedFiles = A2(_elm_lang$core$List$map, _user$project$Analyser_DependencyHandler$dependencyFileInterface, _p12.files);
 			return (!A2(_elm_lang$core$List$all, _elm_community$result_extra$Result_Extra$isOk, loadedFiles)) ? _elm_lang$core$Maybe$Just(
 				_elm_lang$core$Result$Err('Could not load all dependency files')) : _elm_lang$core$Maybe$Just(
 				_elm_lang$core$Result$Ok(
-					A2(
-						_user$project$Analyser_DependencyHandler$buildDependency,
-						{ctor: '_Tuple2', _0: _p15, _1: _p16},
-						loadedFiles)));
+					A2(_user$project$Analyser_DependencyHandler$buildDependency, _p13, loadedFiles)));
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
 		}
 	};
 	return _user$project$Analyser_DependencyHandler$onDependencyFiles(onRawFiles);
 };
+var _user$project$Analyser_DependencyHandler$DependencyPointer = F2(
+	function (a, b) {
+		return {name: a, version: b};
+	});
+var _user$project$Analyser_DependencyHandler$DependencyStore = F2(
+	function (a, b) {
+		return {dependency: a, content: b};
+	});
+var _user$project$Analyser_DependencyHandler$RawDependencyLoad = F2(
+	function (a, b) {
+		return {dependency: a, json: b};
+	});
+var _user$project$Analyser_DependencyHandler$DependencyFiles = F2(
+	function (a, b) {
+		return {dependency: a, files: b};
+	});
+var _user$project$Analyser_DependencyHandler$HttpDocumentationLoad = F2(
+	function (a, b) {
+		return {dependency: a, json: b};
+	});
 var _user$project$Analyser_DependencyHandler$Success = function (a) {
 	return {ctor: 'Success', _0: a};
 };
 var _user$project$Analyser_DependencyHandler$Failed = {ctor: 'Failed'};
 var _user$project$Analyser_DependencyHandler$Ignore = {ctor: 'Ignore'};
-var _user$project$Analyser_DependencyHandler$onReadFromDisk = function (_p17) {
-	var _p18 = _p17;
+var _user$project$Analyser_DependencyHandler$onReadFromDisk = function (_p14) {
+	var _p15 = _p14;
 	return _user$project$Analyser_DependencyHandler$onRawDependency(
-		function (_p19) {
-			var _p20 = _p19;
-			if (_elm_lang$core$Native_Utils.eq(_p20._0, _p18._0) && _elm_lang$core$Native_Utils.eq(_p18._1, _p20._1)) {
-				var _p21 = _user$project$Analyser_Files_Json$deserialiseDependency(_p20._2);
-				if (_p21.ctor === 'Nothing') {
+		function (_p16) {
+			var _p17 = _p16;
+			var _p19 = _p17.dependency;
+			if (_elm_lang$core$Native_Utils.eq(_p19.name, _p15.name) && _elm_lang$core$Native_Utils.eq(_p15.version, _p19.version)) {
+				var _p18 = _user$project$Analyser_Files_Json$deserialiseDependencyValue(_p17.json);
+				if (_p18.ctor === 'Nothing') {
 					return _user$project$Analyser_DependencyHandler$Failed;
 				} else {
-					return _user$project$Analyser_DependencyHandler$Success(_p21._0);
+					return _user$project$Analyser_DependencyHandler$Success(_p18._0);
 				}
 			} else {
 				return _user$project$Analyser_DependencyHandler$Ignore;
@@ -25990,37 +26131,23 @@ var _user$project$Analyser_DependencyHandler$onReadFromDisk = function (_p17) {
 var _user$project$Util_Logger$log = _elm_lang$core$Native_Platform.outgoingPort(
 	'log',
 	function (v) {
-		return [v._0, v._1];
+		return {level: v.level, message: v.message};
+	});
+var _user$project$Util_Logger$LogMessage = F2(
+	function (a, b) {
+		return {level: a, message: b};
 	});
 var _user$project$Util_Logger$info = function (_p0) {
 	return _user$project$Util_Logger$log(
-		A2(
-			F2(
-				function (v0, v1) {
-					return {ctor: '_Tuple2', _0: v0, _1: v1};
-				}),
-			'INFO',
-			_p0));
+		A2(_user$project$Util_Logger$LogMessage, 'INFO', _p0));
 };
 var _user$project$Util_Logger$warning = function (_p1) {
 	return _user$project$Util_Logger$log(
-		A2(
-			F2(
-				function (v0, v1) {
-					return {ctor: '_Tuple2', _0: v0, _1: v1};
-				}),
-			'WARN',
-			_p1));
+		A2(_user$project$Util_Logger$LogMessage, 'WARN', _p1));
 };
 var _user$project$Util_Logger$error = function (_p2) {
 	return _user$project$Util_Logger$log(
-		A2(
-			F2(
-				function (v0, v1) {
-					return {ctor: '_Tuple2', _0: v0, _1: v1};
-				}),
-			'ERROR',
-			_p2));
+		A2(_user$project$Util_Logger$LogMessage, 'ERROR', _p2));
 };
 
 var _user$project$Analyser_Files_DependencyLoader$getDependency = function (m) {
@@ -26044,7 +26171,7 @@ var _user$project$Analyser_Files_DependencyLoader$isDone = function (m) {
 };
 var _user$project$Analyser_Files_DependencyLoader$Model = F2(
 	function (a, b) {
-		return {dep: a, state: b};
+		return {dependency: a, state: b};
 	});
 var _user$project$Analyser_Files_DependencyLoader$Done = function (a) {
 	return {ctor: 'Done', _0: a};
@@ -26071,10 +26198,7 @@ var _user$project$Analyser_Files_DependencyLoader$update = F2(
 								A2(
 									_elm_lang$core$Basics_ops['++'],
 									'Loaded ',
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										_elm_lang$core$Tuple$first(model.dep),
-										' from cache')))
+									A2(_elm_lang$core$Basics_ops['++'], model.dependency.name, ' from cache')))
 						};
 					case 'Failed':
 						return {
@@ -26082,7 +26206,7 @@ var _user$project$Analyser_Files_DependencyLoader$update = F2(
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
 								{state: _user$project$Analyser_Files_DependencyLoader$LoadingOnlineDocs}),
-							_1: _user$project$Analyser_DependencyHandler$loadOnlineDocumentation(model.dep)
+							_1: _user$project$Analyser_DependencyHandler$loadOnlineDocumentation(model.dependency)
 						};
 					default:
 						return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
@@ -26098,7 +26222,7 @@ var _user$project$Analyser_Files_DependencyLoader$update = F2(
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
 								{state: _user$project$Analyser_Files_DependencyLoader$RawDiskLoading}),
-							_1: _user$project$Analyser_DependencyHandler$loadDependencyFiles(model.dep)
+							_1: _user$project$Analyser_DependencyHandler$loadDependencyFiles(model.dependency)
 						};
 					} else {
 						var _p5 = _p4._0._0;
@@ -26119,10 +26243,7 @@ var _user$project$Analyser_Files_DependencyLoader$update = F2(
 											A2(
 												_elm_lang$core$Basics_ops['++'],
 												'Loaded ',
-												A2(
-													_elm_lang$core$Basics_ops['++'],
-													_elm_lang$core$Tuple$first(model.dep),
-													' from package.elm-lang.org'))),
+												A2(_elm_lang$core$Basics_ops['++'], model.dependency.name, ' from package.elm-lang.org'))),
 										_1: {ctor: '[]'}
 									}
 								})
@@ -26141,10 +26262,7 @@ var _user$project$Analyser_Files_DependencyLoader$update = F2(
 								model,
 								{state: _user$project$Analyser_Files_DependencyLoader$Failure}),
 							_1: _user$project$Util_Logger$info(
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									'Failed to load dependency: ',
-									_elm_lang$core$Tuple$first(model.dep)))
+								A2(_elm_lang$core$Basics_ops['++'], 'Failed to load dependency: ', model.dependency.name))
 						};
 					} else {
 						var _p7 = _p6._0._0;
@@ -26165,10 +26283,7 @@ var _user$project$Analyser_Files_DependencyLoader$update = F2(
 											A2(
 												_elm_lang$core$Basics_ops['++'],
 												'Loaded ',
-												A2(
-													_elm_lang$core$Basics_ops['++'],
-													_elm_lang$core$Tuple$first(model.dep),
-													' by building depenceny from plain source files'))),
+												A2(_elm_lang$core$Basics_ops['++'], model.dependency.name, ' by building dependency from plain source files'))),
 										_1: {ctor: '[]'}
 									}
 								})
@@ -26178,16 +26293,14 @@ var _user$project$Analyser_Files_DependencyLoader$update = F2(
 		}
 	});
 var _user$project$Analyser_Files_DependencyLoader$AwaitingCache = {ctor: 'AwaitingCache'};
-var _user$project$Analyser_Files_DependencyLoader$init = function (_p8) {
-	var _p9 = _p8;
-	var _p10 = _p9;
+var _user$project$Analyser_Files_DependencyLoader$init = function (dep) {
 	return {
 		ctor: '_Tuple2',
-		_0: {dep: _p10, state: _user$project$Analyser_Files_DependencyLoader$AwaitingCache},
+		_0: {dependency: dep, state: _user$project$Analyser_Files_DependencyLoader$AwaitingCache},
 		_1: _elm_lang$core$Platform_Cmd$batch(
 			{
 				ctor: '::',
-				_0: _user$project$Analyser_DependencyHandler$readFromDisk(_p10),
+				_0: _user$project$Analyser_DependencyHandler$readFromDisk(dep),
 				_1: {
 					ctor: '::',
 					_0: _user$project$Util_Logger$info(
@@ -26196,8 +26309,8 @@ var _user$project$Analyser_Files_DependencyLoader$init = function (_p8) {
 							'Load dependency ',
 							A2(
 								_elm_lang$core$Basics_ops['++'],
-								_p9._0,
-								A2(_elm_lang$core$Basics_ops['++'], ' ', _p9._1)))),
+								dep.name,
+								A2(_elm_lang$core$Basics_ops['++'], ' ', dep.version)))),
 					_1: {ctor: '[]'}
 				}
 			})
@@ -26213,13 +26326,13 @@ var _user$project$Analyser_Files_DependencyLoader$OnCacheRead = function (a) {
 	return {ctor: 'OnCacheRead', _0: a};
 };
 var _user$project$Analyser_Files_DependencyLoader$subscriptions = function (model) {
-	var _p11 = model.state;
-	switch (_p11.ctor) {
+	var _p8 = model.state;
+	switch (_p8.ctor) {
 		case 'AwaitingCache':
 			return A2(
 				_elm_lang$core$Platform_Sub$map,
 				_user$project$Analyser_Files_DependencyLoader$OnCacheRead,
-				_user$project$Analyser_DependencyHandler$onReadFromDisk(model.dep));
+				_user$project$Analyser_DependencyHandler$onReadFromDisk(model.dependency));
 		case 'Failure':
 			return _elm_lang$core$Platform_Sub$none;
 		case 'Done':
@@ -26228,12 +26341,12 @@ var _user$project$Analyser_Files_DependencyLoader$subscriptions = function (mode
 			return A2(
 				_elm_lang$core$Platform_Sub$map,
 				_user$project$Analyser_Files_DependencyLoader$OnOnlineDocs,
-				_user$project$Analyser_DependencyHandler$onOnlineDocumentation(model.dep));
+				_user$project$Analyser_DependencyHandler$onOnlineDocumentation(model.dependency));
 		default:
 			return A2(
 				_elm_lang$core$Platform_Sub$map,
 				_user$project$Analyser_Files_DependencyLoader$OnLocallyBuildDependency,
-				_user$project$Analyser_DependencyHandler$onLoadDependencyFilesFromDisk(model.dep));
+				_user$project$Analyser_DependencyHandler$onLoadDependencyFilesFromDisk(model.dependency));
 	}
 };
 
@@ -26263,7 +26376,7 @@ var _user$project$Analyser_DependencyLoadingStage$init = function (input) {
 				ctor: '_Tuple2',
 				_0: _p2,
 				_1: _user$project$Analyser_Files_DependencyLoader$init(
-					{ctor: '_Tuple2', _0: _p2, _1: _p1._1})
+					{name: _p2, version: _p1._1})
 			};
 		},
 		input);
@@ -26330,19 +26443,19 @@ var _user$project$Analyser_FileWatch$fileWatch = _elm_lang$core$Native_Platform.
 	'fileWatch',
 	A2(
 		_elm_lang$core$Json_Decode$andThen,
-		function (x0) {
+		function (event) {
 			return A2(
 				_elm_lang$core$Json_Decode$andThen,
-				function (x1) {
+				function (file) {
 					return _elm_lang$core$Json_Decode$succeed(
-						{ctor: '_Tuple2', _0: x0, _1: x1});
+						{event: event, file: file});
 				},
-				A2(_elm_lang$core$Json_Decode$index, 1, _elm_lang$core$Json_Decode$string));
+				A2(_elm_lang$core$Json_Decode$field, 'file', _elm_lang$core$Json_Decode$string));
 		},
-		A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string)));
-var _user$project$Analyser_FileWatch$Person = F2(
+		A2(_elm_lang$core$Json_Decode$field, 'event', _elm_lang$core$Json_Decode$string)));
+var _user$project$Analyser_FileWatch$RawFileChange = F2(
 	function (a, b) {
-		return {name: a, age: b};
+		return {event: a, file: b};
 	});
 var _user$project$Analyser_FileWatch$Remove = function (a) {
 	return {ctor: 'Remove', _0: a};
@@ -26351,36 +26464,28 @@ var _user$project$Analyser_FileWatch$Update = function (a) {
 	return {ctor: 'Update', _0: a};
 };
 var _user$project$Analyser_FileWatch$asFileChange = function (p) {
-	var _p0 = p;
-	_v0_2:
-	do {
-		if (_p0.ctor === '_Tuple2') {
-			switch (_p0._0) {
-				case 'update':
-					return _user$project$Analyser_FileWatch$Update(_p0._1);
-				case 'remove':
-					return _user$project$Analyser_FileWatch$Remove(_p0._1);
-				default:
-					break _v0_2;
-			}
-		} else {
-			break _v0_2;
-		}
-	} while(false);
-	return _elm_lang$core$Native_Utils.crashCase(
-		'Analyser.FileWatch',
-		{
-			start: {line: 27, column: 5},
-			end: {line: 40, column: 18}
-		},
-		_p0)(
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'Unknown filechange: ',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_elm_lang$core$Basics$toString(p),
-				A2(_elm_lang$core$Basics_ops['++'], '.', 'This should never happen. Please create an issue the on elm-analyse issue tracker.'))));
+	var _p0 = p.event;
+	switch (_p0) {
+		case 'update':
+			return _user$project$Analyser_FileWatch$Update(p.file);
+		case 'remove':
+			return _user$project$Analyser_FileWatch$Remove(p.file);
+		default:
+			return _elm_lang$core$Native_Utils.crashCase(
+				'Analyser.FileWatch',
+				{
+					start: {line: 27, column: 5},
+					end: {line: 40, column: 18}
+				},
+				_p0)(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'Unknown filechange: ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(p),
+						A2(_elm_lang$core$Basics_ops['++'], '.', 'This should never happen. Please create an issue the on elm-analyse issue tracker.'))));
+	}
 };
 var _user$project$Analyser_FileWatch$watcher = function (f) {
 	return _user$project$Analyser_FileWatch$fileWatch(
@@ -30413,10 +30518,10 @@ var _user$project$Analyser_Fixer$isDone = function (_p5) {
 	var _p6 = _p5;
 	return _p6._0.done;
 };
-var _user$project$Analyser_Fixer$storeFiles = _elm_lang$core$Native_Platform.outgoingPort(
-	'storeFiles',
+var _user$project$Analyser_Fixer$storeFile = _elm_lang$core$Native_Platform.outgoingPort(
+	'storeFile',
 	function (v) {
-		return [v._0, v._1];
+		return {file: v.file, newContent: v.newContent};
 	});
 var _user$project$Analyser_Fixer$onStoredFiles = _elm_lang$core$Native_Platform.incomingPort('onStoredFiles', _elm_lang$core$Json_Decode$bool);
 var _user$project$Analyser_Fixer$loadFileContentWithSha = _elm_lang$core$Native_Platform.outgoingPort(
@@ -30452,18 +30557,13 @@ var _user$project$Analyser_Fixer$onFileContentWithShas = _elm_lang$core$Native_P
 						A2(_elm_lang$core$Json_Decode$field, 'path', _elm_lang$core$Json_Decode$string));
 				},
 				A2(_elm_lang$core$Json_Decode$field, 'version', _elm_lang$core$Json_Decode$string)))));
-var _user$project$Analyser_Fixer$sendFixResult = _elm_lang$core$Native_Platform.outgoingPort(
-	'sendFixResult',
-	function (v) {
-		return {success: v.success, message: v.message};
+var _user$project$Analyser_Fixer$FileStore = F2(
+	function (a, b) {
+		return {file: a, newContent: b};
 	});
 var _user$project$Analyser_Fixer$FileLoad = F2(
 	function (a, b) {
 		return {file: a, content: b};
-	});
-var _user$project$Analyser_Fixer$FixResult = F2(
-	function (a, b) {
-		return {success: a, message: b};
 	});
 var _user$project$Analyser_Fixer$InnerModel = F4(
 	function (a, b, c, d) {
@@ -30526,8 +30626,7 @@ var _user$project$Analyser_Fixer$update = F3(
 						_elm_lang$core$Native_Utils.update(
 							_p13,
 							{done: true, success: false})),
-					_1: _user$project$Analyser_Fixer$sendFixResult(
-						{success: false, message: 'Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages.'})
+					_1: _user$project$Util_Logger$warning('Could not fix file: Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages.')
 				};
 			} else {
 				var changedContent = A2(
@@ -30557,8 +30656,8 @@ var _user$project$Analyser_Fixer$update = F3(
 					return {
 						ctor: '_Tuple2',
 						_0: _user$project$Analyser_Fixer$Model(_p13),
-						_1: _user$project$Analyser_Fixer$storeFiles(
-							{ctor: '_Tuple2', _0: _p13.message.file.path, _1: _p11._0})
+						_1: _user$project$Analyser_Fixer$storeFile(
+							{file: _p13.message.file.path, newContent: _p11._0})
 					};
 				} else {
 					return {
@@ -30567,8 +30666,7 @@ var _user$project$Analyser_Fixer$update = F3(
 							_elm_lang$core$Native_Utils.update(
 								_p13,
 								{done: true, success: false})),
-						_1: _user$project$Analyser_Fixer$sendFixResult(
-							{success: false, message: _p11._0})
+						_1: _user$project$Util_Logger$warning('Could not fix file: There was an error while loading the file.')
 					};
 				}
 			}
@@ -30579,14 +30677,11 @@ var _user$project$Analyser_Fixer$update = F3(
 					_elm_lang$core$Native_Utils.update(
 						_p13,
 						{done: true})),
-				_1: _user$project$Analyser_Fixer$sendFixResult(
-					{
-						success: true,
-						message: A2(
-							_elm_lang$core$Basics_ops['++'],
-							'Fixed message: ',
-							_user$project$Analyser_Messages_Data$description(_p13.message.data))
-					})
+				_1: _user$project$Util_Logger$info(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'Fixed message: ',
+						_user$project$Analyser_Messages_Data$description(_p13.message.data)))
 			};
 		}
 	});
@@ -30680,7 +30775,7 @@ var _user$project$Analyser_Files_FileLoader$fileContent = _elm_lang$core$Native_
 var _user$project$Analyser_Files_FileLoader$storeAstForSha = _elm_lang$core$Native_Platform.outgoingPort(
 	'storeAstForSha',
 	function (v) {
-		return [v._0, v._1];
+		return {sha1: v.sha1, ast: v.ast};
 	});
 var _user$project$Analyser_Files_FileLoader$update = function (msg) {
 	var _p0 = msg;
@@ -30698,12 +30793,8 @@ var _user$project$Analyser_Files_FileLoader$update = function (msg) {
 					function (a, b) {
 						return _user$project$Analyser_Files_FileLoader$storeAstForSha(
 							{
-								ctor: '_Tuple2',
-								_0: a,
-								_1: A2(
-									_elm_lang$core$Json_Encode$encode,
-									0,
-									_stil4m$elm_syntax$Elm_Json_Encode$encode(b))
+								sha1: a,
+								ast: _stil4m$elm_syntax$Elm_Json_Encode$encode(b)
 							});
 					})),
 			{
@@ -30717,6 +30808,10 @@ var _user$project$Analyser_Files_FileLoader$update = function (msg) {
 		_1: cmd
 	};
 };
+var _user$project$Analyser_Files_FileLoader$AstStore = F2(
+	function (a, b) {
+		return {sha1: a, ast: b};
+	});
 var _user$project$Analyser_Files_FileLoader$OnFileContent = function (a) {
 	return {ctor: 'OnFileContent', _0: a};
 };

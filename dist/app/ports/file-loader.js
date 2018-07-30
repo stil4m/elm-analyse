@@ -13,28 +13,25 @@ var cp = __importStar(require("child_process"));
 var fileReader = __importStar(require("../fileReader"));
 function setup(app, config, directory) {
     app.ports.loadFile.subscribe(function (fileName) {
-        fileReader.readFile(directory, fileName, function (result) {
-            return app.ports.fileContent.send(result);
-        });
+        fileReader.readFile(directory, fileName, function (result) { return app.ports.fileContent.send(result); });
     });
     app.ports.storeAstForSha.subscribe(function (data) {
-        var sha1 = data[0];
-        var content = data[1];
+        var sha1 = data.sha1;
+        var content = data.ast;
         cache.storeShaJson(sha1, content);
     });
-    app.ports.storeFiles.subscribe(function (file) {
+    app.ports.storeFile.subscribe(function (file) {
         new Promise(function (accept) {
-            fs.writeFile(file[0], file[1], function () {
-                console.log('Written file', file[0], '...');
+            fs.writeFile(file.file, file.newContent, function () {
                 try {
-                    cp.execSync(config.elmFormatPath + ' --yes ' + file[0], {
+                    cp.execSync(config.elmFormatPath + ' --yes ' + file.file, {
                         stdio: []
                     });
-                    console.log('Formatted file', file[0]);
+                    console.log('Formatted file', file.file);
                     accept();
                 }
                 catch (e) {
-                    console.log('Could not formated file', file[0]);
+                    console.log('Could not formated file', file.file);
                     accept();
                 }
             });
@@ -45,13 +42,13 @@ function setup(app, config, directory) {
     app.ports.loadFileContentWithSha.subscribe(function (fileName) {
         new Promise(function (accept) {
             fileReader.readFile(directory, fileName, accept);
-        }).then(function (pair) {
+        }).then(function (fileContent) {
             var x = {
                 file: {
-                    version: pair.sha1,
-                    path: pair.path
+                    version: fileContent.sha1,
+                    path: fileContent.path
                 },
-                content: pair.content
+                content: fileContent.content
             };
             app.ports.onFileContentWithShas.send(x);
         }, function (e) {

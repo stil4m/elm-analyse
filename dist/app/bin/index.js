@@ -67,8 +67,7 @@ var args = minimist_1.default(process.argv.slice(2), {
         process.exit(1);
     }
     var elmStuffExists = fs.existsSync('./elm-stuff');
-    if (!elmStuffExists ||
-        !fs.existsSync('./elm-stuff/exact-dependencies.json')) {
+    if (!elmStuffExists || !fs.existsSync('./elm-stuff/exact-dependencies.json')) {
         console.log('Cannot detect which packages are installed. Please run `elm-package install` once.');
         process.exit(1);
     }
