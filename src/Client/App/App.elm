@@ -11,7 +11,7 @@ import Client.Routing as Routing
 import Client.Socket exposing (controlAddress)
 import Client.State exposing (State)
 import Html exposing (div)
-import Html.Attributes exposing (id)
+import Html.Attributes exposing (id, style)
 import Navigation exposing (Location)
 import RemoteData
 import Time
@@ -117,7 +117,7 @@ view : Model -> Html.Html Msg
 view m =
     div []
         [ Client.App.Menu.view Refresh m.location
-        , div [ id "page-wrapper" ]
+        , div [ id "page-wrapper", style [ ( "overflow", "auto" ) ] ]
             [ case m.content of
                 MessagesPageContent subModel ->
                     MessagesPage.view m.state subModel |> Html.map MessagesPageMsg
