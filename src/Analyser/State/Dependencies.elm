@@ -132,8 +132,10 @@ computeVersionState dep pack =
                 Just newest ->
                     if current == newest then
                         UpToDate
+
                     else if Version.isMajorUpgrade current newest then
                         MajorBehind
+
                     else
                         Upgradable
 

@@ -17,7 +17,7 @@ run : CodeBase -> LoadedSourceFiles -> Configuration -> List Message
 run codeBase includedSources configuration =
     let
         enabledChecks =
-            List.filter (.info >> .key >> flip Analyser.Configuration.checkEnabled configuration) Analyser.Checks.all
+            List.filter (.info >> .key >> (\a -> Analyser.Configuration.checkEnabled a configuration)) Analyser.Checks.all
 
         failedMessages : List Message
         failedMessages =
@@ -60,5 +60,5 @@ run codeBase includedSources configuration =
 inspectFileContext : Configuration -> List Checker -> FileContext.FileContext -> List Message
 inspectFileContext configuration enabledChecks fileContext =
     enabledChecks
-        |> List.concatMap (\c -> List.map ((,) c) (c.check fileContext configuration))
+        |> List.concatMap (\c -> List.map (\b -> ( c, b )) (c.check fileContext configuration))
         |> List.map (\( c, data ) -> newMessage fileContext.file c.info.key data)

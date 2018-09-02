@@ -1,7 +1,7 @@
 module Analyser.Checks.UnusedImport exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
@@ -83,6 +83,7 @@ onImport : Import -> Context -> Context
 onImport imp context =
     if imp.moduleAlias == Nothing && imp.exposingList == Nothing then
         Dict.insert imp.moduleName ( imp.range, 0 ) context
+
     else
         context
 

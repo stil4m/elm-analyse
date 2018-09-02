@@ -4,7 +4,7 @@ import Analyser.Checks.UnusedTypeAlias as UnusedTypeAliasCheck
 import Analyser.Fixes.Base exposing (Fixer, Patch(..))
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
-import Elm.Syntax.Declaration exposing (Declaration(AliasDecl))
+import Elm.Syntax.Declaration exposing (Declaration(..))
 import Elm.Syntax.File exposing (File)
 import Elm.Syntax.Range as Syntax exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
@@ -43,6 +43,7 @@ findTypeAlias range file =
                     AliasDecl typeAlias ->
                         if r == range then
                             Just ( r, typeAlias )
+
                         else
                             Nothing
 

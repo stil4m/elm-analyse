@@ -33,5 +33,6 @@ viewState : (State -> Html msg) -> State -> Html msg
 viewState f state =
     if State.isBusy state then
         text "Loading..."
+
     else
         f state

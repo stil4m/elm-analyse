@@ -86,7 +86,7 @@ update location msg model =
         OnFile x ->
             model
                 |> Maybe.map (\y -> { y | codeBlock = RD.fromResult x })
-                |> flip (,) Cmd.none
+                |> (\a -> (\a b -> ( a, b )) a Cmd.none)
 
         Fix ->
             model
@@ -99,6 +99,7 @@ update location msg model =
         OnEscape x ->
             if x then
                 ( hide model, Cmd.none )
+
             else
                 ( model, Cmd.none )
 
@@ -157,7 +158,7 @@ dialogBody state =
 
 viewWithFileContent : State -> String -> Html msg
 viewWithFileContent state x =
-    div [ style [ ( "max-height", "400px" ), ( "overflow", "auto" ) ] ]
+    div [ style "max-height" "400px", style "overflow" "auto" ]
         [ div []
             (List.map (Highlight.highlightedPre 3 x) state.ranges)
         , text <| Data.description state.message.data

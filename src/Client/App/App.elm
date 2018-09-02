@@ -1,4 +1,4 @@
-module Client.App.App exposing (Model, Msg(OnLocation), init, subscriptions, update, view)
+module Client.App.App exposing (Model, Msg(..), init, subscriptions, update, view)
 
 import Client.App.Menu
 import Client.Components.FileTree as FileTree

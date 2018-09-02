@@ -1,7 +1,7 @@
 module Analyser.Checks.MapNothingToNothing exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Inner), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
@@ -36,6 +36,7 @@ onCase _ ( ( { start }, pattern ), ( { end }, expression ) ) context =
     if isNothingPattern pattern && isNothingExpression expression then
         buildMessage { start = start, end = end }
             :: context
+
     else
         context
 

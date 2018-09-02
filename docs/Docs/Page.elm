@@ -1,4 +1,4 @@
-module Docs.Page exposing (Page(Changelog, Configuration, Contributing, Features, Home, Messages, NotFound), hash, nextPage)
+module Docs.Page exposing (Page(..), hash, nextPage)
 
 import Navigation exposing (Location)
 import String.Extra

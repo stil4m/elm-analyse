@@ -1,26 +1,25 @@
-module Analyser.State
-    exposing
-        ( State
-        , Status
-        , addFixToQueue
-        , decodeState
-        , encodeState
-        , encodeStatus
-        , finishWithNewMessages
-        , getMessage
-        , initialState
-        , isBusy
-        , nextTask
-        , outdateMessagesForFile
-        , removeMessagesForFile
-        , startFixing
-        , updateModules
-        , withDependencies
-        )
+module Analyser.State exposing
+    ( State
+    , Status
+    , addFixToQueue
+    , decodeState
+    , encodeState
+    , encodeStatus
+    , finishWithNewMessages
+    , getMessage
+    , initialState
+    , isBusy
+    , nextTask
+    , outdateMessagesForFile
+    , removeMessagesForFile
+    , startFixing
+    , updateModules
+    , withDependencies
+    )
 
 import Analyser.Messages.Json exposing (decodeMessage, encodeMessage)
 import Analyser.Messages.Schemas exposing (Schemas)
-import Analyser.Messages.Types as Messages exposing (Message, MessageId, MessageStatus(Applicable))
+import Analyser.Messages.Types as Messages exposing (Message, MessageId, MessageStatus(..))
 import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing)
 import Analyser.Modules exposing (Modules)
 import Analyser.State.Dependencies exposing (Dependencies)
@@ -130,6 +129,7 @@ outdateMessagesForFile fileName state =
                     (\m ->
                         if Messages.messageFile m == fileName then
                             Messages.outdate m
+
                         else
                             m
                     )

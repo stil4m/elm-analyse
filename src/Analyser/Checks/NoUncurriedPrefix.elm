@@ -1,7 +1,7 @@
 module Analyser.Checks.NoUncurriedPrefix exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
@@ -49,6 +49,7 @@ onExpression ( _, expression ) context =
             -- Allow 3-tuple or greater as prefix.
             if String.startsWith ",," x then
                 context
+
             else
                 (Data.init
                     (String.concat

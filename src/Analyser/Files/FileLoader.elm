@@ -51,8 +51,9 @@ update msg =
                 cmd =
                     if store then
                         ( fileContent.sha1, Result.toMaybe fileLoad )
-                            |> uncurry (Maybe.map2 (\a b -> storeAstForSha { sha1 = a, ast = Elm.Json.Encode.encode b }))
+                            |> (\( a, b ) -> Maybe.map2 (\a b -> storeAstForSha { sha1 = a, ast = Elm.Json.Encode.encode b }) a b)
                             |> Maybe.withDefault Cmd.none
+
                     else
                         Cmd.none
             in

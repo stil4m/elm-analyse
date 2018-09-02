@@ -38,7 +38,7 @@ scan fileContext _ =
         fileContext.ast
         []
         |> List.filter (Tuple.second >> List.length >> (<=) threshold)
-        |> List.filterMap (\( range, fields ) -> firstTwo fields |> Maybe.map ((,) range))
+        |> List.filterMap (\( range, fields ) -> firstTwo fields |> Maybe.map (\b -> ( range, b )))
         |> List.filter (Tuple.second >> fieldsOnSameLine)
         |> List.map (Tuple.first >> buildMessageData)
 

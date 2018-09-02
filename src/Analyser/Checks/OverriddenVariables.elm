@@ -1,7 +1,7 @@
 module Analyser.Checks.OverriddenVariables exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Inner), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import ASTUtil.Variables exposing (getImportsVars, patternToVars)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
@@ -83,7 +83,7 @@ visitWithVariablePointers variablePointers f ( redefines, known ) =
         redefinedPattern : List VariablePointer
         redefinedPattern =
             variablePointers
-                |> List.filter (.value >> flip Dict.member known)
+                |> List.filter (.value >> (\a -> Dict.member a known))
 
         newKnown : Dict String Syntax.Range
         newKnown =

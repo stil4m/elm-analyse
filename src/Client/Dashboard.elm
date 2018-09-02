@@ -16,7 +16,7 @@ view state =
 
 viewState : State.State -> Html msg
 viewState state =
-    div [ Html.Attributes.style [ ( "padding-top", "20px" ) ] ]
+    div [ Html.Attributes.style "padding-top" "20px" ]
         [ Html.div [ Html.Attributes.class "row" ]
             [ Html.div [ Html.Attributes.class "col-md-12" ]
                 [ Html.a [ Html.Attributes.href (Routing.toUrl Routing.FileTree) ]
@@ -46,6 +46,7 @@ listValueWidget title x =
         ( t, i ) =
             if List.isEmpty x then
                 ( Widget.Success, "fa-check-circle-o" )
+
             else
                 ( Widget.Error, " fa-times-circle-o" )
     in

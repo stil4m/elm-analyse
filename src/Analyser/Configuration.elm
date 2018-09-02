@@ -24,7 +24,7 @@ checkEnabled k (Configuration configuration) =
 
 isPathExcluded : String -> Configuration -> Bool
 isPathExcluded p (Configuration { excludedPaths }) =
-    List.any (flip String.startsWith p) excludedPaths
+    List.any (\a -> String.startsWith a p) excludedPaths
 
 
 defaultChecks : Dict String Bool
@@ -67,6 +67,7 @@ fromString input =
         ( defaultConfiguration
         , [ "No configuration provided. Using default configuration." ]
         )
+
     else
         case JD.decodeString (decodeConfiguration input) input of
             Err e ->

@@ -1,6 +1,6 @@
 module Analyser.Checks.UnnecessaryPortModule exposing (checker)
 
-import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
@@ -35,8 +35,10 @@ scan fileContext _ =
         in
         if portDeclCount == 0 then
             [ Data.init "Module defined a `port` module, but is does not declare ports. It may be better to remove these." ]
+
         else
             []
+
     else
         []
 

@@ -1,7 +1,7 @@
 module Analyser.Checks.Variables exposing (UsedVariableContext, collect, unusedTopLevels, unusedVariables)
 
-import ASTUtil.Inspector as Inspector exposing (Order(Inner, Post, Pre), defaultConfig)
-import ASTUtil.Variables exposing (VariableType(Pattern), getLetDeclarationsVars, getTopLevels, patternToUsedVars, patternToVars, patternToVarsInner, withoutTopLevel)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
+import ASTUtil.Variables exposing (VariableType(..), getLetDeclarationsVars, getTopLevels, patternToUsedVars, patternToVars, patternToVarsInner, withoutTopLevel)
 import Analyser.FileContext exposing (FileContext)
 import Dict exposing (Dict)
 import Elm.Syntax.Base exposing (VariablePointer)
@@ -11,7 +11,7 @@ import Elm.Syntax.Infix exposing (InfixDirection)
 import Elm.Syntax.Pattern exposing (Pattern(..))
 import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
-import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(Typed))
+import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
 import Tuple3
 
 
@@ -98,6 +98,7 @@ popScope x =
                     (\( _, activeScope ) ->
                         if Dict.isEmpty activeScope then
                             x.poppedScopes
+
                         else
                             activeScope :: x.poppedScopes
                     )
@@ -113,7 +114,7 @@ pushScope vars x =
             vars
                 |> List.map (\( z, t ) -> ( z.value, ( 0, t, z.range ) ))
                 |> Dict.fromList
-                |> (,) []
+                |> (\b -> ( [], b ))
     in
     { x | activeScopes = y :: x.activeScopes }
 
@@ -153,8 +154,10 @@ flagVariable k l =
         ( masked, x ) :: xs ->
             if List.member k masked then
                 ( masked, x ) :: xs
+
             else if Dict.member k x then
                 ( masked, Dict.update k (Maybe.map (Tuple3.mapFirst ((+) 1))) x ) :: xs
+
             else
                 ( masked, x ) :: flagVariable k xs
 
@@ -182,7 +185,7 @@ onOperatorAppliction ( op, _, _, _ ) context =
 onFile : File -> InneUsedVariableContext -> InneUsedVariableContext
 onFile file context =
     getTopLevels file
-        |> flip pushScope context
+        |> (\a -> pushScope a context)
 
 
 onFunction : (InneUsedVariableContext -> InneUsedVariableContext) -> Function -> InneUsedVariableContext -> InneUsedVariableContext
@@ -198,7 +201,7 @@ onFunction f function context =
                 |> (\c ->
                         function.declaration.arguments
                             |> List.concatMap patternToVars
-                            |> flip pushScope c
+                            |> (\a -> pushScope a c)
                             |> f
                             |> popScope
                             |> unMaskVariable function.declaration.name.value
@@ -213,7 +216,7 @@ onLambda f lambda context =
         preContext =
             lambda.args
                 |> List.concatMap patternToVars
-                |> flip pushScope context
+                |> (\a -> pushScope a context)
 
         postContext =
             f preContext
@@ -225,7 +228,7 @@ onLetBlock : (InneUsedVariableContext -> InneUsedVariableContext) -> LetBlock ->
 onLetBlock f letBlock context =
     letBlock.declarations
         |> (getLetDeclarationsVars >> withoutTopLevel)
-        |> flip pushScope context
+        |> (\a -> pushScope a context)
         |> f
         |> popScope
 
@@ -246,7 +249,7 @@ onCase f caze context =
         postContext =
             Tuple.first caze
                 |> patternToVarsInner False
-                |> flip pushScope context
+                |> (\a -> pushScope a context)
                 |> f
                 |> popScope
     in

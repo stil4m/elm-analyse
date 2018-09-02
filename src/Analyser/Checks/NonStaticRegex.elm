@@ -3,7 +3,7 @@ module Analyser.Checks.NonStaticRegex exposing (checker)
 import AST.Ranges as Range
 import ASTUtil.Functions
 import ASTUtil.Imports as Imports exposing (FunctionReference)
-import ASTUtil.Inspector as Inspector exposing (Order(Inner, Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
@@ -92,6 +92,7 @@ onFunction inner function context =
                 inner { context | staticEnvironment = False }
         in
         { after | staticEnvironment = context.staticEnvironment }
+
     else
         inner context
 
@@ -101,6 +102,7 @@ onExpression x expression context =
     if x.exposesRegex then
         onExpressionFunctionReference expression context
             |> onExpressionQualified x.moduleName expression
+
     else
         onExpressionQualified x.moduleName expression context
 
@@ -109,6 +111,7 @@ addUsedRegex : Range -> Context -> Context
 addUsedRegex range context =
     if context.staticEnvironment then
         context
+
     else
         { context | usages = range :: context.usages }
 
@@ -121,6 +124,7 @@ onExpressionQualified moduleName ( range, inner ) context =
         QualifiedExpr m f ->
             if f == "regex" && m == moduleName then
                 addUsedRegex range context
+
             else
                 context
 

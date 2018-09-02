@@ -15,6 +15,7 @@ import Json.Decode as JD exposing (Value)
 import Result.Extra as Result
 
 
+
 --- Cached Dependencies
 
 
@@ -87,6 +88,7 @@ onReadFromDisk { name, version } =
 
                     Just d ->
                         Success d
+
             else
                 Ignore
         )
@@ -115,6 +117,7 @@ onOnlineDocumentation dep =
                 JD.decodeValue (JD.list Elm.Documentation.decoder) json
                     |> Result.map (depFromModules dep)
                     |> Just
+
             else
                 Nothing
         )
@@ -183,8 +186,10 @@ onLoadDependencyFilesFromDisk dep =
                 in
                 if not <| List.all Result.isOk loadedFiles then
                     Just (Err "Could not load all dependency files")
+
                 else
                     Just (Ok (buildDependency dependency loadedFiles))
+
             else
                 Nothing
     in

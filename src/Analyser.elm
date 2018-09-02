@@ -4,7 +4,7 @@ import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.DependencyLoadingStage as DependencyLoadingStage
-import Analyser.FileWatch as FileWatch exposing (FileChange(Remove, Update))
+import Analyser.FileWatch as FileWatch exposing (FileChange(..))
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Analyser.Fixer as Fixer
 import Analyser.Messages.Util as Messages
@@ -164,6 +164,7 @@ update msg model =
                     ( { model | changedFiles = [] }
                     , Cmd.none
                     )
+
             else
                 ( model
                 , Cmd.none
@@ -188,9 +189,11 @@ onFixerMsg x stage model =
     if Fixer.isDone newFixerModel then
         if Fixer.succeeded newFixerModel then
             ( { model | stage = Finished }, fixerCmds )
+
         else
             startSourceLoading [ Messages.messageFile (Fixer.message newFixerModel) ]
                 ( model, fixerCmds )
+
     else
         ( { model | stage = FixerStage newFixerModel }
         , fixerCmds
@@ -258,6 +261,7 @@ onDependencyLoadingStageMsg x stage model =
         , Cmd.map DependencyLoadingStageMsg cmds
         )
             |> startSourceLoading model.context.sourceFiles
+
     else
         ( { model | stage = DependencyLoadingStage newStage }
         , Cmd.map DependencyLoadingStageMsg cmds
@@ -268,7 +272,7 @@ isSourceFileIncluded : Configuration -> LoadedSourceFile -> Bool
 isSourceFileIncluded configuration =
     Tuple.first
         >> .path
-        >> flip Configuration.isPathExcluded configuration
+        >> (\a -> Configuration.isPathExcluded a configuration)
         >> not
 
 
@@ -327,6 +331,7 @@ onSourceLoadingStageMsg x stage model =
     in
     if SourceLoadingStage.isDone newStage then
         finishProcess newStage cmds model
+
     else
         ( { model | stage = SourceLoadingStage newStage }
         , Cmd.map SourceLoadingStageMsg cmds
@@ -339,6 +344,7 @@ subscriptions model =
         [ AnalyserPorts.onReset (always Reset)
         , if model.server then
             Time.every Time.second (always ReloadTick)
+
           else
             Sub.none
         , FileWatch.watcher Change

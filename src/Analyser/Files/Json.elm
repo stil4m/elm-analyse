@@ -34,7 +34,7 @@ decodeDependency =
             (JD.map Dict.fromList <|
                 JD.list
                     (JD.map2
-                        (,)
+                        (\a b -> ( a, b ))
                         (JD.field "key" (JD.list JD.string))
                         (JD.field "value" decodeInterface)
                     )
@@ -95,7 +95,7 @@ decodeExposedInterface =
     decodeTyped
         [ ( "function", JD.string |> JD.map Function )
         , ( "type_"
-          , JD.succeed (,)
+          , JD.succeed (\a b -> ( a, b ))
                 |: JD.field "name" JD.string
                 |: JD.field "constructors" (JD.list JD.string)
                 |> JD.map Type

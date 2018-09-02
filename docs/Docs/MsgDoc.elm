@@ -48,7 +48,7 @@ import Bootstrap.ListGroup as ListGroup
 import Client.Highlight
 import Debug as SafeDebug
 import Docs.Html as DocsHtml
-import Docs.Page as Page exposing (Page(Messages))
+import Docs.Page as Page exposing (Page(..))
 import Elm.Interface as Interface
 import Elm.Parser
 import Elm.Processing as Processing
@@ -641,6 +641,7 @@ messagesMenu y =
                     ListGroup.li [ ListGroup.active ]
                         [ Html.text x.info.name
                         ]
+
                 else
                     ListGroup.li []
                         [ Html.a [ Html.href (Page.hash (Messages (Just x.info.key))) ]
@@ -656,7 +657,7 @@ view maybeKey =
         maybeMessageDoc =
             Maybe.andThen forKey maybeKey
     in
-    Grid.container [ Html.style [ ( "padding-top", "20px" ), ( "margin-bottom", "60px" ) ] ]
+    Grid.container [ Html.style "padding-top" "20px", Html.style "margin-bottom" "60px" ]
         [ Grid.row []
             [ Grid.col []
                 [ Html.h1 [] [ Html.text "Checks" ]
@@ -753,7 +754,7 @@ getMessages input checker =
                 }
             )
         |> Result.toMaybe
-        |> Maybe.map (flip checker.check docConfiguration)
+        |> Maybe.map (\a -> checker.check a docConfiguration)
 
 
 docConfiguration : Configuration

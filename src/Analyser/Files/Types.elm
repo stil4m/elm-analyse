@@ -1,12 +1,11 @@
-module Analyser.Files.Types
-    exposing
-        ( LoadedFileData
-        , LoadedSourceFile
-        , LoadedSourceFiles
-        , ModuleIndex
-        , OperatorTable
-        , Version
-        )
+module Analyser.Files.Types exposing
+    ( LoadedFileData
+    , LoadedSourceFile
+    , LoadedSourceFiles
+    , ModuleIndex
+    , OperatorTable
+    , Version
+    )
 
 import Analyser.Files.FileContent exposing (FileContent)
 import Dict exposing (Dict)

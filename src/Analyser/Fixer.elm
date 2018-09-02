@@ -56,7 +56,7 @@ type alias InnerModel =
 
 init : Int -> State -> Maybe ( Model, Cmd Msg, State )
 init x state =
-    State.getMessage x state |> Maybe.andThen (flip initWithMessage state)
+    State.getMessage x state |> Maybe.andThen (\a -> initWithMessage a state)
 
 
 initWithMessage : Message -> State -> Maybe ( Model, Cmd Msg, State )
@@ -94,6 +94,7 @@ update codeBase msg (Model model) =
                 ( Model { model | done = True, success = False }
                 , Logger.warning "Could not fix file: Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages."
                 )
+
             else
                 let
                     changedContent =
@@ -101,7 +102,7 @@ update codeBase msg (Model model) =
                             |> (\fileLoad ->
                                     Parser.parse fileLoad.content
                                         |> Result.map (Processing.process (CodeBase.processContext codeBase))
-                                        |> Result.map ((,) fileLoad.content)
+                                        |> Result.map (\b -> ( fileLoad.content, b ))
                                         |> Result.toMaybe
                                )
                             |> Result.fromMaybe "Could not parse file"

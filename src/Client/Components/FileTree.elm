@@ -134,6 +134,7 @@ view m =
         allowFile ( _, mess ) =
             if m.hideGoodFiles then
                 List.length mess > 0
+
             else
                 True
 
@@ -162,7 +163,7 @@ view m =
             Just fileIndex ->
                 Html.div
                     [ Html.Attributes.class "row"
-                    , Html.Attributes.style [ ( "padding-top", "10px" ) ]
+                    , Html.Attributes.style "padding-top" "10px"
                     ]
                     [ Html.div [ Html.Attributes.class "col-md-6 col-sm-6" ]
                         [ Html.div [ Html.Attributes.class "list-group" ]
@@ -174,6 +175,7 @@ view m =
                     , Html.div [ Html.Attributes.class "col-md-6 col-sm-6" ]
                         [ if m.selectedFile == Nothing then
                             Html.div [] []
+
                           else
                             MessageList.view m.messageList |> Html.map MessageListMsg
                         ]

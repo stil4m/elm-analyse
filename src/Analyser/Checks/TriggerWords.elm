@@ -72,9 +72,9 @@ withTriggerWord words ( range, commentText ) =
     in
     words
         |> List.map (\x -> ( x, normalizeWord x ))
-        |> List.filter (Tuple.second >> flip Set.member commentWords)
+        |> List.filter (Tuple.second >> (\a -> Set.member a commentWords))
         |> List.head
-        |> Maybe.map (Tuple.first >> flip (,) range)
+        |> Maybe.map (Tuple.first >> (\a -> (\a b -> ( a, b )) a range))
 
 
 normalizeWord : String -> String

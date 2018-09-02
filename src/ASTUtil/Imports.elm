@@ -92,6 +92,7 @@ stringifyExposingList exp =
                                 seperator =
                                     if areOnDifferentLines then
                                         "\n    , "
+
                                     else
                                         ", "
                             in
@@ -147,6 +148,7 @@ stringifyExposedType { name, constructors } =
                                 seperator =
                                     if areOnDifferentLines then
                                         "\n    , "
+
                                     else
                                         ", "
                             in
@@ -165,6 +167,7 @@ removeRangeFromExposingList range exp =
         All r ->
             if r == range then
                 Nothing
+
             else
                 Just (All r)
 
@@ -179,23 +182,26 @@ removeRangeFromExposingList range exp =
 
 removeRangeFromExpose : Range -> Ranged TopLevelExpose -> Maybe (Ranged TopLevelExpose)
 removeRangeFromExpose range ( r, expose ) =
-    Maybe.map ((,) r) <|
+    Maybe.map (\b -> ( r, b )) <|
         case expose of
             InfixExpose x ->
                 if r == range then
                     Nothing
+
                 else
                     Just (InfixExpose x)
 
             FunctionExpose x ->
                 if r == range then
                     Nothing
+
                 else
                     Just (FunctionExpose x)
 
             TypeOrAliasExpose x ->
                 if r == range then
                     Nothing
+
                 else
                     Just (TypeOrAliasExpose x)
 
@@ -210,6 +216,7 @@ removeRangeFromConstructors range exp =
         All r ->
             if r == range then
                 Nothing
+
             else
                 Just (All r)
 

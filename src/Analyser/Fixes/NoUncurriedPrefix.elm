@@ -18,7 +18,7 @@ fixer =
 fix : ( String, File ) -> MessageData -> Patch
 fix input messageData =
     case
-        Maybe.map3 (,,)
+        Maybe.map3 (\a b c -> ( a, b, c ))
             (Data.getRange "range" messageData)
             (Data.getRange "arg1" messageData)
             (Data.getRange "arg2" messageData)
@@ -57,6 +57,7 @@ updateExpression ( content, _ ) ( opRange, argRange1, argRange2 ) =
         content
             |> FileContent.replaceRangeWith range ("(" ++ arg1 ++ ", " ++ arg2 ++ ")")
             |> Patched
+
     else
         -- Normal case for all other operators
         content

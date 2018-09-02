@@ -1,19 +1,18 @@
-module ASTUtil.Variables
-    exposing
-        ( VariableType(Defined, Imported, Pattern, TopLevel)
-        , getImportsVars
-        , getLetDeclarationsVars
-        , getTopLevels
-        , patternToUsedVars
-        , patternToVars
-        , patternToVarsInner
-        , withoutTopLevel
-        )
+module ASTUtil.Variables exposing
+    ( VariableType(..)
+    , getImportsVars
+    , getLetDeclarationsVars
+    , getTopLevels
+    , patternToUsedVars
+    , patternToVars
+    , patternToVarsInner
+    , withoutTopLevel
+    )
 
 import Elm.Syntax.Base exposing (VariablePointer)
 import Elm.Syntax.Declaration exposing (Declaration(..))
 import Elm.Syntax.Exposing exposing (Exposing(..), TopLevelExpose(..))
-import Elm.Syntax.Expression exposing (Expression(..), LetDeclaration(LetDestructuring, LetFunction))
+import Elm.Syntax.Expression exposing (Expression(..), LetDeclaration(..))
 import Elm.Syntax.File exposing (File)
 import Elm.Syntax.Module exposing (Import)
 import Elm.Syntax.Pattern exposing (Pattern(..), QualifiedNameRef)
@@ -103,8 +102,8 @@ getImportExposedVars e =
 
                                     Just (Explicit constructors) ->
                                         constructors
-                                            |> List.map (uncurry (flip VariablePointer))
-                                            |> List.map (flip (,) Imported)
+                                            |> List.map (\( a, b ) -> (\b a -> VariablePointer a b) a b)
+                                            |> List.map (\a -> (\a b -> ( a, b )) a Imported)
                     )
 
 
@@ -193,6 +192,7 @@ qualifiedNameUsedVars : QualifiedNameRef -> Range -> List VariablePointer
 qualifiedNameUsedVars { moduleName, name } range =
     if moduleName == [] then
         [ { value = name, range = range } ]
+
     else
         []
 
@@ -213,7 +213,7 @@ patternToVarsInner isFirst ( range, p ) =
             List.concatMap recur t
 
         RecordPattern r ->
-            List.map (flip (,) Pattern) r
+            List.map (\a -> (\a b -> ( a, b )) a Pattern) r
 
         UnConsPattern l r ->
             recur l ++ recur r
@@ -225,6 +225,7 @@ patternToVarsInner isFirst ( range, p ) =
             [ ( { value = x, range = range }
               , if isFirst then
                     Defined
+
                 else
                     Pattern
               )

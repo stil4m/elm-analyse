@@ -42,16 +42,17 @@ afterHighlight rowsAround targetRows range =
         postLineText =
             if endsOnLineEnding then
                 ""
+
             else
                 List.drop (endRow - uiStartRow) targetRows
                     |> List.head
                     |> Maybe.map (String.dropLeft <| endColumn)
                     |> Maybe.withDefault ""
-                    |> flip (++) "\n"
+                    |> (\a -> (++) a "\n")
 
         postLines =
             (endRow - uiStartRow + 1)
-                |> flip List.drop targetRows
+                |> (\a -> List.drop a targetRows)
                 |> String.join "\n"
     in
     postLineText ++ postLines
@@ -103,7 +104,8 @@ highlightedString rowsAround targetRows range =
                         |> List.head
                         |> Maybe.map
                             (if endsOnLineEnding then
-                                flip (++) "\n"
+                                \a -> (++) a "\n"
+
                              else
                                 String.left <| endColumn
                             )
@@ -138,6 +140,6 @@ highlightedPre rowsAround content range =
     in
     pre []
         [ text preText
-        , span [ id "highlight", style [ ( "color", "white" ), ( "background", "red" ) ] ] [ text highlighedSection ]
+        , span [ id "highlight", style "color" "white", style "background" "red" ] [ text highlighedSection ]
         , text postText
         ]

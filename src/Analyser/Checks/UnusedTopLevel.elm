@@ -1,7 +1,7 @@
 module Analyser.Checks.UnusedTopLevel exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Variables exposing (VariableType(TopLevel))
+import ASTUtil.Variables exposing (VariableType(..))
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Checks.Variables as Variables exposing (UsedVariableContext)
 import Analyser.Configuration exposing (Configuration)
@@ -42,7 +42,7 @@ scan fileContext _ =
         unusedTopLevels =
             Variables.unusedTopLevels x
                 |> List.filter (filterByModuleType fileContext)
-                |> List.filter (Tuple3.first >> flip Interface.exposesFunction fileContext.interface >> not)
+                |> List.filter (Tuple3.first >> (\a -> Interface.exposesFunction a fileContext.interface) >> not)
                 |> List.filterMap forVariableType
     in
     unusedVariables ++ unusedTopLevels

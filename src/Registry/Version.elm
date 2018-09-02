@@ -18,8 +18,10 @@ order : Version -> Version -> Order
 order (Version a b c) (Version x y z) =
     if a /= x then
         compare a x
+
     else if b /= y then
         compare b y
+
     else
         compare c z
 

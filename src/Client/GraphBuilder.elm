@@ -29,7 +29,7 @@ edgesInFile : Dict.Dict String Int -> ( ModuleName, ModuleName ) -> Maybe (Edge 
 edgesInFile moduleIndex ( from, to ) =
     let
         lookup =
-            String.join "." >> flip Dict.get moduleIndex
+            String.join "." >> (\a -> Dict.get a moduleIndex)
     in
-    Maybe.map2 (,) (lookup from) (lookup to)
+    Maybe.map2 (\a b -> ( a, b )) (lookup from) (lookup to)
         |> Maybe.map (\( fromId, toId ) -> Edge fromId toId (ModuleGraph.nodeFromModuleName from))

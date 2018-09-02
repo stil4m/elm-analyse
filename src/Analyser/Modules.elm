@@ -41,7 +41,7 @@ edgesInFile : FileContext -> List ( List String, List String )
 edgesInFile file =
     file.ast.imports
         |> List.map .moduleName
-        |> List.map ((,) file.moduleName)
+        |> List.map (\b -> ( file.moduleName, b ))
 
 
 decode : JD.Decoder Modules

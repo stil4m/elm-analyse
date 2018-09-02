@@ -14,6 +14,7 @@ view : Int -> ModuleGraph -> Html msg
 view count graph =
     if Graph.isEmpty graph then
         Html.text ""
+
     else
         topListInAndOut count graph
 

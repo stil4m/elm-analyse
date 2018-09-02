@@ -1,7 +1,7 @@
 module Analyser.Checks.DuplicateImport exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Post, Skip), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
@@ -70,7 +70,7 @@ onImport : Import -> Context -> Context
 onImport { moduleName, range } context =
     case Dict.get moduleName context of
         Just _ ->
-            Dict.update moduleName (Maybe.map (flip (++) [ range ])) context
+            Dict.update moduleName (Maybe.map (\a -> (++) a [ range ])) context
 
         Nothing ->
             Dict.insert moduleName [ range ] context

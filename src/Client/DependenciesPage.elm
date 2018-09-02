@@ -61,6 +61,7 @@ viewDependency unusedDeps depInfo =
         , Html.td []
             [ if List.isEmpty newerDependencies then
                 Html.span [] []
+
               else
                 Html.div []
                     [ Html.p [] [ Html.strong [] [ Html.text "Newer dependencies:" ] ]
@@ -82,32 +83,33 @@ viewDependency unusedDeps depInfo =
 depStatus : List String -> DependencyInfo -> Html msg
 depStatus unused depInfo =
     if List.member depInfo.dependency.name unused then
-        Html.span [ Html.Attributes.style [ ( "color", "#d9534f" ) ] ]
+        Html.span [ Html.Attributes.style "color" "#d9534f" ]
             [ Html.i [ Html.Attributes.class "fa fa-exclamation-circle" ] []
             , Html.text " Unused"
             ]
+
     else
         case depInfo.versionState of
             UpToDate ->
-                Html.span [ Html.Attributes.style [ ( "color", "#5cb85c" ) ] ]
+                Html.span [ Html.Attributes.style "color" "#5cb85c" ]
                     [ Html.i [ Html.Attributes.class "fa fa-check-circle" ] []
                     , Html.text " Up to date"
                     ]
 
             MajorBehind ->
-                Html.span [ Html.Attributes.style [ ( "color", "#f0ad4e" ) ] ]
+                Html.span [ Html.Attributes.style "color" "#f0ad4e" ]
                     [ Html.i [ Html.Attributes.class "fa fa-exclamation-circle" ] []
                     , Html.text " New major"
                     ]
 
             Upgradable ->
-                Html.span [ Html.Attributes.style [ ( "color", "#f0ad4e" ) ] ]
+                Html.span [ Html.Attributes.style "color" "#f0ad4e" ]
                     [ Html.i [ Html.Attributes.class "fa fa-dot-circle-o" ] []
                     , Html.text " Upgradable"
                     ]
 
             Unknown ->
-                Html.span [ Html.Attributes.style [ ( "color", "#5bc0de" ) ] ]
+                Html.span [ Html.Attributes.style "color" "#5bc0de" ]
                     [ Html.i [ Html.Attributes.class "fa fa-question-circle-o" ] []
                     , Html.text " Unknown"
                     ]

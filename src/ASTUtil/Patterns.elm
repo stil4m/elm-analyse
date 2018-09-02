@@ -1,7 +1,7 @@
 module ASTUtil.Patterns exposing (findParentPattern)
 
 import AST.Ranges as Ranges
-import ASTUtil.Inspector as Inspector exposing (Order(Pre), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Elm.Syntax.Expression exposing (Case, Expression(..), Function, Lambda)
 import Elm.Syntax.File exposing (File)
 import Elm.Syntax.Pattern exposing (Pattern(..))
@@ -28,6 +28,7 @@ findParentPattern file range =
                 (\() ->
                     if Ranges.containsRange range (Tuple.first (Tuple.first c)) then
                         Just (Tuple.first c)
+
                     else
                         Nothing
                 )
@@ -47,6 +48,7 @@ findParentPattern file range =
                 (\() ->
                     if Tuple.first patt |> Ranges.containsRange range then
                         Just patt
+
                     else
                         Nothing
                 )

@@ -49,6 +49,7 @@ view model =
     div []
         [ if Grouped.isEmpty model.messages then
             div [ class "alert alert-success" ] [ text "No messages" ]
+
           else
             M.viewAll Focus model.messages
         , ActiveMessageDialog.view model.active |> Html.map ActiveMessageDialogMsg

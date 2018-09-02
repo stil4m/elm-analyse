@@ -24,6 +24,7 @@ optimize : Range -> Ranged Pattern -> Ranged Pattern
 optimize range (( r, pattern ) as input) =
     if r == range then
         ( emptyRange, AllPattern )
+
     else
         case pattern of
             TuplePattern xs ->
@@ -33,6 +34,7 @@ optimize range (( r, pattern ) as input) =
                 in
                 if List.all isAllPattern cleaned then
                     ( emptyRange, AllPattern )
+
                 else
                     ( r, TuplePattern cleaned )
 
@@ -60,6 +62,7 @@ optimize range (( r, pattern ) as input) =
             AsPattern subPattern asPointer ->
                 if asPointer.range == range then
                     subPattern
+
                 else
                     case optimize range subPattern of
                         ( _, AllPattern ) ->

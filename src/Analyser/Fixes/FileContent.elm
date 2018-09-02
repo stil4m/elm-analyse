@@ -98,12 +98,14 @@ getStringAtRange { start, end } input =
         trimLast i line =
             if i == end.row then
                 String.left end.column line
+
             else
                 line
 
         trimFirst i line =
             if i == 0 then
                 String.dropLeft start.column line
+
             else
                 line
     in

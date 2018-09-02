@@ -1,7 +1,7 @@
 module Analyser.Checks.UnusedTypeAlias exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
@@ -54,7 +54,7 @@ scan fileContext _ =
         collectedAliased
         |> Dict.toList
         |> List.filter (Tuple.second >> Tuple3.third >> (<) 0 >> not)
-        |> List.filter (Tuple.first >> flip Interface.exposesAlias fileContext.interface >> not)
+        |> List.filter (Tuple.first >> (\a -> Interface.exposesAlias a fileContext.interface) >> not)
         |> List.map (Tuple.mapSecond Tuple3.second)
         |> List.map buildMessageData
 

@@ -1,14 +1,14 @@
 module Analyser.Checks.BooleanCase exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (Case, Expression(..))
-import Elm.Syntax.Pattern exposing (Pattern(NamedPattern))
+import Elm.Syntax.Pattern exposing (Pattern(..))
 import Elm.Syntax.Ranged exposing (Ranged)
 
 
@@ -54,6 +54,7 @@ onExpression ( r, inner ) context =
                     |> Data.addRange "range" r
                 )
                     :: context
+
             else
                 context
 

@@ -9,7 +9,7 @@ import Navigation exposing (Location)
 
 view : msg -> Location -> Html msg
 view refresh l =
-    nav [ class "navbar navbar-default navbar-static-top", attribute "role" "navigation", style [ ( "margin-bottom", "0" ) ] ]
+    nav [ class "navbar navbar-default navbar-static-top", attribute "role" "navigation", style "margin-bottom" "0" ]
         [ div [ class "navbar-header" ]
             [ a
                 [ class "navbar-brand", href "/" ]
@@ -39,6 +39,7 @@ isActiveClass : Location -> Routing.Route -> String
 isActiveClass l r =
     if Routing.fromLocation l == r then
         "active"
+
     else
         ""
 
