@@ -12,7 +12,7 @@ import Elm.Syntax.Pattern exposing (Pattern(..))
 import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
-import Tuple3
+import Tuple.Extra
 
 
 type alias Scope =
@@ -54,7 +54,7 @@ unusedTopLevels (UsedVariableContext x) =
 
 onlyUnused : List ( String, ( Int, VariableType, Range ) ) -> List ( String, ( Int, VariableType, Range ) )
 onlyUnused =
-    List.filter (Tuple.second >> Tuple3.first >> (==) 0)
+    List.filter (Tuple.second >> Tuple.Extra.first3 >> (==) 0)
 
 
 collect : FileContext -> UsedVariableContext
@@ -156,7 +156,7 @@ flagVariable k l =
                 ( masked, x ) :: xs
 
             else if Dict.member k x then
-                ( masked, Dict.update k (Maybe.map (Tuple3.mapFirst ((+) 1))) x ) :: xs
+                ( masked, Dict.update k (Maybe.map (Tuple.Extra.mapFirst3 ((+) 1))) x ) :: xs
 
             else
                 ( masked, x ) :: flagVariable k xs

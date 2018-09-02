@@ -11,7 +11,7 @@ import Analyser.Messages.Schema as Schema
 import Elm.Interface as Interface
 import Elm.Syntax.Module exposing (Module(..))
 import Elm.Syntax.Range as Syntax exposing (Range)
-import Tuple3
+import Tuple.Extra
 
 
 checker : Checker
@@ -42,7 +42,7 @@ scan fileContext _ =
         unusedTopLevels =
             Variables.unusedTopLevels x
                 |> List.filter (filterByModuleType fileContext)
-                |> List.filter (Tuple3.first >> (\a -> Interface.exposesFunction a fileContext.interface) >> not)
+                |> List.filter (Tuple.Extra.first3 >> (\a -> Interface.exposesFunction a fileContext.interface) >> not)
                 |> List.filterMap forVariableType
     in
     unusedVariables ++ unusedTopLevels

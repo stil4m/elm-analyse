@@ -13,7 +13,7 @@ import Elm.Syntax.Range as Range exposing (Range)
 import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAlias exposing (TypeAlias)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
-import Tuple3
+import Tuple.Extra
 
 
 checker : Checker
@@ -53,9 +53,9 @@ scan fileContext _ =
         fileContext.ast
         collectedAliased
         |> Dict.toList
-        |> List.filter (Tuple.second >> Tuple3.third >> (<) 0 >> not)
+        |> List.filter (Tuple.second >> Tuple.Extra.third3 >> (<) 0 >> not)
         |> List.filter (Tuple.first >> (\a -> Interface.exposesAlias a fileContext.interface) >> not)
-        |> List.map (Tuple.mapSecond Tuple3.second)
+        |> List.map (Tuple.mapSecond Tuple.Extra.second3)
         |> List.map buildMessageData
 
 
@@ -75,7 +75,7 @@ buildMessageData ( varName, range ) =
 
 markTypeAlias : String -> Context -> Context
 markTypeAlias key context =
-    Dict.update key (Maybe.map (Tuple3.mapThird ((+) 1))) context
+    Dict.update key (Maybe.map (Tuple.Extra.mapThird3 ((+) 1))) context
 
 
 onTypeAnnotation : Ranged TypeAnnotation -> Context -> Context
