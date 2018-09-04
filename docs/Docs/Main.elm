@@ -1,6 +1,6 @@
 module Docs.Main exposing (main)
 
-import Bootstrap.Navbar
+import Browser.Navigation exposing (Location)
 import Docs.Changelog as Changelog
 import Docs.Configuration as Configuration
 import Docs.Contributing as Contributing
@@ -10,7 +10,6 @@ import Docs.Menu
 import Docs.MsgDoc
 import Docs.Page as Page exposing (Page(..))
 import Html exposing (Html)
-import Navigation exposing (Location)
 
 
 main : Program Never Model Msg

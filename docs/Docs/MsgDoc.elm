@@ -38,9 +38,6 @@ import Analyser.Messages.Json as J
 import Analyser.Messages.Schema as Schema
 import Analyser.Messages.Types as M exposing (Message)
 import Analyser.Messages.Util
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.ListGroup as ListGroup
 import Client.Highlight
 import Debug as SafeDebug
 import Docs.Html as DocsHtml
