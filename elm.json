@@ -25,7 +25,7 @@
             "elm-community/string-extra": "3.0.0",
             "elm-explorations/markdown": "1.0.0",
             "krisajenkins/remotedata": "5.0.0",
-            "stil4m/elm-syntax": "6.1.0"
+            "stil4m/elm-syntax": "7.0.1"
         },
         "indirect": {
             "avh4/elm-fifo": "1.0.4",

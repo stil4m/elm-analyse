@@ -17,7 +17,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 4, column = 4 }, end = { row = 4, column = 17 } }
+                { start = { row = 5, column = 5 }, end = { row = 5, column = 18 } }
       ]
     )
 
@@ -46,7 +46,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 4, column = 4 }, end = { row = 4, column = 20 } }
+                { start = { row = 5, column = 5 }, end = { row = 5, column = 21 } }
       ]
     )
 

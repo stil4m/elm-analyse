@@ -9,7 +9,7 @@ import Test exposing (Test)
 unusedButExposed : ( String, String, List MessageData )
 unusedButExposed =
     ( "unusedButExposed"
-    , """module Foo exposing (Foo(Bar))
+    , """module Foo exposing (Foo(..))
 
 type Foo = Bar
 """
@@ -53,7 +53,7 @@ foo (Bar i ) = i
     , [ Data.init "foo"
             |> Data.addVarName "varName" "Bar"
             |> Data.addRange "range"
-                { start = { row = 2, column = 11 }, end = { row = 2, column = 18 } }
+                { start = { row = 3, column = 12 }, end = { row = 3, column = 19 } }
       ]
     )
 

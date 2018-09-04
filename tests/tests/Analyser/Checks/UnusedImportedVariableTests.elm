@@ -1,4 +1,4 @@
-module Analyser.Checks.UnusedImportedVariableTests exposing (..)
+module Analyser.Checks.UnusedImportedVariableTests exposing (all)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImportedVariable as UnusedImportedVariable
@@ -73,26 +73,11 @@ foo = Thing
 exposedValueConstructor : ( String, String, List MessageData )
 exposedValueConstructor =
     ( "exposedValueConstructor"
-    , """module Bar exposing (foo,Some(Thing))
+    , """module Bar exposing (foo,Some(..))
 type Some = Thing
 
 
 foo = 1
-"""
-    , []
-    )
-
-
-usedOperator : ( String, String, List MessageData )
-usedOperator =
-    ( "usedOperator"
-    , """module Bar exposing (foo,Some(Thing))
-type Some = Thing
-
-(&>) _ b = b
-
-foo =
-    1 &> 2
 """
     , []
     )
@@ -111,7 +96,7 @@ foo = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "!!"
             |> Data.addRange "range"
-                { start = { row = 2, column = 21 }, end = { row = 2, column = 25 } }
+                { start = { row = 3, column = 22 }, end = { row = 3, column = 26 } }
       ]
     )
 
@@ -155,7 +140,7 @@ foo = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "div"
             |> Data.addRange "range"
-                { start = { row = 2, column = 22 }, end = { row = 2, column = 25 } }
+                { start = { row = 3, column = 23 }, end = { row = 3, column = 26 } }
       ]
     )
 
@@ -165,7 +150,7 @@ usedImportedVariableInPatterMatch =
     ( "usedImportedVariableInPatterMatch"
     , """module Foo exposing (foo)
 
-import Color exposing (Color(Blue))
+import Color exposing (Color(..))
 
 foo c =
   case c of
@@ -181,23 +166,10 @@ usedImportedVariableAsOpaque =
     ( "usedImportedVariableAsOpaque"
     , """module Foo exposing (foo)
 
-import Color exposing (Color(Blue))
+import Color exposing (Color(..))
 
 foo (Blue c) =
   c
-"""
-    , []
-    )
-
-
-exposeOperator : ( String, String, List MessageData )
-exposeOperator =
-    ( "exposeOperator"
-    , """module Foo exposing ((@@))
-
-
-(@@) x y =
-  (y,x)
 """
     , []
     )
@@ -208,7 +180,7 @@ usedInDestructuringLet =
     ( "usedInDestructuringLet"
     , """module Foo exposing (..)
 
-import Some exposing (Bar(Bar))
+import Some exposing (Bar(..))
 
 x =
   let
@@ -234,7 +206,7 @@ x y =
     , [ Data.init "foo"
             |> Data.addVarName "varName" "Thing"
             |> Data.addRange "range"
-                { start = { row = 2, column = 22 }, end = { row = 2, column = 27 } }
+                { start = { row = 3, column = 23 }, end = { row = 3, column = 28 } }
       ]
     )
 
@@ -270,14 +242,12 @@ all =
         , usedVariableInAllDeclaration
         , usedValueConstructor
         , exposedValueConstructor
-        , usedOperator
         , unusedImportedOperator
         , destructuringSameName
         , unusedInEffectModule
         , unusedImportedVariable
         , usedImportedVariableInPatterMatch
         , usedImportedVariableAsOpaque
-        , exposeOperator
         , usedInDestructuringLet
         , usedBinaryImportedFunctionUsedAsPrefix
         ]

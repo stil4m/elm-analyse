@@ -30,9 +30,17 @@ fix input messageData =
             IncompatibleData
 
 
-parenRegex : Regex.Regex
+parenRegex : Maybe Regex.Regex
 parenRegex =
-    Regex.regex "[()]"
+    Regex.fromString "[()]"
+
+
+parensReplacer : String -> String
+parensReplacer =
+    parenRegex
+        |> Maybe.map Regex.replace
+        |> Maybe.map ((|>) (always ""))
+        |> Maybe.withDefault identity
 
 
 updateExpression : ( String, File ) -> ( Range, Range, Range ) -> Patch
@@ -41,7 +49,7 @@ updateExpression ( content, _ ) ( opRange, argRange1, argRange2 ) =
         op =
             FileContent.getStringAtRange opRange content
                 -- Drop the surrounding parens
-                |> Regex.replace Regex.All parenRegex (\_ -> "")
+                |> parensReplacer
 
         arg1 =
             FileContent.getStringAtRange argRange1 content

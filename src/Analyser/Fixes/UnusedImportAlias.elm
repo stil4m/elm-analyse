@@ -40,6 +40,6 @@ updateImport ( content, ast ) range =
 writeNewImport : Syntax.Range -> Import -> String -> String
 writeNewImport syntaxRange imp i =
     FileContent.replaceLines
-        ( syntaxRange.start.row, syntaxRange.end.row )
+        ( syntaxRange.start.row - 1, syntaxRange.end.row - 1 )
         (Imports.naiveStringifyImport imp)
         i

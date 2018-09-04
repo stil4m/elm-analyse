@@ -1,4 +1,4 @@
-module Analyser.Checks.NoUncurriedPrefixTests exposing (..)
+module Analyser.Checks.NoUncurriedPrefixTests exposing (all, prefixAsApplicationWithOneArg, prefixAsApplicationWithTwoArgs, threeTupleAsApplicationWithTwoArgs)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
@@ -16,11 +16,11 @@ foo = (+) 1 2
     , [ Data.init "foo"
             |> Data.addVarName "varName" "+"
             |> Data.addRange "range"
-                { start = { row = 2, column = 6 }, end = { row = 2, column = 9 } }
+                { start = { row = 3, column = 7 }, end = { row = 3, column = 10 } }
             |> Data.addRange "arg1"
-                { start = { row = 2, column = 10 }, end = { row = 2, column = 11 } }
+                { start = { row = 3, column = 11 }, end = { row = 3, column = 12 } }
             |> Data.addRange "arg2"
-                { start = { row = 2, column = 12 }, end = { row = 2, column = 13 } }
+                { start = { row = 3, column = 13 }, end = { row = 3, column = 14 } }
       ]
     )
 

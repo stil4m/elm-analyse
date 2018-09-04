@@ -32,45 +32,20 @@ fixContent range content =
         { start, end } =
             range
 
+        endLoc =
+            { row = end.row, column = end.column - 1 }
+
         startChar =
-            FileContent.getCharAtLocation ( start.row, start.column ) content
-
-        lines =
-            content
-                |> String.split "\n"
-
-        endCharLoc =
-            if end.column <= -2 then
-                ( end.row - 1
-                , lines
-                    |> List.drop (end.row - 1)
-                    |> List.head
-                    |> Maybe.withDefault ""
-                    |> String.length
-                    |> (\a -> (-) a 2)
-                )
-
-            else if end.column == -1 then
-                ( end.row - 2
-                , lines
-                    |> List.drop (end.row - 2)
-                    |> List.head
-                    |> Maybe.withDefault ""
-                    |> String.length
-                    |> (\a -> (-) a 2)
-                )
-
-            else
-                ( end.row, end.column - 1 )
+            FileContent.getCharAtLocation start content
 
         endChar =
-            FileContent.getCharAtLocation endCharLoc content
+            FileContent.getCharAtLocation endLoc content
     in
     case ( startChar, endChar ) of
         ( Just "(", Just ")" ) ->
             content
-                |> FileContent.replaceLocationWith ( start.row, start.column ) " "
-                |> FileContent.replaceLocationWith endCharLoc ""
+                |> FileContent.replaceLocationWith start " "
+                |> FileContent.replaceLocationWith endLoc ""
                 |> Patched
 
         _ ->

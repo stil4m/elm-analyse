@@ -43,7 +43,7 @@ onImport : Node Import -> ExposeAllContext -> ExposeAllContext
 onImport (Node _ imp) context =
     (\a -> List.append a context) <|
         case imp.exposingList of
-            Just (All range) ->
+            Just (Node _ (All range)) ->
                 let
                     r =
                         range
@@ -63,5 +63,5 @@ onImport (Node _ imp) context =
             Nothing ->
                 []
 
-            Just (Explicit _) ->
+            Just (Node _ (Explicit _)) ->
                 []

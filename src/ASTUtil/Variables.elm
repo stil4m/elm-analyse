@@ -65,7 +65,7 @@ getImportsVars =
 
 getImportVars : Node Import -> List ( Node String, VariableType )
 getImportVars (Node _ imp) =
-    getImportExposedVars imp.exposingList
+    getImportExposedVars <| Maybe.map Node.value imp.exposingList
 
 
 getImportExposedVars : Maybe Exposing -> List ( Node String, VariableType )

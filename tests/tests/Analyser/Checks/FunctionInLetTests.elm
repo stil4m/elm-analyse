@@ -20,7 +20,7 @@ foo x =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 4, column = 6 }, end = { row = 4, column = 7 } }
+                { start = { row = 5, column = 7 }, end = { row = 5, column = 8 } }
       ]
     )
 

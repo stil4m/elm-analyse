@@ -1,4 +1,4 @@
-module Analyser.Checks.ImportAllTests exposing (..)
+module Analyser.Checks.ImportAllTests exposing (all, importAll, importAllMultiple, importConstructorsStrict, importStrict)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.ImportAll as ImportAll
@@ -17,7 +17,7 @@ import Foo exposing (..)
     , [ Data.init "foo"
             |> Data.addModuleName "moduleName" [ "Foo" ]
             |> Data.addRange "range"
-                { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
+                { start = { row = 3, column = 22 }, end = { row = 3, column = 24 } }
       ]
     )
 
@@ -34,11 +34,11 @@ import Baz exposing (..)
     , [ Data.init "foo"
             |> Data.addModuleName "moduleName" [ "Baz" ]
             |> Data.addRange "range"
-                { start = { row = 3, column = 21 }, end = { row = 3, column = 23 } }
+                { start = { row = 4, column = 22 }, end = { row = 4, column = 24 } }
       , Data.init "foo"
             |> Data.addModuleName "moduleName" [ "Foo" ]
             |> Data.addRange "range"
-                { start = { row = 2, column = 21 }, end = { row = 2, column = 23 } }
+                { start = { row = 3, column = 22 }, end = { row = 3, column = 24 } }
       ]
     )
 
@@ -59,7 +59,7 @@ importConstructorsStrict =
     ( "importConstructorsStrict"
     , """module Bar exposing (foo)
 
-import Foo exposing (Bar(Baz))
+import Foo exposing (Bar(..))
 """
     , []
     )

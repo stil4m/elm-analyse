@@ -46,7 +46,7 @@ import Elm.Interface as Interface
 import Elm.Parser
 import Elm.Processing as Processing
 import Html exposing (Html)
-import Html.Attributes as Html
+import Html.Attributes
 import Json.Encode
 
 
@@ -74,7 +74,6 @@ allMessages =
     , unusedImport
     , unusedImportAlias
     , noUncurriedPrefix
-    , redefineVariable
     , unusedTypeAlias
     , duplicateImportedVariable
     , duplicateImport
@@ -109,7 +108,7 @@ unusedValueConstructor =
     { info = .info Analyser.Checks.UnusedValueConstructor.checker
     , example = Dynamic Analyser.Checks.UnusedValueConstructor.checker
     , input = """
-module Greet exposing (Color(Green))
+module Greet exposing (Color)
 
 type Color
     = Blue
@@ -117,6 +116,8 @@ type Color
     | Green
 
 red = Red
+
+blue = Blue
 """
     }
 
@@ -393,7 +394,7 @@ debugCrash =
 module Foo exposing (foo)
 
 foo =
-    Debug.crash "SHOULD NEVER HAPPEN"
+    Debug.todo "SHOULD NEVER HAPPEN"
 """
     }
 
@@ -561,17 +562,17 @@ messagesMenu y =
         |> List.map
             (\x ->
                 if Just x == y then
-                    ListGroup.li [ ListGroup.active ]
+                    Html.li [ Html.Attributes.class "list-group-item active" ]
                         [ Html.text x.info.name
                         ]
 
                 else
-                    ListGroup.li []
-                        [ Html.a [ Html.href (Page.hash (Messages (Just x.info.key))) ]
+                    Html.li [ Html.Attributes.class "list-group-item" ]
+                        [ Html.a [ Html.Attributes.href (Page.hash (Messages (Just x.info.key))) ]
                             [ Html.text x.info.name ]
                         ]
             )
-        |> ListGroup.ul
+        |> Html.ul [ Html.Attributes.class "list-group" ]
 
 
 view : Maybe String -> Html msg
@@ -580,17 +581,17 @@ view maybeKey =
         maybeMessageDoc =
             Maybe.andThen forKey maybeKey
     in
-    Grid.container [ Html.style "padding-top" "20px", Html.style "margin-bottom" "60px" ]
-        [ Grid.row []
-            [ Grid.col []
+    Html.div [ Html.Attributes.class "container", Html.Attributes.style "padding-top" "20px", Html.Attributes.style "margin-bottom" "60px" ]
+        [ Html.div [ Html.Attributes.class "row" ]
+            [ Html.div [ Html.Attributes.class "col" ]
                 [ Html.h1 [] [ Html.text "Checks" ]
                 , Html.hr [] []
                 ]
             ]
-        , Grid.row []
-            [ Grid.col [ Col.md4, Col.sm5 ]
+        , Html.div [ Html.Attributes.class "row" ]
+            [ Html.div [ Html.Attributes.class "col col-md-4 col-sm-5" ]
                 [ messagesMenu maybeMessageDoc ]
-            , Grid.col [ Col.md8, Col.sm7 ]
+            , Html.div [ Html.Attributes.class "col col-md-8 col-sm-7" ]
                 [ maybeMessageDoc
                     |> Maybe.map viewDoc
                     |> Maybe.withDefault (Html.div [] [])

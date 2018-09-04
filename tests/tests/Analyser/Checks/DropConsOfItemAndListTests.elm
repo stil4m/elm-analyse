@@ -1,4 +1,4 @@
-module Analyser.Checks.DropConsOfItemAndListTests exposing (..)
+module Analyser.Checks.DropConsOfItemAndListTests exposing (all, consWithLiteralList, noOptimisation)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DropConsOfItemAndList as DropConsOfItemAndList
@@ -30,11 +30,11 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 4, column = 4 }, end = { row = 4, column = 16 } }
+                { start = { row = 5, column = 5 }, end = { row = 5, column = 17 } }
             |> Data.addRange "head"
-                { start = { row = 4, column = 4 }, end = { row = 4, column = 5 } }
+                { start = { row = 5, column = 5 }, end = { row = 5, column = 6 } }
             |> Data.addRange "tail"
-                { start = { row = 4, column = 9 }, end = { row = 4, column = 16 } }
+                { start = { row = 5, column = 10 }, end = { row = 5, column = 17 } }
       ]
     )
 

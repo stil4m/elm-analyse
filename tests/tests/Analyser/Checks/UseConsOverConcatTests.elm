@@ -1,4 +1,4 @@
-module Analyser.Checks.UseConsOverConcatTests exposing (..)
+module Analyser.Checks.UseConsOverConcatTests exposing (all)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UseConsOverConcat as UseConsOverConcat
@@ -30,7 +30,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 4, column = 4 }, end = { row = 4, column = 14 } }
+                { start = { row = 5, column = 5 }, end = { row = 5, column = 15 } }
       ]
     )
 

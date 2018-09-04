@@ -1,4 +1,4 @@
-module Analyser.Checks.UnusedTopLevelTests exposing (..)
+module Analyser.Checks.UnusedTopLevelTests exposing (all)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedTopLevel as UnusedTopLevel
@@ -6,11 +6,6 @@ import Analyser.Files.Types exposing (..)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Dict
 import Test exposing (..)
-
-
-table : OperatorTable
-table =
-    Dict.fromList []
 
 
 unusedFunction : ( String, String, List MessageData )
@@ -27,7 +22,7 @@ some = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "baz"
             |> Data.addRange "range"
-                { start = { row = 4, column = 0 }, end = { row = 4, column = 3 } }
+                { start = { row = 5, column = 1 }, end = { row = 5, column = 4 } }
       ]
     )
 
@@ -89,10 +84,10 @@ foo = Thing
     )
 
 
-unusedValueConstructor : ( String, String, List MessageData )
-unusedValueConstructor =
+unusedValueConstructorNotExposed : ( String, String, List MessageData )
+unusedValueConstructorNotExposed =
     ( "unusedValueConstructor"
-    , """module Bar exposing (foo,Some(Thing))
+    , """module Bar exposing (foo,Some)
 
 type Some = Thing | Other
 
@@ -100,7 +95,11 @@ type Some = Thing | Other
     , [ Data.init "foo"
             |> Data.addVarName "varName" "Other"
             |> Data.addRange "range"
-                { start = { row = 2, column = 20 }, end = { row = 2, column = 25 } }
+                { start = { row = 3, column = 21 }, end = { row = 3, column = 26 } }
+      , Data.init "foo"
+            |> Data.addVarName "varName" "Thing"
+            |> Data.addRange "range"
+                { end = { column = 18, row = 3 }, start = { column = 13, row = 3 } }
       ]
     )
 
@@ -108,7 +107,7 @@ type Some = Thing | Other
 exposedValueConstructor : ( String, String, List MessageData )
 exposedValueConstructor =
     ( "exposedValueConstructor"
-    , """module Bar exposing (foo,Some(Thing))
+    , """module Bar exposing (foo,Some(..))
 type Some = Thing
 
 
@@ -121,7 +120,7 @@ foo = 1
 onlyUsedInSelf : ( String, String, List MessageData )
 onlyUsedInSelf =
     ( "onlyUsedInSelf"
-    , """module Bar exposing (foo,Some(Thing))
+    , """module Bar exposing (foo,Some(..))
 type Some = Thing
 
 foo = 1
@@ -131,40 +130,7 @@ bar = bar + foo
     , [ Data.init "foo"
             |> Data.addVarName "varName" "bar"
             |> Data.addRange "range"
-                { start = { row = 5, column = 0 }, end = { row = 5, column = 3 } }
-      ]
-    )
-
-
-usedOperator : ( String, String, List MessageData )
-usedOperator =
-    ( "usedOperator"
-    , """module Bar exposing (foo,Some(Thing))
-type Some = Thing
-
-(&>) _ b = b
-
-foo =
-    1 &> 2
-"""
-    , []
-    )
-
-
-unusedOperator : ( String, String, List MessageData )
-unusedOperator =
-    ( "unusedOperator"
-    , """module Bar exposing (foo)
-
-foo = 1
-
-(&>) _ b = b
-
-"""
-    , [ Data.init "foo"
-            |> Data.addVarName "varName" "&>"
-            |> Data.addRange "range"
-                { start = { row = 4, column = 0 }, end = { row = 4, column = 4 } }
+                { start = { row = 6, column = 1 }, end = { row = 6, column = 4 } }
       ]
     )
 
@@ -201,7 +167,7 @@ usedImportedVariableInPatterMatch =
     ( "usedImportedVariableInPatterMatch"
     , """module Foo exposing (foo)
 
-import Color exposing (Color(Blue))
+import Color exposing (Color(..))
 
 foo c =
   case c of
@@ -217,23 +183,10 @@ usedImportedVariableAsOpaque =
     ( "usedImportedVariableAsOpaque"
     , """module Foo exposing (foo)
 
-import Color exposing (Color(Blue))
+import Color exposing (Color(..))
 
 foo (Blue c) =
   c
-"""
-    , []
-    )
-
-
-exposeOperator : ( String, String, List MessageData )
-exposeOperator =
-    ( "exposeOperator"
-    , """module Foo exposing ((@@))
-
-
-(@@) x y =
-  (y,x)
 """
     , []
     )
@@ -244,7 +197,7 @@ usedInDestructuringLet =
     ( "usedInDestructuringLet"
     , """module Foo exposing (..)
 
-import Some exposing (Bar(Bar))
+import Some exposing (Bar(..))
 
 x =
   let
@@ -286,16 +239,13 @@ all =
         , usedVariableAsRecordUpdate
         , usedVariableInAllDeclaration
         , usedValueConstructor
-        , unusedValueConstructor
+        , unusedValueConstructorNotExposed
         , exposedValueConstructor
         , onlyUsedInSelf
-        , usedOperator
-        , unusedOperator
         , destructuringSameName
         , unusedInEffectModule
         , usedImportedVariableInPatterMatch
         , usedImportedVariableAsOpaque
-        , exposeOperator
         , usedInDestructuringLet
         , usedBinaryImportedFunctionUsedAsPrefix
         ]

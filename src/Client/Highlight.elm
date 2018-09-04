@@ -61,8 +61,17 @@ afterHighlight rowsAround targetRows range =
 highlightedString : Int -> List String -> Range -> String
 highlightedString rowsAround targetRows range =
     let
-        ( startRow, startColumn, endRow, endColumn ) =
-            ( range.start.row, range.start.column, range.end.row, range.end.column )
+        startRow =
+            range.start.row
+
+        startColumn =
+            range.start.column
+
+        endRow =
+            range.end.row
+
+        endColumn =
+            range.end.column
 
         uiStartRow =
             max 0 (startRow - rowsAround)

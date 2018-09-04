@@ -1,8 +1,10 @@
-module Analyser.InterfaceTest exposing (..)
+module Analyser.InterfaceTest exposing (all)
 
 import Elm.Interface as Interface exposing (..)
 import Elm.Parser as Parser
 import Elm.Syntax.Infix as AST exposing (..)
+import Elm.Syntax.Node exposing (Node(..))
+import Elm.Syntax.Range exposing (emptyRange)
 import Expect
 import Test exposing (..)
 
@@ -22,26 +24,35 @@ all =
         [ toInterface "exposeAll"
             exposeAllSample
             [ Alias "X"
-            , Type ( "Color", [ "Red", "Blue" ] )
+            , CustomType ( "Color", [ "Red", "Blue" ] )
             , Function "foo"
-            , Operator { direction = AST.Left, operator = "?>", precedence = 5 }
-            , Operator { direction = AST.Right, operator = "<&", precedence = 3 }
+            , Function "takeRight"
+            , Function "takeLeft"
+            , Operator
+                { direction = Node { end = { column = 12, row = 18 }, start = { column = 7, row = 18 } } Right
+                , function = Node { end = { column = 30, row = 18 }, start = { column = 22, row = 18 } } "takeLeft"
+                , operator = Node { end = { column = 19, row = 18 }, start = { column = 15, row = 18 } } "<&"
+                , precedence = Node { end = { column = 14, row = 18 }, start = { column = 13, row = 18 } } 4
+                }
             ]
         , toInterface "exposeOparatorSample"
             exposeOparatorSample
-            [ Operator { direction = AST.Right, operator = "<&", precedence = 3 } ]
+            [ Operator
+                { direction = Node { end = { column = 12, row = 18 }, start = { column = 7, row = 18 } } Right
+                , function = Node { end = { column = 30, row = 18 }, start = { column = 22, row = 18 } } "takeLeft"
+                , operator = Node { end = { column = 19, row = 18 }, start = { column = 15, row = 18 } } "<&"
+                , precedence = Node { end = { column = 14, row = 18 }, start = { column = 13, row = 18 } } 4
+                }
+            ]
         , toInterface "exposeFunctionSample"
             exposeFunctionSample
             [ Function "foo" ]
         , toInterface "exposeTypeNoneSample"
             exposeTypeNoneSample
-            [ Type ( "Color", [] ) ]
-        , toInterface "exposeTypeSubSetSample"
-            exposeTypeSubSetSample
-            [ Type ( "Color", [ "Blue" ] ) ]
+            [ CustomType ( "Color", [] ) ]
         , toInterface "exposeTypeAllSample"
             exposeTypeAllSample
-            [ Type ( "Color", [ "Red", "Blue" ] ) ]
+            [ CustomType ( "Color", [ "Red", "Blue" ] ) ]
         , toInterface "exposeTypeAliasSample"
             exposeTypeAliasSample
             [ Alias "X" ]
@@ -76,13 +87,6 @@ module Foo exposing (Color)
 """ ++ body
 
 
-exposeTypeSubSetSample : String
-exposeTypeSubSetSample =
-    """
-module Foo exposing (Color(Blue))
-""" ++ body
-
-
 exposeTypeAllSample : String
 exposeTypeAllSample =
     """
@@ -109,11 +113,11 @@ foo x y =
   x + y
 
 
-(?>) y x = x
+takeRight y x = x
 
-(<&) a b =
+takeLeft a b =
   (always a)
 
-infixr 3 <&
+infix right 4 (<&) = takeLeft
 
 """

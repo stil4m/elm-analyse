@@ -38,7 +38,7 @@ importToFunctionReference function i =
     { moduleName = Node.value <| Maybe.withDefault i.moduleName i.moduleAlias
     , exposesRegex =
         i.exposingList
-            |> Maybe.map (exposesFunction function)
+            |> Maybe.map (Node.value >> exposesFunction function)
             |> Maybe.withDefault False
     }
 
@@ -70,7 +70,7 @@ naiveStringifyImport imp =
         [ "import "
         , String.join "." <| Node.value imp.moduleName
         , Maybe.withDefault "" <| Maybe.map (Node.value >> String.join "." >> (++) " as ") <| imp.moduleAlias
-        , stringifyExposingList imp.exposingList
+        , stringifyExposingList <| Maybe.map Node.value imp.exposingList
         ]
 
 
@@ -147,15 +147,15 @@ removeRangeFromImport range imp =
     { imp | exposingList = Maybe.andThen (removeRangeFromExposingList range) imp.exposingList }
 
 
-removeRangeFromExposingList : Range -> Exposing -> Maybe Exposing
-removeRangeFromExposingList range exp =
+removeRangeFromExposingList : Range -> Node Exposing -> Maybe (Node Exposing)
+removeRangeFromExposingList range (Node er exp) =
     case exp of
         All r ->
             if r == range then
                 Nothing
 
             else
-                Just (All r)
+                Just (Node er (All r))
 
         Explicit exposedTypes ->
             case List.filterMap (removeRangeFromExpose range) exposedTypes of
@@ -163,7 +163,7 @@ removeRangeFromExposingList range exp =
                     Nothing
 
                 x ->
-                    Just (Explicit x)
+                    Just (Node er (Explicit x))
 
 
 removeRangeFromExpose : Range -> Node TopLevelExpose -> Maybe (Node TopLevelExpose)

@@ -35,8 +35,8 @@ foo = 1
     , [ Data.init "foo"
             |> Data.addModuleName "moduleName" [ "Baz" ]
             |> Data.addRanges "ranges"
-                [ { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
-                , { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
+                [ { start = { row = 3, column = 1 }, end = { row = 3, column = 11 } }
+                , { start = { row = 5, column = 1 }, end = { row = 5, column = 11 } }
                 ]
       ]
     )
@@ -56,9 +56,9 @@ foo = 1
     , [ Data.init "foo"
             |> Data.addModuleName "moduleName" [ "Baz" ]
             |> Data.addRanges "ranges"
-                [ { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
-                , { start = { row = 3, column = 0 }, end = { row = 3, column = 10 } }
-                , { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
+                [ { start = { row = 3, column = 1 }, end = { row = 3, column = 11 } }
+                , { start = { row = 4, column = 1 }, end = { row = 4, column = 11 } }
+                , { start = { row = 5, column = 1 }, end = { row = 5, column = 11 } }
                 ]
       ]
     )
@@ -79,14 +79,14 @@ foo = 1
     , [ Data.init "foo"
             |> Data.addModuleName "moduleName" [ "Baz" ]
             |> Data.addRanges "ranges"
-                [ { start = { row = 2, column = 0 }, end = { row = 2, column = 10 } }
-                , { start = { row = 4, column = 0 }, end = { row = 4, column = 10 } }
+                [ { start = { row = 3, column = 1 }, end = { row = 3, column = 11 } }
+                , { start = { row = 5, column = 1 }, end = { row = 5, column = 11 } }
                 ]
       , Data.init "foo"
             |> Data.addModuleName "moduleName" [ "John" ]
             |> Data.addRanges "ranges"
-                [ { start = { row = 3, column = 0 }, end = { row = 3, column = 11 } }
-                , { start = { row = 5, column = 0 }, end = { row = 5, column = 11 } }
+                [ { start = { row = 4, column = 1 }, end = { row = 4, column = 12 } }
+                , { start = { row = 6, column = 1 }, end = { row = 6, column = 12 } }
                 ]
       ]
     )

@@ -1,4 +1,4 @@
-module Analyser.Checks.ExposeAllTests exposing (..)
+module Analyser.Checks.ExposeAllTests exposing (all, exposingAll, exposingStrict, exposingStrictConstructors)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.ExposeAll as ExposeAll
@@ -15,7 +15,7 @@ foo = 1
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 0, column = 21 }, end = { row = 0, column = 23 } }
+                { start = { row = 1, column = 22 }, end = { row = 1, column = 24 } }
       ]
     )
 
@@ -34,7 +34,7 @@ foo = 1
 exposingStrictConstructors : ( String, String, List MessageData )
 exposingStrictConstructors =
     ( "exposingStrictConstructors"
-    , """module Bar exposing (Color(Blue,Red))
+    , """module Bar exposing (Color(..))
 
 type Color = Blue | Red
 """

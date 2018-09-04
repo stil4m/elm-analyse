@@ -1,4 +1,4 @@
-module Analyser.Checks.UnusedTypeAliasTests exposing (..)
+module Analyser.Checks.UnusedTypeAliasTests exposing (all)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedTypeAlias as UnusedTypeAlias
@@ -105,7 +105,7 @@ foo = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "Person"
             |> Data.addRange "range"
-                { start = { row = 2, column = 0 }, end = { row = 2, column = 47 } }
+                { start = { row = 3, column = 1 }, end = { row = 3, column = 48 } }
       ]
     )
 

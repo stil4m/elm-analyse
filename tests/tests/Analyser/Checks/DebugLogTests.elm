@@ -1,4 +1,4 @@
-module Analyser.Checks.DebugLogTests exposing (..)
+module Analyser.Checks.DebugLogTests exposing (all, debugLog, noDebug)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DebugLog as DebugLog
@@ -16,7 +16,7 @@ foo x = Debug.log "This is X" x
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 8 }, end = { row = 2, column = 17 } }
+                { start = { row = 3, column = 9 }, end = { row = 3, column = 18 } }
       ]
     )
 

@@ -1,4 +1,4 @@
-module Analyser.Checks.UnnecessaryParensTests exposing (..)
+module Analyser.Checks.UnnecessaryParensTests exposing (all)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
@@ -16,7 +16,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 3, column = 9 }, end = { row = 3, column = 16 } }
+                { start = { row = 4, column = 10 }, end = { row = 4, column = 17 } }
       ]
     )
 
@@ -65,19 +65,19 @@ jon = (john)
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 10, column = 6 }, end = { row = 10, column = 12 } }
+                { start = { row = 11, column = 7 }, end = { row = 11, column = 13 } }
       , Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 8, column = 7 }, end = { row = 8, column = 15 } }
+                { start = { row = 9, column = 8 }, end = { row = 9, column = 16 } }
       , Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 6, column = 6 }, end = { row = 6, column = 11 } }
+                { start = { row = 7, column = 7 }, end = { row = 7, column = 12 } }
       , Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 4, column = 6 }, end = { row = 4, column = 11 } }
+                { start = { row = 5, column = 7 }, end = { row = 5, column = 12 } }
       , Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 6 }, end = { row = 2, column = 9 } }
+                { start = { row = 3, column = 7 }, end = { row = 3, column = 10 } }
       ]
     )
 
@@ -92,7 +92,7 @@ foo = 1 + (1)
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 10 }, end = { row = 2, column = 13 } }
+                { start = { row = 3, column = 11 }, end = { row = 3, column = 14 } }
       ]
     )
 
@@ -107,7 +107,7 @@ foo = (x y) z
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 6 }, end = { row = 2, column = 11 } }
+                { start = { row = 3, column = 7 }, end = { row = 3, column = 12 } }
       ]
     )
 
@@ -149,7 +149,7 @@ foo x =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 3, column = 7 }, end = { row = 3, column = 12 } }
+                { start = { row = 4, column = 8 }, end = { row = 4, column = 13 } }
       ]
     )
 
@@ -167,13 +167,13 @@ foo x =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 3, column = 5 }, end = { row = 3, column = 10 } }
+                { start = { row = 4, column = 6 }, end = { row = 4, column = 11 } }
       , Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 4, column = 4 }, end = { row = 4, column = 9 } }
+                { start = { row = 5, column = 5 }, end = { row = 5, column = 10 } }
       , Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 6, column = 4 }, end = { row = 6, column = 9 } }
+                { start = { row = 7, column = 5 }, end = { row = 7, column = 10 } }
       ]
     )
 
@@ -187,7 +187,7 @@ foo x = ([x])
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 8 }, end = { row = 2, column = 13 } }
+                { start = { row = 3, column = 9 }, end = { row = 3, column = 14 } }
       ]
     )
 
@@ -201,7 +201,7 @@ foo x = [ (x 1) ]
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 10 }, end = { row = 2, column = 15 } }
+                { start = { row = 3, column = 11 }, end = { row = 3, column = 16 } }
       ]
     )
 
@@ -215,7 +215,7 @@ foo x = ((x, 1))
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 8 }, end = { row = 2, column = 16 } }
+                { start = { row = 3, column = 9 }, end = { row = 3, column = 17 } }
       ]
     )
 
@@ -229,7 +229,7 @@ foo x = ({name = x})
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 8 }, end = { row = 2, column = 20 } }
+                { start = { row = 3, column = 9 }, end = { row = 3, column = 21 } }
       ]
     )
 
@@ -243,7 +243,7 @@ foo x = ({ x | name = "Foo"})
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 8 }, end = { row = 2, column = 29 } }
+                { start = { row = 3, column = 9 }, end = { row = 3, column = 30 } }
       ]
     )
 
@@ -259,7 +259,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 3, column = 10 }, end = { row = 3, column = 15 } }
+                { start = { row = 4, column = 11 }, end = { row = 4, column = 16 } }
       ]
     )
 
@@ -276,7 +276,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 4, column = 12 }, end = { row = 4, column = 17 } }
+                { start = { row = 5, column = 13 }, end = { row = 5, column = 18 } }
       ]
     )
 
@@ -290,7 +290,7 @@ foo x = (x.name.first)
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 8 }, end = { row = 2, column = 22 } }
+                { start = { row = 3, column = 9 }, end = { row = 3, column = 23 } }
       ]
     )
 
@@ -304,7 +304,7 @@ foo x = List.map (.name) x
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 17 }, end = { row = 2, column = 24 } }
+                { start = { row = 3, column = 18 }, end = { row = 3, column = 25 } }
       ]
     )
 
@@ -361,7 +361,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 3, column = 4 }, end = { row = 3, column = 11 } }
+                { start = { row = 4, column = 5 }, end = { row = 4, column = 12 } }
       ]
     )
 
@@ -375,10 +375,10 @@ foo = ( ("price"), (Location 0 0) )
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 8 }, end = { row = 2, column = 17 } }
+                { start = { row = 3, column = 9 }, end = { row = 3, column = 18 } }
       , Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 19 }, end = { row = 2, column = 33 } }
+                { start = { row = 3, column = 20 }, end = { row = 3, column = 34 } }
       ]
     )
 
@@ -396,7 +396,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 5, column = 12 }, end = { row = 5, column = 27 } }
+                { start = { row = 6, column = 13 }, end = { row = 6, column = 28 } }
       ]
     )
 
@@ -414,7 +414,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 5, column = 12 }, end = { row = 5, column = 29 } }
+                { start = { row = 6, column = 13 }, end = { row = 6, column = 30 } }
       ]
     )
 
@@ -429,7 +429,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 3, column = 4 }, end = { row = 3, column = 16 } }
+                { start = { row = 4, column = 5 }, end = { row = 4, column = 17 } }
       ]
     )
 

@@ -44,7 +44,7 @@ type alias Foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 4, column = 8 }, end = { row = 4, column = 33 } }
+                { end = { column = 34, row = 5 }, start = { column = 9, row = 5 } }
       ]
     )
 
@@ -59,7 +59,7 @@ type alias Foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 3, column = 2 }, end = { row = 3, column = 27 } }
+                { start = { row = 4, column = 3 }, end = { row = 4, column = 28 } }
       ]
     )
 

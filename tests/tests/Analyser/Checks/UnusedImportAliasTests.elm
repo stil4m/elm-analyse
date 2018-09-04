@@ -1,4 +1,4 @@
-module Analyser.Checks.UnusedImportAliasTests exposing (..)
+module Analyser.Checks.UnusedImportAliasTests exposing (all, noUsageForAlias, usedAsQualified, usedAsQualifiedInPattern, usedInTypeAlias, usedInTypeReference)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnusedImportAlias as UnusedImportAlias
@@ -18,7 +18,7 @@ foo = (+) 1 2
     , [ Data.init "foo"
             |> Data.addModuleName "moduleName" [ "B" ]
             |> Data.addRange "range"
-                { start = { row = 2, column = 0 }, end = { row = 2, column = 15 } }
+                { start = { row = 3, column = 1 }, end = { row = 3, column = 16 } }
       ]
     )
 

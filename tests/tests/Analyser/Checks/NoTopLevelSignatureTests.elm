@@ -1,4 +1,4 @@
-module Analyser.Checks.NoTopLevelSignatureTests exposing (..)
+module Analyser.Checks.NoTopLevelSignatureTests exposing (all)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
@@ -17,7 +17,7 @@ foo = 1
     , [ Data.init "foo"
             |> Data.addVarName "varName" "foo"
             |> Data.addRange "range"
-                { start = { row = 3, column = 0 }, end = { row = 3, column = 3 } }
+                { start = { row = 4, column = 1 }, end = { row = 4, column = 4 } }
       ]
     )
 

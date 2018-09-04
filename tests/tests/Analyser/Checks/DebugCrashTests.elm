@@ -1,4 +1,4 @@
-module Analyser.Checks.DebugCrashTests exposing (..)
+module Analyser.Checks.DebugCrashTests exposing (all, debugCrash, noDebug)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DebugCrash as DebugCrash
@@ -11,12 +11,12 @@ debugCrash =
     ( "debugCrash"
     , """module Bar exposing (..)
 
-foo = Debug.crash "NOOO"
+foo = Debug.todo "NOOO"
 
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 2, column = 6 }, end = { row = 2, column = 17 } }
+                { start = { row = 3, column = 7 }, end = { row = 3, column = 17 } }
       ]
     )
 

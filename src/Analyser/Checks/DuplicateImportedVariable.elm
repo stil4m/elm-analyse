@@ -117,10 +117,10 @@ constructorsAndValues imp =
         Nothing ->
             []
 
-        Just (All _) ->
+        Just (Node _ (All _)) ->
             []
 
-        Just (Explicit xs) ->
+        Just (Node _ (Explicit xs)) ->
             List.map exposingValues xs
     )
 

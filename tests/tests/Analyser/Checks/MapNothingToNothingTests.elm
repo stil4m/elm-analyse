@@ -1,4 +1,4 @@
-module Analyser.Checks.MapNothingToNothingTests exposing (..)
+module Analyser.Checks.MapNothingToNothingTests exposing (all, mapNothingToNothing, mapNothingToSomething, mapSomethingToNothing)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.MapNothingToNothing as MapNothingToNothing
@@ -17,8 +17,8 @@ y = case x of
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 4, column = 4 }
-                , end = { row = 4, column = 22 }
+                { start = { row = 5, column = 5 }
+                , end = { row = 5, column = 23 }
                 }
       ]
     )

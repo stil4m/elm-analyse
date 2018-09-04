@@ -1,4 +1,4 @@
-module Analyser.Checks.UnnecessaryListConcatTests exposing (..)
+module Analyser.Checks.UnnecessaryListConcatTests exposing (all)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
@@ -17,7 +17,7 @@ foo =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 3, column = 4 }, end = { row = 3, column = 28 } }
+                { start = { row = 4, column = 5 }, end = { row = 4, column = 29 } }
       ]
     )
 
@@ -43,7 +43,7 @@ foo x =
   """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 11, column = 18 }, end = { row = 11, column = 50 } }
+                { start = { row = 12, column = 19 }, end = { row = 12, column = 51 } }
       ]
     )
 

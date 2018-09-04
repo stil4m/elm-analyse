@@ -1,4 +1,4 @@
-module Analyser.Checks.BooleanCaseTests exposing (..)
+module Analyser.Checks.BooleanCaseTests exposing (all)
 
 import Analyser.Checks.BooleanCase as BooleanCase
 import Analyser.Checks.CheckTestUtil as CTU
@@ -20,7 +20,7 @@ foo x =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 3, column = 4 }, end = { row = 6, column = 18 } }
+                { start = { row = 4, column = 5 }, end = { row = 7, column = 19 } }
       ]
     )
 
@@ -39,7 +39,7 @@ foo x =
 """
     , [ Data.init "foo"
             |> Data.addRange "range"
-                { start = { row = 3, column = 4 }, end = { row = 6, column = 18 } }
+                { start = { row = 4, column = 5 }, end = { row = 7, column = 19 } }
       ]
     )
 

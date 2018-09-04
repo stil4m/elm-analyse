@@ -34,8 +34,8 @@ analyseAndFix checker fixer input rawFile f =
         [] ->
             Error "No message"
 
-        x :: _ ->
-            fixer.fix ( fileContext.content, fileContext.ast ) x
+        y :: _ ->
+            fixer.fix ( fileContext.content, fileContext.ast ) y
 
 
 testFix : String -> Checker -> Fixer -> List ( String, String, String ) -> Test
