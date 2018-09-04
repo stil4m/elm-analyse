@@ -15,7 +15,7 @@ import Analyser.State.Dependencies
 import AnalyserPorts
 import Inspection
 import Json.Encode exposing (Value)
-import Platform exposing (programWithFlags)
+import Platform exposing (worker)
 import Registry exposing (Registry)
 import Time
 import Util.Logger as Logger
@@ -37,7 +37,7 @@ type Msg
     = OnContext Context
     | DependencyLoadingStageMsg DependencyLoadingStage.Msg
     | SourceLoadingStageMsg SourceLoadingStage.Msg
-    | Change FileChange
+    | Change (Maybe FileChange)
     | ReloadTick
     | Reset
     | OnFixMessage Int
@@ -60,7 +60,11 @@ type alias Flags =
 
 main : Program Flags Model Msg
 main =
-    programWithFlags { init = init, update = update, subscriptions = subscriptions }
+    worker
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        }
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -148,7 +152,7 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
-        Change (Update x) ->
+        Change (Just (Update x)) ->
             doSendState
                 ( { model
                     | state = State.outdateMessagesForFile x model.state
@@ -170,7 +174,10 @@ update msg model =
                 , Cmd.none
                 )
 
-        Change (Remove x) ->
+        Change Nothing ->
+            ( model, Cmd.none )
+
+        Change (Just (Remove x)) ->
             doSendState
                 ( { model
                     | state = State.removeMessagesForFile x model.state
@@ -230,7 +237,7 @@ handleNextStep (( model, cmds ) as input) =
                     case Fixer.init taskId newState of
                         Nothing ->
                             ( { model | state = newState }
-                            , Logger.info ("Could not fix message: '" ++ toString taskId ++ "'.")
+                            , Logger.info ("Could not fix message: '" ++ Debug.toString taskId ++ "'.")
                             )
 
                         Just ( fixerModel, fixerCmds, newState2 ) ->
@@ -343,7 +350,7 @@ subscriptions model =
     Sub.batch
         [ AnalyserPorts.onReset (always Reset)
         , if model.server then
-            Time.every Time.second (always ReloadTick)
+            Time.every 1000 (always ReloadTick)
 
           else
             Sub.none

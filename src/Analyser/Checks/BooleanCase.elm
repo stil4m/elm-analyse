@@ -8,8 +8,8 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (Case, Expression(..))
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Pattern exposing (Pattern(..))
-import Elm.Syntax.Ranged exposing (Ranged)
 
 
 checker : Checker
@@ -40,8 +40,8 @@ scan fileContext _ =
         []
 
 
-onExpression : Ranged Expression -> Context -> Context
-onExpression ( r, inner ) context =
+onExpression : Node Expression -> Context -> Context
+onExpression (Node r inner) context =
     case inner of
         CaseExpression caseExpression ->
             if List.any isBooleanCase caseExpression.cases then
@@ -63,7 +63,7 @@ onExpression ( r, inner ) context =
 
 
 isBooleanCase : Case -> Bool
-isBooleanCase ( ( _, pattern ), _ ) =
+isBooleanCase ( Node _ pattern, _ ) =
     case pattern of
         NamedPattern qnr [] ->
             qnr.moduleName == [] && (qnr.name == "True" || qnr.name == "False")

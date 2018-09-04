@@ -8,8 +8,9 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
-import Elm.Syntax.Base exposing (ModuleName)
-import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.Import exposing (Import)
+import Elm.Syntax.ModuleName exposing (ModuleName)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range as Range exposing (Range)
 
 
@@ -66,8 +67,12 @@ hasLength f =
     List.length >> f
 
 
-onImport : Import -> Context -> Context
-onImport { moduleName, range } context =
+onImport : Node Import -> Context -> Context
+onImport (Node range imp) context =
+    let
+        moduleName =
+            Node.value imp.moduleName
+    in
     case Dict.get moduleName context of
         Just _ ->
             Dict.update moduleName (Maybe.map (\a -> (++) a [ range ])) context

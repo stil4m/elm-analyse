@@ -60,13 +60,13 @@ init x state =
 
 
 initWithMessage : Message -> State -> Maybe ( Model, Cmd Msg, State )
-initWithMessage message state =
-    Analyser.Fixers.getFixer message
+initWithMessage mess state =
+    Analyser.Fixers.getFixer mess
         |> Maybe.map
             (\fixer ->
-                ( Model { message = message, fixer = fixer, done = False, success = True }
-                , loadFileContentWithSha message.file.path
-                , State.startFixing message state
+                ( Model { message = mess, fixer = fixer, done = False, success = True }
+                , loadFileContentWithSha mess.file.path
+                , State.startFixing mess state
                 )
             )
 
@@ -142,8 +142,8 @@ applyFix model pair =
 
 
 fileHashEqual : FileLoad -> Message -> Bool
-fileHashEqual reference message =
-    reference.file == message.file
+fileHashEqual reference mess =
+    reference.file == mess.file
 
 
 subscriptions : Model -> Sub Msg

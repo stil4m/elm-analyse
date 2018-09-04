@@ -7,18 +7,13 @@ import Debug as SafeDebug
 import Elm.Interface as Interface exposing (Interface)
 import Elm.Processing as Processing exposing (ProcessContext)
 import Elm.RawFile as RawFile exposing (RawFile)
-import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.File exposing (File)
+import Elm.Syntax.ModuleName exposing (ModuleName)
 
 
 moduleName : RawFile -> ModuleName
 moduleName rf =
-    case RawFile.moduleName rf of
-        Nothing ->
-            SafeDebug.crash "Legacy"
-
-        Just x ->
-            x
+    RawFile.moduleName rf
 
 
 type alias FileContext =

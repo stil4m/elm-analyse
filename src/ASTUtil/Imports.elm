@@ -1,12 +1,12 @@
 module ASTUtil.Imports exposing (FunctionReference, buildImportInformation, findImportWithRange, naiveStringifyImport, removeRangeFromImport)
 
 import AST.Ranges as Ranges
-import Elm.Syntax.Base exposing (ModuleName)
-import Elm.Syntax.Exposing exposing (ExposedType, Exposing(..), TopLevelExpose(..), ValueConstructorExpose)
+import Elm.Syntax.Exposing exposing (ExposedType, Exposing(..), TopLevelExpose(..))
 import Elm.Syntax.File exposing (File)
-import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.Import exposing (Import)
+import Elm.Syntax.ModuleName exposing (ModuleName)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 import List.Extra as List
 
 
@@ -18,29 +18,34 @@ type alias FunctionReference =
 
 {-| Will look for an import within the file that includes a range. Will return a `Nothing` when no such import exists.
 -}
-findImportWithRange : File -> Range -> Maybe Import
+findImportWithRange : File -> Range -> Maybe (Node Import)
 findImportWithRange ast range =
     ast.imports
-        |> List.filter (.range >> Ranges.containsRange range)
+        |> List.filter (Node.range >> Ranges.containsRange range)
         |> List.head
 
 
 buildImportInformation : ModuleName -> String -> File -> Maybe FunctionReference
 buildImportInformation moduleName function file =
     file.imports
-        |> List.filter (\i -> i.moduleName == moduleName)
+        |> List.filter (Node.value >> (\i -> Node.value i.moduleName == moduleName))
         |> List.head
-        |> Maybe.map
-            (\i ->
-                { moduleName = Maybe.withDefault i.moduleName i.moduleAlias
-                , exposesRegex = Maybe.map (exposesFunction function) i.exposingList |> Maybe.withDefault False
-                }
-            )
+        |> Maybe.map (Node.value >> importToFunctionReference function)
+
+
+importToFunctionReference : String -> Import -> FunctionReference
+importToFunctionReference function i =
+    { moduleName = Node.value <| Maybe.withDefault i.moduleName i.moduleAlias
+    , exposesRegex =
+        i.exposingList
+            |> Maybe.map (exposesFunction function)
+            |> Maybe.withDefault False
+    }
 
 
 {-| TODO
 -}
-exposesFunction : String -> Exposing (Ranged TopLevelExpose) -> Bool
+exposesFunction : String -> Exposing -> Bool
 exposesFunction s exposure =
     case exposure of
         All _ ->
@@ -48,7 +53,7 @@ exposesFunction s exposure =
 
         Explicit l ->
             List.any
-                (\( _, x ) ->
+                (\(Node _ x) ->
                     case x of
                         FunctionExpose fun ->
                             fun == s
@@ -63,13 +68,13 @@ naiveStringifyImport : Import -> String
 naiveStringifyImport imp =
     String.concat <|
         [ "import "
-        , String.join "." imp.moduleName
-        , Maybe.withDefault "" <| Maybe.map (String.join "." >> (++) " as ") imp.moduleAlias
+        , String.join "." <| Node.value imp.moduleName
+        , Maybe.withDefault "" <| Maybe.map (Node.value >> String.join "." >> (++) " as ") <| imp.moduleAlias
         , stringifyExposingList imp.exposingList
         ]
 
 
-stringifyExposingList : Maybe (Exposing (Ranged TopLevelExpose)) -> String
+stringifyExposingList : Maybe Exposing -> String
 stringifyExposingList exp =
     case exp of
         Nothing ->
@@ -87,7 +92,7 @@ stringifyExposingList exp =
                         xs ->
                             let
                                 areOnDifferentLines =
-                                    rangesOnDifferentLines (List.map Tuple.first xs)
+                                    rangesOnDifferentLines (List.map Node.range xs)
 
                                 seperator =
                                     if areOnDifferentLines then
@@ -109,8 +114,8 @@ rangesOnDifferentLines ranges =
     List.length (List.unique starts) == List.length starts
 
 
-stringifyExpose : Ranged TopLevelExpose -> String
-stringifyExpose ( _, expose ) =
+stringifyExpose : Node TopLevelExpose -> String
+stringifyExpose (Node _ expose) =
     case expose of
         InfixExpose s ->
             "(" ++ s ++ ")"
@@ -126,33 +131,14 @@ stringifyExpose ( _, expose ) =
 
 
 stringifyExposedType : ExposedType -> String
-stringifyExposedType { name, constructors } =
+stringifyExposedType { name, open } =
     name
-        ++ (case constructors of
+        ++ (case open of
                 Nothing ->
                     ""
 
-                Just (All _) ->
+                Just r ->
                     "(..)"
-
-                Just (Explicit explicits) ->
-                    case explicits of
-                        [] ->
-                            ""
-
-                        xs ->
-                            let
-                                areOnDifferentLines =
-                                    rangesOnDifferentLines (List.map Tuple.first xs)
-
-                                seperator =
-                                    if areOnDifferentLines then
-                                        "\n    , "
-
-                                    else
-                                        ", "
-                            in
-                            "(" ++ (String.join seperator <| List.map Tuple.second explicits) ++ ")"
            )
 
 
@@ -161,7 +147,7 @@ removeRangeFromImport range imp =
     { imp | exposingList = Maybe.andThen (removeRangeFromExposingList range) imp.exposingList }
 
 
-removeRangeFromExposingList : Range -> Exposing (Ranged TopLevelExpose) -> Maybe (Exposing (Ranged TopLevelExpose))
+removeRangeFromExposingList : Range -> Exposing -> Maybe Exposing
 removeRangeFromExposingList range exp =
     case exp of
         All r ->
@@ -180,9 +166,9 @@ removeRangeFromExposingList range exp =
                     Just (Explicit x)
 
 
-removeRangeFromExpose : Range -> Ranged TopLevelExpose -> Maybe (Ranged TopLevelExpose)
-removeRangeFromExpose range ( r, expose ) =
-    Maybe.map (\b -> ( r, b )) <|
+removeRangeFromExpose : Range -> Node TopLevelExpose -> Maybe (Node TopLevelExpose)
+removeRangeFromExpose range (Node r expose) =
+    Maybe.map (\b -> Node r b) <|
         case expose of
             InfixExpose x ->
                 if r == range then
@@ -207,23 +193,13 @@ removeRangeFromExpose range ( r, expose ) =
 
             TypeExpose exposedType ->
                 Just
-                    (TypeExpose { exposedType | constructors = Maybe.andThen (removeRangeFromConstructors range) exposedType.constructors })
+                    (TypeExpose
+                        { exposedType
+                            | open =
+                                if exposedType.open == Just range then
+                                    Nothing
 
-
-removeRangeFromConstructors : Range -> Exposing ValueConstructorExpose -> Maybe (Exposing ValueConstructorExpose)
-removeRangeFromConstructors range exp =
-    case exp of
-        All r ->
-            if r == range then
-                Nothing
-
-            else
-                Just (All r)
-
-        Explicit pairs ->
-            case List.filter (Tuple.first >> (/=) range) pairs of
-                [] ->
-                    Nothing
-
-                x ->
-                    Just (Explicit x)
+                                else
+                                    exposedType.open
+                        }
+                    )

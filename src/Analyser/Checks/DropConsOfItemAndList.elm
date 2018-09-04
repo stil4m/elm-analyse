@@ -8,7 +8,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (Expression(..))
-import Elm.Syntax.Ranged exposing (Ranged)
+import Elm.Syntax.Node as Node exposing (Node(..))
 
 
 checker : Checker
@@ -41,10 +41,10 @@ scan fileContext _ =
         []
 
 
-onExpression : Ranged Expression -> Context -> Context
-onExpression ( r, inner ) context =
+onExpression : Node Expression -> Context -> Context
+onExpression (Node r inner) context =
     case inner of
-        OperatorApplication "::" _ ( headRange, _ ) ( tailRange, ListExpr _ ) ->
+        OperatorApplication "::" _ (Node headRange _) (Node tailRange (ListExpr _)) ->
             let
                 range =
                     r

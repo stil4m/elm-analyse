@@ -6,8 +6,8 @@ import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Elm.Syntax.Declaration exposing (Declaration(..))
 import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range as Syntax exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAlias exposing (TypeAlias)
 
 
@@ -34,15 +34,15 @@ findAndRemoveTypeAlias ( content, file ) range =
         |> Maybe.map (\typeAlias -> removeTypeAlias typeAlias content)
 
 
-findTypeAlias : Range -> File -> Maybe (Ranged TypeAlias)
+findTypeAlias : Range -> File -> Maybe (Node TypeAlias)
 findTypeAlias range file =
     file.declarations
         |> List.filterMap
-            (\( r, decl ) ->
+            (\(Node r decl) ->
                 case decl of
-                    AliasDecl typeAlias ->
+                    AliasDeclaration typeAlias ->
                         if r == range then
-                            Just ( r, typeAlias )
+                            Just (Node r typeAlias)
 
                         else
                             Nothing
@@ -53,12 +53,12 @@ findTypeAlias range file =
         |> List.head
 
 
-removeTypeAlias : Ranged TypeAlias -> String -> String
-removeTypeAlias ( range, typeAlias ) content =
+removeTypeAlias : Node TypeAlias -> String -> String
+removeTypeAlias (Node range typeAlias) content =
     let
         start =
             typeAlias.documentation
-                |> Maybe.map (.range >> .start)
+                |> Maybe.map (Node.range >> .start)
                 |> Maybe.withDefault range.start
 
         end =

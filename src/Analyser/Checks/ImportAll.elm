@@ -8,7 +8,8 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Exposing exposing (Exposing(..))
-import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.Import exposing (Import)
+import Elm.Syntax.Node as Node exposing (Node(..))
 
 
 checker : Checker
@@ -38,8 +39,8 @@ scan fileContext _ =
         []
 
 
-onImport : Import -> ExposeAllContext -> ExposeAllContext
-onImport imp context =
+onImport : Node Import -> ExposeAllContext -> ExposeAllContext
+onImport (Node _ imp) context =
     (\a -> List.append a context) <|
         case imp.exposingList of
             Just (All range) ->
@@ -50,13 +51,13 @@ onImport imp context =
                 [ Data.init
                     (String.concat
                         [ "Importing all from module `"
-                        , String.join "." imp.moduleName
+                        , String.join "." (Node.value imp.moduleName)
                         , "` at "
                         , Range.rangeToString r
                         ]
                     )
                     |> Data.addRange "range" r
-                    |> Data.addModuleName "moduleName" imp.moduleName
+                    |> Data.addModuleName "moduleName" (Node.value imp.moduleName)
                 ]
 
             Nothing ->

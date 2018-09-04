@@ -1,8 +1,9 @@
 module Docs.Page exposing (Page(..), hash, nextPage)
 
-import Navigation exposing (Location)
+import Browser.Navigation
 import String.Extra
-import UrlParser as Url exposing ((</>), Parser)
+import Url exposing (Url)
+import Url.Parser as Url exposing ((</>), Parser)
 
 
 type Page
@@ -29,9 +30,9 @@ route =
         ]
 
 
-nextPage : Location -> Page
+nextPage : Url -> Page
 nextPage =
-    Url.parseHash route >> Maybe.withDefault NotFound
+    Url.parse route >> Maybe.withDefault NotFound
 
 
 hash : Page -> String

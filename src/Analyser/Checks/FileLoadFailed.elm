@@ -24,4 +24,4 @@ checker =
 
 scan : FileContext -> Configuration -> List MessageData
 scan _ _ =
-    SafeDebug.crash "Something is completely wrong"
+    SafeDebug.todo "Something is completely wrong"

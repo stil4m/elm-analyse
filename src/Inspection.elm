@@ -33,17 +33,17 @@ run codeBase includedSources configuration =
                                 Nothing
                     )
                 |> List.map
-                    (\( source, error ) ->
+                    (\( source, _ ) ->
                         newMessage
                             (FileContent.asFileRef source)
                             (FileLoadFailed.checker |> .info |> .key)
                             (Data.init
                                 (String.concat
                                     [ "Could not load file due to: "
-                                    , error
+                                    , "Unexpected parse error"
                                     ]
                                 )
-                                |> Data.addErrorMessage "message" error
+                                |> Data.addErrorMessage "message" "Unexpected parse error"
                             )
                     )
 

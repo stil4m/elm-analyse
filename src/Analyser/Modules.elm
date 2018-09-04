@@ -5,9 +5,9 @@ import Analyser.CodeBase exposing (CodeBase)
 import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.Files.Types exposing (LoadedSourceFiles)
 import Elm.Dependency exposing (Dependency)
-import Elm.Syntax.Base exposing (ModuleName)
+import Elm.Syntax.ModuleName as ModuleName exposing (ModuleName)
+import Elm.Syntax.Node as Node
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Extra exposing ((|:))
 import Json.Encode as JE exposing (Value)
 
 
@@ -40,15 +40,17 @@ build codeBase sources =
 edgesInFile : FileContext -> List ( List String, List String )
 edgesInFile file =
     file.ast.imports
+        |> List.map Node.value
         |> List.map .moduleName
+        |> List.map Node.value
         |> List.map (\b -> ( file.moduleName, b ))
 
 
 decode : JD.Decoder Modules
 decode =
-    JD.succeed Modules
-        |: JD.field "projectModules" (JD.list decodeModuleName)
-        |: JD.field "dependencies" (JD.list decodeDependency)
+    JD.map2 Modules
+        (JD.field "projectModules" (JD.list decodeModuleName))
+        (JD.field "dependencies" (JD.list decodeDependency))
 
 
 tupleFromLIst : List a -> JD.Decoder ( a, a )
@@ -64,14 +66,14 @@ tupleFromLIst x =
 encode : Modules -> Value
 encode e =
     JE.object
-        [ ( "projectModules", JE.list <| List.map encodeModuleName e.projectModules )
-        , ( "dependencies", JE.list (List.map encodeDependency e.dependencies) )
+        [ ( "projectModules", JE.list ModuleName.encode e.projectModules )
+        , ( "dependencies", JE.list encodeDependency e.dependencies )
         ]
 
 
 encodeDependency : ( ModuleName, ModuleName ) -> JE.Value
 encodeDependency ( x, y ) =
-    JE.list [ encodeModuleName x, encodeModuleName y ]
+    JE.list ModuleName.encode [ x, y ]
 
 
 decodeDependency : Decoder ( ModuleName, ModuleName )
@@ -82,8 +84,3 @@ decodeDependency =
 decodeModuleName : Decoder ModuleName
 decodeModuleName =
     JD.string |> JD.map (String.split ".")
-
-
-encodeModuleName : ModuleName -> Value
-encodeModuleName =
-    String.join "." >> JE.string

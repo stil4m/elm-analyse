@@ -9,8 +9,8 @@ import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Interface as Interface exposing (Interface)
 import Elm.Syntax.Expression exposing (Expression(..))
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.Type exposing (Type)
 import Set exposing (Set)
 
@@ -68,10 +68,10 @@ buildMessageData ( varName, range ) =
         |> Data.addRange "range" range
 
 
-onExpression : Ranged Expression -> Context -> Context
-onExpression ( _, e ) config =
+onExpression : Node Expression -> Context -> Context
+onExpression (Node _ e) config =
     case e of
-        FunctionOrValue s ->
+        FunctionOrValue m s ->
             { config | usedFunctions = Set.insert s config.usedFunctions }
 
         _ ->
@@ -83,7 +83,7 @@ onType interface t context =
     let
         nonExposed =
             t.constructors
-                |> List.filter (not << (\constructor -> Interface.exposesFunction constructor.name interface))
-                |> List.map (\constructor -> ( constructor.name, constructor.range ))
+                |> List.filter (not << (\(Node _ constructor) -> Interface.exposesFunction (Node.value constructor.name) interface))
+                |> List.map (\(Node r constructor) -> ( Node.value constructor.name, r ))
     in
     { context | unexposedConstructors = context.unexposedConstructors ++ nonExposed }

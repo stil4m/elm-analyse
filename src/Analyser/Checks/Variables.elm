@@ -4,13 +4,13 @@ import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import ASTUtil.Variables exposing (VariableType(..), getLetDeclarationsVars, getTopLevels, patternToUsedVars, patternToVars, patternToVarsInner, withoutTopLevel)
 import Analyser.FileContext exposing (FileContext)
 import Dict exposing (Dict)
-import Elm.Syntax.Base exposing (VariablePointer)
-import Elm.Syntax.Expression exposing (Case, Expression(..), Function, Lambda, LetBlock, RecordUpdate)
+import Elm.Syntax.Expression exposing (Case, Expression(..), Function, Lambda, LetBlock, RecordSetter)
 import Elm.Syntax.File exposing (File)
 import Elm.Syntax.Infix exposing (InfixDirection)
+import Elm.Syntax.ModuleName exposing (ModuleName)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Pattern exposing (Pattern(..))
 import Elm.Syntax.Range exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
 import Tuple.Extra
 
@@ -106,13 +106,13 @@ popScope x =
     }
 
 
-pushScope : List ( VariablePointer, VariableType ) -> InneUsedVariableContext -> InneUsedVariableContext
+pushScope : List ( Node String, VariableType ) -> InneUsedVariableContext -> InneUsedVariableContext
 pushScope vars x =
     let
         y : ActiveScope
         y =
             vars
-                |> List.map (\( z, t ) -> ( z.value, ( 0, t, z.range ) ))
+                |> List.map (\( z, t ) -> ( Node.value z, ( 0, t, Node.range z ) ))
                 |> Dict.fromList
                 |> (\b -> ( [], b ))
     in
@@ -162,8 +162,8 @@ flagVariable k l =
                 ( masked, x ) :: flagVariable k xs
 
 
-onFunctionOrValue : String -> InneUsedVariableContext -> InneUsedVariableContext
-onFunctionOrValue x context =
+onFunctionOrValue : ( ModuleName, String ) -> InneUsedVariableContext -> InneUsedVariableContext
+onFunctionOrValue ( _, x ) context =
     addUsedVariable x context
 
 
@@ -172,14 +172,14 @@ onPrefixOperator prefixOperator context =
     addUsedVariable prefixOperator context
 
 
-onRecordUpdate : RecordUpdate -> InneUsedVariableContext -> InneUsedVariableContext
-onRecordUpdate recordUpdate context =
-    addUsedVariable recordUpdate.name context
+onRecordUpdate : ( Node String, List (Node RecordSetter) ) -> InneUsedVariableContext -> InneUsedVariableContext
+onRecordUpdate ( Node _ name, _ ) context =
+    addUsedVariable name context
 
 
-onOperatorAppliction : ( String, InfixDirection, Ranged Expression, Ranged Expression ) -> InneUsedVariableContext -> InneUsedVariableContext
-onOperatorAppliction ( op, _, _, _ ) context =
-    addUsedVariable op context
+onOperatorAppliction : { operator : String, direction : InfixDirection, left : Node Expression, right : Node Expression } -> InneUsedVariableContext -> InneUsedVariableContext
+onOperatorAppliction { operator } context =
+    addUsedVariable operator context
 
 
 onFile : File -> InneUsedVariableContext -> InneUsedVariableContext
@@ -188,23 +188,26 @@ onFile file context =
         |> (\a -> pushScope a context)
 
 
-onFunction : (InneUsedVariableContext -> InneUsedVariableContext) -> Function -> InneUsedVariableContext -> InneUsedVariableContext
-onFunction f function context =
+onFunction : (InneUsedVariableContext -> InneUsedVariableContext) -> Node Function -> InneUsedVariableContext -> InneUsedVariableContext
+onFunction f (Node _ function) context =
     let
+        functionDeclaration =
+            Node.value function.declaration
+
         used =
-            List.concatMap patternToUsedVars function.declaration.arguments
-                |> List.map .value
+            List.concatMap patternToUsedVars functionDeclaration.arguments
+                |> List.map Node.value
 
         postContext =
             context
-                |> maskVariable function.declaration.name.value
+                |> maskVariable (Node.value functionDeclaration.name)
                 |> (\c ->
-                        function.declaration.arguments
+                        functionDeclaration.arguments
                             |> List.concatMap patternToVars
                             |> (\a -> pushScope a c)
                             |> f
                             |> popScope
-                            |> unMaskVariable function.declaration.name.value
+                            |> unMaskVariable (Node.value functionDeclaration.name)
                    )
     in
     List.foldl addUsedVariable postContext used
@@ -233,18 +236,18 @@ onLetBlock f letBlock context =
         |> popScope
 
 
-onDestructuring : ( Ranged Pattern, Ranged Expression ) -> InneUsedVariableContext -> InneUsedVariableContext
+onDestructuring : ( Node Pattern, Node Expression ) -> InneUsedVariableContext -> InneUsedVariableContext
 onDestructuring ( pattern, _ ) context =
     List.foldl addUsedVariable
         context
-        (List.map .value (patternToUsedVars pattern))
+        (List.map Node.value (patternToUsedVars pattern))
 
 
 onCase : (InneUsedVariableContext -> InneUsedVariableContext) -> Case -> InneUsedVariableContext -> InneUsedVariableContext
 onCase f caze context =
     let
         used =
-            patternToUsedVars (Tuple.first caze) |> List.map .value
+            patternToUsedVars (Tuple.first caze) |> List.map Node.value
 
         postContext =
             Tuple.first caze
@@ -256,10 +259,10 @@ onCase f caze context =
     List.foldl addUsedVariable postContext used
 
 
-onTypeAnnotation : Ranged TypeAnnotation -> InneUsedVariableContext -> InneUsedVariableContext
-onTypeAnnotation ( _, t ) c =
+onTypeAnnotation : Node TypeAnnotation -> InneUsedVariableContext -> InneUsedVariableContext
+onTypeAnnotation (Node _ t) c =
     case t of
-        Typed [] name _ ->
+        Typed (Node _ ( [], name )) _ ->
             addUsedVariable name c
 
         _ ->

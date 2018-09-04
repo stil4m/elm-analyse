@@ -8,7 +8,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (Expression(..))
-import Elm.Syntax.Ranged exposing (Ranged)
+import Elm.Syntax.Node as Node exposing (Node(..))
 
 
 checker : Checker
@@ -42,10 +42,10 @@ scan fileContext _ =
         []
 
 
-onExpression : Ranged Expression -> Context -> Context
-onExpression ( _, expression ) context =
+onExpression : Node Expression -> Context -> Context
+onExpression (Node _ expression) context =
     case expression of
-        Application [ ( opRange, PrefixOperator x ), ( argRange1, _ ), ( argRange2, _ ) ] ->
+        Application [ Node opRange (PrefixOperator x), Node argRange1 _, Node argRange2 _ ] ->
             -- Allow 3-tuple or greater as prefix.
             if String.startsWith ",," x then
                 context

@@ -8,11 +8,11 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
-import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.Exposing exposing (Exposing(..), TopLevelExpose(..))
-import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.Import exposing (Import)
+import Elm.Syntax.ModuleName exposing (ModuleName)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range as Syntax
-import Elm.Syntax.Ranged exposing (Ranged)
 
 
 checker : Checker
@@ -79,25 +79,25 @@ findViolations d =
         |> List.filter (\( _, _, rs ) -> List.length rs >= 2)
 
 
-onImport : Import -> Context -> Context
-onImport imp context =
+onImport : Node Import -> Context -> Context
+onImport (Node _ imp) context =
     let
         ( cs, vs ) =
             constructorsAndValues imp
     in
     { context
-        | constructors = Dict.update imp.moduleName (Maybe.withDefault Dict.empty >> mergeImportedValue cs >> Just) context.constructors
+        | constructors = Dict.update (Node.value imp.moduleName) (Maybe.withDefault Dict.empty >> mergeImportedValue cs >> Just) context.constructors
         , functionOrValues =
-            Dict.update imp.moduleName
+            Dict.update (Node.value imp.moduleName)
                 (Maybe.withDefault Dict.empty >> mergeImportedValue vs >> Just)
                 context.functionOrValues
     }
 
 
-mergeImportedValue : List (Ranged String) -> Dict String (List Syntax.Range) -> Dict String (List Syntax.Range)
+mergeImportedValue : List (Node String) -> Dict String (List Syntax.Range) -> Dict String (List Syntax.Range)
 mergeImportedValue l entry =
     let
-        addPair ( v, k ) d =
+        addPair (Node v k) d =
             Dict.update k
                 (\old ->
                     old
@@ -110,24 +110,24 @@ mergeImportedValue l entry =
     List.foldl addPair entry l
 
 
-constructorsAndValues : Import -> ( List (Ranged String), List (Ranged String) )
+constructorsAndValues : Import -> ( List (Node String), List (Node String) )
 constructorsAndValues imp =
-    case imp.exposingList of
+    ( []
+    , case imp.exposingList of
         Nothing ->
-            ( [], [] )
+            []
 
         Just (All _) ->
-            ( [], [] )
+            []
 
         Just (Explicit xs) ->
-            ( List.concatMap exposingConstructors xs
-            , List.map exposingValues xs
-            )
+            List.map exposingValues xs
+    )
 
 
-exposingValues : Ranged TopLevelExpose -> Ranged String
-exposingValues ( r, t ) =
-    (\b -> ( r, b )) <|
+exposingValues : Node TopLevelExpose -> Node String
+exposingValues (Node r t) =
+    Node r <|
         case t of
             TypeExpose s ->
                 s.name
@@ -140,18 +140,3 @@ exposingValues ( r, t ) =
 
             TypeOrAliasExpose s ->
                 s
-
-
-exposingConstructors : Ranged TopLevelExpose -> List (Ranged String)
-exposingConstructors ( _, t ) =
-    case t of
-        TypeExpose s ->
-            case s.constructors of
-                Just (Explicit xs) ->
-                    xs
-
-                _ ->
-                    []
-
-        _ ->
-            []

@@ -9,6 +9,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (Expression(..), Function, LetBlock)
+import Elm.Syntax.Node as Node exposing (Node(..))
 
 
 type alias Context =
@@ -50,10 +51,10 @@ scan fileContext _ =
 
 
 asMessage : Function -> MessageData
-asMessage f =
+asMessage { declaration } =
     let
         range =
-            f.declaration.name.range
+            Node.range (Node.value declaration).name
     in
     Data.init
         (String.concat
@@ -64,8 +65,8 @@ asMessage f =
         |> Data.addRange "range" range
 
 
-onFunction : Function -> Context -> Context
-onFunction function context =
+onFunction : Node Function -> Context -> Context
+onFunction (Node _ function) context =
     let
         isStatic =
             ASTUtil.Functions.isStatic function

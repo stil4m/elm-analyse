@@ -17,24 +17,19 @@ type FileChange
     | Remove String
 
 
-watcher : (FileChange -> msg) -> Sub msg
+watcher : (Maybe FileChange -> msg) -> Sub msg
 watcher f =
     fileWatch (asFileChange >> f)
 
 
-asFileChange : RawFileChange -> FileChange
+asFileChange : RawFileChange -> Maybe FileChange
 asFileChange p =
     case p.event of
         "update" ->
-            Update p.file
+            Just <| Update p.file
 
         "remove" ->
-            Remove p.file
+            Just <| Remove p.file
 
         _ ->
-            SafeDebug.crash
-                ("Unknown filechange: "
-                    ++ toString p
-                    ++ "."
-                    ++ "This should never happen. Please create an issue the on elm-analyse issue tracker."
-                )
+            Nothing

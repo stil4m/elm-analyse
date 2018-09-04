@@ -2,7 +2,7 @@ module Analyser.Configuration exposing (Configuration, checkEnabled, checkProper
 
 import Dict exposing (Dict)
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Extra exposing ((|:))
+import Json.Decode.Extra
 
 
 type Configuration
@@ -72,7 +72,7 @@ fromString input =
         case JD.decodeString (decodeConfiguration input) input of
             Err e ->
                 ( defaultConfiguration
-                , [ "Failed to decode defined configuration due to: " ++ e ++ ". Falling back to default configuration" ]
+                , [ "Failed to decode defined configuration due to: " ++ Debug.toString e ++ ". Falling back to default configuration" ]
                 )
 
             Ok x ->
@@ -83,9 +83,9 @@ fromString input =
 
 decodeConfiguration : String -> Decoder Configuration
 decodeConfiguration raw =
-    JD.succeed (ConfigurationInner raw)
-        |: JD.oneOf [ JD.field "checks" decodeChecks, JD.succeed Dict.empty ]
-        |: JD.oneOf [ JD.field "excludedPaths" (JD.list JD.string), JD.succeed [] ]
+    JD.map2 (ConfigurationInner raw)
+        (JD.oneOf [ JD.field "checks" decodeChecks, JD.succeed Dict.empty ])
+        (JD.oneOf [ JD.field "excludedPaths" (JD.list JD.string), JD.succeed [] ])
         |> JD.map Configuration
 
 

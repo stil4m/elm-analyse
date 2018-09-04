@@ -8,7 +8,7 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (Expression(..))
-import Elm.Syntax.Ranged exposing (Ranged)
+import Elm.Syntax.Node as Node exposing (Node(..))
 
 
 checker : Checker
@@ -37,10 +37,10 @@ scan fileContext _ =
         []
 
 
-onExpression : Ranged Expression -> Context -> Context
-onExpression ( range, expression ) context =
+onExpression : Node Expression -> Context -> Context
+onExpression (Node range expression) context =
     case expression of
-        QualifiedExpr moduleName f ->
+        FunctionOrValue moduleName f ->
             if entryForQualifiedExpr moduleName f then
                 (Data.init
                     (String.concat

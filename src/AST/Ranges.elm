@@ -24,7 +24,7 @@ emptyRange =
 
 locationToString : Location -> String
 locationToString { row, column } =
-    "(" ++ toString row ++ "," ++ toString column ++ ")"
+    "(" ++ String.fromInt row ++ "," ++ String.fromInt column ++ ")"
 
 
 {-| Checks if the second range is the overhauling range on the first range

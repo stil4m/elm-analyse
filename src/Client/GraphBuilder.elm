@@ -2,7 +2,7 @@ module Client.GraphBuilder exposing (run)
 
 import Analyser.Modules exposing (Modules)
 import Dict
-import Elm.Syntax.Base exposing (ModuleName)
+import Elm.Syntax.ModuleName exposing (ModuleName)
 import Graph exposing (Edge, Node)
 import ModuleGraph exposing (ModuleGraph)
 

@@ -1,7 +1,8 @@
 module Client.Routing exposing (Route(..), fromLocation, toUrl)
 
-import Navigation
-import UrlParser as Url
+import Browser.Navigation as Navigation
+import Url exposing (Url)
+import Url.Parser as Url
 
 
 type Route
@@ -27,9 +28,9 @@ parser =
         ]
 
 
-fromLocation : Navigation.Location -> Route
+fromLocation : Url -> Route
 fromLocation =
-    Url.parseHash parser >> Maybe.withDefault NotFound
+    Url.parse parser >> Maybe.withDefault NotFound
 
 
 toUrl : Route -> String

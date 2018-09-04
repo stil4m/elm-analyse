@@ -10,6 +10,7 @@ import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Interface as Interface
 import Elm.Syntax.Module exposing (Module(..))
+import Elm.Syntax.Node as Node
 import Elm.Syntax.Range as Syntax exposing (Range)
 import Tuple.Extra
 
@@ -64,7 +65,7 @@ forVariableType ( variableName, variableType, range ) =
 
 filterByModuleType : FileContext -> ( String, VariableType, Syntax.Range ) -> Bool
 filterByModuleType fileContext =
-    case fileContext.ast.moduleDefinition of
+    case Node.value fileContext.ast.moduleDefinition of
         EffectModule _ ->
             filterForEffectModule
 

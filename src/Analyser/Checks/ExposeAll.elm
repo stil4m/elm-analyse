@@ -10,6 +10,7 @@ import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Exposing exposing (Exposing(..))
 import Elm.Syntax.File exposing (File)
 import Elm.Syntax.Module
+import Elm.Syntax.Node as Node
 
 
 checker : Checker
@@ -33,14 +34,16 @@ type alias ExposeAllContext =
 scan : FileContext -> Configuration -> List MessageData
 scan fileContext _ =
     Inspector.inspect
-        { defaultConfig | onFile = Inner onFile }
+        { defaultConfig
+            | onFile = Inner onFile
+        }
         fileContext.ast
         []
 
 
 onFile : (ExposeAllContext -> ExposeAllContext) -> File -> ExposeAllContext -> ExposeAllContext
 onFile _ file _ =
-    case Elm.Syntax.Module.exposingList file.moduleDefinition of
+    case Elm.Syntax.Module.exposingList (Node.value file.moduleDefinition) of
         All x ->
             let
                 range =

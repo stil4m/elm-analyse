@@ -1,4 +1,4 @@
-module Analyser.Checks.DropConcatOfListsTests exposing (..)
+module Analyser.Checks.DropConcatOfListsTests exposing (all, concatMultiElementList, couldUseCons, noOptimisation)
 
 import Analyser.Checks.CheckTestUtil as CTU
 import Analyser.Checks.DropConcatOfLists as DropConcatOfLists

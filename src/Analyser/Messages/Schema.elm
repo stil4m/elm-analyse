@@ -64,30 +64,30 @@ viewPropertyType p =
 
 
 fileProp : String -> Schema -> Schema
-fileProp k (Schema schema) =
-    Schema (Dict.insert k FileName schema)
+fileProp k (Schema s) =
+    Schema (Dict.insert k FileName s)
 
 
 varProp : String -> Schema -> Schema
-varProp k (Schema schema) =
-    Schema (Dict.insert k VariableName schema)
+varProp k (Schema s) =
+    Schema (Dict.insert k VariableName s)
 
 
 rangeProp : String -> Schema -> Schema
-rangeProp k (Schema schema) =
-    Schema (Dict.insert k Range schema)
+rangeProp k (Schema s) =
+    Schema (Dict.insert k Range s)
 
 
 rangeListProp : String -> Schema -> Schema
-rangeListProp k (Schema schema) =
-    Schema (Dict.insert k RangeList schema)
+rangeListProp k (Schema s) =
+    Schema (Dict.insert k RangeList s)
 
 
 moduleProp : String -> Schema -> Schema
-moduleProp k (Schema schema) =
-    Schema (Dict.insert k ModuleName schema)
+moduleProp k (Schema s) =
+    Schema (Dict.insert k ModuleName s)
 
 
 errorProp : String -> Schema -> Schema
-errorProp k (Schema schema) =
-    Schema (Dict.insert k ErrorMessage schema)
+errorProp k (Schema s) =
+    Schema (Dict.insert k ErrorMessage s)

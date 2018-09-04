@@ -2,14 +2,12 @@ module Docs.MsgDoc exposing (allMessages, forKey, getMessage, view)
 
 import Analyser.Checks.Base exposing (Checker, CheckerInfo)
 import Analyser.Checks.BooleanCase
-import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.DebugCrash
 import Analyser.Checks.DebugLog
 import Analyser.Checks.DropConcatOfLists
 import Analyser.Checks.DropConsOfItemAndList
 import Analyser.Checks.DuplicateImport
 import Analyser.Checks.DuplicateImportedVariable
-import Analyser.Checks.DuplicateRecordFieldUpdate
 import Analyser.Checks.ExposeAll
 import Analyser.Checks.FileLoadFailed as FileLoadFailed
 import Analyser.Checks.FunctionInLet
@@ -18,8 +16,6 @@ import Analyser.Checks.MapNothingToNothing
 import Analyser.Checks.MultiLineRecordFormatting
 import Analyser.Checks.NoTopLevelSignature
 import Analyser.Checks.NoUncurriedPrefix
-import Analyser.Checks.NonStaticRegex
-import Analyser.Checks.OverriddenVariables
 import Analyser.Checks.SingleFieldRecord
 import Analyser.Checks.TriggerWords
 import Analyser.Checks.UnnecessaryListConcat
@@ -72,8 +68,6 @@ type alias MsgDoc =
 allMessages : List MsgDoc
 allMessages =
     [ functionInLet
-    , coreArrayUsage
-    , nonStaticRegex
     , unnecessaryPortModule
     , multiLineRecordFormatting
     , unnecessaryListConcat
@@ -100,7 +94,6 @@ allMessages =
     , unusedVariable
     , importAll
     , singleFieldRecord
-    , duplicateRecordFieldUpdate
     , triggerWords
     , mapNothingToNothing
     , unusedValueConstructor
@@ -181,22 +174,6 @@ thing x =
     }
 
 
-duplicateRecordFieldUpdate : MsgDoc
-duplicateRecordFieldUpdate =
-    { info = .info Analyser.Checks.DuplicateRecordFieldUpdate.checker
-    , example = Dynamic Analyser.Checks.DuplicateRecordFieldUpdate.checker
-    , input = """
-module Person exposing (Person, changeName)
-
-type alias Person = { name : String }
-
-changeName : Person -> Person
-changeName person =
-    { person | name = "John", name = "Jane" }
-"""
-    }
-
-
 functionInLet : MsgDoc
 functionInLet =
     { info = .info Analyser.Checks.FunctionInLet.checker
@@ -212,39 +189,6 @@ foo x =
             y + 1
     in
         somethingIShouldDefineOnTopLevel x
-"""
-    }
-
-
-coreArrayUsage : MsgDoc
-coreArrayUsage =
-    { info = .info CoreArrayUsage.checker
-    , example = Dynamic CoreArrayUsage.checker
-    , input = """
-port module Foo exposing (foo)
-
-import Array
-
-foo x =
-    Array.get 0 x
-"""
-    }
-
-
-nonStaticRegex : MsgDoc
-nonStaticRegex =
-    { info = .info Analyser.Checks.NonStaticRegex.checker
-    , example = Dynamic Analyser.Checks.NonStaticRegex.checker
-    , input = """
-port module Foo exposing (foo)
-
-import Regex
-
-foo x =
-    let
-        myInvalidRegex = Regex.regex "["
-    in
-        (myInvalidRegex, x)
 """
     }
 
@@ -387,24 +331,6 @@ module Foo exposing (main)
 hello : String
 hello =
     (++) "Hello " "World"
-"""
-    }
-
-
-redefineVariable : MsgDoc
-redefineVariable =
-    { info = .info Analyser.Checks.OverriddenVariables.checker
-    , example = Dynamic Analyser.Checks.OverriddenVariables.checker
-    , input = """
-module Foo exposing (main)
-
-foo : Maybe Int -> Int
-foo x =
-    case x of
-        Just x ->
-            x
-        Nothing ->
-            1
 """
     }
 
@@ -730,7 +656,7 @@ getMessage d =
                     M.newMessage (FileRef "abcdef01234567890" "./Foo.elm") checker.info.key mess
 
                 Nothing ->
-                    SafeDebug.crash "Something is wrong"
+                    SafeDebug.todo "Something is wrong"
 
 
 exampleMsgJson : Message -> Html msg

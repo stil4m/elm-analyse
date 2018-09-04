@@ -5,7 +5,7 @@ import Registry.Package as Package exposing (Package)
 
 
 type Registry
-    = Registry (Result String (List Package))
+    = Registry (Result JD.Error (List Package))
 
 
 lookup : String -> Registry -> Maybe Package

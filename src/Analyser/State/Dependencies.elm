@@ -4,7 +4,7 @@ import Analyser.Files.Json
 import Dict exposing (Dict)
 import Elm.Dependency exposing (Dependency)
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Extra exposing ((|:))
+import Json.Decode.Extra
 import Json.Encode as JE exposing (Value)
 import Registry exposing (Registry)
 import Registry.Package as Package exposing (Package)
@@ -26,9 +26,9 @@ type alias DependencyInfo =
 
 decode : Decoder Dependencies
 decode =
-    JD.succeed Dependencies
-        |: JD.field "values" (JD.dict decodeDependencyInfo)
-        |: JD.field "unused" (JD.list JD.string)
+    JD.map2 Dependencies
+        (JD.field "values" (JD.dict decodeDependencyInfo))
+        (JD.field "unused" (JD.list JD.string))
 
 
 encode : Dependencies -> Value
@@ -40,7 +40,7 @@ encode dependencies =
                 |> Dict.toList
                 |> JE.object
           )
-        , ( "unused", JE.list (List.map JE.string dependencies.unused) )
+        , ( "unused", JE.list JE.string dependencies.unused )
         ]
 
 
@@ -55,10 +55,10 @@ encodeDependencyInfo depInfo =
 
 decodeDependencyInfo : Decoder DependencyInfo
 decodeDependencyInfo =
-    JD.succeed DependencyInfo
-        |: JD.field "dependency" Analyser.Files.Json.decodeDependency
-        |: JD.field "versionState" decodeVersionState
-        |: JD.field "package" (JD.maybe Package.decode)
+    JD.map3 DependencyInfo
+        (JD.field "dependency" Analyser.Files.Json.decodeDependency)
+        (JD.field "versionState" decodeVersionState)
+        (JD.field "package" (JD.maybe Package.decode))
 
 
 encodeVersionState : VersionState -> Value
@@ -121,10 +121,10 @@ dependencyInfo dep registry =
 computeVersionState : Dependency -> Package -> VersionState
 computeVersionState dep pack =
     case Version.fromString dep.version of
-        Err _ ->
+        Nothing ->
             Unknown
 
-        Ok current ->
+        Just current ->
             case Package.newestVersion pack of
                 Nothing ->
                     Unknown

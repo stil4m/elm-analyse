@@ -24,9 +24,9 @@ fix input messageData =
             IncompatibleData
 
 
-commaAndIdentifierRegex : Regex.Regex
+commaAndIdentifierRegex : Maybe Regex.Regex
 commaAndIdentifierRegex =
-    Regex.regex ",\\s+[a-z][a-zA-Z0-9_]*'?\\s+:"
+    Regex.fromString ",\\s+[a-z][a-zA-Z0-9_]*'?\\s+:"
 
 
 replacement : Regex.Match -> String
@@ -34,9 +34,13 @@ replacement { match } =
     "\n " ++ match
 
 
+replacer : String -> String
+replacer =
+    commaAndIdentifierRegex
+        |> Maybe.map (\r -> Regex.replaceAtMost 1 r replacement)
+        |> Maybe.withDefault identity
+
+
 fixContent : Range -> String -> String
 fixContent range content =
-    content
-        |> FileContent.updateRange
-            range
-            (Regex.replace (Regex.AtMost 1) commaAndIdentifierRegex replacement)
+    FileContent.updateRange range replacer content

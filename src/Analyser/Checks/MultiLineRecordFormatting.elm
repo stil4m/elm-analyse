@@ -7,8 +7,8 @@ import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range as Syntax exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAlias exposing (TypeAlias)
 import Elm.Syntax.TypeAnnotation exposing (RecordDefinition, RecordField, TypeAnnotation(..))
 
@@ -62,30 +62,30 @@ fieldsOnSameLine ( left, right ) =
 firstTwo : RecordDefinition -> Maybe ( RecordField, RecordField )
 firstTwo def =
     case def of
-        x :: y :: _ ->
+        (Node _ x) :: (Node _ y) :: _ ->
             Just ( x, y )
 
         _ ->
             Nothing
 
 
-onTypeAlias : Ranged TypeAlias -> List ( Range, RecordDefinition ) -> List ( Range, RecordDefinition )
-onTypeAlias ( _, x ) context =
+onTypeAlias : Node TypeAlias -> List ( Range, RecordDefinition ) -> List ( Range, RecordDefinition )
+onTypeAlias (Node _ x) context =
     findRecords x.typeAnnotation ++ context
 
 
-typeAnnotationRange : Ranged TypeAnnotation -> Syntax.Range
-typeAnnotationRange ( r, _ ) =
+typeAnnotationRange : Node TypeAnnotation -> Syntax.Range
+typeAnnotationRange (Node r _) =
     r
 
 
-findRecords : Ranged TypeAnnotation -> List ( Range, RecordDefinition )
-findRecords ( r, x ) =
+findRecords : Node TypeAnnotation -> List ( Range, RecordDefinition )
+findRecords (Node r x) =
     case x of
         GenericType _ ->
             []
 
-        Typed _ _ args ->
+        Typed _ args ->
             List.concatMap findRecords args
 
         Unit ->
@@ -94,11 +94,11 @@ findRecords ( r, x ) =
         Tupled inner ->
             List.concatMap findRecords inner
 
-        Record fields ->
-            ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
-
         GenericRecord _ fields ->
-            ( r, fields ) :: List.concatMap (Tuple.second >> findRecords) fields
+            ( r, Node.value fields ) :: List.concatMap (Node.value >> Tuple.second >> findRecords) (Node.value fields)
+
+        Record fields ->
+            ( r, fields ) :: List.concatMap (Node.value >> Tuple.second >> findRecords) fields
 
         FunctionTypeAnnotation left right ->
             findRecords left ++ findRecords right
