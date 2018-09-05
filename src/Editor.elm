@@ -40,7 +40,7 @@ encodeEditorData editorData =
         [ ( "progress", Analyser.State.encodeStatus editorData.progress )
         , ( "files"
           , editorData.files
-                |> Dict.map (\_ v -> JE.list <| List.map encodeEditorMessage v)
+                |> Dict.map (\_ v -> JE.list encodeEditorMessage v)
                 |> Dict.toList
                 |> JE.object
           )
@@ -64,11 +64,11 @@ encodeEditorMessage editorMessage =
 
 encodePosition : EditorPosition -> JE.Value
 encodePosition ( ( sl, sc ), ( el, ec ) ) =
-    JE.list [ JE.list [ JE.int sl, JE.int sc ], JE.list [ JE.int el, JE.int ec ] ]
+    JE.list identity [ JE.list JE.int [ sl, sc ], JE.list JE.int [ el, ec ] ]
 
 
 type Msg
-    = OnState (Result String State)
+    = OnState (Result JD.Error State)
 
 
 type alias EditorPosition =
@@ -94,7 +94,7 @@ type alias EditorData =
 
 main : Program Flags Model Msg
 main =
-    Platform.programWithFlags
+    Platform.worker
         { init = init
         , update = update
         , subscriptions = subscriptions
