@@ -16,7 +16,7 @@
     "js:format": "sh ./prettier-run.sh",
     "elm:test": "./node_modules/.bin/elm-test",
     "elm:format": "./node_modules/.bin/elm-format --yes src/ tests/ docs/",
-    "elm:validate-format": "./node_modules/.bin/elm-format --validate src/ tests/ docs/",
+    "elm:validate-format": "./node_modules/.bin/elm-format --validate src/ tests/",
     "elm:lint": "node \"./js/bin/index.js\"",
     "elm:lint-server": "node \"./js/bin/index.js\" -s",
     "dev:docs": "elm-live --port=3002 --dir=docs docs/Docs/Main.elm --output docs/docs.js",
