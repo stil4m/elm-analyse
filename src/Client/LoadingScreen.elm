@@ -17,7 +17,7 @@ viewRemoteData rd f =
         RD.Failure e ->
             div []
                 [ text "Something went wrong"
-                , text <| toString e
+                , text <| Debug.toString e
                 ]
 
         RD.NotAsked ->

@@ -4,10 +4,10 @@ import Client.Routing as Routing
 import Html exposing (Html, a, button, div, form, i, li, nav, text, ul)
 import Html.Attributes exposing (attribute, class, href, style, type_)
 import Html.Events exposing (onClick)
-import Navigation exposing (Location)
+import Url exposing (Url)
 
 
-view : msg -> Location -> Html msg
+view : msg -> Url -> Html msg
 view refresh l =
     nav [ class "navbar navbar-default navbar-static-top", attribute "role" "navigation", style "margin-bottom" "0" ]
         [ div [ class "navbar-header" ]
@@ -35,7 +35,7 @@ view refresh l =
         ]
 
 
-isActiveClass : Location -> Routing.Route -> String
+isActiveClass : Url -> Routing.Route -> String
 isActiveClass l r =
     if Routing.fromLocation l == r then
         "active"
@@ -44,7 +44,7 @@ isActiveClass l r =
         ""
 
 
-menuItem : Location -> Routing.Route -> String -> String -> Html msg
+menuItem : Url -> Routing.Route -> String -> String -> Html msg
 menuItem location route name icon =
     li [ class (isActiveClass location route) ]
         [ a [ href (Routing.toUrl route) ]

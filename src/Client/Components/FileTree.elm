@@ -9,7 +9,7 @@ import Html.Attributes
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as JD
-import Navigation exposing (Location)
+import Url exposing (Url)
 
 
 type alias Model =
@@ -82,7 +82,7 @@ onNewState s model =
         |> updateMessageList
 
 
-update : Client.State.State -> Location -> Msg -> Model -> ( Model, Cmd Msg )
+update : Client.State.State -> Url -> Msg -> Model -> ( Model, Cmd Msg )
 update state location msg model =
     case msg of
         OnFileTree x ->
@@ -142,7 +142,7 @@ view m =
             Html.a
                 [ Html.Attributes.class "list-group-item", onClick (OnSelectFile fileName) ]
                 [ Html.span [ Html.Attributes.class "badge" ]
-                    [ Html.text <| toString (List.length messages) ]
+                    [ Html.text <| String.fromInt (List.length messages) ]
                 , Html.text fileName
                 ]
     in

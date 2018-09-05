@@ -9,7 +9,7 @@ elm-backend:
 	./node_modules/.bin/elm make src/Analyser.elm --output dist/app/backend-elm.js
 
 elm-client:
-	./node_modules/.bin/elm-make src/Client.elm --output dist/public/client-elm.js
+	./node_modules/.bin/elm make src/Client.elm --output dist/public/client-elm.js
 
 elm-docs:
 	./node_modules/.bin/elm make docs/Docs/Main.elm --output docs/docs.js

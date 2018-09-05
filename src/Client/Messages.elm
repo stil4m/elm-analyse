@@ -67,7 +67,7 @@ view tag n label message =
                 , style "vertical-align" "middle"
                 ]
                 [ strong []
-                    [ text <| (++) "#" <| toString <| n + 1 ]
+                    [ text <| (++) "#" <| String.fromInt <| n + 1 ]
                 ]
             , span [ style "display" "table-cell" ]
                 [ p [] [ strong [] [ text <| Maybe.withDefault label <| Dict.get label labelIndex ] ]

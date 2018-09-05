@@ -144,13 +144,13 @@ headerNameTd x =
             200
     in
     Html.th
-        [ Html.style "height" (toString height ++ "px")
+        [ Html.style "height" (String.fromInt height ++ "px")
         , Html.style "text-align" "left"
         , Html.style "whitespace" "nowrap"
         , Html.style "width" "30px"
         ]
         [ Html.div
-            [ Html.style "transform" ("rotate(-90deg) translate(" ++ toString (negate height + 40) ++ "px, 0px)")
+            [ Html.style "transform" ("rotate(-90deg) translate(" ++ String.fromInt (negate height + 40) ++ "px, 0px)")
             , Html.style "width" "30px"
             ]
             [ packageNameHtml x ]
@@ -193,7 +193,7 @@ packageContentTd from to relations selected =
             , Html.onClick (Select from to)
             ]
             [ Dict.get ( from, to ) relations
-                |> Maybe.map (List.length >> toString)
+                |> Maybe.map (List.length >> String.fromInt)
                 |> Maybe.withDefault ""
                 |> Html.text
             ]

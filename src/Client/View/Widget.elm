@@ -22,7 +22,7 @@ view category title icon value =
                         ]
                     , Html.div [ Html.class "col-xs-9 text-right" ]
                         [ Html.div [ Html.class "huge" ]
-                            [ Html.text (toString value) ]
+                            [ Html.text (Debug.toString value) ]
                         , Html.div []
                             [ Html.text title ]
                         ]

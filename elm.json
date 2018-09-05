@@ -22,6 +22,7 @@
             "elm-community/intdict": "3.0.0",
             "elm-community/json-extra": "4.0.0",
             "elm-community/list-extra": "8.0.0",
+            "elm-community/maybe-extra": "5.0.0",
             "elm-community/string-extra": "3.0.0",
             "elm-explorations/markdown": "1.0.0",
             "krisajenkins/remotedata": "5.0.0",

@@ -5,18 +5,19 @@ import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Messages.Data as Data
 import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
+import Browser.Events
+import Client.Dialog as Dialog exposing (Config)
 import Client.Highlight as Highlight
 import Client.Socket as Socket
-import Dialog exposing (Config)
 import Elm.Syntax.Range exposing (Range)
 import Html exposing (Html, button, div, h3, i, text)
 import Html.Attributes exposing (class, style)
 import Html.Events
 import Http exposing (Error)
-import Keyboard
-import Navigation exposing (Location)
+import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
-import WebSocket as WS
+import Url exposing (Url)
+import Url.Builder
 
 
 type alias Model =
@@ -47,7 +48,7 @@ show m _ =
     , Http.request
         { method = "GET"
         , headers = []
-        , url = "/file?file=" ++ (Http.encodeUri <| Messages.messageFile m)
+        , url = Url.Builder.absolute [ "file" ] [ Url.Builder.string "file" <| Messages.messageFile m ]
         , body = Http.emptyBody
         , expect = Http.expectString
         , timeout = Nothing
@@ -71,13 +72,13 @@ subscriptions : Model -> Sub Msg
 subscriptions x =
     case x of
         Just _ ->
-            Keyboard.downs ((==) 27 >> OnEscape)
+            Browser.Events.onKeyDown (JD.int |> JD.map ((==) 27) |> JD.map OnEscape)
 
         Nothing ->
             Sub.none
 
 
-update : Location -> Msg -> Model -> ( Model, Cmd Msg )
+update : Url -> Msg -> Model -> ( Model, Cmd Msg )
 update location msg model =
     case msg of
         Close ->
@@ -86,13 +87,16 @@ update location msg model =
         OnFile x ->
             model
                 |> Maybe.map (\y -> { y | codeBlock = RD.fromResult x })
-                |> (\a -> (\a b -> ( a, b )) a Cmd.none)
+                |> (\a -> ( a, Cmd.none ))
 
         Fix ->
             model
                 |> Maybe.map
                     (\y ->
-                        ( hide (Just y), WS.send (Socket.controlAddress location) ("fix:" ++ toString y.message.id) )
+                        ( hide (Just y)
+                        , Cmd.none
+                          -- , WS.send (Socket.controlAddress location) ("fix:" ++ toString y.message.id)
+                        )
                     )
                 |> Maybe.withDefault ( model, Cmd.none )
 

@@ -1,5 +1,7 @@
-module Client.App.App exposing (Model, Msg(..), init, subscriptions, update, view)
+module Client.App.App exposing (Model, Msg(..), init, main, subscriptions, update, view)
 
+import Browser exposing (UrlRequest)
+import Browser.Navigation
 import Client.App.Menu
 import Client.Components.FileTree as FileTree
 import Client.Dashboard as Dashboard
@@ -12,10 +14,20 @@ import Client.Socket exposing (controlAddress)
 import Client.State exposing (State)
 import Html exposing (div)
 import Html.Attributes exposing (id)
-import Navigation exposing (Location)
 import RemoteData
 import Time
-import WebSocket as WS
+import Url exposing (Url)
+
+
+main =
+    Browser.application
+        { init = init
+        , view = view
+        , update = update
+        , onUrlRequest = OnLocation
+        , onUrlChange = Browser.Internal >> OnLocation
+        , subscriptions = subscriptions
+        }
 
 
 type Msg
@@ -23,13 +35,13 @@ type Msg
     | FileTreeMsg FileTree.Msg
     | PackageDependenciesMsg PackageDependencies.Msg
     | Refresh
-    | OnLocation Location
+    | OnLocation UrlRequest
     | Tick
     | NewState State
 
 
 type alias Model =
-    { location : Location
+    { location : Url
     , content : Content
     , state : State
     }
@@ -49,7 +61,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Client.State.listen model.location |> Sub.map NewState
-        , Time.every (Time.second * 10) (always Tick)
+        , Time.every 10000 (always Tick)
         , case model.content of
             MessagesPageContent sub ->
                 MessagesPage.subscriptions sub |> Sub.map MessagesPageMsg
@@ -71,16 +83,18 @@ subscriptions model =
 
             NotFound ->
                 Sub.none
-        , WS.keepAlive (controlAddress model.location)
+        , Sub.none
+
+        -- , WS.keepAlive (controlAddress model.location)
         ]
 
 
-init : Location -> ( Model, Cmd Msg )
-init l =
+init : () -> Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
+init () l key =
     onLocation l { location = l, content = NotFound, state = RemoteData.Loading }
 
 
-onLocation : Location -> Model -> ( Model, Cmd Msg )
+onLocation : Url -> Model -> ( Model, Cmd Msg )
 onLocation l model =
     let
         route =
@@ -113,8 +127,17 @@ onLocation l model =
             ( { model | content = NotFound, location = l }, Cmd.none )
 
 
-view : Model -> Html.Html Msg
-view m =
+view : Model -> Browser.Document Msg
+view model =
+    { title = "Elm Analyse"
+    , body =
+        [ viewInner model
+        ]
+    }
+
+
+viewInner : Model -> Html.Html Msg
+viewInner m =
     div []
         [ Client.App.Menu.view Refresh m.location
         , div [ id "page-wrapper" ]
@@ -177,7 +200,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OnLocation l ->
-            onLocation l model
+            case l of
+                Browser.Internal i ->
+                    onLocation i model
+
+                Browser.External _ ->
+                    ( model, Cmd.none )
 
         Tick ->
             ( model
@@ -186,7 +214,8 @@ update msg model =
 
         Refresh ->
             ( model
-            , WS.send (controlAddress model.location) "reload"
+              -- , WS.send (controlAddress model.location) "reload"
+            , Cmd.none
             )
 
         MessagesPageMsg subMsg ->

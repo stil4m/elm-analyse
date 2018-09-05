@@ -37,7 +37,7 @@ viewDependency : List String -> DependencyInfo -> Html msg
 viewDependency unusedDeps depInfo =
     let
         newerDependencies =
-            case Result.toMaybe <| Version.fromString depInfo.dependency.version of
+            case Version.fromString depInfo.dependency.version of
                 Nothing ->
                     []
 

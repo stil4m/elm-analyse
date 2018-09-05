@@ -6,23 +6,24 @@ import Client.LoadingScreen as LoadingScreen
 import Client.Socket exposing (dashboardAddress)
 import Html exposing (Html)
 import Json.Decode as JD
-import Navigation exposing (Location)
 import RemoteData exposing (RemoteData)
-import WebSocket as WS
+import Url exposing (Url)
 
 
 type alias State =
     RemoteData String AS.State
 
 
-listen : Location -> Sub State
+listen : Url -> Sub State
 listen location =
-    WS.listen (dashboardAddress location) (JD.decodeString (AS.decodeState Analyser.Checks.schemas) >> RemoteData.fromResult)
+    -- WS.listen (dashboardAddress location) (JD.decodeString (AS.decodeState Analyser.Checks.schemas) >> RemoteData.fromResult)
+    Sub.none
 
 
-tick : Location -> Cmd msg
+tick : Url -> Cmd msg
 tick location =
-    WS.send (dashboardAddress location) "ping"
+    -- WS.send (dashboardAddress location) "ping"
+    Cmd.none
 
 
 toMaybe : State -> Maybe AS.State
