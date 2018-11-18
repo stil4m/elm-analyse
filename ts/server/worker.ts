@@ -4,18 +4,18 @@ import * as loggingPorts from '../util/logging-ports';
 import * as dependencies from '../util/dependencies';
 import { Config, ElmApp, Report } from '../domain';
 
-function run(config: Config, project : {}, onload: (app: ElmApp) => void) {
+function run(config: Config, project: {}, onload: (app: ElmApp) => void) {
     dependencies.getDependencies(function(registry) {
         const directory = process.cwd();
         var Elm = require('../backend-elm.js');
-        var app = Elm.Elm.Analyser.init({ flags : {
-            server: true,
-            registry: registry || []
+        var app = Elm.Elm.Analyser.init({
+            flags: {
+                server: true,
+                registry: registry || [],
 
-            ,
-
-            project: project
-        }});
+                project: project
+            }
+        });
 
         app.ports.sendReportValue.subscribe((report: Report) => {
             console.log('Found ' + report.messages.length + ' message(s)');

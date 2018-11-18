@@ -83,7 +83,7 @@ function gather(directory: string): { interfaceFiles: Array<string[]>; sourceFil
     // var interfaceFiles: Array<string[]> = dependencies.filter(x => exactDeps[x]).map(x => [x, exactDeps[x]]);
 
     // dependencies.filter(x => !exactDeps[x]).forEach(x => {
-        // console.log('WARN: Missing dependency `' + x + '`. Maybe run elm-package to update the dependencies.');
+    // console.log('WARN: Missing dependency `' + x + '`. Maybe run elm-package to update the dependencies.');
     // });
 
     const input = {

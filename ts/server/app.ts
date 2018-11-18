@@ -8,12 +8,12 @@ import worker from './worker';
 import watcher from './watcher';
 import control from './control';
 import Dashboard from './dashboard';
-import * as bodyParser from 'body-parser'
+import * as bodyParser from 'body-parser';
 
 const app = express();
 const expressWs = ExpressWs(app);
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 app.use(
     express.static(__dirname + '/../../public', {
         etag: false
@@ -48,9 +48,9 @@ function start(config: Config, info: Info, project: {}) {
         });
 
         app.post('/api/fix', (req, res) => {
-          const body : { id : number} = req.body;
-          elm.ports.onFixMessage.send(body.id);
-          res.send({});
+            const body: { id: number } = req.body;
+            elm.ports.onFixMessage.send(body.id);
+            res.send({});
         });
 
         app.get('/state', function(_req, res) {
@@ -65,8 +65,8 @@ function start(config: Config, info: Info, project: {}) {
             console.log('Listening on http://localhost:' + config.port);
         });
 
-        app.get('*',function(_req,res){
-            res.sendFile(path.resolve(`${__dirname}`,`../../public/index.html`));
+        app.get('*', function(_req, res) {
+            res.sendFile(path.resolve(`${__dirname}`, `../../public/index.html`));
         });
     });
 }

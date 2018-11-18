@@ -7,15 +7,17 @@ import Reporter from './reporter';
 const directory = process.cwd();
 const Elm = require('./backend-elm');
 
-function start(config: Config, project : {}) {
+function start(config: Config, project: {}) {
     const reporter = Reporter.build(config.format);
 
     dependencies.getDependencies(function(registry: Registry) {
-        const app: ElmApp = Elm.Elm.Analyser.init({ flags:{
-            server: false,
-            registry: registry,
-            project: project
-        }});
+        const app: ElmApp = Elm.Elm.Analyser.init({
+            flags: {
+                server: false,
+                registry: registry,
+                project: project
+            }
+        });
 
         app.ports.sendReportValue.subscribe(function(report: Report) {
             reporter.report(report);
