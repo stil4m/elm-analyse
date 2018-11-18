@@ -12,10 +12,14 @@ beforeHighlight rowsAround targetRows range =
             ( range.start.row, range.start.column )
 
         linesToDrop =
-            range.start.row - 1 - rowsAround
+            range.start.row
+                - 1
+                - rowsAround
+                |> Debug.log "Lines to drop"
 
         linesToKeep =
             min rowsAround (rowsAround + linesToDrop)
+                |> Debug.log "Lines to keep"
 
         uiStartRow =
             max 0 (startRow - 1 - rowsAround)
@@ -27,7 +31,7 @@ beforeHighlight rowsAround targetRows range =
 
         preLineText =
             targetRows
-                |> List.drop (linesToDrop + linesToKeep)
+                |> List.drop (range.start.row - 1)
                 |> List.head
                 |> Maybe.map (String.left <| startColumn - 1)
                 |> Maybe.map List.singleton
@@ -47,17 +51,17 @@ afterHighlight rowsAround targetRows range =
 
         postLines =
             targetRows
-                |> List.drop startRow
+                |> List.drop endRow
                 |> List.take rowsAround
 
         postLineText =
             targetRows
-                |> List.drop (startRow - 1)
+                |> List.drop (endRow - 1)
                 |> List.head
                 |> Maybe.map (String.dropLeft <| endColumn - 1)
                 |> Maybe.withDefault ""
     in
-    String.join "\n" (postLineText :: postLines)
+    String.join "\n" <| postLineText :: postLines
 
 
 highlightedString : Int -> List String -> Range -> String
@@ -107,27 +111,33 @@ highlightedString rowsAround targetRows range =
 
 highlightedPre : Int -> String -> Range -> Html msg
 highlightedPre rowsAround content range =
-    let
-        lines =
-            String.split "\n" content
+    if range == Elm.Syntax.Range.emptyRange then
+        pre []
+            [ text content
+            ]
 
-        ( startRow, endRow ) =
-            ( range.start.row, range.end.row )
+    else
+        let
+            lines =
+                String.split "\n" content
 
-        uiStartRow =
-            max 0 (startRow - rowsAround)
+            ( startRow, endRow ) =
+                ( range.start.row, range.end.row )
 
-        preText =
-            beforeHighlight rowsAround lines range
+            uiStartRow =
+                max 0 (startRow - rowsAround)
 
-        postText =
-            afterHighlight rowsAround lines range
+            preText =
+                beforeHighlight rowsAround lines range
 
-        highlighedSection =
-            highlightedString rowsAround lines range
-    in
-    pre []
-        [ text preText
-        , span [ id "highlight", style "color" "white", style "background" "red" ] [ text highlighedSection ]
-        , text postText
-        ]
+            postText =
+                afterHighlight rowsAround lines range
+
+            highlighedSection =
+                highlightedString rowsAround lines range
+        in
+        pre []
+            [ text preText
+            , span [ id "highlight", style "color" "white", style "background" "red" ] [ text highlighedSection ]
+            , text postText
+            ]

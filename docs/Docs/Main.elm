@@ -1,5 +1,6 @@
 module Docs.Main exposing (main)
 
+import Bootstrap.Navbar
 import Browser exposing (Document)
 import Browser.Navigation as Browser
 import Docs.Changelog as Changelog
@@ -33,7 +34,7 @@ type alias Flags =
 type Msg
     = OnLocation Url
     | OnUrlRequest Browser.UrlRequest
-    | MenuMsg ()
+    | MenuMsg Bootstrap.Navbar.State
     | ChangelogMsg Changelog.Msg
 
 
@@ -49,7 +50,7 @@ type Content
 
 type alias Model =
     { page : Page
-    , menu : ()
+    , menu : Bootstrap.Navbar.State
     , key : Browser.Key
     , content : Content
     }
@@ -59,7 +60,7 @@ init : Flags -> Url -> Browser.Key -> ( Model, Cmd Msg )
 init () location key =
     let
         ( menu, menuCmds ) =
-            ( (), Cmd.none )
+            Bootstrap.Navbar.initialState MenuMsg
 
         page =
             Page.nextPage location
@@ -120,10 +121,19 @@ update msg model =
         OnUrlRequest r ->
             case r of
                 Browser.Internal u ->
-                    init () u model.key
+                    let
+                        ( m, cmds ) =
+                            init () u model.key
+                    in
+                    ( m
+                    , Cmd.batch
+                        [ cmds
+                        , Browser.pushUrl model.key (Url.toString u)
+                        ]
+                    )
 
-                _ ->
-                    ( model, Cmd.none )
+                Browser.External d ->
+                    ( model, Browser.load d )
 
         OnLocation location ->
             init () location model.key

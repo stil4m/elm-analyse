@@ -558,20 +558,22 @@ sortedMessages =
 
 messagesMenu : Maybe MsgDoc -> Html msg
 messagesMenu y =
-    sortedMessages
-        |> List.map
-            (\x ->
-                if Just x == y then
-                    Html.li [ Html.Attributes.class "list-group-item active" ]
-                        [ Html.text x.info.name
-                        ]
+    let
+        mapMessage : MsgDoc -> Html msg
+        mapMessage x =
+            if Just x.info.key == Maybe.map (.info >> .key) y then
+                Html.li [ Html.Attributes.class "list-group-item active" ]
+                    [ Html.text x.info.name
+                    ]
 
-                else
-                    Html.li [ Html.Attributes.class "list-group-item" ]
-                        [ Html.a [ Html.Attributes.href (Page.hash (Messages (Just x.info.key))) ]
-                            [ Html.text x.info.name ]
-                        ]
-            )
+            else
+                Html.li [ Html.Attributes.class "list-group-item" ]
+                    [ Html.a [ Html.Attributes.href (Page.hash (Messages (Just x.info.key))) ]
+                        [ Html.text x.info.name ]
+                    ]
+    in
+    sortedMessages
+        |> List.map mapMessage
         |> Html.ul [ Html.Attributes.class "list-group" ]
 
 
