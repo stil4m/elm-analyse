@@ -1,4 +1,4 @@
-module Client.Components.ActiveMessageDialog exposing (Model, Msg, init, show, subscriptions, update, view)
+module Client.Components.ActiveMessageDialog exposing (Model, Msg, init, show, update, view)
 
 import Analyser.Fixers as Fixers
 import Analyser.Fixes.Base exposing (Fixer)
@@ -37,7 +37,6 @@ type Msg
     = Close
     | OnFile (Result Error String)
     | Fix
-    | OnEscape Bool
 
 
 show : Message -> Model -> ( Model, Cmd Msg )
@@ -71,16 +70,6 @@ init =
     Nothing
 
 
-subscriptions : Model -> Sub Msg
-subscriptions x =
-    case x of
-        Just _ ->
-            Browser.Events.onKeyDown (JD.int |> JD.map ((==) 27) |> JD.map OnEscape)
-
-        Nothing ->
-            Sub.none
-
-
 update : Url -> Msg -> Model -> ( Model, Cmd Msg )
 update location msg model =
     case msg of
@@ -102,13 +91,6 @@ update location msg model =
                         )
                     )
                 |> Maybe.withDefault ( model, Cmd.none )
-
-        OnEscape x ->
-            if x then
-                ( hide model, Cmd.none )
-
-            else
-                ( model, Cmd.none )
 
 
 view : Model -> Html Msg

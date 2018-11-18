@@ -60,30 +60,7 @@ type Content
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch
-        [ Time.every 1000 (always Tick)
-        , case model.content of
-            MessagesPageContent sub ->
-                MessagesPage.subscriptions sub |> Sub.map MessagesPageMsg
-
-            GraphContent _ ->
-                Sub.none
-
-            FileTreeContent sub ->
-                FileTree.subscriptions sub |> Sub.map FileTreeMsg
-
-            PackageDependenciesContent _ ->
-                Sub.none
-
-            DashboardContent ->
-                Sub.none
-
-            DependenciesPageContent ->
-                Sub.none
-
-            NotFound ->
-                Sub.none
-        ]
+    Time.every 1000 (always Tick)
 
 
 init : () -> Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )

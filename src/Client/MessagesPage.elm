@@ -1,4 +1,4 @@
-module Client.MessagesPage exposing (Model, Msg, init, onNewState, subscriptions, update, view)
+module Client.MessagesPage exposing (Model, Msg, init, onNewState, update, view)
 
 import Analyser.Messages.Grouped as Grouped exposing (GroupedMessages)
 import Client.Components.MessageList as MessageList
@@ -25,11 +25,6 @@ type Msg
 type MessageGrouper
     = GroupByFileName
     | GroupByType
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    MessageList.subscriptions model.messageList |> Sub.map MessageListMsg
 
 
 init : State -> Model

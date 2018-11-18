@@ -1,4 +1,4 @@
-module Client.Components.MessageList exposing (Model, Msg, init, subscriptions, update, view, withMessages)
+module Client.Components.MessageList exposing (Model, Msg, init, update, view, withMessages)
 
 import Analyser.Messages.Grouped as Grouped exposing (GroupedMessages)
 import Analyser.Messages.Types exposing (Message)
@@ -54,8 +54,3 @@ view model =
             M.viewAll Focus model.messages
         , ActiveMessageDialog.view model.active |> Html.map ActiveMessageDialogMsg
         ]
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    ActiveMessageDialog.subscriptions model.active |> Sub.map ActiveMessageDialogMsg

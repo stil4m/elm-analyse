@@ -1,4 +1,4 @@
-module Client.Components.FileTree exposing (Model, Msg, init, onNewState, subscriptions, update, view)
+module Client.Components.FileTree exposing (Model, Msg, init, onNewState, update, view)
 
 import Analyser.Messages.Grouped as Grouped exposing (GroupedMessages)
 import Analyser.Messages.Types exposing (Message)
@@ -44,11 +44,6 @@ init =
         [ Http.get "/tree" (JD.list JD.string) |> Http.send OnFileTree
         ]
     )
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    MessageList.subscriptions model.messageList |> Sub.map MessageListMsg
 
 
 updateFileIndex : Maybe (List Message) -> Model -> Model
