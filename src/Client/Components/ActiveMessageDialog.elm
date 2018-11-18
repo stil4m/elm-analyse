@@ -5,17 +5,14 @@ import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Messages.Data as Data
 import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
-import Browser.Events
-import Client.Dialog as Dialog exposing (Config)
 import Client.Highlight as Highlight
-import Client.Socket as Socket
 import Client.State
+import Dialog exposing (Config)
 import Elm.Syntax.Range exposing (Range)
 import Html exposing (Html, button, div, h3, i, text)
 import Html.Attributes exposing (class, style)
 import Html.Events
 import Http exposing (Error)
-import Json.Decode as JD
 import RemoteData as RD exposing (RemoteData)
 import Url exposing (Url)
 import Url.Builder
@@ -75,7 +72,7 @@ type Info
 
 
 update : Url -> Msg -> Model -> ( Model, Cmd Msg, Maybe Info )
-update location msg model =
+update _ msg model =
     case msg of
         Close ->
             ( hide model, Cmd.none, Nothing )

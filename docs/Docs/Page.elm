@@ -1,9 +1,7 @@
 module Docs.Page exposing (Page(..), hash, nextPage)
 
-import Browser.Navigation
-import String.Extra
 import Url exposing (Url)
-import Url.Parser as Url exposing ((</>), Parser, fragment)
+import Url.Parser as Url exposing (Parser, fragment)
 
 
 type Page

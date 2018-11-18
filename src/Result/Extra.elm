@@ -14,8 +14,8 @@ merge r =
 isOk : Result a b -> Bool
 isOk r =
     case r of
-        Ok b ->
+        Ok _ ->
             True
 
-        Err a ->
+        Err _ ->
             False

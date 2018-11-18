@@ -75,7 +75,7 @@ onImport (Node range imp) context =
     in
     case Dict.get moduleName context of
         Just _ ->
-            Dict.update moduleName (Maybe.map (\a -> (++) a [ range ])) context
+            Dict.update moduleName (Maybe.map (\a -> a ++ [ range ])) context
 
         Nothing ->
             Dict.insert moduleName [ range ] context

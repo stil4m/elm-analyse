@@ -1,7 +1,6 @@
 module Registry.Version exposing (Version, asString, decode, encode, fromString, isMajorUpgrade, order)
 
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Extra
 import Json.Encode as JE exposing (Value)
 
 

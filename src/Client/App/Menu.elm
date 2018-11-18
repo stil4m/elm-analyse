@@ -1,9 +1,8 @@
 module Client.App.Menu exposing (view)
 
-import Browser.Navigation exposing (Key)
 import Client.Routing as Routing exposing (Route)
-import Html exposing (Html, a, button, div, form, i, li, nav, text, ul)
-import Html.Attributes exposing (attribute, class, href, style, type_)
+import Html exposing (Html, a, div, i, li, nav, text, ul)
+import Html.Attributes exposing (attribute, class, href, style)
 import Html.Events exposing (onClick)
 import Url exposing (Url)
 

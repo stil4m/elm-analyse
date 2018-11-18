@@ -1,7 +1,6 @@
 module Analyser.DependencyLoadingStage exposing (Model, Msg, getDependencies, init, isDone, subscriptions, update)
 
 import Analyser.Files.DependencyLoader as DependencyLoader
-import Analyser.Files.Types exposing (Version)
 import Dict exposing (Dict)
 import Elm.Constraint
 import Elm.Dependency exposing (Dependency)

@@ -71,7 +71,7 @@ buildMessageData ( varName, range ) =
 onExpression : Node Expression -> Context -> Context
 onExpression (Node _ e) config =
     case e of
-        FunctionOrValue m s ->
+        FunctionOrValue _ s ->
             { config | usedFunctions = Set.insert s config.usedFunctions }
 
         _ ->

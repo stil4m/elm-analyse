@@ -4,7 +4,6 @@ import Analyser.Checks
 import Analyser.Messages.Types exposing (Message)
 import Analyser.State as AS
 import Client.LoadingScreen as LoadingScreen
-import Client.Socket exposing (dashboardAddress)
 import Html exposing (Html)
 import Http
 import Json.Decode as JD
@@ -30,7 +29,7 @@ refresh =
 
 
 tick : Url -> Cmd State
-tick location =
+tick _ =
     Http.get "/state" (AS.decodeState Analyser.Checks.schemas)
         |> Http.send identity
         |> Cmd.map RemoteData.fromResult

@@ -33,7 +33,7 @@ fix input messageData =
 removeImport : ( String, File ) -> Range -> Patch
 removeImport ( content, ast ) range =
     case Imports.findImportWithRange ast range of
-        Just (Node r imp) ->
+        Just (Node r _) ->
             Patched (FileContent.replaceRangeWith r "" content)
 
         Nothing ->

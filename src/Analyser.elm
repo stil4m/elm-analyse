@@ -46,7 +46,6 @@ type Msg
     | Reset
     | OnFixMessage Int
     | FixerMsg Fixer.Msg
-    | NoOp
 
 
 type Stage
@@ -223,9 +222,6 @@ update msg model =
                   }
                 , Logger.info ("File was removed: '" ++ x ++ "'. Removing known messages.")
                 )
-
-        NoOp ->
-            ( model, Logger.info "NoOp" )
 
 
 onFixerMsg : Fixer.Msg -> Fixer.Model -> Model -> ( Model, Cmd Msg )

@@ -5,7 +5,6 @@ import Elm.Syntax.Expression exposing (Case, Expression(..), Function, Lambda, L
 import Elm.Syntax.File exposing (File)
 import Elm.Syntax.Import exposing (Import)
 import Elm.Syntax.Infix exposing (InfixDirection)
-import Elm.Syntax.Module
 import Elm.Syntax.ModuleName exposing (ModuleName)
 import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Pattern exposing (Pattern(..))
@@ -33,7 +32,13 @@ type alias Config context =
     , onType : Order context Type
     , onDestructuring : Order context ( Node Pattern, Node Expression )
     , onExpression : Order context (Node Expression)
-    , onOperatorApplication : Order context { operator : String, direction : InfixDirection, left : Node Expression, right : Node Expression }
+    , onOperatorApplication :
+        Order context
+            { operator : String
+            , direction : InfixDirection
+            , left : Node Expression
+            , right : Node Expression
+            }
     , onTypeAnnotation : Order context (Node TypeAnnotation)
     , onLambda : Order context Lambda
     , onLetBlock : Order context LetBlock
@@ -160,7 +165,7 @@ inspectType config typeDecl context =
 
 
 inspectValueConstructor : Config context -> Node ValueConstructor -> context -> context
-inspectValueConstructor config (Node r valueConstructor) context =
+inspectValueConstructor config (Node _ valueConstructor) context =
     List.foldl (inspectTypeAnnotation config) context valueConstructor.arguments
 
 

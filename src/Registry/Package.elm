@@ -1,7 +1,6 @@
 module Registry.Package exposing (Package, decode, encode, newestVersion)
 
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Extra
 import Json.Encode as JE exposing (Value)
 import List.Extra
 import Registry.Version as Version exposing (Version)

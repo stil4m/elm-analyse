@@ -11,7 +11,7 @@ import Elm.Interface as Interface exposing (Interface)
 import Elm.RawFile exposing (RawFile)
 import Elm.Syntax.Infix exposing (Infix)
 import Elm.Syntax.ModuleName exposing (ModuleName)
-import Elm.Syntax.Node as Node exposing (Node(..))
+import Elm.Syntax.Node exposing (Node(..))
 import Elm.Syntax.Range exposing (emptyRange)
 import Json.Decode as JD exposing (Value)
 import Parser

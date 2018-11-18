@@ -228,7 +228,7 @@ onPrefixOperator prefixOperator context =
 
 
 onRecordUpdate : ( Node String, List (Node RecordSetter) ) -> UsedVariableContext -> UsedVariableContext
-onRecordUpdate ( Node _ name, recordUpdate ) context =
+onRecordUpdate ( Node _ name, _ ) context =
     addUsedVariable name context
 
 

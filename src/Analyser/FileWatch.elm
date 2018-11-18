@@ -1,7 +1,5 @@
 port module Analyser.FileWatch exposing (FileChange(..), watcher)
 
-import Debug as SafeDebug
-
 
 port fileWatch : (RawFileChange -> msg) -> Sub msg
 

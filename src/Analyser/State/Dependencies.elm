@@ -4,7 +4,6 @@ import Analyser.Files.Json
 import Dict exposing (Dict)
 import Elm.Dependency exposing (Dependency)
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Extra
 import Json.Encode as JE exposing (Value)
 import Registry exposing (Registry)
 import Registry.Package as Package exposing (Package)

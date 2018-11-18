@@ -2,7 +2,6 @@ module Analyser.Configuration exposing (Configuration, checkEnabled, checkProper
 
 import Dict exposing (Dict)
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Extra
 
 
 type Configuration

@@ -10,7 +10,6 @@ import Client.Graph.Graph as Graph
 import Client.Graph.PackageDependencies as PackageDependencies
 import Client.MessagesPage as MessagesPage
 import Client.Routing as Routing exposing (Route)
-import Client.Socket exposing (controlAddress)
 import Client.State exposing (State)
 import Html exposing (div)
 import Html.Attributes exposing (id)
@@ -19,6 +18,7 @@ import Time
 import Url exposing (Url)
 
 
+main : Program () Model Msg
 main =
     Browser.application
         { init = init
@@ -59,7 +59,7 @@ type Content
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Time.every 1000 (always Tick)
 
 

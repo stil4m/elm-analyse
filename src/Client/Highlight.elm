@@ -8,21 +8,14 @@ import Html.Attributes exposing (id, style)
 beforeHighlight : Int -> List String -> Range -> String
 beforeHighlight rowsAround targetRows range =
     let
-        ( startRow, startColumn ) =
-            ( range.start.row, range.start.column )
+        startColumn =
+            range.start.column
 
         linesToDrop =
-            range.start.row
-                - 1
-                - rowsAround
-                |> Debug.log "Lines to drop"
+            range.start.row - 1 - rowsAround
 
         linesToKeep =
             min rowsAround (rowsAround + linesToDrop)
-                |> Debug.log "Lines to keep"
-
-        uiStartRow =
-            max 0 (startRow - 1 - rowsAround)
 
         preLines =
             targetRows
@@ -43,11 +36,8 @@ beforeHighlight rowsAround targetRows range =
 afterHighlight : Int -> List String -> Range -> String
 afterHighlight rowsAround targetRows range =
     let
-        ( startRow, endRow, endColumn ) =
+        ( _, endRow, endColumn ) =
             ( range.start.row, range.end.row, range.end.column )
-
-        uiStartRow =
-            max 0 (startRow + rowsAround)
 
         postLines =
             targetRows
@@ -64,8 +54,8 @@ afterHighlight rowsAround targetRows range =
     String.join "\n" <| postLineText :: postLines
 
 
-highlightedString : Int -> List String -> Range -> String
-highlightedString rowsAround targetRows range =
+highlightedString : List String -> Range -> String
+highlightedString targetRows range =
     let
         isMultiRow =
             range.start.row /= range.end.row
@@ -121,11 +111,8 @@ highlightedPre rowsAround content range =
             lines =
                 String.split "\n" content
 
-            ( startRow, endRow ) =
+            _ =
                 ( range.start.row, range.end.row )
-
-            uiStartRow =
-                max 0 (startRow - rowsAround)
 
             preText =
                 beforeHighlight rowsAround lines range
@@ -134,7 +121,7 @@ highlightedPre rowsAround content range =
                 afterHighlight rowsAround lines range
 
             highlighedSection =
-                highlightedString rowsAround lines range
+                highlightedString lines range
         in
         pre []
             [ text preText

@@ -3,7 +3,6 @@ module Analyser.FileContext exposing (FileContext, build, moduleName)
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.FileRef exposing (FileRef)
 import Analyser.Files.Types exposing (LoadedSourceFile)
-import Debug as SafeDebug
 import Elm.Interface as Interface exposing (Interface)
 import Elm.Processing as Processing exposing (ProcessContext)
 import Elm.RawFile as RawFile exposing (RawFile)

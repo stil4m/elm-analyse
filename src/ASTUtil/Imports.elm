@@ -137,7 +137,7 @@ stringifyExposedType { name, open } =
                 Nothing ->
                     ""
 
-                Just r ->
+                Just _ ->
                     "(..)"
            )
 

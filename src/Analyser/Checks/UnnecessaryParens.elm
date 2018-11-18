@@ -8,7 +8,6 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression as Expression exposing (CaseBlock, Expression(..), Function, Lambda, RecordSetter)
-import Elm.Syntax.Infix exposing (InfixDirection)
 import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range as Syntax exposing (Range)
 import List.Extra as List
@@ -85,7 +84,7 @@ onExpression (Node range expression) context =
         ParenthesizedExpression inner ->
             onParenthesizedExpression range inner context
 
-        OperatorApplication op dir left right ->
+        OperatorApplication _ _ left right ->
             onOperatorApplication left right context
 
         Application parts ->
@@ -100,7 +99,7 @@ onExpression (Node range expression) context =
         RecordExpr parts ->
             onRecord parts context
 
-        RecordUpdateExpression name updates ->
+        RecordUpdateExpression _ updates ->
             onRecord updates context
 
         TupledExpression x ->
@@ -117,14 +116,14 @@ onListExpr : List (Node Expression) -> Context -> Context
 onListExpr exprs context =
     List.filterMap getParenthesized exprs
         |> List.map Tuple.first
-        |> (\a -> (++) a context)
+        |> (\a -> a ++ context)
 
 
 onTuple : List (Node Expression) -> Context -> Context
 onTuple exprs context =
     List.filterMap getParenthesized exprs
         |> List.map Tuple.first
-        |> (\a -> (++) a context)
+        |> (\a -> a ++ context)
 
 
 onRecord : List (Node RecordSetter) -> Context -> Context
@@ -132,7 +131,7 @@ onRecord setters context =
     setters
         |> List.filterMap (Node.value >> Tuple.second >> getParenthesized)
         |> List.map Tuple.first
-        |> (\a -> (++) a context)
+        |> (\a -> a ++ context)
 
 
 onCaseBlock : CaseBlock -> Context -> Context
@@ -150,7 +149,7 @@ onIfBlock clause thenBranch elseBranch context =
     [ clause, thenBranch, elseBranch ]
         |> List.filterMap getParenthesized
         |> List.map Tuple.first
-        |> (\a -> (++) a context)
+        |> (\a -> a ++ context)
 
 
 onApplication : List (Node Expression) -> Context -> Context
@@ -160,7 +159,7 @@ onApplication parts context =
         |> Maybe.filter (Tuple.second >> Node.value >> Expression.isOperatorApplication >> not)
         |> Maybe.filter (Tuple.second >> Node.value >> Expression.isCase >> not)
         |> Maybe.map Tuple.first
-        |> Maybe.map (\a -> (::) a context)
+        |> Maybe.map (\a -> a :: context)
         |> Maybe.withDefault context
 
 
@@ -177,7 +176,7 @@ onOperatorApplication left right context =
     , fixHandSide right
     ]
         |> List.filterMap identity
-        |> (\a -> (++) a context)
+        |> (\a -> a ++ context)
 
 
 operatorHandSideAllowedParens : Node Expression -> Bool
