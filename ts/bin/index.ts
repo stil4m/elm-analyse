@@ -68,10 +68,11 @@ var args = minimist(process.argv.slice(2), {
         process.exit(1);
     }
 
-    
+    const projectFile = JSON.parse(fs.readFileSync("./elm.json").toString());
+
     if (args.serve) {
-        Server.start(config, info);
+        Server.start(config, info, projectFile);
         return;
     }
-    Analyser.start(config);
+    Analyser.start(config, projectFile);
 })();

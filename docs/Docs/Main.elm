@@ -118,7 +118,7 @@ update msg model =
             )
 
         OnUrlRequest r ->
-            case Debug.log "R" r of
+            case r of
                 Browser.Internal u ->
                     init () u model.key
 
@@ -126,7 +126,7 @@ update msg model =
                     ( model, Cmd.none )
 
         OnLocation location ->
-            init () (Debug.log "X" location) model.key
+            init () location model.key
 
         ChangelogMsg x ->
             case model.content of

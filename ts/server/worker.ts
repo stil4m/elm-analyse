@@ -4,7 +4,7 @@ import * as loggingPorts from '../util/logging-ports';
 import * as dependencies from '../util/dependencies';
 import { Config, ElmApp, Report } from '../domain';
 
-function run(config: Config, onload: (app: ElmApp) => void) {
+function run(config: Config, project : {}, onload: (app: ElmApp) => void) {
     dependencies.getDependencies(function(registry) {
         const directory = process.cwd();
         var Elm = require('../backend-elm.js');
@@ -13,8 +13,8 @@ function run(config: Config, onload: (app: ElmApp) => void) {
             registry: registry || []
 
             ,
-            //TODO
-            project: require('/Users/matstijl/development/repositories/github/stil4m/elm-analyse/elm.json')
+
+            project: project
         }});
 
         app.ports.sendReportValue.subscribe((report: Report) => {

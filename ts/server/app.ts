@@ -17,11 +17,11 @@ app.use(
     })
 );
 
-function start(config: Config, info: Info) {
+function start(config: Config, info: Info, project: {}) {
     console.log('Elm Analyser server starting with config:');
     console.log(config);
 
-    worker.run(config, function(elm: ElmApp) {
+    worker.run(config, project, function(elm: ElmApp) {
         const dashboard = Dashboard.run(app, elm, expressWs);
 
         watcher.run(elm);
