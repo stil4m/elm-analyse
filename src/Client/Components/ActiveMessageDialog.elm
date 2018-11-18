@@ -1,4 +1,4 @@
-module Client.Components.ActiveMessageDialog exposing (Model, Msg, init, show, update, view)
+module Client.Components.ActiveMessageDialog exposing (Info(..), Model, Msg, init, show, update, view)
 
 import Analyser.Fixers as Fixers
 import Analyser.Fixes.Base exposing (Fixer)
@@ -70,16 +70,20 @@ init =
     Nothing
 
 
-update : Url -> Msg -> Model -> ( Model, Cmd Msg )
+type Info
+    = Fixed Message
+
+
+update : Url -> Msg -> Model -> ( Model, Cmd Msg, Maybe Info )
 update location msg model =
     case msg of
         Close ->
-            ( hide model, Cmd.none )
+            ( hide model, Cmd.none, Nothing )
 
         OnFile x ->
             model
                 |> Maybe.map (\y -> { y | codeBlock = RD.fromResult x })
-                |> (\a -> ( a, Cmd.none ))
+                |> (\a -> ( a, Cmd.none, Nothing ))
 
         Fix ->
             model
@@ -88,9 +92,10 @@ update location msg model =
                         ( Just { y | fixing = True }
                         , Client.State.fix y.message
                             |> Cmd.map (always Close)
+                        , Just (Fixed y.message)
                         )
                     )
-                |> Maybe.withDefault ( model, Cmd.none )
+                |> Maybe.withDefault ( model, Cmd.none, Nothing )
 
 
 view : Model -> Html Msg

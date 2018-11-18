@@ -1,7 +1,7 @@
 module ASTUtil.Functions exposing (isStatic)
 
 import Elm.Syntax.Expression exposing (Function)
-import Elm.Syntax.Node as Node exposing (Node)
+import Elm.Syntax.Node as Node
 import Elm.Syntax.Signature exposing (Signature)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
 

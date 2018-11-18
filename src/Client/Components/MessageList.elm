@@ -39,9 +39,21 @@ update location msg model =
                 |> Tuple.mapSecond (Cmd.map ActiveMessageDialogMsg)
 
         ActiveMessageDialogMsg subMsg ->
-            ActiveMessageDialog.update location subMsg model.active
-                |> Tuple.mapFirst (\x -> { model | active = x })
-                |> Tuple.mapSecond (Cmd.map ActiveMessageDialogMsg)
+            let
+                ( newActiveDialog, cmds, info ) =
+                    ActiveMessageDialog.update location subMsg model.active
+
+                newMessages =
+                    case info of
+                        Just (ActiveMessageDialog.Fixed m) ->
+                            Grouped.markFixed m model.messages
+
+                        Nothing ->
+                            model.messages
+            in
+            ( { model | active = newActiveDialog, messages = newMessages }
+            , Cmd.map ActiveMessageDialogMsg cmds
+            )
 
 
 view : Model -> Html Msg

@@ -1,8 +1,7 @@
 module Docs.Menu exposing (menu)
 
-import Docs.Page as Page exposing (Page(..))
+import Docs.Page exposing (Page(..))
 import Html exposing (text)
-import Html.Attributes exposing (href)
 
 
 menu : (a -> msg) -> a -> Html.Html msg
