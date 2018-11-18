@@ -32,6 +32,7 @@
             "avh4/elm-color": "1.0.0",
             "avh4/elm-fifo": "1.0.4",
             "elm/virtual-dom": "1.0.0",
+            "elm-community/json-extra": "4.0.0",
             "etaque/elm-response": "3.1.0",
             "rtfeldman/elm-hex": "1.0.0",
             "rtfeldman/elm-iso8601-date-strings": "1.1.2",
