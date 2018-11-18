@@ -8,19 +8,13 @@ import Html.Events exposing (onClick)
 import Url exposing (Url)
 
 
-view : msg -> Url -> Html (Result Route msg)
-view refresh l =
+view : Url -> Html (Result Route msg)
+view l =
     nav [ class "navbar navbar-default navbar-static-top", attribute "role" "navigation", style "margin-bottom" "0" ]
         [ div [ class "navbar-header" ]
             [ a
                 [ class "navbar-brand", href "/" ]
                 [ text "Elm Analyse" ]
-            , form
-                [ class "navbar-form navbar-right" ]
-                [ button
-                    [ type_ "button", class "btn btn-default", onClick (Ok refresh) ]
-                    [ text "Re-analyse" ]
-                ]
             ]
         , div [ class "navbar-default sidebar", attribute "role" "navigation" ]
             [ div [ class "sidebar-nav" ]

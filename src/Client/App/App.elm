@@ -34,7 +34,6 @@ type Msg
     = MessagesPageMsg MessagesPage.Msg
     | FileTreeMsg FileTree.Msg
     | PackageDependenciesMsg PackageDependencies.Msg
-    | Refresh
     | OnLocation UrlRequest
     | Tick
     | NewState State
@@ -137,7 +136,7 @@ view model =
 viewInner : Model -> Html.Html Msg
 viewInner m =
     div []
-        [ Client.App.Menu.view Refresh m.location
+        [ Client.App.Menu.view m.location
             |> Html.map
                 (\v ->
                     case v of
@@ -221,11 +220,6 @@ update msg model =
             ( model
             , Client.State.tick model.location
                 |> Cmd.map NewState
-            )
-
-        Refresh ->
-            ( model
-            , Client.State.refresh |> Cmd.map (always Tick)
             )
 
         MessagesPageMsg subMsg ->

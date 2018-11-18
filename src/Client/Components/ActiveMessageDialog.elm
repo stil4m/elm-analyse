@@ -9,6 +9,7 @@ import Browser.Events
 import Client.Dialog as Dialog exposing (Config)
 import Client.Highlight as Highlight
 import Client.Socket as Socket
+import Client.State
 import Elm.Syntax.Range exposing (Range)
 import Html exposing (Html, button, div, h3, i, text)
 import Html.Attributes exposing (class, style)
@@ -27,6 +28,7 @@ type alias Model =
 type alias State =
     { message : Message
     , ranges : List Range
+    , fixing : Bool
     , codeBlock : RemoteData Error String
     }
 
@@ -44,6 +46,7 @@ show m _ =
         { message = m
         , ranges = Data.getRanges m.data
         , codeBlock = RD.Loading
+        , fixing = False
         }
     , Http.request
         { method = "GET"
@@ -93,8 +96,9 @@ update location msg model =
             model
                 |> Maybe.map
                     (\y ->
-                        ( hide (Just y)
-                        , Debug.todo "Implement FIX"
+                        ( Just { y | fixing = True }
+                        , Client.State.fix y.message
+                            |> Cmd.map (always Close)
                         )
                     )
                 |> Maybe.withDefault ( model, Cmd.none )
@@ -120,23 +124,24 @@ dialogConfig state =
     , containerClass = Just "message-dialog"
     , header = Just <| dialogHeader state
     , body = Just <| dialogBody state
-    , footer = Just (footer state.message)
+    , footer = Just (footer state.fixing state.message)
     }
 
 
-footer : Message -> Html Msg
-footer message =
+footer : Bool -> Message -> Html Msg
+footer fixing message =
     Fixers.getFixer message
-        |> Maybe.map fixableFooter
+        |> Maybe.map (fixableFooter fixing)
         |> Maybe.withDefault (i [] [ text "Fix has to be implemented. Pull requests are welcome." ])
 
 
-fixableFooter : Fixer -> Html Msg
-fixableFooter fixer =
+fixableFooter : Bool -> Fixer -> Html Msg
+fixableFooter fixing fixer =
     div []
         [ button
             [ class "btn btn-success"
             , Html.Events.onClick Fix
+            , Html.Attributes.disabled fixing
             ]
             [ text fixer.description ]
         ]
