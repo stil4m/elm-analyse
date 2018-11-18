@@ -94,8 +94,7 @@ update location msg model =
                 |> Maybe.map
                     (\y ->
                         ( hide (Just y)
-                        , Cmd.none
-                          -- , WS.send (Socket.controlAddress location) ("fix:" ++ toString y.message.id)
+                        , Debug.todo "Implement FIX"
                         )
                     )
                 |> Maybe.withDefault ( model, Cmd.none )

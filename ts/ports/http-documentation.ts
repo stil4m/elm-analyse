@@ -10,8 +10,6 @@ function setup(app: ElmApp) {
             _response: request.Response,
             body: string
         ) {
-            console.log (err);
-            console.log(body)
             if (err) {
                 app.ports.onHttpDocumentation.send({
                     dependency: pointer,

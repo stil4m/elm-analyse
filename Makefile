@@ -1,6 +1,6 @@
 .PHONY: html test validate-js-format validate-elm-format lint-js
 
-build: tsc elm-backend elm-client elm-docs editor html
+build: elm-backend elm-client elm-docs tsc editor html
 
 tsc:
 	./node_modules/.bin/tsc

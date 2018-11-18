@@ -62,9 +62,7 @@ type Content
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ -- Client.State.listen model.location |> Sub.map NewState
-          --,
-          Time.every 1000 (always Tick)
+        [ Time.every 1000 (always Tick)
         , case model.content of
             MessagesPageContent sub ->
                 MessagesPage.subscriptions sub |> Sub.map MessagesPageMsg
@@ -86,9 +84,6 @@ subscriptions model =
 
             NotFound ->
                 Sub.none
-        , Sub.none
-
-        -- , WS.keepAlive (controlAddress model.location)
         ]
 
 
@@ -230,8 +225,7 @@ update msg model =
 
         Refresh ->
             ( model
-              -- , WS.send (controlAddress model.location) "reload"
-            , Cmd.none
+            , Client.State.refresh |> Cmd.map (always Tick)
             )
 
         MessagesPageMsg subMsg ->

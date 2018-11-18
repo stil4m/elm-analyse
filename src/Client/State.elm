@@ -1,4 +1,4 @@
-module Client.State exposing (State, listen, tick, toMaybe, view)
+module Client.State exposing (State, refresh, tick, toMaybe, view)
 
 import Analyser.Checks
 import Analyser.State as AS
@@ -15,10 +15,10 @@ type alias State =
     RemoteData Http.Error AS.State
 
 
-listen : Url -> Sub State
-listen location =
-    -- WS.listen (dashboardAddress location) (JD.decodeString (AS.decodeState Analyser.Checks.schemas) >> RemoteData.fromResult)
-    Sub.none
+refresh : Cmd (Result Http.Error String)
+refresh =
+    Http.getString "/refresh"
+        |> Http.send identity
 
 
 tick : Url -> Cmd State
@@ -26,11 +26,6 @@ tick location =
     Http.get "/state" (AS.decodeState Analyser.Checks.schemas)
         |> Http.send identity
         |> Cmd.map RemoteData.fromResult
-
-
-
--- WS.send (dashboardAddress location) "ping"
--- Cmd.none
 
 
 toMaybe : State -> Maybe AS.State

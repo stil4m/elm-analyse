@@ -38,6 +38,7 @@ type Msg
 init : Client.State.State -> Model
 init s =
     RemoteData.map innerInit s
+        |> RemoteData.mapError Debug.toString
 
 
 onNewState : Client.State.State -> Model -> Model
