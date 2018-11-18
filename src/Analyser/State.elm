@@ -110,7 +110,7 @@ sortMessages state =
             state.messages
                 |> List.sortWith Messages.compareMessageFile
                 |> List.groupWhile (\a b -> Messages.messageFile a == Messages.messageFile b)
-                |> List.concatMap (Tuple.second >> List.sortWith Messages.compareMessageLocation)
+                |> List.concatMap (\( a, b ) -> (a :: b) |> List.sortWith Messages.compareMessageLocation)
     }
 
 

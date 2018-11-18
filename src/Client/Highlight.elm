@@ -11,16 +11,25 @@ beforeHighlight rowsAround targetRows range =
         ( startRow, startColumn ) =
             ( range.start.row, range.start.column )
 
+        linesToDrop =
+            range.start.row - 1 - rowsAround
+
+        linesToKeep =
+            min rowsAround (rowsAround + linesToDrop)
+
         uiStartRow =
-            max 0 (startRow - rowsAround)
+            max 0 (startRow - 1 - rowsAround)
 
         preLines =
-            List.take (startRow - uiStartRow) targetRows
+            targetRows
+                |> List.drop linesToDrop
+                |> List.take linesToKeep
 
         preLineText =
-            List.drop (startRow - uiStartRow) targetRows
+            targetRows
+                |> List.drop (linesToDrop + linesToKeep)
                 |> List.head
-                |> Maybe.map (String.left <| startColumn)
+                |> Maybe.map (String.left <| startColumn - 1)
                 |> Maybe.map List.singleton
                 |> Maybe.withDefault []
     in
@@ -34,118 +43,88 @@ afterHighlight rowsAround targetRows range =
             ( range.start.row, range.end.row, range.end.column )
 
         uiStartRow =
-            max 0 (startRow - rowsAround)
-
-        endsOnLineEnding =
-            False
-
-        postLineText =
-            if endsOnLineEnding then
-                ""
-
-            else
-                List.drop (endRow - uiStartRow) targetRows
-                    |> List.head
-                    |> Maybe.map (String.dropLeft <| endColumn)
-                    |> Maybe.withDefault ""
-                    |> (\a -> (++) a "\n")
+            max 0 (startRow + rowsAround)
 
         postLines =
-            (endRow - uiStartRow + 1)
-                |> (\a -> List.drop a targetRows)
-                |> String.join "\n"
+            targetRows
+                |> List.drop startRow
+                |> List.take rowsAround
+
+        postLineText =
+            targetRows
+                |> List.drop (startRow - 1)
+                |> List.head
+                |> Maybe.map (String.dropLeft <| endColumn - 1)
+                |> Maybe.withDefault ""
     in
-    postLineText ++ postLines
+    String.join "\n" (postLineText :: postLines)
 
 
 highlightedString : Int -> List String -> Range -> String
 highlightedString rowsAround targetRows range =
     let
-        startRow =
-            range.start.row
+        isMultiRow =
+            range.start.row /= range.end.row
 
-        startColumn =
-            range.start.column
-
-        endRow =
-            range.end.row
-
-        endColumn =
-            range.end.column
-
-        uiStartRow =
-            max 0 (startRow - rowsAround)
-
-        endsOnLineEnding =
-            False
-
-        highlightedRowsFull =
+        headString : List String
+        headString =
             targetRows
-                |> List.drop (startRow - uiStartRow)
-                |> List.take (endRow - startRow + 1)
+                |> List.drop (range.start.row - 1)
+                |> List.head
+                |> Maybe.map (String.dropLeft (range.start.column - 1))
+                |> Maybe.map
+                    (\v ->
+                        if isMultiRow then
+                            v
+
+                        else
+                            String.left (range.end.column - range.start.column) v
+                    )
+                |> Maybe.map List.singleton
+                |> Maybe.withDefault []
+
+        bodyString : List String
+        bodyString =
+            targetRows
+                |> List.drop range.start.row
+                |> List.take (range.end.row - 1 - range.start.row)
+
+        tailString : List String
+        tailString =
+            if isMultiRow then
+                targetRows
+                    |> List.drop (range.end.row - 1)
+                    |> List.head
+                    |> Maybe.map (String.left range.end.column)
+                    |> Maybe.map List.singleton
+                    |> Maybe.withDefault []
+
+            else
+                []
     in
-    case highlightedRowsFull of
-        [] ->
-            ""
-
-        [ x ] ->
-            x
-                |> (String.dropLeft <| startColumn)
-                |> String.left (endColumn - startColumn)
-
-        _ ->
-            let
-                midHighlighedRows =
-                    highlightedRowsFull
-                        |> List.drop 1
-                        |> List.take (List.length highlightedRowsFull - 2)
-
-                firstHighlightedRow =
-                    highlightedRowsFull
-                        |> List.head
-                        |> Maybe.map (String.dropLeft <| startColumn)
-                        |> Maybe.map List.singleton
-                        |> Maybe.withDefault []
-
-                lastHighlighedRow =
-                    highlightedRowsFull
-                        |> List.reverse
-                        |> List.head
-                        |> Maybe.map
-                            (if endsOnLineEnding then
-                                \a -> (++) a "\n"
-
-                             else
-                                String.left <| endColumn
-                            )
-                        |> Maybe.map List.singleton
-                        |> Maybe.withDefault []
-            in
-            String.join "\n" (firstHighlightedRow ++ midHighlighedRows ++ lastHighlighedRow)
+    String.join "\n" (headString ++ bodyString ++ tailString)
 
 
 highlightedPre : Int -> String -> Range -> Html msg
 highlightedPre rowsAround content range =
     let
+        lines =
+            String.split "\n" content
+
         ( startRow, endRow ) =
             ( range.start.row, range.end.row )
-
-        target =
-            String.split "\n" content
-                |> List.drop uiStartRow
-                |> List.take (endRow - startRow + (1 + 2 * rowsAround))
 
         uiStartRow =
             max 0 (startRow - rowsAround)
 
         preText =
-            beforeHighlight rowsAround target range
+            beforeHighlight rowsAround lines range
 
         postText =
-            afterHighlight rowsAround target range
+            afterHighlight rowsAround lines range
 
         highlighedSection =
-            highlightedString rowsAround target range
+            highlightedString rowsAround lines range
     in
     pre []
         [ text preText

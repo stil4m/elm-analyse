@@ -257,7 +257,8 @@ startSourceLoading files ( model, cmds ) =
                     ( Finished, Cmd.none )
 
                 files_ ->
-                    SourceLoadingStage.init files_
+                    files_
+                        |> SourceLoadingStage.init
                         |> Tuple.mapFirst SourceLoadingStage
                         |> Tuple.mapSecond (Cmd.map SourceLoadingStageMsg)
     in

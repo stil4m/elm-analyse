@@ -1,3 +1,4 @@
+import * as path from 'path';
 import express from 'express';
 import ExpressWs from 'express-ws';
 import * as fs from 'fs';
@@ -57,8 +58,8 @@ function start(config: Config, info: Info, project: {}) {
         });
 
         app.get('*',function(_req,res){
-  res.sendfile('dist/public/index.html');
-});
+            res.sendFile(path.resolve(`${__dirname}`,`../../public/index.html`));
+        });
     });
 }
 
