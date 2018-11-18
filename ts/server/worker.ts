@@ -8,10 +8,14 @@ function run(config: Config, onload: (app: ElmApp) => void) {
     dependencies.getDependencies(function(registry) {
         const directory = process.cwd();
         var Elm = require('../backend-elm.js');
-        var app = Elm.Analyser.worker({
+        var app = Elm.Elm.Analyser.init({ flags : {
             server: true,
             registry: registry || []
-        });
+
+            ,
+            //TODO
+            project: require('/Users/matstijl/development/repositories/github/stil4m/elm-analyse/elm.json')
+        }});
 
         app.ports.sendReportValue.subscribe((report: Report) => {
             console.log('Found ' + report.messages.length + ' message(s)');

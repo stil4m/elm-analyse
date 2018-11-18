@@ -5,11 +5,13 @@ function setup(app: ElmApp) {
     app.ports.loadHttpDocumentation.subscribe((pointer: DependencyPointer) => {
         const { name, version } = pointer;
 
-        request.get(`http://package.elm-lang.org/packages/${name}/${version}/documentation.json`, function(
+        request.get(`http://package.elm-lang.org/packages/${name}/${version}/docs.json`, function(
             err: any,
             _response: request.Response,
             body: string
         ) {
+            console.log (err);
+            console.log(body)
             if (err) {
                 app.ports.onHttpDocumentation.send({
                     dependency: pointer,

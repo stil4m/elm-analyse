@@ -11,10 +11,13 @@ function start(config: Config) {
     const reporter = Reporter.build(config.format);
 
     dependencies.getDependencies(function(registry: Registry) {
-        const app: ElmApp = Elm.Analyser.worker({
+        const app: ElmApp = Elm.Elm.Analyser.init({ flags:{
             server: false,
-            registry: registry
-        });
+            registry: registry,
+
+            //TODO
+            project: require('/Users/matstijl/development/repositories/github/stil4m/elm-analyse/elm.json')
+        }});
 
         app.ports.sendReportValue.subscribe(function(report: Report) {
             reporter.report(report);

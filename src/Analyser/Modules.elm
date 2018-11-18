@@ -49,12 +49,12 @@ edgesInFile file =
 decode : JD.Decoder Modules
 decode =
     JD.map2 Modules
-        (JD.field "projectModules" (JD.list decodeModuleName))
+        (JD.field "projectModules" (JD.list ModuleName.decoder))
         (JD.field "dependencies" (JD.list decodeDependency))
 
 
-tupleFromLIst : List a -> JD.Decoder ( a, a )
-tupleFromLIst x =
+tupleFromList : List a -> JD.Decoder ( a, a )
+tupleFromList x =
     case x of
         [ a, b ] ->
             JD.succeed ( a, b )
@@ -78,9 +78,4 @@ encodeDependency ( x, y ) =
 
 decodeDependency : Decoder ( ModuleName, ModuleName )
 decodeDependency =
-    JD.list decodeModuleName |> JD.andThen tupleFromLIst
-
-
-decodeModuleName : Decoder ModuleName
-decodeModuleName =
-    JD.string |> JD.map (String.split ".")
+    JD.list ModuleName.decoder |> JD.andThen tupleFromList

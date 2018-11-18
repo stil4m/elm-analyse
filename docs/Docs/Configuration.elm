@@ -14,7 +14,7 @@ view =
         , Html.p []
             [ Html.text "By default all checks are enabled. To disable checks, add an "
             , Html.code [] [ Html.text "elm-analyse.json" ]
-            , Html.text " file to the root of the Elm project (beside elm-package.json)."
+            , Html.text " file to the root of the Elm project (beside elm.json)."
             ]
         , Html.p []
             [ Html.text "An example configuration to disable the "

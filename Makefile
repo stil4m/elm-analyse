@@ -62,3 +62,7 @@ run:
 
 run-server:
 	node dist/app/bin/index.js -s
+
+reset-diff:
+	git checkout docs/docs.js
+	git checkout dist

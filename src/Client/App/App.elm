@@ -1,7 +1,7 @@
 module Client.App.App exposing (Model, Msg(..), init, main, subscriptions, update, view)
 
 import Browser exposing (UrlRequest)
-import Browser.Navigation
+import Browser.Navigation exposing (Key)
 import Client.App.Menu
 import Client.Components.FileTree as FileTree
 import Client.Dashboard as Dashboard
@@ -9,7 +9,7 @@ import Client.DependenciesPage as DependenciesPage
 import Client.Graph.Graph as Graph
 import Client.Graph.PackageDependencies as PackageDependencies
 import Client.MessagesPage as MessagesPage
-import Client.Routing as Routing
+import Client.Routing as Routing exposing (Route)
 import Client.Socket exposing (controlAddress)
 import Client.State exposing (State)
 import Html exposing (div)
@@ -38,12 +38,14 @@ type Msg
     | OnLocation UrlRequest
     | Tick
     | NewState State
+    | ToRoute Route
 
 
 type alias Model =
     { location : Url
     , content : Content
     , state : State
+    , key : Key
     }
 
 
@@ -60,8 +62,9 @@ type Content
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Client.State.listen model.location |> Sub.map NewState
-        , Time.every 10000 (always Tick)
+        [ -- Client.State.listen model.location |> Sub.map NewState
+          --,
+          Time.every 1000 (always Tick)
         , case model.content of
             MessagesPageContent sub ->
                 MessagesPage.subscriptions sub |> Sub.map MessagesPageMsg
@@ -91,7 +94,7 @@ subscriptions model =
 
 init : () -> Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init () l key =
-    onLocation l { location = l, content = NotFound, state = RemoteData.Loading }
+    onLocation l { location = l, key = key, content = NotFound, state = RemoteData.Loading }
 
 
 onLocation : Url -> Model -> ( Model, Cmd Msg )
@@ -140,6 +143,15 @@ viewInner : Model -> Html.Html Msg
 viewInner m =
     div []
         [ Client.App.Menu.view Refresh m.location
+            |> Html.map
+                (\v ->
+                    case v of
+                        Ok o ->
+                            o
+
+                        Err route ->
+                            ToRoute route
+                )
         , div [ id "page-wrapper" ]
             [ case m.content of
                 MessagesPageContent subModel ->
@@ -199,6 +211,9 @@ updateStateInContent state content =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        ToRoute r ->
+            ( model, Routing.pushRoute model.key r )
+
         OnLocation l ->
             case l of
                 Browser.Internal i ->
@@ -210,6 +225,7 @@ update msg model =
         Tick ->
             ( model
             , Client.State.tick model.location
+                |> Cmd.map NewState
             )
 
         Refresh ->

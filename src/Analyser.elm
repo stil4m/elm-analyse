@@ -13,7 +13,10 @@ import Analyser.SourceLoadingStage as SourceLoadingStage
 import Analyser.State as State exposing (State)
 import Analyser.State.Dependencies
 import AnalyserPorts
+import Elm.Project
+import Elm.Version
 import Inspection
+import Json.Decode
 import Json.Encode exposing (Value)
 import Platform exposing (worker)
 import Registry exposing (Registry)
@@ -30,6 +33,7 @@ type alias Model =
     , changedFiles : List String
     , server : Bool
     , registry : Registry
+    , project : Elm.Project.Project
     }
 
 
@@ -42,6 +46,7 @@ type Msg
     | Reset
     | OnFixMessage Int
     | FixerMsg Fixer.Msg
+    | NoOp
 
 
 type Stage
@@ -55,6 +60,7 @@ type Stage
 type alias Flags =
     { server : Bool
     , registry : Value
+    , project : Value
     }
 
 
@@ -69,18 +75,50 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    reset
-        ( { context = ContextLoader.emptyContext
-          , stage = Finished
-          , configuration = Configuration.defaultConfiguration
-          , codeBase = CodeBase.init
-          , state = State.initialState
-          , changedFiles = []
-          , server = flags.server
-          , registry = Registry.fromValue flags.registry
-          }
-        , Cmd.none
-        )
+    let
+        project =
+            Json.Decode.decodeValue Elm.Project.decoder flags.project
+
+        base =
+            ( { context = ContextLoader.emptyContext
+              , stage = Finished
+              , configuration = Configuration.defaultConfiguration
+              , codeBase = CodeBase.init
+              , state = State.initialState
+              , changedFiles = []
+              , server = flags.server
+              , registry = Registry.fromValue flags.registry
+              , project =
+                    Elm.Project.Application
+                        { elm = Elm.Version.one
+                        , dirs = []
+                        , depsDirect = []
+                        , depsIndirect = []
+                        , testDepsDirect = []
+                        , testDepsIndirect = []
+                        }
+              }
+            , Cmd.none
+            )
+    in
+    case project of
+        Err _ ->
+            ( Tuple.first base, Logger.error "Could not read project file (./elm.json)" )
+
+        Ok v ->
+            reset
+                ( { context = ContextLoader.emptyContext
+                  , stage = Finished
+                  , configuration = Configuration.defaultConfiguration
+                  , codeBase = CodeBase.init
+                  , state = State.initialState
+                  , changedFiles = []
+                  , server = flags.server
+                  , registry = Registry.fromValue flags.registry
+                  , project = v
+                  }
+                , Logger.info "Started..."
+                )
 
 
 reset : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -113,7 +151,7 @@ update msg model =
                     Configuration.fromString context.configuration
 
                 ( stage, cmds ) =
-                    DependencyLoadingStage.init context.interfaceFiles
+                    DependencyLoadingStage.init model.project
             in
             ( { model
                 | context = context
@@ -186,6 +224,9 @@ update msg model =
                 , Logger.info ("File was removed: '" ++ x ++ "'. Removing known messages.")
                 )
 
+        NoOp ->
+            ( model, Logger.info "NoOp" )
+
 
 onFixerMsg : Fixer.Msg -> Fixer.Model -> Model -> ( Model, Cmd Msg )
 onFixerMsg x stage model =
@@ -253,7 +294,8 @@ handleNextStep (( model, cmds ) as input) =
 doSendState : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 doSendState ( model, cmds ) =
     ( model
-    , Cmd.batch [ cmds, AnalyserPorts.sendStateValue model.state ]
+      -- , Cmd.batch [ cmds, AnalyserPorts.sendStateValue model.state ]
+    , cmds
     )
 
 

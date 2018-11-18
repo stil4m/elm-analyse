@@ -55,6 +55,10 @@ function start(config: Config, info: Info) {
         app.listen(config.port, function() {
             console.log('Listening on http://localhost:' + config.port);
         });
+
+        app.get('*',function(_req,res){
+  res.sendfile('dist/public/index.html');
+});
     });
 }
 

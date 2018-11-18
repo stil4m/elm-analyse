@@ -55,7 +55,7 @@ onExpression (Node _ expression) context =
                     (String.concat
                         [ "Prefix notation for `"
                         , x
-                        , "` is unneeded in at "
+                        , "` is unneeded at "
                         , Range.rangeToString opRange
                         ]
                     )

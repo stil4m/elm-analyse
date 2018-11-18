@@ -5,13 +5,14 @@ import Analyser.State as AS
 import Client.LoadingScreen as LoadingScreen
 import Client.Socket exposing (dashboardAddress)
 import Html exposing (Html)
+import Http
 import Json.Decode as JD
 import RemoteData exposing (RemoteData)
 import Url exposing (Url)
 
 
 type alias State =
-    RemoteData String AS.State
+    RemoteData Http.Error AS.State
 
 
 listen : Url -> Sub State
@@ -20,10 +21,16 @@ listen location =
     Sub.none
 
 
-tick : Url -> Cmd msg
+tick : Url -> Cmd State
 tick location =
-    -- WS.send (dashboardAddress location) "ping"
-    Cmd.none
+    Http.get "/state" (AS.decodeState Analyser.Checks.schemas)
+        |> Http.send identity
+        |> Cmd.map RemoteData.fromResult
+
+
+
+-- WS.send (dashboardAddress location) "ping"
+-- Cmd.none
 
 
 toMaybe : State -> Maybe AS.State
