@@ -43,8 +43,18 @@ scan fileContext _ =
                 []
     in
     x
-        |> List.uniqueBy Debug.toString
+        |> List.uniqueBy rangeToString
         |> List.map buildMessage
+
+
+rangeToString : Range -> String
+rangeToString range =
+    String.join "|"
+        [ String.fromInt range.start.row
+        , String.fromInt range.start.column
+        , String.fromInt range.end.row
+        , String.fromInt range.end.column
+        ]
 
 
 buildMessage : Range -> MessageData

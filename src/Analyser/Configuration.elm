@@ -71,7 +71,7 @@ fromString input =
         case JD.decodeString (decodeConfiguration input) input of
             Err e ->
                 ( defaultConfiguration
-                , [ "Failed to decode defined configuration due to: " ++ Debug.toString e ++ ". Falling back to default configuration" ]
+                , [ "Failed to decode defined configuration due to: " ++ JD.errorToString e ++ ". Falling back to default configuration" ]
                 )
 
             Ok x ->

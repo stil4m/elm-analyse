@@ -6,10 +6,10 @@ tsc:
 	./node_modules/.bin/tsc
 
 elm-backend:
-	./node_modules/.bin/elm make src/Analyser.elm --output dist/app/backend-elm.js
+	./node_modules/.bin/elm make src/Analyser.elm --output dist/app/backend-elm.js  --optimize
 
 elm-client:
-	./node_modules/.bin/elm make src/Client.elm --output dist/public/client-elm.js
+	./node_modules/.bin/elm make src/Client.elm --output dist/public/client-elm.js --optimize
 
 elm-docs:
 	./node_modules/.bin/elm make docs/Docs/Main.elm --output docs/docs.js

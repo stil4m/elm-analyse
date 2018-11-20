@@ -275,7 +275,7 @@ handleNextStep (( model, cmds ) as input) =
                     case Fixer.init taskId newState of
                         Nothing ->
                             ( { model | state = newState }
-                            , Logger.info ("Could not fix message: '" ++ Debug.toString taskId ++ "'.")
+                            , Logger.info ("Could not fix message: '" ++ String.fromInt taskId ++ "'.")
                             )
 
                         Just ( fixerModel, fixerCmds, newState2 ) ->
