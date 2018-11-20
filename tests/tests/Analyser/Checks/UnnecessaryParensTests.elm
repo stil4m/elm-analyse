@@ -465,6 +465,20 @@ foo x =
     )
 
 
+{-| Introduced for #98. Bump elm-format to 0.7.0. This version will place parens around statements lhs/rhs of oprator application.
+-}
+firstParamALambda : ( String, String, List MessageData )
+firstParamALambda =
+    ( "firstParamALambda"
+    , """module Bar exposing (..)
+
+foo =
+  A (\\() -> (\\(B c) -> c) d)
+"""
+    , []
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnnecessaryParens"
@@ -497,4 +511,5 @@ all =
         , negatedApplicationWithParens
         , parensAroundCaseOnOperatorSide
         , parensAroundCaseStatement
+        , firstParamALambda
         ]

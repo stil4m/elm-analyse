@@ -158,6 +158,7 @@ onApplication parts context =
         |> Maybe.andThen getParenthesized
         |> Maybe.filter (Tuple.second >> Node.value >> Expression.isOperatorApplication >> not)
         |> Maybe.filter (Tuple.second >> Node.value >> Expression.isCase >> not)
+        |> Maybe.filter (Tuple.second >> Node.value >> Expression.isLambda >> not)
         |> Maybe.map Tuple.first
         |> Maybe.map (\a -> a :: context)
         |> Maybe.withDefault context
