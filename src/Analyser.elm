@@ -11,7 +11,7 @@ import Analyser.Messages.Util as Messages
 import Analyser.Modules
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import Analyser.State as State exposing (State)
-import Analyser.State.Dependencies
+import Analyser.State.Dependencies as Dependencies
 import AnalyserPorts
 import Elm.Project
 import Elm.Version
@@ -344,8 +344,16 @@ finishProcess newStage cmds model =
         ( unusedDeps, newModules ) =
             Analyser.Modules.build newCodeBase (CodeBase.sourceFiles newCodeBase)
 
+        mode =
+            case model.project of
+                Elm.Project.Application _ ->
+                    Dependencies.Application
+
+                Elm.Project.Package _ ->
+                    Dependencies.Package
+
         deps =
-            Analyser.State.Dependencies.init (List.map .name unusedDeps) (CodeBase.dependencies newCodeBase) model.registry
+            Dependencies.init mode (List.map .name unusedDeps) (CodeBase.dependencies newCodeBase) model.registry
 
         newState =
             State.finishWithNewMessages messages model.state
