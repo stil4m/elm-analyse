@@ -1,13 +1,21 @@
 import * as request from 'request';
 import * as cache from './cache';
 
-const fetchDependencies = function(cb: (jsonValue: any) => void) {
-    request.get('http://package.elm-lang.org/all-packages', function(err: any, _: request.Response, body: any) {
+export type Registry = RegistryItem[];
+
+export interface RegistryItem {
+    name: string;
+    summary: string;
+    license: string;
+    versions: string[];
+}
+const fetchDependencies = function(cb: (jsonValue: Registry | null) => void) {
+    request.get('http://package.elm-lang.org/search.json', function(err: any, _: request.Response, body: any) {
         if (err) {
             cb(null);
             return;
         }
-        var cbValue;
+        var cbValue: Registry | null;
         try {
             cbValue = JSON.parse(body);
         } catch (e) {

@@ -1,7 +1,7 @@
 import * as fileLoadingPorts from './file-loading-ports';
 import * as loggingPorts from './util/logging-ports';
-import * as dependencies from './util/dependencies';
-import { ElmApp, Config, Report, Registry } from './domain';
+import { Registry, default as dependencies } from './util/dependencies';
+import { ElmApp, Config, Report } from './domain';
 import Reporter from './reporter';
 
 const directory = process.cwd();
@@ -14,7 +14,7 @@ function start(config: Config, project: {}) {
         const app: ElmApp = Elm.Elm.Analyser.init({
             flags: {
                 server: false,
-                registry: registry,
+                registry: registry || [],
                 project: project
             }
         });

@@ -12,7 +12,6 @@ function run(config: Config, project: {}, onload: (app: ElmApp) => void) {
             flags: {
                 server: true,
                 registry: registry || [],
-
                 project: project
             }
         });

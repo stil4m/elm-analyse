@@ -303,7 +303,11 @@ onDependencyLoadingStageMsg x stage model =
             DependencyLoadingStage.update x stage
     in
     if DependencyLoadingStage.isDone newStage then
-        ( { model | codeBase = CodeBase.setDependencies (DependencyLoadingStage.getDependencies newStage) model.codeBase }
+        let
+            newDependencies =
+                DependencyLoadingStage.getDependencies newStage
+        in
+        ( { model | codeBase = CodeBase.setDependencies newDependencies model.codeBase }
         , Cmd.map DependencyLoadingStageMsg cmds
         )
             |> startSourceLoading model.context.sourceFiles
