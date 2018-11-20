@@ -4,7 +4,7 @@ import { ElmApp, FileChange } from '../domain';
 
 function run(elmWorker: ElmApp) {
     const pack = require(process.cwd() + '/elm.json');
-    watch(pack['source-directories'] || ["src"], { recursive: true }, function(evt: string, name: string) {
+    watch(pack['source-directories'] || ['src'], { recursive: true }, function(evt: string, name: string) {
         const change: FileChange = { event: evt, file: name };
         if (fileGatherer.includedInFileSet(name)) {
             elmWorker.ports.fileWatch.send(change);

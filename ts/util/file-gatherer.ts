@@ -24,7 +24,7 @@ interface ElmPackage {
 }
 
 function targetFilesForPathAndPackage(directory: string, path: string, pack: ElmPackage): string[] {
-    const packTargetDirs: string[] = pack['source-directories'] || ["src"];
+    const packTargetDirs: string[] = pack['source-directories'] || ['src'];
 
     const targetFiles = _.uniq(
         _.flatten(
