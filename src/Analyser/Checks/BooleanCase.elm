@@ -16,7 +16,7 @@ checker : Checker
 checker =
     { check = scan
     , info =
-        { key = "Boolean Case"
+        { key = "BooleanCase"
         , name = "Boolean Case Expression"
         , description = "If you case over a boolean value, it maybe better to use an if expression."
         , schema =
