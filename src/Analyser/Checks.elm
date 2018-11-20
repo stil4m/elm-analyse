@@ -9,6 +9,7 @@ import Analyser.Checks.DropConsOfItemAndList as DropConsOfItemAndList
 import Analyser.Checks.DuplicateImport as DuplicateImport
 import Analyser.Checks.DuplicateImportedVariable as DuplicateImportedVariable
 import Analyser.Checks.ExposeAll as ExposeAll
+import Analyser.Checks.FileLoadFailed as FileLoadFailed
 import Analyser.Checks.FunctionInLet as FunctionInLet
 import Analyser.Checks.ImportAll as ImportAll
 import Analyser.Checks.MapNothingToNothing as MapNothingToNothing
@@ -34,7 +35,7 @@ import Analyser.Messages.Schemas as Schemas exposing (Schemas)
 
 schemas : Schemas
 schemas =
-    Schemas.buildSchemas all
+    Schemas.buildSchemas (FileLoadFailed.checker :: all)
 
 
 all : List Checker

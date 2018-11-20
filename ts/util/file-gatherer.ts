@@ -24,7 +24,8 @@ interface ElmPackage {
 }
 
 function targetFilesForPathAndPackage(directory: string, path: string, pack: ElmPackage): string[] {
-    const packTargetDirs: string[] = pack['source-directories'];
+    const packTargetDirs: string[] = pack['source-directories'] || ["src"];
+
     const targetFiles = _.uniq(
         _.flatten(
             packTargetDirs.map(x => {
@@ -77,17 +78,8 @@ function getDependencyFiles(directory: string, dep: DependencyPointer) {
 
 function gather(directory: string): { interfaceFiles: Array<string[]>; sourceFiles: string[] } {
     const packageFile = require(directory + '/elm.json');
-    // const exactDeps = require(directory + '/elm-stuff/exact-dependencies.json');
-    // const dependencies = Object.keys(packageFile['dependencies']);
-
-    // var interfaceFiles: Array<string[]> = dependencies.filter(x => exactDeps[x]).map(x => [x, exactDeps[x]]);
-
-    // dependencies.filter(x => !exactDeps[x]).forEach(x => {
-    // console.log('WARN: Missing dependency `' + x + '`. Maybe run elm-package to update the dependencies.');
-    // });
 
     const input = {
-        // interfaceFiles: interfaceFiles,
         interfaceFiles: [],
         sourceFiles: targetFilesForPathAndPackage(directory, directory, packageFile)
     };

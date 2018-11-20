@@ -38,11 +38,7 @@ run codeBase includedSources configuration =
                             (FileContent.asFileRef source)
                             (FileLoadFailed.checker |> .info |> .key)
                             (Data.init
-                                (String.concat
-                                    [ "Could not load file due to: "
-                                    , "Unexpected parse error"
-                                    ]
-                                )
+                                "Could not load file due to: Unexpected parse error"
                                 |> Data.addErrorMessage "message" "Unexpected parse error"
                             )
                     )

@@ -1,6 +1,7 @@
 import * as fileLoadingPorts from './file-loading-ports';
 import * as loggingPorts from './util/logging-ports';
-import { Registry, default as dependencies } from './util/dependencies';
+import { Registry } from './util/dependencies';
+import * as dependencies from './util/dependencies';
 import { ElmApp, Config, Report } from './domain';
 import Reporter from './reporter';
 
