@@ -17,7 +17,7 @@ check codeBase files =
 
 notElmLangCore : Dependency -> Bool
 notElmLangCore dep =
-    dep.name /= "elm-lang/core"
+    dep.name /= "elm/core"
 
 
 filterUsedDeps : FileContext -> List Dependency -> List Dependency
