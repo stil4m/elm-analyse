@@ -123,7 +123,7 @@ viewInner m =
                         Err route ->
                             ToRoute route
                 )
-        , div [ id "page-wrapper", style [ ( "overflow", "auto" ) ] ]
+        , div [ id "page-wrapper", style "overflow" "auto" ]
             [ case m.content of
                 MessagesPageContent subModel ->
                     MessagesPage.view m.state subModel |> Html.map MessagesPageMsg
