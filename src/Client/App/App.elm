@@ -12,7 +12,7 @@ import Client.MessagesPage as MessagesPage
 import Client.Routing as Routing exposing (Route)
 import Client.State exposing (State)
 import Html exposing (div)
-import Html.Attributes exposing (id)
+import Html.Attributes exposing (id, style)
 import RemoteData
 import Time
 import Url exposing (Url)
@@ -123,7 +123,7 @@ viewInner m =
                         Err route ->
                             ToRoute route
                 )
-        , div [ id "page-wrapper" ]
+        , div [ id "page-wrapper", style "overflow" "auto" ]
             [ case m.content of
                 MessagesPageContent subModel ->
                     MessagesPage.view m.state subModel |> Html.map MessagesPageMsg
