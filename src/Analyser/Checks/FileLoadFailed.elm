@@ -5,7 +5,6 @@ import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
-import Debug as SafeDebug
 
 
 checker : Checker

@@ -14,7 +14,7 @@ viewRemoteData rd f =
         RD.Success state ->
             f state
 
-        RD.Failure e ->
+        RD.Failure _ ->
             div []
                 [ text "Something went wrong..."
                 ]
