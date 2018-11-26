@@ -1,3 +1,4 @@
+import * as path from 'path';
 import express from 'express';
 import ExpressWs from 'express-ws';
 import * as fs from 'fs';
@@ -7,21 +8,23 @@ import worker from './worker';
 import watcher from './watcher';
 import control from './control';
 import Dashboard from './dashboard';
+import * as bodyParser from 'body-parser';
 
 const app = express();
 const expressWs = ExpressWs(app);
 
+app.use(bodyParser.json());
 app.use(
     express.static(__dirname + '/../../public', {
         etag: false
     })
 );
 
-function start(config: Config, info: Info) {
+function start(config: Config, info: Info, project: {}) {
     console.log('Elm Analyser server starting with config:');
     console.log(config);
 
-    worker.run(config, function(elm: ElmApp) {
+    worker.run(config, project, function(elm: ElmApp) {
         const dashboard = Dashboard.run(app, elm, expressWs);
 
         watcher.run(elm);
@@ -44,6 +47,12 @@ function start(config: Config, info: Info) {
             res.send(info);
         });
 
+        app.post('/api/fix', (req, res) => {
+            const body: { id: number } = req.body;
+            elm.ports.onFixMessage.send(body.id);
+            res.send({});
+        });
+
         app.get('/state', function(_req, res) {
             res.send(dashboard.getState());
         });
@@ -54,6 +63,10 @@ function start(config: Config, info: Info) {
 
         app.listen(config.port, function() {
             console.log('Listening on http://localhost:' + config.port);
+        });
+
+        app.get('*', function(_req, res) {
+            res.sendFile(path.resolve(`${__dirname}`, `../../public/index.html`));
         });
     });
 }

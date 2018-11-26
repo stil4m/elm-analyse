@@ -8,7 +8,7 @@ import Html.Attributes
 
 view : Html msg
 view =
-    Html.div [ Html.Attributes.style [ ( "margin-bottom", "60px" ) ] ]
+    Html.div [ Html.Attributes.style "margin-bottom" "60px" ]
         [ Html.div
             [ Html.Attributes.class "jumbotron" ]
             [ Html.div

@@ -7,8 +7,8 @@ import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAnnotation exposing (RecordDefinition, TypeAnnotation(..))
 
 
@@ -63,15 +63,15 @@ isSingleFieldRecord x =
     List.length x == 1
 
 
-onTypeAnnotation : Ranged TypeAnnotation -> Context -> Context
-onTypeAnnotation (( _, t ) as x) context =
+onTypeAnnotation : Node TypeAnnotation -> Context -> Context
+onTypeAnnotation ((Node _ t) as x) context =
     let
         newWhitelisted =
             case t of
-                Typed _ _ ws ->
+                Typed _ ws ->
                     ws
                         |> List.filter
-                            (\( _, ta ) ->
+                            (\(Node _ ta) ->
                                 case ta of
                                     Record _ ->
                                         True
@@ -79,7 +79,7 @@ onTypeAnnotation (( _, t ) as x) context =
                                     _ ->
                                         False
                             )
-                        |> List.map Tuple.first
+                        |> List.map Node.range
                         |> (++) context.whitelisted
 
                 _ ->
@@ -91,8 +91,8 @@ onTypeAnnotation (( _, t ) as x) context =
     }
 
 
-findPlainRecords : Ranged TypeAnnotation -> List ( Range, RecordDefinition )
-findPlainRecords ( r, x ) =
+findPlainRecords : Node TypeAnnotation -> List ( Range, RecordDefinition )
+findPlainRecords (Node r x) =
     case x of
         Record fields ->
             [ ( r, fields ) ]

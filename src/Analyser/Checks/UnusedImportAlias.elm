@@ -1,19 +1,19 @@
 module Analyser.Checks.UnusedImportAlias exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
-import Elm.Syntax.Base exposing (ModuleName)
 import Elm.Syntax.Expression exposing (Case, Expression(..))
-import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.Import exposing (Import)
+import Elm.Syntax.ModuleName exposing (ModuleName)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Pattern
 import Elm.Syntax.Range as Range exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
 
 
@@ -79,30 +79,30 @@ markUsage key context =
     Dict.update key (Maybe.map (Tuple.mapSecond ((+) 1))) context
 
 
-onImport : Import -> Context -> Context
-onImport imp context =
-    case imp.moduleAlias of
+onImport : Node Import -> Context -> Context
+onImport (Node r imp) context =
+    case Maybe.map Node.value imp.moduleAlias of
         Just x ->
-            Dict.insert x ( imp.range, 0 ) context
+            Dict.insert x ( r, 0 ) context
 
         Nothing ->
             context
 
 
-onTypeAnnotation : Ranged TypeAnnotation -> Context -> Context
-onTypeAnnotation ( _, typeAnnotation ) context =
+onTypeAnnotation : Node TypeAnnotation -> Context -> Context
+onTypeAnnotation (Node _ typeAnnotation) context =
     case typeAnnotation of
-        Typed moduleName _ _ ->
+        Typed (Node _ ( moduleName, _ )) _ ->
             markUsage moduleName context
 
         _ ->
             context
 
 
-onExpression : Ranged Expression -> Context -> Context
+onExpression : Node Expression -> Context -> Context
 onExpression expr context =
-    case Tuple.second expr of
-        QualifiedExpr moduleName _ ->
+    case Node.value expr of
+        FunctionOrValue moduleName _ ->
             markUsage moduleName context
 
         _ ->
@@ -110,5 +110,5 @@ onExpression expr context =
 
 
 onCase : Case -> Context -> Context
-onCase ( ( _, pattern ), _ ) context =
+onCase ( Node _ pattern, _ ) context =
     List.foldl markUsage context (Elm.Syntax.Pattern.moduleNames pattern)

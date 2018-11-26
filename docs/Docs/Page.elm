@@ -1,8 +1,7 @@
-module Docs.Page exposing (Page(Changelog, Configuration, Contributing, Features, Home, Messages, NotFound), hash, nextPage)
+module Docs.Page exposing (Page(..), hash, nextPage)
 
-import Navigation exposing (Location)
-import String.Extra
-import UrlParser as Url exposing ((</>), Parser)
+import Url exposing (Url)
+import Url.Parser as Url exposing (Parser, fragment)
 
 
 type Page
@@ -18,20 +17,43 @@ type Page
 route : Parser (Page -> a) a
 route =
     Url.oneOf
-        [ Url.map Home Url.top
-        , Url.map (String.Extra.nonEmpty >> Messages) (Url.s "messages" </> Url.string)
-        , Url.map (Messages Nothing) (Url.s "messages")
-        , Url.map Changelog (Url.s "changelog")
-        , Url.map (Features << Just) (Url.s "features" </> Url.string)
-        , Url.map (Features Nothing) (Url.s "features")
-        , Url.map Contributing (Url.s "contributing")
-        , Url.map Configuration (Url.s "configuration")
+        [ Url.map
+            (\v ->
+                case v of
+                    [] ->
+                        Home
+
+                    "messages" :: xs ->
+                        Messages (List.head xs)
+
+                    [ "changelog" ] ->
+                        Changelog
+
+                    "features" :: xs ->
+                        Features (List.head xs)
+
+                    [ "contributing" ] ->
+                        Contributing
+
+                    [ "configuration" ] ->
+                        Configuration
+
+                    _ ->
+                        NotFound
+            )
+            (fragment x)
+        , Url.map Home Url.top
         ]
 
 
-nextPage : Location -> Page
+x : Maybe String -> List String
+x =
+    Maybe.map (String.dropLeft 1 >> String.split "/") >> Maybe.withDefault []
+
+
+nextPage : Url -> Page
 nextPage =
-    Url.parseHash route >> Maybe.withDefault NotFound
+    Url.parse route >> Maybe.withDefault NotFound
 
 
 hash : Page -> String

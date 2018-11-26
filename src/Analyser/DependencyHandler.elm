@@ -6,13 +6,17 @@ import Analyser.Files.Json exposing (deserialiseDependencyValue, serialiseDepend
 import Analyser.Files.Types exposing (LoadedFileData)
 import Dict
 import Elm.Dependency exposing (Dependency)
-import Elm.Documentation exposing (Documentation)
+import Elm.Docs exposing (Module)
 import Elm.Interface as Interface exposing (Interface)
 import Elm.RawFile exposing (RawFile)
-import Elm.Syntax.Base exposing (ModuleName)
-import Elm.Syntax.Infix
+import Elm.Syntax.Infix exposing (Infix)
+import Elm.Syntax.ModuleName exposing (ModuleName)
+import Elm.Syntax.Node exposing (Node(..))
+import Elm.Syntax.Range exposing (emptyRange)
 import Json.Decode as JD exposing (Value)
+import Parser
 import Result.Extra as Result
+
 
 
 --- Cached Dependencies
@@ -87,6 +91,7 @@ onReadFromDisk { name, version } =
 
                     Just d ->
                         Success d
+
             else
                 Ignore
         )
@@ -107,20 +112,21 @@ loadOnlineDocumentation =
     loadHttpDocumentation
 
 
-onOnlineDocumentation : DependencyPointer -> Sub (Maybe (Result String Dependency))
+onOnlineDocumentation : DependencyPointer -> Sub (Maybe (Result JD.Error Dependency))
 onOnlineDocumentation dep =
     onHttpDocumentation
         (\{ dependency, json } ->
             if dependency == dep then
-                JD.decodeValue (JD.list Elm.Documentation.decoder) json
+                JD.decodeValue (JD.list Elm.Docs.decoder) json
                     |> Result.map (depFromModules dep)
                     |> Just
+
             else
                 Nothing
         )
 
 
-depFromModules : DependencyPointer -> List Documentation -> Dependency
+depFromModules : DependencyPointer -> List Module -> Dependency
 depFromModules { name, version } docs =
     { name = name
     , version = version
@@ -128,37 +134,36 @@ depFromModules { name, version } docs =
     }
 
 
-interfaceFromDocumentation : Documentation -> ( ModuleName, Interface )
+interfaceFromDocumentation : Module -> ( ModuleName, Interface )
 interfaceFromDocumentation doc =
     ( String.split "." doc.name
     , List.concat
         [ doc.aliases |> List.map (.name >> Interface.Alias)
-        , doc.unions |> List.map (\t -> Interface.Type ( t.name, List.map Tuple.first t.tags ))
-        , doc.values
-            |> List.map
-                (\value ->
-                    case value.name of
-                        Elm.Documentation.Name s ->
-                            Interface.Function s
-
-                        Elm.Documentation.Op str ass prec ->
-                            Interface.Operator
-                                { direction =
-                                    case ass of
-                                        Elm.Documentation.Left ->
-                                            Elm.Syntax.Infix.Left
-
-                                        Elm.Documentation.Right ->
-                                            Elm.Syntax.Infix.Right
-
-                                        Elm.Documentation.None ->
-                                            Elm.Syntax.Infix.Left
-                                , precedence = prec
-                                , operator = str
-                                }
-                )
+        , doc.unions |> List.map (\t -> Interface.CustomType ( t.name, List.map Tuple.first t.tags ))
+        , doc.values |> List.map (.name >> Interface.Function)
+        , doc.binops
+            |> List.map (\v -> binopToOperator v |> Interface.Operator)
         ]
     )
+
+
+binopToOperator : Elm.Docs.Binop -> Infix
+binopToOperator binOp =
+    { function = Node emptyRange binOp.name
+    , direction =
+        Node emptyRange <|
+            case binOp.associativity of
+                Elm.Docs.Left ->
+                    Elm.Syntax.Infix.Left
+
+                Elm.Docs.Right ->
+                    Elm.Syntax.Infix.Right
+
+                Elm.Docs.None ->
+                    Elm.Syntax.Infix.Left
+    , precedence = Node emptyRange binOp.precedence
+    , operator = Node emptyRange binOp.name
+    }
 
 
 
@@ -183,8 +188,10 @@ onLoadDependencyFilesFromDisk dep =
                 in
                 if not <| List.all Result.isOk loadedFiles then
                     Just (Err "Could not load all dependency files")
+
                 else
                     Just (Ok (buildDependency dependency loadedFiles))
+
             else
                 Nothing
     in
@@ -202,7 +209,7 @@ buildDependency { name, version } loadedFiles =
         |> Dependency name version
 
 
-dependencyFileInterface : FileContent -> Result String LoadedFileData
+dependencyFileInterface : FileContent -> Result (List Parser.DeadEnd) LoadedFileData
 dependencyFileInterface =
     FileContent.asRawFile >> Tuple.first >> Result.map loadedInterfaceForFile
 

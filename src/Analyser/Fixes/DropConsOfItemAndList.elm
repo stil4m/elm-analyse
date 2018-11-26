@@ -18,7 +18,7 @@ fixer =
 fix : ( String, File ) -> MessageData -> Patch
 fix ( content, _ ) messageData =
     case
-        Maybe.map2 (,)
+        Maybe.map2 (\a b -> ( a, b ))
             (Data.getRange "head" messageData)
             (Data.getRange "tail" messageData)
     of

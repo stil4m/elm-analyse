@@ -1,7 +1,7 @@
 module Analyser.Checks.UnusedVariable exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Variables exposing (VariableType(Defined))
+import ASTUtil.Variables exposing (VariableType(..))
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Checks.Variables as Variables exposing (UsedVariableContext)
 import Analyser.Configuration exposing (Configuration)
@@ -10,8 +10,9 @@ import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Interface as Interface
 import Elm.Syntax.Module exposing (Module(..))
+import Elm.Syntax.Node as Node
 import Elm.Syntax.Range as Syntax exposing (Range)
-import Tuple3
+import Tuple.Extra
 
 
 checker : Checker
@@ -38,13 +39,13 @@ scan fileContext _ =
 
         unusedVariables =
             Variables.unusedVariables x
-                |> List.filterMap (\( x, t, y ) -> forVariableType t x y)
+                |> List.filterMap (\( z, t, y ) -> forVariableType t z y)
 
         unusedTopLevels =
             Variables.unusedTopLevels x
                 |> List.filter (filterByModuleType fileContext)
-                |> List.filter (Tuple3.first >> flip Interface.exposesFunction fileContext.interface >> not)
-                |> List.filterMap (\( x, t, y ) -> forVariableType t x y)
+                |> List.filter (Tuple.Extra.first3 >> (\a -> Interface.exposesFunction a fileContext.interface) >> not)
+                |> List.filterMap (\( z, t, y ) -> forVariableType t z y)
     in
     unusedVariables ++ unusedTopLevels
 
@@ -75,7 +76,7 @@ buildMessageData varName range =
 
 filterByModuleType : FileContext -> ( String, VariableType, Syntax.Range ) -> Bool
 filterByModuleType fileContext =
-    case fileContext.ast.moduleDefinition of
+    case Node.value fileContext.ast.moduleDefinition of
         EffectModule _ ->
             filterForEffectModule
 

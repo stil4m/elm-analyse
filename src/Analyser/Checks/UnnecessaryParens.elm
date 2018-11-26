@@ -1,16 +1,15 @@
 module Analyser.Checks.UnnecessaryParens exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
-import Elm.Syntax.Expression as Expression exposing (CaseBlock, Expression(..), Function, Lambda)
-import Elm.Syntax.Infix exposing (InfixDirection)
+import Elm.Syntax.Expression as Expression exposing (CaseBlock, Expression(..), Function, Lambda, RecordSetter)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range as Syntax exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 import List.Extra as List
 import Maybe.Extra as Maybe
 
@@ -44,8 +43,18 @@ scan fileContext _ =
                 []
     in
     x
-        |> List.uniqueBy toString
+        |> List.uniqueBy rangeToString
         |> List.map buildMessage
+
+
+rangeToString : Range -> String
+rangeToString range =
+    String.join "|"
+        [ String.fromInt range.start.row
+        , String.fromInt range.start.column
+        , String.fromInt range.end.row
+        , String.fromInt range.end.column
+        ]
 
 
 buildMessage : Range -> MessageData
@@ -59,10 +68,10 @@ buildMessage r =
         |> Data.addRange "range" r
 
 
-onFunction : Function -> Context -> Context
-onFunction function context =
-    case function.declaration.expression of
-        ( range, ParenthesizedExpression _ ) ->
+onFunction : Node Function -> Context -> Context
+onFunction (Node _ function) context =
+    case (Node.value function.declaration).expression of
+        Node range (ParenthesizedExpression _) ->
             range :: context
 
         _ ->
@@ -72,21 +81,21 @@ onFunction function context =
 onLambda : Lambda -> Context -> Context
 onLambda lambda context =
     case lambda.expression of
-        ( range, ParenthesizedExpression _ ) ->
+        Node range (ParenthesizedExpression _) ->
             range :: context
 
         _ ->
             context
 
 
-onExpression : Ranged Expression -> Context -> Context
-onExpression ( range, expression ) context =
+onExpression : Node Expression -> Context -> Context
+onExpression (Node range expression) context =
     case expression of
         ParenthesizedExpression inner ->
             onParenthesizedExpression range inner context
 
-        OperatorApplication op dir left right ->
-            onOperatorApplication ( op, dir, left, right ) context
+        OperatorApplication _ _ left right ->
+            onOperatorApplication left right context
 
         Application parts ->
             onApplication parts context
@@ -100,8 +109,8 @@ onExpression ( range, expression ) context =
         RecordExpr parts ->
             onRecord parts context
 
-        RecordUpdateExpression recordUpdate ->
-            onRecord recordUpdate.updates context
+        RecordUpdateExpression _ updates ->
+            onRecord updates context
 
         TupledExpression x ->
             onTuple x context
@@ -113,26 +122,26 @@ onExpression ( range, expression ) context =
             context
 
 
-onListExpr : List (Ranged Expression) -> Context -> Context
+onListExpr : List (Node Expression) -> Context -> Context
 onListExpr exprs context =
     List.filterMap getParenthesized exprs
         |> List.map Tuple.first
-        |> flip (++) context
+        |> (\a -> a ++ context)
 
 
-onTuple : List (Ranged Expression) -> Context -> Context
+onTuple : List (Node Expression) -> Context -> Context
 onTuple exprs context =
     List.filterMap getParenthesized exprs
         |> List.map Tuple.first
-        |> flip (++) context
+        |> (\a -> a ++ context)
 
 
-onRecord : List ( String, Ranged Expression ) -> Context -> Context
-onRecord fields context =
-    fields
-        |> List.filterMap (Tuple.second >> getParenthesized)
+onRecord : List (Node RecordSetter) -> Context -> Context
+onRecord setters context =
+    setters
+        |> List.filterMap (Node.value >> Tuple.second >> getParenthesized)
         |> List.map Tuple.first
-        |> flip (++) context
+        |> (\a -> a ++ context)
 
 
 onCaseBlock : CaseBlock -> Context -> Context
@@ -145,29 +154,30 @@ onCaseBlock caseBlock context =
             context
 
 
-onIfBlock : Ranged Expression -> Ranged Expression -> Ranged Expression -> Context -> Context
+onIfBlock : Node Expression -> Node Expression -> Node Expression -> Context -> Context
 onIfBlock clause thenBranch elseBranch context =
     [ clause, thenBranch, elseBranch ]
         |> List.filterMap getParenthesized
         |> List.map Tuple.first
-        |> flip (++) context
+        |> (\a -> a ++ context)
 
 
-onApplication : List (Ranged Expression) -> Context -> Context
+onApplication : List (Node Expression) -> Context -> Context
 onApplication parts context =
     List.head parts
         |> Maybe.andThen getParenthesized
-        |> Maybe.filter (Tuple.second >> Tuple.second >> Expression.isOperatorApplication >> not)
-        |> Maybe.filter (Tuple.second >> Tuple.second >> Expression.isCase >> not)
+        |> Maybe.filter (Tuple.second >> Node.value >> Expression.isOperatorApplication >> not)
+        |> Maybe.filter (Tuple.second >> Node.value >> Expression.isCase >> not)
+        |> Maybe.filter (Tuple.second >> Node.value >> Expression.isLambda >> not)
         |> Maybe.map Tuple.first
-        |> Maybe.map (flip (::) context)
+        |> Maybe.map (\a -> a :: context)
         |> Maybe.withDefault context
 
 
-onOperatorApplication : ( String, InfixDirection, Ranged Expression, Ranged Expression ) -> Context -> Context
-onOperatorApplication ( _, _, left, right ) context =
+onOperatorApplication : Node Expression -> Node Expression -> Context -> Context
+onOperatorApplication left right context =
     let
-        fixHandSide : Ranged Expression -> Maybe Syntax.Range
+        fixHandSide : Node Expression -> Maybe Syntax.Range
         fixHandSide =
             getParenthesized
                 >> Maybe.filter (Tuple.second >> operatorHandSideAllowedParens >> not)
@@ -177,17 +187,17 @@ onOperatorApplication ( _, _, left, right ) context =
     , fixHandSide right
     ]
         |> List.filterMap identity
-        |> flip (++) context
+        |> (\a -> a ++ context)
 
 
-operatorHandSideAllowedParens : Ranged Expression -> Bool
-operatorHandSideAllowedParens ( _, expr ) =
+operatorHandSideAllowedParens : Node Expression -> Bool
+operatorHandSideAllowedParens (Node _ expr) =
     List.any ((|>) expr)
         [ Expression.isOperatorApplication, Expression.isIfElse, Expression.isCase, Expression.isLet, Expression.isLambda ]
 
 
-onParenthesizedExpression : Syntax.Range -> Ranged Expression -> Context -> Context
-onParenthesizedExpression range ( _, expression ) context =
+onParenthesizedExpression : Syntax.Range -> Node Expression -> Context -> Context
+onParenthesizedExpression range (Node _ expression) context =
     case expression of
         RecordAccess _ _ ->
             range :: context
@@ -195,7 +205,7 @@ onParenthesizedExpression range ( _, expression ) context =
         RecordAccessFunction _ ->
             range :: context
 
-        RecordUpdateExpression _ ->
+        RecordUpdateExpression _ _ ->
             range :: context
 
         RecordExpr _ ->
@@ -207,7 +217,7 @@ onParenthesizedExpression range ( _, expression ) context =
         ListExpr _ ->
             range :: context
 
-        FunctionOrValue _ ->
+        FunctionOrValue _ _ ->
             range :: context
 
         Integer _ ->
@@ -222,15 +232,12 @@ onParenthesizedExpression range ( _, expression ) context =
         Literal _ ->
             range :: context
 
-        QualifiedExpr _ _ ->
-            range :: context
-
         _ ->
             context
 
 
-getParenthesized : Ranged Expression -> Maybe ( Range, Ranged Expression )
-getParenthesized ( r, e ) =
+getParenthesized : Node Expression -> Maybe ( Range, Node Expression )
+getParenthesized (Node r e) =
     case e of
         ParenthesizedExpression p ->
             Just ( r, p )
