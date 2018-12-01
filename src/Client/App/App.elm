@@ -190,8 +190,8 @@ update msg model =
                 Browser.Internal i ->
                     onLocation i model
 
-                Browser.External _ ->
-                    ( model, Cmd.none )
+                Browser.External u ->
+                    ( model, Browser.Navigation.load u )
 
         Tick ->
             ( model
