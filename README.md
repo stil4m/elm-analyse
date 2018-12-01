@@ -21,7 +21,7 @@ A tool that allows you to analyse your [Elm](http://elm-lang.org/) code, identif
 The following binaries should be available on the path:
 
 ```
-node >=6
+node >=8
 elm  0.18.x
 elm-format (a version that is compatible with the source code you wish to analyse)
 ```
