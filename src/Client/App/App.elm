@@ -76,26 +76,56 @@ onLocation l model =
     in
     case route of
         Routing.FileTree ->
-            FileTree.init
-                |> Tuple.mapFirst (\x -> { model | content = FileTreeContent x, location = l })
-                |> Tuple.mapSecond (Cmd.map FileTreeMsg)
+            case model.content of
+                FileTreeContent _ ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    FileTree.init
+                        |> Tuple.mapFirst (\x -> { model | content = FileTreeContent x, location = l })
+                        |> Tuple.mapSecond (Cmd.map FileTreeMsg)
 
         Routing.Modules ->
-            ( { model | content = GraphContent (Graph.init model.state), location = l }, Cmd.none )
+            case model.content of
+                GraphContent _ ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( { model | content = GraphContent (Graph.init model.state), location = l }, Cmd.none )
 
         Routing.PackageDependencies ->
-            ( { model | content = PackageDependenciesContent (PackageDependencies.init model.state), location = l }
-            , Cmd.none
-            )
+            case model.content of
+                PackageDependenciesContent _ ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( { model | content = PackageDependenciesContent (PackageDependencies.init model.state), location = l }
+                    , Cmd.none
+                    )
 
         Routing.Messages ->
-            ( { model | content = MessagesPageContent (MessagesPage.init model.state), location = l }, Cmd.none )
+            case model.content of
+                PackageDependenciesContent _ ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( { model | content = MessagesPageContent (MessagesPage.init model.state), location = l }, Cmd.none )
 
         Routing.Dependencies ->
-            ( { model | content = DependenciesPageContent, location = l }, Cmd.none )
+            case model.content of
+                DependenciesPageContent ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( { model | content = DependenciesPageContent, location = l }, Cmd.none )
 
         Routing.Dashboard ->
-            ( { model | content = DashboardContent, location = l }, Cmd.none )
+            case model.content of
+                DashboardContent ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( { model | content = DashboardContent, location = l }, Cmd.none )
 
         Routing.NotFound ->
             ( { model | content = NotFound, location = l }, Cmd.none )

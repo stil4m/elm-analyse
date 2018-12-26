@@ -52,7 +52,7 @@ viewDependency unusedDeps depInfo =
             [ depStatus unusedDeps depInfo
             ]
         , Html.td [ Html.Attributes.class "col-md-5 col-sm-6" ]
-            [ Html.a [ dependencyLink depInfo.dependency.name depInfo.dependency.version ]
+            [ Html.a [ dependencyLink depInfo.dependency.name depInfo.dependency.version, Html.Attributes.target "_blank" ]
                 [ Html.text depInfo.dependency.name
                 , Html.text "@"
                 , Html.text depInfo.dependency.version
@@ -69,7 +69,10 @@ viewDependency unusedDeps depInfo =
                         (List.map
                             (\v ->
                                 Html.li []
-                                    [ Html.a [ dependencyLink depInfo.dependency.name (Version.asString v) ]
+                                    [ Html.a
+                                        [ dependencyLink depInfo.dependency.name (Version.asString v)
+                                        , Html.Attributes.target "_blank"
+                                        ]
                                         [ Html.text <| Version.asString v ]
                                     ]
                             )

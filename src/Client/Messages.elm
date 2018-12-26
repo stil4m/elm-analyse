@@ -6,7 +6,7 @@ import Analyser.Messages.Grouped as Grouped exposing (GroupedMessages)
 import Analyser.Messages.Types exposing (Message, MessageStatus(..))
 import Dict exposing (Dict)
 import Html exposing (Html, a, div, h5, li, p, span, strong, text, ul)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (href, style)
 import Html.Events exposing (onClick)
 
 
@@ -60,6 +60,7 @@ view tag n label message =
         [ div [ style "display" "table-row" ]
             [ a
                 [ onClick (tag message)
+                , href "#"
                 , style "cursor" "pointer"
                 , style "display" "table-cell"
                 , style "padding-right" "20px"

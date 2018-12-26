@@ -37,7 +37,7 @@ function start(config: Config, info: Info, project: {}) {
             });
         });
 
-        app.get('/tree', function(_req, res) {
+        app.get('/api/tree', function(_req, res) {
             const directory = process.cwd();
             const x = fileGatherer.gather(directory);
             res.send(x.sourceFiles);

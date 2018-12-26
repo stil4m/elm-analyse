@@ -41,7 +41,7 @@ init =
       , messageList = MessageList.init (Grouped.byType [])
       }
     , Cmd.batch
-        [ Http.get "/tree" (JD.list JD.string) |> Http.send OnFileTree
+        [ Http.get "/api/tree" (JD.list JD.string) |> Http.send OnFileTree
         ]
     )
 
@@ -135,7 +135,10 @@ view m =
 
         asItem ( fileName, messages ) =
             Html.a
-                [ Html.Attributes.class "list-group-item", onClick (OnSelectFile fileName) ]
+                [ Html.Attributes.class "list-group-item"
+                , onClick (OnSelectFile fileName)
+                , Html.Attributes.href "#"
+                ]
                 [ Html.span [ Html.Attributes.class "badge" ]
                     [ Html.text <| String.fromInt (List.length messages) ]
                 , Html.text fileName
