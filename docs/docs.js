@@ -6105,67 +6105,15 @@ var author$project$Docs$Main$contentFromPage = function (page) {
 			return _Utils_Tuple2(author$project$Docs$Main$ContributingContent, elm$core$Platform$Cmd$none);
 	}
 };
-var author$project$Docs$Page$NotFound = {$: 'NotFound'};
+var author$project$Docs$Page$Home = {$: 'Home'};
 var author$project$Docs$Page$Changelog = {$: 'Changelog'};
 var author$project$Docs$Page$Configuration = {$: 'Configuration'};
 var author$project$Docs$Page$Contributing = {$: 'Contributing'};
 var author$project$Docs$Page$Features = function (a) {
 	return {$: 'Features', a: a};
 };
-var author$project$Docs$Page$Home = {$: 'Home'};
 var author$project$Docs$Page$Messages = function (a) {
 	return {$: 'Messages', a: a};
-};
-var elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var elm$core$String$length = _String_length;
-var elm$core$String$slice = _String_slice;
-var elm$core$String$dropLeft = F2(
-	function (n, string) {
-		return (n < 1) ? string : A3(
-			elm$core$String$slice,
-			n,
-			elm$core$String$length(string),
-			string);
-	});
-var author$project$Docs$Page$x = A2(
-	elm$core$Basics$composeR,
-	elm$core$Maybe$map(
-		A2(
-			elm$core$Basics$composeR,
-			elm$core$String$dropLeft(1),
-			elm$core$String$split('/'))),
-	elm$core$Maybe$withDefault(_List_Nil));
-var elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return elm$core$Maybe$Just(x);
-	} else {
-		return elm$core$Maybe$Nothing;
-	}
 };
 var elm$url$Url$Parser$Parser = function (a) {
 	return {$: 'Parser', a: a};
@@ -6174,27 +6122,6 @@ var elm$url$Url$Parser$State = F5(
 	function (visited, unvisited, params, frag, value) {
 		return {frag: frag, params: params, unvisited: unvisited, value: value, visited: visited};
 	});
-var elm$url$Url$Parser$fragment = function (toFrag) {
-	return elm$url$Url$Parser$Parser(
-		function (_n0) {
-			var visited = _n0.visited;
-			var unvisited = _n0.unvisited;
-			var params = _n0.params;
-			var frag = _n0.frag;
-			var value = _n0.value;
-			return _List_fromArray(
-				[
-					A5(
-					elm$url$Url$Parser$State,
-					visited,
-					unvisited,
-					params,
-					frag,
-					value(
-						toFrag(frag)))
-				]);
-		});
-};
 var elm$url$Url$Parser$mapState = F2(
 	function (func, _n0) {
 		var visited = _n0.visited;
@@ -6255,6 +6182,78 @@ var elm$url$Url$Parser$oneOf = function (parsers) {
 				parsers);
 		});
 };
+var elm$url$Url$Parser$s = function (str) {
+	return elm$url$Url$Parser$Parser(
+		function (_n0) {
+			var visited = _n0.visited;
+			var unvisited = _n0.unvisited;
+			var params = _n0.params;
+			var frag = _n0.frag;
+			var value = _n0.value;
+			if (!unvisited.b) {
+				return _List_Nil;
+			} else {
+				var next = unvisited.a;
+				var rest = unvisited.b;
+				return _Utils_eq(next, str) ? _List_fromArray(
+					[
+						A5(
+						elm$url$Url$Parser$State,
+						A2(elm$core$List$cons, next, visited),
+						rest,
+						params,
+						frag,
+						value)
+					]) : _List_Nil;
+			}
+		});
+};
+var elm$url$Url$Parser$slash = F2(
+	function (_n0, _n1) {
+		var parseBefore = _n0.a;
+		var parseAfter = _n1.a;
+		return elm$url$Url$Parser$Parser(
+			function (state) {
+				return A2(
+					elm$core$List$concatMap,
+					parseAfter,
+					parseBefore(state));
+			});
+	});
+var elm$url$Url$Parser$custom = F2(
+	function (tipe, stringToSomething) {
+		return elm$url$Url$Parser$Parser(
+			function (_n0) {
+				var visited = _n0.visited;
+				var unvisited = _n0.unvisited;
+				var params = _n0.params;
+				var frag = _n0.frag;
+				var value = _n0.value;
+				if (!unvisited.b) {
+					return _List_Nil;
+				} else {
+					var next = unvisited.a;
+					var rest = unvisited.b;
+					var _n2 = stringToSomething(next);
+					if (_n2.$ === 'Just') {
+						var nextValue = _n2.a;
+						return _List_fromArray(
+							[
+								A5(
+								elm$url$Url$Parser$State,
+								A2(elm$core$List$cons, next, visited),
+								rest,
+								params,
+								frag,
+								value(nextValue))
+							]);
+					} else {
+						return _List_Nil;
+					}
+				}
+			});
+	});
+var elm$url$Url$Parser$string = A2(elm$url$Url$Parser$custom, 'STRING', elm$core$Maybe$Just);
 var elm$url$Url$Parser$top = elm$url$Url$Parser$Parser(
 	function (state) {
 		return _List_fromArray(
@@ -6263,51 +6262,51 @@ var elm$url$Url$Parser$top = elm$url$Url$Parser$Parser(
 var author$project$Docs$Page$route = elm$url$Url$Parser$oneOf(
 	_List_fromArray(
 		[
+			A2(elm$url$Url$Parser$map, author$project$Docs$Page$Home, elm$url$Url$Parser$top),
 			A2(
 			elm$url$Url$Parser$map,
-			function (v) {
-				_n0$6:
-				while (true) {
-					if (!v.b) {
-						return author$project$Docs$Page$Home;
-					} else {
-						switch (v.a) {
-							case 'messages':
-								var xs = v.b;
-								return author$project$Docs$Page$Messages(
-									elm$core$List$head(xs));
-							case 'changelog':
-								if (!v.b.b) {
-									return author$project$Docs$Page$Changelog;
-								} else {
-									break _n0$6;
-								}
-							case 'features':
-								var xs = v.b;
-								return author$project$Docs$Page$Features(
-									elm$core$List$head(xs));
-							case 'contributing':
-								if (!v.b.b) {
-									return author$project$Docs$Page$Contributing;
-								} else {
-									break _n0$6;
-								}
-							case 'configuration':
-								if (!v.b.b) {
-									return author$project$Docs$Page$Configuration;
-								} else {
-									break _n0$6;
-								}
-							default:
-								break _n0$6;
-						}
-					}
-				}
-				return author$project$Docs$Page$NotFound;
-			},
-			elm$url$Url$Parser$fragment(author$project$Docs$Page$x)),
-			A2(elm$url$Url$Parser$map, author$project$Docs$Page$Home, elm$url$Url$Parser$top)
+			A2(elm$core$Basics$composeL, author$project$Docs$Page$Messages, elm$core$Maybe$Just),
+			A2(
+				elm$url$Url$Parser$slash,
+				elm$url$Url$Parser$s('messages'),
+				elm$url$Url$Parser$string)),
+			A2(
+			elm$url$Url$Parser$map,
+			author$project$Docs$Page$Messages(elm$core$Maybe$Nothing),
+			elm$url$Url$Parser$s('messages')),
+			A2(
+			elm$url$Url$Parser$map,
+			A2(elm$core$Basics$composeL, author$project$Docs$Page$Features, elm$core$Maybe$Just),
+			A2(
+				elm$url$Url$Parser$slash,
+				elm$url$Url$Parser$s('features'),
+				elm$url$Url$Parser$string)),
+			A2(
+			elm$url$Url$Parser$map,
+			author$project$Docs$Page$Features(elm$core$Maybe$Nothing),
+			elm$url$Url$Parser$s('features')),
+			A2(
+			elm$url$Url$Parser$map,
+			author$project$Docs$Page$Changelog,
+			elm$url$Url$Parser$s('changelog')),
+			A2(
+			elm$url$Url$Parser$map,
+			author$project$Docs$Page$Contributing,
+			elm$url$Url$Parser$s('contributing')),
+			A2(
+			elm$url$Url$Parser$map,
+			author$project$Docs$Page$Configuration,
+			elm$url$Url$Parser$s('configuration'))
 		]));
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var elm$url$Url$Parser$getFirstMatch = function (states) {
 	getFirstMatch:
 	while (true) {
@@ -6423,10 +6422,17 @@ var elm$url$Url$Parser$parse = F2(
 					url.fragment,
 					elm$core$Basics$identity)));
 	});
-var author$project$Docs$Page$nextPage = A2(
-	elm$core$Basics$composeR,
-	elm$url$Url$Parser$parse(author$project$Docs$Page$route),
-	elm$core$Maybe$withDefault(author$project$Docs$Page$NotFound));
+var author$project$Docs$Page$nextPage = function (u) {
+	var p = A2(
+		elm$url$Url$Parser$parse,
+		author$project$Docs$Page$route,
+		_Utils_update(
+			u,
+			{
+				path: A2(elm$core$Maybe$withDefault, '', u.fragment)
+			}));
+	return A2(elm$core$Maybe$withDefault, author$project$Docs$Page$Home, p);
+};
 var rundis$elm_bootstrap$Bootstrap$Navbar$Hidden = {$: 'Hidden'};
 var rundis$elm_bootstrap$Bootstrap$Navbar$State = function (a) {
 	return {$: 'State', a: a};
@@ -6470,6 +6476,16 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
+var elm$core$String$length = _String_length;
+var elm$core$String$slice = _String_slice;
+var elm$core$String$dropLeft = F2(
+	function (n, string) {
+		return (n < 1) ? string : A3(
+			elm$core$String$slice,
+			n,
+			elm$core$String$length(string),
+			string);
+	});
 var elm$core$String$startsWith = _String_startsWith;
 var elm$url$Url$Http = {$: 'Http'};
 var elm$url$Url$Https = {$: 'Https'};
@@ -8274,6 +8290,11 @@ var author$project$ASTUtil$Inspector$actionLambda = function (act) {
 				});
 	}
 };
+var elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
 var elm$core$Tuple$second = function (_n0) {
 	var y = _n0.b;
 	return y;
@@ -8355,6 +8376,16 @@ var author$project$ASTUtil$Inspector$inspectSignature = F3(
 				stil4m$elm_syntax$Elm$Syntax$Node$value(signature).typeAnnotation),
 			signature,
 			context);
+	});
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
 	});
 var stil4m$elm_syntax$Elm$Syntax$Node$Node = F2(
 	function (a, b) {
@@ -10377,6 +10408,15 @@ var author$project$Analyser$Checks$TriggerWords$wordSplitter = A2(
 			[v]);
 	},
 	A2(elm$core$Maybe$map, elm$regex$Regex$split, author$project$Analyser$Checks$TriggerWords$splitRegex));
+var elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return elm$core$Maybe$Just(x);
+	} else {
+		return elm$core$Maybe$Nothing;
+	}
+};
 var elm$core$Set$Set_elm_builtin = function (a) {
 	return {$: 'Set_elm_builtin', a: a};
 };
