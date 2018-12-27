@@ -48,7 +48,7 @@
     "node-watch": "0.5.5",
     "open": "0.0.5",
     "os-homedir": "1.0.2",
-    "request": "2.83.0",
+    "request": "2.88.0",
     "sums": "0.2.4",
     "ws": "3.3.1"
   },
@@ -70,7 +70,7 @@
     "chokidar-cli": "1.2.1",
     "elm": "0.19.0-bugfix2",
     "elm-format": "0.8.0",
-    "elm-test": "0.19.0-beta4",
+    "elm-test": "0.19.0-rev3",
     "eslint": "4.10.0",
     "font-awesome": "^4.7.0",
     "gulp": "3.9.1",
