@@ -61,19 +61,15 @@ var args = minimist_1.default(process.argv.slice(2), {
         console.log(elmAnalyseVersion);
         process.exit(0);
     }
-    var packageFileExists = fs.existsSync('./elm-package.json');
+    var packageFileExists = fs.existsSync('./elm.json');
     if (!packageFileExists) {
-        console.log('There is no elm-package.json file in this directory. elm-analyse will only work in directories where such a file is located.');
+        console.log('There is no elm.json file in this directory. elm-analyse will only work in directories where such a file is located.');
         process.exit(1);
     }
-    var elmStuffExists = fs.existsSync('./elm-stuff');
-    if (!elmStuffExists || !fs.existsSync('./elm-stuff/exact-dependencies.json')) {
-        console.log('Cannot detect which packages are installed. Please run `elm-package install` once.');
-        process.exit(1);
-    }
+    var projectFile = JSON.parse(fs.readFileSync('./elm.json').toString());
     if (args.serve) {
-        app_1.default.start(config, info);
+        app_1.default.start(config, info, projectFile);
         return;
     }
-    analyser_1.default.start(config);
+    analyser_1.default.start(config, projectFile);
 })();

@@ -16,12 +16,15 @@ var dependencies = __importStar(require("./util/dependencies"));
 var reporter_1 = __importDefault(require("./reporter"));
 var directory = process.cwd();
 var Elm = require('./backend-elm');
-function start(config) {
+function start(config, project) {
     var reporter = reporter_1.default.build(config.format);
     dependencies.getDependencies(function (registry) {
-        var app = Elm.Analyser.worker({
-            server: false,
-            registry: registry
+        var app = Elm.Elm.Analyser.init({
+            flags: {
+                server: false,
+                registry: registry || [],
+                project: project
+            }
         });
         app.ports.sendReportValue.subscribe(function (report) {
             reporter.report(report);

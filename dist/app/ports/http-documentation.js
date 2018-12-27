@@ -11,7 +11,7 @@ var request = __importStar(require("request"));
 function setup(app) {
     app.ports.loadHttpDocumentation.subscribe(function (pointer) {
         var name = pointer.name, version = pointer.version;
-        request.get("http://package.elm-lang.org/packages/" + name + "/" + version + "/documentation.json", function (err, _response, body) {
+        request.get("http://package.elm-lang.org/packages/" + name + "/" + version + "/docs.json", function (err, _response, body) {
             if (err) {
                 app.ports.onHttpDocumentation.send({
                     dependency: pointer,
