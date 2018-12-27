@@ -57,7 +57,7 @@ function targetFilesForPathAndPackage(directory: string, path: string, pack: Elm
             }
         }
 
-        const result = dirParts.map(() => '../').join() + sParts.join('/');
+        const result = dirParts.map(() => '../').join('') + sParts.join('/');
         return _path.normalize(result);
     });
     return targetFiles;
