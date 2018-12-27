@@ -22,7 +22,7 @@ The following binaries should be available on the path:
 
 ```
 node >=8
-elm  0.18.x
+elm  0.19.x
 elm-format (a version that is compatible with the source code you wish to analyse)
 ```
 

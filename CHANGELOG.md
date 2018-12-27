@@ -1,5 +1,12 @@
 # elm-analyse changelog
 
+## 0.16.0 (2018-12-27)
+
+* Elm 0.19 support. `elm-analyse` can now be used to analyse Elm code written for version `0.19`. Prior versions of Elm are no longer supported.
+* [Issue #178](https://github.com/stil4m/elm-analyse/issues/178) Parent folders not resolved properly.
+* [PR #174](https://github.com/stil4m/elm-analyse/pull/174) Fix for content overlow. Thanks to @jhrcek.
+
+
 ## 0.15.0 (2018-07-29)
 
 * [Issue #152](https://github.com/stil4m/elm-analyse/issues/152) Covered some performance concerns
