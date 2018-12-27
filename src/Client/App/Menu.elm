@@ -1,25 +1,19 @@
 module Client.App.Menu exposing (view)
 
-import Client.Routing as Routing
-import Html exposing (Html, a, button, div, form, i, li, nav, text, ul)
-import Html.Attributes exposing (attribute, class, href, style, type_)
+import Client.Routing as Routing exposing (Route)
+import Html exposing (Html, a, div, i, li, nav, text, ul)
+import Html.Attributes exposing (attribute, class, href, style)
 import Html.Events exposing (onClick)
-import Navigation exposing (Location)
+import Url exposing (Url)
 
 
-view : msg -> Location -> Html msg
-view refresh l =
-    nav [ class "navbar navbar-default navbar-static-top", attribute "role" "navigation", style [ ( "margin-bottom", "0" ) ] ]
+view : Url -> Html (Result Route msg)
+view l =
+    nav [ class "navbar navbar-default navbar-static-top", attribute "role" "navigation", style "margin-bottom" "0" ]
         [ div [ class "navbar-header" ]
             [ a
                 [ class "navbar-brand", href "/" ]
                 [ text "Elm Analyse" ]
-            , form
-                [ class "navbar-form navbar-right" ]
-                [ button
-                    [ type_ "button", class "btn btn-default", onClick refresh ]
-                    [ text "Re-analyse" ]
-                ]
             ]
         , div [ class "navbar-default sidebar", attribute "role" "navigation" ]
             [ div [ class "sidebar-nav" ]
@@ -32,20 +26,22 @@ view refresh l =
                     ]
                 ]
             ]
+            |> Html.map Err
         ]
 
 
-isActiveClass : Location -> Routing.Route -> String
+isActiveClass : Url -> Routing.Route -> String
 isActiveClass l r =
     if Routing.fromLocation l == r then
         "active"
+
     else
         ""
 
 
-menuItem : Location -> Routing.Route -> String -> String -> Html msg
+menuItem : Url -> Routing.Route -> String -> String -> Html Route
 menuItem location route name icon =
     li [ class (isActiveClass location route) ]
-        [ a [ href (Routing.toUrl route) ]
+        [ a [ href (Routing.toUrl route), Html.Events.onClick route ]
             [ i [ class ("fa fa-" ++ icon ++ " fa-fw") ] [], text " ", text name ]
         ]

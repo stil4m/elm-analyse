@@ -14,6 +14,7 @@ view : Int -> ModuleGraph -> Html msg
 view count graph =
     if Graph.isEmpty graph then
         Html.text ""
+
     else
         topListInAndOut count graph
 
@@ -61,8 +62,8 @@ topList nodeContexts =
                 (\nodeContext ->
                     Html.tr []
                         [ Html.td [] [ Html.text nodeContext.node.label.text ]
-                        , Html.td [] [ Html.text (toString (IntDict.size nodeContext.incoming)) ]
-                        , Html.td [] [ Html.text (toString (IntDict.size nodeContext.outgoing)) ]
+                        , Html.td [] [ Html.text (String.fromInt (IntDict.size nodeContext.incoming)) ]
+                        , Html.td [] [ Html.text (String.fromInt (IntDict.size nodeContext.outgoing)) ]
                         ]
                 )
                 nodeContexts

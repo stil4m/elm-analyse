@@ -124,7 +124,7 @@ dependencyInformation =
                     , Html.text "Elm Analyser will help you get insight into this."
                     ]
                 , Html.p []
-                    [ Html.text "Firstly, the elm-analyse checker will exit with a non-zero exit code when you have dependencies specified in your elm-package.json that you do not use."
+                    [ Html.text "Firstly, the elm-analyse checker will exit with a non-zero exit code when you have dependencies specified in your elm.json that you do not use."
                     ]
                 , Html.p []
                     [ Html.text "Secondly, the GUI will show in a simple table what the state of your dependencies are."

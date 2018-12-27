@@ -1,31 +1,29 @@
-module Analyser.State
-    exposing
-        ( State
-        , Status
-        , addFixToQueue
-        , decodeState
-        , encodeState
-        , encodeStatus
-        , finishWithNewMessages
-        , getMessage
-        , initialState
-        , isBusy
-        , nextTask
-        , outdateMessagesForFile
-        , removeMessagesForFile
-        , startFixing
-        , updateModules
-        , withDependencies
-        )
+module Analyser.State exposing
+    ( State
+    , Status
+    , addFixToQueue
+    , decodeState
+    , encodeState
+    , encodeStatus
+    , finishWithNewMessages
+    , getMessage
+    , initialState
+    , isBusy
+    , nextTask
+    , outdateMessagesForFile
+    , removeMessagesForFile
+    , startFixing
+    , updateModules
+    , withDependencies
+    )
 
 import Analyser.Messages.Json exposing (decodeMessage, encodeMessage)
 import Analyser.Messages.Schemas exposing (Schemas)
-import Analyser.Messages.Types as Messages exposing (Message, MessageId, MessageStatus(Applicable))
+import Analyser.Messages.Types as Messages exposing (Message, MessageId, MessageStatus(..))
 import Analyser.Messages.Util as Messages exposing (blockForShas, markFixing)
 import Analyser.Modules exposing (Modules)
 import Analyser.State.Dependencies exposing (Dependencies)
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Extra exposing ((|:))
 import Json.Encode as JE exposing (Value)
 import List.Extra as List
 
@@ -112,7 +110,7 @@ sortMessages state =
             state.messages
                 |> List.sortWith Messages.compareMessageFile
                 |> List.groupWhile (\a b -> Messages.messageFile a == Messages.messageFile b)
-                |> List.concatMap (List.sortWith Messages.compareMessageLocation)
+                |> List.concatMap (\( a, b ) -> (a :: b) |> List.sortWith Messages.compareMessageLocation)
     }
 
 
@@ -130,6 +128,7 @@ outdateMessagesForFile fileName state =
                     (\m ->
                         if Messages.messageFile m == fileName then
                             Messages.outdate m
+
                         else
                             m
                     )
@@ -166,23 +165,23 @@ updateModules newModules s =
 
 decodeState : Schemas -> Decoder State
 decodeState schemas =
-    JD.succeed State
-        |: JD.field "messages" (JD.list (decodeMessage schemas))
-        |: JD.field "dependencies" Analyser.State.Dependencies.decode
-        |: JD.field "idCount" JD.int
-        |: JD.field "status" decodeStatus
-        |: JD.field "queue" (JD.list JD.int)
-        |: JD.field "modules" Analyser.Modules.decode
+    JD.map6 State
+        (JD.field "messages" (JD.list (decodeMessage schemas)))
+        (JD.field "dependencies" Analyser.State.Dependencies.decode)
+        (JD.field "idCount" JD.int)
+        (JD.field "status" decodeStatus)
+        (JD.field "queue" (JD.list JD.int))
+        (JD.field "modules" Analyser.Modules.decode)
 
 
 encodeState : State -> Value
 encodeState state =
     JE.object
-        [ ( "messages", JE.list (List.map encodeMessage state.messages) )
+        [ ( "messages", JE.list encodeMessage state.messages )
         , ( "dependencies", Analyser.State.Dependencies.encode state.dependencies )
         , ( "idCount", JE.int state.idCount )
         , ( "status", encodeStatus state.status )
-        , ( "queue", JE.list (List.map JE.int state.queue) )
+        , ( "queue", JE.list JE.int state.queue )
         , ( "modules", Analyser.Modules.encode state.modules )
         ]
 

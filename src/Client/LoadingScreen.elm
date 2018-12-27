@@ -14,10 +14,9 @@ viewRemoteData rd f =
         RD.Success state ->
             f state
 
-        RD.Failure e ->
+        RD.Failure _ ->
             div []
-                [ text "Something went wrong"
-                , text <| toString e
+                [ text "Something went wrong..."
                 ]
 
         RD.NotAsked ->
@@ -33,5 +32,6 @@ viewState : (State -> Html msg) -> State -> Html msg
 viewState f state =
     if State.isBusy state then
         text "Loading..."
+
     else
         f state

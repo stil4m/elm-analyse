@@ -56,17 +56,17 @@ type alias InnerModel =
 
 init : Int -> State -> Maybe ( Model, Cmd Msg, State )
 init x state =
-    State.getMessage x state |> Maybe.andThen (flip initWithMessage state)
+    State.getMessage x state |> Maybe.andThen (\a -> initWithMessage a state)
 
 
 initWithMessage : Message -> State -> Maybe ( Model, Cmd Msg, State )
-initWithMessage message state =
-    Analyser.Fixers.getFixer message
+initWithMessage mess state =
+    Analyser.Fixers.getFixer mess
         |> Maybe.map
             (\fixer ->
-                ( Model { message = message, fixer = fixer, done = False, success = True }
-                , loadFileContentWithSha message.file.path
-                , State.startFixing message state
+                ( Model { message = mess, fixer = fixer, done = False, success = True }
+                , loadFileContentWithSha mess.file.path
+                , State.startFixing mess state
                 )
             )
 
@@ -94,6 +94,7 @@ update codeBase msg (Model model) =
                 ( Model { model | done = True, success = False }
                 , Logger.warning "Could not fix file: Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages."
                 )
+
             else
                 let
                     changedContent =
@@ -101,7 +102,7 @@ update codeBase msg (Model model) =
                             |> (\fileLoad ->
                                     Parser.parse fileLoad.content
                                         |> Result.map (Processing.process (CodeBase.processContext codeBase))
-                                        |> Result.map ((,) fileLoad.content)
+                                        |> Result.map (\b -> ( fileLoad.content, b ))
                                         |> Result.toMaybe
                                )
                             |> Result.fromMaybe "Could not parse file"
@@ -141,8 +142,8 @@ applyFix model pair =
 
 
 fileHashEqual : FileLoad -> Message -> Bool
-fileHashEqual reference message =
-    reference.file == message.file
+fileHashEqual reference mess =
+    reference.file == mess.file
 
 
 subscriptions : Model -> Sub Msg

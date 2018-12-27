@@ -1,28 +1,38 @@
-module Client.State exposing (State, listen, tick, toMaybe, view)
+module Client.State exposing (State, fix, refresh, tick, toMaybe, view)
 
 import Analyser.Checks
+import Analyser.Messages.Types exposing (Message)
 import Analyser.State as AS
 import Client.LoadingScreen as LoadingScreen
-import Client.Socket exposing (dashboardAddress)
 import Html exposing (Html)
+import Http
 import Json.Decode as JD
-import Navigation exposing (Location)
+import Json.Encode as JE
 import RemoteData exposing (RemoteData)
-import WebSocket as WS
+import Url exposing (Url)
 
 
 type alias State =
-    RemoteData String AS.State
+    RemoteData Http.Error AS.State
 
 
-listen : Location -> Sub State
-listen location =
-    WS.listen (dashboardAddress location) (JD.decodeString (AS.decodeState Analyser.Checks.schemas) >> RemoteData.fromResult)
+fix : Message -> Cmd (Result Http.Error ())
+fix mess =
+    Http.post "/api/fix" (Http.jsonBody (JE.object [ ( "id", JE.int mess.id ) ])) (JD.succeed ())
+        |> Http.send identity
 
 
-tick : Location -> Cmd msg
-tick location =
-    WS.send (dashboardAddress location) "ping"
+refresh : Cmd (Result Http.Error String)
+refresh =
+    Http.post "/api/refresh" Http.emptyBody (JD.succeed "")
+        |> Http.send identity
+
+
+tick : Url -> Cmd State
+tick _ =
+    Http.get "/state" (AS.decodeState Analyser.Checks.schemas)
+        |> Http.send identity
+        |> Cmd.map RemoteData.fromResult
 
 
 toMaybe : State -> Maybe AS.State

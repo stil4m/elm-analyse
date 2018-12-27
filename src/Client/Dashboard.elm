@@ -16,14 +16,14 @@ view state =
 
 viewState : State.State -> Html msg
 viewState state =
-    div [ Html.Attributes.style [ ( "padding-top", "20px" ) ] ]
+    div [ Html.Attributes.style "padding-top" "20px" ]
         [ Html.div [ Html.Attributes.class "row" ]
             [ Html.div [ Html.Attributes.class "col-md-12" ]
                 [ Html.a [ Html.Attributes.href (Routing.toUrl Routing.FileTree) ]
-                    [ Widget.view Widget.Default "Modules" "fa-info-circle" (List.length state.modules.projectModules)
+                    [ Widget.view Widget.Default "Modules" "fa-info-circle" (String.fromInt <| List.length state.modules.projectModules)
                     ]
                 , Html.a [ Html.Attributes.href (Routing.toUrl Routing.Modules) ]
-                    [ Widget.view Widget.Default "Imports" "fa-info-circle" (List.length state.modules.dependencies)
+                    [ Widget.view Widget.Default "Imports" "fa-info-circle" (String.fromInt <| List.length state.modules.dependencies)
                     ]
                 ]
             ]
@@ -46,7 +46,8 @@ listValueWidget title x =
         ( t, i ) =
             if List.isEmpty x then
                 ( Widget.Success, "fa-check-circle-o" )
+
             else
                 ( Widget.Error, " fa-times-circle-o" )
     in
-    Widget.view t title i (List.length x)
+    Widget.view t title i (String.fromInt <| List.length x)

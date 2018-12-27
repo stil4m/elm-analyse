@@ -1,11 +1,10 @@
-module Client.View.Panel
-    exposing
-        ( HeaderButton(..)
-        , Width(..)
-        , documentationButton
-        , view
-        , viewWithFooter
-        )
+module Client.View.Panel exposing
+    ( HeaderButton(..)
+    , Width(..)
+    , documentationButton
+    , view
+    , viewWithFooter
+    )
 
 {-| Provides helper functions panels.
 -}
@@ -65,7 +64,7 @@ headerButton button =
     case button of
         Documentation href ->
             Html.a
-                [ Html.href href, Html.style [ ( "float", "right" ) ] ]
+                [ Html.href href, Html.style "float" "right" ]
                 [ Html.i [ Html.class "fa fa-book" ] []
                 ]
 

@@ -5,7 +5,6 @@ import Elm.Dependency exposing (Dependency)
 import Elm.Interface exposing (Exposed(..), Interface)
 import Elm.Syntax.Infix as Infix
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Extra exposing ((|:))
 import Json.Encode as JE exposing (Value)
 import Util.Json exposing (decodeTyped, encodeTyped)
 
@@ -27,18 +26,19 @@ serialiseDependency =
 
 decodeDependency : Decoder Dependency
 decodeDependency =
-    JD.succeed Dependency
-        |: JD.field "name" JD.string
-        |: JD.field "version" JD.string
-        |: JD.field "interfaces"
+    JD.map3 Dependency
+        (JD.field "name" JD.string)
+        (JD.field "version" JD.string)
+        (JD.field "interfaces"
             (JD.map Dict.fromList <|
                 JD.list
                     (JD.map2
-                        (,)
+                        (\a b -> ( a, b ))
                         (JD.field "key" (JD.list JD.string))
                         (JD.field "value" decodeInterface)
                     )
             )
+        )
 
 
 encodeDependency : Dependency -> Value
@@ -49,18 +49,20 @@ encodeDependency dep =
         , ( "interfaces"
           , dep.interfaces
                 |> Dict.toList
-                |> List.map
-                    (\( k, v ) ->
-                        JE.object [ ( "key", JE.list <| List.map JE.string k ), ( "value", encodeInterface v ) ]
-                    )
                 |> JE.list
+                    (\( k, v ) ->
+                        JE.object
+                            [ ( "key", JE.list JE.string k )
+                            , ( "value", encodeInterface v )
+                            ]
+                    )
           )
         ]
 
 
 encodeInterface : Interface -> Value
 encodeInterface =
-    JE.list << List.map encodeExposedInterface
+    JE.list encodeExposedInterface
 
 
 encodeExposedInterface : Exposed -> Value
@@ -70,11 +72,11 @@ encodeExposedInterface x =
             Function s ->
                 encodeTyped "function" (JE.string s)
 
-            Type ( name, constructors ) ->
+            CustomType ( name, constructors ) ->
                 encodeTyped "type_"
                     (JE.object
                         [ ( "name", JE.string name )
-                        , ( "constructors", JE.list <| List.map JE.string constructors )
+                        , ( "constructors", JE.list JE.string constructors )
                         ]
                     )
 
@@ -95,11 +97,11 @@ decodeExposedInterface =
     decodeTyped
         [ ( "function", JD.string |> JD.map Function )
         , ( "type_"
-          , JD.succeed (,)
-                |: JD.field "name" JD.string
-                |: JD.field "constructors" (JD.list JD.string)
-                |> JD.map Type
+          , JD.map2 Tuple.pair
+                (JD.field "name" JD.string)
+                (JD.field "constructors" (JD.list JD.string))
+                |> JD.map CustomType
           )
         , ( "alias", JD.string |> JD.map Alias )
-        , ( "operator", Infix.decode |> JD.map Operator )
+        , ( "operator", Infix.decoder |> JD.map Operator )
         ]

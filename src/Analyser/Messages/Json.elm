@@ -5,7 +5,6 @@ import Analyser.Messages.Data as Data
 import Analyser.Messages.Schemas as Schemas exposing (Schemas)
 import Analyser.Messages.Types exposing (Message, MessageStatus(..))
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Extra exposing ((|:))
 import Json.Encode as JE
 
 
@@ -14,12 +13,12 @@ decodeMessage schemas =
     JD.field "type" JD.string
         |> JD.andThen
             (\t ->
-                JD.succeed Message
-                    |: JD.field "id" JD.int
-                    |: JD.field "status" decodeMessageStatus
-                    |: JD.field "file" FileRef.decoder
-                    |: JD.succeed t
-                    |: JD.field "data" (Schemas.decoderFor t schemas)
+                JD.map5 Message
+                    (JD.field "id" JD.int)
+                    (JD.field "status" decodeMessageStatus)
+                    (JD.field "file" FileRef.decoder)
+                    (JD.succeed t)
+                    (JD.field "data" (Schemas.decoderFor t schemas))
             )
 
 

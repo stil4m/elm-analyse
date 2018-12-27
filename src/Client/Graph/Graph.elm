@@ -1,10 +1,9 @@
-module Client.Graph.Graph
-    exposing
-        ( Model
-        , init
-        , onNewState
-        , view
-        )
+module Client.Graph.Graph exposing
+    ( Model
+    , init
+    , onNewState
+    , view
+    )
 
 import Client.Graph.Table as Table
 import Client.Graph.Widgets as Widgets

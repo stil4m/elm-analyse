@@ -1,4 +1,4 @@
-module Client.MessagesPage exposing (Model, Msg, init, onNewState, subscriptions, update, view)
+module Client.MessagesPage exposing (Model, Msg, init, onNewState, update, view)
 
 import Analyser.Messages.Grouped as Grouped exposing (GroupedMessages)
 import Client.Components.MessageList as MessageList
@@ -7,8 +7,8 @@ import Client.State exposing (State)
 import Html exposing (Html, button, div, h3, text)
 import Html.Attributes exposing (class, classList, type_)
 import Html.Events exposing (onClick)
-import Navigation exposing (Location)
 import RemoteData as RD
+import Url exposing (Url)
 
 
 type alias Model =
@@ -25,11 +25,6 @@ type Msg
 type MessageGrouper
     = GroupByFileName
     | GroupByType
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    MessageList.subscriptions model.messageList |> Sub.map MessageListMsg
 
 
 init : State -> Model
@@ -64,7 +59,7 @@ buildMessageList s grouper old =
     MessageList.withMessages (groupMessages s grouper) old
 
 
-update : State -> Location -> Msg -> Model -> ( Model, Cmd Msg )
+update : State -> Url -> Msg -> Model -> ( Model, Cmd Msg )
 update state location msg model =
     case msg of
         MessageListMsg subMsg ->

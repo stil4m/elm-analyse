@@ -1,8 +1,8 @@
 module ASTUtil.PatternOptimizer exposing (optimize)
 
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Pattern exposing (Pattern(..))
 import Elm.Syntax.Range exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 
 
 emptyRange : Range
@@ -10,9 +10,9 @@ emptyRange =
     { start = { row = 0, column = 0 }, end = { row = 0, column = 0 } }
 
 
-isAllPattern : Ranged Pattern -> Bool
+isAllPattern : Node Pattern -> Bool
 isAllPattern p =
-    case Tuple.second p of
+    case Node.value p of
         AllPattern ->
             True
 
@@ -20,10 +20,11 @@ isAllPattern p =
             False
 
 
-optimize : Range -> Ranged Pattern -> Ranged Pattern
-optimize range (( r, pattern ) as input) =
+optimize : Range -> Node Pattern -> Node Pattern
+optimize range ((Node r pattern) as input) =
     if r == range then
-        ( emptyRange, AllPattern )
+        Node emptyRange AllPattern
+
     else
         case pattern of
             TuplePattern xs ->
@@ -32,44 +33,46 @@ optimize range (( r, pattern ) as input) =
                         List.map (optimize range) xs
                 in
                 if List.all isAllPattern cleaned then
-                    ( emptyRange, AllPattern )
+                    Node emptyRange AllPattern
+
                 else
-                    ( r, TuplePattern cleaned )
+                    Node r <| TuplePattern cleaned
 
             RecordPattern inner ->
                 let
                     cleaned =
-                        List.filter (.range >> (/=) range) inner
+                        List.filter (Node.range >> (/=) range) inner
                 in
                 case cleaned of
                     [] ->
-                        ( emptyRange, AllPattern )
+                        Node emptyRange AllPattern
 
                     xs ->
-                        ( r, RecordPattern xs )
+                        Node r <| RecordPattern xs
 
             UnConsPattern left right ->
-                ( r, UnConsPattern (optimize range left) (optimize range right) )
+                Node r <| UnConsPattern (optimize range left) (optimize range right)
 
             ListPattern xs ->
-                ( r, ListPattern (List.map (optimize range) xs) )
+                Node r <| ListPattern (List.map (optimize range) xs)
 
             NamedPattern qnr inner ->
-                ( r, NamedPattern qnr (List.map (optimize range) inner) )
+                Node r <| NamedPattern qnr (List.map (optimize range) inner)
 
             AsPattern subPattern asPointer ->
-                if asPointer.range == range then
+                if Node.range asPointer == range then
                     subPattern
+
                 else
                     case optimize range subPattern of
-                        ( _, AllPattern ) ->
-                            ( asPointer.range, VarPattern asPointer.value )
+                        Node _ AllPattern ->
+                            Node (Node.range asPointer) <| VarPattern <| Node.value asPointer
 
                         other ->
-                            ( r, AsPattern other asPointer )
+                            Node r <| AsPattern other asPointer
 
             ParenthesizedPattern inner ->
-                ( r, ParenthesizedPattern (optimize range inner) )
+                Node r <| ParenthesizedPattern (optimize range inner)
 
             VarPattern _ ->
                 input

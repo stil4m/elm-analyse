@@ -1,7 +1,7 @@
 module Docs.Menu exposing (menu)
 
 import Bootstrap.Navbar as Navbar
-import Docs.Page as Page exposing (Page(Changelog, Configuration, Contributing, Features, Home, Messages))
+import Docs.Page as Page exposing (Page(..))
 import Html exposing (text)
 import Html.Attributes exposing (href)
 

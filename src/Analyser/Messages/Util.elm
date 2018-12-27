@@ -10,6 +10,7 @@ blockForShas : String -> Message -> Message
 blockForShas sha message =
     if message.file.version == sha then
         { message | status = Blocked }
+
     else
         message
 
@@ -18,6 +19,7 @@ markFixing : Int -> Message -> Message
 markFixing x message =
     if message.id == x then
         { message | status = Fixing }
+
     else
         message
 

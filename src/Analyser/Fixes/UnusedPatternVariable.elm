@@ -7,6 +7,7 @@ import Analyser.Fixes.Base exposing (Fixer, Patch(..))
 import Analyser.Fixes.FileContent as FileContent
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Node as Node
 import Elm.Syntax.Range exposing (Range)
 import Elm.Writer as Writer
 
@@ -32,7 +33,7 @@ fixPattern ( content, ast ) range =
         Just parentPattern ->
             Patched <|
                 FileContent.replaceRangeWith
-                    (Tuple.first parentPattern)
+                    (Node.range parentPattern)
                     (Writer.writePattern (PatternOptimizer.optimize range parentPattern)
                         |> Writer.write
                     )

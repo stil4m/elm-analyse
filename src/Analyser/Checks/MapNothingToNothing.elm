@@ -1,13 +1,14 @@
 module Analyser.Checks.MapNothingToNothing exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Inner), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (Case, Expression(..))
+import Elm.Syntax.Node exposing (Node(..))
 import Elm.Syntax.Pattern exposing (Pattern(..))
 import Elm.Syntax.Range exposing (Range)
 
@@ -32,10 +33,11 @@ scan fileContext _ =
 
 
 onCase : (List MessageData -> List MessageData) -> Case -> List MessageData -> List MessageData
-onCase _ ( ( { start }, pattern ), ( { end }, expression ) ) context =
+onCase _ ( Node { start } pattern, Node { end } expression ) context =
     if isNothingPattern pattern && isNothingExpression expression then
         buildMessage { start = start, end = end }
             :: context
+
     else
         context
 
@@ -47,7 +49,7 @@ isNothingPattern pattern =
 
 isNothingExpression : Expression -> Bool
 isNothingExpression expression =
-    expression == FunctionOrValue "Nothing"
+    expression == FunctionOrValue [] "Nothing"
 
 
 buildMessage : Range -> MessageData

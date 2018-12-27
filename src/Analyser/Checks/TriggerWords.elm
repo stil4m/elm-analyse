@@ -6,8 +6,8 @@ import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
+import Elm.Syntax.Node exposing (Node(..))
 import Elm.Syntax.Range as Syntax exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 import Json.Decode as JD
 import Regex
 import Set
@@ -57,24 +57,31 @@ buildMessage ( word, range ) =
         |> Data.addRange "range" range
 
 
-splitRegex : Regex.Regex
+splitRegex : Maybe Regex.Regex
 splitRegex =
-    Regex.regex "[^\\w]+"
+    Regex.fromString "[^\\w]+"
 
 
-withTriggerWord : List String -> Ranged String -> Maybe ( String, Syntax.Range )
-withTriggerWord words ( range, commentText ) =
+wordSplitter : String -> List String
+wordSplitter =
+    splitRegex
+        |> Maybe.map Regex.split
+        |> Maybe.withDefault (\v -> [ v ])
+
+
+withTriggerWord : List String -> Node String -> Maybe ( String, Syntax.Range )
+withTriggerWord words (Node range commentText) =
     let
         commentWords =
-            Regex.split Regex.All splitRegex commentText
+            wordSplitter commentText
                 |> List.map normalizeWord
                 |> Set.fromList
     in
     words
         |> List.map (\x -> ( x, normalizeWord x ))
-        |> List.filter (Tuple.second >> flip Set.member commentWords)
+        |> List.filter (Tuple.second >> (\a -> Set.member a commentWords))
         |> List.head
-        |> Maybe.map (Tuple.first >> flip (,) range)
+        |> Maybe.map (Tuple.first >> (\a -> ( a, range )))
 
 
 normalizeWord : String -> String

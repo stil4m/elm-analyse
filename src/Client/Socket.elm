@@ -1,13 +1,13 @@
 module Client.Socket exposing (controlAddress, dashboardAddress)
 
-import Navigation exposing (Location)
+import Url exposing (Url)
 
 
-controlAddress : Location -> String
+controlAddress : Url -> String
 controlAddress { host } =
     "ws://" ++ host ++ "/control"
 
 
-dashboardAddress : Location -> String
+dashboardAddress : Url -> String
 dashboardAddress { host } =
     "ws://" ++ host ++ "/state"

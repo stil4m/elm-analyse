@@ -2,23 +2,20 @@ module Analyser.Checks exposing (all, schemas)
 
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Checks.BooleanCase as BooleanCase
-import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.DebugCrash as DebugCrash
 import Analyser.Checks.DebugLog as DebugLog
 import Analyser.Checks.DropConcatOfLists as DropConcatOfLists
 import Analyser.Checks.DropConsOfItemAndList as DropConsOfItemAndList
 import Analyser.Checks.DuplicateImport as DuplicateImport
 import Analyser.Checks.DuplicateImportedVariable as DuplicateImportedVariable
-import Analyser.Checks.DuplicateRecordFieldUpdate as DuplicateRecordFieldUpdate
 import Analyser.Checks.ExposeAll as ExposeAll
+import Analyser.Checks.FileLoadFailed as FileLoadFailed
 import Analyser.Checks.FunctionInLet as FunctionInLet
 import Analyser.Checks.ImportAll as ImportAll
 import Analyser.Checks.MapNothingToNothing as MapNothingToNothing
 import Analyser.Checks.MultiLineRecordFormatting as MultiLineRecordFormatting
 import Analyser.Checks.NoTopLevelSignature as NoTopLevelSignature
 import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
-import Analyser.Checks.NonStaticRegex as NonStaticRegex
-import Analyser.Checks.OverriddenVariables as OverriddenVariables
 import Analyser.Checks.SingleFieldRecord as SingleFieldRecord
 import Analyser.Checks.TriggerWords as TriggerWords
 import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
@@ -38,7 +35,7 @@ import Analyser.Messages.Schemas as Schemas exposing (Schemas)
 
 schemas : Schemas
 schemas =
-    Schemas.buildSchemas all
+    Schemas.buildSchemas (FileLoadFailed.checker :: all)
 
 
 all : List Checker
@@ -57,7 +54,6 @@ all =
     , DuplicateImport.checker
     , DuplicateImportedVariable.checker
     , UnusedTypeAlias.checker
-    , OverriddenVariables.checker
     , NoUncurriedPrefix.checker
     , UnusedImportAlias.checker
     , UnusedImport.checker
@@ -67,10 +63,7 @@ all =
     , UnnecessaryListConcat.checker
     , MultiLineRecordFormatting.checker
     , UnnecessaryPortModule.checker
-    , NonStaticRegex.checker
-    , CoreArrayUsage.checker
     , FunctionInLet.checker
-    , DuplicateRecordFieldUpdate.checker
     , SingleFieldRecord.checker
     , TriggerWords.checker
     , BooleanCase.checker

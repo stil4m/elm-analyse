@@ -1,24 +1,30 @@
 module ASTUtil.Functions exposing (isStatic)
 
-import Elm.Syntax.Expression exposing (Function, FunctionSignature)
-import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(FunctionTypeAnnotation))
+import Elm.Syntax.Expression exposing (Function)
+import Elm.Syntax.Node as Node
+import Elm.Syntax.Signature exposing (Signature)
+import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
 
 
 isStatic : Function -> Bool
 isStatic function =
-    if List.length function.declaration.arguments > 0 then
+    let
+        decl =
+            Node.value function.declaration
+    in
+    if List.length decl.arguments > 0 then
         False
-    else if function.declaration.operatorDefinition then
+
+    else if Maybe.withDefault False <| Maybe.map (Node.value >> isFunctionSignature) function.signature then
         False
-    else if Maybe.withDefault False <| Maybe.map (Tuple.second >> isFunctionSignature) function.signature then
-        False
+
     else
         True
 
 
-isFunctionSignature : FunctionSignature -> Bool
+isFunctionSignature : Signature -> Bool
 isFunctionSignature { typeAnnotation } =
-    isFunctionTypeAnnotation (Tuple.second typeAnnotation)
+    isFunctionTypeAnnotation (Node.value typeAnnotation)
 
 
 isFunctionTypeAnnotation : TypeAnnotation -> Bool
