@@ -16483,19 +16483,29 @@ var stil4m$elm_syntax$Elm$Parser$Declarations$reference = function () {
 			_List_fromArray(
 				[
 					A2(
-					stil4m$elm_syntax$Combine$andThen,
-					function (t) {
-						return helper(
-							_Utils_Tuple2(
-								t,
-								A2(elm$core$List$cons, n, xs)));
-					},
-					A2(
-						stil4m$elm_syntax$Combine$continueWith,
-						stil4m$elm_syntax$Combine$choice(
-							_List_fromArray(
-								[stil4m$elm_syntax$Elm$Parser$Tokens$typeName, stil4m$elm_syntax$Elm$Parser$Tokens$functionName])),
-						stil4m$elm_syntax$Combine$string('.'))),
+					stil4m$elm_syntax$Combine$continueWith,
+					stil4m$elm_syntax$Combine$choice(
+						_List_fromArray(
+							[
+								A2(
+								stil4m$elm_syntax$Combine$andThen,
+								function (t) {
+									return helper(
+										_Utils_Tuple2(
+											t,
+											A2(elm$core$List$cons, n, xs)));
+								},
+								stil4m$elm_syntax$Elm$Parser$Tokens$typeName),
+								A2(
+								stil4m$elm_syntax$Combine$map,
+								function (t) {
+									return _Utils_Tuple2(
+										t,
+										A2(elm$core$List$cons, n, xs));
+								},
+								stil4m$elm_syntax$Elm$Parser$Tokens$functionName)
+							])),
+					stil4m$elm_syntax$Combine$string('.')),
 					stil4m$elm_syntax$Combine$succeed(
 					_Utils_Tuple2(n, xs))
 				]));

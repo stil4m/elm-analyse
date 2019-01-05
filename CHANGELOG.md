@@ -1,5 +1,11 @@
 # elm-analyse changelog
 
+
+## 0.16.1 (2019-01-05)
+
+* [Issue #186](https://github.com/stil4m/elm-analyse/issues/186) Fix for security vulnerability. Thanks to @decioferreira.
+
+
 ## 0.16.0 (2018-12-27)
 
 * Elm 0.19 support. `elm-analyse` can now be used to analyse Elm code written for version `0.19`. Prior versions of Elm are no longer supported.
