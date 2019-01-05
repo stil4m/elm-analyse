@@ -6,7 +6,7 @@ tsc:
 	./node_modules/.bin/tsc
 
 elm-backend:
-	./node_modules/.bin/elm make src/Analyser.elm --output dist/app/backend-elm.js  --optimize
+	./node_modules/.bin/elm make src/Analyser.elm --output dist/app/backend-elm.js --optimize
 
 elm-client:
 	./node_modules/.bin/elm make src/Client.elm --output dist/public/client-elm.js --optimize
