@@ -1,4 +1,4 @@
-import open from 'open';
+import opn from 'opn';
 import * as fileLoadingPorts from '../file-loading-ports';
 import * as loggingPorts from '../util/logging-ports';
 import * as dependencies from '../util/dependencies';
@@ -24,7 +24,7 @@ function run(config: Config, project: {}, onload: (app: ElmApp) => void) {
         fileLoadingPorts.setup(app, config, directory);
         onload(app);
         if (config.open) {
-            open('http://localhost:' + config.port);
+            opn('http://localhost:' + config.port);
         }
     });
 }

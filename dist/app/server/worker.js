@@ -10,7 +10,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var open_1 = __importDefault(require("open"));
+var opn_1 = __importDefault(require("opn"));
 var fileLoadingPorts = __importStar(require("../file-loading-ports"));
 var loggingPorts = __importStar(require("../util/logging-ports"));
 var dependencies = __importStar(require("../util/dependencies"));
@@ -32,7 +32,7 @@ function run(config, project, onload) {
         fileLoadingPorts.setup(app, config, directory);
         onload(app);
         if (config.open) {
-            open_1.default('http://localhost:' + config.port);
+            opn_1.default('http://localhost:' + config.port);
         }
     });
 }

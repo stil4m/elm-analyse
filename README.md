@@ -51,8 +51,10 @@ Add the `-s` option for server mode. This will allow you to view results in your
 | `--help or -h`          | Print the help output. |
 | `--serve or -s`         | Enable server mode. Disabled by default. |
 | `--port or -p`          | The port on which the server should listen. Defaults to 3000 (`--port=3000`). |
+| `--open or -o`          | Open default browser when server goes live. |
 | `--elm-format-path`     | Path to elm-format. Defaults to `elm-format`. |
 | `--version` or `-v`     | Print version of software. |
+| `--format`              | Output format for CLI. Defaults to "human". Valid values are either "human" or "json". |
 
 ---
 

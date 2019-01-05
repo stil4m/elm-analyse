@@ -8127,6 +8127,32 @@ var author$project$Docs$Home$view = A2(
 															_List_Nil,
 															_List_fromArray(
 																[
+																	elm$html$Html$text('--open or -o')
+																]))
+														])),
+													A2(
+													elm$html$Html$td,
+													_List_Nil,
+													_List_fromArray(
+														[
+															elm$html$Html$text('Open default browser when server goes live.')
+														]))
+												])),
+											A2(
+											elm$html$Html$tr,
+											_List_Nil,
+											_List_fromArray(
+												[
+													A2(
+													elm$html$Html$td,
+													_List_Nil,
+													_List_fromArray(
+														[
+															A2(
+															elm$html$Html$code,
+															_List_Nil,
+															_List_fromArray(
+																[
 																	elm$html$Html$text('--elm-format-path')
 																]))
 														])),
