@@ -26,7 +26,7 @@
             "elm-explorations/markdown": "1.0.0",
             "krisajenkins/remotedata": "5.0.0",
             "rundis/elm-bootstrap": "5.0.0",
-            "stil4m/elm-syntax": "7.0.4"
+            "stil4m/elm-syntax": "7.0.5"
         },
         "indirect": {
             "avh4/elm-color": "1.0.0",

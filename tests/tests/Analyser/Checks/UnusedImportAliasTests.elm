@@ -84,6 +84,20 @@ type alias Thing = { name : B.Name }
     )
 
 
+usedAsQualifiedWithNestedRecordAccess : ( String, String, List MessageData )
+usedAsQualifiedWithNestedRecordAccess =
+    ( "usedAsQualifiedWithNestedRecordAccess"
+    , """module Foo exposing (..)
+
+import Bar as B
+
+foo = B.math.add 1
+
+"""
+    , []
+    )
+
+
 all : Test
 all =
     CTU.build "Analyser.Checks.UnusedImportAlias"
@@ -93,4 +107,5 @@ all =
         , usedAsQualifiedInPattern
         , usedInTypeReference
         , usedInTypeAlias
+        , usedAsQualifiedWithNestedRecordAccess
         ]
