@@ -1,7 +1,7 @@
 module Docs.Page exposing (Page(..), hash, nextPage)
 
 import Url exposing (Url)
-import Url.Parser as Url exposing ((</>), Parser, fragment)
+import Url.Parser as Url exposing ((</>), Parser)
 
 
 type Page
@@ -26,11 +26,6 @@ route =
         , Url.map Contributing (Url.s "contributing")
         , Url.map Configuration (Url.s "configuration")
         ]
-
-
-inner : Maybe String -> List String
-inner =
-    Maybe.map (String.dropLeft 1 >> String.split "/") >> Maybe.withDefault []
 
 
 nextPage : Url -> Page
