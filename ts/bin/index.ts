@@ -4,17 +4,19 @@ import minimist from 'minimist';
 import * as fs from 'fs';
 import * as path from 'path';
 import Server from '../server/app';
+import LSPServer from '../server/language-server';
 import Analyser from '../analyser';
 
 var args = minimist(process.argv.slice(2), {
     alias: {
         serve: 's',
+        lsp: 'l',
         help: 'h',
         port: 'p',
         version: 'v',
         open: 'o'
     },
-    boolean: ['serve', 'help', 'version', 'open'],
+    boolean: ['lsp', 'serve', 'help', 'version', 'open'],
     string: ['port', 'elm-format-path', 'format']
 });
 
@@ -49,6 +51,9 @@ var args = minimist(process.argv.slice(2), {
         console.log('   --help, -h          Print the help output.');
         console.log('   --serve, -s         Enable server mode. Disabled by default.');
         console.log('   --port, -p          The port on which the server should listen. Defaults to 3000.');
+        console.log('   --lsp, -l           Enable language server mode. Disabled by default.');
+        console.log('                       You must also specify one of: "--stdio", "--node-ipc",');
+        console.log('                       or "--socket={number}" for the communication method to use.');
         console.log('   --open, -o          Open default browser when server goes live.');
         console.log('   --elm-format-path   Path to elm-format. Defaults to `elm-format`.');
         console.log('   --format            Output format for CLI. Defaults to "human". Options "human"|"json"');
@@ -70,6 +75,9 @@ var args = minimist(process.argv.slice(2), {
 
     if (args.serve) {
         Server.start(config, info, projectFile);
+        return;
+    } else if (args.lsp) {
+        LSPServer.start(config, info, projectFile);
         return;
     }
     Analyser.start(config, projectFile);

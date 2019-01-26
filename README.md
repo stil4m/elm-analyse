@@ -50,6 +50,7 @@ Add the `-s` option for server mode. This will allow you to view results in your
 | ------ | ----------- |
 | `--help or -h`          | Print the help output. |
 | `--serve or -s`         | Enable server mode. Disabled by default. |
+| `--lsp or -l`           | Enable language server mode. Disabled by default. You must also specify one of: `--stdio`, `--node-ipc`, or `--socket={number}` for the communication method to use. |
 | `--port or -p`          | The port on which the server should listen. Defaults to 3000 (`--port=3000`). |
 | `--open or -o`          | Open default browser when server goes live. |
 | `--elm-format-path`     | Path to elm-format. Defaults to `elm-format`. |
