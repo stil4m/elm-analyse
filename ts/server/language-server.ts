@@ -14,6 +14,10 @@ import {
 } from 'vscode-languageserver';
 
 function start(config: Config, info: Info, project: {}) {
+    // Disable console logging while in language server mode
+    // otherwise in stdio mode we will not be sending valid JSON
+    console.log = console.warn = () => {};
+
     let connection = createConnection(ProposedFeatures.all);
     worker.run(config, project, function(elm: ElmApp) {
         let report: Report | null = null;
