@@ -30,6 +30,7 @@
     "lint"
   ],
   "dependencies": {
+    "body-parser": "1.18.3",
     "express": "4.16.3",
     "express-ws": "2.0.0",
     "find": "0.2.7",
