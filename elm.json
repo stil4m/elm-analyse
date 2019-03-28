@@ -8,8 +8,8 @@
     "dependencies": {
         "direct": {
             "alex-tan/elm-dialog": "1.0.0",
-            "elm/browser": "1.0.0",
-            "elm/core": "1.0.0",
+            "elm/browser": "1.0.1",
+            "elm/core": "1.0.2",
             "elm/html": "1.0.0",
             "elm/http": "1.0.0",
             "elm/json": "1.0.0",
@@ -21,12 +21,12 @@
             "elm-community/dict-extra": "2.4.0",
             "elm-community/graph": "6.0.0",
             "elm-community/intdict": "3.0.0",
-            "elm-community/list-extra": "8.0.0",
+            "elm-community/list-extra": "8.1.0",
             "elm-community/maybe-extra": "5.0.0",
             "elm-explorations/markdown": "1.0.0",
             "krisajenkins/remotedata": "5.0.0",
-            "rundis/elm-bootstrap": "5.0.0",
-            "stil4m/elm-syntax": "7.0.5"
+            "rundis/elm-bootstrap": "5.1.0",
+            "stil4m/elm-syntax": "7.1.0"
         },
         "indirect": {
             "avh4/elm-color": "1.0.0",
