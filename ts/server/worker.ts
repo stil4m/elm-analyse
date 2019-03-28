@@ -1,8 +1,8 @@
-import opn from 'opn';
 import * as fileLoadingPorts from '../file-loading-ports';
 import * as loggingPorts from '../util/logging-ports';
 import * as dependencies from '../util/dependencies';
 import { Config, ElmApp, Report } from '../domain';
+const opn = require('opn');
 
 function run(config: Config, project: {}, onload: (app: ElmApp) => void) {
     dependencies.getDependencies(function(registry) {
