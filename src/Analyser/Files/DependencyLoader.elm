@@ -2,6 +2,7 @@ module Analyser.Files.DependencyLoader exposing (Model, Msg, getDependency, init
 
 import Analyser.DependencyHandler as DependencyHandler exposing (CacheDependencyRead(..), DependencyPointer)
 import Elm.Dependency exposing (Dependency)
+import Json.Decode as JD
 import Util.Logger as Logger
 
 
@@ -21,7 +22,7 @@ type State
 
 type Msg
     = OnCacheRead CacheDependencyRead
-    | OnOnlineDocs (Maybe (Result String Dependency))
+    | OnOnlineDocs (Maybe (Result JD.Error Dependency))
     | OnLocallyBuildDependency (Maybe (Result String Dependency))
 
 

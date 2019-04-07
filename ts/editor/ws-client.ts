@@ -17,11 +17,7 @@ export function connect(url: string, es: EventListener): Client {
     const autoReconnectInterval = 5000;
     var number = 0;
 
-    function bind(
-        ws: WebSocket,
-        events: EventListener,
-        reconnect: ((err: any) => void)
-    ) {
+    function bind(ws: WebSocket, events: EventListener, reconnect: ((err: any) => void)) {
         ws.on('open', () => {
             if (events.onOpen) {
                 events.onOpen();

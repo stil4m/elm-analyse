@@ -48,14 +48,14 @@ sourceFiles (CodeBase codeBase) =
 
 
 addSourceFiles : List LoadedSourceFile -> CodeBase -> CodeBase
-addSourceFiles sourceFiles (CodeBase codeBase) =
+addSourceFiles sources (CodeBase codeBase) =
     CodeBase
         { codeBase
-            | sources = mergeLoadedSourceFiles sourceFiles codeBase.sources
+            | sources = mergeLoadedSourceFiles sources codeBase.sources
             , processContext =
                 List.foldl Processing.addFile
                     codeBase.processContext
-                    (List.filterMap (Tuple.second >> Result.toMaybe) sourceFiles)
+                    (List.filterMap (Tuple.second >> Result.toMaybe) sources)
         }
 
 

@@ -19,11 +19,7 @@ var args = minimist(process.argv.slice(2), {
 });
 
 (function() {
-    const elmAnalyseVersion = require(path.join(
-        __dirname,
-        '../../..',
-        'package.json'
-    )).version;
+    const elmAnalyseVersion = require(path.join(__dirname, '../../..', 'package.json')).version;
 
     const elmFormatPath = args['elm-format-path'] || 'elm-format';
 
@@ -44,30 +40,18 @@ var args = minimist(process.argv.slice(2), {
     if (args.help) {
         console.log('Usages:');
         console.log('  $ elm-analyse');
-        console.log(
-            '    # Analyse the project and log messages to the console\n'
-        );
+        console.log('    # Analyse the project and log messages to the console\n');
         console.log('  $ elm-analyse -s');
         console.log(
             '    # Analyse the project and start a server. Allows inspection of messages through a browser (Default: http://localhost:3000).\n'
         );
         console.log('Options: ');
         console.log('   --help, -h          Print the help output.');
-        console.log(
-            '   --serve, -s         Enable server mode. Disabled by default.'
-        );
-        console.log(
-            '   --port, -p          The port on which the server should listen. Defaults to 3000.'
-        );
-        console.log(
-            '   --open, -o          Open default browser when server goes live.'
-        );
-        console.log(
-            '   --elm-format-path   Path to elm-format. Defaults to `elm-format`.'
-        );
-        console.log(
-            '   --format            Output format for CLI. Defaults to "human". Options "human"|"json"'
-        );
+        console.log('   --serve, -s         Enable server mode. Disabled by default.');
+        console.log('   --port, -p          The port on which the server should listen. Defaults to 3000.');
+        console.log('   --open, -o          Open default browser when server goes live.');
+        console.log('   --elm-format-path   Path to elm-format. Defaults to `elm-format`.');
+        console.log('   --format            Output format for CLI. Defaults to "human". Options "human"|"json"');
         process.exit(1);
     }
 
@@ -76,28 +60,17 @@ var args = minimist(process.argv.slice(2), {
         process.exit(0);
     }
 
-    const packageFileExists = fs.existsSync('./elm-package.json');
+    const packageFileExists = fs.existsSync('./elm.json');
     if (!packageFileExists) {
-        console.log(
-            'There is no elm-package.json file in this directory. elm-analyse will only work in directories where such a file is located.'
-        );
+        console.log('There is no elm.json file in this directory. elm-analyse will only work in directories where such a file is located.');
         process.exit(1);
     }
 
-    const elmStuffExists = fs.existsSync('./elm-stuff');
-    if (
-        !elmStuffExists ||
-        !fs.existsSync('./elm-stuff/exact-dependencies.json')
-    ) {
-        console.log(
-            'Cannot detect which packages are installed. Please run `elm-package install` once.'
-        );
-        process.exit(1);
-    }
+    const projectFile = JSON.parse(fs.readFileSync('./elm.json').toString());
 
     if (args.serve) {
-        Server.start(config, info);
+        Server.start(config, info, projectFile);
         return;
     }
-    Analyser.start(config);
+    Analyser.start(config, projectFile);
 })();

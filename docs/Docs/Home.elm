@@ -8,7 +8,7 @@ import Html.Attributes
 
 view : Html msg
 view =
-    Html.div [ Html.Attributes.style [ ( "margin-bottom", "60px" ) ] ]
+    Html.div [ Html.Attributes.style "margin-bottom" "60px" ]
         [ Html.div
             [ Html.Attributes.class "jumbotron" ]
             [ Html.div
@@ -80,6 +80,10 @@ view =
                         , Html.tr []
                             [ Html.td [] [ Html.code [] [ Html.text "--port or -p" ] ]
                             , Html.td [] [ Html.text "The port on which the server should listen. Defaults to 3000 (", Html.code [] [ Html.text "--port=3000" ], Html.text ")." ]
+                            ]
+                        , Html.tr []
+                            [ Html.td [] [ Html.code [] [ Html.text "--open or -o" ] ]
+                            , Html.td [] [ Html.text "Open default browser when server goes live." ]
                             ]
                         , Html.tr []
                             [ Html.td [] [ Html.code [] [ Html.text "--elm-format-path" ] ]

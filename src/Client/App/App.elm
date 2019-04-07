@@ -1,5 +1,7 @@
-module Client.App.App exposing (Model, Msg(OnLocation), init, subscriptions, update, view)
+module Client.App.App exposing (Model, Msg(..), init, main, subscriptions, update, view)
 
+import Browser exposing (UrlRequest)
+import Browser.Navigation exposing (Key)
 import Client.App.Menu
 import Client.Components.FileTree as FileTree
 import Client.Dashboard as Dashboard
@@ -7,31 +9,42 @@ import Client.DependenciesPage as DependenciesPage
 import Client.Graph.Graph as Graph
 import Client.Graph.PackageDependencies as PackageDependencies
 import Client.MessagesPage as MessagesPage
-import Client.Routing as Routing
-import Client.Socket exposing (controlAddress)
+import Client.Routing as Routing exposing (Route)
 import Client.State exposing (State)
 import Html exposing (div)
-import Html.Attributes exposing (id)
-import Navigation exposing (Location)
+import Html.Attributes exposing (id, style)
 import RemoteData
 import Time
-import WebSocket as WS
+import Url exposing (Url)
+
+
+main : Program () Model Msg
+main =
+    Browser.application
+        { init = init
+        , view = view
+        , update = update
+        , onUrlRequest = OnLocation
+        , onUrlChange = Browser.Internal >> OnLocation
+        , subscriptions = subscriptions
+        }
 
 
 type Msg
     = MessagesPageMsg MessagesPage.Msg
     | FileTreeMsg FileTree.Msg
     | PackageDependenciesMsg PackageDependencies.Msg
-    | Refresh
-    | OnLocation Location
+    | OnLocation UrlRequest
     | Tick
     | NewState State
+    | ToRoute Route
 
 
 type alias Model =
-    { location : Location
+    { location : Url
     , content : Content
     , state : State
+    , key : Key
     }
 
 
@@ -46,41 +59,16 @@ type Content
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.batch
-        [ Client.State.listen model.location |> Sub.map NewState
-        , Time.every (Time.second * 10) (always Tick)
-        , case model.content of
-            MessagesPageContent sub ->
-                MessagesPage.subscriptions sub |> Sub.map MessagesPageMsg
-
-            GraphContent _ ->
-                Sub.none
-
-            FileTreeContent sub ->
-                FileTree.subscriptions sub |> Sub.map FileTreeMsg
-
-            PackageDependenciesContent _ ->
-                Sub.none
-
-            DashboardContent ->
-                Sub.none
-
-            DependenciesPageContent ->
-                Sub.none
-
-            NotFound ->
-                Sub.none
-        , WS.keepAlive (controlAddress model.location)
-        ]
+subscriptions _ =
+    Time.every 1000 (always Tick)
 
 
-init : Location -> ( Model, Cmd Msg )
-init l =
-    onLocation l { location = l, content = NotFound, state = RemoteData.Loading }
+init : () -> Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
+init () l key =
+    onLocation l { location = l, key = key, content = NotFound, state = RemoteData.Loading }
 
 
-onLocation : Location -> Model -> ( Model, Cmd Msg )
+onLocation : Url -> Model -> ( Model, Cmd Msg )
 onLocation l model =
     let
         route =
@@ -88,36 +76,84 @@ onLocation l model =
     in
     case route of
         Routing.FileTree ->
-            FileTree.init
-                |> Tuple.mapFirst (\x -> { model | content = FileTreeContent x, location = l })
-                |> Tuple.mapSecond (Cmd.map FileTreeMsg)
+            case model.content of
+                FileTreeContent _ ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    FileTree.init
+                        |> Tuple.mapFirst (\x -> { model | content = FileTreeContent x, location = l })
+                        |> Tuple.mapSecond (Cmd.map FileTreeMsg)
 
         Routing.Modules ->
-            ( { model | content = GraphContent (Graph.init model.state), location = l }, Cmd.none )
+            case model.content of
+                GraphContent _ ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( { model | content = GraphContent (Graph.init model.state), location = l }, Cmd.none )
 
         Routing.PackageDependencies ->
-            ( { model | content = PackageDependenciesContent (PackageDependencies.init model.state), location = l }
-            , Cmd.none
-            )
+            case model.content of
+                PackageDependenciesContent _ ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( { model | content = PackageDependenciesContent (PackageDependencies.init model.state), location = l }
+                    , Cmd.none
+                    )
 
         Routing.Messages ->
-            ( { model | content = MessagesPageContent (MessagesPage.init model.state), location = l }, Cmd.none )
+            case model.content of
+                PackageDependenciesContent _ ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( { model | content = MessagesPageContent (MessagesPage.init model.state), location = l }, Cmd.none )
 
         Routing.Dependencies ->
-            ( { model | content = DependenciesPageContent, location = l }, Cmd.none )
+            case model.content of
+                DependenciesPageContent ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( { model | content = DependenciesPageContent, location = l }, Cmd.none )
 
         Routing.Dashboard ->
-            ( { model | content = DashboardContent, location = l }, Cmd.none )
+            case model.content of
+                DashboardContent ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( { model | content = DashboardContent, location = l }, Cmd.none )
 
         Routing.NotFound ->
             ( { model | content = NotFound, location = l }, Cmd.none )
 
 
-view : Model -> Html.Html Msg
-view m =
+view : Model -> Browser.Document Msg
+view model =
+    { title = "Elm Analyse"
+    , body =
+        [ viewInner model
+        ]
+    }
+
+
+viewInner : Model -> Html.Html Msg
+viewInner m =
     div []
-        [ Client.App.Menu.view Refresh m.location
-        , div [ id "page-wrapper" ]
+        [ Client.App.Menu.view m.location
+            |> Html.map
+                (\v ->
+                    case v of
+                        Ok o ->
+                            o
+
+                        Err route ->
+                            ToRoute route
+                )
+        , div [ id "page-wrapper", style "overflow" "auto" ]
             [ case m.content of
                 MessagesPageContent subModel ->
                     MessagesPage.view m.state subModel |> Html.map MessagesPageMsg
@@ -176,17 +212,21 @@ updateStateInContent state content =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        ToRoute r ->
+            ( model, Routing.pushRoute model.key r )
+
         OnLocation l ->
-            onLocation l model
+            case l of
+                Browser.Internal i ->
+                    onLocation i model
+
+                Browser.External u ->
+                    ( model, Browser.Navigation.load u )
 
         Tick ->
             ( model
             , Client.State.tick model.location
-            )
-
-        Refresh ->
-            ( model
-            , WS.send (controlAddress model.location) "reload"
+                |> Cmd.map NewState
             )
 
         MessagesPageMsg subMsg ->

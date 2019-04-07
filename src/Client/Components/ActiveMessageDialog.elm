@@ -1,4 +1,4 @@
-module Client.Components.ActiveMessageDialog exposing (Model, Msg, init, show, subscriptions, update, view)
+module Client.Components.ActiveMessageDialog exposing (Info(..), Model, Msg, init, show, update, view)
 
 import Analyser.Fixers as Fixers
 import Analyser.Fixes.Base exposing (Fixer)
@@ -6,17 +6,16 @@ import Analyser.Messages.Data as Data
 import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
 import Client.Highlight as Highlight
-import Client.Socket as Socket
+import Client.State
 import Dialog exposing (Config)
 import Elm.Syntax.Range exposing (Range)
 import Html exposing (Html, button, div, h3, i, text)
 import Html.Attributes exposing (class, style)
 import Html.Events
 import Http exposing (Error)
-import Keyboard
-import Navigation exposing (Location)
 import RemoteData as RD exposing (RemoteData)
-import WebSocket as WS
+import Url exposing (Url)
+import Url.Builder
 
 
 type alias Model =
@@ -26,6 +25,7 @@ type alias Model =
 type alias State =
     { message : Message
     , ranges : List Range
+    , fixing : Bool
     , codeBlock : RemoteData Error String
     }
 
@@ -34,7 +34,6 @@ type Msg
     = Close
     | OnFile (Result Error String)
     | Fix
-    | OnEscape Bool
 
 
 show : Message -> Model -> ( Model, Cmd Msg )
@@ -43,11 +42,12 @@ show m _ =
         { message = m
         , ranges = Data.getRanges m.data
         , codeBlock = RD.Loading
+        , fixing = False
         }
     , Http.request
         { method = "GET"
         , headers = []
-        , url = "/file?file=" ++ (Http.encodeUri <| Messages.messageFile m)
+        , url = Url.Builder.absolute [ "file" ] [ Url.Builder.string "file" <| Messages.messageFile m ]
         , body = Http.emptyBody
         , expect = Http.expectString
         , timeout = Nothing
@@ -67,40 +67,32 @@ init =
     Nothing
 
 
-subscriptions : Model -> Sub Msg
-subscriptions x =
-    case x of
-        Just _ ->
-            Keyboard.downs ((==) 27 >> OnEscape)
-
-        Nothing ->
-            Sub.none
+type Info
+    = Fixed Message
 
 
-update : Location -> Msg -> Model -> ( Model, Cmd Msg )
-update location msg model =
+update : Url -> Msg -> Model -> ( Model, Cmd Msg, Maybe Info )
+update _ msg model =
     case msg of
         Close ->
-            ( hide model, Cmd.none )
+            ( hide model, Cmd.none, Nothing )
 
         OnFile x ->
             model
                 |> Maybe.map (\y -> { y | codeBlock = RD.fromResult x })
-                |> flip (,) Cmd.none
+                |> (\a -> ( a, Cmd.none, Nothing ))
 
         Fix ->
             model
                 |> Maybe.map
                     (\y ->
-                        ( hide (Just y), WS.send (Socket.controlAddress location) ("fix:" ++ toString y.message.id) )
+                        ( Just { y | fixing = True }
+                        , Client.State.fix y.message
+                            |> Cmd.map (always Close)
+                        , Just (Fixed y.message)
+                        )
                     )
-                |> Maybe.withDefault ( model, Cmd.none )
-
-        OnEscape x ->
-            if x then
-                ( hide model, Cmd.none )
-            else
-                ( model, Cmd.none )
+                |> Maybe.withDefault ( model, Cmd.none, Nothing )
 
 
 view : Model -> Html Msg
@@ -114,25 +106,26 @@ dialogConfig : State -> Config Msg
 dialogConfig state =
     { closeMessage = Just Close
     , containerClass = Just "message-dialog"
-    , header = Just dialogHeader
+    , header = Just <| dialogHeader state
     , body = Just <| dialogBody state
-    , footer = Just (footer state.message)
+    , footer = Just (footer state.fixing state.message)
     }
 
 
-footer : Message -> Html Msg
-footer message =
+footer : Bool -> Message -> Html Msg
+footer fixing message =
     Fixers.getFixer message
-        |> Maybe.map fixableFooter
+        |> Maybe.map (fixableFooter fixing)
         |> Maybe.withDefault (i [] [ text "Fix has to be implemented. Pull requests are welcome." ])
 
 
-fixableFooter : Fixer -> Html Msg
-fixableFooter fixer =
+fixableFooter : Bool -> Fixer -> Html Msg
+fixableFooter fixing fixer =
     div []
         [ button
             [ class "btn btn-success"
             , Html.Events.onClick Fix
+            , Html.Attributes.disabled fixing
             ]
             [ text fixer.description ]
         ]
@@ -157,13 +150,17 @@ dialogBody state =
 
 viewWithFileContent : State -> String -> Html msg
 viewWithFileContent state x =
-    div [ style [ ( "max-height", "400px" ), ( "overflow", "scroll" ) ] ]
+    div [ style "max-height" "400px", style "overflow" "auto" ]
         [ div []
             (List.map (Highlight.highlightedPre 3 x) state.ranges)
         , text <| Data.description state.message.data
         ]
 
 
-dialogHeader : Html msg
-dialogHeader =
-    h3 [] [ text "Message" ]
+dialogHeader : State -> Html msg
+dialogHeader state =
+    let
+        filePath =
+            state.message.file.path
+    in
+    h3 [] [ text <| "Message (" ++ filePath ++ ")" ]

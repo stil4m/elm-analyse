@@ -2,14 +2,12 @@ module Docs.MsgDoc exposing (allMessages, forKey, getMessage, view)
 
 import Analyser.Checks.Base exposing (Checker, CheckerInfo)
 import Analyser.Checks.BooleanCase
-import Analyser.Checks.CoreArrayUsage as CoreArrayUsage
 import Analyser.Checks.DebugCrash
 import Analyser.Checks.DebugLog
 import Analyser.Checks.DropConcatOfLists
 import Analyser.Checks.DropConsOfItemAndList
 import Analyser.Checks.DuplicateImport
 import Analyser.Checks.DuplicateImportedVariable
-import Analyser.Checks.DuplicateRecordFieldUpdate
 import Analyser.Checks.ExposeAll
 import Analyser.Checks.FileLoadFailed as FileLoadFailed
 import Analyser.Checks.FunctionInLet
@@ -18,8 +16,6 @@ import Analyser.Checks.MapNothingToNothing
 import Analyser.Checks.MultiLineRecordFormatting
 import Analyser.Checks.NoTopLevelSignature
 import Analyser.Checks.NoUncurriedPrefix
-import Analyser.Checks.NonStaticRegex
-import Analyser.Checks.OverriddenVariables
 import Analyser.Checks.SingleFieldRecord
 import Analyser.Checks.TriggerWords
 import Analyser.Checks.UnnecessaryListConcat
@@ -42,18 +38,15 @@ import Analyser.Messages.Json as J
 import Analyser.Messages.Schema as Schema
 import Analyser.Messages.Types as M exposing (Message)
 import Analyser.Messages.Util
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.ListGroup as ListGroup
 import Client.Highlight
 import Debug as SafeDebug
 import Docs.Html as DocsHtml
-import Docs.Page as Page exposing (Page(Messages))
+import Docs.Page as Page exposing (Page(..))
 import Elm.Interface as Interface
 import Elm.Parser
 import Elm.Processing as Processing
 import Html exposing (Html)
-import Html.Attributes as Html
+import Html.Attributes
 import Json.Encode
 
 
@@ -72,8 +65,6 @@ type alias MsgDoc =
 allMessages : List MsgDoc
 allMessages =
     [ functionInLet
-    , coreArrayUsage
-    , nonStaticRegex
     , unnecessaryPortModule
     , multiLineRecordFormatting
     , unnecessaryListConcat
@@ -83,7 +74,6 @@ allMessages =
     , unusedImport
     , unusedImportAlias
     , noUncurriedPrefix
-    , redefineVariable
     , unusedTypeAlias
     , duplicateImportedVariable
     , duplicateImport
@@ -100,7 +90,6 @@ allMessages =
     , unusedVariable
     , importAll
     , singleFieldRecord
-    , duplicateRecordFieldUpdate
     , triggerWords
     , mapNothingToNothing
     , unusedValueConstructor
@@ -119,7 +108,7 @@ unusedValueConstructor =
     { info = .info Analyser.Checks.UnusedValueConstructor.checker
     , example = Dynamic Analyser.Checks.UnusedValueConstructor.checker
     , input = """
-module Greet exposing (Color(Green))
+module Greet exposing (Color)
 
 type Color
     = Blue
@@ -127,6 +116,8 @@ type Color
     | Green
 
 red = Red
+
+blue = Blue
 """
     }
 
@@ -181,22 +172,6 @@ thing x =
     }
 
 
-duplicateRecordFieldUpdate : MsgDoc
-duplicateRecordFieldUpdate =
-    { info = .info Analyser.Checks.DuplicateRecordFieldUpdate.checker
-    , example = Dynamic Analyser.Checks.DuplicateRecordFieldUpdate.checker
-    , input = """
-module Person exposing (Person, changeName)
-
-type alias Person = { name : String }
-
-changeName : Person -> Person
-changeName person =
-    { person | name = "John", name = "Jane" }
-"""
-    }
-
-
 functionInLet : MsgDoc
 functionInLet =
     { info = .info Analyser.Checks.FunctionInLet.checker
@@ -212,39 +187,6 @@ foo x =
             y + 1
     in
         somethingIShouldDefineOnTopLevel x
-"""
-    }
-
-
-coreArrayUsage : MsgDoc
-coreArrayUsage =
-    { info = .info CoreArrayUsage.checker
-    , example = Dynamic CoreArrayUsage.checker
-    , input = """
-port module Foo exposing (foo)
-
-import Array
-
-foo x =
-    Array.get 0 x
-"""
-    }
-
-
-nonStaticRegex : MsgDoc
-nonStaticRegex =
-    { info = .info Analyser.Checks.NonStaticRegex.checker
-    , example = Dynamic Analyser.Checks.NonStaticRegex.checker
-    , input = """
-port module Foo exposing (foo)
-
-import Regex
-
-foo x =
-    let
-        myInvalidRegex = Regex.regex "["
-    in
-        (myInvalidRegex, x)
 """
     }
 
@@ -391,24 +333,6 @@ hello =
     }
 
 
-redefineVariable : MsgDoc
-redefineVariable =
-    { info = .info Analyser.Checks.OverriddenVariables.checker
-    , example = Dynamic Analyser.Checks.OverriddenVariables.checker
-    , input = """
-module Foo exposing (main)
-
-foo : Maybe Int -> Int
-foo x =
-    case x of
-        Just x ->
-            x
-        Nothing ->
-            1
-"""
-    }
-
-
 unusedTypeAlias : MsgDoc
 unusedTypeAlias =
     { info = .info Analyser.Checks.UnusedTypeAlias.checker
@@ -470,7 +394,7 @@ debugCrash =
 module Foo exposing (foo)
 
 foo =
-    Debug.crash "SHOULD NEVER HAPPEN"
+    Debug.todo "SHOULD NEVER HAPPEN"
 """
     }
 
@@ -634,20 +558,23 @@ sortedMessages =
 
 messagesMenu : Maybe MsgDoc -> Html msg
 messagesMenu y =
+    let
+        mapMessage : MsgDoc -> Html msg
+        mapMessage x =
+            if Just x.info.key == Maybe.map (.info >> .key) y then
+                Html.li [ Html.Attributes.class "list-group-item active" ]
+                    [ Html.text x.info.name
+                    ]
+
+            else
+                Html.li [ Html.Attributes.class "list-group-item" ]
+                    [ Html.a [ Html.Attributes.href (Page.hash (Messages (Just x.info.key))) ]
+                        [ Html.text x.info.name ]
+                    ]
+    in
     sortedMessages
-        |> List.map
-            (\x ->
-                if Just x == y then
-                    ListGroup.li [ ListGroup.active ]
-                        [ Html.text x.info.name
-                        ]
-                else
-                    ListGroup.li []
-                        [ Html.a [ Html.href (Page.hash (Messages (Just x.info.key))) ]
-                            [ Html.text x.info.name ]
-                        ]
-            )
-        |> ListGroup.ul
+        |> List.map mapMessage
+        |> Html.ul [ Html.Attributes.class "list-group" ]
 
 
 view : Maybe String -> Html msg
@@ -656,17 +583,17 @@ view maybeKey =
         maybeMessageDoc =
             Maybe.andThen forKey maybeKey
     in
-    Grid.container [ Html.style [ ( "padding-top", "20px" ), ( "margin-bottom", "60px" ) ] ]
-        [ Grid.row []
-            [ Grid.col []
+    Html.div [ Html.Attributes.class "container", Html.Attributes.style "padding-top" "20px", Html.Attributes.style "margin-bottom" "60px" ]
+        [ Html.div [ Html.Attributes.class "row" ]
+            [ Html.div [ Html.Attributes.class "col" ]
                 [ Html.h1 [] [ Html.text "Checks" ]
                 , Html.hr [] []
                 ]
             ]
-        , Grid.row []
-            [ Grid.col [ Col.md4, Col.sm5 ]
+        , Html.div [ Html.Attributes.class "row" ]
+            [ Html.div [ Html.Attributes.class "col col-md-4 col-sm-5" ]
                 [ messagesMenu maybeMessageDoc ]
-            , Grid.col [ Col.md8, Col.sm7 ]
+            , Html.div [ Html.Attributes.class "col col-md-8 col-sm-7" ]
                 [ maybeMessageDoc
                     |> Maybe.map viewDoc
                     |> Maybe.withDefault (Html.div [] [])
@@ -729,7 +656,7 @@ getMessage d =
                     M.newMessage (FileRef "abcdef01234567890" "./Foo.elm") checker.info.key mess
 
                 Nothing ->
-                    SafeDebug.crash "Something is wrong"
+                    SafeDebug.todo "Something is wrong"
 
 
 exampleMsgJson : Message -> Html msg
@@ -753,7 +680,7 @@ getMessages input checker =
                 }
             )
         |> Result.toMaybe
-        |> Maybe.map (flip checker.check docConfiguration)
+        |> Maybe.map (\a -> checker.check a docConfiguration)
 
 
 docConfiguration : Configuration

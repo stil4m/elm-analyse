@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var request = __importStar(require("request"));
 var cache = __importStar(require("./cache"));
 var fetchDependencies = function (cb) {
-    request.get('http://package.elm-lang.org/all-packages', function (err, _, body) {
+    request.get('http://package.elm-lang.org/search.json', function (err, _, body) {
         if (err) {
             cb(null);
             return;

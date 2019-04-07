@@ -1,7 +1,7 @@
 module Analyser.Checks.UnusedTypeAlias exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
@@ -9,11 +9,11 @@ import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Interface as Interface
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range as Range exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 import Elm.Syntax.TypeAlias exposing (TypeAlias)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
-import Tuple3
+import Tuple.Extra
 
 
 checker : Checker
@@ -53,9 +53,9 @@ scan fileContext _ =
         fileContext.ast
         collectedAliased
         |> Dict.toList
-        |> List.filter (Tuple.second >> Tuple3.third >> (<) 0 >> not)
-        |> List.filter (Tuple.first >> flip Interface.exposesAlias fileContext.interface >> not)
-        |> List.map (Tuple.mapSecond Tuple3.second)
+        |> List.filter (Tuple.second >> Tuple.Extra.third3 >> (<) 0 >> not)
+        |> List.filter (Tuple.first >> (\a -> Interface.exposesAlias a fileContext.interface) >> not)
+        |> List.map (Tuple.mapSecond Tuple.Extra.second3)
         |> List.map buildMessageData
 
 
@@ -75,24 +75,24 @@ buildMessageData ( varName, range ) =
 
 markTypeAlias : String -> Context -> Context
 markTypeAlias key context =
-    Dict.update key (Maybe.map (Tuple3.mapThird ((+) 1))) context
+    Dict.update key (Maybe.map (Tuple.Extra.mapThird3 ((+) 1))) context
 
 
-onTypeAnnotation : Ranged TypeAnnotation -> Context -> Context
-onTypeAnnotation ( _, typeAnnotation ) context =
+onTypeAnnotation : Node TypeAnnotation -> Context -> Context
+onTypeAnnotation (Node _ typeAnnotation) context =
     case typeAnnotation of
-        Typed [] x _ ->
+        Typed (Node _ ( [], x )) _ ->
             markTypeAlias x context
 
         _ ->
             context
 
 
-onFunctionOrValue : String -> Context -> Context
+onFunctionOrValue : ( a, String ) -> Context -> Context
 onFunctionOrValue =
-    markTypeAlias
+    Tuple.second >> markTypeAlias
 
 
-onTypeAlias : Ranged TypeAlias -> Context -> Context
-onTypeAlias ( range, typeAlias ) context =
-    Dict.insert typeAlias.name ( typeAlias.name, range, 0 ) context
+onTypeAlias : Node TypeAlias -> Context -> Context
+onTypeAlias (Node range typeAlias) context =
+    Dict.insert (Node.value typeAlias.name) ( Node.value typeAlias.name, range, 0 ) context

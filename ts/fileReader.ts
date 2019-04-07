@@ -34,11 +34,7 @@ function readFileNotCached(realPath: string, path: string, checksum: string) {
     });
 }
 
-function readFile(
-    directory: string,
-    path: string,
-    cb: (data: FileContent) => void
-) {
+function readFile(directory: string, path: string, cb: (data: FileContent) => void) {
     var real = directory + '/' + path;
 
     sums

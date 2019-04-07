@@ -1,16 +1,19 @@
-import open from 'open';
 import * as fileLoadingPorts from '../file-loading-ports';
 import * as loggingPorts from '../util/logging-ports';
 import * as dependencies from '../util/dependencies';
 import { Config, ElmApp, Report } from '../domain';
+const opn = require('opn');
 
-function run(config: Config, onload: (app: ElmApp) => void) {
+function run(config: Config, project: {}, onload: (app: ElmApp) => void) {
     dependencies.getDependencies(function(registry) {
         const directory = process.cwd();
         var Elm = require('../backend-elm.js');
-        var app = Elm.Analyser.worker({
-            server: true,
-            registry: registry || []
+        var app = Elm.Elm.Analyser.init({
+            flags: {
+                server: true,
+                registry: registry || [],
+                project: project
+            }
         });
 
         app.ports.sendReportValue.subscribe((report: Report) => {
@@ -21,7 +24,7 @@ function run(config: Config, onload: (app: ElmApp) => void) {
         fileLoadingPorts.setup(app, config, directory);
         onload(app);
         if (config.open) {
-            open('http://localhost:' + config.port);
+            opn('http://localhost:' + config.port);
         }
     });
 }

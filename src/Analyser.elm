@@ -4,18 +4,21 @@ import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.DependencyLoadingStage as DependencyLoadingStage
-import Analyser.FileWatch as FileWatch exposing (FileChange(Remove, Update))
+import Analyser.FileWatch as FileWatch exposing (FileChange(..))
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Analyser.Fixer as Fixer
 import Analyser.Messages.Util as Messages
 import Analyser.Modules
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import Analyser.State as State exposing (State)
-import Analyser.State.Dependencies
+import Analyser.State.Dependencies as Dependencies
 import AnalyserPorts
+import Elm.Project
+import Elm.Version
 import Inspection
+import Json.Decode
 import Json.Encode exposing (Value)
-import Platform exposing (programWithFlags)
+import Platform exposing (worker)
 import Registry exposing (Registry)
 import Time
 import Util.Logger as Logger
@@ -30,6 +33,7 @@ type alias Model =
     , changedFiles : List String
     , server : Bool
     , registry : Registry
+    , project : Elm.Project.Project
     }
 
 
@@ -37,7 +41,7 @@ type Msg
     = OnContext Context
     | DependencyLoadingStageMsg DependencyLoadingStage.Msg
     | SourceLoadingStageMsg SourceLoadingStage.Msg
-    | Change FileChange
+    | Change (Maybe FileChange)
     | ReloadTick
     | Reset
     | OnFixMessage Int
@@ -55,28 +59,65 @@ type Stage
 type alias Flags =
     { server : Bool
     , registry : Value
+    , project : Value
     }
 
 
 main : Program Flags Model Msg
 main =
-    programWithFlags { init = init, update = update, subscriptions = subscriptions }
+    worker
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    reset
-        ( { context = ContextLoader.emptyContext
-          , stage = Finished
-          , configuration = Configuration.defaultConfiguration
-          , codeBase = CodeBase.init
-          , state = State.initialState
-          , changedFiles = []
-          , server = flags.server
-          , registry = Registry.fromValue flags.registry
-          }
-        , Cmd.none
-        )
+    let
+        project =
+            Json.Decode.decodeValue Elm.Project.decoder flags.project
+
+        base =
+            ( { context = ContextLoader.emptyContext
+              , stage = Finished
+              , configuration = Configuration.defaultConfiguration
+              , codeBase = CodeBase.init
+              , state = State.initialState
+              , changedFiles = []
+              , server = flags.server
+              , registry = Registry.fromValue flags.registry
+              , project =
+                    Elm.Project.Application
+                        { elm = Elm.Version.one
+                        , dirs = []
+                        , depsDirect = []
+                        , depsIndirect = []
+                        , testDepsDirect = []
+                        , testDepsIndirect = []
+                        }
+              }
+            , Cmd.none
+            )
+    in
+    case project of
+        Err _ ->
+            ( Tuple.first base, Logger.error "Could not read project file (./elm.json)" )
+
+        Ok v ->
+            reset
+                ( { context = ContextLoader.emptyContext
+                  , stage = Finished
+                  , configuration = Configuration.defaultConfiguration
+                  , codeBase = CodeBase.init
+                  , state = State.initialState
+                  , changedFiles = []
+                  , server = flags.server
+                  , registry = Registry.fromValue flags.registry
+                  , project = v
+                  }
+                , Logger.info "Started..."
+                )
 
 
 reset : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -109,7 +150,7 @@ update msg model =
                     Configuration.fromString context.configuration
 
                 ( stage, cmds ) =
-                    DependencyLoadingStage.init context.interfaceFiles
+                    DependencyLoadingStage.init model.project
             in
             ( { model
                 | context = context
@@ -148,7 +189,7 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
-        Change (Update x) ->
+        Change (Just (Update x)) ->
             doSendState
                 ( { model
                     | state = State.outdateMessagesForFile x model.state
@@ -164,12 +205,16 @@ update msg model =
                     ( { model | changedFiles = [] }
                     , Cmd.none
                     )
+
             else
                 ( model
                 , Cmd.none
                 )
 
-        Change (Remove x) ->
+        Change Nothing ->
+            ( model, Cmd.none )
+
+        Change (Just (Remove x)) ->
             doSendState
                 ( { model
                     | state = State.removeMessagesForFile x model.state
@@ -188,9 +233,11 @@ onFixerMsg x stage model =
     if Fixer.isDone newFixerModel then
         if Fixer.succeeded newFixerModel then
             ( { model | stage = Finished }, fixerCmds )
+
         else
             startSourceLoading [ Messages.messageFile (Fixer.message newFixerModel) ]
                 ( model, fixerCmds )
+
     else
         ( { model | stage = FixerStage newFixerModel }
         , fixerCmds
@@ -206,7 +253,8 @@ startSourceLoading files ( model, cmds ) =
                     ( Finished, Cmd.none )
 
                 files_ ->
-                    SourceLoadingStage.init files_
+                    files_
+                        |> SourceLoadingStage.init
                         |> Tuple.mapFirst SourceLoadingStage
                         |> Tuple.mapSecond (Cmd.map SourceLoadingStageMsg)
     in
@@ -227,7 +275,7 @@ handleNextStep (( model, cmds ) as input) =
                     case Fixer.init taskId newState of
                         Nothing ->
                             ( { model | state = newState }
-                            , Logger.info ("Could not fix message: '" ++ toString taskId ++ "'.")
+                            , Logger.info ("Could not fix message: '" ++ String.fromInt taskId ++ "'.")
                             )
 
                         Just ( fixerModel, fixerCmds, newState2 ) ->
@@ -243,7 +291,8 @@ handleNextStep (( model, cmds ) as input) =
 doSendState : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 doSendState ( model, cmds ) =
     ( model
-    , Cmd.batch [ cmds, AnalyserPorts.sendStateValue model.state ]
+      -- , Cmd.batch [ cmds, AnalyserPorts.sendStateValue model.state ]
+    , cmds
     )
 
 
@@ -254,10 +303,15 @@ onDependencyLoadingStageMsg x stage model =
             DependencyLoadingStage.update x stage
     in
     if DependencyLoadingStage.isDone newStage then
-        ( { model | codeBase = CodeBase.setDependencies (DependencyLoadingStage.getDependencies newStage) model.codeBase }
+        let
+            newDependencies =
+                DependencyLoadingStage.getDependencies newStage
+        in
+        ( { model | codeBase = CodeBase.setDependencies newDependencies model.codeBase }
         , Cmd.map DependencyLoadingStageMsg cmds
         )
             |> startSourceLoading model.context.sourceFiles
+
     else
         ( { model | stage = DependencyLoadingStage newStage }
         , Cmd.map DependencyLoadingStageMsg cmds
@@ -268,7 +322,7 @@ isSourceFileIncluded : Configuration -> LoadedSourceFile -> Bool
 isSourceFileIncluded configuration =
     Tuple.first
         >> .path
-        >> flip Configuration.isPathExcluded configuration
+        >> (\a -> Configuration.isPathExcluded a configuration)
         >> not
 
 
@@ -290,8 +344,16 @@ finishProcess newStage cmds model =
         ( unusedDeps, newModules ) =
             Analyser.Modules.build newCodeBase (CodeBase.sourceFiles newCodeBase)
 
+        mode =
+            case model.project of
+                Elm.Project.Application _ ->
+                    Dependencies.Application
+
+                Elm.Project.Package _ ->
+                    Dependencies.Package
+
         deps =
-            Analyser.State.Dependencies.init (List.map .name unusedDeps) (CodeBase.dependencies newCodeBase) model.registry
+            Dependencies.init mode (List.map .name unusedDeps) (CodeBase.dependencies newCodeBase) model.registry
 
         newState =
             State.finishWithNewMessages messages model.state
@@ -327,6 +389,7 @@ onSourceLoadingStageMsg x stage model =
     in
     if SourceLoadingStage.isDone newStage then
         finishProcess newStage cmds model
+
     else
         ( { model | stage = SourceLoadingStage newStage }
         , Cmd.map SourceLoadingStageMsg cmds
@@ -338,7 +401,8 @@ subscriptions model =
     Sub.batch
         [ AnalyserPorts.onReset (always Reset)
         , if model.server then
-            Time.every Time.second (always ReloadTick)
+            Time.every 1000 (always ReloadTick)
+
           else
             Sub.none
         , FileWatch.watcher Change

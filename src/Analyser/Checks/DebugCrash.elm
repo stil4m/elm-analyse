@@ -1,22 +1,22 @@
 module Analyser.Checks.DebugCrash exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Post), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (Expression(..))
-import Elm.Syntax.Ranged exposing (Ranged)
+import Elm.Syntax.Node exposing (Node(..))
 
 
 checker : Checker
 checker =
     { check = scan
     , info =
-        { key = "DebugCrash"
-        , name = "Debug Crash"
+        { key = "DebugTodo"
+        , name = "Debug Todo"
         , description = "You may not want to ship this to your end users."
         , schema =
             Schema.schema
@@ -37,10 +37,10 @@ scan fileContext _ =
         []
 
 
-onExpression : Ranged Expression -> Context -> Context
-onExpression ( range, expression ) context =
+onExpression : Node Expression -> Context -> Context
+onExpression (Node range expression) context =
     case expression of
-        QualifiedExpr moduleName f ->
+        FunctionOrValue moduleName f ->
             if entryForQualifiedExpr moduleName f then
                 let
                     r =
@@ -48,13 +48,14 @@ onExpression ( range, expression ) context =
                 in
                 (Data.init
                     (String.concat
-                        [ "Use of Debug.crash at "
+                        [ "Use of Debug.todo at "
                         , Range.rangeToString r
                         ]
                     )
                     |> Data.addRange "range" r
                 )
                     :: context
+
             else
                 context
 
@@ -65,9 +66,11 @@ onExpression ( range, expression ) context =
 entryForQualifiedExpr : List String -> String -> Bool
 entryForQualifiedExpr moduleName f =
     if moduleName == [ "Debug" ] then
-        if f == "crash" then
+        if f == "todo" then
             True
+
         else
             False
+
     else
         False

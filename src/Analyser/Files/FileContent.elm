@@ -1,11 +1,11 @@
 module Analyser.Files.FileContent exposing (FileContent, RefeshedAST, asFileRef, asRawFile)
 
 import Analyser.FileRef exposing (FileRef)
-import Elm.Json.Decode as Elm
 import Elm.Parser as Parser
 import Elm.RawFile exposing (RawFile)
 import Json.Decode
 import Maybe.Extra as Maybe
+import Parser
 import Result.Extra as Result
 
 
@@ -27,23 +27,23 @@ type alias FileContent =
     }
 
 
-asRawFile : FileContent -> ( Result String RawFile, RefeshedAST )
+asRawFile : FileContent -> ( Result (List Parser.DeadEnd) RawFile, RefeshedAST )
 asRawFile fileContent =
     fileContent.ast
-        |> Maybe.andThen (Json.Decode.decodeString Elm.decode >> Result.toMaybe)
+        |> Maybe.andThen (Json.Decode.decodeString Elm.RawFile.decoder >> Result.toMaybe)
         |> Maybe.map (\x -> ( Ok x, False ))
         |> Maybe.orElseLazy (\() -> Just ( loadedFileFromContent fileContent, True ))
-        |> Maybe.withDefault ( Err "Internal problem in the file loader. Please report an issue.", False )
+        |> Maybe.withDefault ( Err [ { row = 0, col = 0, problem = Parser.Problem "Internal problem in the file loader. Please report an issue." } ], False )
 
 
-loadedFileFromContent : FileContent -> Result String RawFile
+loadedFileFromContent : FileContent -> Result (List Parser.DeadEnd) RawFile
 loadedFileFromContent fileContent =
     case fileContent.content of
         Just content ->
             Parser.parse content
                 |> Result.map Ok
-                |> Result.mapError (List.head >> Maybe.withDefault "" >> Err)
+                |> Result.mapError Err
                 |> Result.merge
 
         Nothing ->
-            Err "No file content"
+            Err [ { row = 0, col = 0, problem = Parser.Problem "No file content" } ]

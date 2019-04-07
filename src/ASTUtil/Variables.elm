@@ -1,24 +1,22 @@
-module ASTUtil.Variables
-    exposing
-        ( VariableType(Defined, Imported, Pattern, TopLevel)
-        , getImportsVars
-        , getLetDeclarationsVars
-        , getTopLevels
-        , patternToUsedVars
-        , patternToVars
-        , patternToVarsInner
-        , withoutTopLevel
-        )
+module ASTUtil.Variables exposing
+    ( VariableType(..)
+    , getImportsVars
+    , getLetDeclarationsVars
+    , getTopLevels
+    , patternToUsedVars
+    , patternToVars
+    , patternToVarsInner
+    , withoutTopLevel
+    )
 
-import Elm.Syntax.Base exposing (VariablePointer)
 import Elm.Syntax.Declaration exposing (Declaration(..))
 import Elm.Syntax.Exposing exposing (Exposing(..), TopLevelExpose(..))
-import Elm.Syntax.Expression exposing (Expression(..), LetDeclaration(LetDestructuring, LetFunction))
+import Elm.Syntax.Expression exposing (Expression(..), LetDeclaration(..))
 import Elm.Syntax.File exposing (File)
-import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.Import exposing (Import)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Pattern exposing (Pattern(..), QualifiedNameRef)
 import Elm.Syntax.Range exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
 
 
 type VariableType
@@ -28,7 +26,7 @@ type VariableType
     | TopLevel
 
 
-withoutTopLevel : List ( VariablePointer, VariableType ) -> List ( VariablePointer, VariableType )
+withoutTopLevel : List ( Node String, VariableType ) -> List ( Node String, VariableType )
 withoutTopLevel =
     let
         f (( pointer, variableType ) as pair) =
@@ -42,7 +40,7 @@ withoutTopLevel =
     List.map f
 
 
-getTopLevels : File -> List ( VariablePointer, VariableType )
+getTopLevels : File -> List ( Node String, VariableType )
 getTopLevels file =
     List.concat
         [ getImportsVars file.imports
@@ -50,27 +48,27 @@ getTopLevels file =
         ]
 
 
-getDeclarationsVars : List (Ranged Declaration) -> List ( VariablePointer, VariableType )
+getDeclarationsVars : List (Node Declaration) -> List ( Node String, VariableType )
 getDeclarationsVars =
     List.concatMap getDeclarationVars
 
 
-getLetDeclarationsVars : List (Ranged LetDeclaration) -> List ( VariablePointer, VariableType )
+getLetDeclarationsVars : List (Node LetDeclaration) -> List ( Node String, VariableType )
 getLetDeclarationsVars =
     List.concatMap getLetDeclarationVars
 
 
-getImportsVars : List Import -> List ( VariablePointer, VariableType )
+getImportsVars : List (Node Import) -> List ( Node String, VariableType )
 getImportsVars =
     List.concatMap getImportVars
 
 
-getImportVars : Import -> List ( VariablePointer, VariableType )
-getImportVars imp =
-    getImportExposedVars imp.exposingList
+getImportVars : Node Import -> List ( Node String, VariableType )
+getImportVars (Node _ imp) =
+    getImportExposedVars <| Maybe.map Node.value imp.exposingList
 
 
-getImportExposedVars : Maybe (Exposing (Ranged TopLevelExpose)) -> List ( VariablePointer, VariableType )
+getImportExposedVars : Maybe Exposing -> List ( Node String, VariableType )
 getImportExposedVars e =
     case e of
         Just (All _) ->
@@ -82,43 +80,40 @@ getImportExposedVars e =
         Just (Explicit l) ->
             l
                 |> List.concatMap
-                    (\( r, exposed ) ->
+                    (\(Node r exposed) ->
                         case exposed of
                             InfixExpose x ->
-                                [ ( VariablePointer x r, Imported ) ]
+                                [ ( Node r x, Imported ) ]
 
                             FunctionExpose x ->
-                                [ ( VariablePointer x r, Imported ) ]
+                                [ ( Node r x, Imported ) ]
 
                             TypeOrAliasExpose x ->
-                                [ ( VariablePointer x r, Imported ) ]
+                                [ ( Node r x, Imported ) ]
 
                             TypeExpose exposedType ->
-                                case exposedType.constructors of
-                                    Just (All _) ->
+                                case exposedType.open of
+                                    Just _ ->
                                         []
 
                                     Nothing ->
-                                        [ ( VariablePointer exposedType.name r, Imported ) ]
-
-                                    Just (Explicit constructors) ->
-                                        constructors
-                                            |> List.map (uncurry (flip VariablePointer))
-                                            |> List.map (flip (,) Imported)
+                                        [ ( Node r exposedType.name, Imported ) ]
                     )
 
 
-getDeclarationVars : Ranged Declaration -> List ( VariablePointer, VariableType )
-getDeclarationVars ( _, decl ) =
+getDeclarationVars : Node Declaration -> List ( Node String, VariableType )
+getDeclarationVars (Node _ decl) =
     case decl of
-        FuncDecl f ->
-            [ ( f.declaration.name, TopLevel ) ]
+        FunctionDeclaration f ->
+            [ ( (Node.value f.declaration).name, TopLevel ) ]
 
-        AliasDecl _ ->
+        AliasDeclaration _ ->
             []
 
-        TypeDecl t ->
-            List.map (\{ name, range } -> ( { value = name, range = range }, TopLevel )) t.constructors
+        CustomTypeDeclaration t ->
+            List.map
+                (\(Node _ { name }) -> ( name, TopLevel ))
+                t.constructors
 
         PortDeclaration p ->
             [ ( p.name, TopLevel ) ]
@@ -130,18 +125,18 @@ getDeclarationVars ( _, decl ) =
             patternToVars pattern
 
 
-getLetDeclarationVars : Ranged LetDeclaration -> List ( VariablePointer, VariableType )
-getLetDeclarationVars ( _, decl ) =
+getLetDeclarationVars : Node LetDeclaration -> List ( Node String, VariableType )
+getLetDeclarationVars (Node _ decl) =
     case decl of
         LetFunction f ->
-            [ ( f.declaration.name, TopLevel ) ]
+            [ ( (Node.value f.declaration).name, TopLevel ) ]
 
         LetDestructuring pattern _ ->
             patternToVars pattern
 
 
-patternToUsedVars : Ranged Pattern -> List VariablePointer
-patternToUsedVars ( range, p ) =
+patternToUsedVars : Node Pattern -> List (Node String)
+patternToUsedVars (Node range p) =
     case p of
         TuplePattern t ->
             List.concatMap patternToUsedVars t
@@ -189,21 +184,22 @@ patternToUsedVars ( range, p ) =
             []
 
 
-qualifiedNameUsedVars : QualifiedNameRef -> Range -> List VariablePointer
+qualifiedNameUsedVars : QualifiedNameRef -> Range -> List (Node String)
 qualifiedNameUsedVars { moduleName, name } range =
     if moduleName == [] then
-        [ { value = name, range = range } ]
+        [ Node range name ]
+
     else
         []
 
 
-patternToVars : Ranged Pattern -> List ( VariablePointer, VariableType )
+patternToVars : Node Pattern -> List ( Node String, VariableType )
 patternToVars =
     patternToVarsInner True
 
 
-patternToVarsInner : Bool -> Ranged Pattern -> List ( VariablePointer, VariableType )
-patternToVarsInner isFirst ( range, p ) =
+patternToVarsInner : Bool -> Node Pattern -> List ( Node String, VariableType )
+patternToVarsInner isFirst (Node range p) =
     let
         recur =
             patternToVarsInner False
@@ -213,7 +209,7 @@ patternToVarsInner isFirst ( range, p ) =
             List.concatMap recur t
 
         RecordPattern r ->
-            List.map (flip (,) Pattern) r
+            List.map (\a -> ( a, Pattern )) r
 
         UnConsPattern l r ->
             recur l ++ recur r
@@ -222,9 +218,10 @@ patternToVarsInner isFirst ( range, p ) =
             List.concatMap recur l
 
         VarPattern x ->
-            [ ( { value = x, range = range }
+            [ ( Node range x
               , if isFirst then
                     Defined
+
                 else
                     Pattern
               )

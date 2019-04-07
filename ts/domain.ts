@@ -127,8 +127,6 @@ interface Report {
     unusedDependencies: string[];
 }
 
-interface Registry {}
-
 interface FileContent {
     path: string;
     success: boolean;
@@ -166,7 +164,6 @@ interface MessageData {
 export {
     Config,
     ElmApp,
-    Registry,
     FileContent,
     Report,
     State,

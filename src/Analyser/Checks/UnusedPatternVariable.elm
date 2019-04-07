@@ -1,8 +1,8 @@
 module Analyser.Checks.UnusedPatternVariable exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Inner, Post, Pre), defaultConfig)
-import ASTUtil.Variables exposing (VariableType(Pattern), getLetDeclarationsVars, getTopLevels, patternToUsedVars, patternToVars, patternToVarsInner, withoutTopLevel)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
+import ASTUtil.Variables exposing (VariableType(..), getLetDeclarationsVars, getTopLevels, patternToUsedVars, patternToVars, patternToVarsInner, withoutTopLevel)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
@@ -10,16 +10,16 @@ import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
 import Elm.Interface as Interface
-import Elm.Syntax.Base exposing (VariablePointer)
-import Elm.Syntax.Expression exposing (Case, Expression(..), Function, Lambda, LetBlock, RecordUpdate)
+import Elm.Syntax.Expression exposing (Case, Expression(..), Function, Lambda, LetBlock, RecordSetter)
 import Elm.Syntax.File exposing (File)
 import Elm.Syntax.Infix exposing (InfixDirection)
 import Elm.Syntax.Module exposing (Module(..))
+import Elm.Syntax.ModuleName exposing (ModuleName)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Pattern exposing (Pattern(..))
 import Elm.Syntax.Range as Syntax exposing (Range)
-import Elm.Syntax.Ranged exposing (Ranged)
-import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(Typed))
-import Tuple3
+import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
+import Tuple.Extra
 
 
 checker : Checker
@@ -63,7 +63,7 @@ scan fileContext _ =
                     , onLetBlock = Inner onLetBlock
                     , onLambda = Inner onLambda
                     , onCase = Inner onCase
-                    , onOperatorApplication = Post onOperatorAppliction
+                    , onOperatorApplication = Post onOperatorApplication
                     , onDestructuring = Post onDestructuring
                     , onFunctionOrValue = Post onFunctionOrValue
                     , onPrefixOperator = Post onPrefixOperator
@@ -75,13 +75,13 @@ scan fileContext _ =
 
         onlyUnused : List ( String, ( Int, VariableType, Syntax.Range ) ) -> List ( String, ( Int, VariableType, Syntax.Range ) )
         onlyUnused =
-            List.filter (Tuple.second >> Tuple3.first >> (==) 0)
+            List.filter (Tuple.second >> Tuple.Extra.first3 >> (==) 0)
 
         unusedVariables =
             x.poppedScopes
                 |> List.concatMap Dict.toList
                 |> onlyUnused
-                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType t x y)
+                |> List.filterMap (\( z, ( _, t, y ) ) -> forVariableType t z y)
 
         unusedTopLevels =
             x.activeScopes
@@ -91,8 +91,8 @@ scan fileContext _ =
                 |> Dict.toList
                 |> onlyUnused
                 |> List.filter (filterByModuleType fileContext)
-                |> List.filter (Tuple.first >> flip Interface.exposesFunction fileContext.interface >> not)
-                |> List.filterMap (\( x, ( _, t, y ) ) -> forVariableType t x y)
+                |> List.filter (Tuple.first >> (\a -> Interface.exposesFunction a fileContext.interface) >> not)
+                |> List.filterMap (\( z, ( _, t, y ) ) -> forVariableType t z y)
     in
     unusedVariables ++ unusedTopLevels
 
@@ -120,7 +120,7 @@ forVariableType variableType variableName range =
 
 filterByModuleType : FileContext -> ( String, ( Int, VariableType, Syntax.Range ) ) -> Bool
 filterByModuleType fileContext =
-    case fileContext.ast.moduleDefinition of
+    case Node.value fileContext.ast.moduleDefinition of
         EffectModule _ ->
             filterForEffectModule
 
@@ -133,15 +133,15 @@ filterForEffectModule ( k, _ ) =
     not <| List.member k [ "init", "onEffects", "onSelfMsg", "subMap", "cmdMap" ]
 
 
-pushScope : List ( VariablePointer, VariableType ) -> UsedVariableContext -> UsedVariableContext
+pushScope : List ( Node String, VariableType ) -> UsedVariableContext -> UsedVariableContext
 pushScope vars x =
     let
         y : ActiveScope
         y =
             vars
-                |> List.map (\( z, t ) -> ( z.value, ( 0, t, z.range ) ))
+                |> List.map (\( Node vr vv, t ) -> ( vv, ( 0, t, vr ) ))
                 |> Dict.fromList
-                |> (,) []
+                |> (\b -> ( [], b ))
     in
     { x | activeScopes = y :: x.activeScopes }
 
@@ -156,6 +156,7 @@ popScope x =
                     (\( _, activeScope ) ->
                         if Dict.isEmpty activeScope then
                             x.poppedScopes
+
                         else
                             activeScope :: x.poppedScopes
                     )
@@ -203,8 +204,10 @@ flagVariable k l =
         ( masked, x ) :: xs ->
             if List.member k masked then
                 ( masked, x ) :: xs
+
             else if Dict.member k x then
-                ( masked, Dict.update k (Maybe.map (Tuple3.mapFirst ((+) 1))) x ) :: xs
+                ( masked, Dict.update k (Maybe.map (Tuple.Extra.mapFirst3 ((+) 1))) x ) :: xs
+
             else
                 ( masked, x ) :: flagVariable k xs
 
@@ -214,8 +217,8 @@ addUsedVariable x context =
     { context | activeScopes = flagVariable x context.activeScopes }
 
 
-onFunctionOrValue : String -> UsedVariableContext -> UsedVariableContext
-onFunctionOrValue x context =
+onFunctionOrValue : ( ModuleName, String ) -> UsedVariableContext -> UsedVariableContext
+onFunctionOrValue ( _, x ) context =
     addUsedVariable x context
 
 
@@ -224,39 +227,42 @@ onPrefixOperator prefixOperator context =
     addUsedVariable prefixOperator context
 
 
-onRecordUpdate : RecordUpdate -> UsedVariableContext -> UsedVariableContext
-onRecordUpdate recordUpdate context =
-    addUsedVariable recordUpdate.name context
+onRecordUpdate : ( Node String, List (Node RecordSetter) ) -> UsedVariableContext -> UsedVariableContext
+onRecordUpdate ( Node _ name, _ ) context =
+    addUsedVariable name context
 
 
-onOperatorAppliction : ( String, InfixDirection, Ranged Expression, Ranged Expression ) -> UsedVariableContext -> UsedVariableContext
-onOperatorAppliction ( op, _, _, _ ) context =
-    addUsedVariable op context
+onOperatorApplication : { operator : String, direction : InfixDirection, left : Node Expression, right : Node Expression } -> UsedVariableContext -> UsedVariableContext
+onOperatorApplication { operator } context =
+    addUsedVariable operator context
 
 
 onFile : File -> UsedVariableContext -> UsedVariableContext
 onFile file context =
     getTopLevels file
-        |> flip pushScope context
+        |> (\a -> pushScope a context)
 
 
-onFunction : (UsedVariableContext -> UsedVariableContext) -> Function -> UsedVariableContext -> UsedVariableContext
-onFunction f function context =
+onFunction : (UsedVariableContext -> UsedVariableContext) -> Node Function -> UsedVariableContext -> UsedVariableContext
+onFunction f (Node _ function) context =
     let
+        functionDeclaration =
+            Node.value function.declaration
+
         used =
-            List.concatMap patternToUsedVars function.declaration.arguments
-                |> List.map .value
+            List.concatMap patternToUsedVars functionDeclaration.arguments
+                |> List.map Node.value
 
         postContext =
             context
-                |> maskVariable function.declaration.name.value
+                |> maskVariable (Node.value functionDeclaration.name)
                 |> (\c ->
-                        function.declaration.arguments
+                        functionDeclaration.arguments
                             |> List.concatMap patternToVars
-                            |> flip pushScope c
+                            |> (\a -> pushScope a c)
                             |> f
                             |> popScope
-                            |> unMaskVariable function.declaration.name.value
+                            |> unMaskVariable (Node.value functionDeclaration.name)
                    )
     in
     List.foldl addUsedVariable postContext used
@@ -268,7 +274,7 @@ onLambda f lambda context =
         preContext =
             lambda.args
                 |> List.concatMap patternToVars
-                |> flip pushScope context
+                |> (\a -> pushScope a context)
 
         postContext =
             f preContext
@@ -280,38 +286,38 @@ onLetBlock : (UsedVariableContext -> UsedVariableContext) -> LetBlock -> UsedVar
 onLetBlock f letBlock context =
     letBlock.declarations
         |> (getLetDeclarationsVars >> withoutTopLevel)
-        |> flip pushScope context
+        |> (\a -> pushScope a context)
         |> f
         |> popScope
 
 
-onDestructuring : ( Ranged Pattern, Ranged Expression ) -> UsedVariableContext -> UsedVariableContext
+onDestructuring : ( Node Pattern, Node Expression ) -> UsedVariableContext -> UsedVariableContext
 onDestructuring ( pattern, _ ) context =
     List.foldl addUsedVariable
         context
-        (List.map .value (patternToUsedVars pattern))
+        (List.map Node.value (patternToUsedVars pattern))
 
 
 onCase : (UsedVariableContext -> UsedVariableContext) -> Case -> UsedVariableContext -> UsedVariableContext
 onCase f caze context =
     let
         used =
-            patternToUsedVars (Tuple.first caze) |> List.map .value
+            patternToUsedVars (Tuple.first caze) |> List.map Node.value
 
         postContext =
             Tuple.first caze
                 |> patternToVarsInner False
-                |> flip pushScope context
+                |> (\a -> pushScope a context)
                 |> f
                 |> popScope
     in
     List.foldl addUsedVariable postContext used
 
 
-onTypeAnnotation : Ranged TypeAnnotation -> UsedVariableContext -> UsedVariableContext
-onTypeAnnotation ( _, t ) c =
+onTypeAnnotation : Node TypeAnnotation -> UsedVariableContext -> UsedVariableContext
+onTypeAnnotation (Node _ t) c =
     case t of
-        Typed [] name _ ->
+        Typed (Node _ ( [], name )) _ ->
             addUsedVariable name c
 
         _ ->

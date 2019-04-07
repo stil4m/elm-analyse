@@ -9,21 +9,28 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var request = __importStar(require("request"));
 function setup(app) {
-    //TODO
-    app.ports.loadHttpDocumentation.subscribe(function (depPair) {
-        var name = depPair[0];
-        var version = depPair[1];
-        request.get("http://package.elm-lang.org/packages/" + name + "/" + version + "/documentation.json", function (err, _response, body) {
+    app.ports.loadHttpDocumentation.subscribe(function (pointer) {
+        var name = pointer.name, version = pointer.version;
+        request.get("http://package.elm-lang.org/packages/" + name + "/" + version + "/docs.json", function (err, _response, body) {
             if (err) {
-                app.ports.onHttpDocumentation.send([depPair, null]);
+                app.ports.onHttpDocumentation.send({
+                    dependency: pointer,
+                    json: null
+                });
                 return;
             }
             try {
                 var parsed = JSON.parse(body);
-                app.ports.onHttpDocumentation.send([depPair, parsed]);
+                app.ports.onHttpDocumentation.send({
+                    dependency: pointer,
+                    json: parsed
+                });
             }
             catch (e) {
-                app.ports.onHttpDocumentation.send([depPair, null]);
+                app.ports.onHttpDocumentation.send({
+                    dependency: pointer,
+                    json: null
+                });
             }
         });
     });

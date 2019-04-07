@@ -2,7 +2,7 @@ port module Analyser.Files.FileLoader exposing (Msg, init, subscriptions, update
 
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
 import Analyser.Files.Types exposing (LoadedSourceFile)
-import Elm.Json.Encode
+import Elm.RawFile
 import Json.Encode exposing (Value)
 import Result
 import Util.Logger as Logger
@@ -43,19 +43,24 @@ subscriptions =
 update : Msg -> ( LoadedSourceFile, Cmd a )
 update msg =
     case msg of
-        OnFileContent fileContent ->
+        OnFileContent fc ->
             let
                 ( fileLoad, store ) =
-                    FileContent.asRawFile fileContent
+                    FileContent.asRawFile fc
 
+                cmd : Cmd a
                 cmd =
                     if store then
-                        ( fileContent.sha1, Result.toMaybe fileLoad )
-                            |> uncurry (Maybe.map2 (\a b -> storeAstForSha { sha1 = a, ast = Elm.Json.Encode.encode b }))
+                        fileLoad
+                            |> Result.toMaybe
+                            |> Maybe.map Elm.RawFile.encode
+                            |> Maybe.map2 AstStore fc.sha1
+                            |> Maybe.map storeAstForSha
                             |> Maybe.withDefault Cmd.none
+
                     else
                         Cmd.none
             in
-            ( ( fileContent, fileLoad )
+            ( ( fc, fileLoad )
             , cmd
             )

@@ -53,9 +53,8 @@ function readDependencyJson(dependency, version, cb) {
     fs.readFile(path.resolve(globalCachePath, 'interfaces', dependency, version, 'dependency.json'), cb);
 }
 exports.readDependencyJson = readDependencyJson;
-//TODO Make content Object
 function storeShaJson(sha1, content) {
-    fs.writeFile(path.resolve(cachePath, '_shas', sha1 + '.json'), content, function () { });
+    fs.writeFile(path.resolve(cachePath, '_shas', sha1 + '.json'), JSON.stringify(content), function () { });
 }
 exports.storeShaJson = storeShaJson;
 function storeDependencyJson(dependency, version, content) {

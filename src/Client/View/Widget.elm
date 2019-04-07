@@ -11,7 +11,7 @@ type Category
     | Warning
 
 
-view : Category -> String -> String -> a -> Html msg
+view : Category -> String -> String -> String -> Html msg
 view category title icon value =
     Html.div [ Html.class "col-lg-6 col-md-6" ]
         [ Html.div [ Html.class ("panel panel-" ++ colorForCategory category) ]
@@ -22,7 +22,7 @@ view category title icon value =
                         ]
                     , Html.div [ Html.class "col-xs-9 text-right" ]
                         [ Html.div [ Html.class "huge" ]
-                            [ Html.text (toString value) ]
+                            [ Html.text value ]
                         , Html.div []
                             [ Html.text title ]
                         ]

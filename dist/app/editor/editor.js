@@ -33,14 +33,6 @@ module.exports = function setup(port) {
         onReconnect: function () { return console.log('Elm editor: On reconnect'); },
         onOpen: function () { return console.log('Elm editor: On open'); }
     };
-    // const onMessage = function incoming(data) {
-    //     try {
-    //         const parsed = JSON.parse(data);
-    //         app.ports.stateListener.send(parsed);
-    //     } catch (e) {
-    //         console.log('Parse state failed');
-    //     }
-    // };
     app.ports.editorMessages.subscribe(function (x) {
         Object.keys(listeners).forEach(function (k) {
             listeners[k](x);

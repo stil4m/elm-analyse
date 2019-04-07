@@ -1,12 +1,28 @@
 module Analyser.Fixes.FileContent exposing (getCharAtLocation, getStringAtRange, replaceLines, replaceLocationWith, replaceRangeWith, updateRange)
 
-import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Range exposing (Location, Range)
 import List.Extra as List
 
 
+patchRange : Range -> Range
+patchRange rawRange =
+    { start =
+        { column = rawRange.start.column - 1
+        , row = rawRange.start.row - 1
+        }
+    , end =
+        { column = rawRange.end.column - 1
+        , row = rawRange.end.row - 1
+        }
+    }
+
+
 updateRange : Range -> (String -> String) -> String -> String
-updateRange range patch content =
+updateRange rawRange patch content =
     let
+        range =
+            patchRange rawRange
+
         rows =
             content
                 |> String.split "\n"
@@ -64,9 +80,17 @@ replaceRangeWith range newValue input =
     updateRange range (always newValue) input
 
 
-replaceLocationWith : ( Int, Int ) -> String -> String -> String
-replaceLocationWith ( row, column ) x input =
+patchLocation : Location -> Location
+patchLocation { column, row } =
+    { column = column - 1, row = row - 1 }
+
+
+replaceLocationWith : Location -> String -> String -> String
+replaceLocationWith pair x input =
     let
+        { row, column } =
+            patchLocation pair
+
         rows =
             input
                 |> String.split "\n"
@@ -83,8 +107,12 @@ replaceLocationWith ( row, column ) x input =
         |> String.join "\n"
 
 
-getCharAtLocation : ( Int, Int ) -> String -> Maybe String
-getCharAtLocation ( row, column ) input =
+getCharAtLocation : Location -> String -> Maybe String
+getCharAtLocation pair input =
+    let
+        { row, column } =
+            patchLocation pair
+    in
     input
         |> String.split "\n"
         |> List.drop row
@@ -93,17 +121,22 @@ getCharAtLocation ( row, column ) input =
 
 
 getStringAtRange : Range -> String -> String
-getStringAtRange { start, end } input =
+getStringAtRange r input =
     let
+        { start, end } =
+            patchRange r
+
         trimLast i line =
             if i == end.row then
                 String.left end.column line
+
             else
                 line
 
         trimFirst i line =
             if i == 0 then
                 String.dropLeft start.column line
+
             else
                 line
     in

@@ -1,12 +1,14 @@
-module ASTUtil.Inspector exposing (Config, Order(Continue, Inner, Post, Pre, Skip), defaultConfig, inspect)
+module ASTUtil.Inspector exposing (Config, Order(..), defaultConfig, inspect)
 
 import Elm.Syntax.Declaration exposing (Declaration(..))
-import Elm.Syntax.Expression exposing (Case, Expression(..), Function, FunctionSignature, Lambda, LetBlock, LetDeclaration(..), RecordUpdate)
+import Elm.Syntax.Expression exposing (Case, Expression(..), Function, Lambda, LetBlock, LetDeclaration(..), RecordSetter)
 import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Import exposing (Import)
 import Elm.Syntax.Infix exposing (InfixDirection)
-import Elm.Syntax.Module exposing (Import)
+import Elm.Syntax.ModuleName exposing (ModuleName)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Pattern exposing (Pattern(..))
-import Elm.Syntax.Ranged exposing (Ranged)
+import Elm.Syntax.Signature exposing (Signature)
 import Elm.Syntax.Type exposing (Type, ValueConstructor)
 import Elm.Syntax.TypeAlias exposing (TypeAlias)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
@@ -22,23 +24,29 @@ type Order context x
 
 type alias Config context =
     { onFile : Order context File
-    , onImport : Order context Import
-    , onFunction : Order context Function
-    , onFunctionSignature : Order context FunctionSignature
-    , onPortDeclaration : Order context FunctionSignature
-    , onTypeAlias : Order context (Ranged TypeAlias)
+    , onImport : Order context (Node Import)
+    , onFunction : Order context (Node Function)
+    , onFunctionSignature : Order context (Node Signature)
+    , onPortDeclaration : Order context (Node Signature)
+    , onTypeAlias : Order context (Node TypeAlias)
     , onType : Order context Type
-    , onDestructuring : Order context ( Ranged Pattern, Ranged Expression )
-    , onExpression : Order context (Ranged Expression)
-    , onOperatorApplication : Order context ( String, InfixDirection, Ranged Expression, Ranged Expression )
-    , onTypeAnnotation : Order context (Ranged TypeAnnotation)
+    , onDestructuring : Order context ( Node Pattern, Node Expression )
+    , onExpression : Order context (Node Expression)
+    , onOperatorApplication :
+        Order context
+            { operator : String
+            , direction : InfixDirection
+            , left : Node Expression
+            , right : Node Expression
+            }
+    , onTypeAnnotation : Order context (Node TypeAnnotation)
     , onLambda : Order context Lambda
     , onLetBlock : Order context LetBlock
     , onCase : Order context Case
-    , onFunctionOrValue : Order context String
+    , onFunctionOrValue : Order context ( ModuleName, String )
     , onPrefixOperator : Order context String
-    , onRecordAccess : Order context ( Ranged Expression, String )
-    , onRecordUpdate : Order context RecordUpdate
+    , onRecordAccess : Order context ( Node Expression, Node String )
+    , onRecordUpdate : Order context ( Node String, List (Node RecordSetter) )
     }
 
 
@@ -92,12 +100,12 @@ inspect config file context =
         context
 
 
-inspectImports : Config context -> List Import -> context -> context
+inspectImports : Config context -> List (Node Import) -> context -> context
 inspectImports config imports context =
     List.foldl (inspectImport config) context imports
 
 
-inspectImport : Config context -> Import -> context -> context
+inspectImport : Config context -> Node Import -> context -> context
 inspectImport config imp context =
     actionLambda config.onImport
         identity
@@ -105,40 +113,40 @@ inspectImport config imp context =
         context
 
 
-inspectDeclarations : Config context -> List (Ranged Declaration) -> context -> context
+inspectDeclarations : Config context -> List (Node Declaration) -> context -> context
 inspectDeclarations config declarations context =
     List.foldl (inspectDeclaration config) context declarations
 
 
-inspectLetDeclarations : Config context -> List (Ranged LetDeclaration) -> context -> context
+inspectLetDeclarations : Config context -> List (Node LetDeclaration) -> context -> context
 inspectLetDeclarations config declarations context =
     List.foldl (inspectLetDeclaration config) context declarations
 
 
-inspectLetDeclaration : Config context -> Ranged LetDeclaration -> context -> context
-inspectLetDeclaration config ( _, declaration ) context =
+inspectLetDeclaration : Config context -> Node LetDeclaration -> context -> context
+inspectLetDeclaration config (Node r declaration) context =
     case declaration of
         LetFunction function ->
-            inspectFunction config function context
+            inspectFunction config (Node r function) context
 
         LetDestructuring pattern expression ->
             inspectDestructuring config ( pattern, expression ) context
 
 
-inspectDeclaration : Config context -> Ranged Declaration -> context -> context
-inspectDeclaration config ( r, declaration ) context =
+inspectDeclaration : Config context -> Node Declaration -> context -> context
+inspectDeclaration config (Node r declaration) context =
     case declaration of
-        FuncDecl function ->
-            inspectFunction config function context
+        FunctionDeclaration function ->
+            inspectFunction config (Node r function) context
 
-        AliasDecl typeAlias ->
-            inspectTypeAlias config ( r, typeAlias ) context
+        AliasDeclaration typeAlias ->
+            inspectTypeAlias config (Node r typeAlias) context
 
-        TypeDecl typeDecl ->
+        CustomTypeDeclaration typeDecl ->
             inspectType config typeDecl context
 
         PortDeclaration signature ->
-            inspectPortDeclaration config signature context
+            inspectPortDeclaration config (Node r signature) context
 
         InfixDeclaration _ ->
             context
@@ -156,21 +164,21 @@ inspectType config typeDecl context =
         context
 
 
-inspectValueConstructor : Config context -> ValueConstructor -> context -> context
-inspectValueConstructor config valueConstructor context =
+inspectValueConstructor : Config context -> Node ValueConstructor -> context -> context
+inspectValueConstructor config (Node _ valueConstructor) context =
     List.foldl (inspectTypeAnnotation config) context valueConstructor.arguments
 
 
-inspectTypeAlias : Config context -> Ranged TypeAlias -> context -> context
+inspectTypeAlias : Config context -> Node TypeAlias -> context -> context
 inspectTypeAlias config typeAlias context =
     actionLambda
         config.onTypeAlias
-        (inspectTypeAnnotation config (Tuple.second typeAlias).typeAnnotation)
+        (inspectTypeAnnotation config (Node.value typeAlias).typeAnnotation)
         typeAlias
         context
 
 
-inspectDestructuring : Config context -> ( Ranged Pattern, Ranged Expression ) -> context -> context
+inspectDestructuring : Config context -> ( Node Pattern, Node Expression ) -> context -> context
 inspectDestructuring config destructuring context =
     actionLambda
         config.onDestructuring
@@ -179,20 +187,24 @@ inspectDestructuring config destructuring context =
         context
 
 
-inspectFunction : Config context -> Function -> context -> context
-inspectFunction config function context =
+inspectFunction : Config context -> Node Function -> context -> context
+inspectFunction config functionNode context =
+    let
+        function =
+            Node.value functionNode
+    in
     actionLambda
         config.onFunction
-        (inspectExpression config function.declaration.expression
+        (inspectExpression config (Node.value function.declaration).expression
             >> (Maybe.withDefault identity <|
-                    Maybe.map (Tuple.second >> inspectSignature config) function.signature
+                    Maybe.map (inspectSignature config) function.signature
                )
         )
-        function
+        functionNode
         context
 
 
-inspectPortDeclaration : Config context -> FunctionSignature -> context -> context
+inspectPortDeclaration : Config context -> Node Signature -> context -> context
 inspectPortDeclaration config signature context =
     actionLambda
         config.onPortDeclaration
@@ -201,16 +213,16 @@ inspectPortDeclaration config signature context =
         context
 
 
-inspectSignature : Config context -> FunctionSignature -> context -> context
+inspectSignature : Config context -> Node Signature -> context -> context
 inspectSignature config signature context =
     actionLambda
         config.onFunctionSignature
-        (inspectTypeAnnotation config signature.typeAnnotation)
+        (inspectTypeAnnotation config (Node.value signature).typeAnnotation)
         signature
         context
 
 
-inspectTypeAnnotation : Config context -> Ranged TypeAnnotation -> context -> context
+inspectTypeAnnotation : Config context -> Node TypeAnnotation -> context -> context
 inspectTypeAnnotation config typeAnnotation context =
     actionLambda
         config.onTypeAnnotation
@@ -219,20 +231,20 @@ inspectTypeAnnotation config typeAnnotation context =
         context
 
 
-inspectTypeAnnotationInner : Config context -> Ranged TypeAnnotation -> context -> context
-inspectTypeAnnotationInner config ( _, typeRefence ) context =
+inspectTypeAnnotationInner : Config context -> Node TypeAnnotation -> context -> context
+inspectTypeAnnotationInner config (Node _ typeRefence) context =
     case typeRefence of
-        Typed _ _ typeArgs ->
+        Typed _ typeArgs ->
             List.foldl (inspectTypeAnnotation config) context typeArgs
 
         Tupled typeAnnotations ->
             List.foldl (inspectTypeAnnotation config) context typeAnnotations
 
         Record recordDefinition ->
-            List.foldl (inspectTypeAnnotation config) context (List.map Tuple.second recordDefinition)
+            List.foldl (inspectTypeAnnotation config) context (List.map (Node.value >> Tuple.second) recordDefinition)
 
         GenericRecord _ recordDefinition ->
-            List.foldl (inspectTypeAnnotation config) context (List.map Tuple.second recordDefinition)
+            List.foldl (inspectTypeAnnotation config) context (List.map (Node.value >> Tuple.second) <| Node.value recordDefinition)
 
         FunctionTypeAnnotation left right ->
             List.foldl (inspectTypeAnnotation config) context [ left, right ]
@@ -244,11 +256,11 @@ inspectTypeAnnotationInner config ( _, typeRefence ) context =
             context
 
 
-inspectExpression : Config context -> Ranged Expression -> context -> context
+inspectExpression : Config context -> Node Expression -> context -> context
 inspectExpression config expression context =
     actionLambda
         config.onExpression
-        (inspectInnerExpression config <| Tuple.second expression)
+        (inspectInnerExpression config <| Node.value expression)
         expression
         context
 
@@ -259,10 +271,10 @@ inspectInnerExpression config expression context =
         UnitExpr ->
             context
 
-        FunctionOrValue functionOrVal ->
+        FunctionOrValue m functionOrVal ->
             actionLambda config.onFunctionOrValue
                 identity
-                functionOrVal
+                ( m, functionOrVal )
                 context
 
         PrefixOperator prefix ->
@@ -292,9 +304,6 @@ inspectInnerExpression config expression context =
         CharLiteral _ ->
             context
 
-        QualifiedExpr _ _ ->
-            context
-
         RecordAccess ex1 key ->
             actionLambda config.onRecordAccess
                 (inspectExpression config ex1)
@@ -312,8 +321,8 @@ inspectInnerExpression config expression context =
 
         OperatorApplication op dir left right ->
             actionLambda config.onOperatorApplication
-                (flip (List.foldl (inspectExpression config)) [ left, right ])
-                ( op, dir, left, right )
+                (\a -> List.foldl (inspectExpression config) a [ left, right ])
+                { operator = op, direction = dir, left = left, right = right }
                 context
 
         IfBlock e1 e2 e3 ->
@@ -355,12 +364,12 @@ inspectInnerExpression config expression context =
             List.foldl (inspectExpression config) context expressionList
 
         RecordExpr expressionStringList ->
-            List.foldl (\a b -> inspectExpression config (Tuple.second a) b) context expressionStringList
+            List.foldl (\a b -> inspectExpression config (Tuple.second <| Node.value a) b) context expressionStringList
 
-        RecordUpdateExpression recordUpdate ->
+        RecordUpdateExpression name updates ->
             actionLambda config.onRecordUpdate
-                (\c -> List.foldl (\a b -> inspectExpression config (Tuple.second a) b) c recordUpdate.updates)
-                recordUpdate
+                (\c -> List.foldl (\a b -> inspectExpression config (Tuple.second <| Node.value a) b) c updates)
+                ( name, updates )
                 context
 
 

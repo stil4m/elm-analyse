@@ -10,22 +10,31 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var cache = __importStar(require("../util/cache"));
 function setup(app) {
     app.ports.storeRawDependency.subscribe(function (x) {
-        cache.storeDependencyJson(x[0], x[1], x[2]);
+        var dependency = x.dependency;
+        cache.storeDependencyJson(dependency.name, dependency.version, x.content);
     });
-    app.ports.loadRawDependency.subscribe(function (x) {
-        var dependency = x[0];
-        var version = x[1];
-        cache.readDependencyJson(dependency, version, function (err, content) {
+    app.ports.loadRawDependency.subscribe(function (dependency) {
+        cache.readDependencyJson(dependency.name, dependency.version, function (err, content) {
             if (err) {
-                //TODO
-                app.ports.onRawDependency.send([dependency, version, '' + x]);
+                app.ports.onRawDependency.send({
+                    dependency: dependency,
+                    json: null
+                });
             }
             else {
-                app.ports.onRawDependency.send([
-                    dependency,
-                    version,
-                    content.toString()
-                ]);
+                try {
+                    var parsed = JSON.parse(content.toString());
+                    app.ports.onRawDependency.send({
+                        dependency: dependency,
+                        json: parsed
+                    });
+                }
+                catch (e) {
+                    app.ports.onRawDependency.send({
+                        dependency: dependency,
+                        json: null
+                    });
+                }
             }
         });
     });

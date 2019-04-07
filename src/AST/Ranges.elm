@@ -7,6 +7,7 @@ orderByStart : Range -> Range -> Order
 orderByStart r1 r2 =
     if r1.start.row /= r2.start.row then
         compare r1.start.row r2.start.row
+
     else
         compare r1.start.column r2.start.column
 
@@ -23,7 +24,7 @@ emptyRange =
 
 locationToString : Location -> String
 locationToString { row, column } =
-    "(" ++ toString row ++ "," ++ toString column ++ ")"
+    "(" ++ String.fromInt row ++ "," ++ String.fromInt column ++ ")"
 
 
 {-| Checks if the second range is the overhauling range on the first range
@@ -37,7 +38,9 @@ isGte : Location -> Location -> Bool
 isGte a b =
     if a.row > b.row then
         True
+
     else if a.row < b.row then
         False
+
     else
         a.column >= b.column

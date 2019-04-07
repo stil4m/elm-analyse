@@ -1,7 +1,4 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -10,17 +7,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var open_1 = __importDefault(require("open"));
 var fileLoadingPorts = __importStar(require("../file-loading-ports"));
 var loggingPorts = __importStar(require("../util/logging-ports"));
 var dependencies = __importStar(require("../util/dependencies"));
-function run(config, onload) {
+var opn = require('opn');
+function run(config, project, onload) {
     dependencies.getDependencies(function (registry) {
         var directory = process.cwd();
         var Elm = require('../backend-elm.js');
-        var app = Elm.Analyser.worker({
-            server: true,
-            registry: registry || []
+        var app = Elm.Elm.Analyser.init({
+            flags: {
+                server: true,
+                registry: registry || [],
+                project: project
+            }
         });
         app.ports.sendReportValue.subscribe(function (report) {
             console.log('Found ' + report.messages.length + ' message(s)');
@@ -29,7 +29,7 @@ function run(config, onload) {
         fileLoadingPorts.setup(app, config, directory);
         onload(app);
         if (config.open) {
-            open_1.default('http://localhost:' + config.port);
+            opn('http://localhost:' + config.port);
         }
     });
 }

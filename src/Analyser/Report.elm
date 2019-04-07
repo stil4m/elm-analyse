@@ -16,7 +16,7 @@ type alias Report =
 encode : Report -> Value
 encode r =
     JE.object
-        [ ( "messages", JE.list (List.map Analyser.Messages.Json.encodeMessage r.messages) )
+        [ ( "messages", JE.list Analyser.Messages.Json.encodeMessage r.messages )
         , ( "modules", Analyser.Modules.encode r.modules )
-        , ( "unusedDependencies", JE.list (List.map JE.string r.unusedDependencies) )
+        , ( "unusedDependencies", JE.list JE.string r.unusedDependencies )
         ]

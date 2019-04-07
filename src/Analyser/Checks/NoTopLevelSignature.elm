@@ -1,13 +1,14 @@
 module Analyser.Checks.NoTopLevelSignature exposing (checker)
 
 import AST.Ranges as Range
-import ASTUtil.Inspector as Inspector exposing (Order(Inner, Skip), defaultConfig)
+import ASTUtil.Inspector as Inspector exposing (Order(..), defaultConfig)
 import Analyser.Checks.Base exposing (Checker)
 import Analyser.Configuration exposing (Configuration)
 import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Elm.Syntax.Expression exposing (Expression(..), Function)
+import Elm.Syntax.Node as Node exposing (Node(..))
 
 
 checker : Checker
@@ -30,23 +31,26 @@ scan fileContext _ =
         []
 
 
-onFunction : (List MessageData -> List MessageData) -> Function -> List MessageData -> List MessageData
-onFunction _ function context =
+onFunction : (List MessageData -> List MessageData) -> Node Function -> List MessageData -> List MessageData
+onFunction _ (Node _ function) context =
     case function.signature of
         Nothing ->
             let
-                r =
-                    function.declaration.name.range
+                declaration =
+                    Node.value function.declaration
+
+                (Node r declarationName) =
+                    declaration.name
             in
             (Data.init
                 (String.concat
                     [ "No signature for top level definition `"
-                    , function.declaration.name.value
+                    , declarationName
                     , "` at "
                     , Range.rangeToString r
                     ]
                 )
-                |> Data.addVarName "varName" function.declaration.name.value
+                |> Data.addVarName "varName" declarationName
                 |> Data.addRange "range" r
             )
                 :: context

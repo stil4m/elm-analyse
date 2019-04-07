@@ -38,6 +38,7 @@ type Msg
 init : Client.State.State -> Model
 init s =
     RemoteData.map innerInit s
+        |> RemoteData.mapError (always "Some error occured...")
 
 
 onNewState : Client.State.State -> Model -> Model
@@ -113,7 +114,7 @@ interPackageRelationTable ( from, to ) rels =
                     [ Html.tr []
                         [ Html.td []
                             [ Html.i
-                                [ Html.style [ ( "color", "#777" ) ] ]
+                                [ Html.style "color" "#777" ]
                                 [ Html.text "No dependencies" ]
                             ]
                         ]
@@ -130,7 +131,7 @@ packageNameHtml : String -> Html msg
 packageNameHtml input =
     case input of
         "" ->
-            Html.span [ Html.style [ ( "color", "#999" ) ] ]
+            Html.span [ Html.style "color" "#999" ]
                 [ Html.text "<<root>>" ]
 
         _ ->
@@ -144,18 +145,14 @@ headerNameTd x =
             200
     in
     Html.th
-        [ Html.style
-            [ ( "height", toString height ++ "px" )
-            , ( "text-align", "left" )
-            , ( "whitespace", "nowrap" )
-            , ( "width", "30px" )
-            ]
+        [ Html.style "height" (String.fromInt height ++ "px")
+        , Html.style "text-align" "left"
+        , Html.style "whitespace" "nowrap"
+        , Html.style "width" "30px"
         ]
         [ Html.div
-            [ Html.style
-                [ ( "transform", "rotate(-90deg) translate(" ++ toString (negate height + 40) ++ "px, 0px)" )
-                , ( "width", "30px" )
-                ]
+            [ Html.style "transform" ("rotate(-90deg) translate(" ++ String.fromInt (negate height + 40) ++ "px, 0px)")
+            , Html.style "width" "30px"
             ]
             [ packageNameHtml x ]
         ]
@@ -177,24 +174,27 @@ packageCycleRow name names relations selected =
 packageContentTd : String -> String -> PackageFileRelations -> Maybe ( String, String ) -> Html Msg
 packageContentTd from to relations selected =
     if from == to then
-        Html.td [ Html.style [ ( "background", "black" ) ] ] []
+        Html.td [ Html.style "background" "black" ] []
+
     else
         let
             styleClass =
                 if selected == Just ( from, to ) || selected == Just ( to, from ) then
                     "info"
+
                 else if Dict.member ( from, to ) relations && Dict.member ( to, from ) relations then
                     "danger"
+
                 else
                     ""
         in
         Html.td
             [ Html.class styleClass
-            , Html.style [ ( "text-align", "center" ) ]
+            , Html.style "text-align" "center"
             , Html.onClick (Select from to)
             ]
             [ Dict.get ( from, to ) relations
-                |> Maybe.map (List.length >> toString)
+                |> Maybe.map (List.length >> String.fromInt)
                 |> Maybe.withDefault ""
                 |> Html.text
             ]

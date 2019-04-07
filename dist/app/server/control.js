@@ -15,10 +15,5 @@ function run(app, elm) {
             }
         });
     });
-    // TODO, bring to elm
-    elm.ports.sendFixResult.subscribe(function (m) {
-        console.log('FixResult');
-        console.log(m);
-    });
 }
 exports.default = { run: run };

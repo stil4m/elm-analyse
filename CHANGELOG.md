@@ -1,5 +1,30 @@
 # elm-analyse changelog
 
+
+## 0.16.1 (2019-01-05)
+
+* [Issue #186](https://github.com/stil4m/elm-analyse/issues/186) Fix for security vulnerability. Thanks to @decioferreira.
+
+
+## 0.16.0 (2018-12-27)
+
+* Elm 0.19 support. `elm-analyse` can now be used to analyse Elm code written for version `0.19`. Prior versions of Elm are no longer supported.
+* [Issue #178](https://github.com/stil4m/elm-analyse/issues/178) Parent folders not resolved properly.
+* [PR #174](https://github.com/stil4m/elm-analyse/pull/174) Fix for content overlow. Thanks to @jhrcek.
+
+
+## 0.15.0 (2018-07-29)
+
+* [Issue #152](https://github.com/stil4m/elm-analyse/issues/152) Covered some performance concerns
+* [Issue #171](https://github.com/stil4m/elm-analyse/issues/171) Add message file to dialog in server mode. Thanks to @andys8
+* [Issue #160](https://github.com/stil4m/elm-analyse/issues/160) Fix out of memory crash
+* [Issue #158](https://github.com/stil4m/elm-analyse/issues/158) Remove 'formatted' check. Please use elm-format.
+* [Issue #162](https://github.com/stil4m/elm-analyse/issues/162) Add option to open browser when starting in server mode. Thanks to @romariolopezc
+* Bump elm-syntax to 5.0.1 which resolves #165 and #167
+
+
+
+
 ## 0.14.1 (2018-04-16)
 
 * [Issue #159](https://github.com/stil4m/elm-analyse/issues/159) Bug: elm-lang/core reported as unused dependency in basic Elm program

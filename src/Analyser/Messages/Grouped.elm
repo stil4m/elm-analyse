@@ -1,6 +1,6 @@
-module Analyser.Messages.Grouped exposing (GroupedMessages, byFileName, byType, isEmpty, map)
+module Analyser.Messages.Grouped exposing (GroupedMessages, byFileName, byType, isEmpty, map, markFixed)
 
-import Analyser.Messages.Types exposing (Message)
+import Analyser.Messages.Types exposing (Message, MessageStatus(..))
 import Dict
 import Dict.Extra as Dict
 
@@ -12,6 +12,22 @@ type GroupedMessages
 isEmpty : GroupedMessages -> Bool
 isEmpty (GroupedMessages _ xs) =
     List.isEmpty xs
+
+
+markFixed : Message -> GroupedMessages -> GroupedMessages
+markFixed m (GroupedMessages f l) =
+    let
+        markIfIsInputMessage other =
+            if m.id == other.id then
+                { other | status = Fixing }
+
+            else
+                other
+
+        patched =
+            l |> List.map (Tuple.mapSecond (List.map markIfIsInputMessage))
+    in
+    GroupedMessages f patched
 
 
 map : (( String, List ( String, Message ) ) -> b) -> GroupedMessages -> List b

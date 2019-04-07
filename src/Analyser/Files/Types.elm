@@ -1,19 +1,19 @@
-module Analyser.Files.Types
-    exposing
-        ( LoadedFileData
-        , LoadedSourceFile
-        , LoadedSourceFiles
-        , ModuleIndex
-        , OperatorTable
-        , Version
-        )
+module Analyser.Files.Types exposing
+    ( LoadedFileData
+    , LoadedSourceFile
+    , LoadedSourceFiles
+    , ModuleIndex
+    , OperatorTable
+    , Version
+    )
 
 import Analyser.Files.FileContent exposing (FileContent)
 import Dict exposing (Dict)
 import Elm.Interface exposing (Interface)
 import Elm.RawFile exposing (RawFile)
-import Elm.Syntax.Base as AST
 import Elm.Syntax.Infix as AST
+import Elm.Syntax.ModuleName exposing (ModuleName)
+import Parser exposing (DeadEnd)
 
 
 type alias Version =
@@ -25,18 +25,18 @@ type alias LoadedSourceFiles =
 
 
 type alias LoadedSourceFile =
-    ( FileContent, Result String RawFile )
+    ( FileContent, Result (List DeadEnd) RawFile )
 
 
 type alias LoadedFileData =
     { interface : Interface
-    , moduleName : AST.ModuleName
+    , moduleName : ModuleName
     , ast : RawFile
     }
 
 
 type alias ModuleIndex =
-    Dict AST.ModuleName Interface
+    Dict ModuleName Interface
 
 
 type alias OperatorTable =
