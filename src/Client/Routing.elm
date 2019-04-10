@@ -1,4 +1,4 @@
-module Client.Routing exposing (Route(..), fromLocation, pushRoute, toUrl)
+module Client.Routing exposing (Route(..), fromUrl, setRoute, toUrl)
 
 import Browser.Navigation as Navigation exposing (Key)
 import Url exposing (Url)
@@ -28,15 +28,15 @@ parser =
         ]
 
 
-fromLocation : Url -> Route
-fromLocation url =
+fromUrl : Url -> Route
+fromUrl url =
     url
         |> Url.parse parser
         |> Maybe.withDefault NotFound
 
 
-pushRoute : Key -> Route -> Cmd msg
-pushRoute key route =
+setRoute : Key -> Route -> Cmd msg
+setRoute key route =
     Navigation.pushUrl key (toUrl route)
 
 

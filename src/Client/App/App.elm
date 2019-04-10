@@ -1,6 +1,6 @@
-module Client.App.App exposing (Model, Msg(..), init, main, subscriptions, update, view)
+module Client.App.App exposing (Model, Msg(..), main)
 
-import Browser exposing (UrlRequest)
+import Browser
 import Browser.Navigation exposing (Key)
 import Client.App.Menu
 import Client.Components.FileTree as FileTree
@@ -24,8 +24,8 @@ main =
         { init = init
         , view = view
         , update = update
-        , onUrlRequest = OnLocation
-        , onUrlChange = Browser.Internal >> OnLocation
+        , onUrlRequest = OnUrlRequest
+        , onUrlChange = OnUrlChange
         , subscriptions = subscriptions
         }
 
@@ -34,14 +34,14 @@ type Msg
     = MessagesPageMsg MessagesPage.Msg
     | FileTreeMsg FileTree.Msg
     | PackageDependenciesMsg PackageDependencies.Msg
-    | OnLocation UrlRequest
+    | OnUrlRequest Browser.UrlRequest
+    | OnUrlChange Url
     | Tick
     | NewState State
-    | ToRoute Route
 
 
 type alias Model =
-    { location : Url
+    { location : Route
     , content : Content
     , state : State
     , key : Key
@@ -65,15 +65,16 @@ subscriptions _ =
 
 init : () -> Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init () l key =
-    onLocation l { location = l, key = key, content = NotFound, state = RemoteData.Loading }
+    onLocation l { location = Routing.NotFound, key = key, content = NotFound, state = RemoteData.Loading }
 
 
 onLocation : Url -> Model -> ( Model, Cmd Msg )
-onLocation l model =
-    let
-        route =
-            Routing.fromLocation l
-    in
+onLocation url model =
+    onRoute (Routing.fromUrl url) model
+
+
+onRoute : Route -> Model -> ( Model, Cmd Msg )
+onRoute route model =
     case route of
         Routing.FileTree ->
             case model.content of
@@ -82,7 +83,7 @@ onLocation l model =
 
                 _ ->
                     FileTree.init
-                        |> Tuple.mapFirst (\x -> { model | content = FileTreeContent x, location = l })
+                        |> Tuple.mapFirst (\x -> { model | content = FileTreeContent x, location = route })
                         |> Tuple.mapSecond (Cmd.map FileTreeMsg)
 
         Routing.Modules ->
@@ -91,7 +92,7 @@ onLocation l model =
                     ( model, Cmd.none )
 
                 _ ->
-                    ( { model | content = GraphContent (Graph.init model.state), location = l }, Cmd.none )
+                    ( { model | content = GraphContent (Graph.init model.state), location = route }, Cmd.none )
 
         Routing.PackageDependencies ->
             case model.content of
@@ -99,7 +100,7 @@ onLocation l model =
                     ( model, Cmd.none )
 
                 _ ->
-                    ( { model | content = PackageDependenciesContent (PackageDependencies.init model.state), location = l }
+                    ( { model | content = PackageDependenciesContent (PackageDependencies.init model.state), location = route }
                     , Cmd.none
                     )
 
@@ -109,7 +110,7 @@ onLocation l model =
                     ( model, Cmd.none )
 
                 _ ->
-                    ( { model | content = MessagesPageContent (MessagesPage.init model.state), location = l }, Cmd.none )
+                    ( { model | content = MessagesPageContent (MessagesPage.init model.state), location = route }, Cmd.none )
 
         Routing.Dependencies ->
             case model.content of
@@ -117,7 +118,7 @@ onLocation l model =
                     ( model, Cmd.none )
 
                 _ ->
-                    ( { model | content = DependenciesPageContent, location = l }, Cmd.none )
+                    ( { model | content = DependenciesPageContent, location = route }, Cmd.none )
 
         Routing.Dashboard ->
             case model.content of
@@ -125,10 +126,10 @@ onLocation l model =
                     ( model, Cmd.none )
 
                 _ ->
-                    ( { model | content = DashboardContent, location = l }, Cmd.none )
+                    ( { model | content = DashboardContent, location = route }, Cmd.none )
 
         Routing.NotFound ->
-            ( { model | content = NotFound, location = l }, Cmd.none )
+            ( { model | content = NotFound, location = route }, Cmd.none )
 
 
 view : Model -> Browser.Document Msg
@@ -144,15 +145,6 @@ viewInner : Model -> Html.Html Msg
 viewInner m =
     div []
         [ Client.App.Menu.view m.location
-            |> Html.map
-                (\v ->
-                    case v of
-                        Ok o ->
-                            o
-
-                        Err route ->
-                            ToRoute route
-                )
         , div [ id "page-wrapper", style "overflow" "auto" ]
             [ case m.content of
                 MessagesPageContent subModel ->
@@ -212,16 +204,22 @@ updateStateInContent state content =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ToRoute r ->
-            ( model, Routing.pushRoute model.key r )
+        OnUrlChange u ->
+            let
+                route =
+                    Routing.fromUrl u
+            in
+            onRoute route model
 
-        OnLocation l ->
-            case l of
-                Browser.Internal i ->
-                    onLocation i model
+        OnUrlRequest req ->
+            case req of
+                Browser.Internal u ->
+                    ( model
+                    , Routing.setRoute model.key (Routing.fromUrl u)
+                    )
 
-                Browser.External u ->
-                    ( model, Browser.Navigation.load u )
+                Browser.External _ ->
+                    ( model, Cmd.none )
 
         Tick ->
             ( model
@@ -256,7 +254,7 @@ onFileTreeMsg : FileTree.Msg -> Model -> ( Model, Cmd Msg )
 onFileTreeMsg subMsg model =
     case model.content of
         FileTreeContent subModel ->
-            FileTree.update model.state model.location subMsg subModel
+            FileTree.update model.state subMsg subModel
                 |> Tuple.mapFirst (\x -> { model | content = FileTreeContent x })
                 |> Tuple.mapSecond (Cmd.map FileTreeMsg)
 
@@ -268,7 +266,7 @@ onMessagesPageMsg : MessagesPage.Msg -> Model -> ( Model, Cmd Msg )
 onMessagesPageMsg subMsg model =
     case model.content of
         MessagesPageContent subModel ->
-            MessagesPage.update model.state model.location subMsg subModel
+            MessagesPage.update model.state subMsg subModel
                 |> Tuple.mapFirst (\x -> { model | content = MessagesPageContent x })
                 |> Tuple.mapSecond (Cmd.map MessagesPageMsg)
 
