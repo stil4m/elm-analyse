@@ -1,5 +1,12 @@
 # elm-analyse changelog
 
+## 0.16.3 (2019-04-10)
+
+* Fix navigation issue on dashboard of server mode. Url was not updated properly.
+
+## 0.16.2 (2019-03-26)
+
+* Resolve some security vulnerabilities
 
 ## 0.16.1 (2019-01-05)
 
