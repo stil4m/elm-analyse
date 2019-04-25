@@ -37,7 +37,7 @@ function readPackageDependencyInfo(cb: ((err: any, result: any) => void)) {
 function storePackageDependencyInfo(data: any) {
     fs.writeFile(path.resolve(globalCachePath, 'all-packages.json'), JSON.stringify(data), function() {});
 }
-function readDependencyJson(dependency: string, version: string, cb: (err: NodeJS.ErrnoException, data: Buffer) => void) {
+function readDependencyJson(dependency: string, version: string, cb: (err: NodeJS.ErrnoException | null, data: Buffer) => void) {
     //TODO Error handling
 
     fs.readFile(path.resolve(globalCachePath, 'interfaces', dependency, version, 'dependency.json'), cb);

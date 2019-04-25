@@ -32,6 +32,7 @@ export interface DependencyFiles {
 export interface FileChange {
     event: string;
     file: string;
+    content: string | null;
 }
 export interface FileStore {
     file: string;

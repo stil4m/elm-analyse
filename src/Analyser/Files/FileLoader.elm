@@ -1,4 +1,4 @@
-port module Analyser.Files.FileLoader exposing (Msg, init, subscriptions, update)
+port module Analyser.Files.FileLoader exposing (Msg, init, load, subscriptions, update)
 
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
 import Analyser.Files.Types exposing (LoadedSourceFile)
@@ -44,23 +44,28 @@ update : Msg -> ( LoadedSourceFile, Cmd a )
 update msg =
     case msg of
         OnFileContent fc ->
-            let
-                ( fileLoad, store ) =
-                    FileContent.asRawFile fc
+            load fc
 
-                cmd : Cmd a
-                cmd =
-                    if store then
-                        fileLoad
-                            |> Result.toMaybe
-                            |> Maybe.map Elm.RawFile.encode
-                            |> Maybe.map2 AstStore fc.sha1
-                            |> Maybe.map storeAstForSha
-                            |> Maybe.withDefault Cmd.none
 
-                    else
-                        Cmd.none
-            in
-            ( ( fc, fileLoad )
-            , cmd
-            )
+load : FileContent -> ( LoadedSourceFile, Cmd a )
+load fc =
+    let
+        ( fileLoad, store ) =
+            FileContent.asRawFile fc
+
+        cmd : Cmd a
+        cmd =
+            if store then
+                fileLoad
+                    |> Result.toMaybe
+                    |> Maybe.map Elm.RawFile.encode
+                    |> Maybe.map2 AstStore fc.sha1
+                    |> Maybe.map storeAstForSha
+                    |> Maybe.withDefault Cmd.none
+
+            else
+                Cmd.none
+    in
+    ( ( fc, fileLoad )
+    , cmd
+    )
