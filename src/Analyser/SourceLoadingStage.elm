@@ -1,6 +1,6 @@
 module Analyser.SourceLoadingStage exposing (Model, Msg, init, initWithContent, isDone, parsedFiles, subscriptions, update)
 
-import Analyser.Files.FileContent as FileContent exposing (FileContent)
+import Analyser.Files.FileContent exposing (FileContent)
 import Analyser.Files.FileLoader as FileLoader
 import Analyser.Files.Types exposing (LoadedSourceFile, LoadedSourceFiles)
 import List.Extra
