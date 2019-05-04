@@ -1,4 +1,4 @@
-port module Analyser.Fixer exposing (Model, Msg, init, initWithMessage, isDone, message, subscriptions, succeeded, update)
+port module Analyser.Fixer exposing (Model, Msg, fixFast, init, initWithMessage, isDone, message, subscriptions, succeeded, update)
 
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.FileRef exposing (FileRef)
@@ -69,6 +69,24 @@ initWithMessage mess state =
                 , State.startFixing mess state
                 )
             )
+
+
+fixFast : Message -> ( String, File ) -> Result String String
+fixFast mess pathAndFile =
+    Analyser.Fixers.getFixer mess
+        |> Maybe.map
+            (\fixer ->
+                case fixer.fix pathAndFile mess.data of
+                    Error e ->
+                        Err e
+
+                    Patched p ->
+                        Ok p
+
+                    IncompatibleData ->
+                        Err ("Invalid message data for fixer, message id: " ++ String.fromInt mess.id)
+            )
+        |> Maybe.withDefault (Err "Unable to find fixer")
 
 
 isDone : Model -> Bool

@@ -4,6 +4,7 @@ import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.DependencyLoadingStage as DependencyLoadingStage
+import Analyser.FileContext as FileContext
 import Analyser.FileWatch as FileWatch exposing (FileChange(..))
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Analyser.Fixer as Fixer
@@ -18,6 +19,7 @@ import Elm.Version
 import Inspection
 import Json.Decode
 import Json.Encode exposing (Value)
+import Maybe.Extra as Maybe
 import Platform exposing (worker)
 import Registry exposing (Registry)
 import Time
@@ -45,6 +47,7 @@ type Msg
     | ReloadTick
     | Reset
     | OnFixMessage Int
+    | OnQuickFixMessage Int
     | FixerMsg Fixer.Msg
 
 
@@ -140,6 +143,53 @@ update msg model =
             , Cmd.none
             )
                 |> handleNextStep
+
+        OnQuickFixMessage messageId ->
+            let
+                processingContext =
+                    CodeBase.processContext model.codeBase
+
+                maybeMessage =
+                    State.getMessage messageId model.state
+
+                maybeFixedFile =
+                    case maybeMessage of
+                        Just message ->
+                            CodeBase.getFile message.file.path model.codeBase
+                                |> Maybe.map
+                                    (\loadedSourceFile ->
+                                        ( .content <| Tuple.first loadedSourceFile
+                                        , FileContext.buildForFile processingContext loadedSourceFile
+                                            |> Maybe.map .ast
+                                        )
+                                    )
+                                |> Maybe.map
+                                    (\sources ->
+                                        case sources of
+                                            ( Just fileText, Just ast ) ->
+                                                Just <| Fixer.fixFast message ( fileText, ast )
+
+                                            _ ->
+                                                Nothing
+                                    )
+                                |> Maybe.join
+
+                        Nothing ->
+                            Nothing
+            in
+            case ( maybeMessage, maybeFixedFile ) of
+                ( Just message, Just (Ok fixedFile) ) ->
+                    ( model
+                    , AnalyserPorts.sendFixedFile
+                        { path = message.file.path
+                        , content = fixedFile
+                        }
+                    )
+
+                _ ->
+                    ( model
+                    , Logger.info ("Unable to apply fix for message id: " ++ String.fromInt messageId)
+                    )
 
         Reset ->
             reset ( model, Cmd.none )
@@ -419,6 +469,7 @@ subscriptions model =
             Sub.none
         , FileWatch.watcher Change
         , AnalyserPorts.onFixMessage OnFixMessage
+        , AnalyserPorts.onFixQuick OnQuickFixMessage
         , case model.stage of
             ContextLoadingStage ->
                 ContextLoader.onLoadedContext OnContext

@@ -1,9 +1,10 @@
-module Analyser.CodeBase exposing (CodeBase, addSourceFiles, dependencies, init, mergeLoadedSourceFiles, processContext, setDependencies, sourceFiles)
+module Analyser.CodeBase exposing (CodeBase, addSourceFiles, dependencies, getFile, init, mergeLoadedSourceFiles, processContext, setDependencies, sourceFiles)
 
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Dict exposing (Dict)
 import Elm.Dependency exposing (Dependency)
 import Elm.Processing as Processing exposing (ProcessContext)
+import Elm.Syntax.File exposing (File)
 
 
 type CodeBase
@@ -62,3 +63,8 @@ addSourceFiles sources (CodeBase codeBase) =
 mergeLoadedSourceFiles : List LoadedSourceFile -> Dict String LoadedSourceFile -> Dict String LoadedSourceFile
 mergeLoadedSourceFiles newItems dict =
     List.foldl (\sourceFile -> Dict.insert (Tuple.first sourceFile).path sourceFile) dict newItems
+
+
+getFile : String -> CodeBase -> Maybe LoadedSourceFile
+getFile path (CodeBase codeBase) =
+    Dict.get path codeBase.sources
