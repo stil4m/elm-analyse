@@ -6,7 +6,7 @@ import * as HttpDocumentation from './ports/http-documentation';
 import * as FileLoader from './ports/file-loader';
 import * as Context from './ports/context';
 import { LocalCache } from "./util/cache";
-import  { FileReader } from './fileReader';
+import { FileReader } from './fileReader';
 
 export function setup(app: ElmApp, config: Config, directory: string): void {
     const localCache = new LocalCache(directory);
