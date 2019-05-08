@@ -1,8 +1,8 @@
 import * as fs from 'fs';
-import { LocalCache } from "../util/cache";
+import { LocalCache } from '../util/cache';
 import * as cp from 'child_process';
 import { ElmApp, FileStore, AstStore, Config, FileContent, FileContentSha } from '../domain';
-import  { FileReader } from '../fileReader';
+import { FileReader } from '../fileReader';
 
 function setup(app: ElmApp, config: Config, directory: string, cache: LocalCache, fileReader: FileReader) {
     app.ports.loadFile.subscribe(fileName => {

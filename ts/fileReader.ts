@@ -12,11 +12,7 @@ export class FileReader {
         cache.setupShaFolder();
     }
 
-    private readFileNotCached(
-        realPath: string,
-        path: string,
-        checksum: string
-    ) {
+    private readFileNotCached(realPath: string, path: string, checksum: string) {
         return new Promise((accept: (data: FileContent) => void) => {
             fs.readFile(realPath, function(e, content) {
                 if (e) {
@@ -36,14 +32,11 @@ export class FileReader {
         });
     }
 
-    public readFile(
-        directory: string,
-        path: string,
-        cb: (data: FileContent) => void
-    ) {
+    public readFile(directory: string, path: string, cb: (data: FileContent) => void) {
         var real = directory + '/' + path;
 
-        sums.checksum(fs.createReadStream(real))
+        sums
+            .checksum(fs.createReadStream(real))
             .then(
                 (checkSumResult: { sum: string }) => {
                     const checksum = checkSumResult.sum;

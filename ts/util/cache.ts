@@ -13,11 +13,7 @@ class LocalCache {
         this.cachePath = path.join(projectPath, 'elm-stuff', '.elm-analyse');
     }
     public storeShaJson(sha1: string, content: JSON) {
-        fs.writeFile(
-            path.resolve(this.cachePath, '_shas', sha1 + '.json'),
-            JSON.stringify(content),
-            function() {}
-        );
+        fs.writeFile(path.resolve(this.cachePath, '_shas', sha1 + '.json'), JSON.stringify(content), function() {});
     }
     public elmCachePathForSha(sha: string) {
         return path.resolve(this.cachePath, '_shas', sha + '.elma');
@@ -81,10 +77,4 @@ function storeDependencyJson(dependency: string, version: string, content: strin
     fs.writeFile(targetPath, content, function() {});
 }
 
-export {
-    readDependencyJson,
-    readPackageDependencyInfo,
-    storePackageDependencyInfo,
-    storeDependencyJson,
-    LocalCache
-};
+export { readDependencyJson, readPackageDependencyInfo, storePackageDependencyInfo, storeDependencyJson, LocalCache };
