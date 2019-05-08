@@ -72,10 +72,6 @@ function readDependencyJson(dependency: string, version: string, cb: (err: NodeJ
     fs.readFile(path.resolve(globalCachePath, 'interfaces', dependency, version, 'dependency.json'), cb);
 }
 
-function storeShaJson(sha1: string, content: JSON) {
-    fs.writeFile(path.resolve(cachePath, '_shas', sha1 + '.json'), JSON.stringify(content), function() {});
-}
-
 function storeDependencyJson(dependency: string, version: string, content: string) {
     const targetDir = path.resolve(globalCachePath, 'interfaces', dependency, version);
     const targetPath = path.resolve(targetDir, 'dependency.json');
