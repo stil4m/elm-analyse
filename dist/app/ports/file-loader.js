@@ -8,10 +8,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs = __importStar(require("fs"));
-var cache = __importStar(require("../util/cache"));
 var cp = __importStar(require("child_process"));
-var fileReader = __importStar(require("../fileReader"));
-function setup(app, config, directory) {
+function setup(app, config, directory, cache, fileReader) {
     app.ports.loadFile.subscribe(function (fileName) {
         fileReader.readFile(directory, fileName, function (result) { return app.ports.fileContent.send(result); });
     });

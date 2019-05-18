@@ -1,6 +1,6 @@
 {
   "name": "elm-analyse",
-  "version": "0.16.3",
+  "version": "0.16.4",
   "description": "A tool that allows you analyse your Elm code and identifies deficiencies and best practices.",
   "repository": {
     "type": "git",

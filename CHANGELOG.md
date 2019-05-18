@@ -1,5 +1,9 @@
 # elm-analyse changelog
 
+## 0.16.4 (2019-05-18)
+
+* More flexibility in the analysis process to support language servers.
+
 ## 0.16.3 (2019-04-10)
 
 * Fix navigation issue on dashboard of server mode. Url was not updated properly.
