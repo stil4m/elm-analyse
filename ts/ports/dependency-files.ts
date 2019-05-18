@@ -1,8 +1,8 @@
 import * as fileGatherer from '../util/file-gatherer';
 import { ElmApp, DependencyPointer, FileContent } from '../domain';
-import * as fileReader from '../fileReader';
+import { FileReader } from '../fileReader';
 
-function setup(app: ElmApp, directory: string) {
+function setup(app: ElmApp, directory: string, fileReader: FileReader) {
     app.ports.loadDependencyFiles.subscribe((dependency: DependencyPointer) => {
         const result = fileGatherer.getDependencyFiles(directory, dependency);
 
