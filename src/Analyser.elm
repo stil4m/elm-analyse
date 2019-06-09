@@ -8,7 +8,6 @@ import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.FileWatch as FileWatch exposing (FileChange(..))
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Analyser.Fixer as Fixer
-import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
 import Analyser.Modules
 import Analyser.SourceLoadingStage as SourceLoadingStage
