@@ -1,6 +1,7 @@
-port module Analyser.Fixer exposing (Model, Msg, fixFast, init, initWithMessage, isDone, message, subscriptions, succeeded, update)
+port module Analyser.Fixer exposing (Model, Msg, getFixedFile, init, initWithMessage, isDone, message, subscriptions, succeeded, update)
 
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
+import Analyser.FileContext exposing (FileContext)
 import Analyser.FileRef exposing (FileRef)
 import Analyser.Fixers
 import Analyser.Fixes.Base exposing (Fixer, Patch(..))
@@ -71,12 +72,12 @@ initWithMessage mess state =
             )
 
 
-fixFast : Message -> ( String, File ) -> Result String String
-fixFast mess pathAndFile =
+getFixedFile : Message -> FileContext -> Result String String
+getFixedFile mess fileContext =
     Analyser.Fixers.getFixer mess
         |> Maybe.map
             (\fixer ->
-                case fixer.fix pathAndFile mess.data of
+                case fixer.fix ( fileContext.content, fileContext.ast ) mess.data of
                     Error e ->
                         Err e
 

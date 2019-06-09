@@ -4,10 +4,11 @@ import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.DependencyLoadingStage as DependencyLoadingStage
-import Analyser.FileContext as FileContext
+import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.FileWatch as FileWatch exposing (FileChange(..))
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Analyser.Fixer as Fixer
+import Analyser.Messages.Types exposing (Message)
 import Analyser.Messages.Util as Messages
 import Analyser.Modules
 import Analyser.SourceLoadingStage as SourceLoadingStage
@@ -146,49 +147,34 @@ update msg model =
 
         OnQuickFixMessage messageId ->
             let
-                processingContext =
-                    CodeBase.processContext model.codeBase
-
-                maybeMessage =
-                    State.getMessage messageId model.state
-
-                maybeFixedFile =
-                    case maybeMessage of
-                        Just message ->
-                            CodeBase.getFile message.file.path model.codeBase
-                                |> Maybe.map
-                                    (\loadedSourceFile ->
-                                        ( .content <| Tuple.first loadedSourceFile
-                                        , FileContext.buildForFile processingContext loadedSourceFile
-                                            |> Maybe.map .ast
-                                        )
-                                    )
-                                |> Maybe.map
-                                    (\sources ->
-                                        case sources of
-                                            ( Just fileText, Just ast ) ->
-                                                Just <| Fixer.fixFast message ( fileText, ast )
-
-                                            _ ->
-                                                Nothing
-                                    )
-                                |> Maybe.join
-
-                        Nothing ->
-                            Nothing
+                applyFix message =
+                    getFileContext message.file.path model.codeBase
+                        |> Maybe.map (Fixer.getFixedFile message)
+                        |> Maybe.withDefault
+                            (Err ("Unable to fix messageId: " ++ String.fromInt messageId))
             in
-            case ( maybeMessage, maybeFixedFile ) of
-                ( Just message, Just (Ok fixedFile) ) ->
-                    ( model
-                    , AnalyserPorts.sendFixedFile
-                        { path = message.file.path
-                        , content = fixedFile
-                        }
-                    )
+            case State.getMessage messageId model.state of
+                Just message ->
+                    case applyFix message of
+                        Ok fixedFile ->
+                            ( model
+                            , AnalyserPorts.sendFixedFile
+                                { path = message.file.path
+                                , content = fixedFile
+                                }
+                            )
 
-                _ ->
+                        Err err ->
+                            ( model
+                            , Logger.error err
+                            )
+
+                Nothing ->
                     ( model
-                    , Logger.info ("Unable to apply fix for message id: " ++ String.fromInt messageId)
+                    , Logger.info
+                        ("Unable to apply fix, unable to find messageId: "
+                            ++ String.fromInt messageId
+                        )
                     )
 
         Reset ->
@@ -456,6 +442,14 @@ onSourceLoadingStageMsg x stage model =
         ( { model | stage = SourceLoadingStage newStage }
         , Cmd.map SourceLoadingStageMsg cmds
         )
+
+
+getFileContext : String -> CodeBase -> Maybe FileContext
+getFileContext path codeBase =
+    CodeBase.getFile path codeBase
+        |> Maybe.map
+            (FileContext.buildForFile (CodeBase.processContext codeBase))
+        |> Maybe.join
 
 
 subscriptions : Model -> Sub Msg
