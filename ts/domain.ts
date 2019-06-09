@@ -43,8 +43,8 @@ export interface AstStore {
     ast: JSON;
 }
 export interface FixedFile {
-    path : string,
-    content: string
+    path: string;
+    content: string;
 }
 
 export interface LogMessage {
@@ -105,8 +105,8 @@ interface EditorElmApp {
 }
 
 interface Subscription<T> {
-    subscribe: ((cb: ((d: T) => void)) => void);
-    unsubscribe: ((cb: ((d: T) => void)) => void);
+    subscribe: (cb: (d: T) => void) => void;
+    unsubscribe: (cb: (d: T) => void) => void;
 }
 
 interface FileContentSha {
@@ -123,7 +123,7 @@ interface Context {
     configuration: string;
 }
 interface MailBox<T> {
-    send: ((d: T) => void);
+    send: (d: T) => void;
 }
 
 interface Reporter {
