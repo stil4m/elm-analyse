@@ -106,6 +106,7 @@ interface EditorElmApp {
 
 interface Subscription<T> {
     subscribe: ((cb: ((d: T) => void)) => void);
+    unsubscribe: ((cb: ((d: T) => void)) => void);
 }
 
 interface FileContentSha {
