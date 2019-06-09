@@ -4,7 +4,6 @@ import Analyser.Files.Types exposing (LoadedSourceFile)
 import Dict exposing (Dict)
 import Elm.Dependency exposing (Dependency)
 import Elm.Processing as Processing exposing (ProcessContext)
-import Elm.Syntax.File exposing (File)
 
 
 type CodeBase
