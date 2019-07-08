@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.I.aU === region.bE.aU)
+	if (region.I.aV === region.bE.aV)
 	{
-		return 'on line ' + region.I.aU;
+		return 'on line ' + region.I.aV;
 	}
-	return 'on lines ' + region.I.aU + ' through ' + region.bE.aU;
+	return 'on lines ' + region.I.aV + ' through ' + region.bE.aV;
 }
 
 
@@ -2716,7 +2716,7 @@ var elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var stil4m$elm_syntax$Elm$Processing$ProcessContext = elm$core$Basics$identity;
 var stil4m$elm_syntax$Elm$Processing$init = elm$core$Dict$empty;
-var author$project$Analyser$CodeBase$init = {fz: _List_Nil, aB: stil4m$elm_syntax$Elm$Processing$init, cz: elm$core$Dict$empty};
+var author$project$Analyser$CodeBase$init = {fz: _List_Nil, aD: stil4m$elm_syntax$Elm$Processing$init, cz: elm$core$Dict$empty};
 var elm$core$Array$branchFactor = 32;
 var elm$core$Array$Array_elm_builtin = F4(
 	function (a, b, c, d) {
@@ -3122,7 +3122,7 @@ var author$project$Analyser$Modules$empty = {fz: _List_Nil, ch: _List_Nil};
 var author$project$Analyser$State$Initialising = 0;
 var author$project$Analyser$State$Dependencies$Application = 1;
 var author$project$Analyser$State$Dependencies$none = {bY: 1, gK: _List_Nil, gO: elm$core$Dict$empty};
-var author$project$Analyser$State$initialState = {fz: author$project$Analyser$State$Dependencies$none, as: 0, es: _List_Nil, eu: author$project$Analyser$Modules$empty, ag: _List_Nil, gw: 0};
+var author$project$Analyser$State$initialState = {fz: author$project$Analyser$State$Dependencies$none, at: 0, es: _List_Nil, eu: author$project$Analyser$Modules$empty, ag: _List_Nil, gw: 0};
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var author$project$Analyser$reset = function (_n0) {
 	var model = _n0.a;
@@ -3131,7 +3131,7 @@ var author$project$Analyser$reset = function (_n0) {
 		_Utils_Tuple2(
 			_Utils_update(
 				model,
-				{J: author$project$Analyser$CodeBase$init, j: author$project$Analyser$ContextLoadingStage, o: author$project$Analyser$State$initialState}),
+				{J: author$project$Analyser$CodeBase$init, j: author$project$Analyser$ContextLoadingStage, m: author$project$Analyser$State$initialState}),
 			elm$core$Platform$Cmd$batch(
 				_List_fromArray(
 					[
@@ -3266,7 +3266,7 @@ var author$project$Analyser$Configuration$defaultChecks = elm$core$Dict$fromList
 		[
 			_Utils_Tuple2('FunctionInLet', false)
 		]));
-var author$project$Analyser$Configuration$defaultConfiguration = {aI: author$project$Analyser$Configuration$defaultChecks, cW: _List_Nil, dx: ''};
+var author$project$Analyser$Configuration$defaultConfiguration = {aK: author$project$Analyser$Configuration$defaultChecks, cW: _List_Nil, dx: ''};
 var author$project$Analyser$ContextLoader$emptyContext = {X: '', c1: _List_Nil, gu: _List_Nil};
 var author$project$Registry$Registry = elm$core$Basics$identity;
 var author$project$Registry$Package$Package = F3(
@@ -4094,13 +4094,13 @@ var author$project$Analyser$init = function (flags) {
 			D: _List_Nil,
 			J: author$project$Analyser$CodeBase$init,
 			X: author$project$Analyser$Configuration$defaultConfiguration,
-			aK: author$project$Analyser$ContextLoader$emptyContext,
+			aM: author$project$Analyser$ContextLoader$emptyContext,
 			R: elm$project_metadata_utils$Elm$Project$Application(
 				{fB: _List_Nil, fC: _List_Nil, fF: _List_Nil, fI: elm$project_metadata_utils$Elm$Version$one, gD: _List_Nil, gE: _List_Nil}),
 			S: author$project$Registry$fromValue(flags.S),
 			T: flags.T,
 			j: author$project$Analyser$Finished,
-			o: author$project$Analyser$State$initialState
+			m: author$project$Analyser$State$initialState
 		},
 		elm$core$Platform$Cmd$none);
 	if (project.$ === 1) {
@@ -4115,12 +4115,12 @@ var author$project$Analyser$init = function (flags) {
 					D: _List_Nil,
 					J: author$project$Analyser$CodeBase$init,
 					X: author$project$Analyser$Configuration$defaultConfiguration,
-					aK: author$project$Analyser$ContextLoader$emptyContext,
+					aM: author$project$Analyser$ContextLoader$emptyContext,
 					R: v,
 					S: author$project$Registry$fromValue(flags.S),
 					T: flags.T,
 					j: author$project$Analyser$Finished,
-					o: author$project$Analyser$State$initialState
+					m: author$project$Analyser$State$initialState
 				},
 				author$project$Util$Logger$info('Started...')));
 	}
@@ -4195,13 +4195,13 @@ var stil4m$elm_syntax$Elm$Syntax$Module$moduleName = function (m) {
 	switch (m.$) {
 		case 0:
 			var x = m.a;
-			return stil4m$elm_syntax$Elm$Syntax$Node$value(x.aY);
+			return stil4m$elm_syntax$Elm$Syntax$Node$value(x.aZ);
 		case 1:
 			var x = m.a;
-			return stil4m$elm_syntax$Elm$Syntax$Node$value(x.aY);
+			return stil4m$elm_syntax$Elm$Syntax$Node$value(x.aZ);
 		default:
 			var x = m.a;
-			return stil4m$elm_syntax$Elm$Syntax$Node$value(x.aY);
+			return stil4m$elm_syntax$Elm$Syntax$Node$value(x.aZ);
 	}
 };
 var stil4m$elm_syntax$Elm$RawFile$moduleName = function (_n0) {
@@ -4567,7 +4567,7 @@ var author$project$Analyser$DependencyHandler$loadedInterfaceForFile = function 
 	return {
 		fg: file,
 		f_: stil4m$elm_syntax$Elm$Interface$build(file),
-		aY: author$project$Analyser$FileContext$moduleName(file)
+		aZ: author$project$Analyser$FileContext$moduleName(file)
 	};
 };
 var author$project$Result$Extra$merge = function (r) {
@@ -4641,7 +4641,7 @@ var elm$parser$Parser$Advanced$run = F2(
 	function (_n0, src) {
 		var parse = _n0;
 		var _n1 = parse(
-			{dW: 1, aK: _List_Nil, f: 1, b: 0, C: 1, a: src});
+			{dW: 1, aM: _List_Nil, f: 1, b: 0, C: 1, a: src});
 		if (!_n1.$) {
 			var value = _n1.b;
 			return elm$core$Result$Ok(value);
@@ -4697,7 +4697,7 @@ var elm$parser$Parser$Advanced$fromState = F2(
 		return A2(
 			elm$parser$Parser$Advanced$AddRight,
 			elm$parser$Parser$Advanced$Empty,
-			A4(elm$parser$Parser$Advanced$DeadEnd, s.C, s.dW, x, s.aK));
+			A4(elm$parser$Parser$Advanced$DeadEnd, s.C, s.dW, x, s.aM));
 	});
 var elm$parser$Parser$Advanced$end = function (x) {
 	return function (s) {
@@ -4851,7 +4851,7 @@ var stil4m$elm_syntax$Combine$withLocation = function (f) {
 				function (_n0) {
 					var row = _n0.a;
 					var col = _n0.b;
-					return {W: col, aU: row};
+					return {W: col, aV: row};
 				},
 				elm$parser$Parser$getPosition));
 	};
@@ -5198,7 +5198,7 @@ var elm$parser$Parser$Advanced$token = function (_n0) {
 			elm$parser$Parser$Advanced$Good,
 			progress,
 			0,
-			{dW: newCol, aK: s.aK, f: s.f, b: newOffset, C: newRow, a: s.a});
+			{dW: newCol, aM: s.aM, f: s.f, b: newOffset, C: newRow, a: s.a});
 	};
 };
 var elm$parser$Parser$token = function (str) {
@@ -5324,7 +5324,7 @@ var stil4m$elm_syntax$Combine$sepBy1 = F2(
 				stil4m$elm_syntax$Combine$succeed(elm$core$List$cons)));
 	});
 var stil4m$elm_syntax$Elm$Parser$Node$asPointerLocation = function (_n0) {
-	var line = _n0.aU;
+	var line = _n0.aV;
 	var column = _n0.W;
 	return {W: column, C: line};
 };
@@ -5394,11 +5394,11 @@ var elm$parser$Parser$Advanced$chompIf = F2(
 				elm$parser$Parser$Advanced$Good,
 				true,
 				0,
-				{dW: 1, aK: s.aK, f: s.f, b: s.b + 1, C: s.C + 1, a: s.a}) : A3(
+				{dW: 1, aM: s.aM, f: s.f, b: s.b + 1, C: s.C + 1, a: s.a}) : A3(
 				elm$parser$Parser$Advanced$Good,
 				true,
 				0,
-				{dW: s.dW + 1, aK: s.aK, f: s.f, b: newOffset, C: s.C, a: s.a}));
+				{dW: s.dW + 1, aM: s.aM, f: s.f, b: newOffset, C: s.C, a: s.a}));
 		};
 	});
 var elm$parser$Parser$chompIf = function (isGood) {
@@ -5471,7 +5471,7 @@ var elm$parser$Parser$Advanced$chompWhileHelp = F5(
 					elm$parser$Parser$Advanced$Good,
 					_Utils_cmp(s0.b, offset) < 0,
 					0,
-					{dW: col, aK: s0.aK, f: s0.f, b: offset, C: row, a: s0.a});
+					{dW: col, aM: s0.aM, f: s0.f, b: offset, C: row, a: s0.a});
 			} else {
 				if (_Utils_eq(newOffset, -2)) {
 					var $temp$isGood = isGood,
@@ -5834,7 +5834,7 @@ var elm$parser$Parser$Advanced$keyword = function (_n0) {
 			elm$parser$Parser$Advanced$Good,
 			progress,
 			0,
-			{dW: newCol, aK: s.aK, f: s.f, b: newOffset, C: newRow, a: s.a});
+			{dW: newCol, aM: s.aM, f: s.f, b: newOffset, C: newRow, a: s.a});
 	};
 };
 var elm$parser$Parser$keyword = function (kwd) {
@@ -5872,7 +5872,7 @@ var elm$parser$Parser$Advanced$varHelp = F7(
 		while (true) {
 			var newOffset = A3(elm$parser$Parser$Advanced$isSubChar, isGood, offset, src);
 			if (_Utils_eq(newOffset, -1)) {
-				return {dW: col, aK: context, f: indent, b: offset, C: row, a: src};
+				return {dW: col, aM: context, f: indent, b: offset, C: row, a: src};
 			} else {
 				if (_Utils_eq(newOffset, -2)) {
 					var $temp$isGood = isGood,
@@ -5919,7 +5919,7 @@ var elm$parser$Parser$Advanced$variable = function (i) {
 				false,
 				A2(elm$parser$Parser$Advanced$fromState, s, i.d3));
 		} else {
-			var s1 = _Utils_eq(firstOffset, -2) ? A7(elm$parser$Parser$Advanced$varHelp, i.eh, s.b + 1, s.C + 1, 1, s.a, s.f, s.aK) : A7(elm$parser$Parser$Advanced$varHelp, i.eh, firstOffset, s.C, s.dW + 1, s.a, s.f, s.aK);
+			var s1 = _Utils_eq(firstOffset, -2) ? A7(elm$parser$Parser$Advanced$varHelp, i.eh, s.b + 1, s.C + 1, 1, s.a, s.f, s.aM) : A7(elm$parser$Parser$Advanced$varHelp, i.eh, firstOffset, s.C, s.dW + 1, s.a, s.f, s.aM);
 			var name = A3(elm$core$String$slice, s.b, s1.b, s.a);
 			return A2(elm$core$Set$member, name, i.eM) ? A2(
 				elm$parser$Parser$Advanced$Bad,
@@ -6021,11 +6021,11 @@ var elm$parser$Parser$Advanced$chompUntil = function (_n0) {
 		return _Utils_eq(newOffset, -1) ? A2(
 			elm$parser$Parser$Advanced$Bad,
 			false,
-			A4(elm$parser$Parser$Advanced$fromInfo, newRow, newCol, expecting, s.aK)) : A3(
+			A4(elm$parser$Parser$Advanced$fromInfo, newRow, newCol, expecting, s.aM)) : A3(
 			elm$parser$Parser$Advanced$Good,
 			_Utils_cmp(s.b, newOffset) < 0,
 			0,
-			{dW: newCol, aK: s.aK, f: s.f, b: newOffset, C: newRow, a: s.a});
+			{dW: newCol, aM: s.aM, f: s.f, b: newOffset, C: newRow, a: s.a});
 	};
 };
 var elm$core$Basics$neq = _Utils_notEqual;
@@ -6274,7 +6274,7 @@ var elm$parser$Parser$Advanced$consumeBase16 = _Parser_consumeBase16;
 var elm$core$String$toFloat = _String_toFloat;
 var elm$parser$Parser$Advanced$bumpOffset = F2(
 	function (newOffset, s) {
-		return {dW: s.dW + (newOffset - s.b), aK: s.aK, f: s.f, b: newOffset, C: s.C, a: s.a};
+		return {dW: s.dW + (newOffset - s.b), aM: s.aM, f: s.f, b: newOffset, C: s.C, a: s.a};
 	});
 var elm$parser$Parser$Advanced$chompBase10 = _Parser_chompBase10;
 var elm$parser$Parser$Advanced$isAsciiCode = _Parser_isAsciiCode;
@@ -6326,7 +6326,7 @@ var elm$parser$Parser$Advanced$finalizeFloat = F6(
 			return A2(
 				elm$parser$Parser$Advanced$Bad,
 				true,
-				A4(elm$parser$Parser$Advanced$fromInfo, s.C, s.dW - (floatOffset + s.b), invalid, s.aK));
+				A4(elm$parser$Parser$Advanced$fromInfo, s.C, s.dW - (floatOffset + s.b), invalid, s.aM));
 		} else {
 			if (_Utils_eq(s.b, floatOffset)) {
 				return A2(
@@ -6662,7 +6662,7 @@ var stil4m$elm_syntax$Elm$Syntax$Pattern$ParenthesizedPattern = function (a) {
 };
 var stil4m$elm_syntax$Elm$Syntax$Pattern$QualifiedNameRef = F2(
 	function (moduleName, name) {
-		return {aY: moduleName, f7: name};
+		return {aZ: moduleName, f7: name};
 	});
 var stil4m$elm_syntax$Elm$Syntax$Pattern$StringPattern = function (a) {
 	return {$: 3, a: a};
@@ -7414,7 +7414,7 @@ var stil4m$elm_syntax$Elm$Parser$Tokens$multiLineStringLiteral = function () {
 							_Utils_update(
 								s,
 								{
-									O: s.O + 1,
+									P: s.P + 1,
 									h: A2(elm$core$List$cons, v, s.h)
 								}));
 					},
@@ -7426,7 +7426,7 @@ var stil4m$elm_syntax$Elm$Parser$Tokens$multiLineStringLiteral = function () {
 						return elm$parser$Parser$Loop(
 							_Utils_update(
 								s,
-								{O: s.O + 1, F: true, h: s.h}));
+								{P: s.P + 1, F: true, h: s.h}));
 					},
 					elm$parser$Parser$getChompedString(
 						elm$parser$Parser$symbol('\\'))),
@@ -7441,7 +7441,7 @@ var stil4m$elm_syntax$Elm$Parser$Tokens$multiLineStringLiteral = function () {
 								_Utils_update(
 									s,
 									{
-										O: s.O + 1,
+										P: s.P + 1,
 										h: A2(elm$core$List$cons, value, s.h)
 									})));
 					},
@@ -7474,7 +7474,7 @@ var stil4m$elm_syntax$Elm$Parser$Tokens$multiLineStringLiteral = function () {
 				elm$parser$Parser$symbol('\"\"\"')),
 			A2(
 				elm$parser$Parser$loop,
-				{O: 0, F: false, h: _List_Nil},
+				{P: 0, F: false, h: _List_Nil},
 				helper)));
 }();
 var stil4m$elm_syntax$Elm$Syntax$Expression$Literal = function (a) {
@@ -8696,7 +8696,7 @@ var stil4m$elm_syntax$Elm$Parser$Infix$infixDefinition = A2(
 												elm$parser$Parser$keyword('infix')),
 											stil4m$elm_syntax$Combine$succeed(stil4m$elm_syntax$Elm$Syntax$Infix$Infix))))))))))));
 var stil4m$elm_syntax$Elm$Parser$Ranges$asPointerLocation = function (_n0) {
-	var line = _n0.aU;
+	var line = _n0.aV;
 	var column = _n0.W;
 	return {W: column, C: line};
 };
@@ -9170,7 +9170,7 @@ var stil4m$elm_syntax$Elm$Parser$Imports$setupNode = F2(
 			[
 				elm$core$Maybe$Just(start),
 				elm$core$Maybe$Just(
-				stil4m$elm_syntax$Elm$Syntax$Node$range(imp.aY)),
+				stil4m$elm_syntax$Elm$Syntax$Node$range(imp.aZ)),
 				A2(elm$core$Maybe$map, stil4m$elm_syntax$Elm$Syntax$Node$range, imp.bF),
 				A2(elm$core$Maybe$map, stil4m$elm_syntax$Elm$Syntax$Node$range, imp.et)
 			]);
@@ -9186,7 +9186,7 @@ var stil4m$elm_syntax$Elm$Parser$Tokens$importToken = stil4m$elm_syntax$Combine$
 	elm$parser$Parser$keyword('import'));
 var stil4m$elm_syntax$Elm$Syntax$Import$Import = F3(
 	function (moduleName, moduleAlias, exposingList) {
-		return {bF: exposingList, et: moduleAlias, aY: moduleName};
+		return {bF: exposingList, et: moduleAlias, aZ: moduleName};
 	});
 var stil4m$elm_syntax$Elm$Parser$Imports$importDefinition = function () {
 	var parseExposingDefinition = F2(
@@ -9304,7 +9304,7 @@ var stil4m$elm_syntax$Elm$Parser$Modules$effectModuleDefinition = function () {
 	var createEffectModule = F3(
 		function (name, whereClauses, exp) {
 			return stil4m$elm_syntax$Elm$Syntax$Module$EffectModule(
-				{cR: whereClauses.cR, bF: exp, aY: name, dE: whereClauses.dE});
+				{cR: whereClauses.cR, bF: exp, aZ: name, dE: whereClauses.dE});
 		});
 	return A2(
 		stil4m$elm_syntax$Combine$andMap,
@@ -9337,7 +9337,7 @@ var stil4m$elm_syntax$Elm$Parser$Modules$effectModuleDefinition = function () {
 }();
 var stil4m$elm_syntax$Elm$Syntax$Module$DefaultModuleData = F2(
 	function (moduleName, exposingList) {
-		return {bF: exposingList, aY: moduleName};
+		return {bF: exposingList, aZ: moduleName};
 	});
 var stil4m$elm_syntax$Elm$Syntax$Module$NormalModule = function (a) {
 	return {$: 0, a: a};
@@ -10446,7 +10446,7 @@ var stil4m$elm_syntax$Elm$Syntax$Module$decodeDefaultModuleData = A3(
 		stil4m$elm_syntax$Elm$Syntax$Node$decoder(stil4m$elm_syntax$Elm$Syntax$Exposing$decoder)));
 var stil4m$elm_syntax$Elm$Syntax$Module$EffectModuleData = F4(
 	function (moduleName, exposingList, command, subscription) {
-		return {cR: command, bF: exposingList, aY: moduleName, dE: subscription};
+		return {cR: command, bF: exposingList, aZ: moduleName, dE: subscription};
 	});
 var stil4m$elm_syntax$Elm$Syntax$Module$decodeEffectModuleData = A5(
 	elm$json$Json$Decode$map4,
@@ -10750,7 +10750,7 @@ var author$project$Analyser$DependencyHandler$onHttpDocumentation = _Platform_in
 				elm$json$Json$Decode$andThen,
 				function (dependency) {
 					return elm$json$Json$Decode$succeed(
-						{y: dependency, ax: json});
+						{y: dependency, ay: json});
 				},
 				A2(
 					elm$json$Json$Decode$field,
@@ -11389,7 +11389,7 @@ var author$project$Analyser$DependencyHandler$onOnlineDocumentation = function (
 	return author$project$Analyser$DependencyHandler$onHttpDocumentation(
 		function (_n0) {
 			var dependency = _n0.y;
-			var json = _n0.ax;
+			var json = _n0.ay;
 			return _Utils_eq(dependency, dep) ? elm$core$Maybe$Just(
 				A2(
 					elm$core$Result$map,
@@ -11414,7 +11414,7 @@ var author$project$Analyser$DependencyHandler$onRawDependency = _Platform_incomi
 				elm$json$Json$Decode$andThen,
 				function (dependency) {
 					return elm$json$Json$Decode$succeed(
-						{y: dependency, ax: json});
+						{y: dependency, ay: json});
 				},
 				A2(
 					elm$json$Json$Decode$field,
@@ -11517,7 +11517,7 @@ var author$project$Analyser$DependencyHandler$onReadFromDisk = function (_n0) {
 	return author$project$Analyser$DependencyHandler$onRawDependency(
 		function (_n1) {
 			var dependency = _n1.y;
-			var json = _n1.ax;
+			var json = _n1.ay;
 			if (_Utils_eq(dependency.f7, name) && _Utils_eq(version, dependency.p)) {
 				var _n2 = author$project$Analyser$Files$Json$deserialiseDependencyValue(json);
 				if (_n2.$ === 1) {
@@ -11544,7 +11544,7 @@ var elm$core$Platform$Sub$map = _Platform_map;
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Analyser$Files$DependencyLoader$subscriptions = function (model) {
-	var _n0 = model.o;
+	var _n0 = model.m;
 	switch (_n0.$) {
 		case 0:
 			return A2(
@@ -11584,15 +11584,32 @@ var author$project$Analyser$DependencyLoadingStage$subscriptions = function (mod
 var author$project$Analyser$FileWatch$Remove = function (a) {
 	return {$: 1, a: a};
 };
-var author$project$Analyser$FileWatch$Update = function (a) {
-	return {$: 0, a: a};
-};
+var author$project$Analyser$FileWatch$Update = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var author$project$Analyser$FileWatch$asFileContent = F2(
+	function (p, content) {
+		return {
+			fg: elm$core$Maybe$Nothing,
+			bz: elm$core$Maybe$Just(content),
+			gl: p.d6,
+			gs: elm$core$Maybe$Nothing,
+			gz: true
+		};
+	});
 var author$project$Analyser$FileWatch$asFileChange = function (p) {
 	var _n0 = p.cV;
 	switch (_n0) {
 		case 'update':
 			return elm$core$Maybe$Just(
-				author$project$Analyser$FileWatch$Update(p.d6));
+				A2(
+					author$project$Analyser$FileWatch$Update,
+					p.d6,
+					A2(
+						elm$core$Maybe$map,
+						author$project$Analyser$FileWatch$asFileContent(p),
+						p.bz)));
 		case 'remove':
 			return elm$core$Maybe$Just(
 				author$project$Analyser$FileWatch$Remove(p.d6));
@@ -11608,8 +11625,21 @@ var author$project$Analyser$FileWatch$fileWatch = _Platform_incomingPort(
 			return A2(
 				elm$json$Json$Decode$andThen,
 				function (event) {
-					return elm$json$Json$Decode$succeed(
-						{cV: event, d6: file});
+					return A2(
+						elm$json$Json$Decode$andThen,
+						function (content) {
+							return elm$json$Json$Decode$succeed(
+								{bz: content, cV: event, d6: file});
+						},
+						A2(
+							elm$json$Json$Decode$field,
+							'content',
+							elm$json$Json$Decode$oneOf(
+								_List_fromArray(
+									[
+										elm$json$Json$Decode$null(elm$core$Maybe$Nothing),
+										A2(elm$json$Json$Decode$map, elm$core$Maybe$Just, elm$json$Json$Decode$string)
+									]))));
 				},
 				A2(elm$json$Json$Decode$field, 'event', elm$json$Json$Decode$string));
 		},
@@ -11731,7 +11761,7 @@ var author$project$Analyser$SourceLoadingStage$subscriptions = function (_n0) {
 					author$project$Analyser$SourceLoadingStage$FileLoaderMsg(n),
 					author$project$Analyser$Files$FileLoader$subscriptions);
 			},
-			elm$core$Set$toList(model.P)));
+			elm$core$Set$toList(model.L)));
 };
 var author$project$AnalyserPorts$onFixMessage = _Platform_incomingPort('onFixMessage', elm$json$Json$Decode$int);
 var author$project$AnalyserPorts$onReset = _Platform_incomingPort('onReset', elm$json$Json$Decode$bool);
@@ -13357,7 +13387,7 @@ var author$project$Analyser$Checks$DuplicateImport$onImport = F2(
 	function (_n0, context) {
 		var range = _n0.a;
 		var imp = _n0.b;
-		var moduleName = stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aY);
+		var moduleName = stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aZ);
 		var _n1 = A2(elm$core$Dict$get, moduleName, context);
 		if (!_n1.$) {
 			return A3(
@@ -14169,7 +14199,7 @@ var stil4m$elm_syntax$Elm$Syntax$Pattern$moduleNames = function (p) {
 			var subPatterns = p.b;
 			return A2(
 				elm$core$List$cons,
-				qualifiedNameRef.aY,
+				qualifiedNameRef.aZ,
 				A2(elm$core$List$concatMap, recur, subPatterns));
 		case 13:
 			var inner = p.a;
@@ -14207,7 +14237,7 @@ var author$project$Analyser$Checks$UnusedImport$onImport = F2(
 		var imp = _n0.b;
 		return (_Utils_eq(imp.et, elm$core$Maybe$Nothing) && _Utils_eq(imp.bF, elm$core$Maybe$Nothing)) ? A3(
 			elm$core$Dict$insert,
-			stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aY),
+			stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aZ),
 			_Utils_Tuple2(range, 0),
 			context) : context;
 	});
@@ -14529,7 +14559,7 @@ var author$project$ASTUtil$Imports$naiveStringifyImport = function (imp) {
 				A2(
 				elm$core$String$join,
 				'.',
-				stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aY)),
+				stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aZ)),
 				A2(
 				elm$core$Maybe$withDefault,
 				'',
@@ -14673,7 +14703,7 @@ var author$project$Analyser$Checks$Variables$UsedVariableContext = elm$core$Basi
 var author$project$Analyser$Checks$Variables$emptyContext = {r: _List_Nil, af: _List_Nil};
 var author$project$ASTUtil$Variables$qualifiedNameUsedVars = F2(
 	function (_n0, range) {
-		var moduleName = _n0.aY;
+		var moduleName = _n0.aZ;
 		var name = _n0.f7;
 		return _Utils_eq(moduleName, _List_Nil) ? _List_fromArray(
 			[
@@ -16180,7 +16210,7 @@ var stil4m$structured_writer$StructuredWriter$Joined = function (a) {
 };
 var stil4m$structured_writer$StructuredWriter$join = stil4m$structured_writer$StructuredWriter$Joined;
 var stil4m$elm_syntax$Elm$Writer$writeQualifiedNameRef = function (_n0) {
-	var moduleName = _n0.aY;
+	var moduleName = _n0.aZ;
 	var name = _n0.f7;
 	if (!moduleName.b) {
 		return stil4m$structured_writer$StructuredWriter$string(name);
@@ -16659,7 +16689,7 @@ var author$project$Analyser$handleNextStep = function (input) {
 	var cmds = input.b;
 	var _n0 = model.j;
 	if (_n0.$ === 4) {
-		var _n1 = author$project$Analyser$State$nextTask(model.o);
+		var _n1 = author$project$Analyser$State$nextTask(model.m);
 		if (_n1.$ === 1) {
 			return input;
 		} else {
@@ -16671,7 +16701,7 @@ var author$project$Analyser$handleNextStep = function (input) {
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{o: newState}),
+						{m: newState}),
 					author$project$Util$Logger$info(
 						'Could not fix message: \'' + (elm$core$String$fromInt(taskId) + '\'.')));
 			} else {
@@ -16685,7 +16715,7 @@ var author$project$Analyser$handleNextStep = function (input) {
 							model,
 							{
 								j: author$project$Analyser$FixerStage(fixerModel),
-								o: newState2
+								m: newState2
 							}),
 						elm$core$Platform$Cmd$batch(
 							_List_fromArray(
@@ -16699,131 +16729,75 @@ var author$project$Analyser$handleNextStep = function (input) {
 		return input;
 	}
 };
-var author$project$Analyser$SourceLoadingStage = function (a) {
-	return {$: 2, a: a};
-};
-var author$project$Analyser$SourceLoadingStage$Model = elm$core$Basics$identity;
-var author$project$Analyser$Files$FileLoader$loadFile = _Platform_outgoingPort('loadFile', elm$json$Json$Encode$string);
-var author$project$Analyser$Files$FileLoader$init = function (s) {
-	return elm$core$Platform$Cmd$batch(
-		_List_fromArray(
-			[
-				author$project$Analyser$Files$FileLoader$loadFile(s),
-				author$project$Util$Logger$info('Load file ' + (s + '...'))
-			]));
-};
-var elm_community$list_extra$List$Extra$uncons = function (list) {
-	if (!list.b) {
-		return elm$core$Maybe$Nothing;
-	} else {
-		var first = list.a;
-		var rest = list.b;
-		return elm$core$Maybe$Just(
-			_Utils_Tuple2(first, rest));
-	}
-};
-var author$project$Analyser$SourceLoadingStage$loadNextFile = function (_n0) {
-	var model = _n0.a;
-	var msgs = _n0.b;
-	return A2(
-		elm$core$Maybe$withDefault,
-		_Utils_Tuple2(model, msgs),
-		A2(
-			elm$core$Maybe$map,
-			function (_n1) {
-				var next = _n1.a;
-				var rest = _n1.b;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							aM: rest,
-							P: A2(elm$core$Set$insert, next, model.P)
-						}),
-					elm$core$Platform$Cmd$batch(
-						_List_fromArray(
-							[
-								msgs,
-								A2(
-								elm$core$Platform$Cmd$map,
-								author$project$Analyser$SourceLoadingStage$FileLoaderMsg(next),
-								author$project$Analyser$Files$FileLoader$init(next))
-							])));
+var author$project$Analyser$Configuration$isPathExcluded = F2(
+	function (p, _n0) {
+		var excludedPaths = _n0.cW;
+		return A2(
+			elm$core$List$any,
+			function (a) {
+				return A2(elm$core$String$startsWith, a, p);
 			},
-			elm_community$list_extra$List$Extra$uncons(model.aM)));
-};
-var author$project$Analyser$SourceLoadingStage$init = function (input) {
-	return author$project$Analyser$SourceLoadingStage$loadNextFile(
-		_Utils_Tuple2(
-			{aM: input, P: elm$core$Set$empty, a0: _List_Nil},
-			elm$core$Platform$Cmd$none));
-};
-var elm$core$Tuple$mapFirst = F2(
-	function (func, _n0) {
-		var x = _n0.a;
-		var y = _n0.b;
-		return _Utils_Tuple2(
-			func(x),
-			y);
+			excludedPaths);
 	});
-var author$project$Analyser$startSourceLoading = F2(
-	function (files, _n0) {
-		var model = _n0.a;
-		var cmds = _n0.b;
-		var _n1 = function () {
-			if (!files.b) {
-				return _Utils_Tuple2(author$project$Analyser$Finished, elm$core$Platform$Cmd$none);
-			} else {
-				var files_ = files;
-				return A2(
-					elm$core$Tuple$mapSecond,
-					elm$core$Platform$Cmd$map(author$project$Analyser$SourceLoadingStageMsg),
-					A2(
-						elm$core$Tuple$mapFirst,
-						author$project$Analyser$SourceLoadingStage,
-						author$project$Analyser$SourceLoadingStage$init(files_)));
-			}
-		}();
-		var nextStage = _n1.a;
-		var stageCmds = _n1.b;
-		return _Utils_Tuple2(
-			_Utils_update(
-				model,
-				{j: nextStage}),
-			elm$core$Platform$Cmd$batch(
-				_List_fromArray(
-					[stageCmds, cmds])));
-	});
-var stil4m$elm_syntax$Elm$Processing$addDependency = F2(
-	function (dep, _n0) {
-		var x = _n0;
+var author$project$Analyser$isSourceFileIncluded = function (configuration) {
+	return A2(
+		elm$core$Basics$composeR,
+		elm$core$Tuple$first,
+		A2(
+			elm$core$Basics$composeR,
+			function ($) {
+				return $.gl;
+			},
+			A2(
+				elm$core$Basics$composeR,
+				function (a) {
+					return A2(author$project$Analyser$Configuration$isPathExcluded, a, configuration);
+				},
+				elm$core$Basics$not)));
+};
+var author$project$Analyser$CodeBase$mergeLoadedSourceFiles = F2(
+	function (newItems, dict) {
 		return A3(
-			elm$core$Dict$foldl,
-			F3(
-				function (k, v, d) {
-					return A3(elm$core$Dict$insert, k, v, d);
-				}),
-			x,
-			dep.f$);
+			elm$core$List$foldl,
+			function (sourceFile) {
+				return A2(elm$core$Dict$insert, sourceFile.a.gl, sourceFile);
+			},
+			dict,
+			newItems);
 	});
-var author$project$Analyser$CodeBase$setDependencies = F2(
-	function (deps, _n0) {
+var stil4m$elm_syntax$Elm$Processing$entryFromRawFile = function (rawFile) {
+	return _Utils_Tuple2(
+		stil4m$elm_syntax$Elm$RawFile$moduleName(rawFile),
+		stil4m$elm_syntax$Elm$Interface$build(rawFile));
+};
+var stil4m$elm_syntax$Elm$Processing$addFile = F2(
+	function (file, _n0) {
+		var x = _n0;
+		var _n1 = stil4m$elm_syntax$Elm$Processing$entryFromRawFile(file);
+		var k = _n1.a;
+		var v = _n1.b;
+		return A3(elm$core$Dict$insert, k, v, x);
+	});
+var author$project$Analyser$CodeBase$addSourceFiles = F2(
+	function (sources, _n0) {
 		var codeBase = _n0;
 		return _Utils_update(
 			codeBase,
 			{
-				fz: deps,
-				aB: A3(elm$core$List$foldl, stil4m$elm_syntax$Elm$Processing$addDependency, codeBase.aB, deps)
+				aD: A3(
+					elm$core$List$foldl,
+					stil4m$elm_syntax$Elm$Processing$addFile,
+					codeBase.aD,
+					A2(
+						elm$core$List$filterMap,
+						A2(elm$core$Basics$composeR, elm$core$Tuple$second, elm$core$Result$toMaybe),
+						sources)),
+				cz: A2(author$project$Analyser$CodeBase$mergeLoadedSourceFiles, sources, codeBase.cz)
 			});
 	});
-var author$project$Analyser$Files$DependencyLoader$getDependency = function (m) {
-	var _n0 = m.o;
-	if (_n0.$ === 4) {
-		var d = _n0.a;
-		return elm$core$Maybe$Just(d);
-	} else {
-		return elm$core$Maybe$Nothing;
-	}
+var author$project$Analyser$CodeBase$dependencies = function (_n0) {
+	var codeBase = _n0;
+	return codeBase.fz;
 };
 var elm$core$Dict$values = function (dict) {
 	return A3(
@@ -16835,439 +16809,49 @@ var elm$core$Dict$values = function (dict) {
 		_List_Nil,
 		dict);
 };
-var author$project$Analyser$DependencyLoadingStage$getDependencies = function (model) {
-	return A2(
-		elm$core$List$filterMap,
-		author$project$Analyser$Files$DependencyLoader$getDependency,
-		elm$core$Dict$values(model));
+var author$project$Analyser$CodeBase$sourceFiles = function (_n0) {
+	var codeBase = _n0;
+	return elm$core$Dict$values(codeBase.cz);
 };
-var author$project$Analyser$Files$DependencyLoader$isDone = function (m) {
-	var _n0 = m.o;
-	switch (_n0.$) {
-		case 3:
-			return true;
-		case 4:
-			return true;
-		default:
-			return false;
-	}
+var author$project$Analyser$Checks$UnusedDependency$dependencyIncludesModule = F2(
+	function (_n0, dependency) {
+		var moduleName = _n0.b;
+		return A2(elm$core$Dict$member, moduleName, dependency.f$);
+	});
+var author$project$Analyser$Checks$UnusedDependency$markImport = F2(
+	function (_n0, deps) {
+		var moduleName = _n0.b.aZ;
+		return A2(
+			elm$core$List$filter,
+			A2(
+				elm$core$Basics$composeL,
+				elm$core$Basics$not,
+				author$project$Analyser$Checks$UnusedDependency$dependencyIncludesModule(moduleName)),
+			deps);
+	});
+var author$project$Analyser$Checks$UnusedDependency$filterUsedDeps = F2(
+	function (_n0, deps) {
+		var ast = _n0.fg;
+		return A3(elm$core$List$foldl, author$project$Analyser$Checks$UnusedDependency$markImport, deps, ast.eg);
+	});
+var author$project$Analyser$Checks$UnusedDependency$notElmLangCore = function (dep) {
+	return dep.f7 !== 'elm/core';
 };
-var author$project$Analyser$DependencyLoadingStage$isDone = function (model) {
-	return A2(
-		elm$core$List$all,
-		author$project$Analyser$Files$DependencyLoader$isDone,
-		elm$core$Dict$values(model));
-};
-var author$project$Analyser$DependencyHandler$loadDependencyFiles = _Platform_outgoingPort(
-	'loadDependencyFiles',
-	function ($) {
-		return elm$json$Json$Encode$object(
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					'name',
-					elm$json$Json$Encode$string($.f7)),
-					_Utils_Tuple2(
-					'version',
-					elm$json$Json$Encode$string($.p))
-				]));
-	});
-var author$project$Analyser$DependencyHandler$loadHttpDocumentation = _Platform_outgoingPort(
-	'loadHttpDocumentation',
-	function ($) {
-		return elm$json$Json$Encode$object(
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					'name',
-					elm$json$Json$Encode$string($.f7)),
-					_Utils_Tuple2(
-					'version',
-					elm$json$Json$Encode$string($.p))
-				]));
-	});
-var author$project$Analyser$DependencyHandler$loadOnlineDocumentation = author$project$Analyser$DependencyHandler$loadHttpDocumentation;
-var author$project$Analyser$DependencyHandler$storeRawDependency = _Platform_outgoingPort(
-	'storeRawDependency',
-	function ($) {
-		return elm$json$Json$Encode$object(
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					'content',
-					elm$json$Json$Encode$string($.bz)),
-					_Utils_Tuple2(
-					'dependency',
-					function ($) {
-						return elm$json$Json$Encode$object(
-							_List_fromArray(
-								[
-									_Utils_Tuple2(
-									'name',
-									elm$json$Json$Encode$string($.f7)),
-									_Utils_Tuple2(
-									'version',
-									elm$json$Json$Encode$string($.p))
-								]));
-					}($.y))
-				]));
-	});
-var author$project$Util$Json$encodeTyped = F2(
-	function (x, v) {
-		return _List_fromArray(
-			[
-				_Utils_Tuple2(
-				'type',
-				elm$json$Json$Encode$string(x)),
-				_Utils_Tuple2('value', v)
-			]);
-	});
-var elm$json$Json$Encode$list = F2(
-	function (func, entries) {
-		return _Json_wrap(
+var author$project$Analyser$Checks$UnusedDependency$check = F2(
+	function (codeBase, files) {
+		return A2(
+			elm$core$List$filter,
+			author$project$Analyser$Checks$UnusedDependency$notElmLangCore,
 			A3(
 				elm$core$List$foldl,
-				_Json_addEntry(func),
-				_Json_emptyArray(0),
-				entries));
+				author$project$Analyser$Checks$UnusedDependency$filterUsedDeps,
+				author$project$Analyser$CodeBase$dependencies(codeBase),
+				files));
 	});
-var elm$json$Json$Encode$int = _Json_wrap;
-var stil4m$elm_syntax$Elm$Syntax$Infix$encodeDirection = function (d) {
-	switch (d) {
-		case 0:
-			return elm$json$Json$Encode$string('left');
-		case 1:
-			return elm$json$Json$Encode$string('right');
-		default:
-			return elm$json$Json$Encode$string('non');
-	}
-};
-var stil4m$elm_syntax$Elm$Syntax$Range$encode = function (_n0) {
-	var start = _n0.I;
-	var end = _n0.bE;
-	return A2(
-		elm$json$Json$Encode$list,
-		elm$json$Json$Encode$int,
-		_List_fromArray(
-			[start.C, start.W, end.C, end.W]));
-};
-var stil4m$elm_syntax$Elm$Syntax$Node$encode = F2(
-	function (f, _n0) {
-		var r = _n0.a;
-		var v = _n0.b;
-		return elm$json$Json$Encode$object(
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					'range',
-					stil4m$elm_syntax$Elm$Syntax$Range$encode(r)),
-					_Utils_Tuple2(
-					'value',
-					f(v))
-				]));
-	});
-var stil4m$elm_syntax$Elm$Syntax$Infix$encode = function (inf) {
-	return elm$json$Json$Encode$object(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'direction',
-				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, stil4m$elm_syntax$Elm$Syntax$Infix$encodeDirection, inf.fE)),
-				_Utils_Tuple2(
-				'precedence',
-				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, elm$json$Json$Encode$int, inf.eC)),
-				_Utils_Tuple2(
-				'operator',
-				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, elm$json$Json$Encode$string, inf.gj)),
-				_Utils_Tuple2(
-				'function',
-				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, elm$json$Json$Encode$string, inf.fQ))
-			]));
-};
-var author$project$Analyser$Files$Json$encodeExposedInterface = function (x) {
-	return elm$json$Json$Encode$object(
-		function () {
-			switch (x.$) {
-				case 0:
-					var s = x.a;
-					return A2(
-						author$project$Util$Json$encodeTyped,
-						'function',
-						elm$json$Json$Encode$string(s));
-				case 1:
-					var _n1 = x.a;
-					var name = _n1.a;
-					var constructors = _n1.b;
-					return A2(
-						author$project$Util$Json$encodeTyped,
-						'type_',
-						elm$json$Json$Encode$object(
-							_List_fromArray(
-								[
-									_Utils_Tuple2(
-									'name',
-									elm$json$Json$Encode$string(name)),
-									_Utils_Tuple2(
-									'constructors',
-									A2(elm$json$Json$Encode$list, elm$json$Json$Encode$string, constructors))
-								])));
-				case 2:
-					var s = x.a;
-					return A2(
-						author$project$Util$Json$encodeTyped,
-						'alias',
-						elm$json$Json$Encode$string(s));
-				default:
-					var s = x.a;
-					return A2(
-						author$project$Util$Json$encodeTyped,
-						'operator',
-						stil4m$elm_syntax$Elm$Syntax$Infix$encode(s));
-			}
-		}());
-};
-var author$project$Analyser$Files$Json$encodeInterface = elm$json$Json$Encode$list(author$project$Analyser$Files$Json$encodeExposedInterface);
-var author$project$Analyser$Files$Json$encodeDependency = function (dep) {
-	return elm$json$Json$Encode$object(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'name',
-				elm$json$Json$Encode$string(dep.f7)),
-				_Utils_Tuple2(
-				'version',
-				elm$json$Json$Encode$string(dep.p)),
-				_Utils_Tuple2(
-				'interfaces',
-				A2(
-					elm$json$Json$Encode$list,
-					function (_n0) {
-						var k = _n0.a;
-						var v = _n0.b;
-						return elm$json$Json$Encode$object(
-							_List_fromArray(
-								[
-									_Utils_Tuple2(
-									'key',
-									A2(elm$json$Json$Encode$list, elm$json$Json$Encode$string, k)),
-									_Utils_Tuple2(
-									'value',
-									author$project$Analyser$Files$Json$encodeInterface(v))
-								]));
-					},
-					elm$core$Dict$toList(dep.f$)))
-			]));
-};
-var author$project$Analyser$Files$Json$serialiseDependency = A2(
-	elm$core$Basics$composeL,
-	elm$json$Json$Encode$encode(2),
-	author$project$Analyser$Files$Json$encodeDependency);
-var author$project$Analyser$DependencyHandler$storeToDisk = function (dependency) {
-	return author$project$Analyser$DependencyHandler$storeRawDependency(
-		{
-			bz: author$project$Analyser$Files$Json$serialiseDependency(dependency),
-			y: {f7: dependency.f7, p: dependency.p}
-		});
-};
-var author$project$Analyser$Files$DependencyLoader$Done = function (a) {
-	return {$: 4, a: a};
-};
-var author$project$Analyser$Files$DependencyLoader$Failure = {$: 3};
-var author$project$Analyser$Files$DependencyLoader$LoadingOnlineDocs = {$: 1};
-var author$project$Analyser$Files$DependencyLoader$RawDiskLoading = {$: 2};
-var author$project$Analyser$Files$DependencyLoader$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 0:
-				var read = msg.a;
-				switch (read.$) {
-					case 2:
-						var result = read.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									o: author$project$Analyser$Files$DependencyLoader$Done(result)
-								}),
-							author$project$Util$Logger$info('Loaded ' + (model.y.f7 + ' from cache')));
-					case 1:
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{o: author$project$Analyser$Files$DependencyLoader$LoadingOnlineDocs}),
-							author$project$Analyser$DependencyHandler$loadOnlineDocumentation(model.y));
-					default:
-						return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-				}
-			case 1:
-				var result = msg.a;
-				if (result.$ === 1) {
-					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-				} else {
-					if (result.a.$ === 1) {
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{o: author$project$Analyser$Files$DependencyLoader$RawDiskLoading}),
-							author$project$Analyser$DependencyHandler$loadDependencyFiles(model.y));
-					} else {
-						var decodedDependency = result.a.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									o: author$project$Analyser$Files$DependencyLoader$Done(decodedDependency)
-								}),
-							elm$core$Platform$Cmd$batch(
-								_List_fromArray(
-									[
-										author$project$Analyser$DependencyHandler$storeToDisk(decodedDependency),
-										author$project$Util$Logger$info('Loaded ' + (model.y.f7 + ' from package.elm-lang.org'))
-									])));
-					}
-				}
-			default:
-				var result = msg.a;
-				if (result.$ === 1) {
-					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-				} else {
-					if (result.a.$ === 1) {
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{o: author$project$Analyser$Files$DependencyLoader$Failure}),
-							author$project$Util$Logger$info('Failed to load dependency: ' + model.y.f7));
-					} else {
-						var decodedDependency = result.a.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									o: author$project$Analyser$Files$DependencyLoader$Done(decodedDependency)
-								}),
-							elm$core$Platform$Cmd$batch(
-								_List_fromArray(
-									[
-										author$project$Analyser$DependencyHandler$storeToDisk(decodedDependency),
-										author$project$Util$Logger$info('Loaded ' + (model.y.f7 + ' by building dependency from plain source files'))
-									])));
-					}
-				}
-		}
-	});
-var author$project$Analyser$DependencyLoadingStage$update = F2(
-	function (msg, model) {
-		var name = msg.a;
-		var subMsg = msg.b;
-		var loader = A2(elm$core$Dict$get, name, model);
-		if (loader.$ === 1) {
-			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-		} else {
-			var l = loader.a;
-			var _n2 = A2(author$project$Analyser$Files$DependencyLoader$update, subMsg, l);
-			var newLoader = _n2.a;
-			var cmds = _n2.b;
-			return _Utils_Tuple2(
-				A3(elm$core$Dict$insert, name, newLoader, model),
-				A2(
-					elm$core$Platform$Cmd$map,
-					author$project$Analyser$DependencyLoadingStage$DependencyLoaderMsg(name),
-					cmds));
-		}
-	});
-var author$project$Analyser$onDependencyLoadingStageMsg = F3(
-	function (x, stage, model) {
-		var _n0 = A2(author$project$Analyser$DependencyLoadingStage$update, x, stage);
-		var newStage = _n0.a;
-		var cmds = _n0.b;
-		if (author$project$Analyser$DependencyLoadingStage$isDone(newStage)) {
-			var newDependencies = author$project$Analyser$DependencyLoadingStage$getDependencies(newStage);
-			return A2(
-				author$project$Analyser$startSourceLoading,
-				model.aK.gu,
-				_Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							J: A2(author$project$Analyser$CodeBase$setDependencies, newDependencies, model.J)
-						}),
-					A2(elm$core$Platform$Cmd$map, author$project$Analyser$DependencyLoadingStageMsg, cmds)));
-		} else {
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						j: author$project$Analyser$DependencyLoadingStage(newStage)
-					}),
-				A2(elm$core$Platform$Cmd$map, author$project$Analyser$DependencyLoadingStageMsg, cmds));
-		}
-	});
-var author$project$Analyser$Fixer$isDone = function (_n0) {
-	var m = _n0;
-	return m.ap;
-};
-var author$project$Analyser$Fixer$message = function (_n0) {
-	var m = _n0;
-	return m.ac;
-};
-var author$project$Analyser$Fixer$succeeded = function (_n0) {
-	var m = _n0;
-	return m.gz;
-};
 var author$project$Analyser$CodeBase$processContext = function (_n0) {
 	var codeBase = _n0;
-	return codeBase.aB;
+	return codeBase.aD;
 };
-var author$project$Analyser$Fixer$applyFix = F2(
-	function (model, pair) {
-		var _n0 = A2(model.bH.fO, pair, model.ac.dY);
-		switch (_n0.$) {
-			case 2:
-				var e = _n0.a;
-				return elm$core$Result$Err(e);
-			case 1:
-				var p = _n0.a;
-				return elm$core$Result$Ok(p);
-			default:
-				return elm$core$Result$Err('Invalid message data for fixer ' + model.bH.fm);
-		}
-	});
-var author$project$Analyser$Fixer$fileHashEqual = F2(
-	function (reference, mess) {
-		return _Utils_eq(reference.d6, mess.d6);
-	});
-var author$project$Analyser$Fixer$storeFile = _Platform_outgoingPort(
-	'storeFile',
-	function ($) {
-		return elm$json$Json$Encode$object(
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					'file',
-					elm$json$Json$Encode$string($.d6)),
-					_Utils_Tuple2(
-					'newContent',
-					elm$json$Json$Encode$string($.c4))
-				]));
-	});
-var author$project$Analyser$Messages$Data$description = function (_n0) {
-	var d = _n0.a;
-	return d;
-};
-var author$project$Util$Logger$warning = A2(
-	elm$core$Basics$composeR,
-	author$project$Util$Logger$LogMessage('WARN'),
-	author$project$Util$Logger$log);
-var elm$core$Result$andThen = F2(
-	function (callback, result) {
-		if (!result.$) {
-			var value = result.a;
-			return callback(value);
-		} else {
-			var msg = result.a;
-			return elm$core$Result$Err(msg);
-		}
-	});
 var stil4m$elm_syntax$Elm$Processing$expressionOperators = function (_n0) {
 	var expression = _n0.b;
 	if (expression.$ === 6) {
@@ -17454,7 +17038,7 @@ var stil4m$elm_syntax$Elm$DefaultImports$defaults = _List_fromArray(
 				stil4m$elm_syntax$Elm$Syntax$Range$emptyRange,
 				stil4m$elm_syntax$Elm$Syntax$Exposing$All(stil4m$elm_syntax$Elm$Syntax$Range$emptyRange))),
 		et: elm$core$Maybe$Nothing,
-		aY: A2(
+		aZ: A2(
 			stil4m$elm_syntax$Elm$Syntax$Node$Node,
 			stil4m$elm_syntax$Elm$Syntax$Range$emptyRange,
 			_List_fromArray(
@@ -17479,7 +17063,7 @@ var stil4m$elm_syntax$Elm$DefaultImports$defaults = _List_fromArray(
 							stil4m$elm_syntax$Elm$Syntax$Exposing$InfixExpose('::'))
 						])))),
 		et: elm$core$Maybe$Nothing,
-		aY: A2(
+		aZ: A2(
 			stil4m$elm_syntax$Elm$Syntax$Node$Node,
 			stil4m$elm_syntax$Elm$Syntax$Range$emptyRange,
 			_List_fromArray(
@@ -17503,7 +17087,7 @@ var stil4m$elm_syntax$Elm$DefaultImports$defaults = _List_fromArray(
 									elm$core$Maybe$Just(stil4m$elm_syntax$Elm$Syntax$Range$emptyRange))))
 						])))),
 		et: elm$core$Maybe$Nothing,
-		aY: A2(
+		aZ: A2(
 			stil4m$elm_syntax$Elm$Syntax$Node$Node,
 			stil4m$elm_syntax$Elm$Syntax$Range$emptyRange,
 			_List_fromArray(
@@ -17527,7 +17111,7 @@ var stil4m$elm_syntax$Elm$DefaultImports$defaults = _List_fromArray(
 									elm$core$Maybe$Just(stil4m$elm_syntax$Elm$Syntax$Range$emptyRange))))
 						])))),
 		et: elm$core$Maybe$Nothing,
-		aY: A2(
+		aZ: A2(
 			stil4m$elm_syntax$Elm$Syntax$Node$Node,
 			stil4m$elm_syntax$Elm$Syntax$Range$emptyRange,
 			_List_fromArray(
@@ -17536,7 +17120,7 @@ var stil4m$elm_syntax$Elm$DefaultImports$defaults = _List_fromArray(
 		{
 		bF: elm$core$Maybe$Nothing,
 		et: elm$core$Maybe$Nothing,
-		aY: A2(
+		aZ: A2(
 			stil4m$elm_syntax$Elm$Syntax$Node$Node,
 			stil4m$elm_syntax$Elm$Syntax$Range$emptyRange,
 			_List_fromArray(
@@ -17545,7 +17129,7 @@ var stil4m$elm_syntax$Elm$DefaultImports$defaults = _List_fromArray(
 		{
 		bF: elm$core$Maybe$Nothing,
 		et: elm$core$Maybe$Nothing,
-		aY: A2(
+		aZ: A2(
 			stil4m$elm_syntax$Elm$Syntax$Node$Node,
 			stil4m$elm_syntax$Elm$Syntax$Range$emptyRange,
 			_List_fromArray(
@@ -17554,7 +17138,7 @@ var stil4m$elm_syntax$Elm$DefaultImports$defaults = _List_fromArray(
 		{
 		bF: elm$core$Maybe$Nothing,
 		et: elm$core$Maybe$Nothing,
-		aY: A2(
+		aZ: A2(
 			stil4m$elm_syntax$Elm$Syntax$Node$Node,
 			stil4m$elm_syntax$Elm$Syntax$Range$emptyRange,
 			_List_fromArray(
@@ -17575,7 +17159,7 @@ var stil4m$elm_syntax$Elm$DefaultImports$defaults = _List_fromArray(
 								A2(stil4m$elm_syntax$Elm$Syntax$Exposing$ExposedType, 'Program', elm$core$Maybe$Nothing)))
 						])))),
 		et: elm$core$Maybe$Nothing,
-		aY: A2(
+		aZ: A2(
 			stil4m$elm_syntax$Elm$Syntax$Node$Node,
 			stil4m$elm_syntax$Elm$Syntax$Range$emptyRange,
 			_List_fromArray(
@@ -17600,7 +17184,7 @@ var stil4m$elm_syntax$Elm$DefaultImports$defaults = _List_fromArray(
 							stil4m$elm_syntax$Elm$Syntax$Exposing$InfixExpose('!'))
 						])))),
 		et: elm$core$Maybe$Nothing,
-		aY: A2(
+		aZ: A2(
 			stil4m$elm_syntax$Elm$Syntax$Node$Node,
 			stil4m$elm_syntax$Elm$Syntax$Range$emptyRange,
 			_List_fromArray(
@@ -17621,7 +17205,7 @@ var stil4m$elm_syntax$Elm$DefaultImports$defaults = _List_fromArray(
 								A2(stil4m$elm_syntax$Elm$Syntax$Exposing$ExposedType, 'Sub', elm$core$Maybe$Nothing)))
 						])))),
 		et: elm$core$Maybe$Nothing,
-		aY: A2(
+		aZ: A2(
 			stil4m$elm_syntax$Elm$Syntax$Node$Node,
 			stil4m$elm_syntax$Elm$Syntax$Range$emptyRange,
 			_List_fromArray(
@@ -17669,7 +17253,7 @@ var stil4m$elm_syntax$Elm$Processing$buildSingle = F2(
 							_List_Nil,
 							A2(
 								elm$core$Dict$get,
-								stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aY),
+								stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aZ),
 								moduleIndex))));
 			} else {
 				var _n2 = _n0.a;
@@ -17697,7 +17281,7 @@ var stil4m$elm_syntax$Elm$Processing$buildSingle = F2(
 								_List_Nil,
 								A2(
 									elm$core$Dict$get,
-									stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aY),
+									stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aZ),
 									moduleIndex)))));
 			}
 		}
@@ -18591,201 +18175,6 @@ var stil4m$elm_syntax$Elm$Processing$process = F2(
 		var documentationFixed = stil4m$elm_syntax$Elm$Processing$Documentation$postProcess(operatorFixed);
 		return documentationFixed;
 	});
-var author$project$Analyser$Fixer$update = F3(
-	function (codeBase, msg, _n0) {
-		var model = _n0;
-		if (!msg.$) {
-			var reference = msg.a;
-			if (!A2(author$project$Analyser$Fixer$fileHashEqual, reference, model.ac)) {
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{ap: true, gz: false}),
-					author$project$Util$Logger$warning('Could not fix file: Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages.'));
-			} else {
-				var changedContent = A2(
-					elm$core$Result$andThen,
-					function (x) {
-						return A2(author$project$Analyser$Fixer$applyFix, model, x);
-					},
-					A2(
-						elm$core$Result$fromMaybe,
-						'Could not parse file',
-						function (fileLoad) {
-							return elm$core$Result$toMaybe(
-								A2(
-									elm$core$Result$map,
-									function (b) {
-										return _Utils_Tuple2(fileLoad.bz, b);
-									},
-									A2(
-										elm$core$Result$map,
-										stil4m$elm_syntax$Elm$Processing$process(
-											author$project$Analyser$CodeBase$processContext(codeBase)),
-										stil4m$elm_syntax$Elm$Parser$parse(fileLoad.bz))));
-						}(reference)));
-				if (!changedContent.$) {
-					var newContent = changedContent.a;
-					return _Utils_Tuple2(
-						model,
-						author$project$Analyser$Fixer$storeFile(
-							{d6: model.ac.d6.gl, c4: newContent}));
-				} else {
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{ap: true, gz: false}),
-						author$project$Util$Logger$warning('Could not fix file: There was an error while loading the file.'));
-				}
-			}
-		} else {
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{ap: true}),
-				author$project$Util$Logger$info(
-					'Fixed message: ' + author$project$Analyser$Messages$Data$description(model.ac.dY)));
-		}
-	});
-var author$project$Analyser$Messages$Util$messageFile = function (m) {
-	return m.d6.gl;
-};
-var author$project$Analyser$onFixerMsg = F3(
-	function (x, stage, model) {
-		var _n0 = A2(
-			elm$core$Tuple$mapSecond,
-			elm$core$Platform$Cmd$map(author$project$Analyser$FixerMsg),
-			A3(author$project$Analyser$Fixer$update, model.J, x, stage));
-		var newFixerModel = _n0.a;
-		var fixerCmds = _n0.b;
-		return author$project$Analyser$Fixer$isDone(newFixerModel) ? (author$project$Analyser$Fixer$succeeded(newFixerModel) ? _Utils_Tuple2(
-			_Utils_update(
-				model,
-				{j: author$project$Analyser$Finished}),
-			fixerCmds) : A2(
-			author$project$Analyser$startSourceLoading,
-			_List_fromArray(
-				[
-					author$project$Analyser$Messages$Util$messageFile(
-					author$project$Analyser$Fixer$message(newFixerModel))
-				]),
-			_Utils_Tuple2(model, fixerCmds))) : _Utils_Tuple2(
-			_Utils_update(
-				model,
-				{
-					j: author$project$Analyser$FixerStage(newFixerModel)
-				}),
-			fixerCmds);
-	});
-var author$project$Analyser$Configuration$isPathExcluded = F2(
-	function (p, _n0) {
-		var excludedPaths = _n0.cW;
-		return A2(
-			elm$core$List$any,
-			function (a) {
-				return A2(elm$core$String$startsWith, a, p);
-			},
-			excludedPaths);
-	});
-var author$project$Analyser$isSourceFileIncluded = function (configuration) {
-	return A2(
-		elm$core$Basics$composeR,
-		elm$core$Tuple$first,
-		A2(
-			elm$core$Basics$composeR,
-			function ($) {
-				return $.gl;
-			},
-			A2(
-				elm$core$Basics$composeR,
-				function (a) {
-					return A2(author$project$Analyser$Configuration$isPathExcluded, a, configuration);
-				},
-				elm$core$Basics$not)));
-};
-var author$project$Analyser$CodeBase$mergeLoadedSourceFiles = F2(
-	function (newItems, dict) {
-		return A3(
-			elm$core$List$foldl,
-			function (sourceFile) {
-				return A2(elm$core$Dict$insert, sourceFile.a.gl, sourceFile);
-			},
-			dict,
-			newItems);
-	});
-var stil4m$elm_syntax$Elm$Processing$entryFromRawFile = function (rawFile) {
-	return _Utils_Tuple2(
-		stil4m$elm_syntax$Elm$RawFile$moduleName(rawFile),
-		stil4m$elm_syntax$Elm$Interface$build(rawFile));
-};
-var stil4m$elm_syntax$Elm$Processing$addFile = F2(
-	function (file, _n0) {
-		var x = _n0;
-		var _n1 = stil4m$elm_syntax$Elm$Processing$entryFromRawFile(file);
-		var k = _n1.a;
-		var v = _n1.b;
-		return A3(elm$core$Dict$insert, k, v, x);
-	});
-var author$project$Analyser$CodeBase$addSourceFiles = F2(
-	function (sources, _n0) {
-		var codeBase = _n0;
-		return _Utils_update(
-			codeBase,
-			{
-				aB: A3(
-					elm$core$List$foldl,
-					stil4m$elm_syntax$Elm$Processing$addFile,
-					codeBase.aB,
-					A2(
-						elm$core$List$filterMap,
-						A2(elm$core$Basics$composeR, elm$core$Tuple$second, elm$core$Result$toMaybe),
-						sources)),
-				cz: A2(author$project$Analyser$CodeBase$mergeLoadedSourceFiles, sources, codeBase.cz)
-			});
-	});
-var author$project$Analyser$CodeBase$dependencies = function (_n0) {
-	var codeBase = _n0;
-	return codeBase.fz;
-};
-var author$project$Analyser$CodeBase$sourceFiles = function (_n0) {
-	var codeBase = _n0;
-	return elm$core$Dict$values(codeBase.cz);
-};
-var author$project$Analyser$Checks$UnusedDependency$dependencyIncludesModule = F2(
-	function (_n0, dependency) {
-		var moduleName = _n0.b;
-		return A2(elm$core$Dict$member, moduleName, dependency.f$);
-	});
-var author$project$Analyser$Checks$UnusedDependency$markImport = F2(
-	function (_n0, deps) {
-		var moduleName = _n0.b.aY;
-		return A2(
-			elm$core$List$filter,
-			A2(
-				elm$core$Basics$composeL,
-				elm$core$Basics$not,
-				author$project$Analyser$Checks$UnusedDependency$dependencyIncludesModule(moduleName)),
-			deps);
-	});
-var author$project$Analyser$Checks$UnusedDependency$filterUsedDeps = F2(
-	function (_n0, deps) {
-		var ast = _n0.fg;
-		return A3(elm$core$List$foldl, author$project$Analyser$Checks$UnusedDependency$markImport, deps, ast.eg);
-	});
-var author$project$Analyser$Checks$UnusedDependency$notElmLangCore = function (dep) {
-	return dep.f7 !== 'elm/core';
-};
-var author$project$Analyser$Checks$UnusedDependency$check = F2(
-	function (codeBase, files) {
-		return A2(
-			elm$core$List$filter,
-			author$project$Analyser$Checks$UnusedDependency$notElmLangCore,
-			A3(
-				elm$core$List$foldl,
-				author$project$Analyser$Checks$UnusedDependency$filterUsedDeps,
-				author$project$Analyser$CodeBase$dependencies(codeBase),
-				files));
-	});
 var author$project$Analyser$FileContext$buildForFile = F2(
 	function (moduleIndex, _n0) {
 		var fileContent = _n0.a;
@@ -18803,7 +18192,7 @@ var author$project$Analyser$FileContext$buildForFile = F2(
 						p: A2(elm$core$Maybe$withDefault, '', fileContent.gs)
 					},
 					f_: stil4m$elm_syntax$Elm$Interface$build(l),
-					aY: author$project$Analyser$FileContext$moduleName(l)
+					aZ: author$project$Analyser$FileContext$moduleName(l)
 				});
 		}
 	});
@@ -18819,7 +18208,7 @@ var author$project$Analyser$Modules$edgesInFile = function (file) {
 	return A2(
 		elm$core$List$map,
 		function (b) {
-			return _Utils_Tuple2(file.aY, b);
+			return _Utils_Tuple2(file.aZ, b);
 		},
 		A2(
 			elm$core$List$map,
@@ -18827,7 +18216,7 @@ var author$project$Analyser$Modules$edgesInFile = function (file) {
 			A2(
 				elm$core$List$map,
 				function ($) {
-					return $.aY;
+					return $.aZ;
 				},
 				A2(elm$core$List$map, stil4m$elm_syntax$Elm$Syntax$Node$value, file.fg.eg))));
 };
@@ -18841,17 +18230,20 @@ var author$project$Analyser$Modules$build = F2(
 				ch: A2(
 					elm$core$List$map,
 					function ($) {
-						return $.aY;
+						return $.aZ;
 					},
 					files)
 			});
 	});
 var author$project$Analyser$SourceLoadingStage$parsedFiles = function (_n0) {
 	var model = _n0;
-	return model.a0;
+	return model.aB;
 };
 var author$project$Analyser$Messages$Types$Applicable = 3;
 var author$project$Analyser$State$Idle = 2;
+var author$project$Analyser$Messages$Util$messageFile = function (m) {
+	return m.d6.gl;
+};
 var author$project$Analyser$Messages$Util$compareMessageFile = F2(
 	function (a, b) {
 		return A2(
@@ -18990,14 +18382,14 @@ var author$project$Analyser$State$finishWithNewMessages = F2(
 				function (n, message) {
 					return _Utils_update(
 						message,
-						{fV: n + s.as});
+						{fV: n + s.at});
 				}),
 			messages);
 		return author$project$Analyser$State$sortMessages(
 			_Utils_update(
 				s,
 				{
-					as: s.as + elm$core$List$length(messages),
+					at: s.at + elm$core$List$length(messages),
 					es: _Utils_ap(untouchedMessages, messagesWithId),
 					gw: 2
 				}));
@@ -19133,6 +18525,25 @@ var author$project$Analyser$State$Dependencies$init = F4(
 var author$project$Analyser$FileRef$encode = function (fileRef) {
 	return elm$json$Json$Encode$string(fileRef.gl);
 };
+var elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(0),
+				entries));
+	});
+var elm$json$Json$Encode$int = _Json_wrap;
+var stil4m$elm_syntax$Elm$Syntax$Range$encode = function (_n0) {
+	var start = _n0.I;
+	var end = _n0.bE;
+	return A2(
+		elm$json$Json$Encode$list,
+		elm$json$Json$Encode$int,
+		_List_fromArray(
+			[start.C, start.W, end.C, end.W]));
+};
 var author$project$Analyser$Messages$Data$encodeDataValue = function (dataValue) {
 	switch (dataValue.$) {
 		case 0:
@@ -19258,6 +18669,133 @@ var author$project$Analyser$State$encodeStatus = function (s) {
 			return elm$json$Json$Encode$string('fixing');
 	}
 };
+var author$project$Util$Json$encodeTyped = F2(
+	function (x, v) {
+		return _List_fromArray(
+			[
+				_Utils_Tuple2(
+				'type',
+				elm$json$Json$Encode$string(x)),
+				_Utils_Tuple2('value', v)
+			]);
+	});
+var stil4m$elm_syntax$Elm$Syntax$Infix$encodeDirection = function (d) {
+	switch (d) {
+		case 0:
+			return elm$json$Json$Encode$string('left');
+		case 1:
+			return elm$json$Json$Encode$string('right');
+		default:
+			return elm$json$Json$Encode$string('non');
+	}
+};
+var stil4m$elm_syntax$Elm$Syntax$Node$encode = F2(
+	function (f, _n0) {
+		var r = _n0.a;
+		var v = _n0.b;
+		return elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'range',
+					stil4m$elm_syntax$Elm$Syntax$Range$encode(r)),
+					_Utils_Tuple2(
+					'value',
+					f(v))
+				]));
+	});
+var stil4m$elm_syntax$Elm$Syntax$Infix$encode = function (inf) {
+	return elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'direction',
+				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, stil4m$elm_syntax$Elm$Syntax$Infix$encodeDirection, inf.fE)),
+				_Utils_Tuple2(
+				'precedence',
+				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, elm$json$Json$Encode$int, inf.eC)),
+				_Utils_Tuple2(
+				'operator',
+				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, elm$json$Json$Encode$string, inf.gj)),
+				_Utils_Tuple2(
+				'function',
+				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, elm$json$Json$Encode$string, inf.fQ))
+			]));
+};
+var author$project$Analyser$Files$Json$encodeExposedInterface = function (x) {
+	return elm$json$Json$Encode$object(
+		function () {
+			switch (x.$) {
+				case 0:
+					var s = x.a;
+					return A2(
+						author$project$Util$Json$encodeTyped,
+						'function',
+						elm$json$Json$Encode$string(s));
+				case 1:
+					var _n1 = x.a;
+					var name = _n1.a;
+					var constructors = _n1.b;
+					return A2(
+						author$project$Util$Json$encodeTyped,
+						'type_',
+						elm$json$Json$Encode$object(
+							_List_fromArray(
+								[
+									_Utils_Tuple2(
+									'name',
+									elm$json$Json$Encode$string(name)),
+									_Utils_Tuple2(
+									'constructors',
+									A2(elm$json$Json$Encode$list, elm$json$Json$Encode$string, constructors))
+								])));
+				case 2:
+					var s = x.a;
+					return A2(
+						author$project$Util$Json$encodeTyped,
+						'alias',
+						elm$json$Json$Encode$string(s));
+				default:
+					var s = x.a;
+					return A2(
+						author$project$Util$Json$encodeTyped,
+						'operator',
+						stil4m$elm_syntax$Elm$Syntax$Infix$encode(s));
+			}
+		}());
+};
+var author$project$Analyser$Files$Json$encodeInterface = elm$json$Json$Encode$list(author$project$Analyser$Files$Json$encodeExposedInterface);
+var author$project$Analyser$Files$Json$encodeDependency = function (dep) {
+	return elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'name',
+				elm$json$Json$Encode$string(dep.f7)),
+				_Utils_Tuple2(
+				'version',
+				elm$json$Json$Encode$string(dep.p)),
+				_Utils_Tuple2(
+				'interfaces',
+				A2(
+					elm$json$Json$Encode$list,
+					function (_n0) {
+						var k = _n0.a;
+						var v = _n0.b;
+						return elm$json$Json$Encode$object(
+							_List_fromArray(
+								[
+									_Utils_Tuple2(
+									'key',
+									A2(elm$json$Json$Encode$list, elm$json$Json$Encode$string, k)),
+									_Utils_Tuple2(
+									'value',
+									author$project$Analyser$Files$Json$encodeInterface(v))
+								]));
+					},
+					elm$core$Dict$toList(dep.f$)))
+			]));
+};
 var author$project$Analyser$State$Dependencies$encodeVersionState = function (vs) {
 	return elm$json$Json$Encode$string(
 		function () {
@@ -19381,7 +18919,7 @@ var author$project$Analyser$State$encodeState = function (state) {
 				author$project$Analyser$State$Dependencies$encode(state.fz)),
 				_Utils_Tuple2(
 				'idCount',
-				elm$json$Json$Encode$int(state.as)),
+				elm$json$Json$Encode$int(state.at)),
 				_Utils_Tuple2(
 				'status',
 				author$project$Analyser$State$encodeStatus(state.gw)),
@@ -19400,7 +18938,7 @@ var author$project$Analyser$Checks$BooleanCase$isBooleanCase = function (_n0) {
 	var pattern = _n1.b;
 	if ((pattern.$ === 12) && (!pattern.b.b)) {
 		var qnr = pattern.a;
-		return _Utils_eq(qnr.aY, _List_Nil) && ((qnr.f7 === 'True') || (qnr.f7 === 'False'));
+		return _Utils_eq(qnr.aZ, _List_Nil) && ((qnr.f7 === 'True') || (qnr.f7 === 'False'));
 	} else {
 		return false;
 	}
@@ -19740,7 +19278,7 @@ var author$project$Analyser$Checks$DuplicateImportedVariable$onImport = F2(
 			{
 				fv: A3(
 					elm$core$Dict$update,
-					stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aY),
+					stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aZ),
 					A2(
 						elm$core$Basics$composeR,
 						elm$core$Maybe$withDefault(elm$core$Dict$empty),
@@ -19749,9 +19287,9 @@ var author$project$Analyser$Checks$DuplicateImportedVariable$onImport = F2(
 							author$project$Analyser$Checks$DuplicateImportedVariable$mergeImportedValue(cs),
 							elm$core$Maybe$Just)),
 					context.fv),
-				aN: A3(
+				aO: A3(
 					elm$core$Dict$update,
-					stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aY),
+					stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aZ),
 					A2(
 						elm$core$Basics$composeR,
 						elm$core$Maybe$withDefault(elm$core$Dict$empty),
@@ -19759,7 +19297,7 @@ var author$project$Analyser$Checks$DuplicateImportedVariable$onImport = F2(
 							elm$core$Basics$composeR,
 							author$project$Analyser$Checks$DuplicateImportedVariable$mergeImportedValue(vs),
 							elm$core$Maybe$Just)),
-					context.aN)
+					context.aO)
 			});
 	});
 var author$project$Analyser$Checks$DuplicateImportedVariable$scan = F2(
@@ -19773,12 +19311,12 @@ var author$project$Analyser$Checks$DuplicateImportedVariable$scan = F2(
 					df: author$project$ASTUtil$Inspector$Post(author$project$Analyser$Checks$DuplicateImportedVariable$onImport)
 				}),
 			fileContext.fg,
-			{fv: elm$core$Dict$empty, aN: elm$core$Dict$empty});
+			{fv: elm$core$Dict$empty, aO: elm$core$Dict$empty});
 		return A2(
 			elm$core$List$map,
 			author$project$Analyser$Checks$DuplicateImportedVariable$asMessageData,
 			_Utils_ap(
-				author$project$Analyser$Checks$DuplicateImportedVariable$findViolations(result.aN),
+				author$project$Analyser$Checks$DuplicateImportedVariable$findViolations(result.aO),
 				author$project$Analyser$Checks$DuplicateImportedVariable$findViolations(result.fv)));
 	});
 var author$project$Analyser$Checks$DuplicateImportedVariable$checker = {
@@ -19884,10 +19422,10 @@ var author$project$Analyser$Checks$FunctionInLet$onFunction = F2(
 	function (_n0, context) {
 		var _function = _n0.b;
 		var isStatic = author$project$ASTUtil$Functions$isStatic(_function);
-		return ((!isStatic) && context.at) ? _Utils_update(
+		return ((!isStatic) && context.au) ? _Utils_update(
 			context,
 			{
-				aO: A2(elm$core$List$cons, _function, context.aO)
+				aP: A2(elm$core$List$cons, _function, context.aP)
 			}) : context;
 	});
 var author$project$Analyser$Checks$FunctionInLet$onLetBlock = F3(
@@ -19895,14 +19433,14 @@ var author$project$Analyser$Checks$FunctionInLet$onLetBlock = F3(
 		return function (after) {
 			return _Utils_update(
 				after,
-				{at: context.at});
+				{au: context.au});
 		}(
 			_continue(
 				_Utils_update(
 					context,
-					{at: true})));
+					{au: true})));
 	});
-var author$project$Analyser$Checks$FunctionInLet$startingContext = {aO: _List_Nil, at: false};
+var author$project$Analyser$Checks$FunctionInLet$startingContext = {aP: _List_Nil, au: false};
 var author$project$Analyser$Checks$FunctionInLet$scan = F2(
 	function (fileContext, _n0) {
 		return A2(
@@ -19917,7 +19455,7 @@ var author$project$Analyser$Checks$FunctionInLet$scan = F2(
 						di: author$project$ASTUtil$Inspector$Inner(author$project$Analyser$Checks$FunctionInLet$onLetBlock)
 					}),
 				fileContext.fg,
-				author$project$Analyser$Checks$FunctionInLet$startingContext).aO);
+				author$project$Analyser$Checks$FunctionInLet$startingContext).aP);
 	});
 var author$project$Analyser$Checks$FunctionInLet$checker = {
 	fp: author$project$Analyser$Checks$FunctionInLet$scan,
@@ -19948,7 +19486,7 @@ var author$project$Analyser$Checks$ImportAll$onImport = F2(
 								A3(
 								author$project$Analyser$Messages$Data$addModuleName,
 								'moduleName',
-								stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aY),
+								stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aZ),
 								A3(
 									author$project$Analyser$Messages$Data$addRange,
 									'range',
@@ -19961,7 +19499,7 @@ var author$project$Analyser$Checks$ImportAll$onImport = F2(
 													A2(
 													elm$core$String$join,
 													'.',
-													stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aY)),
+													stil4m$elm_syntax$Elm$Syntax$Node$value(imp.aZ)),
 													'` at ',
 													author$project$AST$Ranges$rangeToString(r)
 												])))))
@@ -20020,7 +19558,7 @@ var author$project$Analyser$Checks$MapNothingToNothing$isNothingPattern = functi
 		pattern,
 		A2(
 			stil4m$elm_syntax$Elm$Syntax$Pattern$NamedPattern,
-			{aY: _List_Nil, f7: 'Nothing'},
+			{aZ: _List_Nil, f7: 'Nothing'},
 			_List_Nil));
 };
 var author$project$Analyser$Checks$MapNothingToNothing$onCase = F3(
@@ -20215,7 +19753,7 @@ var author$project$Analyser$Checks$SingleFieldRecord$onTypeAnnotation = F2(
 			if (t.$ === 1) {
 				var ws = t.b;
 				return _Utils_ap(
-					context.aF,
+					context.aH,
 					A2(
 						elm$core$List$map,
 						stil4m$elm_syntax$Elm$Syntax$Node$range,
@@ -20231,21 +19769,21 @@ var author$project$Analyser$Checks$SingleFieldRecord$onTypeAnnotation = F2(
 							},
 							ws)));
 			} else {
-				return context.aF;
+				return context.aH;
 			}
 		}();
 		return _Utils_update(
 			context,
 			{
-				aV: _Utils_ap(
+				aW: _Utils_ap(
 					author$project$Analyser$Checks$SingleFieldRecord$findPlainRecords(x),
-					context.aV),
-				aF: newWhitelisted
+					context.aW),
+				aH: newWhitelisted
 			});
 	});
 var author$project$Analyser$Checks$SingleFieldRecord$realMatches = function (_n0) {
-	var matches = _n0.aV;
-	var whitelisted = _n0.aF;
+	var matches = _n0.aW;
+	var whitelisted = _n0.aH;
 	return A2(
 		elm$core$List$filter,
 		function (m) {
@@ -20285,7 +19823,7 @@ var author$project$Analyser$Checks$SingleFieldRecord$scan = F2(
 									dr: author$project$ASTUtil$Inspector$Post(author$project$Analyser$Checks$SingleFieldRecord$onTypeAnnotation)
 								}),
 							fileContext.fg,
-							{aV: _List_Nil, aF: _List_Nil})))));
+							{aW: _List_Nil, aH: _List_Nil})))));
 	});
 var author$project$Analyser$Checks$SingleFieldRecord$checker = {
 	fp: author$project$Analyser$Checks$SingleFieldRecord$scan,
@@ -20868,7 +20406,7 @@ var author$project$Analyser$Configuration$checkEnabled = F2(
 		return A2(
 			elm$core$Maybe$withDefault,
 			true,
-			A2(elm$core$Dict$get, k, configuration.aI));
+			A2(elm$core$Dict$get, k, configuration.aK));
 	});
 var author$project$Analyser$Files$FileContent$asFileRef = function (x) {
 	return {
@@ -21019,10 +20557,10 @@ var author$project$Analyser$finishProcess = F3(
 			A2(
 				author$project$Analyser$State$updateModules,
 				newModules,
-				A2(author$project$Analyser$State$finishWithNewMessages, messages, model.o)));
+				A2(author$project$Analyser$State$finishWithNewMessages, messages, model.m)));
 		var newModel = _Utils_update(
 			model,
-			{J: newCodeBase, j: author$project$Analyser$Finished, o: newState});
+			{J: newCodeBase, j: author$project$Analyser$Finished, m: newState});
 		return author$project$Analyser$handleNextStep(
 			_Utils_Tuple2(
 				newModel,
@@ -21034,6 +20572,498 @@ var author$project$Analyser$finishProcess = F3(
 							author$project$AnalyserPorts$sendStateValue(newState),
 							A2(elm$core$Platform$Cmd$map, author$project$Analyser$SourceLoadingStageMsg, cmds)
 						]))));
+	});
+var author$project$Analyser$SourceLoadingStage = function (a) {
+	return {$: 2, a: a};
+};
+var author$project$Analyser$SourceLoadingStage$Model = elm$core$Basics$identity;
+var author$project$Analyser$Files$FileLoader$loadFile = _Platform_outgoingPort('loadFile', elm$json$Json$Encode$string);
+var author$project$Analyser$Files$FileLoader$init = function (s) {
+	return elm$core$Platform$Cmd$batch(
+		_List_fromArray(
+			[
+				author$project$Analyser$Files$FileLoader$loadFile(s),
+				author$project$Util$Logger$info('Load file ' + (s + '...'))
+			]));
+};
+var elm_community$list_extra$List$Extra$uncons = function (list) {
+	if (!list.b) {
+		return elm$core$Maybe$Nothing;
+	} else {
+		var first = list.a;
+		var rest = list.b;
+		return elm$core$Maybe$Just(
+			_Utils_Tuple2(first, rest));
+	}
+};
+var author$project$Analyser$SourceLoadingStage$loadNextFile = function (_n0) {
+	var model = _n0.a;
+	var msgs = _n0.b;
+	return A2(
+		elm$core$Maybe$withDefault,
+		_Utils_Tuple2(model, msgs),
+		A2(
+			elm$core$Maybe$map,
+			function (_n1) {
+				var next = _n1.a;
+				var rest = _n1.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							aq: rest,
+							L: A2(elm$core$Set$insert, next, model.L)
+						}),
+					elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								msgs,
+								A2(
+								elm$core$Platform$Cmd$map,
+								author$project$Analyser$SourceLoadingStage$FileLoaderMsg(next),
+								author$project$Analyser$Files$FileLoader$init(next))
+							])));
+			},
+			elm_community$list_extra$List$Extra$uncons(model.aq)));
+};
+var author$project$Analyser$SourceLoadingStage$init = function (input) {
+	return author$project$Analyser$SourceLoadingStage$loadNextFile(
+		_Utils_Tuple2(
+			{aq: input, L: elm$core$Set$empty, aB: _List_Nil},
+			elm$core$Platform$Cmd$none));
+};
+var elm$core$Tuple$mapFirst = F2(
+	function (func, _n0) {
+		var x = _n0.a;
+		var y = _n0.b;
+		return _Utils_Tuple2(
+			func(x),
+			y);
+	});
+var author$project$Analyser$startSourceLoading = F2(
+	function (files, _n0) {
+		var model = _n0.a;
+		var cmds = _n0.b;
+		var _n1 = function () {
+			if (!files.b) {
+				return _Utils_Tuple2(author$project$Analyser$Finished, elm$core$Platform$Cmd$none);
+			} else {
+				var files_ = files;
+				return A2(
+					elm$core$Tuple$mapSecond,
+					elm$core$Platform$Cmd$map(author$project$Analyser$SourceLoadingStageMsg),
+					A2(
+						elm$core$Tuple$mapFirst,
+						author$project$Analyser$SourceLoadingStage,
+						author$project$Analyser$SourceLoadingStage$init(files_)));
+			}
+		}();
+		var nextStage = _n1.a;
+		var stageCmds = _n1.b;
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{j: nextStage}),
+			elm$core$Platform$Cmd$batch(
+				_List_fromArray(
+					[stageCmds, cmds])));
+	});
+var stil4m$elm_syntax$Elm$Processing$addDependency = F2(
+	function (dep, _n0) {
+		var x = _n0;
+		return A3(
+			elm$core$Dict$foldl,
+			F3(
+				function (k, v, d) {
+					return A3(elm$core$Dict$insert, k, v, d);
+				}),
+			x,
+			dep.f$);
+	});
+var author$project$Analyser$CodeBase$setDependencies = F2(
+	function (deps, _n0) {
+		var codeBase = _n0;
+		return _Utils_update(
+			codeBase,
+			{
+				fz: deps,
+				aD: A3(elm$core$List$foldl, stil4m$elm_syntax$Elm$Processing$addDependency, codeBase.aD, deps)
+			});
+	});
+var author$project$Analyser$Files$DependencyLoader$getDependency = function (m) {
+	var _n0 = m.m;
+	if (_n0.$ === 4) {
+		var d = _n0.a;
+		return elm$core$Maybe$Just(d);
+	} else {
+		return elm$core$Maybe$Nothing;
+	}
+};
+var author$project$Analyser$DependencyLoadingStage$getDependencies = function (model) {
+	return A2(
+		elm$core$List$filterMap,
+		author$project$Analyser$Files$DependencyLoader$getDependency,
+		elm$core$Dict$values(model));
+};
+var author$project$Analyser$Files$DependencyLoader$isDone = function (m) {
+	var _n0 = m.m;
+	switch (_n0.$) {
+		case 3:
+			return true;
+		case 4:
+			return true;
+		default:
+			return false;
+	}
+};
+var author$project$Analyser$DependencyLoadingStage$isDone = function (model) {
+	return A2(
+		elm$core$List$all,
+		author$project$Analyser$Files$DependencyLoader$isDone,
+		elm$core$Dict$values(model));
+};
+var author$project$Analyser$DependencyHandler$loadDependencyFiles = _Platform_outgoingPort(
+	'loadDependencyFiles',
+	function ($) {
+		return elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'name',
+					elm$json$Json$Encode$string($.f7)),
+					_Utils_Tuple2(
+					'version',
+					elm$json$Json$Encode$string($.p))
+				]));
+	});
+var author$project$Analyser$DependencyHandler$loadHttpDocumentation = _Platform_outgoingPort(
+	'loadHttpDocumentation',
+	function ($) {
+		return elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'name',
+					elm$json$Json$Encode$string($.f7)),
+					_Utils_Tuple2(
+					'version',
+					elm$json$Json$Encode$string($.p))
+				]));
+	});
+var author$project$Analyser$DependencyHandler$loadOnlineDocumentation = author$project$Analyser$DependencyHandler$loadHttpDocumentation;
+var author$project$Analyser$DependencyHandler$storeRawDependency = _Platform_outgoingPort(
+	'storeRawDependency',
+	function ($) {
+		return elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'content',
+					elm$json$Json$Encode$string($.bz)),
+					_Utils_Tuple2(
+					'dependency',
+					function ($) {
+						return elm$json$Json$Encode$object(
+							_List_fromArray(
+								[
+									_Utils_Tuple2(
+									'name',
+									elm$json$Json$Encode$string($.f7)),
+									_Utils_Tuple2(
+									'version',
+									elm$json$Json$Encode$string($.p))
+								]));
+					}($.y))
+				]));
+	});
+var author$project$Analyser$Files$Json$serialiseDependency = A2(
+	elm$core$Basics$composeL,
+	elm$json$Json$Encode$encode(2),
+	author$project$Analyser$Files$Json$encodeDependency);
+var author$project$Analyser$DependencyHandler$storeToDisk = function (dependency) {
+	return author$project$Analyser$DependencyHandler$storeRawDependency(
+		{
+			bz: author$project$Analyser$Files$Json$serialiseDependency(dependency),
+			y: {f7: dependency.f7, p: dependency.p}
+		});
+};
+var author$project$Analyser$Files$DependencyLoader$Done = function (a) {
+	return {$: 4, a: a};
+};
+var author$project$Analyser$Files$DependencyLoader$Failure = {$: 3};
+var author$project$Analyser$Files$DependencyLoader$LoadingOnlineDocs = {$: 1};
+var author$project$Analyser$Files$DependencyLoader$RawDiskLoading = {$: 2};
+var author$project$Analyser$Files$DependencyLoader$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 0:
+				var read = msg.a;
+				switch (read.$) {
+					case 2:
+						var result = read.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									m: author$project$Analyser$Files$DependencyLoader$Done(result)
+								}),
+							author$project$Util$Logger$info('Loaded ' + (model.y.f7 + ' from cache')));
+					case 1:
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{m: author$project$Analyser$Files$DependencyLoader$LoadingOnlineDocs}),
+							author$project$Analyser$DependencyHandler$loadOnlineDocumentation(model.y));
+					default:
+						return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
+			case 1:
+				var result = msg.a;
+				if (result.$ === 1) {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				} else {
+					if (result.a.$ === 1) {
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{m: author$project$Analyser$Files$DependencyLoader$RawDiskLoading}),
+							author$project$Analyser$DependencyHandler$loadDependencyFiles(model.y));
+					} else {
+						var decodedDependency = result.a.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									m: author$project$Analyser$Files$DependencyLoader$Done(decodedDependency)
+								}),
+							elm$core$Platform$Cmd$batch(
+								_List_fromArray(
+									[
+										author$project$Analyser$DependencyHandler$storeToDisk(decodedDependency),
+										author$project$Util$Logger$info('Loaded ' + (model.y.f7 + ' from package.elm-lang.org'))
+									])));
+					}
+				}
+			default:
+				var result = msg.a;
+				if (result.$ === 1) {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				} else {
+					if (result.a.$ === 1) {
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{m: author$project$Analyser$Files$DependencyLoader$Failure}),
+							author$project$Util$Logger$info('Failed to load dependency: ' + model.y.f7));
+					} else {
+						var decodedDependency = result.a.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									m: author$project$Analyser$Files$DependencyLoader$Done(decodedDependency)
+								}),
+							elm$core$Platform$Cmd$batch(
+								_List_fromArray(
+									[
+										author$project$Analyser$DependencyHandler$storeToDisk(decodedDependency),
+										author$project$Util$Logger$info('Loaded ' + (model.y.f7 + ' by building dependency from plain source files'))
+									])));
+					}
+				}
+		}
+	});
+var author$project$Analyser$DependencyLoadingStage$update = F2(
+	function (msg, model) {
+		var name = msg.a;
+		var subMsg = msg.b;
+		var loader = A2(elm$core$Dict$get, name, model);
+		if (loader.$ === 1) {
+			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+		} else {
+			var l = loader.a;
+			var _n2 = A2(author$project$Analyser$Files$DependencyLoader$update, subMsg, l);
+			var newLoader = _n2.a;
+			var cmds = _n2.b;
+			return _Utils_Tuple2(
+				A3(elm$core$Dict$insert, name, newLoader, model),
+				A2(
+					elm$core$Platform$Cmd$map,
+					author$project$Analyser$DependencyLoadingStage$DependencyLoaderMsg(name),
+					cmds));
+		}
+	});
+var author$project$Analyser$onDependencyLoadingStageMsg = F3(
+	function (x, stage, model) {
+		var _n0 = A2(author$project$Analyser$DependencyLoadingStage$update, x, stage);
+		var newStage = _n0.a;
+		var cmds = _n0.b;
+		if (author$project$Analyser$DependencyLoadingStage$isDone(newStage)) {
+			var newDependencies = author$project$Analyser$DependencyLoadingStage$getDependencies(newStage);
+			return A2(
+				author$project$Analyser$startSourceLoading,
+				model.aM.gu,
+				_Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							J: A2(author$project$Analyser$CodeBase$setDependencies, newDependencies, model.J)
+						}),
+					A2(elm$core$Platform$Cmd$map, author$project$Analyser$DependencyLoadingStageMsg, cmds)));
+		} else {
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{
+						j: author$project$Analyser$DependencyLoadingStage(newStage)
+					}),
+				A2(elm$core$Platform$Cmd$map, author$project$Analyser$DependencyLoadingStageMsg, cmds));
+		}
+	});
+var author$project$Analyser$Fixer$isDone = function (_n0) {
+	var m = _n0;
+	return m.ap;
+};
+var author$project$Analyser$Fixer$message = function (_n0) {
+	var m = _n0;
+	return m.ac;
+};
+var author$project$Analyser$Fixer$succeeded = function (_n0) {
+	var m = _n0;
+	return m.gz;
+};
+var author$project$Analyser$Fixer$applyFix = F2(
+	function (model, pair) {
+		var _n0 = A2(model.bH.fO, pair, model.ac.dY);
+		switch (_n0.$) {
+			case 2:
+				var e = _n0.a;
+				return elm$core$Result$Err(e);
+			case 1:
+				var p = _n0.a;
+				return elm$core$Result$Ok(p);
+			default:
+				return elm$core$Result$Err('Invalid message data for fixer ' + model.bH.fm);
+		}
+	});
+var author$project$Analyser$Fixer$fileHashEqual = F2(
+	function (reference, mess) {
+		return _Utils_eq(reference.d6, mess.d6);
+	});
+var author$project$Analyser$Fixer$storeFile = _Platform_outgoingPort(
+	'storeFile',
+	function ($) {
+		return elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'file',
+					elm$json$Json$Encode$string($.d6)),
+					_Utils_Tuple2(
+					'newContent',
+					elm$json$Json$Encode$string($.c4))
+				]));
+	});
+var author$project$Analyser$Messages$Data$description = function (_n0) {
+	var d = _n0.a;
+	return d;
+};
+var author$project$Util$Logger$warning = A2(
+	elm$core$Basics$composeR,
+	author$project$Util$Logger$LogMessage('WARN'),
+	author$project$Util$Logger$log);
+var elm$core$Result$andThen = F2(
+	function (callback, result) {
+		if (!result.$) {
+			var value = result.a;
+			return callback(value);
+		} else {
+			var msg = result.a;
+			return elm$core$Result$Err(msg);
+		}
+	});
+var author$project$Analyser$Fixer$update = F3(
+	function (codeBase, msg, _n0) {
+		var model = _n0;
+		if (!msg.$) {
+			var reference = msg.a;
+			if (!A2(author$project$Analyser$Fixer$fileHashEqual, reference, model.ac)) {
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{ap: true, gz: false}),
+					author$project$Util$Logger$warning('Could not fix file: Sha1 mismatch. Message is outdated for the corresponding file. Maybe refresh the messages.'));
+			} else {
+				var changedContent = A2(
+					elm$core$Result$andThen,
+					function (x) {
+						return A2(author$project$Analyser$Fixer$applyFix, model, x);
+					},
+					A2(
+						elm$core$Result$fromMaybe,
+						'Could not parse file',
+						function (fileLoad) {
+							return elm$core$Result$toMaybe(
+								A2(
+									elm$core$Result$map,
+									function (b) {
+										return _Utils_Tuple2(fileLoad.bz, b);
+									},
+									A2(
+										elm$core$Result$map,
+										stil4m$elm_syntax$Elm$Processing$process(
+											author$project$Analyser$CodeBase$processContext(codeBase)),
+										stil4m$elm_syntax$Elm$Parser$parse(fileLoad.bz))));
+						}(reference)));
+				if (!changedContent.$) {
+					var newContent = changedContent.a;
+					return _Utils_Tuple2(
+						model,
+						author$project$Analyser$Fixer$storeFile(
+							{d6: model.ac.d6.gl, c4: newContent}));
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{ap: true, gz: false}),
+						author$project$Util$Logger$warning('Could not fix file: There was an error while loading the file.'));
+				}
+			}
+		} else {
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{ap: true}),
+				author$project$Util$Logger$info(
+					'Fixed message: ' + author$project$Analyser$Messages$Data$description(model.ac.dY)));
+		}
+	});
+var author$project$Analyser$onFixerMsg = F3(
+	function (x, stage, model) {
+		var _n0 = A2(
+			elm$core$Tuple$mapSecond,
+			elm$core$Platform$Cmd$map(author$project$Analyser$FixerMsg),
+			A3(author$project$Analyser$Fixer$update, model.J, x, stage));
+		var newFixerModel = _n0.a;
+		var fixerCmds = _n0.b;
+		return author$project$Analyser$Fixer$isDone(newFixerModel) ? (author$project$Analyser$Fixer$succeeded(newFixerModel) ? _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{j: author$project$Analyser$Finished}),
+			fixerCmds) : A2(
+			author$project$Analyser$startSourceLoading,
+			_List_fromArray(
+				[
+					author$project$Analyser$Messages$Util$messageFile(
+					author$project$Analyser$Fixer$message(newFixerModel))
+				]),
+			_Utils_Tuple2(model, fixerCmds))) : _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{
+					j: author$project$Analyser$FixerStage(newFixerModel)
+				}),
+			fixerCmds);
 	});
 var elm$core$List$isEmpty = function (xs) {
 	if (!xs.b) {
@@ -21048,7 +21078,7 @@ var elm$core$Set$isEmpty = function (_n0) {
 };
 var author$project$Analyser$SourceLoadingStage$isDone = function (_n0) {
 	var model = _n0;
-	return elm$core$List$isEmpty(model.aM) && elm$core$Set$isEmpty(model.P);
+	return elm$core$List$isEmpty(model.aq) && elm$core$Set$isEmpty(model.L);
 };
 var author$project$Analyser$Files$FileLoader$AstStore = F2(
 	function (sha1, ast) {
@@ -21244,7 +21274,7 @@ var stil4m$elm_syntax$Elm$Syntax$Pattern$encode = function (pattern) {
 									[
 										_Utils_Tuple2(
 										'moduleName',
-										stil4m$elm_syntax$Elm$Syntax$ModuleName$encode(qualifiedNameRef.aY)),
+										stil4m$elm_syntax$Elm$Syntax$ModuleName$encode(qualifiedNameRef.aZ)),
 										_Utils_Tuple2(
 										'name',
 										elm$json$Json$Encode$string(qualifiedNameRef.f7))
@@ -22036,7 +22066,7 @@ var stil4m$elm_syntax$Elm$Syntax$Exposing$encode = function (exp) {
 	}
 };
 var stil4m$elm_syntax$Elm$Syntax$Import$encode = function (_n0) {
-	var moduleName = _n0.aY;
+	var moduleName = _n0.aZ;
 	var moduleAlias = _n0.et;
 	var exposingList = _n0.bF;
 	return elm$json$Json$Encode$object(
@@ -22071,7 +22101,7 @@ var stil4m$elm_syntax$Elm$Syntax$Module$encodeDefaultModuleData = function (modu
 			[
 				_Utils_Tuple2(
 				'moduleName',
-				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, stil4m$elm_syntax$Elm$Syntax$ModuleName$encode, moduleData.aY)),
+				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, stil4m$elm_syntax$Elm$Syntax$ModuleName$encode, moduleData.aZ)),
 				_Utils_Tuple2(
 				'exposingList',
 				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, stil4m$elm_syntax$Elm$Syntax$Exposing$encode, moduleData.bF))
@@ -22083,7 +22113,7 @@ var stil4m$elm_syntax$Elm$Syntax$Module$encodeEffectModuleData = function (modul
 			[
 				_Utils_Tuple2(
 				'moduleName',
-				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, stil4m$elm_syntax$Elm$Syntax$ModuleName$encode, moduleData.aY)),
+				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, stil4m$elm_syntax$Elm$Syntax$ModuleName$encode, moduleData.aZ)),
 				_Utils_Tuple2(
 				'exposingList',
 				A2(stil4m$elm_syntax$Elm$Syntax$Node$encode, stil4m$elm_syntax$Elm$Syntax$Exposing$encode, moduleData.bF)),
@@ -22164,11 +22194,10 @@ var stil4m$elm_syntax$Elm$RawFile$encode = function (_n0) {
 	var file = _n0;
 	return stil4m$elm_syntax$Elm$Syntax$File$encode(file);
 };
-var author$project$Analyser$Files$FileLoader$update = function (msg) {
-	var fc = msg;
-	var _n1 = author$project$Analyser$Files$FileContent$asRawFile(fc);
-	var fileLoad = _n1.a;
-	var store = _n1.b;
+var author$project$Analyser$Files$FileLoader$load = function (fc) {
+	var _n0 = author$project$Analyser$Files$FileContent$asRawFile(fc);
+	var fileLoad = _n0.a;
+	var store = _n0.b;
 	var cmd = store ? A2(
 		elm$core$Maybe$withDefault,
 		elm$core$Platform$Cmd$none,
@@ -22186,6 +22215,10 @@ var author$project$Analyser$Files$FileLoader$update = function (msg) {
 	return _Utils_Tuple2(
 		_Utils_Tuple2(fc, fileLoad),
 		cmd);
+};
+var author$project$Analyser$Files$FileLoader$update = function (msg) {
+	var fc = msg;
+	return author$project$Analyser$Files$FileLoader$load(fc);
 };
 var elm$core$Set$remove = F2(
 	function (key, _n0) {
@@ -22205,8 +22238,8 @@ var author$project$Analyser$SourceLoadingStage$update = F2(
 				_Utils_update(
 					state,
 					{
-						P: A2(elm$core$Set$remove, name, state.P),
-						a0: A2(elm$core$List$cons, fileLoad, state.a0)
+						L: A2(elm$core$Set$remove, name, state.L),
+						aB: A2(elm$core$List$cons, fileLoad, state.aB)
 					}),
 				A2(
 					elm$core$Platform$Cmd$map,
@@ -22228,7 +22261,7 @@ var author$project$Analyser$onSourceLoadingStageMsg = F3(
 	});
 var author$project$Analyser$Configuration$ConfigurationInner = F3(
 	function (raw, checks, excludedPaths) {
-		return {aI: checks, cW: excludedPaths, dx: raw};
+		return {aK: checks, cW: excludedPaths, dx: raw};
 	});
 var elm$json$Json$Decode$dict = function (decoder) {
 	return A2(
@@ -22278,7 +22311,7 @@ var author$project$Analyser$Configuration$mergeWithDefaults = function (_n0) {
 	return _Utils_update(
 		innerConfig,
 		{
-			aI: author$project$Analyser$Configuration$withDefaultChecks(innerConfig.aI)
+			aK: author$project$Analyser$Configuration$withDefaultChecks(innerConfig.aK)
 		});
 };
 var author$project$Analyser$Configuration$fromString = function (input) {
@@ -22385,7 +22418,7 @@ var author$project$Analyser$DependencyHandler$readFromDisk = function (dependenc
 var author$project$Analyser$Files$DependencyLoader$AwaitingCache = {$: 0};
 var author$project$Analyser$Files$DependencyLoader$init = function (dep) {
 	return _Utils_Tuple2(
-		{y: dep, o: author$project$Analyser$Files$DependencyLoader$AwaitingCache},
+		{y: dep, m: author$project$Analyser$Files$DependencyLoader$AwaitingCache},
 		elm$core$Platform$Cmd$batch(
 			_List_fromArray(
 				[
@@ -22429,6 +22462,19 @@ var author$project$Analyser$DependencyLoadingStage$init = function (elmProject) 
 						c);
 				},
 				inits)));
+};
+var author$project$Analyser$SourceLoadingStage$initWithContent = function (input) {
+	var _n0 = author$project$Analyser$Files$FileLoader$load(input);
+	var loadedSourceFile = _n0.a;
+	var cmds = _n0.b;
+	return _Utils_Tuple2(
+		{
+			aq: _List_Nil,
+			L: elm$core$Set$empty,
+			aB: _List_fromArray(
+				[loadedSourceFile])
+		},
+		cmds);
 };
 var author$project$Analyser$State$addFixToQueue = F2(
 	function (m, s) {
@@ -22487,7 +22533,7 @@ var author$project$Analyser$update = F2(
 						_Utils_update(
 							model,
 							{
-								o: A2(author$project$Analyser$State$addFixToQueue, messageId, model.o)
+								m: A2(author$project$Analyser$State$addFixToQueue, messageId, model.m)
 							}),
 						elm$core$Platform$Cmd$none));
 			case 5:
@@ -22507,7 +22553,7 @@ var author$project$Analyser$update = F2(
 							model,
 							{
 								X: configuration,
-								aK: context,
+								aM: context,
 								j: author$project$Analyser$DependencyLoadingStage(stage)
 							}),
 						elm$core$Platform$Cmd$batch(
@@ -22553,20 +22599,43 @@ var author$project$Analyser$update = F2(
 						elm$core$Platform$Cmd$none)) : _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 			default:
 				if (msg.a.$ === 1) {
-					var _n6 = msg.a;
+					var _n9 = msg.a;
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				} else {
 					if (!msg.a.a.$) {
-						var x = msg.a.a.a;
-						return author$project$Analyser$doSendState(
-							_Utils_Tuple2(
-								_Utils_update(
-									model,
-									{
-										D: A2(elm$core$List$cons, x, model.D),
-										o: A2(author$project$Analyser$State$outdateMessagesForFile, x, model.o)
-									}),
-								elm$core$Platform$Cmd$none));
+						var _n6 = msg.a.a;
+						var path = _n6.a;
+						var maybeContent = _n6.b;
+						if (!maybeContent.$) {
+							var content = maybeContent.a;
+							var finishQuick = function (_n8) {
+								var sourceModel = _n8.a;
+								var sourceCmds = _n8.b;
+								return A3(
+									author$project$Analyser$finishProcess,
+									sourceModel,
+									sourceCmds,
+									_Utils_update(
+										model,
+										{
+											m: A2(author$project$Analyser$State$outdateMessagesForFile, path, model.m)
+										}));
+							};
+							return finishQuick(
+								author$project$Analyser$SourceLoadingStage$initWithContent(content));
+						} else {
+							return A2(
+								author$project$Analyser$startSourceLoading,
+								A2(elm$core$List$cons, path, model.D),
+								_Utils_Tuple2(
+									_Utils_update(
+										model,
+										{
+											D: _List_Nil,
+											m: A2(author$project$Analyser$State$outdateMessagesForFile, path, model.m)
+										}),
+									elm$core$Platform$Cmd$none));
+						}
 					} else {
 						var x = msg.a.a.a;
 						return author$project$Analyser$doSendState(
@@ -22581,7 +22650,7 @@ var author$project$Analyser$update = F2(
 												elm$core$Basics$not,
 												elm$core$Basics$eq(x)),
 											model.D),
-										o: A2(author$project$Analyser$State$removeMessagesForFile, x, model.o)
+										m: A2(author$project$Analyser$State$removeMessagesForFile, x, model.m)
 									}),
 								author$project$Util$Logger$info('File was removed: \'' + (x + '\'. Removing known messages.'))));
 					}

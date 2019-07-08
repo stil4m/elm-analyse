@@ -12,7 +12,7 @@ var fileGatherer = __importStar(require("../util/file-gatherer"));
 function run(elmWorker) {
     var pack = require(process.cwd() + '/elm.json');
     watch(pack['source-directories'] || ['src'], { recursive: true }, function (evt, name) {
-        var change = { event: evt, file: name };
+        var change = { event: evt, file: name, content: null };
         if (fileGatherer.includedInFileSet(name)) {
             elmWorker.ports.fileWatch.send(change);
         }

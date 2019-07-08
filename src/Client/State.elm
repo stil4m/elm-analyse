@@ -4,12 +4,12 @@ import Analyser.Checks
 import Analyser.Messages.Types exposing (Message)
 import Analyser.State as AS
 import Client.LoadingScreen as LoadingScreen
+import Client.Routing exposing (Route)
 import Html exposing (Html)
 import Http
 import Json.Decode as JD
 import Json.Encode as JE
 import RemoteData exposing (RemoteData)
-import Url exposing (Url)
 
 
 type alias State =
@@ -28,7 +28,7 @@ refresh =
         |> Http.send identity
 
 
-tick : Url -> Cmd State
+tick : Route -> Cmd State
 tick _ =
     Http.get "/state" (AS.decodeState Analyser.Checks.schemas)
         |> Http.send identity

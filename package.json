@@ -1,6 +1,6 @@
 {
   "name": "elm-analyse",
-  "version": "0.16.2",
+  "version": "0.16.4",
   "description": "A tool that allows you analyse your Elm code and identifies deficiencies and best practices.",
   "repository": {
     "type": "git",
@@ -55,7 +55,7 @@
     "@types/os-homedir": "^1.0.0",
     "@types/request": "^2.47.1",
     "@types/ws": "^5.1.2",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^3.4.1",
     "bufferutil": "3.0.3",
     "chokidar": "^2.1.2",
     "chokidar-cli": "^1.2.2",

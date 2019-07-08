@@ -14,7 +14,6 @@ import Html.Attributes exposing (class, style)
 import Html.Events
 import Http exposing (Error)
 import RemoteData as RD exposing (RemoteData)
-import Url exposing (Url)
 import Url.Builder
 
 
@@ -71,8 +70,8 @@ type Info
     = Fixed Message
 
 
-update : Url -> Msg -> Model -> ( Model, Cmd Msg, Maybe Info )
-update _ msg model =
+update : Msg -> Model -> ( Model, Cmd Msg, Maybe Info )
+update msg model =
     case msg of
         Close ->
             ( hide model, Cmd.none, Nothing )

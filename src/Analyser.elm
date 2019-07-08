@@ -189,14 +189,26 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
-        Change (Just (Update x)) ->
-            doSendState
-                ( { model
-                    | state = State.outdateMessagesForFile x model.state
-                    , changedFiles = x :: model.changedFiles
-                  }
-                , Cmd.none
-                )
+        Change (Just (Update path maybeContent)) ->
+            case maybeContent of
+                Just content ->
+                    let
+                        finishQuick ( sourceModel, sourceCmds ) =
+                            finishProcess sourceModel
+                                sourceCmds
+                                { model | state = State.outdateMessagesForFile path model.state }
+                    in
+                    SourceLoadingStage.initWithContent content
+                        |> finishQuick
+
+                Nothing ->
+                    startSourceLoading (path :: model.changedFiles)
+                        ( { model
+                            | state = State.outdateMessagesForFile path model.state
+                            , changedFiles = []
+                          }
+                        , Cmd.none
+                        )
 
         ReloadTick ->
             if model.stage == Finished && model.changedFiles /= [] then

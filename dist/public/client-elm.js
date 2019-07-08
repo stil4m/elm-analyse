@@ -4685,7 +4685,10 @@ var _Regex_splitAtMost = F3(function(n, re, str)
 });
 
 var _Regex_infinity = Infinity;
-var author$project$Client$App$App$OnLocation = function (a) {
+var author$project$Client$App$App$OnUrlChange = function (a) {
+	return {$: 4, a: a};
+};
+var author$project$Client$App$App$OnUrlRequest = function (a) {
 	return {$: 3, a: a};
 };
 var author$project$Client$App$App$NotFound = {$: 6};
@@ -6790,6 +6793,122 @@ var author$project$Client$MessagesPage$init = function (state) {
 				author$project$Analyser$Messages$Grouped$byFileName(_List_Nil)))
 	};
 };
+var elm$core$Platform$Cmd$map = _Platform_map;
+var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
+var elm$core$Tuple$mapFirst = F2(
+	function (func, _n0) {
+		var x = _n0.a;
+		var y = _n0.b;
+		return _Utils_Tuple2(
+			func(x),
+			y);
+	});
+var elm$core$Tuple$mapSecond = F2(
+	function (func, _n0) {
+		var x = _n0.a;
+		var y = _n0.b;
+		return _Utils_Tuple2(
+			x,
+			func(y));
+	});
+var author$project$Client$App$App$onRoute = F2(
+	function (route, model) {
+		switch (route) {
+			case 4:
+				var _n1 = model.cH;
+				if (_n1.$ === 3) {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				} else {
+					return A2(
+						elm$core$Tuple$mapSecond,
+						elm$core$Platform$Cmd$map(author$project$Client$App$App$FileTreeMsg),
+						A2(
+							elm$core$Tuple$mapFirst,
+							function (x) {
+								return _Utils_update(
+									model,
+									{
+										cH: author$project$Client$App$App$FileTreeContent(x),
+										y: route
+									});
+							},
+							author$project$Client$Components$FileTree$init));
+				}
+			case 2:
+				var _n2 = model.cH;
+				if (_n2.$ === 4) {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								cH: author$project$Client$App$App$GraphContent(
+									author$project$Client$Graph$Graph$init(model.x)),
+								y: route
+							}),
+						elm$core$Platform$Cmd$none);
+				}
+			case 5:
+				var _n3 = model.cH;
+				if (_n3.$ === 5) {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								cH: author$project$Client$App$App$PackageDependenciesContent(
+									author$project$Client$Graph$PackageDependencies$init(model.x)),
+								y: route
+							}),
+						elm$core$Platform$Cmd$none);
+				}
+			case 3:
+				var _n4 = model.cH;
+				if (_n4.$ === 5) {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								cH: author$project$Client$App$App$MessagesPageContent(
+									author$project$Client$MessagesPage$init(model.x)),
+								y: route
+							}),
+						elm$core$Platform$Cmd$none);
+				}
+			case 1:
+				var _n5 = model.cH;
+				if (_n5.$ === 2) {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{cH: author$project$Client$App$App$DependenciesPageContent, y: route}),
+						elm$core$Platform$Cmd$none);
+				}
+			case 0:
+				var _n6 = model.cH;
+				if (_n6.$ === 1) {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{cH: author$project$Client$App$App$DashboardContent, y: route}),
+						elm$core$Platform$Cmd$none);
+				}
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{cH: author$project$Client$App$App$NotFound, y: route}),
+					elm$core$Platform$Cmd$none);
+		}
+	});
 var author$project$Client$Routing$NotFound = 6;
 var author$project$Client$Routing$Dashboard = 0;
 var author$project$Client$Routing$Dependencies = 1;
@@ -7017,137 +7136,27 @@ var elm$url$Url$Parser$parse = F2(
 					url.dZ,
 					elm$core$Basics$identity)));
 	});
-var author$project$Client$Routing$fromLocation = function (url) {
+var author$project$Client$Routing$fromUrl = function (url) {
 	return A2(
 		elm$core$Maybe$withDefault,
 		6,
 		A2(elm$url$Url$Parser$parse, author$project$Client$Routing$parser, url));
 };
-var elm$core$Platform$Cmd$map = _Platform_map;
-var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
-var elm$core$Tuple$mapFirst = F2(
-	function (func, _n0) {
-		var x = _n0.a;
-		var y = _n0.b;
-		return _Utils_Tuple2(
-			func(x),
-			y);
-	});
-var elm$core$Tuple$mapSecond = F2(
-	function (func, _n0) {
-		var x = _n0.a;
-		var y = _n0.b;
-		return _Utils_Tuple2(
-			x,
-			func(y));
-	});
 var author$project$Client$App$App$onLocation = F2(
-	function (l, model) {
-		var route = author$project$Client$Routing$fromLocation(l);
-		switch (route) {
-			case 4:
-				var _n1 = model.cH;
-				if (_n1.$ === 3) {
-					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-				} else {
-					return A2(
-						elm$core$Tuple$mapSecond,
-						elm$core$Platform$Cmd$map(author$project$Client$App$App$FileTreeMsg),
-						A2(
-							elm$core$Tuple$mapFirst,
-							function (x) {
-								return _Utils_update(
-									model,
-									{
-										cH: author$project$Client$App$App$FileTreeContent(x),
-										r: l
-									});
-							},
-							author$project$Client$Components$FileTree$init));
-				}
-			case 2:
-				var _n2 = model.cH;
-				if (_n2.$ === 4) {
-					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								cH: author$project$Client$App$App$GraphContent(
-									author$project$Client$Graph$Graph$init(model.y)),
-								r: l
-							}),
-						elm$core$Platform$Cmd$none);
-				}
-			case 5:
-				var _n3 = model.cH;
-				if (_n3.$ === 5) {
-					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								cH: author$project$Client$App$App$PackageDependenciesContent(
-									author$project$Client$Graph$PackageDependencies$init(model.y)),
-								r: l
-							}),
-						elm$core$Platform$Cmd$none);
-				}
-			case 3:
-				var _n4 = model.cH;
-				if (_n4.$ === 5) {
-					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								cH: author$project$Client$App$App$MessagesPageContent(
-									author$project$Client$MessagesPage$init(model.y)),
-								r: l
-							}),
-						elm$core$Platform$Cmd$none);
-				}
-			case 1:
-				var _n5 = model.cH;
-				if (_n5.$ === 2) {
-					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{cH: author$project$Client$App$App$DependenciesPageContent, r: l}),
-						elm$core$Platform$Cmd$none);
-				}
-			case 0:
-				var _n6 = model.cH;
-				if (_n6.$ === 1) {
-					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{cH: author$project$Client$App$App$DashboardContent, r: l}),
-						elm$core$Platform$Cmd$none);
-				}
-			default:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{cH: author$project$Client$App$App$NotFound, r: l}),
-					elm$core$Platform$Cmd$none);
-		}
+	function (url, model) {
+		return A2(
+			author$project$Client$App$App$onRoute,
+			author$project$Client$Routing$fromUrl(url),
+			model);
 	});
 var author$project$Client$App$App$init = F3(
 	function (_n0, l, key) {
 		return A2(
 			author$project$Client$App$App$onLocation,
 			l,
-			{cH: author$project$Client$App$App$NotFound, fX: key, r: l, y: krisajenkins$remotedata$RemoteData$Loading});
+			{cH: author$project$Client$App$App$NotFound, fX: key, y: 6, x: krisajenkins$remotedata$RemoteData$Loading});
 	});
-var author$project$Client$App$App$Tick = {$: 4};
+var author$project$Client$App$App$Tick = {$: 5};
 var elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
@@ -7421,7 +7430,7 @@ var author$project$Client$App$App$subscriptions = function (_n0) {
 		elm$core$Basics$always(author$project$Client$App$App$Tick));
 };
 var author$project$Client$App$App$NewState = function (a) {
-	return {$: 5, a: a};
+	return {$: 6, a: a};
 };
 var author$project$Client$Components$FileTree$MessageListMsg = function (a) {
 	return {$: 1, a: a};
@@ -7699,8 +7708,8 @@ var krisajenkins$remotedata$RemoteData$fromResult = function (result) {
 		return krisajenkins$remotedata$RemoteData$Success(x);
 	}
 };
-var author$project$Client$Components$ActiveMessageDialog$update = F3(
-	function (_n0, msg, model) {
+var author$project$Client$Components$ActiveMessageDialog$update = F2(
+	function (msg, model) {
 		switch (msg.$) {
 			case 0:
 				return _Utils_Tuple3(
@@ -7746,8 +7755,8 @@ var author$project$Client$Components$ActiveMessageDialog$update = F3(
 var author$project$Client$Components$MessageList$ActiveMessageDialogMsg = function (a) {
 	return {$: 1, a: a};
 };
-var author$project$Client$Components$MessageList$update = F3(
-	function (location, msg, model) {
+var author$project$Client$Components$MessageList$update = F2(
+	function (msg, model) {
 		if (!msg.$) {
 			var m = msg.a;
 			return A2(
@@ -7763,7 +7772,7 @@ var author$project$Client$Components$MessageList$update = F3(
 					A2(author$project$Client$Components$ActiveMessageDialog$show, m, model.aa)));
 		} else {
 			var subMsg = msg.a;
-			var _n1 = A3(author$project$Client$Components$ActiveMessageDialog$update, location, subMsg, model.aa);
+			var _n1 = A2(author$project$Client$Components$ActiveMessageDialog$update, subMsg, model.aa);
 			var newActiveDialog = _n1.a;
 			var cmds = _n1.b;
 			var info = _n1.c;
@@ -7782,8 +7791,8 @@ var author$project$Client$Components$MessageList$update = F3(
 				A2(elm$core$Platform$Cmd$map, author$project$Client$Components$MessageList$ActiveMessageDialogMsg, cmds));
 		}
 	});
-var author$project$Client$Components$FileTree$update = F4(
-	function (state, location, msg, model) {
+var author$project$Client$Components$FileTree$update = F3(
+	function (state, msg, model) {
 		switch (msg.$) {
 			case 0:
 				var x = msg.a;
@@ -7835,7 +7844,7 @@ var author$project$Client$Components$FileTree$update = F4(
 								model,
 								{T: x});
 						},
-						A3(author$project$Client$Components$MessageList$update, location, subMsg, model.T)));
+						A2(author$project$Client$Components$MessageList$update, subMsg, model.T)));
 		}
 	});
 var author$project$Client$App$App$onFileTreeMsg = F2(
@@ -7855,7 +7864,7 @@ var author$project$Client$App$App$onFileTreeMsg = F2(
 								cH: author$project$Client$App$App$FileTreeContent(x)
 							});
 					},
-					A4(author$project$Client$Components$FileTree$update, model.y, model.r, subMsg, subModel)));
+					A3(author$project$Client$Components$FileTree$update, model.x, subMsg, subModel)));
 		} else {
 			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
@@ -7866,8 +7875,8 @@ var author$project$Client$App$App$MessagesPageMsg = function (a) {
 var author$project$Client$MessagesPage$MessageListMsg = function (a) {
 	return {$: 0, a: a};
 };
-var author$project$Client$MessagesPage$update = F4(
-	function (state, location, msg, model) {
+var author$project$Client$MessagesPage$update = F3(
+	function (state, msg, model) {
 		if (!msg.$) {
 			var subMsg = msg.a;
 			return A2(
@@ -7880,7 +7889,7 @@ var author$project$Client$MessagesPage$update = F4(
 							model,
 							{T: x});
 					},
-					A3(author$project$Client$Components$MessageList$update, location, subMsg, model.T)));
+					A2(author$project$Client$Components$MessageList$update, subMsg, model.T)));
 		} else {
 			var messageGrouper = msg.a;
 			return _Utils_Tuple2(
@@ -7910,7 +7919,7 @@ var author$project$Client$App$App$onMessagesPageMsg = F2(
 								cH: author$project$Client$App$App$MessagesPageContent(x)
 							});
 					},
-					A4(author$project$Client$MessagesPage$update, model.y, model.r, subMsg, subModel)));
+					A3(author$project$Client$MessagesPage$update, model.x, subMsg, subModel)));
 		} else {
 			return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
@@ -7975,7 +7984,7 @@ var author$project$Client$App$App$onNewState = F2(
 			model,
 			{
 				cH: A2(author$project$Client$App$App$updateStateInContent, s, model.cH),
-				y: s
+				x: s
 			});
 	});
 var author$project$Client$Graph$PackageDependencies$update = F2(
@@ -8194,7 +8203,7 @@ var elm$url$Url$fromString = function (str) {
 		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
 var elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
-var author$project$Client$Routing$pushRoute = F2(
+var author$project$Client$Routing$setRoute = F2(
 	function (key, route) {
 		return A2(
 			elm$browser$Browser$Navigation$pushUrl,
@@ -13160,33 +13169,33 @@ var author$project$Client$State$tick = function (_n0) {
 				'/state',
 				author$project$Analyser$State$decodeState(author$project$Analyser$Checks$schemas))));
 };
-var elm$browser$Browser$Navigation$load = _Browser_load;
 var author$project$Client$App$App$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 6:
-				var r = msg.a;
-				return _Utils_Tuple2(
-					model,
-					A2(author$project$Client$Routing$pushRoute, model.fX, r));
+			case 4:
+				var u = msg.a;
+				var route = author$project$Client$Routing$fromUrl(u);
+				return A2(author$project$Client$App$App$onRoute, route, model);
 			case 3:
-				var l = msg.a;
-				if (!l.$) {
-					var i = l.a;
-					return A2(author$project$Client$App$App$onLocation, i, model);
-				} else {
-					var u = l.a;
+				var req = msg.a;
+				if (!req.$) {
+					var u = req.a;
 					return _Utils_Tuple2(
 						model,
-						elm$browser$Browser$Navigation$load(u));
+						A2(
+							author$project$Client$Routing$setRoute,
+							model.fX,
+							author$project$Client$Routing$fromUrl(u)));
+				} else {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
-			case 4:
+			case 5:
 				return _Utils_Tuple2(
 					model,
 					A2(
 						elm$core$Platform$Cmd$map,
 						author$project$Client$App$App$NewState,
-						author$project$Client$State$tick(model.r)));
+						author$project$Client$State$tick(model.y)));
 			case 0:
 				var subMsg = msg.a;
 				return A2(author$project$Client$App$App$onMessagesPageMsg, subMsg, model);
@@ -13208,14 +13217,9 @@ var author$project$Client$App$App$update = F2(
 var author$project$Client$App$App$PackageDependenciesMsg = function (a) {
 	return {$: 2, a: a};
 };
-var author$project$Client$App$App$ToRoute = function (a) {
-	return {$: 6, a: a};
-};
 var author$project$Client$App$Menu$isActiveClass = F2(
 	function (l, r) {
-		return _Utils_eq(
-			author$project$Client$Routing$fromLocation(l),
-			r) ? 'active' : '';
+		return _Utils_eq(l, r) ? 'active' : '';
 	});
 var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$i = _VirtualDom_node('i');
@@ -13237,23 +13241,6 @@ var elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
-var elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 0, a: a};
-};
-var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			elm$virtual_dom$VirtualDom$on,
-			event,
-			elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		elm$html$Html$Events$on,
-		'click',
-		elm$json$Json$Decode$succeed(msg));
-};
 var author$project$Client$App$Menu$menuItem = F4(
 	function (location, route, name, icon) {
 		return A2(
@@ -13270,8 +13257,7 @@ var author$project$Client$App$Menu$menuItem = F4(
 					_List_fromArray(
 						[
 							elm$html$Html$Attributes$href(
-							author$project$Client$Routing$toUrl(route)),
-							elm$html$Html$Events$onClick(route)
+							author$project$Client$Routing$toUrl(route))
 						]),
 					_List_fromArray(
 						[
@@ -13288,8 +13274,6 @@ var author$project$Client$App$Menu$menuItem = F4(
 				]));
 	});
 var elm$html$Html$div = _VirtualDom_node('div');
-var elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
-var elm$html$Html$map = elm$virtual_dom$VirtualDom$map;
 var elm$html$Html$nav = _VirtualDom_node('nav');
 var elm$html$Html$ul = _VirtualDom_node('ul');
 var elm$virtual_dom$VirtualDom$attribute = F2(
@@ -13334,41 +13318,38 @@ var author$project$Client$App$Menu$view = function (l) {
 							]))
 					])),
 				A2(
-				elm$html$Html$map,
-				elm$core$Result$Err,
-				A2(
-					elm$html$Html$div,
-					_List_fromArray(
-						[
-							elm$html$Html$Attributes$class('navbar-default sidebar'),
-							A2(elm$html$Html$Attributes$attribute, 'role', 'navigation')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							elm$html$Html$div,
-							_List_fromArray(
-								[
-									elm$html$Html$Attributes$class('sidebar-nav')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									elm$html$Html$ul,
-									_List_fromArray(
-										[
-											elm$html$Html$Attributes$class('nav in')
-										]),
-									_List_fromArray(
-										[
-											A4(author$project$Client$App$Menu$menuItem, l, 0, 'Dashboard', 'dashboard'),
-											A4(author$project$Client$App$Menu$menuItem, l, 3, 'All Messages', 'list'),
-											A4(author$project$Client$App$Menu$menuItem, l, 4, 'Tree', 'files-o'),
-											A4(author$project$Client$App$Menu$menuItem, l, 1, 'Dependencies', 'arrows'),
-											A4(author$project$Client$App$Menu$menuItem, l, 2, 'Modules', 'cubes')
-										]))
-								]))
-						])))
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('navbar-default sidebar'),
+						A2(elm$html$Html$Attributes$attribute, 'role', 'navigation')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$div,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('sidebar-nav')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								elm$html$Html$ul,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$class('nav in')
+									]),
+								_List_fromArray(
+									[
+										A4(author$project$Client$App$Menu$menuItem, l, 0, 'Dashboard', 'dashboard'),
+										A4(author$project$Client$App$Menu$menuItem, l, 3, 'All Messages', 'list'),
+										A4(author$project$Client$App$Menu$menuItem, l, 4, 'Tree', 'files-o'),
+										A4(author$project$Client$App$Menu$menuItem, l, 1, 'Dependencies', 'arrows'),
+										A4(author$project$Client$App$Menu$menuItem, l, 2, 'Modules', 'cubes')
+									]))
+							]))
+					]))
 			]));
 };
 var author$project$Client$Components$FileTree$OnSelectFile = function (a) {
@@ -13450,6 +13431,23 @@ var alex_tan$elm_dialog$Dialog$wrapFooter = function (footer) {
 			[footer]));
 };
 var elm$html$Html$button = _VirtualDom_node('button');
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 0, a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
+};
 var alex_tan$elm_dialog$Dialog$closeButton = function (closeMessage) {
 	return A2(
 		elm$html$Html$button,
@@ -15395,6 +15393,8 @@ var author$project$Client$Messages$viewAll = F2(
 				author$project$Client$Messages$renderGroup(tag),
 				messages));
 	});
+var elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
+var elm$html$Html$map = elm$virtual_dom$VirtualDom$map;
 var author$project$Client$Components$MessageList$view = function (model) {
 	return A2(
 		elm$html$Html$div,
@@ -17014,18 +17014,7 @@ var author$project$Client$App$App$viewInner = function (m) {
 		_List_Nil,
 		_List_fromArray(
 			[
-				A2(
-				elm$html$Html$map,
-				function (v) {
-					if (!v.$) {
-						var o = v.a;
-						return o;
-					} else {
-						var route = v.a;
-						return author$project$Client$App$App$ToRoute(route);
-					}
-				},
-				author$project$Client$App$Menu$view(m.r)),
+				author$project$Client$App$Menu$view(m.y),
 				A2(
 				elm$html$Html$div,
 				_List_fromArray(
@@ -17036,33 +17025,33 @@ var author$project$Client$App$App$viewInner = function (m) {
 				_List_fromArray(
 					[
 						function () {
-						var _n1 = m.cH;
-						switch (_n1.$) {
+						var _n0 = m.cH;
+						switch (_n0.$) {
 							case 0:
-								var subModel = _n1.a;
+								var subModel = _n0.a;
 								return A2(
 									elm$html$Html$map,
 									author$project$Client$App$App$MessagesPageMsg,
-									A2(author$project$Client$MessagesPage$view, m.y, subModel));
+									A2(author$project$Client$MessagesPage$view, m.x, subModel));
 							case 4:
-								var subModel = _n1.a;
-								return A2(author$project$Client$Graph$Graph$view, m.y, subModel);
+								var subModel = _n0.a;
+								return A2(author$project$Client$Graph$Graph$view, m.x, subModel);
 							case 3:
-								var subModel = _n1.a;
+								var subModel = _n0.a;
 								return A2(
 									elm$html$Html$map,
 									author$project$Client$App$App$FileTreeMsg,
 									author$project$Client$Components$FileTree$view(subModel));
 							case 5:
-								var subModel = _n1.a;
+								var subModel = _n0.a;
 								return A2(
 									elm$html$Html$map,
 									author$project$Client$App$App$PackageDependenciesMsg,
 									author$project$Client$Graph$PackageDependencies$view(subModel));
 							case 1:
-								return author$project$Client$Dashboard$view(m.y);
+								return author$project$Client$Dashboard$view(m.x);
 							case 2:
-								return author$project$Client$DependenciesPage$view(m.y);
+								return author$project$Client$DependenciesPage$view(m.x);
 							default:
 								return A2(
 									elm$html$Html$h3,
@@ -17087,14 +17076,7 @@ var author$project$Client$App$App$view = function (model) {
 };
 var elm$browser$Browser$application = _Browser_application;
 var author$project$Client$App$App$main = elm$browser$Browser$application(
-	{
-		fT: author$project$Client$App$App$init,
-		gc: A2(elm$core$Basics$composeR, elm$browser$Browser$Internal, author$project$Client$App$App$OnLocation),
-		gd: author$project$Client$App$App$OnLocation,
-		gt: author$project$Client$App$App$subscriptions,
-		gD: author$project$Client$App$App$update,
-		gH: author$project$Client$App$App$view
-	});
+	{fT: author$project$Client$App$App$init, gc: author$project$Client$App$App$OnUrlChange, gd: author$project$Client$App$App$OnUrlRequest, gt: author$project$Client$App$App$subscriptions, gD: author$project$Client$App$App$update, gH: author$project$Client$App$App$view});
 var author$project$Client$main = author$project$Client$App$App$main;
 _Platform_export({'Client':{'init':author$project$Client$main(
 	elm$json$Json$Decode$succeed(0))(0)}});}(this));

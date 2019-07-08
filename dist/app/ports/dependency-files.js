@@ -8,8 +8,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var fileGatherer = __importStar(require("../util/file-gatherer"));
-var fileReader = __importStar(require("../fileReader"));
-function setup(app, directory) {
+function setup(app, directory, fileReader) {
     app.ports.loadDependencyFiles.subscribe(function (dependency) {
         var result = fileGatherer.getDependencyFiles(directory, dependency);
         var promises = result.map(function (fileName) { return new Promise(function (accept) { return fileReader.readFile(directory, fileName, accept); }); });

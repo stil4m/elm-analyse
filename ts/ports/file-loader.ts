@@ -1,10 +1,10 @@
 import * as fs from 'fs';
-import * as cache from '../util/cache';
+import { LocalCache } from '../util/cache';
 import * as cp from 'child_process';
 import { ElmApp, FileStore, AstStore, Config, FileContent, FileContentSha } from '../domain';
-import * as fileReader from '../fileReader';
+import { FileReader } from '../fileReader';
 
-function setup(app: ElmApp, config: Config, directory: string) {
+function setup(app: ElmApp, config: Config, directory: string, cache: LocalCache, fileReader: FileReader) {
     app.ports.loadFile.subscribe(fileName => {
         fileReader.readFile(directory, fileName, result => app.ports.fileContent.send(result));
     });
