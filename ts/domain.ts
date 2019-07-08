@@ -42,6 +42,10 @@ export interface AstStore {
     sha1: string;
     ast: JSON;
 }
+export interface FixedFile {
+    path: string;
+    content: string;
+}
 
 export interface LogMessage {
     level: string;
@@ -52,6 +56,7 @@ interface ElmApp {
         log: Subscription<LogMessage>;
         sendReportValue: Subscription<Report>;
         sendState: Subscription<State>;
+        sendFixedFile: Subscription<FixedFile>;
         loadContext: Subscription<void>;
         loadDependencyFiles: Subscription<DependencyPointer>;
         loadFile: Subscription<string>;
@@ -65,6 +70,7 @@ interface ElmApp {
         fileWatch: MailBox<FileChange>;
         onReset: MailBox<boolean>;
         onFixMessage: MailBox<number>;
+        onFixQuick: MailBox<number>;
         onLoadedContext: MailBox<Context>;
         onDependencyFiles: MailBox<DependencyFiles>;
         fileContent: MailBox<FileContent>;
@@ -99,7 +105,8 @@ interface EditorElmApp {
 }
 
 interface Subscription<T> {
-    subscribe: ((cb: ((d: T) => void)) => void);
+    subscribe: (cb: (d: T) => void) => void;
+    unsubscribe: (cb: (d: T) => void) => void;
 }
 
 interface FileContentSha {
@@ -116,7 +123,7 @@ interface Context {
     configuration: string;
 }
 interface MailBox<T> {
-    send: ((d: T) => void);
+    send: (d: T) => void;
 }
 
 interface Reporter {

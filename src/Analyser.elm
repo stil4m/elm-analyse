@@ -4,6 +4,7 @@ import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.DependencyLoadingStage as DependencyLoadingStage
+import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.FileWatch as FileWatch exposing (FileChange(..))
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Analyser.Fixer as Fixer
@@ -18,6 +19,7 @@ import Elm.Version
 import Inspection
 import Json.Decode
 import Json.Encode exposing (Value)
+import Maybe.Extra as Maybe
 import Platform exposing (worker)
 import Registry exposing (Registry)
 import Time
@@ -45,6 +47,7 @@ type Msg
     | ReloadTick
     | Reset
     | OnFixMessage Int
+    | OnQuickFixMessage Int
     | FixerMsg Fixer.Msg
 
 
@@ -140,6 +143,38 @@ update msg model =
             , Cmd.none
             )
                 |> handleNextStep
+
+        OnQuickFixMessage messageId ->
+            let
+                applyFix message =
+                    getFileContext message.file.path model.codeBase
+                        |> Maybe.map (Fixer.getFixedFile message)
+                        |> Maybe.withDefault
+                            (Err ("Unable to fix messageId: " ++ String.fromInt messageId))
+            in
+            case State.getMessage messageId model.state of
+                Just message ->
+                    case applyFix message of
+                        Ok fixedFile ->
+                            ( model
+                            , AnalyserPorts.sendFixedFile
+                                { path = message.file.path
+                                , content = fixedFile
+                                }
+                            )
+
+                        Err err ->
+                            ( model
+                            , Logger.error err
+                            )
+
+                Nothing ->
+                    ( model
+                    , Logger.info
+                        ("Unable to apply fix, unable to find messageId: "
+                            ++ String.fromInt messageId
+                        )
+                    )
 
         Reset ->
             reset ( model, Cmd.none )
@@ -408,6 +443,14 @@ onSourceLoadingStageMsg x stage model =
         )
 
 
+getFileContext : String -> CodeBase -> Maybe FileContext
+getFileContext path codeBase =
+    CodeBase.getFile path codeBase
+        |> Maybe.map
+            (FileContext.buildForFile (CodeBase.processContext codeBase))
+        |> Maybe.join
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
@@ -419,6 +462,7 @@ subscriptions model =
             Sub.none
         , FileWatch.watcher Change
         , AnalyserPorts.onFixMessage OnFixMessage
+        , AnalyserPorts.onFixQuick OnQuickFixMessage
         , case model.stage of
             ContextLoadingStage ->
                 ContextLoader.onLoadedContext OnContext
