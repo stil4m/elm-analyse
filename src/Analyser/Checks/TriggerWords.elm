@@ -49,7 +49,7 @@ buildMessage : ( String, Range ) -> MessageData
 buildMessage ( word, range ) =
     Data.init
         (String.concat
-            [ "`" ++ word ++ "` should not be used in comments. Found at "
+            [ "`" ++ word ++ "` should not be used in comments at "
             , Range.rangeToString range
             ]
         )
