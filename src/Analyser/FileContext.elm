@@ -1,4 +1,4 @@
-module Analyser.FileContext exposing (FileContext, build, moduleName)
+module Analyser.FileContext exposing (FileContext, build, buildForFile, moduleName)
 
 import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.FileRef exposing (FileRef)

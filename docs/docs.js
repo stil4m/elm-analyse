@@ -449,6 +449,16 @@ function _Debug_toAnsiString(ansi, value)
 		return _Debug_ctorColor(ansi, tag) + output;
 	}
 
+	if (typeof DataView === 'function' && value instanceof DataView)
+	{
+		return _Debug_stringColor(ansi, '<' + value.byteLength + ' bytes>');
+	}
+
+	if (typeof File === 'function' && value instanceof File)
+	{
+		return _Debug_internalColor(ansi, '<' + value.name + '>');
+	}
+
 	if (typeof value === 'object')
 	{
 		var output = [];
@@ -517,6 +527,10 @@ function _Debug_internalColor(ansi, string)
 	return ansi ? '\x1b[94m' + string + '\x1b[0m' : string;
 }
 
+function _Debug_toHexDigit(n)
+{
+	return String.fromCharCode(n < 10 ? 48 + n : 55 + n);
+}
 
 
 // CRASH
@@ -686,7 +700,7 @@ function _Utils_cmp(x, y, ord)
 	//*/
 
 	/**_UNUSED/
-	if (!x.$)
+	if (typeof x.$ === 'undefined')
 	//*/
 	/**/
 	if (x.$[0] === '#')
@@ -1232,9 +1246,7 @@ function _Char_fromCode(code)
 			? String.fromCharCode(code)
 			:
 		(code -= 0x10000,
-			String.fromCharCode(Math.floor(code / 0x400) + 0xD800)
-			+
-			String.fromCharCode(code % 0x400 + 0xDC00)
+			String.fromCharCode(Math.floor(code / 0x400) + 0xD800, code % 0x400 + 0xDC00)
 		)
 	);
 }
@@ -4127,10 +4139,15 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 // ANIMATION
 
 
+var _Browser_cancelAnimationFrame =
+	typeof cancelAnimationFrame !== 'undefined'
+		? cancelAnimationFrame
+		: function(id) { clearTimeout(id); };
+
 var _Browser_requestAnimationFrame =
 	typeof requestAnimationFrame !== 'undefined'
 		? requestAnimationFrame
-		: function(callback) { setTimeout(callback, 1000 / 60); };
+		: function(callback) { return setTimeout(callback, 1000 / 60); };
 
 
 function _Browser_makeAnimator(model, draw)
@@ -4180,7 +4197,7 @@ function _Browser_application(impl)
 
 			return F2(function(domNode, event)
 			{
-				if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button < 1 && !domNode.target && !domNode.download)
+				if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button < 1 && !domNode.target && !domNode.hasAttribute('download'))
 				{
 					event.preventDefault();
 					var href = domNode.href;
@@ -4292,12 +4309,12 @@ function _Browser_rAF()
 {
 	return _Scheduler_binding(function(callback)
 	{
-		var id = requestAnimationFrame(function() {
+		var id = _Browser_requestAnimationFrame(function() {
 			callback(_Scheduler_succeed(Date.now()));
 		});
 
 		return function() {
-			cancelAnimationFrame(id);
+			_Browser_cancelAnimationFrame(id);
 		};
 	});
 }
@@ -18139,7 +18156,8 @@ var stil4m$elm_syntax$Elm$Parser$Imports$setupNode = F2(
 				A2(elm$core$List$filterMap, elm$core$Basics$identity, allRanges)),
 			imp);
 	});
-var stil4m$elm_syntax$Elm$Parser$Tokens$asToken = stil4m$elm_syntax$Combine$string('as');
+var stil4m$elm_syntax$Elm$Parser$Tokens$asToken = stil4m$elm_syntax$Combine$fromCore(
+	elm$parser$Parser$keyword('as'));
 var stil4m$elm_syntax$Elm$Parser$Tokens$importToken = stil4m$elm_syntax$Combine$fromCore(
 	elm$parser$Parser$keyword('import'));
 var stil4m$elm_syntax$Elm$Syntax$Import$Import = F3(

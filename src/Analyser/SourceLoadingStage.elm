@@ -1,5 +1,6 @@
-module Analyser.SourceLoadingStage exposing (Model, Msg, init, isDone, parsedFiles, subscriptions, update)
+module Analyser.SourceLoadingStage exposing (Model, Msg, init, initWithContent, isDone, parsedFiles, subscriptions, update)
 
+import Analyser.Files.FileContent exposing (FileContent)
 import Analyser.Files.FileLoader as FileLoader
 import Analyser.Files.Types exposing (LoadedSourceFile, LoadedSourceFiles)
 import List.Extra
@@ -31,6 +32,21 @@ init input =
     , Cmd.none
     )
         |> loadNextFile
+
+
+initWithContent : FileContent -> ( Model, Cmd Msg )
+initWithContent input =
+    let
+        ( loadedSourceFile, cmds ) =
+            FileLoader.load input
+    in
+    ( Model
+        { filesToLoad = []
+        , loadingFiles = Set.empty
+        , parsedFiles = [ loadedSourceFile ]
+        }
+    , cmds
+    )
 
 
 isDone : Model -> Bool

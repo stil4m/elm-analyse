@@ -9,7 +9,6 @@ import Html.Attributes
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as JD
-import Url exposing (Url)
 
 
 type alias Model =
@@ -77,8 +76,8 @@ onNewState s model =
         |> updateMessageList
 
 
-update : Client.State.State -> Url -> Msg -> Model -> ( Model, Cmd Msg )
-update state location msg model =
+update : Client.State.State -> Msg -> Model -> ( Model, Cmd Msg )
+update state msg model =
     case msg of
         OnFileTree x ->
             case x of
@@ -103,7 +102,7 @@ update state location msg model =
             )
 
         MessageListMsg subMsg ->
-            MessageList.update location subMsg model.messageList
+            MessageList.update subMsg model.messageList
                 |> Tuple.mapFirst (\x -> { model | messageList = x })
                 |> Tuple.mapSecond (Cmd.map MessageListMsg)
 

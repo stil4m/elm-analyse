@@ -7,6 +7,7 @@ var lodash_1 = __importDefault(require("lodash"));
 function report(report) {
     var messages = report.messages;
     var unusedDependencies = report.unusedDependencies;
+    console.log('Found ' + report.messages.length + ' message(s)');
     if (messages.length > 0) {
         var index_1 = lodash_1.default.groupBy(messages, 'file');
         console.log();

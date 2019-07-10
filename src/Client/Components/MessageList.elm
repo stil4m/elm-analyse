@@ -6,7 +6,6 @@ import Client.Components.ActiveMessageDialog as ActiveMessageDialog
 import Client.Messages as M
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
-import Url exposing (Url)
 
 
 type alias Model =
@@ -30,8 +29,8 @@ withMessages x m =
     { m | messages = x }
 
 
-update : Url -> Msg -> Model -> ( Model, Cmd Msg )
-update location msg model =
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
     case msg of
         Focus m ->
             ActiveMessageDialog.show m model.active
@@ -41,7 +40,7 @@ update location msg model =
         ActiveMessageDialogMsg subMsg ->
             let
                 ( newActiveDialog, cmds, info ) =
-                    ActiveMessageDialog.update location subMsg model.active
+                    ActiveMessageDialog.update subMsg model.active
 
                 newMessages =
                     case info of

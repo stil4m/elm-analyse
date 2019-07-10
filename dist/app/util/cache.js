@@ -13,9 +13,33 @@ var fsExtra = __importStar(require("fs-extra"));
 // const fsExtra = require('fs-extra');
 var osHomedir = require('os-homedir');
 var path = __importStar(require("path"));
-var cachePath = path.resolve('elm-stuff', '.elm-analyse');
 var packageJsonPath = path.resolve(__dirname, '..', '..', '..', 'package.json');
 var elmAnalyseVersion = require(packageJsonPath).version;
+var LocalCache = /** @class */ (function () {
+    function LocalCache(projectPath) {
+        this.cachePath = path.join(projectPath, 'elm-stuff', '.elm-analyse');
+    }
+    LocalCache.prototype.storeShaJson = function (sha1, content) {
+        fs.writeFile(path.resolve(this.cachePath, '_shas', sha1 + '.json'), JSON.stringify(content), function () { });
+    };
+    LocalCache.prototype.elmCachePathForSha = function (sha) {
+        return path.resolve(this.cachePath, '_shas', sha + '.elma');
+    };
+    LocalCache.prototype.astCachePathForSha = function (sha) {
+        return path.resolve(this.cachePath, '_shas', sha + '.json');
+    };
+    LocalCache.prototype.setupShaFolder = function () {
+        fsExtra.ensureDirSync(path.resolve(this.cachePath, '_shas'));
+    };
+    LocalCache.prototype.hasAstForSha = function (sha) {
+        return fs.existsSync(this.astCachePathForSha(sha));
+    };
+    LocalCache.prototype.readAstForSha = function (sha) {
+        return fs.readFileSync(this.astCachePathForSha(sha)).toString();
+    };
+    return LocalCache;
+}());
+exports.LocalCache = LocalCache;
 var major;
 if (elmAnalyseVersion.split('.')[0] === '0') {
     major = '0.' + elmAnalyseVersion.split('.')[1];
@@ -53,10 +77,6 @@ function readDependencyJson(dependency, version, cb) {
     fs.readFile(path.resolve(globalCachePath, 'interfaces', dependency, version, 'dependency.json'), cb);
 }
 exports.readDependencyJson = readDependencyJson;
-function storeShaJson(sha1, content) {
-    fs.writeFile(path.resolve(cachePath, '_shas', sha1 + '.json'), JSON.stringify(content), function () { });
-}
-exports.storeShaJson = storeShaJson;
 function storeDependencyJson(dependency, version, content) {
     var targetDir = path.resolve(globalCachePath, 'interfaces', dependency, version);
     var targetPath = path.resolve(targetDir, 'dependency.json');
@@ -65,22 +85,3 @@ function storeDependencyJson(dependency, version, content) {
     fs.writeFile(targetPath, content, function () { });
 }
 exports.storeDependencyJson = storeDependencyJson;
-function elmCachePathForSha(sha) {
-    return path.resolve(cachePath, '_shas', sha + '.elma');
-}
-exports.elmCachePathForSha = elmCachePathForSha;
-function astCachePathForSha(sha) {
-    return path.resolve(cachePath, '_shas', sha + '.json');
-}
-function hasAstForSha(sha) {
-    return fs.existsSync(astCachePathForSha(sha));
-}
-exports.hasAstForSha = hasAstForSha;
-function readAstForSha(sha) {
-    return fs.readFileSync(astCachePathForSha(sha)).toString();
-}
-exports.readAstForSha = readAstForSha;
-function setupShaFolder() {
-    fsExtra.ensureDirSync(path.resolve(cachePath, '_shas'));
-}
-exports.setupShaFolder = setupShaFolder;

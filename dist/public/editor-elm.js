@@ -431,7 +431,7 @@ function _Utils_cmp(x, y, ord)
 	}
 
 	/**_UNUSED/
-	if (!x.$)
+	if (typeof x.$ === 'undefined')
 	/**/
 	if (x.$[0] === '#')
 	{
@@ -786,6 +786,16 @@ function _Debug_toAnsiString(ansi, value)
 		return _Debug_ctorColor(ansi, tag) + output;
 	}
 
+	if (typeof DataView === 'function' && value instanceof DataView)
+	{
+		return _Debug_stringColor(ansi, '<' + value.byteLength + ' bytes>');
+	}
+
+	if (typeof File === 'function' && value instanceof File)
+	{
+		return _Debug_internalColor(ansi, '<' + value.name + '>');
+	}
+
 	if (typeof value === 'object')
 	{
 		var output = [];
@@ -852,6 +862,11 @@ function _Debug_fadeColor(ansi, string)
 function _Debug_internalColor(ansi, string)
 {
 	return ansi ? '\x1b[94m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_toHexDigit(n)
+{
+	return String.fromCharCode(n < 10 ? 48 + n : 55 + n);
 }
 
 
@@ -993,9 +1008,7 @@ function _Char_fromCode(code)
 			? String.fromCharCode(code)
 			:
 		(code -= 0x10000,
-			String.fromCharCode(Math.floor(code / 0x400) + 0xD800)
-			+
-			String.fromCharCode(code % 0x400 + 0xDC00)
+			String.fromCharCode(Math.floor(code / 0x400) + 0xD800, code % 0x400 + 0xDC00)
 		)
 	);
 }
