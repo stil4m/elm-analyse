@@ -35,7 +35,7 @@
     "express-ws": "2.0.0",
     "find": "0.2.7",
     "fs-extra": "2.0.0",
-    "lodash": "4.17.11",
+    "lodash": "^4.17.13",
     "minimist": "1.2.0",
     "node-watch": "0.5.5",
     "opn": "5.4.0",
