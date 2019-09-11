@@ -5,7 +5,7 @@ import { Config, ElmApp, Report } from '../domain';
 const opn = require('opn');
 
 function run(config: Config, project: {}, onload: (app: ElmApp) => void) {
-    dependencies.getDependencies(function(registry) {
+    dependencies.getDependencies(config.format == 'json', function(registry) {
         const directory = process.cwd();
         var Elm = require('../backend-elm.js');
         var app = Elm.Elm.Analyser.init({

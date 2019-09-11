@@ -45,14 +45,16 @@ const isOutdated = function(timestamp: number): boolean {
     return timestamp < barrier;
 };
 
-const getDependencies = function(cb: (jsonValue: any) => void) {
+const getDependencies = function(silent : Boolean, cb: (jsonValue: any) => void) {
     cache.readPackageDependencyInfo(function(err: (err: any, result: any) => void, cached: { timestamp: number; data: any }) {
         if (err) {
-            console.log('Fetching package information from package.elm-lang.org.');
+            if(!silent)
+                console.log('Fetching package information from package.elm-lang.org.');
             updatePackageDependencyInfo(cb, null);
         } else {
             if (isOutdated(cached.timestamp)) {
-                console.log('Cached package information invalidated. Fetching new data from package.elm-lang.org');
+                if(!silent)
+                    console.log('Cached package information invalidated. Fetching new data from package.elm-lang.org');
                 updatePackageDependencyInfo(cb, cached.data);
             } else {
                 cb(cached.data);

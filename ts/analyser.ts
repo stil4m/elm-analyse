@@ -11,7 +11,7 @@ const Elm = require('./backend-elm');
 function start(config: Config, project: {}) {
     const reporter = Reporter.build(config.format);
 
-    dependencies.getDependencies(function(registry: Registry) {
+    dependencies.getDependencies(config.format == 'json' , function(registry: Registry) {
         const app: ElmApp = Elm.Elm.Analyser.init({
             flags: {
                 server: false,
