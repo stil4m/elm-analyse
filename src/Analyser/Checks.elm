@@ -19,6 +19,7 @@ import Analyser.Checks.NoUncurriedPrefix as NoUncurriedPrefix
 import Analyser.Checks.SingleFieldRecord as SingleFieldRecord
 import Analyser.Checks.TriggerWords as TriggerWords
 import Analyser.Checks.UnnecessaryListConcat as UnnecessaryListConcat
+import Analyser.Checks.UnnecessaryLiteralBools as UnnecessaryLiteralBools
 import Analyser.Checks.UnnecessaryParens as UnnecessaryParens
 import Analyser.Checks.UnnecessaryPortModule as UnnecessaryPortModule
 import Analyser.Checks.UnusedImport as UnusedImport
@@ -68,4 +69,5 @@ all =
     , TriggerWords.checker
     , BooleanCase.checker
     , MapNothingToNothing.checker
+    , UnnecessaryLiteralBools.checker
     ]
