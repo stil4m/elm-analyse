@@ -65,12 +65,9 @@
     "elm-test": "^0.19.1",
     "eslint": "4.10.0",
     "font-awesome": "^4.7.0",
-    "gulp": "4.0.0",
-    "gulp-replace": "0.5.4",
     "node-module-concat": "2.1.0",
     "nodemon": "^1.19.4",
     "prettier": "1.7.0",
-    "run-sequence": "1.2.2",
     "sb-admin-2": "^3.3.8",
     "typescript": "^2.9.2",
     "utf-8-validate": "3.0.4"

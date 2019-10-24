@@ -15,7 +15,7 @@ elm-docs:
 	./node_modules/.bin/elm make docs/Docs/Main.elm --output docs/docs.js
 
 html:
-	./node_modules/.bin/gulp html
+	node build-html.js
 	mkdir -p dist/public/bootstrap
 	cp ./node_modules/bootstrap/dist/css/bootstrap.min.css dist/public/bootstrap/bootstrap-v3.3.7.css
 	cp ./node_modules/sb-admin-2/dist/css/sb-admin-2.css dist/public/bootstrap/start-bootstrap-admin-2_v3.3.7.css
