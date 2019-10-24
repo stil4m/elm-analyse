@@ -15,11 +15,9 @@ isStatic function =
     if List.length decl.arguments > 0 then
         False
 
-    else if Maybe.withDefault False <| Maybe.map (Node.value >> isFunctionSignature) function.signature then
-        False
-
     else
-        True
+        Maybe.withDefault True <|
+            Maybe.map (Node.value >> isFunctionSignature >> not) function.signature
 
 
 isFunctionSignature : Signature -> Bool

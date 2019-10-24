@@ -62,11 +62,7 @@ onExpression (Node range expression) context =
 entryForQualifiedExpr : List String -> String -> Bool
 entryForQualifiedExpr moduleName f =
     if moduleName == [ "Debug" ] then
-        if f == "log" then
-            True
-
-        else
-            False
+        f == "log"
 
     else
         False
