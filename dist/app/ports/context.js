@@ -9,12 +9,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs = __importStar(require("fs"));
 var fileGatherer = __importStar(require("../util/file-gatherer"));
+var path = __importStar(require("path"));
 function setup(app, directory) {
     app.ports.loadContext.subscribe(function () {
         var input = fileGatherer.gather(directory);
         var configuration;
         try {
-            configuration = fs.readFileSync('./elm-analyse.json').toString();
+            configuration = fs.readFileSync(path.join(directory, 'elm-analyse.json')).toString();
         }
         catch (e) {
             configuration = '';

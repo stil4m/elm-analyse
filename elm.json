@@ -12,7 +12,7 @@
             "elm/core": "1.0.2",
             "elm/html": "1.0.0",
             "elm/http": "1.0.0",
-            "elm/json": "1.0.0",
+            "elm/json": "1.1.3",
             "elm/parser": "1.1.0",
             "elm/project-metadata-utils": "1.0.0",
             "elm/regex": "1.0.0",
@@ -21,27 +21,27 @@
             "elm-community/dict-extra": "2.4.0",
             "elm-community/graph": "6.0.0",
             "elm-community/intdict": "3.0.0",
-            "elm-community/list-extra": "8.1.0",
+            "elm-community/list-extra": "8.2.2",
             "elm-community/maybe-extra": "5.0.0",
             "elm-explorations/markdown": "1.0.0",
             "krisajenkins/remotedata": "5.0.0",
-            "rundis/elm-bootstrap": "5.1.0",
-            "stil4m/elm-syntax": "7.1.0"
+            "rundis/elm-bootstrap": "5.2.0",
+            "stil4m/elm-syntax": "7.1.1"
         },
         "indirect": {
             "avh4/elm-color": "1.0.0",
             "avh4/elm-fifo": "1.0.4",
-            "elm/virtual-dom": "1.0.0",
-            "elm-community/json-extra": "4.0.0",
+            "elm/virtual-dom": "1.0.2",
+            "elm-community/json-extra": "4.2.0",
             "etaque/elm-response": "3.1.0",
             "rtfeldman/elm-hex": "1.0.0",
-            "rtfeldman/elm-iso8601-date-strings": "1.1.2",
+            "rtfeldman/elm-iso8601-date-strings": "1.1.3",
             "stil4m/structured-writer": "1.0.2"
         }
     },
     "test-dependencies": {
         "direct": {
-            "elm-explorations/test": "1.2.0"
+            "elm-explorations/test": "1.2.2"
         },
         "indirect": {
             "elm/random": "1.0.0"
