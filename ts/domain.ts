@@ -1,11 +1,19 @@
 interface Info {
     config: Config;
 }
+
+enum LogLevel {
+    INFO,
+    WARN,
+    ERROR,
+}
+
 interface Config {
     format: string | undefined;
     open: boolean;
     port: number;
     elmFormatPath: string;
+    logLevel: LogLevel;
 }
 
 export interface DependencyPointer {
@@ -48,7 +56,7 @@ export interface FixedFile {
 }
 
 export interface LogMessage {
-    level: string;
+    level: keyof typeof LogLevel;
     message: string;
 }
 interface ElmApp {
@@ -182,5 +190,6 @@ export {
     FileContentSha,
     EditorElmApp,
     EditorMessage,
-    EditorData
+    EditorData,
+    LogLevel
 };

@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import Server from '../server/app';
 import Analyser from '../analyser';
+import { LogLevel } from '../domain';
 
 var args = minimist(process.argv.slice(2), {
     alias: {
@@ -29,7 +30,8 @@ var args = minimist(process.argv.slice(2), {
         port: args.port || 3000,
         elmFormatPath: elmFormatPath,
         format: validFormats.indexOf(args.format) != -1 ? args.format : 'human',
-        open: args.open || false
+        open: args.open || false,
+        logLevel: LogLevel.INFO
     };
     const info = {
         version: elmAnalyseVersion,
