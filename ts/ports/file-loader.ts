@@ -3,6 +3,7 @@ import { LocalCache } from '../util/cache';
 import * as cp from 'child_process';
 import { ElmApp, FileStore, AstStore, Config, FileContent, FileContentSha } from '../domain';
 import { FileReader } from '../fileReader';
+import { printInPlace } from '../util/logging-ports';
 
 function setup(app: ElmApp, config: Config, directory: string, cache: LocalCache, fileReader: FileReader) {
     app.ports.loadFile.subscribe(fileName => {
@@ -22,10 +23,10 @@ function setup(app: ElmApp, config: Config, directory: string, cache: LocalCache
                     cp.execSync(config.elmFormatPath + ' --yes ' + file.file, {
                         stdio: []
                     });
-                    console.log('Formatted file', file.file);
+                    printInPlace(`Formatted file: ${file.file}`);
                     accept();
                 } catch (e) {
-                    console.log('Could not formated file', file.file);
+                    console.log('Could not format file', file.file);
                     accept();
                 }
             });

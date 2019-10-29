@@ -12,10 +12,11 @@ var args = minimist(process.argv.slice(2), {
         help: 'h',
         port: 'p',
         version: 'v',
-        open: 'o'
+        open: 'o',
+        fix: 'f'
     },
-    boolean: ['serve', 'help', 'version', 'open'],
-    string: ['port', 'elm-format-path', 'format']
+    boolean: ['serve', 'help', 'version', 'open', 'fix-all'],
+    string: ['port', 'elm-format-path', 'format', 'fix']
 });
 
 (function() {
@@ -45,6 +46,10 @@ var args = minimist(process.argv.slice(2), {
         console.log(
             '    # Analyse the project and start a server. Allows inspection of messages through a browser (Default: http://localhost:3000).\n'
         );
+        console.log('  $ elm-analyse --fix src/Main.elm');
+        console.log('    # Fix a single file and write it back to disk.\n');
+        console.log('  $ elm-analyse --fix-all');
+        console.log('    # Fix all files in a project and write them to disk.\n');
         console.log('Options: ');
         console.log('   --help, -h          Print the help output.');
         console.log('   --serve, -s         Enable server mode. Disabled by default.');
@@ -52,6 +57,8 @@ var args = minimist(process.argv.slice(2), {
         console.log('   --open, -o          Open default browser when server goes live.');
         console.log('   --elm-format-path   Path to elm-format. Defaults to `elm-format`.');
         console.log('   --format            Output format for CLI. Defaults to "human". Options "human"|"json"');
+        console.log('   --fix, -f           Fix a file');
+        console.log('   --fix-all           Fix a whole project');
         process.exit(1);
     }
 
@@ -71,6 +78,12 @@ var args = minimist(process.argv.slice(2), {
     if (args.serve) {
         Server.start(config, info, projectFile);
         return;
+    }
+    if (args.fix) {
+        return Analyser.fix(args.fix, config, projectFile);
+    }
+    if (args['fix-all']) {
+        return Analyser.fixAll(config, projectFile);
     }
     Analyser.start(config, projectFile);
 })();
