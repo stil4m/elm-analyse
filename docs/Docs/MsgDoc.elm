@@ -212,7 +212,7 @@ multiLineRecordFormatting =
 module Foo exposing (Person)
 
 type alias Person =
-    { name : String , age : string , address : Adress }
+    { name : String , age : string , address : Address }
 """
     }
 

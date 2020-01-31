@@ -30,7 +30,7 @@ resolvingIssues =
             [ Html.div [ Html.Attributes.class "col" ]
                 [ Html.p []
                     [ Html.text "Elm analyse reports issues via the command line interface or via a web GUI. "
-                    , Html.text "However, the web GUI also allows you to automaticall resolve some of the check violations."
+                    , Html.text "However, the web GUI also allows you to automatically resolve some of the check violations."
                     ]
                 , Html.p []
                     [ Html.text "Not all checks can be resolved automatically, we need your expertise for that, but the others can be fixed with a click of a button."
@@ -99,7 +99,7 @@ moduleGraph =
         , Html.div [ Html.Attributes.class "row" ]
             [ Html.div [ Html.Attributes.class "col" ]
                 [ Html.h4 [ Html.Attributes.id "top-importees" ] [ Html.text "Top importees" ]
-                , Html.p [] [ Html.text "A list of modules being imported the most. These modules are the most \"popular\" in your code base. This might be the result of modules taking up too many responsibilites. To reduce the number of imports of a specific module you may:" ]
+                , Html.p [] [ Html.text "A list of modules being imported the most. These modules are the most \"popular\" in your code base. This might be the result of modules taking up too many responsibilities. To reduce the number of imports of a specific module you may:" ]
                 , Html.ul []
                     [ Html.li [] [ Html.text "Split type definitions and function operating with these into separate modules." ]
                     , Html.li [] [ Html.text "Separate related functions into sub-modules to allow callsites to import only the most appropriate part of the code." ]

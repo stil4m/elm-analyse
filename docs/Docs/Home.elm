@@ -100,7 +100,7 @@ view =
                         ]
                     ]
                 , Html.p []
-                    [ Html.text "To furter configure elm-analyse, please look into the "
+                    [ Html.text "To further configure elm-analyse, please look into the "
                     , Html.a [ Html.Attributes.href (Page.hash Page.Configuration) ] [ Html.text "Configuration" ]
                     , Html.text " section."
                     ]

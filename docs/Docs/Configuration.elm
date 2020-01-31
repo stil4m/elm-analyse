@@ -61,7 +61,7 @@ view =
                     ]
                 ]
             , Html.tbody []
-                (List.map configuratonPropertyRow configurationProperties)
+                (List.map configurationPropertyRow configurationProperties)
             ]
         , Html.hr [] []
         , Html.h2 [] [ Html.text "Ignore Paths" ]
@@ -82,8 +82,8 @@ view =
         ]
 
 
-configuratonPropertyRow : ConfigurationProperty -> Html msg
-configuratonPropertyRow x =
+configurationPropertyRow : ConfigurationProperty -> Html msg
+configurationPropertyRow x =
     Html.tr []
         [ Html.td [] [ Html.code [] [ Html.text x.check ] ]
         , Html.td [] [ Html.code [] [ Html.text x.property ] ]
