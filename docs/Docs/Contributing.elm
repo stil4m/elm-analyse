@@ -12,7 +12,7 @@ view =
         , Html.p []
             [ Html.text """
                 Contributions are an important part of moving software forward.
-                In this guide I would like to help you not only bringing Elm Analyse forward, but also in the right direction.
+                In this guide I would like to help you not only bring Elm Analyse forward, but also in the right direction.
                 I've listed a few points below that would help you get your contributions back into Elm Analyse.
                 """
             ]
