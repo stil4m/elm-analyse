@@ -16,7 +16,7 @@ export interface DependencyStore {
     dependency: DependencyPointer;
     content: string;
 }
-export interface HttpDocumentationLoad {
+export interface DocsJsonLoad {
     dependency: DependencyPointer;
     json: any;
 }
@@ -63,7 +63,7 @@ interface ElmApp {
         storeAstForSha: Subscription<AstStore>;
         storeFile: Subscription<FileStore>;
         loadFileContentWithSha: Subscription<string>;
-        loadHttpDocumentation: Subscription<DependencyPointer>;
+        loadDocsJson: Subscription<DependencyPointer>;
         storeRawDependency: Subscription<DependencyStore>;
         loadRawDependency: Subscription<DependencyPointer>;
 
@@ -76,7 +76,7 @@ interface ElmApp {
         fileContent: MailBox<FileContent>;
         onStoredFiles: MailBox<boolean>;
         onFileContentWithShas: MailBox<FileContentSha>;
-        onHttpDocumentation: MailBox<HttpDocumentationLoad>;
+        onDocsJsonLoaded: MailBox<DocsJsonLoad>;
         onRawDependency: MailBox<RawDependencyLoad>;
     };
 }

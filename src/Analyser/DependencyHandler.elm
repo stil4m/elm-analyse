@@ -1,4 +1,4 @@
-port module Analyser.DependencyHandler exposing (CacheDependencyRead(..), DependencyPointer, loadDependencyFiles, loadOnlineDocumentation, onLoadDependencyFilesFromDisk, onOnlineDocumentation, onReadFromDisk, readFromDisk, storeToDisk)
+port module Analyser.DependencyHandler exposing (CacheDependencyRead(..), DependencyPointer, loadDependencyFiles, loadDocsJson, onDocsLoaded, onLoadDependencyFilesFromDisk, onReadFromDisk, readFromDisk, storeToDisk)
 
 import Analyser.FileContext as FileContext
 import Analyser.Files.FileContent as FileContent exposing (FileContent)
@@ -46,7 +46,7 @@ type alias DependencyFiles =
     }
 
 
-type alias HttpDocumentationLoad =
+type alias DocsJsonLoad =
     { dependency : DependencyPointer
     , json : Value
     }
@@ -101,20 +101,15 @@ onReadFromDisk { name, version } =
 -- Online Docs Ports
 
 
-port loadHttpDocumentation : DependencyPointer -> Cmd msg
+port loadDocsJson : DependencyPointer -> Cmd msg
 
 
-port onHttpDocumentation : (HttpDocumentationLoad -> msg) -> Sub msg
+port onDocsJsonLoaded : (DocsJsonLoad -> msg) -> Sub msg
 
 
-loadOnlineDocumentation : DependencyPointer -> Cmd msg
-loadOnlineDocumentation =
-    loadHttpDocumentation
-
-
-onOnlineDocumentation : DependencyPointer -> Sub (Maybe (Result JD.Error Dependency))
-onOnlineDocumentation dep =
-    onHttpDocumentation
+onDocsLoaded : DependencyPointer -> Sub (Maybe (Result JD.Error Dependency))
+onDocsLoaded dep =
+    onDocsJsonLoaded
         (\{ dependency, json } ->
             if dependency == dep then
                 JD.decodeValue (JD.list Elm.Docs.decoder) json
