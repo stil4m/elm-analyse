@@ -36,7 +36,7 @@
     "find": "0.2.7",
     "fs-extra": "2.0.0",
     "lodash": "^4.17.15",
-    "minimist": "1.2.0",
+    "minimist": "1.2.3",
     "node-watch": "0.5.5",
     "opn": "5.4.0",
     "os-homedir": "1.0.2",
