@@ -60,7 +60,7 @@
     "bufferutil": "3.0.3",
     "elm-format": "0.8.0",
     "elm-test": "^0.19.1",
-    "eslint": "4.10.0",
+    "eslint": "4.18.2",
     "font-awesome": "^4.7.0",
     "node-module-concat": "2.1.0",
     "prettier": "1.7.0",
