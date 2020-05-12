@@ -6,13 +6,13 @@ tsc:
 	./node_modules/.bin/tsc
 
 elm-backend:
-	./node_modules/.bin/elm make src/Analyser.elm --output dist/app/backend-elm.js --optimize
+	elm make src/Analyser.elm --output dist/app/backend-elm.js --optimize
 
 elm-client:
-	./node_modules/.bin/elm make src/Client.elm --output dist/public/client-elm.js --optimize
+	elm make src/Client.elm --output dist/public/client-elm.js --optimize
 
 elm-docs:
-	./node_modules/.bin/elm make docs/Docs/Main.elm --output docs/docs.js
+	elm make docs/Docs/Main.elm --output docs/docs.js
 
 html:
 	node build-html.js
@@ -48,7 +48,7 @@ clean:
 	rm -rf tests/elm-stuff
 
 editor: tsc
-	./node_modules/.bin/elm make src/Editor.elm --output dist/app/editor/elm.js
+	elm make src/Editor.elm --output dist/app/editor/elm.js
 	mkdir -p dist/public
 	node build-editor.js
 

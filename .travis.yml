@@ -22,6 +22,7 @@ install:
       make && make install;
       cd ..;
     fi
+  - npm install -g elm
   - make prepare
 
 script:

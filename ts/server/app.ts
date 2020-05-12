@@ -32,7 +32,7 @@ function start(config: Config, info: Info, project: {}) {
 
         app.get('/file', function(req, res) {
             const fileName = req.query.file;
-            fs.readFile(fileName, function(_err: any, content) {
+            fs.readFile(fileName as string, function(_err: any, content: any) {
                 res.send(content);
             });
         });

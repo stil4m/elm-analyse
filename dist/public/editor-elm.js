@@ -12080,7 +12080,7 @@ __modules[18] = function(module, exports) {
 'use strict';
 
 try {
-  module.exports = __require(20,18)('validation');
+  module.exports = __require(20,18)(__getDirname("../../node_modules/utf-8-validate/index.js"));
 } catch (e) {
   module.exports = __require(21,18);
 }
@@ -12093,16 +12093,163 @@ __modules[19] = function(module, exports) {
 'use strict';
 
 try {
-  module.exports = __require(20,19)('bufferutil');
+  module.exports = __require(22,19)('bufferutil');
 } catch (e) {
-  module.exports = __require(22,19);
+  module.exports = __require(23,19);
 }
 
 return module.exports;
 }
 /********** End of module 19: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/bufferutil/index.js **********/
-/********** Start module 20: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/bindings/bindings.js **********/
+/********** Start module 20: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/node-gyp-build/index.js **********/
 __modules[20] = function(module, exports) {
+var fs = require('fs')
+var path = require('path')
+var os = require('os')
+var runtimeRequire = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require // eslint-disable-line
+
+var abi = process.versions.modules // TODO: support old node where this is undef
+var runtime = isElectron() ? 'electron' : 'node'
+var arch = os.arch()
+var platform = os.platform()
+
+module.exports = load
+
+function load (dir) {
+  return runtimeRequire(load.path(dir))
+}
+
+load.path = function (dir) {
+  dir = path.resolve(dir || '.')
+
+  try {
+    var name = runtimeRequire(path.join(dir, 'package.json')).name.toUpperCase().replace(/-/g, '_')
+    if (process.env[name + '_PREBUILD']) dir = process.env[name + '_PREBUILD']
+  } catch (err) {}
+
+  var release = getFirst(path.join(dir, 'build/Release'), matchBuild)
+  if (release) return release
+
+  var debug = getFirst(path.join(dir, 'build/Debug'), matchBuild)
+  if (debug) return debug
+
+  var prebuild = getFirst(path.join(dir, 'prebuilds/' + platform + '-' + arch), matchPrebuild)
+  if (prebuild) return prebuild
+
+  var napiRuntime = getFirst(path.join(dir, 'prebuilds/' + platform + '-' + arch), matchNapiRuntime)
+  if (napiRuntime) return napiRuntime
+
+  var napi = getFirst(path.join(dir, 'prebuilds/' + platform + '-' + arch), matchNapi)
+  if (napi) return napi
+
+  throw new Error('No native build was found for runtime=' + runtime + ' abi=' + abi + ' platform=' + platform + ' arch=' + arch)
+}
+
+function getFirst (dir, filter) {
+  try {
+    var files = fs.readdirSync(dir).filter(filter)
+    return files[0] && path.join(dir, files[0])
+  } catch (err) {
+    return null
+  }
+}
+
+function matchNapiRuntime (name) {
+  return name === runtime + '-napi.node'
+}
+
+function matchNapi (name) {
+  return name === 'node-napi.node'
+}
+
+function matchPrebuild (name) {
+  var parts = name.split('-')
+  return parts[0] === runtime && parts[1] === abi + '.node'
+}
+
+function matchBuild (name) {
+  return /\.node$/.test(name)
+}
+
+function isElectron () {
+  if (process.versions && process.versions.electron) return true
+  if (process.env.ELECTRON_RUN_AS_NODE) return true
+  return typeof window !== 'undefined' && window.process && window.process.type === 'renderer'
+}
+
+return module.exports;
+}
+/********** End of module 20: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/node-gyp-build/index.js **********/
+/********** Start module 21: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/utf-8-validate/fallback.js **********/
+__modules[21] = function(module, exports) {
+'use strict';
+
+/**
+ * Checks if a given buffer contains only correct UTF-8.
+ * Ported from https://www.cl.cam.ac.uk/%7Emgk25/ucs/utf8_check.c by
+ * Markus Kuhn.
+ *
+ * @param {Buffer} buf The buffer to check
+ * @return {Boolean} `true` if `buf` contains only correct UTF-8, else `false`
+ * @public
+ */
+const isValidUTF8 = (buf) => {
+  var len = buf.length;
+  var i = 0;
+
+  while (i < len) {
+    if (buf[i] < 0x80) {  // 0xxxxxxx
+      i++;
+    } else if ((buf[i] & 0xe0) === 0xc0) {  // 110xxxxx 10xxxxxx
+      if (
+        i + 1 === len ||
+        (buf[i + 1] & 0xc0) !== 0x80 ||
+        (buf[i] & 0xfe) === 0xc0  // overlong
+      ) {
+        return false;
+      } else {
+        i += 2;
+      }
+    } else if ((buf[i] & 0xf0) === 0xe0) {  // 1110xxxx 10xxxxxx 10xxxxxx
+      if (
+        i + 2 >= len ||
+        (buf[i + 1] & 0xc0) !== 0x80 ||
+        (buf[i + 2] & 0xc0) !== 0x80 ||
+        buf[i] === 0xe0 && (buf[i + 1] & 0xe0) === 0x80 ||  // overlong
+        buf[i] === 0xed && (buf[i + 1] & 0xe0) === 0xa0     // surrogate (U+D800 - U+DFFF)
+      ) {
+        return false;
+      } else {
+        i += 3;
+      }
+    } else if ((buf[i] & 0xf8) === 0xf0) {  // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+      if (
+        i + 3 >= len ||
+        (buf[i + 1] & 0xc0) !== 0x80 ||
+        (buf[i + 2] & 0xc0) !== 0x80 ||
+        (buf[i + 3] & 0xc0) !== 0x80 ||
+        buf[i] === 0xf0 && (buf[i + 1] & 0xf0) === 0x80 ||  // overlong
+        buf[i] === 0xf4 && buf[i + 1] > 0x8f || buf[i] > 0xf4  // > U+10FFFF
+      ) {
+        return false;
+      } else {
+        i += 4;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+module.exports = isValidUTF8;
+
+return module.exports;
+}
+/********** End of module 21: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/utf-8-validate/fallback.js **********/
+/********** Start module 22: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/bindings/bindings.js **********/
+__modules[22] = function(module, exports) {
 
 /**
  * Module dependencies.
@@ -12255,87 +12402,9 @@ exports.getRoot = function getRoot (file) {
 
 return module.exports;
 }
-/********** End of module 20: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/bindings/bindings.js **********/
-/********** Start module 21: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/utf-8-validate/fallback.js **********/
-__modules[21] = function(module, exports) {
-/*!
- * UTF-8 validate: UTF-8 validation for WebSockets.
- * Copyright(c) 2015 Einar Otto Stangvik <einaros@gmail.com>
- * MIT Licensed
- */
-
-'use strict';
-
-/**
- * Checks if a given buffer contains only correct UTF-8.
- * Ported from https://www.cl.cam.ac.uk/%7Emgk25/ucs/utf8_check.c by
- * Markus Kuhn.
- *
- * @param {Buffer} buf The buffer to check
- * @return {Boolean} `true` if `buf` contains only correct UTF-8, else `false`
- * @public
- */
-const isValidUTF8 = (buf) => {
-  if (!Buffer.isBuffer(buf)) {
-    throw new TypeError('First argument needs to be a buffer');
-  }
-
-  var len = buf.length;
-  var i = 0;
-
-  while (i < len) {
-    if (buf[i] < 0x80) {  // 0xxxxxxx
-      i++;
-    } else if ((buf[i] & 0xe0) === 0xc0) {  // 110xxxxx 10xxxxxx
-      if (
-        i + 1 === len ||
-        (buf[i + 1] & 0xc0) !== 0x80 ||
-        (buf[i] & 0xfe) === 0xc0  // overlong
-      ) {
-        return false;
-      } else {
-        i += 2;
-      }
-    } else if ((buf[i] & 0xf0) === 0xe0) {  // 1110xxxx 10xxxxxx 10xxxxxx
-      if (
-        i + 2 >= len ||
-        (buf[i + 1] & 0xc0) !== 0x80 ||
-        (buf[i + 2] & 0xc0) !== 0x80 ||
-        buf[i] === 0xe0 && (buf[i + 1] & 0xe0) === 0x80 ||  // overlong
-        buf[i] === 0xed && (buf[i + 1] & 0xe0) === 0xa0     // surrogate (U+D800 - U+DFFF)
-      ) {
-        return false;
-      } else {
-        i += 3;
-      }
-    } else if ((buf[i] & 0xf8) === 0xf0) {  // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-      if (
-        i + 3 >= len ||
-        (buf[i + 1] & 0xc0) !== 0x80 ||
-        (buf[i + 2] & 0xc0) !== 0x80 ||
-        (buf[i + 3] & 0xc0) !== 0x80 ||
-        buf[i] === 0xf0 && (buf[i + 1] & 0xf0) === 0x80 ||  // overlong
-        buf[i] === 0xf4 && buf[i + 1] > 0x8f || buf[i] > 0xf4  // > U+10FFFF
-      ) {
-        return false;
-      } else {
-        i += 4;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  return true;
-};
-
-module.exports = isValidUTF8;
-
-return module.exports;
-}
-/********** End of module 21: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/utf-8-validate/fallback.js **********/
-/********** Start module 22: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/bufferutil/fallback.js **********/
-__modules[22] = function(module, exports) {
+/********** End of module 22: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/bindings/bindings.js **********/
+/********** Start module 23: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/bufferutil/fallback.js **********/
+__modules[23] = function(module, exports) {
 /*!
  * bufferutil: WebSocket buffer utils
  * Copyright(c) 2015 Einar Otto Stangvik <einaros@gmail.com>
@@ -12378,7 +12447,7 @@ module.exports = { mask, unmask };
 
 return module.exports;
 }
-/********** End of module 22: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/bufferutil/fallback.js **********/
+/********** End of module 23: /Users/matstijl/development/repositories/github/stil4m/elm-analyse/node_modules/bufferutil/fallback.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

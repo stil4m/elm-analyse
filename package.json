@@ -31,7 +31,7 @@
   ],
   "dependencies": {
     "body-parser": "1.19.0",
-    "express": "4.16.3",
+    "express": "4.17.1",
     "express-ws": "2.0.0",
     "find": "0.2.7",
     "fs-extra": "2.0.0",
@@ -45,7 +45,7 @@
     "ws": "3.3.1"
   },
   "devDependencies": {
-    "@types/express": "^4.17.6",
+    "@types/express": "4.17.6",
     "@types/express-ws": "^3.0.0",
     "@types/find": "^0.2.0",
     "@types/fs-extra": "^5.1.0",
@@ -58,7 +58,6 @@
     "@types/ws": "^5.1.2",
     "bootstrap": "^3.4.1",
     "bufferutil": "3.0.3",
-    "elm": "0.19.1-3",
     "elm-format": "0.8.0",
     "elm-test": "^0.19.1",
     "eslint": "4.10.0",
@@ -66,6 +65,7 @@
     "node-module-concat": "2.1.0",
     "prettier": "1.7.0",
     "sb-admin-2": "^3.3.8",
-    "typescript": "^2.9.2"
+    "typescript": "^2.9.2",
+    "utf-8-validate": "^5.0.2"
   }
 }
