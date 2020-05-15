@@ -14,7 +14,7 @@ type alias Model =
 
 type State
     = AwaitingCache
-    | LoadingOnlineDocs
+    | LoadingDocs
     | RawDiskLoading
     | Failure
     | Done Dependency
@@ -22,7 +22,7 @@ type State
 
 type Msg
     = OnCacheRead CacheDependencyRead
-    | OnOnlineDocs (Maybe (Result JD.Error Dependency))
+    | OnDocsLoaded (Maybe (Result JD.Error Dependency))
     | OnLocallyBuildDependency (Maybe (Result String Dependency))
 
 
@@ -70,8 +70,8 @@ update msg model =
                     )
 
                 Failed ->
-                    ( { model | state = LoadingOnlineDocs }
-                    , DependencyHandler.loadOnlineDocumentation model.dependency
+                    ( { model | state = LoadingDocs }
+                    , DependencyHandler.loadDocsJson model.dependency
                     )
 
                 Ignore ->
@@ -79,7 +79,7 @@ update msg model =
                     , Cmd.none
                     )
 
-        OnOnlineDocs result ->
+        OnDocsLoaded result ->
             case result of
                 Nothing ->
                     ( model, Cmd.none )
@@ -129,9 +129,9 @@ subscriptions model =
         Done _ ->
             Sub.none
 
-        LoadingOnlineDocs ->
-            DependencyHandler.onOnlineDocumentation model.dependency
-                |> Sub.map OnOnlineDocs
+        LoadingDocs ->
+            DependencyHandler.onDocsLoaded model.dependency
+                |> Sub.map OnDocsLoaded
 
         RawDiskLoading ->
             DependencyHandler.onLoadDependencyFilesFromDisk model.dependency
