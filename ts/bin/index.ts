@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import Server from '../server/app';
 import Analyser from '../analyser';
+import { LogLevel } from '../domain';
 
 var args = minimist(process.argv.slice(2), {
     alias: {
@@ -12,9 +13,10 @@ var args = minimist(process.argv.slice(2), {
         help: 'h',
         port: 'p',
         version: 'v',
-        open: 'o'
+        open: 'o',
+        quiet: 'q',
     },
-    boolean: ['serve', 'help', 'version', 'open'],
+    boolean: ['serve', 'help', 'version', 'open', 'quiet'],
     string: ['port', 'elm-format-path', 'format']
 });
 
@@ -29,7 +31,8 @@ var args = minimist(process.argv.slice(2), {
         port: args.port || 3000,
         elmFormatPath: elmFormatPath,
         format: validFormats.indexOf(args.format) != -1 ? args.format : 'human',
-        open: args.open || false
+        open: args.open || false,
+        logLevel: args.quiet ? LogLevel.ERROR : LogLevel.INFO
     };
     const info = {
         version: elmAnalyseVersion,
@@ -50,6 +53,7 @@ var args = minimist(process.argv.slice(2), {
         console.log('   --serve, -s         Enable server mode. Disabled by default.');
         console.log('   --port, -p          The port on which the server should listen. Defaults to 3000.');
         console.log('   --open, -o          Open default browser when server goes live.');
+        console.log('   --quiet, -q         Print fewer log messages.');
         console.log('   --elm-format-path   Path to elm-format. Defaults to `elm-format`.');
         console.log('   --format            Output format for CLI. Defaults to "human". Options "human"|"json"');
         process.exit(1);
