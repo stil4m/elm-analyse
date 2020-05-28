@@ -1,4 +1,4 @@
-module Analyser.Fixers exposing (all, getFixer)
+module Analyser.Fixers exposing (all, canFix, getFixer)
 
 import Analyser.Fixes.Base exposing (Fixer)
 import Analyser.Fixes.DropConsOfItemAndList as DropConsOfItemAndList
@@ -17,6 +17,11 @@ getFixer : Message -> Maybe Fixer
 getFixer m =
     List.filter (\x -> x.canFix == m.type_) all
         |> List.head
+
+
+canFix : Message -> Bool
+canFix m =
+    getFixer m /= Nothing
 
 
 all : List Fixer

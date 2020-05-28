@@ -7,6 +7,7 @@ module Analyser.State exposing
     , encodeStatus
     , finishWithNewMessages
     , getMessage
+    , getMessagesForFile
     , initialState
     , isBusy
     , nextTask
@@ -75,6 +76,11 @@ isBusy s =
 getMessage : MessageId -> State -> Maybe Message
 getMessage messageId =
     .messages >> List.filter (.id >> (==) messageId) >> List.head
+
+
+getMessagesForFile : String -> State -> List Message
+getMessagesForFile path =
+    .messages >> List.filter (\m -> m.file.path == path)
 
 
 nextTask : State -> Maybe ( State, MessageId )

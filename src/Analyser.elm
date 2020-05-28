@@ -4,12 +4,13 @@ import Analyser.CodeBase as CodeBase exposing (CodeBase)
 import Analyser.Configuration as Configuration exposing (Configuration)
 import Analyser.ContextLoader as ContextLoader exposing (Context)
 import Analyser.DependencyLoadingStage as DependencyLoadingStage
-import Analyser.FileContext as FileContext exposing (FileContext)
 import Analyser.FileWatch as FileWatch exposing (FileChange(..))
 import Analyser.Files.Types exposing (LoadedSourceFile)
 import Analyser.Fixer as Fixer
+import Analyser.Fixers as Fixers
 import Analyser.Messages.Util as Messages
 import Analyser.Modules
+import Analyser.QuickFixer as QuickFixer
 import Analyser.SourceLoadingStage as SourceLoadingStage
 import Analyser.State as State exposing (State)
 import Analyser.State.Dependencies as Dependencies
@@ -19,7 +20,6 @@ import Elm.Version
 import Inspection
 import Json.Decode
 import Json.Encode exposing (Value)
-import Maybe.Extra as Maybe
 import Platform exposing (worker)
 import Registry exposing (Registry)
 import Time
@@ -47,7 +47,9 @@ type Msg
     | ReloadTick
     | Reset
     | OnFixMessage Int
+    | OnFixFileMessage String
     | OnQuickFixMessage Int
+    | OnQuickFixFileMessage String
     | FixerMsg Fixer.Msg
 
 
@@ -144,22 +146,35 @@ update msg model =
             )
                 |> handleNextStep
 
-        OnQuickFixMessage messageId ->
+        OnFixFileMessage path ->
             let
-                applyFix message =
-                    getFileContext message.file.path model.codeBase
-                        |> Maybe.map (Fixer.getFixedFile message)
-                        |> Maybe.withDefault
-                            (Err ("Unable to fix messageId: " ++ String.fromInt messageId))
+                messagesForFile =
+                    State.getMessagesForFile path model.state
+                        |> List.filter (\m -> Fixers.getFixer m /= Nothing)
             in
+            case QuickFixer.fixAll model.configuration model.codeBase messagesForFile path of
+                Ok fixedFile ->
+                    ( model
+                    , Fixer.storeFile
+                        { file = path
+                        , newContent = fixedFile
+                        }
+                    )
+
+                Err err ->
+                    ( model
+                    , Logger.info ("Unable to fix file: " ++ path ++ ", Err: " ++ err)
+                    )
+
+        OnQuickFixMessage messageId ->
             case State.getMessage messageId model.state of
                 Just message ->
-                    case applyFix message of
+                    case QuickFixer.fix model.codeBase message of
                         Ok fixedFile ->
                             ( model
                             , AnalyserPorts.sendFixedFile
                                 { path = message.file.path
-                                , content = fixedFile
+                                , content = fixedFile.content
                                 }
                             )
 
@@ -174,6 +189,26 @@ update msg model =
                         ("Unable to apply fix, unable to find messageId: "
                             ++ String.fromInt messageId
                         )
+                    )
+
+        OnQuickFixFileMessage path ->
+            let
+                messagesForFile =
+                    State.getMessagesForFile path model.state
+                        |> List.filter (\m -> Fixers.getFixer m /= Nothing)
+            in
+            case QuickFixer.fixAll model.configuration model.codeBase messagesForFile path of
+                Ok fixedFile ->
+                    ( model
+                    , AnalyserPorts.sendFixedFile
+                        { path = path
+                        , content = fixedFile
+                        }
+                    )
+
+                Err err ->
+                    ( model
+                    , Logger.info ("Unable to fix file: " ++ path ++ ", Err: " ++ err)
                     )
 
         Reset ->
@@ -443,14 +478,6 @@ onSourceLoadingStageMsg x stage model =
         )
 
 
-getFileContext : String -> CodeBase -> Maybe FileContext
-getFileContext path codeBase =
-    CodeBase.getFile path codeBase
-        |> Maybe.map
-            (FileContext.buildForFile (CodeBase.processContext codeBase))
-        |> Maybe.join
-
-
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
@@ -462,7 +489,9 @@ subscriptions model =
             Sub.none
         , FileWatch.watcher Change
         , AnalyserPorts.onFixMessage OnFixMessage
+        , AnalyserPorts.onFixFileMessage OnFixFileMessage
         , AnalyserPorts.onFixQuick OnQuickFixMessage
+        , AnalyserPorts.onFixFileQuick OnQuickFixFileMessage
         , case model.stage of
             ContextLoadingStage ->
                 ContextLoader.onLoadedContext OnContext
