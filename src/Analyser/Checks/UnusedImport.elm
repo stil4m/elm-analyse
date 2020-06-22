@@ -8,11 +8,11 @@ import Analyser.FileContext exposing (FileContext)
 import Analyser.Messages.Data as Data exposing (MessageData)
 import Analyser.Messages.Schema as Schema
 import Dict exposing (Dict)
-import Elm.Syntax.Expression exposing (Case, Expression(..))
+import Elm.Syntax.Expression exposing (Case, Expression(..), Function, LetDeclaration(..))
 import Elm.Syntax.Import exposing (Import)
 import Elm.Syntax.ModuleName exposing (ModuleName)
 import Elm.Syntax.Node as Node exposing (Node(..))
-import Elm.Syntax.Pattern
+import Elm.Syntax.Pattern exposing (Pattern)
 import Elm.Syntax.Range as Range exposing (Range)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
 
@@ -51,6 +51,7 @@ scan fileContext _ =
             | onTypeAnnotation = Post onTypeAnnotation
             , onExpression = Post onExpression
             , onCase = Post onCase
+            , onFunction = Post onFunction
         }
         fileContext.ast
         aliases
@@ -79,6 +80,11 @@ markUsage key context =
     Dict.update key (Maybe.map (Tuple.mapSecond ((+) 1))) context
 
 
+markPatternUsage : Node Pattern -> Context -> Context
+markPatternUsage (Node _ pattern) context =
+    List.foldl markUsage context (Elm.Syntax.Pattern.moduleNames pattern)
+
+
 onImport : Node Import -> Context -> Context
 onImport (Node range imp) context =
     if imp.moduleAlias == Nothing && imp.exposingList == Nothing then
@@ -104,10 +110,36 @@ onExpression expr context =
         FunctionOrValue moduleName _ ->
             markUsage moduleName context
 
+        LetExpression { declarations } ->
+            List.foldl
+                (\(Node _ declaration) ->
+                    case declaration of
+                        -- Functions are handled elsewhere.
+                        LetFunction _ ->
+                            identity
+
+                        LetDestructuring pattern _ ->
+                            markPatternUsage pattern
+                )
+                context
+                declarations
+
+        LambdaExpression lambda ->
+            List.foldl markPatternUsage context lambda.args
+
         _ ->
             context
 
 
 onCase : Case -> Context -> Context
-onCase ( Node _ pattern, _ ) context =
-    List.foldl markUsage context (Elm.Syntax.Pattern.moduleNames pattern)
+onCase ( pattern, _ ) context =
+    markPatternUsage pattern context
+
+
+onFunction : Node Function -> Context -> Context
+onFunction (Node _ { declaration }) context =
+    let
+        (Node _ { arguments }) =
+            declaration
+    in
+    List.foldl markPatternUsage context arguments

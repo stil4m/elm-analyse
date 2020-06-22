@@ -37,6 +37,44 @@ z a =
     )
 
 
+usedInFunctionArgs : ( String, String, List MessageData )
+usedInFunctionArgs =
+    ( "usedInFunctionArgs", """
+module Main exposing (..)
+
+import Bar
+
+x (Bar.Bar _) =
+    0
+""", [] )
+
+
+usedInLambdaArgs : ( String, String, List MessageData )
+usedInLambdaArgs =
+    ( "usedInLambda", """
+module Main exposing (..)
+
+import Bar
+
+x = \\(Bar.Bar _) -> 0
+""", [] )
+
+
+usedInLetPattern : ( String, String, List MessageData )
+usedInLetPattern =
+    ( "usedInLetPattern", """
+module Main exposing (..)
+
+import Bar
+
+x a =
+    let
+        (Bar.Bar _) = a
+    in
+        0
+""", [] )
+
+
 usedInTypeReference : ( String, String, List MessageData )
 usedInTypeReference =
     ( "usedInTypeReference"
@@ -119,6 +157,9 @@ all =
         UnusedImport.checker
         [ usedAsQualified
         , usedAsQualifiedInPattern
+        , usedInFunctionArgs
+        , usedInLambdaArgs
+        , usedInLetPattern
         , usedInTypeReference
         , usedInTypeAlias
         , unusedButHasAlias
