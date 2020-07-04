@@ -2,6 +2,8 @@ module Analyser.Configuration exposing (Configuration, checkEnabled, checkProper
 
 import Dict exposing (Dict)
 import Json.Decode as JD exposing (Decoder)
+import List
+import String
 
 
 type Configuration
@@ -23,7 +25,11 @@ checkEnabled k (Configuration configuration) =
 
 isPathExcluded : String -> Configuration -> Bool
 isPathExcluded p (Configuration { excludedPaths }) =
-    List.any (\a -> String.startsWith a p) excludedPaths
+    let
+        winPaths =
+            List.map (String.replace "/" "\\") excludedPaths
+    in
+    List.any (\a -> String.startsWith a p) (excludedPaths ++ winPaths)
 
 
 defaultChecks : Dict String Bool
