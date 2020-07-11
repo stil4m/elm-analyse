@@ -25,10 +25,10 @@ view =
         , Html.div [ Html.Attributes.class "container" ]
             [ Html.div []
                 [ Html.h1 [] [ Html.text "What is it?" ]
-                , Html.p [] [ Html.text "A tool that allows you to analyse your Elm code, identify deficiencies and apply best practices." ]
+                , Html.p [] [ Html.text "A tool that allows you to analyse your Elm code, identify deficiencies, and apply best practices." ]
                 , Html.p []
                     [ Html.code [] [ Html.text "elm-analyse" ]
-                    , Html.text " does this by looking at the code in your project determine the structure and parsing the files."
+                    , Html.text " does this by looking at the code in your project to determine the structure and parse the files."
                     , Html.text " "
                     , Html.text "You can find out more on this in the "
                     , Html.a [ Html.Attributes.href (Page.hash (Page.Features Nothing)) ] [ Html.text "Features" ]
@@ -45,7 +45,7 @@ view =
                     [ Html.li [] [ Html.code [] [ Html.text "node >= 6" ] ]
                     , Html.li [] [ Html.code [] [ Html.text "elm-format" ] ]
                     ]
-                , Html.text "The installation can easily be installed running one of the following commandos:"
+                , Html.text "Can easily be installed by running one of the following commands:"
                 , DocsHtml.pre
                     [ Html.text """npm install -g elm-analyse""" ]
                 , DocsHtml.pre
@@ -65,7 +65,7 @@ view =
                     [ DocsHtml.pre
                         [ Html.text "elm-analyse -s" ]
                     ]
-                , Html.p [] [ Html.text "The command line does also allow additional options:" ]
+                , Html.p [] [ Html.text "The command line also allows additional options:" ]
                 , Html.table
                     [ Html.Attributes.class "table table-condensed" ]
                     [ Html.tbody []
@@ -100,7 +100,7 @@ view =
                         ]
                     ]
                 , Html.p []
-                    [ Html.text "To furter configure elm-analyse, please look into the "
+                    [ Html.text "To further configure elm-analyse, please look into the "
                     , Html.a [ Html.Attributes.href (Page.hash Page.Configuration) ] [ Html.text "Configuration" ]
                     , Html.text " section."
                     ]
@@ -108,7 +108,7 @@ view =
             , Html.hr [] []
             , Html.h1 [] [ Html.text "Contribution and Issues" ]
             , Html.p []
-                [ Html.text "If you encounter issues, want to contribute or have suggestions for features or new checks, please report these via the issue tracker on "
+                [ Html.text "If you encounter issues, want to contribute, or have suggestions for features or new checks, please report these via the issue tracker on "
                 , Html.a [ Html.Attributes.href "https://github.com/stil4m/elm-analyse", Html.Attributes.target "_blank" ] [ Html.text "GitHub" ]
                 , Html.text "."
                 ]
