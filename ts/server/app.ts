@@ -39,7 +39,7 @@ function start(config: Config, info: Info, project: {}) {
 
         app.get('/api/tree', function(_req, res) {
             const directory = process.cwd();
-            const x = fileGatherer.gather(directory);
+            const x = fileGatherer.gather(config, directory);
             res.send(x.sourceFiles);
         });
 

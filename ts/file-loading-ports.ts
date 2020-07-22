@@ -16,5 +16,5 @@ export function setup(app: ElmApp, config: Config, directory: string): void {
     RawDependencies.setup(app);
     DependencyFiles.setup(app, directory, fileReader);
     FileLoader.setup(app, config, directory, localCache, fileReader);
-    Context.setup(app, directory);
+    Context.setup(config, app, directory);
 }
