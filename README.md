@@ -56,6 +56,16 @@ Add the `-s` option for server mode. This will allow you to view results in your
 | `--version` or `-v`     | Print version of software. |
 | `--format`              | Output format for CLI. Defaults to "human". Valid values are either "human" or "json". |
 
+### CLI Arguments
+
+Run `elm-analyse` with any number of extra source files to check following any flags.
+
+Example:
+
+``` shell
+$ elm-analyse --serve directory/not/in/source-directories/Main.elm other/Main.elm
+```
+
 ---
 
 ## Supported Checks

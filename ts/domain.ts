@@ -6,6 +6,7 @@ interface Config {
     open: boolean;
     port: number;
     elmFormatPath: string;
+    extraSourcePaths: string[];
 }
 
 export interface DependencyPointer {
