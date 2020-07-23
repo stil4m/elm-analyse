@@ -29,7 +29,8 @@ var args = minimist(process.argv.slice(2), {
         port: args.port || 3000,
         elmFormatPath: elmFormatPath,
         format: validFormats.indexOf(args.format) != -1 ? args.format : 'human',
-        open: args.open || false
+        open: args.open || false,
+        extraSourcePaths: args._
     };
     const info = {
         version: elmAnalyseVersion,
@@ -39,9 +40,9 @@ var args = minimist(process.argv.slice(2), {
 
     if (args.help) {
         console.log('Usages:');
-        console.log('  $ elm-analyse');
+        console.log('  $ elm-analyse [PATHS ...]');
         console.log('    # Analyse the project and log messages to the console\n');
-        console.log('  $ elm-analyse -s');
+        console.log('  $ elm-analyse -s [PATHS ...]');
         console.log(
             '    # Analyse the project and start a server. Allows inspection of messages through a browser (Default: http://localhost:3000).\n'
         );
@@ -52,6 +53,8 @@ var args = minimist(process.argv.slice(2), {
         console.log('   --open, -o          Open default browser when server goes live.');
         console.log('   --elm-format-path   Path to elm-format. Defaults to `elm-format`.');
         console.log('   --format            Output format for CLI. Defaults to "human". Options "human"|"json"');
+        console.log('Arguments: ');
+        console.log('   PATHS               Optional extra source paths. Example: Main.elm');
         process.exit(1);
     }
 

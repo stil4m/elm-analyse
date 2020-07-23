@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import _ from 'lodash';
 import * as find from 'find';
 import * as _path from 'path';
-import { DependencyPointer } from '../domain';
+import { Config, DependencyPointer } from '../domain';
 
 function isRealElmPaths(sourceDir: string, filePath: String): boolean {
     const modulePath = filePath.replace(_path.normalize(sourceDir + '/'), '');
@@ -76,12 +76,13 @@ function getDependencyFiles(directory: string, dep: DependencyPointer) {
     });
 }
 
-function gather(directory: string): { interfaceFiles: Array<string[]>; sourceFiles: string[] } {
+function gather(config: Config, directory: string): { interfaceFiles: Array<string[]>; sourceFiles: string[] } {
     const packageFile = require(directory + '/elm.json');
 
     const input = {
         interfaceFiles: [],
         sourceFiles: targetFilesForPathAndPackage(directory, directory, packageFile)
+            .concat(_.uniq(config.extraSourcePaths))
     };
     return input;
 }
