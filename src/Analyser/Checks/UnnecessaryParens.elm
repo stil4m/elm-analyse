@@ -164,11 +164,17 @@ onIfBlock clause thenBranch elseBranch context =
 
 onApplication : List (Node Expression) -> Context -> Context
 onApplication parts context =
+    let
+        needsParentheses : Expression -> Bool
+        needsParentheses e =
+            Expression.isOperatorApplication e
+                || Expression.isCase e
+                || Expression.isLambda e
+                || Expression.isIfElse e
+    in
     List.head parts
         |> Maybe.andThen getParenthesized
-        |> Maybe.filter (Tuple.second >> Node.value >> Expression.isOperatorApplication >> not)
-        |> Maybe.filter (Tuple.second >> Node.value >> Expression.isCase >> not)
-        |> Maybe.filter (Tuple.second >> Node.value >> Expression.isLambda >> not)
+        |> Maybe.filter (Tuple.second >> Node.value >> needsParentheses >> not)
         |> Maybe.map Tuple.first
         |> Maybe.map (\a -> a :: context)
         |> Maybe.withDefault context

@@ -10745,6 +10745,13 @@ var $stil4m$elm_syntax$Elm$Syntax$Expression$isCase = function (e) {
 		return false;
 	}
 };
+var $stil4m$elm_syntax$Elm$Syntax$Expression$isIfElse = function (e) {
+	if (e.$ === 'IfBlock') {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $stil4m$elm_syntax$Elm$Syntax$Expression$isLambda = function (e) {
 	if (e.$ === 'LambdaExpression') {
 		return true;
@@ -10761,6 +10768,9 @@ var $stil4m$elm_syntax$Elm$Syntax$Expression$isOperatorApplication = function (e
 };
 var $author$project$Analyser$Checks$UnnecessaryParens$onApplication = F2(
 	function (parts, context) {
+		var needsParentheses = function (e) {
+			return $stil4m$elm_syntax$Elm$Syntax$Expression$isOperatorApplication(e) || ($stil4m$elm_syntax$Elm$Syntax$Expression$isCase(e) || ($stil4m$elm_syntax$Elm$Syntax$Expression$isLambda(e) || $stil4m$elm_syntax$Elm$Syntax$Expression$isIfElse(e)));
+		};
 		return A2(
 			$elm$core$Maybe$withDefault,
 			context,
@@ -10780,29 +10790,11 @@ var $author$project$Analyser$Checks$UnnecessaryParens$onApplication = F2(
 							A2(
 								$elm$core$Basics$composeR,
 								$stil4m$elm_syntax$Elm$Syntax$Node$value,
-								A2($elm$core$Basics$composeR, $stil4m$elm_syntax$Elm$Syntax$Expression$isLambda, $elm$core$Basics$not))),
+								A2($elm$core$Basics$composeR, needsParentheses, $elm$core$Basics$not))),
 						A2(
-							$elm_community$maybe_extra$Maybe$Extra$filter,
-							A2(
-								$elm$core$Basics$composeR,
-								$elm$core$Tuple$second,
-								A2(
-									$elm$core$Basics$composeR,
-									$stil4m$elm_syntax$Elm$Syntax$Node$value,
-									A2($elm$core$Basics$composeR, $stil4m$elm_syntax$Elm$Syntax$Expression$isCase, $elm$core$Basics$not))),
-							A2(
-								$elm_community$maybe_extra$Maybe$Extra$filter,
-								A2(
-									$elm$core$Basics$composeR,
-									$elm$core$Tuple$second,
-									A2(
-										$elm$core$Basics$composeR,
-										$stil4m$elm_syntax$Elm$Syntax$Node$value,
-										A2($elm$core$Basics$composeR, $stil4m$elm_syntax$Elm$Syntax$Expression$isOperatorApplication, $elm$core$Basics$not))),
-								A2(
-									$elm$core$Maybe$andThen,
-									$author$project$Analyser$Checks$UnnecessaryParens$getParenthesized,
-									$elm$core$List$head(parts))))))));
+							$elm$core$Maybe$andThen,
+							$author$project$Analyser$Checks$UnnecessaryParens$getParenthesized,
+							$elm$core$List$head(parts))))));
 	});
 var $author$project$Analyser$Checks$UnnecessaryParens$onCaseBlock = F2(
 	function (caseBlock, context) {
@@ -10839,13 +10831,6 @@ var $author$project$Analyser$Checks$UnnecessaryParens$onListExpr = F2(
 				$elm$core$Tuple$first,
 				A2($elm$core$List$filterMap, $author$project$Analyser$Checks$UnnecessaryParens$getParenthesized, exprs)));
 	});
-var $stil4m$elm_syntax$Elm$Syntax$Expression$isIfElse = function (e) {
-	if (e.$ === 'IfBlock') {
-		return true;
-	} else {
-		return false;
-	}
-};
 var $stil4m$elm_syntax$Elm$Syntax$Expression$isLet = function (e) {
 	if (e.$ === 'LetExpression') {
 		return true;
