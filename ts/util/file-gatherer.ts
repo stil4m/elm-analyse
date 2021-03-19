@@ -15,7 +15,7 @@ function includedInFileSet(path: string): boolean {
         return false;
     }
 
-    return path.indexOf('elm-stuff') === -1 && path.indexOf('node_modules') === -1;
+    return path.indexOf('elm-stuff') === -1;
 }
 
 interface ElmPackage {

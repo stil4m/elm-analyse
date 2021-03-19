@@ -23,7 +23,7 @@ function includedInFileSet(path) {
     if (!path.match(/\.elm$/)) {
         return false;
     }
-    return path.indexOf('elm-stuff') === -1 && path.indexOf('node_modules') === -1;
+    return path.indexOf('elm-stuff') === -1;
 }
 exports.includedInFileSet = includedInFileSet;
 function targetFilesForPathAndPackage(directory, path, pack) {
