@@ -1,0 +1,6 @@
+- id: elm-analyse
+  name: elm-analyse
+  description: Analyse the elm project
+  entry: elm-analyse
+  language: node
+  files: '.*\.elm'
