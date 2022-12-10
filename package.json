@@ -31,7 +31,7 @@
   ],
   "dependencies": {
     "body-parser": "1.19.0",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "express-ws": "2.0.0",
     "find": "0.2.7",
     "fs-extra": "2.0.0",
