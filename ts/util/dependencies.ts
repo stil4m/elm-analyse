@@ -36,8 +36,8 @@ const isOutdated = function(timestamp: number): boolean {
 };
 
 const getDependencies = function(cb: (jsonValue: any) => void) {
-    cache.readPackageDependencyInfo(function(err: (err: any, result: any) => void, cached: { timestamp: number; data: any }) {
-        if (err) {
+    cache.readPackageDependencyInfo(function(err: unknown, cached?: { timestamp: number; data: any }) {
+        if (err || cached == null) {
             console.log('Fetching package information from package.elm-lang.org.');
             updatePackageDependencyInfo(cb, null);
         } else {

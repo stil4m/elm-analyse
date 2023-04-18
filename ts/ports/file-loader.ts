@@ -16,7 +16,7 @@ function setup(app: ElmApp, config: Config, directory: string, cache: LocalCache
     });
 
     app.ports.storeFile.subscribe((file: FileStore) => {
-        new Promise(function(accept) {
+        new Promise<void>(function(accept) {
             fs.writeFile(file.file, file.newContent, function() {
                 try {
                     cp.execSync(config.elmFormatPath + ' --yes ' + file.file, {

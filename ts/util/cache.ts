@@ -41,7 +41,7 @@ if (elmAnalyseVersion.split('.')[0] === '0') {
 }
 const globalCachePath: string = path.resolve(osHomedir(), '.elm-analyse', major);
 
-function readPackageDependencyInfo(cb: ((err: any, result: any) => void)) {
+function readPackageDependencyInfo<T>(cb: ((err: unknown, result: T | undefined) => void)) {
     fs.readFile(path.resolve(globalCachePath, 'all-packages.json'), function(err, data) {
         if (err) {
             cb(err, undefined);
