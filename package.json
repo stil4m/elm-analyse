@@ -57,6 +57,7 @@
     "@types/ws": "^5.1.2",
     "bootstrap": "^3.4.1",
     "bufferutil": "4.0.7",
+    "elm": "^0.19.1-5",
     "elm-format": "^0.8.7",
     "elm-test": "^0.19.1",
     "eslint": "^8.38.0",
