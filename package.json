@@ -11,7 +11,7 @@
     "email": "mstijlaart@gmail.com"
   },
   "scripts": {
-    "js:lint": "eslint js",
+    "js:lint": "eslint *.js",
     "js:validate-format": "sh ./prettier-check.sh",
     "js:format": "sh ./prettier-run.sh",
     "elm:test": "./node_modules/.bin/elm-test",
