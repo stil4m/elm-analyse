@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -7,23 +10,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var request = __importStar(require("request"));
+var axios_1 = __importDefault(require("axios"));
 var cache = __importStar(require("./cache"));
 var fetchDependencies = function (cb) {
-    request.get('http://package.elm-lang.org/search.json', function (err, _, body) {
-        if (err) {
-            cb(null);
-            return;
-        }
-        var cbValue;
-        try {
-            cbValue = JSON.parse(body);
-        }
-        catch (e) {
-            cbValue = null;
-        }
-        cb(cbValue);
-    });
+    axios_1.default.get('http://package.elm-lang.org/search.json')
+        .then(function (response) { return cb(response.data); })
+        .catch(function () { return cb(null); });
 };
 var updatePackageDependencyInfo = function (cb, defaultValue) {
     fetchDependencies(function (result) {
