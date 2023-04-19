@@ -1,37 +1,25 @@
 "use strict";
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var request = __importStar(require("request"));
+exports.setup = void 0;
+var axios_1 = __importDefault(require("axios"));
 function setup(app) {
     app.ports.loadHttpDocumentation.subscribe(function (pointer) {
         var name = pointer.name, version = pointer.version;
-        request.get("http://package.elm-lang.org/packages/" + name + "/" + version + "/docs.json", function (err, _response, body) {
-            if (err) {
-                app.ports.onHttpDocumentation.send({
-                    dependency: pointer,
-                    json: null
-                });
-                return;
-            }
-            try {
-                var parsed = JSON.parse(body);
-                app.ports.onHttpDocumentation.send({
-                    dependency: pointer,
-                    json: parsed
-                });
-            }
-            catch (e) {
-                app.ports.onHttpDocumentation.send({
-                    dependency: pointer,
-                    json: null
-                });
-            }
+        axios_1.default.get("http://package.elm-lang.org/packages/".concat(name, "/").concat(version, "/docs.json"))
+            .then(function (reponse) {
+            app.ports.onHttpDocumentation.send({
+                dependency: pointer,
+                json: reponse.data
+            });
+        })
+            .catch(function () {
+            app.ports.onHttpDocumentation.send({
+                dependency: pointer,
+                json: null
+            });
         });
     });
 }

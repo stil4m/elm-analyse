@@ -1,4 +1,4 @@
-import * as request from 'request';
+import axios from 'axios';
 import * as cache from './cache';
 
 export type Registry = RegistryItem[];
@@ -10,19 +10,9 @@ export interface RegistryItem {
     versions: string[];
 }
 const fetchDependencies = function(cb: (jsonValue: Registry | null) => void) {
-    request.get('http://package.elm-lang.org/search.json', function(err: any, _: request.Response, body: any) {
-        if (err) {
-            cb(null);
-            return;
-        }
-        var cbValue: Registry | null;
-        try {
-            cbValue = JSON.parse(body);
-        } catch (e) {
-            cbValue = null;
-        }
-        cb(cbValue);
-    });
+    axios.get<Registry>('http://package.elm-lang.org/search.json')
+        .then(response => cb(response.data))
+        .catch(() => cb(null))
 };
 
 const updatePackageDependencyInfo = function(cb: (jsonValue: any) => void, defaultValue: any) {
@@ -46,8 +36,8 @@ const isOutdated = function(timestamp: number): boolean {
 };
 
 const getDependencies = function(cb: (jsonValue: any) => void) {
-    cache.readPackageDependencyInfo(function(err: (err: any, result: any) => void, cached: { timestamp: number; data: any }) {
-        if (err) {
+    cache.readPackageDependencyInfo(function(err: unknown, cached?: { timestamp: number; data: any }) {
+        if (err || cached == null) {
             console.log('Fetching package information from package.elm-lang.org.');
             updatePackageDependencyInfo(cb, null);
         } else {

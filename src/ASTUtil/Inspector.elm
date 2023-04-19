@@ -33,7 +33,8 @@ type alias Config context =
     , onDestructuring : Order context ( Node Pattern, Node Expression )
     , onExpression : Order context (Node Expression)
     , onOperatorApplication :
-        Order context
+        Order
+            context
             { operator : String
             , direction : InfixDirection
             , left : Node Expression
